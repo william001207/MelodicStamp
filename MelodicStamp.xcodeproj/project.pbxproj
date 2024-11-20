@@ -33,6 +33,7 @@
 		65F1DABD2CEDC2F200389E37 /* MiniPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65F1DABC2CEDC2F200389E37 /* MiniPlayer.swift */; };
 		65F1DABF2CEDC49F00389E37 /* PlayerNamespace.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65F1DABE2CEDC49F00389E37 /* PlayerNamespace.swift */; };
 		65F1DAC12CEDE14F00389E37 /* VisualEffectView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65F1DAC02CEDE14F00389E37 /* VisualEffectView.swift */; };
+		65F1DAC32CEDF4CA00389E37 /* PlayerViewModel+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65F1DAC22CEDF4CA00389E37 /* PlayerViewModel+Extensions.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -58,6 +59,7 @@
 		65F1DABC2CEDC2F200389E37 /* MiniPlayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MiniPlayer.swift; sourceTree = "<group>"; };
 		65F1DABE2CEDC49F00389E37 /* PlayerNamespace.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerNamespace.swift; sourceTree = "<group>"; };
 		65F1DAC02CEDE14F00389E37 /* VisualEffectView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisualEffectView.swift; sourceTree = "<group>"; };
+		65F1DAC22CEDF4CA00389E37 /* PlayerViewModel+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PlayerViewModel+Extensions.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -122,6 +124,7 @@
 			isa = PBXGroup;
 			children = (
 				65F1DA802CED785900389E37 /* PlayerViewModel.swift */,
+				65F1DAC22CEDF4CA00389E37 /* PlayerViewModel+Extensions.swift */,
 				65F1DA852CED78B300389E37 /* PlaylistItem.swift */,
 			);
 			path = PlayModel;
@@ -289,6 +292,7 @@
 				65F1DABB2CEDC21A00389E37 /* MusicTitle.swift in Sources */,
 				65F1DA862CED78B300389E37 /* PlaylistItem.swift in Sources */,
 				65F1DA772CED77E800389E37 /* ContentView.swift in Sources */,
+				65F1DAC32CEDF4CA00389E37 /* PlayerViewModel+Extensions.swift in Sources */,
 				65F1DA782CED77E800389E37 /* MelodicStampApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -422,17 +426,18 @@
 				CODE_SIGN_ENTITLEMENTS = MelodicStamp/MelodicStamp.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 20241120MA;
 				DEVELOPMENT_ASSET_PATHS = "\"MelodicStamp/Preview Content\"";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = "Melodic Stamp";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.music";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 0.0.1;
 				PRODUCT_BUNDLE_IDENTIFIER = labs.cement.MelodicStamp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -448,17 +453,18 @@
 				CODE_SIGN_ENTITLEMENTS = MelodicStamp/MelodicStamp.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 20241120MA;
 				DEVELOPMENT_ASSET_PATHS = "\"MelodicStamp/Preview Content\"";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = "Melodic Stamp";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.music";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 0.0.1;
 				PRODUCT_BUNDLE_IDENTIFIER = labs.cement.MelodicStamp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;

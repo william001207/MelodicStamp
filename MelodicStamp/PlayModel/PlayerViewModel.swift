@@ -11,6 +11,7 @@ import SFSafeSymbols
 import CAAudioHardware
 import SFBAudioEngine
 import os.log
+import MediaPlayer
 
 enum PlaybackMode: String, CaseIterable, Identifiable {
     var id: String { self.rawValue }
@@ -21,17 +22,25 @@ enum PlaybackMode: String, CaseIterable, Identifiable {
 }
 
 class PlayerViewModel: NSObject, ObservableObject {
+    
+    static let shared = PlayerViewModel()
+    
     let player = AudioPlayer()
     
-    @Published var playlist: [PlaylistItem] = []
-    @Published var nowPlaying: PlaylistItem?
     @Published var outputDevices: [AudioDevice] = []
     @Published var selectedDevice: AudioDevice?
+    @Published var playlist: [PlaylistItem] = []
     
-    @Published var progress: Double = 0.0
+    @Published var nowPlaying: PlaylistItem?
+    
+    @Published var progress: Double = 0.0 {
+        didSet {
+            updateNowPlayingInfo()
+        }
+    }
+    
     @Published var elapsed: Double = 0.0
     @Published var remaining: Double = 0.0
-    
     @Published var errorMessage: String?
     @Published var showError: Bool = false
     @Published var showSecondWindow: Bool = false
@@ -67,13 +76,17 @@ class PlayerViewModel: NSObject, ObservableObject {
         return .init(systemSymbol: .speakerWave3Fill, variableValue: Double(volume))
     }
     
+    let remoteCommandCenter = MPRemoteCommandCenter.shared()
+    let nowPlayingInfoCenter = MPNowPlayingInfoCenter.default()
+    
     private var timer: Timer?
     
-    override init() {
+    private override init() {
         super.init()
         player.delegate = self
         loadPlaylist()
         updateDeviceMenu()
+        setupRemoteCommandCenter()
         startTimer()
     }
     
@@ -93,7 +106,7 @@ class PlayerViewModel: NSObject, ObservableObject {
     }
     
     func savePlaylist() {
-        let urls = playlist.map { $0.url.absoluteString }
+        // let urls = playlist.map { $0.url.absoluteString }
         // TODO: 使用 Defaults 管理用户配置文件
         // UserDefaults.standard.set(urls, forKey: "playlistURLs")
     }
@@ -165,6 +178,21 @@ class PlayerViewModel: NSObject, ObservableObject {
         }
     }
     
+    func playPause() {
+        if player.isPlaying {
+            updateNowPlayingState(.playing)
+        } else if player.isPaused {
+            updateNowPlayingState(.paused)
+        } else if player.isStopped {
+            updateNowPlayingState(.stopped)
+        }
+        do {
+            try togglePlayPause()
+        } catch {
+            handleError(error)
+        }
+    }
+    
     func togglePlayPause() throws {
         try player.togglePlayPause()
     }
@@ -180,6 +208,7 @@ class PlayerViewModel: NSObject, ObservableObject {
     func seek(position: Double) {
         player.seek(position: position)
     }
+    
     
     func nextTrack() {
         guard !playlist.isEmpty else { return }
@@ -356,7 +385,6 @@ extension PlayerViewModel: AudioPlayer.Delegate {
 
             switch playbackMode {
             case .singleLoop:
-                // 单曲循环：重新播放当前曲目
                 do {
                     if let currentDecoder = try playlist[index].decoder() {
                         try player.enqueue(currentDecoder)
@@ -368,7 +396,6 @@ extension PlayerViewModel: AudioPlayer.Delegate {
                 }
 
             case .sequential:
-                // 顺序播放：跳转到下一首
                 let nextIndex = playlist.index(after: index)
                 if playlist.indices.contains(nextIndex) {
                     do {
@@ -381,11 +408,10 @@ extension PlayerViewModel: AudioPlayer.Delegate {
                         }
                     }
                 } else {
-                    nextTrack() // 或者处理播放列表结束的逻辑
+                    nextTrack()
                 }
 
             case .shuffle:
-                // 随机播放：选择随机曲目
                 let randomIndex = playlist.indices.randomElement()!
                 do {
                     if let randomDecoder = try playlist[randomIndex].decoder() {
@@ -398,7 +424,6 @@ extension PlayerViewModel: AudioPlayer.Delegate {
                 }
 
             case .loop:
-                // 列表循环：播放下一首，如果是最后一首，则从第一首开始
                 let nextIndex = playlist.index(after: index)
                 let loopIndex = nextIndex % playlist.count
                 do {
@@ -418,7 +443,7 @@ extension PlayerViewModel: AudioPlayer.Delegate {
     
     func audioPlayerNowPlayingChanged(_ audioPlayer: AudioPlayer) {
         DispatchQueue.main.async {
-            if let nowPlayingDecoder = audioPlayer.nowPlaying as? PCMDecoding,
+            if let nowPlayingDecoder = audioPlayer.nowPlaying,
                let audioDecoder = nowPlayingDecoder as? AudioDecoder,
                let url = audioDecoder.inputSource.url {
                 self.nowPlaying = self.playlist.first(where: { $0.url == url })
@@ -449,7 +474,6 @@ extension PlayerViewModel {
         let newProgress = self.progress + delta * adjustedMultiplier
         self.progress = max(0, min(1, newProgress))
         
-        // 调用 playerViewModel.seek 更新位置
         seek(position: self.progress)
         
         return newProgress >= 0 && newProgress <= 1

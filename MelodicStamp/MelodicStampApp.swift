@@ -12,7 +12,7 @@ struct MelodicStampApp: App {
     
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     
-    @StateObject var playerViewModel = PlayerViewModel()
+    @StateObject var playerViewModel = PlayerViewModel.shared
     
     @Environment(\.openWindow) var openWindow
     

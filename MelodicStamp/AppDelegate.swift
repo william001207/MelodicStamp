@@ -9,11 +9,11 @@ import SwiftUI
 import AppKit
 
 class AppDelegate: NSObject, NSApplicationDelegate {
-    var playerViewModel: PlayerViewModel?
+    
+    let playerViewModel = PlayerViewModel.shared
 
     func applicationDidFinishLaunching(_ notification: Notification) {
-        // 初始化ViewModel
-        // 注意：此处假设ContentView已经加载并设置了environmentObject
+        playerViewModel.setupRemoteCommandCenter()
     }
 
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
@@ -22,11 +22,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     func application(_ application: NSApplication, open urls: [URL]) {
         if let url = urls.first {
-            playerViewModel?.play(url)
+            playerViewModel.play(url)
         }
     }
     
     func applicationWillTerminate(_ notification: Notification) {
-        playerViewModel?.savePlaylist()
+        playerViewModel.savePlaylist()
     }
 }
