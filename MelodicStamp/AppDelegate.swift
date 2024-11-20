@@ -12,7 +12,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     var model: PlayerModel?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
-        playerViewModel.setupRemoteCommandCenter()
+//        playerViewModel.setupRemoteCommandCenter()
     }
 
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {

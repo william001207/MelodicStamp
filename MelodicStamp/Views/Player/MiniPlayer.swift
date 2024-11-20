@@ -178,32 +178,33 @@ struct MiniPlayer: View {
                 } label: {
                     Image(systemSymbol: .squareAndArrowUp)
                 }
-                
-                AliveButton(enabledStyle: .init(.secondary)) {
-                    let hasShift = NSEvent.modifierFlags.contains(.shift)
-                    model.playbackMode = switch model.playbackMode {
-                    case .single:
-                        hasShift ? .shuffle : .sequential
-                    case .sequential:
-                        hasShift ? .single : .loop
-                    case .loop:
-                        hasShift ? .sequential : .shuffle
-                    case .shuffle:
-                        hasShift ? .loop : .single
-                    }
-                } label: {
-                    model.playbackMode.image
-                        .frame(width: 16)
-                        .contentTransition(.symbolEffect(.replace))
-                }
             }
             .opacity(isTitleHovering ? 1 : 0)
+            
+            AliveButton(enabledStyle: .init(.secondary)) {
+                let hasShift = NSEvent.modifierFlags.contains(.shift)
+                model.playbackMode = switch model.playbackMode {
+                case .single:
+                    hasShift ? .shuffle : .sequential
+                case .sequential:
+                    hasShift ? .single : .loop
+                case .loop:
+                    hasShift ? .sequential : .shuffle
+                case .shuffle:
+                    hasShift ? .loop : .single
+                }
+            } label: {
+                model.playbackMode.image
+                    .frame(width: 16)
+                    .contentTransition(.symbolEffect(.replace))
+            }
             
             ShrinkableMarqueeScrollView {
                 MusicTitle(model: model)
             }
             .contentTransition(.numericText())
             .animation(.default, value: model.currentIndex)
+            .padding(.bottom, 2)
             
             Group {
                 AliveButton(enabledStyle: .init(.secondary)) {
