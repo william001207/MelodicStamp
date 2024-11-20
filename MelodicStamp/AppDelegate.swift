@@ -12,8 +12,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     var model: PlayerModel?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
-        // 初始化ViewModel
-        // 注意：此处假设ContentView已经加载并设置了environmentObject
+        playerViewModel.setupRemoteCommandCenter()
     }
 
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
