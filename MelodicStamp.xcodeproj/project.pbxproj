@@ -6,23 +6,43 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		65F1DA772CED77E800389E37 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65F1DA732CED77E800389E37 /* ContentView.swift */; };
+		65F1DA782CED77E800389E37 /* MelodicStampApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65F1DA752CED77E800389E37 /* MelodicStampApp.swift */; };
+		65F1DA792CED77E800389E37 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 65F1DA702CED77E800389E37 /* Preview Assets.xcassets */; };
+		65F1DA7A2CED77E800389E37 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 65F1DA722CED77E800389E37 /* Assets.xcassets */; };
+		65F1DA7D2CED77F100389E37 /* SFBAudioEngine in Frameworks */ = {isa = PBXBuildFile; productRef = 65F1DA7C2CED77F100389E37 /* SFBAudioEngine */; };
+		65F1DA7F2CED782600389E37 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65F1DA7E2CED782600389E37 /* AppDelegate.swift */; };
+		65F1DA812CED785900389E37 /* PlayerViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65F1DA802CED785900389E37 /* PlayerViewModel.swift */; };
+		65F1DA842CED788D00389E37 /* CAAudioHardware in Frameworks */ = {isa = PBXBuildFile; productRef = 65F1DA832CED788D00389E37 /* CAAudioHardware */; };
+		65F1DA862CED78B300389E37 /* PlaylistItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65F1DA852CED78B300389E37 /* PlaylistItem.swift */; };
+		65F1DA8A2CED7F1600389E37 /* EditMetadataView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65F1DA892CED7F1600389E37 /* EditMetadataView.swift */; };
+		65F1DA8D2CED83F800389E37 /* FullDiskAccess in Frameworks */ = {isa = PBXBuildFile; productRef = 65F1DA8C2CED83F800389E37 /* FullDiskAccess */; };
+		65F1DA8F2CED880700389E37 /* ImagePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65F1DA8E2CED880700389E37 /* ImagePicker.swift */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		65F1DA012CECCEE900389E37 /* MelodicStamp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MelodicStamp.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		65F1DA702CED77E800389E37 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		65F1DA722CED77E800389E37 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		65F1DA732CED77E800389E37 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		65F1DA742CED77E800389E37 /* MelodicStamp.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = MelodicStamp.entitlements; sourceTree = "<group>"; };
+		65F1DA752CED77E800389E37 /* MelodicStampApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MelodicStampApp.swift; sourceTree = "<group>"; };
+		65F1DA7E2CED782600389E37 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		65F1DA802CED785900389E37 /* PlayerViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerViewModel.swift; sourceTree = "<group>"; };
+		65F1DA852CED78B300389E37 /* PlaylistItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistItem.swift; sourceTree = "<group>"; };
+		65F1DA892CED7F1600389E37 /* EditMetadataView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditMetadataView.swift; sourceTree = "<group>"; };
+		65F1DA8E2CED880700389E37 /* ImagePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePicker.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
-
-/* Begin PBXFileSystemSynchronizedRootGroup section */
-		65F1DA032CECCEE900389E37 /* MelodicStamp */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = MelodicStamp;
-			sourceTree = "<group>";
-		};
-/* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		65F1D9FE2CECCEE900389E37 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				65F1DA8D2CED83F800389E37 /* FullDiskAccess in Frameworks */,
+				65F1DA7D2CED77F100389E37 /* SFBAudioEngine in Frameworks */,
+				65F1DA842CED788D00389E37 /* CAAudioHardware in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -32,7 +52,7 @@
 		65F1D9F82CECCEE900389E37 = {
 			isa = PBXGroup;
 			children = (
-				65F1DA032CECCEE900389E37 /* MelodicStamp */,
+				65F1DA762CED77E800389E37 /* MelodicStamp */,
 				65F1DA022CECCEE900389E37 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -43,6 +63,55 @@
 				65F1DA012CECCEE900389E37 /* MelodicStamp.app */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		65F1DA712CED77E800389E37 /* Preview Content */ = {
+			isa = PBXGroup;
+			children = (
+				65F1DA702CED77E800389E37 /* Preview Assets.xcassets */,
+			);
+			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		65F1DA762CED77E800389E37 /* MelodicStamp */ = {
+			isa = PBXGroup;
+			children = (
+				65F1DA752CED77E800389E37 /* MelodicStampApp.swift */,
+				65F1DA7E2CED782600389E37 /* AppDelegate.swift */,
+				65F1DA732CED77E800389E37 /* ContentView.swift */,
+				65F1DA882CED7F0E00389E37 /* View */,
+				65F1DA872CED7DF400389E37 /* PlayModel */,
+				65F1DA722CED77E800389E37 /* Assets.xcassets */,
+				65F1DA742CED77E800389E37 /* MelodicStamp.entitlements */,
+				65F1DA712CED77E800389E37 /* Preview Content */,
+			);
+			path = MelodicStamp;
+			sourceTree = "<group>";
+		};
+		65F1DA872CED7DF400389E37 /* PlayModel */ = {
+			isa = PBXGroup;
+			children = (
+				65F1DA802CED785900389E37 /* PlayerViewModel.swift */,
+				65F1DA852CED78B300389E37 /* PlaylistItem.swift */,
+			);
+			path = PlayModel;
+			sourceTree = "<group>";
+		};
+		65F1DA882CED7F0E00389E37 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				65F1DA902CED8B9F00389E37 /* Fundamentals */,
+				65F1DA8E2CED880700389E37 /* ImagePicker.swift */,
+				65F1DA892CED7F1600389E37 /* EditMetadataView.swift */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		65F1DA902CED8B9F00389E37 /* Fundamentals */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Fundamentals;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -60,11 +129,11 @@
 			);
 			dependencies = (
 			);
-			fileSystemSynchronizedGroups = (
-				65F1DA032CECCEE900389E37 /* MelodicStamp */,
-			);
 			name = MelodicStamp;
 			packageProductDependencies = (
+				65F1DA7C2CED77F100389E37 /* SFBAudioEngine */,
+				65F1DA832CED788D00389E37 /* CAAudioHardware */,
+				65F1DA8C2CED83F800389E37 /* FullDiskAccess */,
 			);
 			productName = MelodicStamp;
 			productReference = 65F1DA012CECCEE900389E37 /* MelodicStamp.app */;
@@ -94,6 +163,11 @@
 			);
 			mainGroup = 65F1D9F82CECCEE900389E37;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				65F1DA7B2CED77F100389E37 /* XCRemoteSwiftPackageReference "SFBAudioEngine" */,
+				65F1DA822CED788D00389E37 /* XCRemoteSwiftPackageReference "CAAudioHardware" */,
+				65F1DA8B2CED83F800389E37 /* XCRemoteSwiftPackageReference "FullDiskAccess" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 65F1DA022CECCEE900389E37 /* Products */;
 			projectDirPath = "";
@@ -109,6 +183,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				65F1DA792CED77E800389E37 /* Preview Assets.xcassets in Resources */,
+				65F1DA7A2CED77E800389E37 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -119,6 +195,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				65F1DA7F2CED782600389E37 /* AppDelegate.swift in Sources */,
+				65F1DA8A2CED7F1600389E37 /* EditMetadataView.swift in Sources */,
+				65F1DA812CED785900389E37 /* PlayerViewModel.swift in Sources */,
+				65F1DA8F2CED880700389E37 /* ImagePicker.swift in Sources */,
+				65F1DA862CED78B300389E37 /* PlaylistItem.swift in Sources */,
+				65F1DA772CED77E800389E37 /* ContentView.swift in Sources */,
+				65F1DA782CED77E800389E37 /* MelodicStampApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -255,6 +338,7 @@
 				DEVELOPMENT_ASSET_PATHS = "\"MelodicStamp/Preview Content\"";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "Melodic Stamp";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -280,6 +364,7 @@
 				DEVELOPMENT_ASSET_PATHS = "\"MelodicStamp/Preview Content\"";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "Melodic Stamp";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -315,6 +400,51 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		65F1DA7B2CED77F100389E37 /* XCRemoteSwiftPackageReference "SFBAudioEngine" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sbooth/SFBAudioEngine";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.4.0;
+			};
+		};
+		65F1DA822CED788D00389E37 /* XCRemoteSwiftPackageReference "CAAudioHardware" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sbooth/CAAudioHardware";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.5.0;
+			};
+		};
+		65F1DA8B2CED83F800389E37 /* XCRemoteSwiftPackageReference "FullDiskAccess" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/inket/FullDiskAccess";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		65F1DA7C2CED77F100389E37 /* SFBAudioEngine */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 65F1DA7B2CED77F100389E37 /* XCRemoteSwiftPackageReference "SFBAudioEngine" */;
+			productName = SFBAudioEngine;
+		};
+		65F1DA832CED788D00389E37 /* CAAudioHardware */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 65F1DA822CED788D00389E37 /* XCRemoteSwiftPackageReference "CAAudioHardware" */;
+			productName = CAAudioHardware;
+		};
+		65F1DA8C2CED83F800389E37 /* FullDiskAccess */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 65F1DA8B2CED83F800389E37 /* XCRemoteSwiftPackageReference "FullDiskAccess" */;
+			productName = FullDiskAccess;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 65F1D9F92CECCEE900389E37 /* Project object */;
 }
