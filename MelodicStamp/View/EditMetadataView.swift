@@ -32,7 +32,7 @@ struct EditMetadataView: View {
         VStack {
             Form {
                 Section(header: Text("封面")) {
-                    HStack {
+                    VStack {
                         if let cover = coverImage {
                             Image(nsImage: cover)
                                 .resizable()

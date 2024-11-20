@@ -12,13 +12,18 @@ import CSFBAudioEngine
 
 struct ContentView: View {
     @EnvironmentObject var playerViewModel: PlayerViewModel
+    @Environment(\.openWindow) var openWindow
+    
     @State private var showOpenPanel: Bool = false
     @State private var showAddFilesPanel: Bool = false
     @State private var showAnalyzeFilesPanel: Bool = false
     @State private var showExportPanel: Bool = false
     @State private var exportURL: URL?
+    
     @State private var showEditMetadata: Bool = false
-    @State private var selectedItem: PlaylistItem?
+    @State private var showBatchEdit: Bool = false
+    
+    @State private var selectedItems: Set<PlaylistItem> = []
     
     static var supportedPathExtensions: [String] = {
         var pathExtensions = [String]()
@@ -31,6 +36,46 @@ struct ContentView: View {
         VStack {
             // 播放控制
             HStack {
+                /*
+                if let picture = playerViewModel.nowPlaying?.metadata.attachedPictures.first?.image {
+                    let resizedImage = resizeImage(image: picture, maxSize: 40)
+                    Image(nsImage: resizedImage)
+                        .resizable()
+                        .frame(width: 40, height: 40)
+                        .cornerRadius(5)
+                } else {
+                    Image(systemName: "photo")
+                        .resizable()
+                        .frame(width: 40, height: 40)
+                        .foregroundColor(.gray)
+                }
+                */
+                
+                if let nowPlaying = playerViewModel.nowPlaying {
+                    VStack(alignment: .leading) {
+                        Text(nowPlaying.metadata.title ?? nowPlaying.url.lastPathComponent)
+                            .font(.headline)
+                        Text(nowPlaying.metadata.artist ?? "未知艺术家")
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                        Text(nowPlaying.url.lastPathComponent)
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                    .padding([.leading, .trailing, .bottom])
+                } else {
+                    VStack(alignment: .center) {
+                        Text("暂无播放内容")
+                    }
+                }
+                
+                Button(action: playerViewModel.previousTrack) {
+                    Image(systemName: "backward.fill")
+                        .resizable()
+                        .frame(width: 30, height: 30)
+                }
+                .disabled(!playerViewModel.canNavigatePrevious())
+                
                 Button(action: playPause) {
                     Image(systemName: playerViewModel.player.isPlaying ? "pause.circle.fill" : "play.circle.fill")
                         .resizable()
@@ -38,21 +83,36 @@ struct ContentView: View {
                 }
                 .disabled(playerViewModel.playlist.isEmpty)
                 
+                Button(action: playerViewModel.nextTrack) {
+                    Image(systemName: "forward.fill")
+                        .resizable()
+                        .frame(width: 30, height: 30)
+                }
+                .disabled(!playerViewModel.canNavigateNext())
+                
                 Button(action: playerViewModel.seekBackward) {
-                    Image(systemName: "backward.fill")
+                    Image(systemName: "5.arrow.trianglehead.counterclockwise")
                         .resizable()
                         .frame(width: 30, height: 30)
                 }
                 .disabled(!playerViewModel.player.supportsSeeking)
                 
                 Button(action: playerViewModel.seekForward) {
-                    Image(systemName: "forward.fill")
+                    Image(systemName: "5.arrow.trianglehead.clockwise")
                         .resizable()
                         .frame(width: 30, height: 30)
                 }
                 .disabled(!playerViewModel.player.supportsSeeking)
                 
                 Spacer()
+                
+                Picker("播放模式", selection: $playerViewModel.playbackMode) {
+                    ForEach(PlaybackMode.allCases) { mode in
+                        Text(mode.rawValue).tag(mode)
+                    }
+                }
+                .pickerStyle(.menu)
+                .frame(maxWidth: 400)
                 
                 // 设备选择
                 Picker("Output Device", selection: Binding(
@@ -68,7 +128,7 @@ struct ContentView: View {
                     }
                 }
                 .pickerStyle(MenuPickerStyle())
-                .frame(maxWidth: 500)
+                .frame(maxWidth: 400)
             }
             .padding()
             
@@ -91,11 +151,13 @@ struct ContentView: View {
             }
             
             // 播放列表
-            List(selection: $selectedItem) {
+            List(selection: $selectedItems) {
                 ForEach(playerViewModel.playlist) { item in
                     HStack {
+                        /*
                         if let picture = item.metadata.attachedPictures.first?.image {
-                            Image(nsImage: picture)
+                            let resizedImage = resizeImage(image: picture, maxSize: 40)
+                            Image(nsImage: resizedImage)
                                 .resizable()
                                 .frame(width: 40, height: 40)
                                 .cornerRadius(5)
@@ -105,12 +167,17 @@ struct ContentView: View {
                                 .frame(width: 40, height: 40)
                                 .foregroundColor(.gray)
                         }
+                        */
                         
                         VStack(alignment: .leading) {
-                            Text(item.metadata.title ?? "Unknown Title")
+                            Text(item.metadata.title ?? item.url.lastPathComponent)
                                 .font(.headline)
                             Text(item.metadata.artist ?? "Unknown Artist")
                                 .font(.subheadline)
+                                .foregroundColor(.secondary)
+                            
+                            Text(item.url.lastPathComponent)
+                                .font(.caption)
                                 .foregroundColor(.secondary)
                         }
                         Spacer()
@@ -121,14 +188,18 @@ struct ContentView: View {
                     }
                     .contentShape(Rectangle())
                     .background {
-                        if selectedItem == item {
-                            Color.blue
+                        if selectedItems.contains(item) {
+                            Color.blue.opacity(0.3) // Highlight color for selected items
                         } else {
                             Color.clear
                         }
                     }
                     .onTapGesture {
-                        selectedItem = item
+                        if selectedItems.contains(item) {
+                            selectedItems.remove(item)
+                        } else {
+                            selectedItems.insert(item)
+                        }
                     }
                 }
                 .onDelete(perform: deleteItems)
@@ -145,28 +216,48 @@ struct ContentView: View {
                 Button("添加文件") {
                     addFiles()
                 }
-                .keyboardShortcut("A", modifiers: [.command])
+                //.keyboardShortcut("A", modifiers: [.command])
                 
                 Button("分析文件") {
                     analyzeFiles()
                 }
-                .keyboardShortcut("E", modifiers: [.command])
+                //.keyboardShortcut("E", modifiers: [.command])
                 
                 Button("导出WAVE文件") {
                     exportWAVEFile()
                 }
-                .keyboardShortcut("W", modifiers: [.command])
+                //.keyboardShortcut("W", modifiers: [.command])
                 
+                // 单项或批量编辑按钮
                 Button("编辑元信息") {
-                    if let item = selectedItem {
-                        self.selectedItem = item
-                        self.showEditMetadata = true
+                    if selectedItems.count == 1 {
+                        // 单选编辑
+                        showEditMetadata = true
+                    } else if selectedItems.count > 1 {
+                        // 批量编辑
+                        showBatchEdit = true
                     }
                 }
-                .disabled(selectedItem == nil)
-                .keyboardShortcut("M", modifiers: [.command])
+                .disabled(selectedItems.isEmpty) // 禁用按钮条件：未选中任何项目
+                .keyboardShortcut("M", modifiers: [.command]) // 添加快捷键
                 
                 Spacer()
+                
+                HStack {
+                    Image(systemName: "speaker.3.fill")
+                    Slider(value: Binding(
+                        get: { Float(playerViewModel.volume) },
+                        set: { newValue in
+                            playerViewModel.volume = newValue
+                        }
+                    ), in: 0...1)
+                    .frame(width: 100)
+                }
+                
+                Button("打开MiniPlayBar") {
+                    openWindow(id: "SecondView")
+                }
+                
             }
             .padding()
         }
@@ -174,10 +265,18 @@ struct ContentView: View {
         .alert(isPresented: $playerViewModel.showError) {
             Alert(title: Text("错误"), message: Text(playerViewModel.errorMessage ?? "未知错误"), dismissButton: .default(Text("确定")))
         }
+        // 单项编辑弹窗
         .sheet(isPresented: $showEditMetadata) {
-            if let item = selectedItem {
-                EditMetadataView(viewModel: playerViewModel, selectedItem: $selectedItem)
+            if let singleSelectedItem = selectedItems.first {
+                EditMetadataView(viewModel: playerViewModel, selectedItem: .constant(singleSelectedItem))
             }
+        }
+        // 批量编辑弹窗
+        .sheet(isPresented: $showBatchEdit) {
+            BatchEditMetadataView(
+                viewModel: playerViewModel,
+                selectedItems: Array(selectedItems) // 将 Set 转为 Array
+            )
         }
     }
     
@@ -255,6 +354,28 @@ struct ContentView: View {
     }
     
     // MARK: - Helper
+    
+    func resizeImage(image: NSImage, maxSize: CGFloat) -> NSImage {
+        let aspectRatio = image.size.width / image.size.height
+        let newSize: NSSize
+        
+        if aspectRatio > 1 {
+            newSize = NSSize(width: maxSize, height: maxSize / aspectRatio)
+        } else {
+            newSize = NSSize(width: maxSize * aspectRatio, height: maxSize)
+        }
+        
+        // 使用 NSImage 的绘图方法
+        let newImage = NSImage(size: newSize)
+        newImage.lockFocus()
+        defer { newImage.unlockFocus() }
+        
+        let rect = NSRect(origin: .zero, size: newSize)
+        let imageRect = NSRect(origin: .zero, size: image.size)
+        image.draw(in: rect, from: imageRect, operation: .copy, fraction: 1.0)
+        
+        return newImage
+    }
     
     func formatTime(_ time: Double) -> String {
         let totalSeconds = Int(abs(time))

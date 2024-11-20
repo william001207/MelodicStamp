@@ -1,5 +1,5 @@
 {
-  "originHash" : "abb99f5492f65e8d4887e7c00c049c1b5db74061a1102d2dc96e362d36e4d41e",
+  "originHash" : "043156be2f849b1a25969011e8501071b1733dcf585a34378a1ea5cdd9dff39f",
   "pins" : [
     {
       "identity" : "avfaudioextensions",
@@ -74,6 +74,15 @@
       }
     },
     {
+      "identity" : "defaults",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/sindresorhus/Defaults",
+      "state" : {
+        "branch" : "main",
+        "revision" : "a89f799930c92a85aa04b72131849d46c0833ab3"
+      }
+    },
+    {
       "identity" : "flac-binary-xcframework",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/sbooth/flac-binary-xcframework",
@@ -107,6 +116,15 @@
       "state" : {
         "revision" : "07703e040231d50f2e7f160c670f356f129a00e4",
         "version" : "0.1.2"
+      }
+    },
+    {
+      "identity" : "luminare",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/Cement-Labs/Luminare.git",
+      "state" : {
+        "branch" : "main",
+        "revision" : "86a65ee1bada0c05a72d47bdfd02a9894c51ba83"
       }
     },
     {
@@ -152,6 +170,15 @@
       "state" : {
         "revision" : "bf628d2696838b02f7e9a21fdf52173b8a3747d9",
         "version" : "0.4.0"
+      }
+    },
+    {
+      "identity" : "sfsafesymbols",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/SFSafeSymbols/SFSafeSymbols",
+      "state" : {
+        "revision" : "e2e28f4e56e1769c2ec3c61c9355fc64eb7a535a",
+        "version" : "5.3.0"
       }
     },
     {

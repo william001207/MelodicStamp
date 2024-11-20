@@ -1,0 +1,15 @@
+//
+//  View+Extensions.swift
+//  MelodicStamp
+//
+//  Created by Xinshao_Air on 2024/11/20.
+//
+
+import SwiftUI
+
+extension View {
+    public func observeAnimation<Value: VectorArithmetic>(for observedValue: Value, onChange: ((Value) -> Void)? = nil, onComplete: (() -> Void)? = nil) -> some View {
+        modifier(AnimationObserverModifier(for: observedValue, onChange: onChange, onComplete: onComplete))
+    }
+}
+

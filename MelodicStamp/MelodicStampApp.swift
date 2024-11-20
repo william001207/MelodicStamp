@@ -14,10 +14,28 @@ struct MelodicStampApp: App {
     
     @StateObject var playerViewModel = PlayerViewModel()
     
+    @Environment(\.openWindow) var openWindow
+    
+    @Namespace private var animationNamespace
+    
     var body: some Scene {
         WindowGroup {
             ContentView()
         }
         .environmentObject(playerViewModel)
+        
+        WindowGroup("Second Window", id: "SecondView") {
+            
+            ZStack {
+                VisualEffectView(material: .hudWindow, blendingMode: .behindWindow)
+                MiniPlayer(namespace: animationNamespace)
+            }
+            .edgesIgnoringSafeArea(.top)
+            .frame(width: 500, height: 75, alignment: .center)
+        }
+        .environmentObject(playerViewModel)
+        .windowResizability(.contentSize)
+        .windowStyle(.hiddenTitleBar)
+        .windowToolbarStyle(.unified)
     }
 }
