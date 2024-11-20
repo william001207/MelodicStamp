@@ -10,7 +10,7 @@ import CSFBAudioEngine
 
 struct BatchEditMetadataView: View {
     @Environment(\.presentationMode) var presentationMode
-    @ObservedObject var viewModel: PlayerViewModel
+    @State var model: PlayerModel
     var selectedItems: [PlaylistItem]
 
     // 批量编辑字段（可选项）
@@ -182,21 +182,21 @@ struct BatchEditMetadataView: View {
                 metadata.comment = comments
             }
 
-            // 保存到文件
-            do {
-                let audioFile = try AudioFile(url: item.url)
-                
-                // 写入元信息
-                audioFile.metadata = metadata
-                try audioFile.writeMetadata()
-                
-                // 更新播放列表中的元信息
-                if let index = viewModel.playlist.firstIndex(where: { $0.id == item.id }) {
-                    viewModel.playlist[index].metadata = metadata
-                }
-            } catch {
-                viewModel.handleError(error)
-            }
+//            // 保存到文件
+//            do {
+//                let audioFile = try AudioFile(url: item.url)
+//                
+//                // 写入元信息
+//                audioFile.metadata = metadata
+//                try audioFile.writeMetadata()
+//                
+//                // 更新播放列表中的元信息
+//                if let index = viewModel.playlist.firstIndex(where: { $0.id == item.id }) {
+//                    viewModel.playlist[index].metadata = metadata
+//                }
+//            } catch {
+//                viewModel.handleError(error)
+//            }
         }
     }
 }

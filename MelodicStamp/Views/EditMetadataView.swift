@@ -10,7 +10,7 @@ import CSFBAudioEngine
 
 struct EditMetadataView: View {
     @Environment(\.presentationMode) var presentationMode
-    @ObservedObject var viewModel: PlayerViewModel
+    @State var model: PlayerModel
     @Binding var selectedItem: PlaylistItem?
 
     @State private var title: String = ""
@@ -134,10 +134,10 @@ struct EditMetadataView: View {
 //        item.metadata.lyricist = lyricist
         item.metadata.comment = comments
 
-        // 更新播放列表
-        if let index = viewModel.playlist.firstIndex(where: { $0.id == item.id }) {
-            viewModel.playlist[index] = item
-        }
+//        // 更新播放列表
+//        if let index = model.playlist.firstIndex(where: { $0.id == item.id }) {
+//            model.playlist[index] = item
+//        }
 
         // 保存到文件
         do {
@@ -168,7 +168,7 @@ struct EditMetadataView: View {
             // 写入元信息
             try audioFile.writeMetadata()
         } catch {
-            viewModel.handleError(error)
+//            model.handleError(error)
         }
     }
 }

@@ -104,7 +104,7 @@ struct MarqueeScrollView<Content>: View where Content: View {
                         .frame(width: overflow)
                     
                     Color.white
-                        .frame(width: visibleLength)
+                        .frame(width: max(0, visibleLength))
                     
                     LinearGradient(colors: [.white, .clear], startPoint: .leading, endPoint: .trailing)
                         .frame(width: overflow)

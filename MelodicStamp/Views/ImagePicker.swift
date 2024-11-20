@@ -15,7 +15,7 @@ struct ImagePicker: NSViewControllerRepresentable {
         let viewController = NSViewController()
         DispatchQueue.main.async {
             let panel = NSOpenPanel()
-            panel.allowedFileTypes = ["jpg", "jpeg", "png", "bmp", "gif", "tiff"]
+//            panel.allowedFileTypes = ["jpg", "jpeg", "png", "bmp", "gif", "tiff"]
             panel.allowsMultipleSelection = false
             panel.canChooseDirectories = false
             panel.canCreateDirectories = false

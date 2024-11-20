@@ -24,7 +24,7 @@ struct MiniPlayer: View {
     
     var namespace: Namespace.ID
     
-    @EnvironmentObject var playerViewModel: PlayerViewModel
+    @State var model: PlayerModel
     
     @State private var activeControl: ActiveControl = .progress
     
@@ -50,7 +50,7 @@ struct MiniPlayer: View {
                     }
                 }
             
-            HStack(alignment: .center, spacing: 8) {
+            HStack(alignment: .center, spacing: 12) {
                 if !isProgressBarExpanded {
                     leadingControls()
                         .transition(.blurReplace)
@@ -91,13 +91,13 @@ struct MiniPlayer: View {
         .focusEffectDisabled()
         
         .onKeyPress(keys: [.space], phases: .all) { key in
-            guard playerViewModel.nowPlaying != nil else { return .ignored }
+            guard model.hasCurrentTrack else { return .ignored }
             
             switch key.phase {
             case .down:
                 guard !isPressingSpace else { return .ignored }
                 
-                playPause()
+                model.togglePlayPause()
                 isPressingSpace = true
                 return .handled
             case .up:
@@ -107,54 +107,62 @@ struct MiniPlayer: View {
                 return .ignored
             }
         }
-        .onKeyPress(keys: [.leftArrow, .rightArrow]) { key in
-            guard playerViewModel.nowPlaying != nil else { return .ignored }
-            
-            let sign: FloatingPointSign = key.key == .leftArrow ? .minus : .plus
-            let modifiers = key.modifiers
-            
-            if modifiers.contains(.command) {
-                switch sign {
-                case .plus:
-                    playerViewModel.nextTrack()
-                    nextSongButtonBounceAnimation.toggle()
-                case .minus:
-                    playerViewModel.previousTrack()
-                    previousSongButtonBounceAnimation.toggle()
+        .onKeyPress(keys: [.leftArrow, .rightArrow], phases: .all) { key in
+            switch key.phase {
+            case .down:
+                guard model.hasCurrentTrack else { return .ignored }
+                
+                let sign: FloatingPointSign = key.key == .leftArrow ? .minus : .plus
+                let modifiers = key.modifiers
+                
+                if modifiers.contains(.command) {
+                    switch sign {
+                    case .plus:
+                        model.nextTrack()
+                        nextSongButtonBounceAnimation.toggle()
+                    case .minus:
+                        model.previousTrack()
+                        previousSongButtonBounceAnimation.toggle()
+                    }
+                    
+                    return .handled
+                }
+                
+                let hasShift = modifiers.contains(.shift)
+                let hasOption = modifiers.contains(.option)
+                let multiplier: CGFloat = if hasShift && !hasOption {
+                    5
+                } else if hasOption && !hasShift {
+                    0.1
+                } else { 1 }
+                
+                let inRange = switch activeControl {
+                case .progress:
+                    model.adjustTime(multiplier: multiplier, sign: sign)
+                case .volume:
+                    model.adjustVolume(multiplier: multiplier, sign: sign)
+                }
+                
+                if !inRange {
+                    progressBarExternalOvershootSign = sign
                 }
                 
                 return .handled
+            case .up:
+                progressBarExternalOvershootSign = nil
+                return .ignored
+            default:
+                return .ignored
             }
-            
-            let hasShift = modifiers.contains(.shift)
-            let hasOption = modifiers.contains(.option)
-            let multiplier: CGFloat = if hasShift && !hasOption {
-                5
-            } else if hasOption && !hasShift {
-                0.1
-            } else { 1 }
-            
-            let inRange = switch activeControl {
-            case .progress:
-                playerViewModel.adjustTime(multiplier: multiplier, sign: sign)
-            case .volume:
-                playerViewModel.adjustVolume(multiplier: Float(multiplier), sign: sign)
-            }
-            
-            if !inRange {
-                progressBarExternalOvershootSign = sign
-            }
-            
-            return .handled
-        }
-        .onKeyPress(keys: [.leftArrow, .rightArrow], phases: .up) { key in
-            progressBarExternalOvershootSign = nil
-            return .ignored
         }
         .onKeyPress(.escape) {
             guard activeControl == .volume else { return .ignored }
             
             activeControl = .progress
+            return .handled
+        }
+        .onKeyPress(keys: ["m"], phases: .down) { key in
+            model.isMuted.toggle()
             return .handled
         }
     }
@@ -170,14 +178,32 @@ struct MiniPlayer: View {
                 } label: {
                     Image(systemSymbol: .squareAndArrowUp)
                 }
+                
+                AliveButton(enabledStyle: .init(.secondary)) {
+                    let hasShift = NSEvent.modifierFlags.contains(.shift)
+                    model.playbackMode = switch model.playbackMode {
+                    case .single:
+                        hasShift ? .shuffle : .sequential
+                    case .sequential:
+                        hasShift ? .single : .loop
+                    case .loop:
+                        hasShift ? .sequential : .shuffle
+                    case .shuffle:
+                        hasShift ? .loop : .single
+                    }
+                } label: {
+                    model.playbackMode.image
+                        .frame(width: 16)
+                        .contentTransition(.symbolEffect(.replace))
+                }
             }
             .opacity(isTitleHovering ? 1 : 0)
             
             ShrinkableMarqueeScrollView {
-                MusicTitle()
+                MusicTitle(model: model)
             }
             .contentTransition(.numericText())
-            .animation(.default, value: playerViewModel.playlist)
+            .animation(.default, value: model.currentIndex)
             
             Group {
                 AliveButton(enabledStyle: .init(.secondary)) {
@@ -193,21 +219,20 @@ struct MiniPlayer: View {
     @ViewBuilder private func leadingControls() -> some View {
         Group {
             AliveButton {
-                playerViewModel.previousTrack()
+                model.previousTrack()
                 previousSongButtonBounceAnimation.toggle()
             } label: {
                 Image(systemSymbol: .backwardFill)
-                    .imageScale(.large)
             }
-            .disabled(!playerViewModel.canNavigatePrevious())
+            .disabled(!model.hasPreviousTrack)
             .symbolEffect(.bounce, value: previousSongButtonBounceAnimation)
             .matchedGeometryEffect(id: PlayerNamespace.previousSongButton, in: namespace)
             
             AliveButton {
-                playPause()
+                model.togglePlayPause()
                 isPressingSpace = false
             } label: {
-                playPauseImage(height: 16)
+                playPauseIcon(height: 16)
                     .frame(width: 16)
                     .contentTransition(.symbolEffect(.replace.upUp))
             }
@@ -216,17 +241,16 @@ struct MiniPlayer: View {
             .matchedGeometryEffect(id: PlayerNamespace.playPauseButton, in: namespace)
             
             AliveButton {
-                playerViewModel.nextTrack()
+                model.nextTrack()
                 nextSongButtonBounceAnimation.toggle()
             } label: {
                 Image(systemSymbol: .forwardFill)
-                    .imageScale(.large)
             }
-            .disabled(!playerViewModel.canNavigateNext())
+            .disabled(!model.hasNextTrack)
             .symbolEffect(.bounce, value: nextSongButtonBounceAnimation)
             .matchedGeometryEffect(id: PlayerNamespace.nextSongButton, in: namespace)
         }
-        //.disabled(!model.hasCurrent)
+        .disabled(!model.hasCurrentTrack)
     }
     
     @ViewBuilder private func trailingControls() -> some View {
@@ -235,10 +259,10 @@ struct MiniPlayer: View {
             case .progress:
                 activeControl = .volume
             case .volume:
-                playerViewModel.isMuted.toggle()
+                model.isMuted.toggle()
             }
         } label: {
-            playerViewModel.speakerImage
+            model.speakerImage
                 .imageScale(.large)
                 .contentTransition(.symbolEffect(.replace))
                 .frame(width: 20)
@@ -259,45 +283,40 @@ struct MiniPlayer: View {
         HStack(alignment: .center, spacing: 8) {
             Group {
                 if activeControl == .progress {
-                    Text(formatTime(playerViewModel.elapsed))
-                        .frame(width: 40)
-                        .foregroundStyle(.secondary)
-                        .onTapGesture {
-                            shouldUseRemainingDuration.toggle()
-                        }
+                    let time = if shouldUseRemainingDuration {
+                        model.timeRemaining
+                    } else {
+                        model.timeElapsed
+                    }
+                    
+                    DurationText(
+                        duration: .seconds(time),
+                        sign: shouldUseRemainingDuration ? .minus : .plus
+                    )
+                    .frame(width: 40)
+                    .foregroundStyle(.secondary)
+                    .onTapGesture {
+                        shouldUseRemainingDuration.toggle()
+                    }
                 }
             }
             .transition(.blurReplace)
             .matchedGeometryEffect(id: PlayerNamespace.timeText, in: namespace)
             
             Group {
-                if playerViewModel.nowPlaying != nil {
-                    let value: Binding<CGFloat> = switch activeControl {
-                    case .progress: Binding(
-                        get: { CGFloat(playerViewModel.progress) },
-                        set: { newValue in
-                            playerViewModel.seek(position: newValue)
-                        }
-                    )
-                    case .volume: Binding(
-                        get: { CGFloat(playerViewModel.volume) },
-                        set: { newValue in
-                            playerViewModel.volume = Float(newValue)
-                        }
-                    )
-                    }
-                    
-                    ProgressBar(value: value, isActive: $isProgressBarActive, externalOvershootSign: progressBarExternalOvershootSign) { oldValue, newValue in
-                        if activeControl == .volume && oldValue <= 0 && newValue > 0 {
-                            speakerButtonBounceAnimation.toggle()
-                        }
-                    }
-                } else {
-                    ProgressBar(value: .constant(0), isActive: .constant(false))
-                        .disabled(true)
+                let value: Binding<CGFloat> = switch activeControl {
+                case .progress: model.hasCurrentTrack ? $model.progress : .constant(0)
+                case .volume: $model.volume
                 }
+                
+                ProgressBar(value: value, isActive: $isProgressBarActive, externalOvershootSign: progressBarExternalOvershootSign) { oldValue, newValue in
+                    if activeControl == .volume && oldValue <= 0 && newValue > 0 {
+                        speakerButtonBounceAnimation.toggle()
+                    }
+                }
+                .disabled(activeControl == .progress && !model.hasCurrentTrack)
             }
-            .foregroundStyle(isProgressBarActive ? .primary : activeControl == .volume && playerViewModel.isMuted ? .quaternary : .secondary)
+            .foregroundStyle(isProgressBarActive ? .primary : activeControl == .volume && model.isMuted ? .quaternary : .secondary)
             .backgroundStyle(.quinary)
             .padding(.horizontal, !isProgressBarHovering || isProgressBarActive ? 0 : 12)
             .onHover { hover in
@@ -306,12 +325,12 @@ struct MiniPlayer: View {
                 
                 isProgressBarHovering = true
             }
-            .animation(.default.speed(2), value: playerViewModel.isMuted)
+            .animation(.default.speed(2), value: model.isMuted)
             .matchedGeometryEffect(id: activeControl.id, in: namespace)
             
             Group {
                 if activeControl == .progress {
-                    Text(formatTime(playerViewModel.remaining))
+                    DurationText(duration: model.duration)
                         .frame(width: 40)
                         .foregroundStyle(.secondary)
                 }
@@ -329,34 +348,24 @@ struct MiniPlayer: View {
         }
     }
     
-    @ViewBuilder func playPauseImage(width: CGFloat? = nil, height: CGFloat? = nil) -> some View {
+    @ViewBuilder func playPauseIcon(width: CGFloat? = nil, height: CGFloat? = nil) -> some View {
         Group {
-            Image(systemSymbol: playerViewModel.player.isPlaying ? .pauseFill : .playFill)
-                .resizable()
+            if model.hasCurrentTrack && model.isPlaying {
+                Image(systemSymbol: .pauseFill)
+                    .resizable()
+            } else {
+                Image(systemSymbol: .playFill)
+                    .resizable()
+            }
         }
         .aspectRatio(contentMode: .fit)
         .frame(width: width, height: height)
-        .contentTransition(.symbolEffect(.replace))
     }
+}
+
+#Preview {
+    @Previewable @State var model = PlayerModel()
+    @Previewable @Namespace var namespace
     
-    func playPause() {
-        do {
-            try playerViewModel.togglePlayPause()
-        } catch {
-            playerViewModel.handleError(error)
-        }
-    }
-    
-    func formatTime(_ time: Double) -> String {
-        let totalSeconds = Int(abs(time))
-        let hours = totalSeconds / 3600
-        let minutes = (totalSeconds % 3600) / 60
-        let seconds = totalSeconds % 60
-        
-        if hours > 0 {
-            return String(format: "%d:%02d:%02d", hours, minutes, seconds)
-        } else {
-            return String(format: "%02d:%02d", minutes, seconds)
-        }
-    }
+    MiniPlayer(namespace: namespace, model: model)
 }

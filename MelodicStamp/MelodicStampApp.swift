@@ -9,31 +9,30 @@ import SwiftUI
 
 @main
 struct MelodicStampApp: App {
-    
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     
-    @StateObject var playerViewModel = PlayerViewModel()
+    @State var model = PlayerModel()
     
     @Environment(\.openWindow) var openWindow
     
-    @Namespace private var animationNamespace
+    @Namespace private var namespace
     
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            ContentView(model: model)
         }
-        .environmentObject(playerViewModel)
         
-        WindowGroup("Second Window", id: "SecondView") {
-            
-            ZStack {
-                VisualEffectView(material: .hudWindow, blendingMode: .behindWindow)
-                MiniPlayer(namespace: animationNamespace)
-            }
-            .edgesIgnoringSafeArea(.top)
-            .frame(width: 500, height: 75, alignment: .center)
+        WindowGroup("Mini Player", id: "mini-player") {
+            MiniPlayer(namespace: namespace, model: model)
+                .padding(8)
+                .background {
+                    VisualEffectView(material: .popover, blendingMode: .behindWindow)
+                }
+                .padding(.bottom, -32)
+                .edgesIgnoringSafeArea(.all)
+                .frame(minWidth: 500, idealWidth: 500)
+                .fixedSize(horizontal: false, vertical: true)
         }
-        .environmentObject(playerViewModel)
         .windowResizability(.contentSize)
         .windowStyle(.hiddenTitleBar)
         .windowToolbarStyle(.unified)

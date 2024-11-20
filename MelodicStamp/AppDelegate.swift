@@ -9,7 +9,7 @@ import SwiftUI
 import AppKit
 
 class AppDelegate: NSObject, NSApplicationDelegate {
-    var playerViewModel: PlayerViewModel?
+    var model: PlayerModel?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         // 初始化ViewModel
@@ -22,11 +22,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     func application(_ application: NSApplication, open urls: [URL]) {
         if let url = urls.first {
-            playerViewModel?.play(url)
+            model?.play(url)
         }
     }
     
     func applicationWillTerminate(_ notification: Notification) {
-        playerViewModel?.savePlaylist()
+        model?.savePlaylist()
     }
 }
