@@ -33,6 +33,7 @@ struct MiniPlayer: View {
     @State private var isProgressBarHovering: Bool = false
     @State private var isProgressBarActive: Bool = false
     @State private var isPressingSpace: Bool = false
+    @State private var isHoveringHappenedInside: Bool = false
     
     @State private var shouldUseRemainingDuration: Bool = true
     @State private var progressBarExternalOvershootSign: FloatingPointSign?
@@ -87,15 +88,24 @@ struct MiniPlayer: View {
             .animation(.default, value: isProgressBarActive)
             .animation(.default, value: activeControl)
         }
+        .onHover { hover in
+            let isLeftMouseButtonDown = NSEvent.pressedMouseButtons & 0b1 == 1
+            if !isHovering && hover {
+                // hovering happened
+                isHoveringHappenedInside = !isLeftMouseButtonDown
+            } else if !hover {
+                // reset
+                isHoveringHappenedInside = false
+            }
+            
+            isHovering = hover
+        }
         .padding(12)
         .background(Color.clear)
         
         .focusable()
         .focusEffectDisabled()
         
-        .onHover { hover in
-            isHovering = hover
-        }
         .onKeyPress(keys: [.space], phases: .all) { key in
             guard model.hasCurrentTrack else { return .ignored }
             
@@ -174,11 +184,13 @@ struct MiniPlayer: View {
     }
     
     private var isProgressBarExpanded: Bool {
-        (model.hasCurrentTrack || activeControl == .volume) && (isProgressBarHovering || isProgressBarActive)
+        guard model.hasCurrentTrack || activeControl == .volume else { return false }
+        return isProgressBarHovering || isProgressBarActive
     }
     
     private var progressBarShouldAnimate: Bool {
-        NSEvent.pressedMouseButtons & 0b1 == 0 && (isHovering || isProgressBarHovering || isProgressBarActive)
+        let isMouseInside = isHovering || isProgressBarHovering || isProgressBarActive
+        return isHoveringHappenedInside && isMouseInside
     }
     
     @ViewBuilder private func header() -> some View {
@@ -246,7 +258,7 @@ struct MiniPlayer: View {
                 model.playPauseImage
                     .imageScale(.large)
                     .contentTransition(.symbolEffect(.replace.upUp))
-                    .frame(width: 20)
+                    .frame(width: 16)
             }
             .scaleEffect(isPressingSpace ? 0.75 : 1, anchor: .center)
             .animation(.bouncy, value: isPressingSpace)
@@ -322,14 +334,16 @@ struct MiniPlayer: View {
                 }
                 
                 ZStack {
-                    ProgressBar(
-                        value: .constant(0),
-                        isActive: $isProgressBarActive,
-                        externalOvershootSign: progressBarExternalOvershootSign
-                    )
-                    .disabled(true)
-                    .foregroundStyle(.clear)
-                    .backgroundStyle(.quinary)
+                    if !isProgressBarActive {
+                        ProgressBar(
+                            value: .constant(0),
+                            isActive: $isProgressBarActive,
+                            externalOvershootSign: progressBarExternalOvershootSign
+                        )
+                        .disabled(true)
+                        .foregroundStyle(.clear)
+                        .backgroundStyle(.quinary)
+                    }
                     
                     ProgressBar(
                         value: value,
@@ -343,7 +357,7 @@ struct MiniPlayer: View {
                     }
                     .disabled(activeControl == .progress && !model.hasCurrentTrack)
                     .foregroundStyle(isProgressBarActive ? .primary : activeControl == .volume && model.isMuted ? .quaternary : .secondary)
-                    .backgroundStyle(.clear)
+                    .backgroundStyle(isProgressBarActive ? AnyShapeStyle(.quinary) : AnyShapeStyle(.clear))
                 }
             }
             .padding(.horizontal, !isProgressBarHovering || isProgressBarActive ? 0 : 12)

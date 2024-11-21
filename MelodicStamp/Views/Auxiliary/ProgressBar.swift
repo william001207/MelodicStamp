@@ -10,6 +10,8 @@ import SwiftUI
 struct ProgressBar: View {
     @Environment(\.isEnabled) private var isEnabled
     
+    @Namespace private var namespace
+    
     @Binding var value: CGFloat
     var total: CGFloat = 1
     @Binding var isActive: Bool
@@ -33,8 +35,19 @@ struct ProgressBar: View {
                 if isEnabled {
                     Capsule()
                         .mask(alignment: .leading) {
-                            Color.white
-                                .frame(width: containerSize.width * percentage)
+                            let percentage = max(0, min(1, self.percentage))
+                            
+                            Group {
+                                if percentage < 1 {
+                                    Color.white
+                                        .frame(width: containerSize.width * percentage)
+                                        .matchedGeometryEffect(id: "mask", in: namespace)
+                                } else {
+                                    Color.white
+                                        .matchedGeometryEffect(id: "mask", in: namespace)
+                                }
+                            }
+                            .animation(.instant, value: percentage < 1)
                         }
                 }
             }
