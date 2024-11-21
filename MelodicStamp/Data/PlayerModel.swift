@@ -39,6 +39,8 @@ enum PlaybackMode: String, CaseIterable, Identifiable {
 // MARK: - Player Model
 
 @Observable class PlayerModel: NSObject {
+    static let shared: PlayerModel = .init()
+    
     private let player = AudioPlayer()
     
     private var playlist: [PlaylistItem] = []
@@ -210,6 +212,24 @@ enum PlaybackMode: String, CaseIterable, Identifiable {
         }
     }
     
+    func playlist<R>(in offsets: IndexSet? = nil, _ operation: @escaping (PlaylistItem) -> R) -> [R] {
+        playlist
+            .enumerated()
+            .filter {
+                if let offsets {
+                    offsets.contains($0.offset)
+                } else {
+                    true
+                }
+            }
+            .map { $0.element }
+            .map(operation)
+    }
+    
+    func playlist(in offsets: IndexSet? = nil) -> [PlaylistItem] {
+        playlist(in: offsets) { $0 }
+    }
+    
     func loadPlaylist() {
         if let urls = UserDefaults.standard.object(forKey: "playlistURLs") as? [String] {
             for urlString in urls {
@@ -352,16 +372,15 @@ extension PlayerModel: AudioPlayer.Delegate {
     func audioPlayer(_ audioPlayer: AudioPlayer, decodingComplete decoder: PCMDecoding) {
         if
             let audioDecoder = decoder as? AudioDecoder,
-            let url = audioDecoder.inputSource.url,
-            let index = playlist.firstIndex(where: { $0.url == url })
+            let url = audioDecoder.inputSource.url
         {
-
             switch playbackMode {
             case .single:
-                // single: play again
+                // play again
+                guard let currentIndex else { break }
                 do {
-                    if let currentDecoder = try playlist[index].decoder() {
-                        try player.enqueue(currentDecoder)
+                    if let decoder = try playlist[currentIndex].decoder() {
+                        try player.enqueue(decoder)
                     }
                 } catch {
 //                    DispatchQueue.main.async {
@@ -369,43 +388,12 @@ extension PlayerModel: AudioPlayer.Delegate {
 //                    }
                 }
 
-            case .sequential:
-                // sequential: jump to next track
-                let nextIndex = playlist.index(after: index)
-                if playlist.indices.contains(nextIndex) {
-                    do {
-                        if let nextDecoder = try playlist[nextIndex].decoder() {
-                            try player.enqueue(nextDecoder)
-                        }
-                    } catch {
-//                        DispatchQueue.main.async {
-//                            self.handleError(error)
-//                        }
-                    }
-                } else {
-                    nextTrack()
-                }
-
-            case .shuffle:
-                // random
-                let randomIndex = playlist.indices.randomElement()!
+            default:
+                // jump to next track
+                guard let nextIndex else { break }
                 do {
-                    if let randomDecoder = try playlist[randomIndex].decoder() {
-                        try player.enqueue(randomDecoder)
-                    }
-                } catch {
-//                    DispatchQueue.main.async {
-//                        self.handleError(error)
-//                    }
-                }
-
-            case .loop:
-                // playlist: jump to next track
-                let nextIndex = playlist.index(after: index)
-                let loopIndex = nextIndex % playlist.count
-                do {
-                    if let loopDecoder = try playlist[loopIndex].decoder() {
-                        try player.enqueue(loopDecoder)
+                    if let decoder = try playlist[nextIndex].decoder() {
+                        try player.enqueue(decoder)
                     }
                 } catch {
 //                    DispatchQueue.main.async {
@@ -422,7 +410,8 @@ extension PlayerModel: AudioPlayer.Delegate {
         DispatchQueue.main.async {
             if let nowPlayingDecoder = audioPlayer.nowPlaying,
                let audioDecoder = nowPlayingDecoder as? AudioDecoder,
-               let url = audioDecoder.inputSource.url {
+               let url = audioDecoder.inputSource.url
+            {
                 self.current = self.playlist.first(where: { $0.url == url })
             } else {
                 self.current = nil
@@ -441,8 +430,19 @@ extension PlayerModel: AudioPlayer.Delegate {
 
 extension PlayerModel {
     var speakerImage: Image {
-        guard !isMuted else { return .init(systemSymbol: .speakerSlashFill) }
-        return .init(systemSymbol: .speakerWave3Fill, variableValue: volume)
+        if isMuted {
+            Image(systemSymbol: .speakerSlashFill)
+        } else {
+            Image(systemSymbol: .speakerWave3Fill, variableValue: volume)
+        }
+    }
+    
+    var playPauseImage: Image {
+        if hasCurrentTrack && isPlaying {
+            Image(systemSymbol: .pauseFill)
+        } else {
+            Image(systemSymbol: .playFill)
+        }
     }
     
     @discardableResult func adjustProgress(delta: CGFloat = 0.01, multiplier: CGFloat = 1, sign: FloatingPointSign = .plus) -> Bool {

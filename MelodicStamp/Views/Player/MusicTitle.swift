@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct MusicTitle: View {
-    @State var model: PlayerModel
+    @State var model: PlayerModel = .shared
     
     var body: some View {
         if let metadata = model.currentMetadata {

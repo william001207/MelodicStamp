@@ -13,7 +13,7 @@ import CSFBAudioEngine
 struct ContentView: View {
     @Environment(\.openWindow) var openWindow
     
-    @State var model: PlayerModel
+    @State var model: PlayerModel = .shared
     
     @State private var showOpenPanel: Bool = false
     @State private var showAddFilesPanel: Bool = false
@@ -40,7 +40,7 @@ struct ContentView: View {
             }
         }
         
-//        VStack {
+        VStack {
             // 播放控制
 //            HStack {
 //                if let picture = model.nowPlaying?.metadata.attachedPictures.first?.image {
@@ -156,82 +156,82 @@ struct ContentView: View {
 //            }
             
             // 播放列表
-//            List(selection: $selectedItems) {
-//                ForEach(model.playlist) { item in
-//                    HStack {
-//                        /*
-//                        if let picture = item.metadata.attachedPictures.first?.image {
-//                            let resizedImage = resizeImage(image: picture, maxSize: 40)
-//                            Image(nsImage: resizedImage)
-//                                .resizable()
-//                                .frame(width: 40, height: 40)
-//                                .cornerRadius(5)
-//                        } else {
-//                            Image(systemName: "photo")
-//                                .resizable()
-//                                .frame(width: 40, height: 40)
-//                                .foregroundColor(.gray)
-//                        }
-//                        */
-//                        
-//                        VStack(alignment: .leading) {
-//                            Text(item.metadata.title ?? item.url.lastPathComponent)
-//                                .font(.headline)
-//                            Text(item.metadata.artist ?? "Unknown Artist")
-//                                .font(.subheadline)
-//                                .foregroundColor(.secondary)
-//                            
-//                            Text(item.url.lastPathComponent)
-//                                .font(.caption)
-//                                .foregroundColor(.secondary)
-//                        }
-//                        Spacer()
-//                        
-//                        Button("Play") {
-//                            model.play(item: item)
-//                        }
-//                    }
-//                    .contentShape(Rectangle())
-//                    .background {
-//                        if selectedItems.contains(item) {
-//                            Color.blue.opacity(0.3) // Highlight color for selected items
-//                        } else {
-//                            Color.clear
-//                        }
-//                    }
-//                    .onTapGesture {
-//                        if selectedItems.contains(item) {
-//                            selectedItems.remove(item)
-//                        } else {
-//                            selectedItems.insert(item)
-//                        }
-//                    }
-//                }
-//                .onDelete(perform: deleteItems)
-//            }
-//            .frame(maxHeight: .infinity)
+            List(selection: $selectedItems) {
+                ForEach(model.playlist()) { item in
+                    HStack {
+                        /*
+                        if let picture = item.metadata.attachedPictures.first?.image {
+                            let resizedImage = resizeImage(image: picture, maxSize: 40)
+                            Image(nsImage: resizedImage)
+                                .resizable()
+                                .frame(width: 40, height: 40)
+                                .cornerRadius(5)
+                        } else {
+                            Image(systemName: "photo")
+                                .resizable()
+                                .frame(width: 40, height: 40)
+                                .foregroundColor(.gray)
+                        }
+                        */
+                        
+                        VStack(alignment: .leading) {
+                            Text(item.metadata.title ?? item.url.lastPathComponent)
+                                .font(.headline)
+                            Text(item.metadata.artist ?? "Unknown Artist")
+                                .font(.subheadline)
+                                .foregroundColor(.secondary)
+                            
+                            Text(item.url.lastPathComponent)
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                        Spacer()
+                        
+                        Button("Play") {
+                            model.play(item)
+                        }
+                    }
+                    .contentShape(Rectangle())
+                    .background {
+                        if selectedItems.contains(item) {
+                            Color.blue.opacity(0.3)
+                        } else {
+                            Color.clear
+                        }
+                    }
+                    .onTapGesture {
+                        if selectedItems.contains(item) {
+                            selectedItems.remove(item)
+                        } else {
+                            selectedItems.insert(item)
+                        }
+                    }
+                }
+                .onDelete(perform: deleteItems)
+            }
+            .frame(maxHeight: .infinity)
             
             // 控制按钮
-//            HStack {
-//                Button("打开文件") {
-//                    openFile()
-//                }
-//                .keyboardShortcut("O", modifiers: [.command])
-//                
-//                Button("添加文件") {
-//                    addFiles()
-//                }
-//                .keyboardShortcut("A", modifiers: [.command])
-//                
-//                Button("分析文件") {
-//                    analyzeFiles()
-//                }
-//                .keyboardShortcut("E", modifiers: [.command])
-//                
-//                Button("导出WAVE文件") {
-//                    exportWAVEFile()
-//                }
-//                .keyboardShortcut("W", modifiers: [.command])
+            HStack {
+                Button("打开文件") {
+                    openFile()
+                }
+                .keyboardShortcut("O", modifiers: [.command])
+                
+                Button("添加文件") {
+                    addFiles()
+                }
+                .keyboardShortcut("A", modifiers: [.command])
+
+                Button("分析文件") {
+                    analyzeFiles()
+                }
+                .keyboardShortcut("E", modifiers: [.command])
+                
+                Button("导出WAVE文件") {
+                    exportWAVEFile()
+                }
+                .keyboardShortcut("W", modifiers: [.command])
                 
                 // 单项或批量编辑按钮
 //                Button("编辑元信息") {
@@ -263,10 +263,10 @@ struct ContentView: View {
 //                    openWindow(id: "SecondView")
 //                }
 //                
-//            }
-//            .padding()
-//        }
-//        .frame(minWidth: 800, minHeight: 600)
+            }
+            .padding()
+        }
+        .frame(minWidth: 800, minHeight: 600)
 //        .alert(isPresented: $model.showError) {
 //            Alert(title: Text("错误"), message: Text(model.errorMessage ?? "未知错误"), dismissButton: .default(Text("确定")))
 //        }
@@ -291,68 +291,68 @@ struct ContentView: View {
 //        model.togglePlayPause()
 //    }
 //    
-//    func deleteItems(at offsets: IndexSet) {
-//        let urlsToRemove = offsets.map { model.playlist[$0].url }
-//        model.removeFromPlaylist(urls: urlsToRemove)
-//        model.savePlaylist()
-//    }
-//    
-//    func openFile() {
-//        let panel = NSOpenPanel()
-//        panel.allowsMultipleSelection = false
-//        panel.canChooseDirectories = false
-////        panel.allowedFileTypes = ContentView.supportedPathExtensions
-//        
-//        if panel.runModal() == .OK, let url = panel.url {
-//            model.play(url)
-//        }
-//    }
-//    
-//    func addFiles() {
-//        let panel = NSOpenPanel()
-//        panel.allowsMultipleSelection = true
-//        panel.canChooseDirectories = false
-////        panel.allowedFileTypes = ContentView.supportedPathExtensions
-//        
-//        if panel.runModal() == .OK {
-//            model.addToPlaylist(urls: panel.urls)
-//        }
-//    }
-//    
-//    func analyzeFiles() {
-//        let panel = NSOpenPanel()
-//        panel.allowsMultipleSelection = true
-//        panel.canChooseDirectories = false
-////        panel.allowedFileTypes = ContentView.supportedPathExtensions
-//        
-//        if panel.runModal() == .OK {
-//            model.analyzeFiles(urls: panel.urls)
-//        }
-//    }
-//    
-//    func exportWAVEFile() {
-//        let panel = NSOpenPanel()
-//        panel.allowsMultipleSelection = false
-//        panel.canChooseDirectories = false
-////        panel.allowedFileTypes = ContentView.supportedPathExtensions
-//        
-//        if panel.runModal() == .OK, let url = panel.url {
-//            let destURL = url.deletingPathExtension().appendingPathExtension("wav")
-//            if FileManager.default.fileExists(atPath: destURL.path) {
-//                let alert = NSAlert()
-//                alert.messageText = "是否覆盖现有文件？"
-//                alert.informativeText = "同名文件已存在。"
-//                alert.addButton(withTitle: "覆盖")
-//                alert.addButton(withTitle: "取消")
-//                
-//                if alert.runModal() != .alertFirstButtonReturn {
-//                    return
-//                }
-//            }
-//            
-//            model.exportWAVEFile(url: url)
-//        }
-//    }
+    func deleteItems(in offsets: IndexSet) {
+        let urlsToRemove = model.playlist(in: offsets) { $0.url }
+        model.removeFromPlaylist(urls: urlsToRemove)
+        model.savePlaylist()
+    }
+
+    func openFile() {
+        let panel = NSOpenPanel()
+        panel.allowsMultipleSelection = false
+        panel.canChooseDirectories = false
+        panel.allowedFileTypes = ContentView.supportedPathExtensions
+        
+        if panel.runModal() == .OK, let url = panel.url {
+            model.play(url)
+        }
+    }
+    
+    func addFiles() {
+        let panel = NSOpenPanel()
+        panel.allowsMultipleSelection = true
+        panel.canChooseDirectories = false
+        panel.allowedFileTypes = ContentView.supportedPathExtensions
+        
+        if panel.runModal() == .OK {
+            model.addToPlaylist(urls: panel.urls)
+        }
+    }
+    
+    func analyzeFiles() {
+        let panel = NSOpenPanel()
+        panel.allowsMultipleSelection = true
+        panel.canChooseDirectories = false
+        panel.allowedFileTypes = ContentView.supportedPathExtensions
+        
+        if panel.runModal() == .OK {
+            model.analyzeFiles(urls: panel.urls)
+        }
+    }
+    
+    func exportWAVEFile() {
+        let panel = NSOpenPanel()
+        panel.allowsMultipleSelection = false
+        panel.canChooseDirectories = false
+        panel.allowedFileTypes = ContentView.supportedPathExtensions
+        
+        if panel.runModal() == .OK, let url = panel.url {
+            let destURL = url.deletingPathExtension().appendingPathExtension("wav")
+            if FileManager.default.fileExists(atPath: destURL.path) {
+                let alert = NSAlert()
+                alert.messageText = "是否覆盖现有文件？"
+                alert.informativeText = "同名文件已存在。"
+                alert.addButton(withTitle: "覆盖")
+                alert.addButton(withTitle: "取消")
+                
+                if alert.runModal() != .alertFirstButtonReturn {
+                    return
+                }
+            }
+            
+            model.exportWAVEFile(url: url)
+        }
+    }
 //    
 //    // MARK: - Helper
 //    

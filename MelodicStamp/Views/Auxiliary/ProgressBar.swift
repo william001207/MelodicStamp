@@ -13,6 +13,7 @@ struct ProgressBar: View {
     @Binding var value: CGFloat
     var total: CGFloat = 1
     @Binding var isActive: Bool
+    var shouldAnimate: Bool = false
     
     var shrinkFactor: CGFloat = 0.6
     var overshoot: CGFloat = 16
@@ -40,7 +41,7 @@ struct ProgressBar: View {
             .frame(height: isActive ? containerSize.height : containerSize.height * shrinkFactor)
             .animation(.smooth, value: isActive)
             .animation(.default.speed(5), value: value)
-            .animation(.default, value: containerSize)
+            .animation(shouldAnimate ? .default : nil, value: containerSize)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .onGeometryChange(for: CGSize.self) { proxy in

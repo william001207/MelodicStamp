@@ -24,10 +24,11 @@ struct MiniPlayer: View {
     
     var namespace: Namespace.ID
     
-    @State var model: PlayerModel
+    @State var model: PlayerModel = .shared
     
     @State private var activeControl: ActiveControl = .progress
     
+    @State private var isHovering: Bool = false
     @State private var isTitleHovering: Bool = false
     @State private var isProgressBarHovering: Bool = false
     @State private var isProgressBarActive: Bool = false
@@ -56,7 +57,9 @@ struct MiniPlayer: View {
                         .transition(.blurReplace)
                 }
                 
-                progressBar()
+                TimelineView(.animation) { context in
+                    progressBar()
+                }
                 
                 if activeControl == .volume {
                     Group {
@@ -90,6 +93,9 @@ struct MiniPlayer: View {
         .focusable()
         .focusEffectDisabled()
         
+        .onHover { hover in
+            isHovering = hover
+        }
         .onKeyPress(keys: [.space], phases: .all) { key in
             guard model.hasCurrentTrack else { return .ignored }
             
@@ -168,7 +174,11 @@ struct MiniPlayer: View {
     }
     
     private var isProgressBarExpanded: Bool {
-        isProgressBarHovering || isProgressBarActive
+        (model.hasCurrentTrack || activeControl == .volume) && (isProgressBarHovering || isProgressBarActive)
+    }
+    
+    private var progressBarShouldAnimate: Bool {
+        NSEvent.pressedMouseButtons & 0b1 == 0 && (isHovering || isProgressBarHovering || isProgressBarActive)
     }
     
     @ViewBuilder private func header() -> some View {
@@ -200,7 +210,7 @@ struct MiniPlayer: View {
             }
             
             ShrinkableMarqueeScrollView {
-                MusicTitle(model: model)
+                MusicTitle()
             }
             .contentTransition(.numericText())
             .animation(.default, value: model.currentIndex)
@@ -233,9 +243,10 @@ struct MiniPlayer: View {
                 model.togglePlayPause()
                 isPressingSpace = false
             } label: {
-                playPauseIcon(height: 16)
-                    .frame(width: 16)
+                model.playPauseImage
+                    .imageScale(.large)
                     .contentTransition(.symbolEffect(.replace.upUp))
+                    .frame(width: 20)
             }
             .scaleEffect(isPressingSpace ? 0.75 : 1, anchor: .center)
             .animation(.bouncy, value: isPressingSpace)
@@ -310,18 +321,34 @@ struct MiniPlayer: View {
                 case .volume: $model.volume
                 }
                 
-                ProgressBar(value: value, isActive: $isProgressBarActive, externalOvershootSign: progressBarExternalOvershootSign) { oldValue, newValue in
-                    if activeControl == .volume && oldValue <= 0 && newValue > 0 {
-                        speakerButtonBounceAnimation.toggle()
+                ZStack {
+                    ProgressBar(
+                        value: .constant(0),
+                        isActive: $isProgressBarActive,
+                        externalOvershootSign: progressBarExternalOvershootSign
+                    )
+                    .disabled(true)
+                    .foregroundStyle(.clear)
+                    .backgroundStyle(.quinary)
+                    
+                    ProgressBar(
+                        value: value,
+                        isActive: $isProgressBarActive,
+                        shouldAnimate: progressBarShouldAnimate,
+                        externalOvershootSign: progressBarExternalOvershootSign
+                    ) { oldValue, newValue in
+                        if activeControl == .volume && oldValue <= 0 && newValue > 0 {
+                            speakerButtonBounceAnimation.toggle()
+                        }
                     }
+                    .disabled(activeControl == .progress && !model.hasCurrentTrack)
+                    .foregroundStyle(isProgressBarActive ? .primary : activeControl == .volume && model.isMuted ? .quaternary : .secondary)
+                    .backgroundStyle(.clear)
                 }
-                .disabled(activeControl == .progress && !model.hasCurrentTrack)
             }
-            .foregroundStyle(isProgressBarActive ? .primary : activeControl == .volume && model.isMuted ? .quaternary : .secondary)
-            .backgroundStyle(.quinary)
             .padding(.horizontal, !isProgressBarHovering || isProgressBarActive ? 0 : 12)
             .onHover { hover in
-                let canHover = activeControl == .volume
+                let canHover = model.hasCurrentTrack || activeControl == .volume
                 guard canHover && hover else { return }
                 
                 isProgressBarHovering = true
@@ -343,30 +370,13 @@ struct MiniPlayer: View {
         .onHover { hover in
             guard !hover else { return }
             
-            withAnimation {
-                isProgressBarHovering = false
-            }
+            isProgressBarHovering = false
         }
-    }
-    
-    @ViewBuilder func playPauseIcon(width: CGFloat? = nil, height: CGFloat? = nil) -> some View {
-        Group {
-            if model.hasCurrentTrack && model.isPlaying {
-                Image(systemSymbol: .pauseFill)
-                    .resizable()
-            } else {
-                Image(systemSymbol: .playFill)
-                    .resizable()
-            }
-        }
-        .aspectRatio(contentMode: .fit)
-        .frame(width: width, height: height)
     }
 }
 
 #Preview {
-    @Previewable @State var model = PlayerModel()
     @Previewable @Namespace var namespace
     
-    MiniPlayer(namespace: namespace, model: model)
+    MiniPlayer(namespace: namespace)
 }

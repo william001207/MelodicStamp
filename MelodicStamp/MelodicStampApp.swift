@@ -19,11 +19,11 @@ struct MelodicStampApp: App {
     
     var body: some Scene {
         WindowGroup {
-            ContentView(model: model)
+            ContentView()
         }
         
         WindowGroup("Mini Player", id: "mini-player") {
-            MiniPlayer(namespace: namespace, model: model)
+            MiniPlayer(namespace: namespace)
                 .padding(8)
                 .background {
                     VisualEffectView(material: .popover, blendingMode: .behindWindow)
