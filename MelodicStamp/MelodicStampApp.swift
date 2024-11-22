@@ -19,8 +19,13 @@ struct MelodicStampApp: App {
     
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            MainView()
+                .frame(minWidth: 900, minHeight: 600)
+                .edgesIgnoringSafeArea(.top)
         }
+        .windowResizability(.contentSize)
+        .windowStyle(.hiddenTitleBar)
+        .windowToolbarStyle(.unified)
         
         WindowGroup("Mini Player", id: "mini-player") {
             MiniPlayer(namespace: namespace)

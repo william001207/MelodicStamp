@@ -264,8 +264,8 @@ struct ContentView: View {
 //                }
 //                
             }
-            .padding()
         }
+        .background(Color.clear)
         .frame(minWidth: 800, minHeight: 600)
 //        .alert(isPresented: $model.showError) {
 //            Alert(title: Text("错误"), message: Text(model.errorMessage ?? "未知错误"), dismissButton: .default(Text("确定")))
