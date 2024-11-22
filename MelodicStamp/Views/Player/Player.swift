@@ -20,6 +20,7 @@ struct Player: View {
     @State private var isVolumeBarActive: Bool = false
     @State private var isPressingSpace: Bool = false
     
+    @State private var adjustmentPercentage: CGFloat = .zero
     @State private var shouldUseRemainingDuration: Bool = false
     @State private var progressBarExternalOvershootSign: FloatingPointSign?
     
@@ -64,6 +65,7 @@ struct Player: View {
         .focusable()
         .focusEffectDisabled()
         
+        // handle space down/up -> toggle play pause
         .onKeyPress(keys: [.space], phases: .all) { key in
             guard model.hasCurrentTrack else { return .ignored }
             
@@ -81,48 +83,71 @@ struct Player: View {
                 return .ignored
             }
         }
-        .onKeyPress(keys: [.leftArrow, .rightArrow]) { key in
-            guard model.hasCurrentTrack else { return .ignored }
-            
-            let sign: FloatingPointSign = key.key == .leftArrow ? .minus : .plus
-            let modifiers = key.modifiers
-            
-            if modifiers.contains(.command) {
-                switch sign {
-                case .plus:
-                    model.nextTrack()
-                    nextSongButtonBounceAnimation.toggle()
-                case .minus:
-                    model.previousTrack()
-                    previousSongButtonBounceAnimation.toggle()
+        
+        // handle left arrow/right arrow down/up -> adjust progress and navigate track
+        .onKeyPress(keys: [.leftArrow, .rightArrow], phases: .all) { key in
+            switch key.phase {
+            case .down:
+                guard model.hasCurrentTrack else { return .ignored }
+                
+                let sign: FloatingPointSign = key.key == .leftArrow ? .minus : .plus
+                let modifiers = key.modifiers
+                
+                if modifiers.contains(.command) {
+                    switch sign {
+                    case .plus:
+                        model.nextTrack()
+                        nextSongButtonBounceAnimation.toggle()
+                    case .minus:
+                        model.previousTrack()
+                        previousSongButtonBounceAnimation.toggle()
+                    }
+                    
+                    return .handled
+                }
+                
+                let hasShift = modifiers.contains(.shift)
+                let hasOption = modifiers.contains(.option)
+                let multiplier: CGFloat = if hasShift && !hasOption {
+                    5
+                } else if hasOption && !hasShift {
+                    0.1
+                } else { 1 }
+                
+                let inRange = model.adjustTime(multiplier: multiplier, sign: sign)
+                
+                if !inRange {
+                    progressBarExternalOvershootSign = sign
                 }
                 
                 return .handled
+            case .up:
+                progressBarExternalOvershootSign = nil
+                return .ignored
+            default:
+                return .ignored
             }
-            
-            let hasShift = modifiers.contains(.shift)
-            let hasOption = modifiers.contains(.option)
-            let multiplier: CGFloat = if hasShift && !hasOption {
-                5
-            } else if hasOption && !hasShift {
-                0.1
-            } else { 1 }
-            
-            let inRange = model.adjustTime(multiplier: multiplier, sign: sign)
-            if !inRange {
-                progressBarExternalOvershootSign = sign
-            }
-            
-            return .handled
         }
-        .onKeyPress(keys: [.leftArrow, .rightArrow], phases: .up) { key in
-            progressBarExternalOvershootSign = nil
-            return .ignored
+        
+        // handle m -> toggle mute
+        .onKeyPress(keys: ["m"], phases: .down) { key in
+            model.isMuted.toggle()
+            return .handled
         }
     }
     
     @ViewBuilder private func header() -> some View {
         HStack(alignment: .center, spacing: 12) {
+            AliveButton(enabledStyle: .init(.secondary)) {
+                let hasShift = NSEvent.modifierFlags.contains(.shift)
+                model.playbackMode = model.playbackMode.cycle(negate: hasShift)
+            } label: {
+                model.playbackMode.image
+                    .imageScale(.large)
+                    .contentTransition(.symbolEffect(.replace))
+                    .frame(width: 20)
+            }
+            .matchedGeometryEffect(id: PlayerNamespace.playbackModeButton, in: namespace)
             
             Spacer()
             
@@ -143,7 +168,6 @@ struct Player: View {
             }
             .matchedGeometryEffect(id: PlayerNamespace.expandShrinkButton, in: namespace)
         }
-        .padding(.leading, 20)
     }
     
     @ViewBuilder private func leadingControls() -> some View {
@@ -164,8 +188,8 @@ struct Player: View {
                 isPressingSpace = false
             } label: {
                 model.playPauseImage
-                    .frame(width: 24)
                     .contentTransition(.symbolEffect(.replace.upUp))
+                    .frame(width: 24)
             }
             .scaleEffect(isPressingSpace ? 0.75 : 1, anchor: .center)
             .animation(.bouncy, value: isPressingSpace)
@@ -186,7 +210,9 @@ struct Player: View {
     }
     
     @ViewBuilder private func trailingControls() -> some View {
-        ProgressBar(value: $model.volume, isActive: $isVolumeBarActive) { oldValue, newValue in
+        ProgressBar(value: $model.volume, isActive: $isVolumeBarActive, isDelegated: true) { oldValue, newValue in
+            adjustmentPercentage = newValue
+        } onOvershootOffsetChange: { oldValue, newValue in
             if oldValue <= 0 && newValue > 0 {
                 speakerButtonBounceAnimation.toggle()
             }
@@ -210,10 +236,20 @@ struct Player: View {
     }
     
     @ViewBuilder private func progressBar() -> some View {
-        let time = if shouldUseRemainingDuration {
-            model.timeRemaining
+        let time: TimeInterval = if isProgressBarActive {
+            // use adjustment time
+            if shouldUseRemainingDuration {
+                model.duration.toTimeInterval() * (1 - adjustmentPercentage)
+            } else {
+                model.duration.toTimeInterval() * adjustmentPercentage
+            }
         } else {
-            model.timeElapsed
+            // use track time
+            if shouldUseRemainingDuration {
+                model.timeRemaining
+            } else {
+                model.timeElapsed
+            }
         }
         
         DurationText(

@@ -21,6 +21,7 @@ enum PlayerNamespace: String, Identifiable, Hashable, Equatable {
     case timeText
     case durationText
     
+    case playbackModeButton
     case expandShrinkButton
     
     var id: Self { self }

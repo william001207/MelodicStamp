@@ -34,6 +34,19 @@ enum PlaybackMode: String, CaseIterable, Identifiable {
                 .init(systemSymbol: .shuffle)
         }
     }
+    
+    func cycle(negate: Bool = false) -> Self {
+        switch self {
+        case .single:
+            negate ? .shuffle : .sequential
+        case .sequential:
+            negate ? .single : .loop
+        case .loop:
+            negate ? .sequential : .shuffle
+        case .shuffle:
+            negate ? .loop : .single
+        }
+    }
 }
 
 // MARK: - Player Model

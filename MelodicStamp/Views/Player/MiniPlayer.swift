@@ -190,31 +190,21 @@ struct MiniPlayer: View {
     
     @ViewBuilder private func header() -> some View {
         HStack(alignment: .center, spacing: 12) {
-            Group {
-                AliveButton(enabledStyle: .init(.secondary)) {
-                } label: {
-                    Image(systemSymbol: .squareAndArrowUp)
-                }
+            AliveButton(enabledStyle: .init(.secondary)) {
+            } label: {
+                Image(systemSymbol: .squareAndArrowUp)
             }
             .opacity(isTitleHovering ? 1 : 0)
             
             AliveButton(enabledStyle: .init(.secondary)) {
                 let hasShift = NSEvent.modifierFlags.contains(.shift)
-                model.playbackMode = switch model.playbackMode {
-                case .single:
-                    hasShift ? .shuffle : .sequential
-                case .sequential:
-                    hasShift ? .single : .loop
-                case .loop:
-                    hasShift ? .sequential : .shuffle
-                case .shuffle:
-                    hasShift ? .loop : .single
-                }
+                model.playbackMode = model.playbackMode.cycle(negate: hasShift)
             } label: {
                 model.playbackMode.image
-                    .frame(width: 16)
                     .contentTransition(.symbolEffect(.replace))
+                    .frame(width: 16)
             }
+            .matchedGeometryEffect(id: PlayerNamespace.playbackModeButton, in: namespace)
             
             ShrinkableMarqueeScrollView {
                 MusicTitle()
@@ -223,13 +213,11 @@ struct MiniPlayer: View {
             .animation(.default, value: model.currentIndex)
             .padding(.bottom, 2)
             
-            Group {
-                AliveButton(enabledStyle: .init(.secondary)) {
-                } label: {
-                    Image(systemSymbol: .arrowUpLeftAndArrowDownRight)
-                }
-                .matchedGeometryEffect(id: PlayerNamespace.expandShrinkButton, in: namespace)
+            AliveButton(enabledStyle: .init(.secondary)) {
+            } label: {
+                Image(systemSymbol: .arrowUpLeftAndArrowDownRight)
             }
+            .matchedGeometryEffect(id: PlayerNamespace.expandShrinkButton, in: namespace)
             .opacity(isTitleHovering ? 1 : 0)
         }
     }
