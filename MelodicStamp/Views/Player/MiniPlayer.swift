@@ -33,6 +33,7 @@ struct MiniPlayer: View {
     @State private var isProgressBarActive: Bool = false
     @State private var isPressingSpace: Bool = false
     
+    @State private var adjustmentPercentage: CGFloat = .zero
     @State private var shouldUseRemainingDuration: Bool = true
     @State private var progressBarExternalOvershootSign: FloatingPointSign?
     
@@ -92,6 +93,13 @@ struct MiniPlayer: View {
         .focusable()
         .focusEffectDisabled()
         
+        // regain progress control on new track
+        .onChange(of: model.currentIndex) { oldValue, newValue in
+            guard newValue != nil else { return }
+            activeControl = .progress
+        }
+        
+        // handle space down/up -> toggle play pause
         .onKeyPress(keys: [.space], phases: .all) { key in
             guard model.hasCurrentTrack else { return .ignored }
             
@@ -109,6 +117,8 @@ struct MiniPlayer: View {
                 return .ignored
             }
         }
+        
+        // handle left arrow/right arrow down/up -> adjust progress and navigate track
         .onKeyPress(keys: [.leftArrow, .rightArrow], phases: .all) { key in
             switch key.phase {
             case .down:
@@ -157,12 +167,16 @@ struct MiniPlayer: View {
                 return .ignored
             }
         }
+        
+        // handle escape -> regain progress control
         .onKeyPress(.escape) {
             guard activeControl == .volume else { return .ignored }
             
             activeControl = .progress
             return .handled
         }
+        
+        // handle m -> toggle mute
         .onKeyPress(keys: ["m"], phases: .down) { key in
             model.isMuted.toggle()
             return .handled
@@ -288,10 +302,20 @@ struct MiniPlayer: View {
         HStack(alignment: .center, spacing: 8) {
             Group {
                 if activeControl == .progress {
-                    let time = if shouldUseRemainingDuration {
-                        model.timeRemaining
+                    let time: TimeInterval = if isProgressBarActive {
+                        // use adjustment time
+                        if shouldUseRemainingDuration {
+                            model.duration.toTimeInterval() * (1 - adjustmentPercentage)
+                        } else {
+                            model.duration.toTimeInterval() * adjustmentPercentage
+                        }
                     } else {
-                        model.timeElapsed
+                        // use track time
+                        if shouldUseRemainingDuration {
+                            model.timeRemaining
+                        } else {
+                            model.timeElapsed
+                        }
                     }
                     
                     DurationText(
@@ -317,8 +341,11 @@ struct MiniPlayer: View {
                 ProgressBar(
                     value: value,
                     isActive: $isProgressBarActive,
+                    isDelegated: activeControl == .progress,
                     externalOvershootSign: progressBarExternalOvershootSign
                 ) { oldValue, newValue in
+                    adjustmentPercentage = newValue
+                } onOvershootOffsetChange: { oldValue, newValue in
                     if activeControl == .volume && oldValue <= 0 && newValue > 0 {
                         speakerButtonBounceAnimation.toggle()
                     }

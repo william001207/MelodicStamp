@@ -24,7 +24,6 @@ struct ProgressBar: View {
     enum UpdateType {
         case literal
         case offset
-        case offsetDebounce
     }
     
     enum InteractionState {
@@ -38,22 +37,21 @@ struct ProgressBar: View {
     @Binding var value: CGFloat
     var total: CGFloat = 1
     @Binding var isActive: Bool
+    var isDelegated: Bool = false
     
     var shrinkFactor: CGFloat = 0.6
     var overshoot: CGFloat = 16
     var externalOvershootSign: FloatingPointSign?
     
+    var onPercentageChange: (CGFloat, CGFloat) -> Void = { _, _ in }
     var onOvershootOffsetChange: (CGFloat, CGFloat) -> Void = { _, _ in }
     
     @State private var interactionState: InteractionState = .receiving
     @State private var percentage: CGFloat = .zero
     @State private var percentageOrigin: CGFloat = .zero
-    @State private var debounceTarget: CGFloat = .zero
     
     @State private var containerSize: CGSize = .zero
     @State private var overshootPercentage: CGFloat = .zero
-    
-    @State private var debounceTimer: Timer?
     
     var body: some View {
         ZStack {
@@ -72,7 +70,7 @@ struct ProgressBar: View {
             .clipShape(.capsule)
             .frame(height: isActive ? containerSize.height : containerSize.height * shrinkFactor)
             .animation(.smooth, value: isActive)
-            .animation(.smooth.speed(5), value: percentage)
+            .animation(.smooth, value: percentage)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .onGeometryChange(for: CGSize.self) { proxy in
@@ -94,7 +92,7 @@ struct ProgressBar: View {
                     // update dragging
                     update(
                         percentage: gesture.translation.width / containerSize.width,
-                        type: .offsetDebounce
+                        type: .offset
                     )
                 case .propagating:
                     break
@@ -106,7 +104,7 @@ struct ProgressBar: View {
                 guard isEnabled else { return }
                 
                 isActive = false
-                interactionState = .propagating
+                interactionState = isDelegated ? .propagating : .receiving
                 update(
                     percentage: gesture.translation.width / containerSize.width,
                     type: .offset
@@ -119,23 +117,25 @@ struct ProgressBar: View {
         .animation(.default, value: overshootOffset)
         .animation(.default, value: isEnabled)
         
-        .onChange(of: overshootOffset, onOvershootOffsetChange)
-        .onChange(of: value) { oldValue, newValue in
-            switch interactionState {
-            case .receiving:
+        .onChange(of: overshootOffset, initial: true, onOvershootOffsetChange)
+        .onChange(of: percentage, initial: true, onPercentageChange)
+        .onChange(of: value, initial: true) { oldValue, newValue in
+            if isDelegated {
+                switch interactionState {
+                case .receiving:
+                    percentage = max(0, min(1, newValue / total))
+                default:
+                    break
+                }
+            } else {
                 percentage = max(0, min(1, newValue / total))
-            default:
-                break
             }
         }
         .onChange(of: percentage) { oldValue, newValue in
-            switch interactionState {
-            case .propagating:
-                value = total * percentage
-                interactionState = .receiving
-            default:
-                break
-            }
+            syncDelegate(percentage: newValue)
+        }
+        .onChange(of: interactionState) { _, _ in
+            syncDelegate(percentage: percentage)
         }
     }
     
@@ -163,26 +163,10 @@ struct ProgressBar: View {
     private func update(percentage: CGFloat, type: UpdateType = .literal) {
         switch type {
         case .literal:
-            debounceTimer?.invalidate()
-            debounceTimer = nil
-            
             self.percentage = max(0, min(1, percentage))
             percentageOrigin = self.percentage
         case .offset:
-            debounceTimer?.invalidate()
-            debounceTimer = nil
-            
             self.percentage = max(0, min(1, percentageOrigin + percentage))
-        case .offsetDebounce:
-            debounceTarget = max(0, min(1, percentageOrigin + percentage))
-            guard debounceTimer == nil else { return }
-            
-            debounceTimer = .scheduledTimer(withTimeInterval: 0.1, repeats: false) { _ in
-                self.percentage = debounceTarget
-                
-                debounceTimer?.invalidate()
-                debounceTimer = nil
-            }
         }
     }
     
@@ -196,6 +180,22 @@ struct ProgressBar: View {
             overshootPercentage = 0
         }
     }
+    
+    private func syncDelegate(percentage: CGFloat) {
+        if isDelegated {
+            switch interactionState {
+            case .propagating:
+                value = total * percentage
+                interactionState = .receiving
+            default:
+                break
+            }
+        } else {
+            let value = total * percentage
+            guard self.value != value else { return }
+            self.value = value
+        }
+    }
 }
 
 #Preview {
@@ -205,5 +205,11 @@ struct ProgressBar: View {
     ProgressBar(value: $value, isActive: $isActive)
         .frame(width: 300, height: 12)
         .padding()
+        .backgroundStyle(.quinary)
+    
+    ProgressBar(value: $value, isActive: $isActive, isDelegated: true)
+        .frame(width: 300, height: 12)
+        .padding()
+        .foregroundStyle(.tint)
         .backgroundStyle(.quinary)
 }

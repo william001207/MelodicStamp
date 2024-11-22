@@ -458,10 +458,9 @@ extension PlayerModel {
         return progress >= 0 && progress <= 1
     }
     
-    @discardableResult func adjustTime(delta: Duration = .seconds(1), multiplier: CGFloat = 1, sign: FloatingPointSign = .plus) -> Bool {
+    @discardableResult func adjustTime(delta: TimeInterval = 1, multiplier: CGFloat = 1, sign: FloatingPointSign = .plus) -> Bool {
         guard duration > .zero else { return false }
-        let deltaValue = CGFloat(delta.components.seconds) / CGFloat(duration.components.seconds)
-        return adjustProgress(delta: deltaValue, multiplier: multiplier, sign: sign)
+        return adjustProgress(delta: delta / duration.toTimeInterval(), multiplier: multiplier, sign: sign)
     }
     
     @discardableResult func adjustVolume(delta: CGFloat = 0.01, multiplier: CGFloat = 1, sign: FloatingPointSign = .plus) -> Bool {
