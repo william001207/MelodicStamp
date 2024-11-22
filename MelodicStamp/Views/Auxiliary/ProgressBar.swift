@@ -7,15 +7,37 @@
 
 import SwiftUI
 
-struct ProgressBar: View {
-    @Environment(\.isEnabled) private var isEnabled
+struct ProportionalWidthEffect: GeometryEffect {
+    var animatableData: CGFloat {
+        get { proportion }
+        set { proportion = newValue }
+    }
     
-    @Namespace private var namespace
+    var proportion: CGFloat = 0
+    
+    func effectValue(size: CGSize) -> ProjectionTransform {
+        .init(.init(scaleX: max(.leastNonzeroMagnitude, min(1, proportion)), y: 1))
+    }
+}
+
+struct ProgressBar: View {
+    enum UpdateType {
+        case literal
+        case offset
+        case offsetDebounce
+    }
+    
+    enum InteractionState {
+        case receiving
+        case updating
+        case propagating
+    }
+    
+    @Environment(\.isEnabled) private var isEnabled
     
     @Binding var value: CGFloat
     var total: CGFloat = 1
     @Binding var isActive: Bool
-    var shouldAnimate: Bool = false
     
     var shrinkFactor: CGFloat = 0.6
     var overshoot: CGFloat = 16
@@ -23,38 +45,34 @@ struct ProgressBar: View {
     
     var onOvershootOffsetChange: (CGFloat, CGFloat) -> Void = { _, _ in }
     
+    @State private var interactionState: InteractionState = .receiving
+    @State private var percentage: CGFloat = .zero
+    @State private var percentageOrigin: CGFloat = .zero
+    @State private var debounceTarget: CGFloat = .zero
+    
     @State private var containerSize: CGSize = .zero
     @State private var overshootPercentage: CGFloat = .zero
+    
+    @State private var debounceTimer: Timer?
     
     var body: some View {
         ZStack {
             Group {
-                Capsule()
+                Rectangle()
                     .foregroundStyle(.background)
                 
                 if isEnabled {
-                    Capsule()
+                    Rectangle()
                         .mask(alignment: .leading) {
-                            let percentage = max(0, min(1, self.percentage))
-                            
-                            Group {
-                                if percentage < 1 {
-                                    Color.white
-                                        .frame(width: containerSize.width * percentage)
-                                        .matchedGeometryEffect(id: "mask", in: namespace)
-                                } else {
-                                    Color.white
-                                        .matchedGeometryEffect(id: "mask", in: namespace)
-                                }
-                            }
-                            .animation(.instant, value: percentage < 1)
+                            Color.white
+                                .modifier(ProportionalWidthEffect(proportion: percentage))
                         }
                 }
             }
+            .clipShape(.capsule)
             .frame(height: isActive ? containerSize.height : containerSize.height * shrinkFactor)
             .animation(.smooth, value: isActive)
-            .animation(.default.speed(5), value: value)
-            .animation(shouldAnimate ? .default : nil, value: containerSize)
+            .animation(.smooth.speed(5), value: percentage)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .onGeometryChange(for: CGSize.self) { proxy in
@@ -66,14 +84,33 @@ struct ProgressBar: View {
             .onChanged { gesture in
                 guard isEnabled else { return }
                 
-                isActive = true
-                update(percentage: gesture.location.x / containerSize.width)
+                switch interactionState {
+                case .receiving:
+                    // start dragging
+                    isActive = true
+                    interactionState = .updating
+                    update(percentage: gesture.location.x / containerSize.width)
+                case .updating:
+                    // update dragging
+                    update(
+                        percentage: gesture.translation.width / containerSize.width,
+                        type: .offsetDebounce
+                    )
+                case .propagating:
+                    break
+                }
+                
                 tryOvershoot(offset: gesture.location.x)
             }
             .onEnded { gesture in
                 guard isEnabled else { return }
                 
                 isActive = false
+                interactionState = .propagating
+                update(
+                    percentage: gesture.translation.width / containerSize.width,
+                    type: .offset
+                )
                 tryOvershoot(offset: 0)
             })
         
@@ -83,10 +120,23 @@ struct ProgressBar: View {
         .animation(.default, value: isEnabled)
         
         .onChange(of: overshootOffset, onOvershootOffsetChange)
-    }
-    
-    private var percentage: CGFloat {
-        clamp(percentage: value / total)
+        .onChange(of: value) { oldValue, newValue in
+            switch interactionState {
+            case .receiving:
+                percentage = max(0, min(1, newValue / total))
+            default:
+                break
+            }
+        }
+        .onChange(of: percentage) { oldValue, newValue in
+            switch interactionState {
+            case .propagating:
+                value = total * percentage
+                interactionState = .receiving
+            default:
+                break
+            }
+        }
     }
     
     private var overshootFactor: CGFloat {
@@ -110,12 +160,30 @@ struct ProgressBar: View {
         }
     }
     
-    private func clamp(percentage: CGFloat) -> CGFloat {
-        max(0, min(1, percentage))
-    }
-    
-    private func update(percentage: CGFloat) {
-        value = total * clamp(percentage: percentage)
+    private func update(percentage: CGFloat, type: UpdateType = .literal) {
+        switch type {
+        case .literal:
+            debounceTimer?.invalidate()
+            debounceTimer = nil
+            
+            self.percentage = max(0, min(1, percentage))
+            percentageOrigin = self.percentage
+        case .offset:
+            debounceTimer?.invalidate()
+            debounceTimer = nil
+            
+            self.percentage = max(0, min(1, percentageOrigin + percentage))
+        case .offsetDebounce:
+            debounceTarget = max(0, min(1, percentageOrigin + percentage))
+            guard debounceTimer == nil else { return }
+            
+            debounceTimer = .scheduledTimer(withTimeInterval: 0.1, repeats: false) { _ in
+                self.percentage = debounceTarget
+                
+                debounceTimer?.invalidate()
+                debounceTimer = nil
+            }
+        }
     }
     
     private func tryOvershoot(offset: CGFloat) {

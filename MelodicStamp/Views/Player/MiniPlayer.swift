@@ -28,12 +28,10 @@ struct MiniPlayer: View {
     
     @State private var activeControl: ActiveControl = .progress
     
-    @State private var isHovering: Bool = false
     @State private var isTitleHovering: Bool = false
     @State private var isProgressBarHovering: Bool = false
     @State private var isProgressBarActive: Bool = false
     @State private var isPressingSpace: Bool = false
-    @State private var isHoveringHappenedInside: Bool = false
     
     @State private var shouldUseRemainingDuration: Bool = true
     @State private var progressBarExternalOvershootSign: FloatingPointSign?
@@ -87,18 +85,6 @@ struct MiniPlayer: View {
             .animation(.default, value: isProgressBarHovering)
             .animation(.default, value: isProgressBarActive)
             .animation(.default, value: activeControl)
-        }
-        .onHover { hover in
-            let isLeftMouseButtonDown = NSEvent.pressedMouseButtons & 0b1 == 1
-            if !isHovering && hover {
-                // hovering happened
-                isHoveringHappenedInside = !isLeftMouseButtonDown
-            } else if !hover {
-                // reset
-                isHoveringHappenedInside = false
-            }
-            
-            isHovering = hover
         }
         .padding(12)
         .background(Color.clear)
@@ -186,11 +172,6 @@ struct MiniPlayer: View {
     private var isProgressBarExpanded: Bool {
         guard model.hasCurrentTrack || activeControl == .volume else { return false }
         return isProgressBarHovering || isProgressBarActive
-    }
-    
-    private var progressBarShouldAnimate: Bool {
-        let isMouseInside = isHovering || isProgressBarHovering || isProgressBarActive
-        return isHoveringHappenedInside && isMouseInside
     }
     
     @ViewBuilder private func header() -> some View {
@@ -333,32 +314,18 @@ struct MiniPlayer: View {
                 case .volume: $model.volume
                 }
                 
-                ZStack {
-                    if !isProgressBarActive {
-                        ProgressBar(
-                            value: .constant(0),
-                            isActive: $isProgressBarActive,
-                            externalOvershootSign: progressBarExternalOvershootSign
-                        )
-                        .disabled(true)
-                        .foregroundStyle(.clear)
-                        .backgroundStyle(.quinary)
+                ProgressBar(
+                    value: value,
+                    isActive: $isProgressBarActive,
+                    externalOvershootSign: progressBarExternalOvershootSign
+                ) { oldValue, newValue in
+                    if activeControl == .volume && oldValue <= 0 && newValue > 0 {
+                        speakerButtonBounceAnimation.toggle()
                     }
-                    
-                    ProgressBar(
-                        value: value,
-                        isActive: $isProgressBarActive,
-                        shouldAnimate: progressBarShouldAnimate,
-                        externalOvershootSign: progressBarExternalOvershootSign
-                    ) { oldValue, newValue in
-                        if activeControl == .volume && oldValue <= 0 && newValue > 0 {
-                            speakerButtonBounceAnimation.toggle()
-                        }
-                    }
-                    .disabled(activeControl == .progress && !model.hasCurrentTrack)
-                    .foregroundStyle(isProgressBarActive ? .primary : activeControl == .volume && model.isMuted ? .quaternary : .secondary)
-                    .backgroundStyle(isProgressBarActive ? AnyShapeStyle(.quinary) : AnyShapeStyle(.clear))
                 }
+                .disabled(activeControl == .progress && !model.hasCurrentTrack)
+                .foregroundStyle(isProgressBarActive ? .primary : activeControl == .volume && model.isMuted ? .quaternary : .secondary)
+                .backgroundStyle(.quinary)
             }
             .padding(.horizontal, !isProgressBarHovering || isProgressBarActive ? 0 : 12)
             .onHover { hover in
