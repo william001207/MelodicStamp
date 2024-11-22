@@ -70,12 +70,13 @@ struct FloatingTabBarView: View {
                 onHover = isOnHover
             }
         })
-        .background(Color.clear)
+        .background(.clear)
         .frame(width: onHover ? 140 : 55, height: 200)
-        .clipShape(RoundedRectangle(cornerRadius: 25))
+        .clipShape(.rect(cornerRadius: 25))
+        
         .frame(maxWidth: .infinity, alignment: .leading)
         .frame(width: 150, alignment: .leading)
-        .contentShape(RoundedRectangle(cornerRadius: 25))
+        .contentShape(.rect(cornerRadius: 25))
     }
 }
 

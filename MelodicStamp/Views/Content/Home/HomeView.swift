@@ -223,7 +223,7 @@ struct HomeView: View {
         let panel = NSOpenPanel()
         panel.allowsMultipleSelection = false
         panel.canChooseDirectories = false
-        panel.allowedFileTypes = ContentView.supportedPathExtensions
+        panel.allowedFileTypes = supportedPathExtensions
         
         if panel.runModal() == .OK, let url = panel.url {
             model.play(url)
@@ -234,7 +234,7 @@ struct HomeView: View {
         let panel = NSOpenPanel()
         panel.allowsMultipleSelection = true
         panel.canChooseDirectories = false
-        panel.allowedFileTypes = ContentView.supportedPathExtensions
+        panel.allowedFileTypes = supportedPathExtensions
         
         if panel.runModal() == .OK {
             model.addToPlaylist(urls: panel.urls)

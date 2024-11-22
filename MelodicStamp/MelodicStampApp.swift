@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import CSFBAudioEngine
 
 @main
 struct MelodicStampApp: App {
@@ -38,8 +39,17 @@ struct MelodicStampApp: App {
                 .frame(minWidth: 500, idealWidth: 500)
                 .fixedSize(horizontal: false, vertical: true)
         }
+        .defaultSize(width: 500, height: 0)
         .windowResizability(.contentSize)
         .windowStyle(.hiddenTitleBar)
         .windowToolbarStyle(.unified)
     }
 }
+
+// TODO: improve this
+let supportedPathExtensions: [String] = {
+    var pathExtensions = [String]()
+    pathExtensions.append(contentsOf: AudioDecoder.supportedPathExtensions)
+    pathExtensions.append(contentsOf: DSDDecoder.supportedPathExtensions)
+    return pathExtensions
+}()
