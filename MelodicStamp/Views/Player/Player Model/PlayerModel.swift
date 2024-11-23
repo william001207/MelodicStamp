@@ -247,24 +247,26 @@ enum PlaybackMode: String, CaseIterable, Identifiable {
     }
     
     func loadPlaylist() {
-        if let urls = UserDefaults.standard.object(forKey: "playlistURLs") as? [String] {
-            for urlString in urls {
-                if let url = URL(string: urlString) {
-                    let item = PlaylistItem(url)
-                    playlist.append(item)
-                }
-            }
-        }
+//        if let urls = UserDefaults.standard.object(forKey: "playlistURLs") as? [String] {
+//            for urlString in urls {
+//                if let url = URL(string: urlString) {
+//                    if let item = PlaylistItem(url) {
+//                        playlist.append(item)
+//                    }
+//                }
+//            }
+//        }
     }
     
     func savePlaylist() {
-        let urls = playlist.map { $0.url.absoluteString }
+//        let urls = playlist.map { $0.url.absoluteString }
         // TODO: use `Defaults`
         // UserDefaults.standard.set(urls, forKey: "playlistURLs")
     }
     
     func play(_ url: URL) {
         addToPlaylist(urls: [url])
+        
         if let item = playlist.first(where: { $0.url == url }) {
             play(item)
         }
@@ -284,8 +286,10 @@ enum PlaybackMode: String, CaseIterable, Identifiable {
     func addToPlaylist(urls: [URL]) {
         for url in urls {
             guard !playlist.contains(where: { $0.url == url }) else { continue }
-            let item = PlaylistItem(url)
-            playlist.append(item)
+            
+            if let item = PlaylistItem(url) {
+                playlist.append(item)
+            }
         }
     }
     

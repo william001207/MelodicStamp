@@ -15,7 +15,10 @@ struct PlaylistItem: Identifiable, Equatable, Hashable {
     var properties: AudioProperties
     var metadata: AudioMetadata
 
-    init(_ url: URL) {
+    init?(_ url: URL) {
+        guard url.startAccessingSecurityScopedResource() else { return nil }
+        defer { url.stopAccessingSecurityScopedResource() }
+        
         self.url = url
         if let audioFile = try? AudioFile(readingPropertiesAndMetadataFrom: url) {
             self.properties = audioFile.properties
@@ -27,6 +30,9 @@ struct PlaylistItem: Identifiable, Equatable, Hashable {
     }
 
     func decoder(enableDoP: Bool = false) throws -> PCMDecoding? {
+        guard url.startAccessingSecurityScopedResource() else { return nil }
+        defer { url.stopAccessingSecurityScopedResource() }
+        
         let pathExtension = url.pathExtension.lowercased()
         if AudioDecoder.handlesPaths(withExtension: pathExtension) {
             return try AudioDecoder(url: url)
@@ -34,6 +40,7 @@ struct PlaylistItem: Identifiable, Equatable, Hashable {
             let dsdDecoder = try DSDDecoder(url: url)
             return enableDoP ? try DoPDecoder(decoder: dsdDecoder) : try DSDPCMDecoder(decoder: dsdDecoder)
         }
+        
         return nil
     }
 

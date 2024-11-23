@@ -92,7 +92,6 @@ struct PlaylistView: View {
             switch result {
             case .success(let success):
                 guard !success.isEmpty else { return }
-                print(1)
                 player.play(success[0])
             case .failure:
                 break
