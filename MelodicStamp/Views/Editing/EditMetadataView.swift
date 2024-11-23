@@ -10,7 +10,9 @@ import CSFBAudioEngine
 
 struct EditMetadataView: View {
     @Environment(\.presentationMode) var presentationMode
-    @State var player: PlayerModel
+    
+    @Bindable var player: PlayerModel
+    
     @Binding var selectedItem: PlaylistItem?
 
     @State private var title: String = ""

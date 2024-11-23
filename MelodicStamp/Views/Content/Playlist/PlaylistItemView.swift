@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct PlaylistItemView: View {
-    @State var player: PlayerModel
+    @Bindable var player: PlayerModel
     
     var item: PlaylistItem
     var isSelected: Bool
