@@ -260,8 +260,7 @@ enum PlaybackMode: String, CaseIterable, Identifiable {
     
     func savePlaylist() {
 //        let urls = playlist.map { $0.url.absoluteString }
-        // TODO: use `Defaults`
-        // UserDefaults.standard.set(urls, forKey: "playlistURLs")
+//        UserDefaults.standard.set(urls, forKey: "playlistURLs")
     }
     
     func play(_ url: URL) {
