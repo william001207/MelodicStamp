@@ -10,60 +10,98 @@ import SwiftUI
 struct FloatingTabBarView: View {
     @Bindable var floatingWindows: FloatingWindowsModel
     
-    @State private var hoveringStates: [SidebarItem: Bool] = [:]
+    @State private var hoveringStates: [SidebarTab: Bool] = [:]
     @State private var isHovering: Bool = false
     
     var sections: [SidebarSection]
     
-    @Binding var selectedItem: SidebarItem
+    @Binding var selectedTabs: Set<SidebarTab>
+    
+    @State private var isComposed: Bool?
     
     var body: some View {
         ZStack {
             VisualEffectView(material: .popover, blendingMode: .behindWindow)
             
-            ForEach(sections) { section in
-                VStack(alignment:.center, spacing: 2.5) {
-                    ForEach(section.items) { item in
-                        let isHoveringItem = hoveringStates[item] ?? false
-                        let isSelected = self.selectedItem == item
+            VStack {
+                ForEach(sections) { section in
+                    VStack(alignment:.center, spacing: 2.5) {
+                        if let title = section.title {
+                            Text(title)
+                                .font(.caption)
+                                .bold()
+                                .foregroundStyle(.secondary)
+                        }
                         
-                        AliveButton {
-                            self.selectedItem = item
-                        } label: {
-                            HStack(spacing: 10) {
-                                item.icon
-                                    .font(.system(size: 18.0).bold())
-                                    .frame(width: 35, height: 35)
-                                if isHovering {
-                                    Text(item.title)
-                                        .font(.headline)
+                        ForEach(section.items) { tab in
+                            let isTabHovering = hoveringStates[tab] ?? false
+                            let isSelected = selectedTabs.contains(tab)
+                            
+                            AliveButton {
+                                if let isComposed {
+                                    if tab.isComposable && isComposed {
+                                        if isSelected {
+                                            selectedTabs.remove(tab)
+                                        } else {
+                                            selectedTabs.insert(tab)
+                                        }
+                                    } else {
+                                        selectedTabs = .init([tab])
+                                    }
+                                } else {
+                                    isComposed = tab.isComposable
+                                    selectedTabs = .init([tab])
                                 }
-                            }
-                            .frame(height: 35)
-                            .padding(5)
-                            .frame(maxWidth: .infinity, alignment: isHovering ? .leading : .center)
-                            .opacity(isSelected || isHoveringItem ? 1 : 0.75)
-                            .background {
-                                if isSelected {
-                                    RoundedRectangle(cornerRadius: 20)
-                                        .stroke(.quaternary, lineWidth: 2)
-                                        .fill(.quaternary)
-                                } else if isHoveringItem {
-                                    RoundedRectangle(cornerRadius: 20)
-                                        .stroke(.quinary, lineWidth: 2)
-                                        .fill(.quinary)
+                            } label: {
+                                HStack(spacing: 10) {
+                                    tab.icon
+                                        .font(.system(size: 18))
+                                        .bold()
+                                        .frame(width: 35, height: 35)
+                                    if isHovering {
+                                        Text(tab.title)
+                                            .font(.headline)
+                                    }
                                 }
-                            }
-                            .onHover { hover in
-                                withAnimation(.default.speed(2)) {
-                                    hoveringStates[item] = hover
+                                .frame(height: 35)
+                                .padding(5)
+                                .frame(maxWidth: .infinity, alignment: isHovering ? .leading : .center)
+                                .opacity(isSelected || isTabHovering ? 1 : 0.75)
+                                .background {
+                                    if isSelected {
+                                        RoundedRectangle(cornerRadius: 20)
+                                            .stroke(.quaternary)
+                                            .fill(.quaternary)
+                                    } else if isTabHovering {
+                                        RoundedRectangle(cornerRadius: 20)
+                                            .stroke(.quinary)
+                                            .fill(.quinary)
+                                    }
+                                }
+                                .onHover { hover in
+                                    withAnimation(.default.speed(2)) {
+                                        hoveringStates[tab] = hover
+                                    }
                                 }
                             }
                         }
                     }
+                    .padding(5)
                 }
-                .padding(5)
             }
+        }
+        .onAppear {
+            var isComposed: Bool?
+            for tab in selectedTabs {
+                if let isComposed {
+                    if tab.isComposable != isComposed {
+                        selectedTabs.remove(tab)
+                    }
+                } else {
+                    isComposed = tab.isComposable
+                }
+            }
+            self.isComposed = isComposed
         }
         .onHover(perform: { hover in
             withAnimation(.smooth.speed(2)) {
@@ -71,7 +109,7 @@ struct FloatingTabBarView: View {
             }
         })
         .background(.clear)
-        .frame(width: isHovering ? 140 : 55, height: 200)
+        .frame(width: isHovering ? 140 : 55)
         .clipShape(.rect(cornerRadius: 25))
         
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -81,7 +119,7 @@ struct FloatingTabBarView: View {
 }
 
 #Preview {
-    @Previewable @State var selectedTab: SidebarItem = .home
+    @Previewable @State var selectedTabs: Set<SidebarTab> = .init([.playlist])
     
-    FloatingTabBarView(floatingWindows: .init(), sections: [.init(items: SidebarItem.allCases)], selectedItem: $selectedTab)
+    FloatingTabBarView(floatingWindows: .init(), sections: [.init(items: SidebarTab.allCases)], selectedTabs: $selectedTabs)
 }

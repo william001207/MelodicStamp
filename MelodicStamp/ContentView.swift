@@ -12,7 +12,7 @@ struct ContentView: View {
     
     @Namespace private var namespace
     
-    @State private var selectedTab: SidebarItem = .home
+    @State private var selectedTabs: Set<SidebarTab> = .init([.playlist])
     
     @State private var floatingWindows: FloatingWindowsModel = .init()
     @State private var player: PlayerModel = .init()
@@ -22,7 +22,7 @@ struct ContentView: View {
         Group {
             switch windowStyle {
             case .main:
-                MainView(player: player, selectedTab: $selectedTab)
+                MainView(player: player, selectedTabs: $selectedTabs)
                     .onGeometryChange(for: CGRect.self) { proxy in
                         proxy.frame(in: .global)
                     } action: { newValue in
@@ -73,9 +73,9 @@ struct ContentView: View {
             FloatingTabBarView(
                 floatingWindows: floatingWindows,
                 sections: [
-                    .init(items: [.home, .search, .library, .setting])
+                    .init(items: [.playlist, .inspector, .metadata])
                 ],
-                selectedItem: $selectedTab
+                selectedTabs: $selectedTabs
             )
         }
         floatingWindows.addPlayer {
@@ -84,8 +84,8 @@ struct ContentView: View {
                 player: player
             )
             .environment(\.melodicStampWindowStyle, windowStyle)
-            .environment(\.changeMelodicStampWindowStyle) { windowStyle in
-                self.windowStyle = windowStyle
+            .environment(\.changeMelodicStampWindowStyle) { newValue in
+                windowStyle = newValue
             }
         }
     }

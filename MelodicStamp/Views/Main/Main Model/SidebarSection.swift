@@ -10,7 +10,7 @@ import SFSafeSymbols
 
 struct SidebarSection: Hashable, Identifiable {
     let title: String? = nil
-    let items: [SidebarItem]
+    let items: [SidebarTab]
     
     var id: Int {
         return self.hashValue
@@ -21,39 +21,41 @@ struct SidebarSection: Hashable, Identifiable {
     }
 }
 
-enum SidebarItem: Hashable, Identifiable, CaseIterable {
-    case home
-    case search
-    case library
-    case setting
+enum SidebarTab: Hashable, Identifiable, CaseIterable {
+    case playlist
+    case inspector
+    case metadata
     
     var id: String {
         .init(describing: self)
     }
     
+    var isComposable: Bool {
+        switch self {
+        case .playlist, .inspector, .metadata:
+            true
+        }
+    }
+    
     var title: String {
         switch self {
-        case .home:
-                .init(localized: "Home")
-        case .search:
-                .init(localized: "Search")
-        case .library:
-                .init(localized: "Library")
-        case .setting:
-                .init(localized: "Settings")
+        case .playlist:
+                .init(localized: "Playlist")
+        case .inspector:
+                .init(localized: "Inspector")
+        case .metadata:
+                .init(localized: "Metadata")
         }
     }
     
     var icon: Image {
         switch self {
-        case .home:
-                .init(systemSymbol: .house)
-        case .search:
-                .init(systemSymbol: .magnifyingglass)
-        case .library:
-                .init(systemSymbol: .playSquareStack)
-        case .setting:
-                .init(systemSymbol: .gearshape)
+        case .playlist:
+                .init(systemSymbol: .musicNoteList)
+        case .inspector:
+                .init(systemSymbol: .photo)
+        case .metadata:
+                .init(systemSymbol: .textBadgePlus)
         }
     }
     

@@ -12,17 +12,21 @@ struct MainView: View {
     
     @Bindable var player: PlayerModel
     
-    @Binding var selectedTab: SidebarItem
+    @Binding var selectedTabs: Set<SidebarTab>
     
     var body: some View {
         // use `ZStack` to eliminate safe area animation problems
         ZStack {
             VisualEffectView(material: .contentBackground, blendingMode: .behindWindow)
             
-            Group {
-                switch selectedTab {
-                case .home:
-                    HomeView(player: player)
+            if !selectedTabs.isEmpty {
+                HSplitView {
+                    ForEach(Array(selectedTabs)) { tab in
+                        switch tab {
+                        default:
+                            EmptyView()
+                        }
+                    }
                 }
             }
         }
@@ -38,7 +42,7 @@ struct MainView: View {
 }
 
 #Preview {
-    @Previewable @State var selectedTab: SidebarItem = .home
+    @Previewable @State var selectedTabs: Set<SidebarTab> = .init([.playlist])
     
-    MainView(player: .init(), selectedTab: $selectedTab)
+    MainView(player: .init(), selectedTabs: $selectedTabs)
 }
