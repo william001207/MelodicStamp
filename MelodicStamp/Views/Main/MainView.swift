@@ -21,13 +21,27 @@ struct MainView: View {
             
             if !selectedTabs.isEmpty {
                 HSplitView {
-                    ForEach(Array(selectedTabs)) { tab in
+                    ForEach(Array(selectedTabs).sorted { $0.order < $1.order }) { tab in
                         switch tab {
-                        default:
-                            EmptyView()
+                        case .playlist:
+                            PlaylistView(player: player)
+                                .frame(minWidth: 200)
+                        case .inspector:
+                            Color.red
+                                .frame(minWidth: 200)
+                        case .metadata:
+                            Color.blue
+                                .frame(minWidth: 200)
                         }
                     }
+                    .edgesIgnoringSafeArea(.top)
                 }
+            } else {
+                Image(systemSymbol: .musicNote)
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .frame(height: 32)
+                    .foregroundStyle(.placeholder)
             }
         }
         .frame(minWidth: 1000, minHeight: 600)

@@ -37,6 +37,18 @@ enum SidebarTab: Hashable, Identifiable, CaseIterable {
         }
     }
     
+    /// A larger value prefers a place closer to the trailing edge.
+    var order: Int {
+        switch self {
+        case .playlist:
+            0
+        case .inspector:
+            2
+        case .metadata:
+            1
+        }
+    }
+    
     var title: String {
         switch self {
         case .playlist:

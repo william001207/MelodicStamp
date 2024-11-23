@@ -7,6 +7,7 @@
 
 import SwiftUI
 import CSFBAudioEngine
+import UniformTypeIdentifiers
 
 @main
 struct MelodicStampApp: App {
@@ -41,9 +42,9 @@ struct MelodicStampApp: App {
 }
 
 // TODO: improve this
-let supportedPathExtensions: [String] = {
-    var pathExtensions = [String]()
-    pathExtensions.append(contentsOf: AudioDecoder.supportedPathExtensions)
-    pathExtensions.append(contentsOf: DSDDecoder.supportedPathExtensions)
-    return pathExtensions
+let allowedContentTypes: [UTType] = {
+    var types = [UTType]()
+    types.append(contentsOf: AudioDecoder.supportedMIMETypes.compactMap { UTType(mimeType: $0) })
+    types.append(contentsOf: DSDDecoder.supportedMIMETypes.compactMap { UTType(mimeType: $0) })
+    return types
 }()
