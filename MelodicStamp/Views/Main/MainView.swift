@@ -8,20 +8,35 @@
 import SwiftUI
 
 struct MainView: View {
-    @State private var floatingWindowsModel: FloatingWindowsModel = .init()
-    @State private var playerModel: PlayerModel = .init()
-    
     @Environment(\.appearsActive) private var isActive
+    @Environment(\.melodicStampWindowStyle) private var windowStyle
+    @Environment(\.changeMelodicStampWindowStyle) private var changeWindowStyle
+    
+    @Bindable var player: PlayerModel
+    
+    @State private var floatingWindows: FloatingWindowsModel = .init()
+    @State private var selectedTab: SidebarItem = .home
     
     var body: some View {
-        ZStack(alignment: .topLeading) {
+        Group {
+            switch selectedTab {
+            case .home:
+                HomeView(player: player)
+            case .search:
+                Text("SearchView")
+            case .library:
+                Text("LibraryView")
+            case .setting:
+                Text("SettingsView")
+            }
+        }
+        .transition(.blurReplace.animation(.smooth.speed(2)))
+        .background {
             VisualEffectView(material: .sidebar, blendingMode: .behindWindow)
-            
-            floatingWindowsModel.selectedSidebarItem.content(model: playerModel)
-                .transition(.blurReplace.animation(.smooth.speed(2)))
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
         .frame(minWidth: 1000, minHeight: 600)
+        .edgesIgnoringSafeArea(.top)
+        
         .toolbar {
             ToolbarItem(placement: .principal) {
                 Color.clear
@@ -30,18 +45,42 @@ struct MainView: View {
         .onGeometryChange(for: CGRect.self) { proxy in
             proxy.frame(in: .global)
         } action: { newValue in
-            floatingWindowsModel.updateTabBarPosition()
-            floatingWindowsModel.updatePlayerPosition()
+            floatingWindows.updateTabBarPosition()
+            floatingWindows.updatePlayerPosition()
         }
         .onChange(of: isActive, initial: true) { oldValue, newValue in
-            if newValue {
-                floatingWindowsModel.addTabBar()
-                floatingWindowsModel.addPlayer(model: playerModel)
+            switch windowStyle {
+            case .main:
+                if newValue {
+                    floatingWindows.addTabBar {
+                        FloatingTabBarView(
+                            floatingWindows: floatingWindows,
+                            sections: [
+                                .init(items: [.home, .search, .library, .setting])
+                            ],
+                            selectedItem: $selectedTab
+                        )
+                    }
+                    floatingWindows.addPlayer {
+                        FloatingPlayerView(
+                            floatingWindows: floatingWindows,
+                            player: player
+                        )
+                        .environment(\.melodicStampWindowStyle, windowStyle)
+                        .environment(\.changeMelodicStampWindowStyle, changeWindowStyle)
+                    }
+                }
+            default:
+                break
             }
+        }
+        .onDisappear {
+            floatingWindows.removeTabBar()
+            floatingWindows.removePlayer()
         }
     }
 }
 
 #Preview {
-    MainView()
+    MainView(player: .init())
 }

@@ -9,8 +9,6 @@ import SwiftUI
 import AppKit
 
 class AppDelegate: NSObject, NSApplicationDelegate {
-    var model: PlayerModel?
-
     func applicationDidFinishLaunching(_ notification: Notification) {
 //        playerViewModel.setupRemoteCommandCenter()
     }
@@ -21,11 +19,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     func application(_ application: NSApplication, open urls: [URL]) {
         if let url = urls.first {
-            model?.play(url)
+//            model?.play(url)
         }
     }
     
     func applicationWillTerminate(_ notification: Notification) {
-        model?.savePlaylist()
     }
 }

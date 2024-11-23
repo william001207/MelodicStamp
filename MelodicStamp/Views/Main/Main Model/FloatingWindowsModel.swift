@@ -14,25 +14,14 @@ import AppKit
     
     private var tabBarIdentifier: UUID = .init()
     private var playerIdentifier: UUID = .init()
-    
-    var selectedSidebarItem: SidebarItem = .home
 
-    func addTabBar() {
+    func addTabBar(@ViewBuilder content: () -> some View) {
         guard !isTabBarAdded else { return }
         
         if let applicationWindow = NSApp.mainWindow {
-            let content = NSHostingView(rootView: FloatingTabBarView(
-                model: self,
-                sections: sidebarSections,
-                selectedItem: .init {
-                    self.selectedSidebarItem
-                } set: { newValue in
-                    self.selectedSidebarItem = newValue
-                }
-            ))
             let floatingWindow = NSWindow()
             floatingWindow.styleMask = .borderless
-            floatingWindow.contentView = content
+            floatingWindow.contentView = NSHostingView(rootView: content())
             floatingWindow.backgroundColor = .clear
             floatingWindow.title = tabBarIdentifier.uuidString
             
@@ -45,14 +34,13 @@ import AppKit
         }
     }
     
-    func addPlayer(model: PlayerModel) {
+    func addPlayer(@ViewBuilder content: () -> some View) {
         guard !isPlayerAdded else { return }
 
         if let applicationWindow = NSApp.mainWindow {
-            let content = NSHostingView(rootView: FloatingPlayerView(floatingWindowsModel: self, playerModel: model))
             let floatingWindow = NSWindow()
             floatingWindow.styleMask = .borderless
-            floatingWindow.contentView = content
+            floatingWindow.contentView = NSHostingView(rootView: content())
             floatingWindow.backgroundColor = .clear
             floatingWindow.title = playerIdentifier.uuidString
 
@@ -62,6 +50,26 @@ import AppKit
             DispatchQueue.main.async {
                 self.updatePlayerPosition()
             }
+        }
+    }
+    
+    func removeTabBar() {
+        guard isTabBarAdded else { return }
+        
+        if let floatingWindow = NSApp.windows.first(where: { $0.title == tabBarIdentifier.uuidString }), let applicationWindow = NSApp.mainWindow {
+            floatingWindow.close()
+            applicationWindow.removeChildWindow(floatingWindow)
+            isTabBarAdded = false
+        }
+    }
+    
+    func removePlayer() {
+        guard isPlayerAdded else { return }
+        
+        if let floatingWindow = NSApp.windows.first(where: { $0.title == playerIdentifier.uuidString }), let applicationWindow = NSApp.mainWindow {
+            floatingWindow.close()
+            applicationWindow.removeChildWindow(floatingWindow)
+            isTabBarAdded = false
         }
     }
     

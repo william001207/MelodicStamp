@@ -70,7 +70,7 @@ struct ProgressBar: View {
             .clipShape(.capsule)
             .frame(height: isActive ? containerSize.height : containerSize.height * shrinkFactor)
             .animation(.smooth, value: isActive)
-            .animation(.smooth, value: percentage)
+            .animation(.smooth(duration: 0.35), value: percentage)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .onGeometryChange(for: CGSize.self) { proxy in

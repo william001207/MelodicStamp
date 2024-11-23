@@ -11,7 +11,7 @@ import Luminare
 import SFSafeSymbols
 
 struct HomeView: View {
-    @Bindable var model: PlayerModel
+    @Bindable var player: PlayerModel
     
     @State var selectedItems: Set<PlaylistItem> = []
     @State var lastSelectedItem: PlaylistItem? = nil
@@ -155,7 +155,7 @@ struct HomeView: View {
     private func playList() -> some View {
         ScrollView(.vertical, showsIndicators: false) {
             LazyVStack(spacing: 10) {
-                ForEach(model.playlist()) { item in
+                ForEach(player.playlist()) { item in
                     AliveButton {
                         let hasShift = NSEvent.modifierFlags.contains(.shift)
                         let hasCommand = NSEvent.modifierFlags.contains(.command)
@@ -176,7 +176,7 @@ struct HomeView: View {
                             Spacer()
                             
                             AliveButton {
-                                model.play(item)
+                                player.play(item)
                             } label: {
                                 Image(systemSymbol: .playCircle)
                                     .font(.system(size: 18.0).bold())
@@ -211,10 +211,10 @@ struct HomeView: View {
         ScrollView {
             LazyVStack {
                 if let singleSelectedItem = selectedItems.first, showEditMetadata {
-                    EditMetadataView(model: model, selectedItem: .constant(singleSelectedItem))
+                    EditMetadataView(player: player, selectedItem: .constant(singleSelectedItem))
                 } else if showBatchEdit {
                     BatchEditMetadataView(
-                        model: model,
+                        player: player,
                         selectedItems: Array(selectedItems)
                     )
                 }
@@ -228,10 +228,10 @@ struct HomeView: View {
     
     private func handleSelection(of item: PlaylistItem, isShiftPressed: Bool, isCommandPressed: Bool) {
         if isShiftPressed, let last = lastSelectedItem {
-            if let startIndex = model.playlist().firstIndex(of: last),
-               let endIndex = model.playlist().firstIndex(of: item) {
+            if let startIndex = player.playlist().firstIndex(of: last),
+               let endIndex = player.playlist().firstIndex(of: item) {
                 let range = min(startIndex, endIndex)...max(startIndex, endIndex)
-                let itemsInRange = model.playlist()[range]
+                let itemsInRange = player.playlist()[range]
                 selectedItems.formUnion(itemsInRange)
             }
         } else if isCommandPressed {
@@ -253,7 +253,7 @@ struct HomeView: View {
         panel.allowedFileTypes = supportedPathExtensions
         
         if panel.runModal() == .OK, let url = panel.url {
-            model.play(url)
+            player.play(url)
         }
     }
     
@@ -264,11 +264,11 @@ struct HomeView: View {
         panel.allowedFileTypes = supportedPathExtensions
         
         if panel.runModal() == .OK {
-            model.addToPlaylist(urls: panel.urls)
+            player.addToPlaylist(urls: panel.urls)
         }
     }
 }
 
 #Preview {
-    HomeView(model: .init())
+    HomeView(player: .init())
 }

@@ -10,7 +10,7 @@ import CSFBAudioEngine
 
 struct BatchEditMetadataView: View {
     @Environment(\.presentationMode) var presentationMode
-    @State var model: PlayerModel
+    @State var player: PlayerModel
     var selectedItems: [PlaylistItem]
 
     // 批量编辑字段（可选项）

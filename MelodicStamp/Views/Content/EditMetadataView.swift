@@ -10,7 +10,7 @@ import CSFBAudioEngine
 
 struct EditMetadataView: View {
     @Environment(\.presentationMode) var presentationMode
-    @State var model: PlayerModel
+    @State var player: PlayerModel
     @Binding var selectedItem: PlaylistItem?
 
     @State private var title: String = ""
@@ -219,8 +219,8 @@ struct EditMetadataView: View {
         item.metadata.replayGainReferenceLoudness = Double(replayGainReferenceLoudness)
 
 //        // 更新播放列表
-//        if let index = model.playlist.firstIndex(where: { $0.id == item.id }) {
-//            model.playlist[index] = item
+//        if let index = player.playlist.firstIndex(where: { $0.id == item.id }) {
+//            player.playlist[index] = item
 //        }
 
         do {
@@ -236,7 +236,7 @@ struct EditMetadataView: View {
             audioFile.metadata = metadata
             try audioFile.writeMetadata()
         } catch {
-//            model.handleError(error)
+//            player.handleError(error)
         }
     }
 }
