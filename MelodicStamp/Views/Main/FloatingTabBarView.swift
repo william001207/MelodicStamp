@@ -8,47 +8,47 @@
 import SwiftUI
 
 struct FloatingTabBarView: View {
-    @State var model: FloatingWindowsModel
+    @Bindable var model: FloatingWindowsModel
     
     @State private var hoveringStates: [SidebarItem: Bool] = [:]
-    @State private var onHover: Bool = false
+    @State private var isHovering: Bool = false
     
-    let sections: [SidebarSection]
+    var sections: [SidebarSection]
     
     @Binding var selectedItem: SidebarItem
     
     var body: some View {
         ZStack {
             VisualEffectView(material: .popover, blendingMode: .behindWindow)
-            ForEach(self.sections) { section in
+            
+            ForEach(sections) { section in
                 VStack(alignment:.center, spacing: 2.5) {
                     ForEach(section.items) { item in
-                        
-                        let isHovering = hoveringStates[item] ?? false
+                        let isHoveringItem = hoveringStates[item] ?? false
                         let isSelected = self.selectedItem == item
                         
                         AliveButton {
                             self.selectedItem = item
                         } label: {
                             HStack(spacing: 10) {
-                                Image(systemName: item.iconName)
+                                item.icon
                                     .font(.system(size: 18.0).bold())
                                     .frame(width: 35, height: 35)
-                                if onHover {
+                                if isHovering {
                                     Text(item.title)
                                         .font(.headline)
                                 }
                             }
                             .frame(height: 35)
                             .padding(5)
-                            .frame(maxWidth: .infinity, alignment: onHover ? .leading : .center)
-                            .opacity(isSelected || isHovering ? 1 : 0.75)
+                            .frame(maxWidth: .infinity, alignment: isHovering ? .leading : .center)
+                            .opacity(isSelected || isHoveringItem ? 1 : 0.75)
                             .background {
                                 if isSelected {
                                     RoundedRectangle(cornerRadius: 20)
                                         .stroke(.quaternary, lineWidth: 2)
                                         .fill(.quaternary)
-                                } else if isHovering {
+                                } else if isHoveringItem {
                                     RoundedRectangle(cornerRadius: 20)
                                         .stroke(.quinary, lineWidth: 2)
                                         .fill(.quinary)
@@ -65,13 +65,13 @@ struct FloatingTabBarView: View {
                 .padding(5)
             }
         }
-        .onHover(perform: { isOnHover in
-            withAnimation(.smooth(duration: 0.32)) {
-                onHover = isOnHover
+        .onHover(perform: { hover in
+            withAnimation(.smooth.speed(2)) {
+                isHovering = hover
             }
         })
         .background(.clear)
-        .frame(width: onHover ? 140 : 55, height: 200)
+        .frame(width: isHovering ? 140 : 55, height: 200)
         .clipShape(.rect(cornerRadius: 25))
         
         .frame(maxWidth: .infinity, alignment: .leading)

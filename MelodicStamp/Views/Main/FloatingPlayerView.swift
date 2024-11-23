@@ -8,20 +8,16 @@
 import SwiftUI
 
 struct FloatingPlayerView: View {
-    @State var model: FloatingWindowsModel
+    @Bindable var floatingWindowsModel: FloatingWindowsModel
+    @Bindable var playerModel: PlayerModel
     
     @Namespace private var namespace
     
-    @State var onHover: Bool = false
-    
     var body: some View {
         ZStack {
-            
             VisualEffectView(material: .popover, blendingMode: .behindWindow)
             
-            Player(namespace: namespace)
-                .background(.clear)
-            
+            Player(model: playerModel, namespace: namespace)
         }
         .frame(width: 800, height: 100)
         .clipShape(.rect(cornerRadius: 25))

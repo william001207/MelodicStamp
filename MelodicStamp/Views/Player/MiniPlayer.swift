@@ -22,9 +22,9 @@ struct MiniPlayer: View {
         }
     }
     
-    var namespace: Namespace.ID
+    @Bindable var model: PlayerModel
     
-    @State var model: PlayerModel = .shared
+    var namespace: Namespace.ID
     
     @State private var activeControl: ActiveControl = .progress
     
@@ -52,35 +52,15 @@ struct MiniPlayer: View {
                 }
             
             HStack(alignment: .center, spacing: 12) {
-                if !isProgressBarExpanded {
-                    leadingControls()
-                        .transition(.blurReplace)
-                }
+                leadingControls()
+                    .transition(.blurReplace)
                 
                 TimelineView(.animation) { context in
                     progressBar()
                 }
                 
-                if activeControl == .volume {
-                    Group {
-                        if isProgressBarExpanded {
-                            Spacer()
-                                .frame(width: 0)
-                        } else {
-                            AliveButton {
-                                activeControl = .progress
-                            } label: {
-                                Image(systemSymbol: .chevronLeft)
-                            }
-                        }
-                    }
+                trailingControls()
                     .transition(.blurReplace)
-                }
-                
-                if activeControl == .volume || !isProgressBarExpanded {
-                    trailingControls()
-                        .transition(.blurReplace)
-                }
             }
             .frame(height: 16)
             .animation(.default, value: isProgressBarHovering)
@@ -207,7 +187,7 @@ struct MiniPlayer: View {
             .matchedGeometryEffect(id: PlayerNamespace.playbackModeButton, in: namespace)
             
             ShrinkableMarqueeScrollView {
-                MusicTitle()
+                MusicTitle(metadata: model.currentMetadata, url: model.currentURL)
             }
             .contentTransition(.numericText())
             .animation(.default, value: model.currentIndex)
@@ -223,67 +203,86 @@ struct MiniPlayer: View {
     }
     
     @ViewBuilder private func leadingControls() -> some View {
-        Group {
-            AliveButton {
-                model.previousTrack()
-                previousSongButtonBounceAnimation.toggle()
-            } label: {
-                Image(systemSymbol: .backwardFill)
+        if !isProgressBarExpanded {
+            Group {
+                AliveButton {
+                    model.previousTrack()
+                    previousSongButtonBounceAnimation.toggle()
+                } label: {
+                    Image(systemSymbol: .backwardFill)
+                }
+                .disabled(!model.hasPreviousTrack)
+                .symbolEffect(.bounce, value: previousSongButtonBounceAnimation)
+                .matchedGeometryEffect(id: PlayerNamespace.previousSongButton, in: namespace)
+                
+                AliveButton {
+                    model.togglePlayPause()
+                    isPressingSpace = false
+                } label: {
+                    model.playPauseImage
+                        .imageScale(.large)
+                        .contentTransition(.symbolEffect(.replace.upUp))
+                        .frame(width: 16)
+                }
+                .scaleEffect(isPressingSpace ? 0.75 : 1, anchor: .center)
+                .animation(.bouncy, value: isPressingSpace)
+                .matchedGeometryEffect(id: PlayerNamespace.playPauseButton, in: namespace)
+                
+                AliveButton {
+                    model.nextTrack()
+                    nextSongButtonBounceAnimation.toggle()
+                } label: {
+                    Image(systemSymbol: .forwardFill)
+                }
+                .disabled(!model.hasNextTrack)
+                .symbolEffect(.bounce, value: nextSongButtonBounceAnimation)
+                .matchedGeometryEffect(id: PlayerNamespace.nextSongButton, in: namespace)
             }
-            .disabled(!model.hasPreviousTrack)
-            .symbolEffect(.bounce, value: previousSongButtonBounceAnimation)
-            .matchedGeometryEffect(id: PlayerNamespace.previousSongButton, in: namespace)
-            
-            AliveButton {
-                model.togglePlayPause()
-                isPressingSpace = false
-            } label: {
-                model.playPauseImage
-                    .imageScale(.large)
-                    .contentTransition(.symbolEffect(.replace.upUp))
-                    .frame(width: 16)
-            }
-            .scaleEffect(isPressingSpace ? 0.75 : 1, anchor: .center)
-            .animation(.bouncy, value: isPressingSpace)
-            .matchedGeometryEffect(id: PlayerNamespace.playPauseButton, in: namespace)
-            
-            AliveButton {
-                model.nextTrack()
-                nextSongButtonBounceAnimation.toggle()
-            } label: {
-                Image(systemSymbol: .forwardFill)
-            }
-            .disabled(!model.hasNextTrack)
-            .symbolEffect(.bounce, value: nextSongButtonBounceAnimation)
-            .matchedGeometryEffect(id: PlayerNamespace.nextSongButton, in: namespace)
+            .disabled(!model.hasCurrentTrack)
         }
-        .disabled(!model.hasCurrentTrack)
     }
     
     @ViewBuilder private func trailingControls() -> some View {
-        AliveButton {
-            switch activeControl {
-            case .progress:
-                activeControl = .volume
-            case .volume:
-                model.isMuted.toggle()
+        if activeControl == .volume {
+            Group {
+                if isProgressBarExpanded {
+                    Spacer()
+                        .frame(width: 0)
+                } else {
+                    AliveButton {
+                        activeControl = .progress
+                    } label: {
+                        Image(systemSymbol: .chevronLeft)
+                    }
+                }
             }
-        } label: {
-            model.speakerImage
-                .imageScale(.large)
-                .contentTransition(.symbolEffect(.replace))
-                .frame(width: 20)
         }
-        .symbolEffect(.bounce, value: activeControl)
-        .symbolEffect(.bounce, value: speakerButtonBounceAnimation)
-        .matchedGeometryEffect(id: PlayerNamespace.volumeButton, in: namespace)
         
-        AliveButton {
-        } label: {
-            Image(systemSymbol: .listTriangle)
-                .imageScale(.large)
+        if activeControl == .volume || !isProgressBarExpanded {
+            AliveButton {
+                switch activeControl {
+                case .progress:
+                    activeControl = .volume
+                case .volume:
+                    model.isMuted.toggle()
+                }
+            } label: {
+                model.speakerImage
+                    .imageScale(.large)
+                    .contentTransition(.symbolEffect(.replace))
+                    .frame(width: 20)
+            }
+            .symbolEffect(.bounce, value: activeControl)
+            .symbolEffect(.bounce, value: speakerButtonBounceAnimation)
+            .matchedGeometryEffect(id: PlayerNamespace.volumeButton, in: namespace)
+            
+            AliveButton {
+            } label: {
+                Image(systemSymbol: .listTriangle)
+                    .imageScale(.large)
+            }
+            .matchedGeometryEffect(id: PlayerNamespace.playlistButton, in: namespace)
         }
-        .matchedGeometryEffect(id: PlayerNamespace.playlistButton, in: namespace)
     }
     
     @ViewBuilder private func progressBar() -> some View {
@@ -374,5 +373,5 @@ struct MiniPlayer: View {
 #Preview {
     @Previewable @Namespace var namespace
     
-    MiniPlayer(namespace: namespace)
+    MiniPlayer(model: .init(), namespace: namespace)
 }

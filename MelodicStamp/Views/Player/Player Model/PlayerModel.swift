@@ -52,8 +52,6 @@ enum PlaybackMode: String, CaseIterable, Identifiable {
 // MARK: - Player Model
 
 @Observable class PlayerModel: NSObject {
-    static let shared: PlayerModel = .init()
-    
     private let player = AudioPlayer()
     
     private var playlist: [PlaylistItem] = []

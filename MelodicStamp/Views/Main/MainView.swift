@@ -8,15 +8,17 @@
 import SwiftUI
 
 struct MainView: View {
-    @StateObject private var model: FloatingWindowsModel = .init()
+    @State private var floatingWindowsModel: FloatingWindowsModel = .init()
+    @State private var playerModel: PlayerModel = .init()
+    
     @Environment(\.appearsActive) private var isActive
     
     var body: some View {
         ZStack(alignment: .topLeading) {
             VisualEffectView(material: .sidebar, blendingMode: .behindWindow)
             
-            model.selectedSidebarItem.content
-                .transition(.blurReplace.animation(.smooth(duration: 0.65)))
+            floatingWindowsModel.selectedSidebarItem.content(model: playerModel)
+                .transition(.blurReplace.animation(.smooth.speed(2)))
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
         .frame(minWidth: 1000, minHeight: 600)
@@ -25,21 +27,17 @@ struct MainView: View {
                 Color.clear
             }
         }
-        .background {
-            GeometryReader {
-                let rect = $0.frame(in: .global)
-                
-                Color.clear
-                    .onChange(of: rect) { oldValue, newValue in
-                        model.updateTabPosition()
-                        model.updatePlayBarPosition()
-                    }
-            }
+        .onGeometryChange(for: CGRect.self) { proxy in
+            proxy.frame(in: .global)
+        } action: { newValue in
+            print(1)
+            floatingWindowsModel.updateTabBarPosition()
+            floatingWindowsModel.updatePlayerPosition()
         }
-        .onChange(of: isActive) { oldValue, newValue in
+        .onChange(of: isActive, initial: true) { oldValue, newValue in
             if newValue {
-                model.addTabBar()
-                model.addPlayer()
+                floatingWindowsModel.addTabBar()
+                floatingWindowsModel.addPlayer(model: playerModel)
             }
         }
     }

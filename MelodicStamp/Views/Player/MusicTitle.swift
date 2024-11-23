@@ -6,17 +6,19 @@
 //
 
 import SwiftUI
+import CSFBAudioEngine
 
 struct MusicTitle: View {
-    @State var model: PlayerModel = .shared
+    var metadata: AudioMetadata?
+    var url: URL?
     
     var body: some View {
-        if let metadata = model.currentMetadata {
+        if let metadata {
             HStack(spacing: 12) {
                 Group {
                     if let title = metadata.title {
                         Text(title)
-                    } else if let url = model.currentURL {
+                    } else if let url {
                         Text(url.lastPathComponent)
                     } else {
                         Text("Unknown Music")

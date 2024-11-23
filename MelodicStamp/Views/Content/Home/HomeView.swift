@@ -11,8 +11,8 @@ import Luminare
 import SFSafeSymbols
 
 struct HomeView: View {
+    @Bindable var model: PlayerModel
     
-    @State var model: PlayerModel = .shared
     @State var selectedItems: Set<PlaylistItem> = []
     @State var lastSelectedItem: PlaylistItem? = nil
     
@@ -22,7 +22,6 @@ struct HomeView: View {
     
     var body: some View {
         HStack(spacing: 20) {
-            
             siderBar()
             
             VStack(alignment: .leading, spacing: 20) {
@@ -37,7 +36,6 @@ struct HomeView: View {
                 .padding([.trailing, .vertical], 20)
                 .padding(.bottom, 50)
                 .padding(.top, 35)
-            
         }
         .frame(minWidth: 1000, minHeight: 600)
     }
@@ -51,7 +49,6 @@ struct HomeView: View {
             VStack(alignment: .trailing, spacing: 10) {
                 VStack {
                     LuminareSection {
-                        
                         LuminareTextField("Search", text: $searchText)
                         
                         HStack(spacing: 2) {
@@ -273,5 +270,5 @@ struct HomeView: View {
 }
 
 #Preview {
-    HomeView()
+    HomeView(model: .init())
 }

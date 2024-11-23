@@ -15,13 +15,21 @@ import AppKit
     private var tabBarIdentifier: NSUserInterfaceItemIdentifier?
     private var playerIdentifier: NSUserInterfaceItemIdentifier?
     
-    @State var selectedSidebarItem: SidebarItem = .home
+    var selectedSidebarItem: SidebarItem = .home
 
     func addTabBar() {
         guard !isTabBarAdded else { return }
         
         if let applicationWindow = NSApp.mainWindow {
-            let content = NSHostingView(rootView: FloatingTabBarView(model: self, sections: sidebarSections, selectedItem: $selectedSidebarItem))
+            let content = NSHostingView(rootView: FloatingTabBarView(
+                model: self,
+                sections: sidebarSections,
+                selectedItem: .init {
+                    self.selectedSidebarItem
+                } set: { newValue in
+                    self.selectedSidebarItem = newValue
+                }
+            ))
             let floatingWindow = NSWindow()
             floatingWindow.styleMask = .borderless
             floatingWindow.contentView = content
@@ -30,15 +38,16 @@ import AppKit
             applicationWindow.addChildWindow(floatingWindow, ordered: .above)
             tabBarIdentifier = floatingWindow.identifier
             isTabBarAdded = true
+            
             updateTabBarPosition()
         }
     }
     
-    func addPlayer() {
+    func addPlayer(model: PlayerModel) {
         guard !isPlayBarAdded else { return }
 
         if let applicationWindow = NSApp.mainWindow {
-            let content = NSHostingView(rootView: FloatingPlayerView(model: self))
+            let content = NSHostingView(rootView: FloatingPlayerView(floatingWindowsModel: self, playerModel: model))
             let floatingWindow = NSWindow()
             floatingWindow.styleMask = .borderless
             floatingWindow.contentView = content
@@ -53,21 +62,18 @@ import AppKit
     
     func updateTabBarPosition() {
         if let floatingWindow = NSApp.windows.first(where: { $0.identifier == tabBarIdentifier }), let applicationWindow = NSApp.mainWindow {
-            let windowSize = applicationWindow.frame.size
-            let windowOrigin = applicationWindow.frame.origin
+            let windowFrame = applicationWindow.frame
+            let tabBarFrame = floatingWindow.frame
             
-            let playBarWidth: CGFloat = 55
-            let playBarHeight: CGFloat = 200
-            
-            let centeredX = windowOrigin.x - 75
-            let bottomY = windowOrigin.y + (windowSize.height - 200) / 2
+            let centerX = windowFrame.origin.x - 75
+            let bottomY = windowFrame.origin.y + (windowFrame.height - tabBarFrame.height) / 2
             
             floatingWindow.setFrame(
                 NSRect(
-                    x: centeredX,
+                    x: centerX,
                     y: bottomY,
-                    width: playBarWidth,
-                    height: playBarHeight
+                    width: tabBarFrame.width,
+                    height: tabBarFrame.height
                 ),
                 display: true
             )
@@ -77,18 +83,17 @@ import AppKit
     func updatePlayerPosition() {
         if let floatingWindow = NSApp.windows.first(where: { $0.identifier == playerIdentifier }), let applicationWindow = NSApp.mainWindow {
             let windowFrame = applicationWindow.frame
-            let playBarWidth: CGFloat = 800
-            let playBarHeight: CGFloat = 100
+            let playerFrame = floatingWindow.frame
 
-            let centeredX = windowFrame.origin.x + (windowFrame.width - playBarWidth) / 2
+            let centerX = windowFrame.origin.x + (windowFrame.width - playerFrame.width) / 2
             let bottomY = windowFrame.origin.y - 50
 
             floatingWindow.setFrame(
                 NSRect(
-                    x: centeredX,
+                    x: centerX,
                     y: bottomY,
-                    width: playBarWidth,
-                    height: playBarHeight
+                    width: playerFrame.width,
+                    height: playerFrame.height
                 ),
                 display: true
             )

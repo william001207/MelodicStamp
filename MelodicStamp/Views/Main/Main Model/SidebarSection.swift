@@ -5,8 +5,8 @@
 //  Created by Xinshao_Air on 2024/11/22.
 //
 
-import Foundation
 import SwiftUI
+import SFSafeSymbols
 
 struct SidebarSection: Hashable, Identifiable {
     let title: String?
@@ -38,60 +38,51 @@ enum SidebarItem: Hashable, Identifiable, CaseIterable {
     case library
     case setting
     
-    var id: Int {
-        return self.hashValue
+    var id: String {
+        .init(describing: self)
     }
     
-    /// Title of an item
     var title: String {
         switch self {
         case .home:
-            return "Home"
+                .init(localized: "Home")
         case .search:
-            return "Search"
+                .init(localized: "Search")
         case .library:
-            return "Library"
+                .init(localized: "Library")
         case .setting:
-            return "Settings"
+                .init(localized: "Settings")
         }
     }
     
-    /// System icon name of an item
-    var iconName: String {
+    var icon: Image {
         switch self {
         case .home:
-            return "house"
+                .init(systemSymbol: .house)
         case .search:
-            return "magnifyingglass"
+                .init(systemSymbol: .magnifyingglass)
         case .library:
-            return "play.square.stack"
+                .init(systemSymbol: .playSquareStack)
         case .setting:
-            return "gearshape"
+                .init(systemSymbol: .gearshape)
         }
     }
     
-    /// Content that should be presented for the item
-    @ViewBuilder
-    var content: some View {
+    @ViewBuilder func content(model: PlayerModel) -> some View {
         switch self {
         case .home:
-            // Text("HomeView")
-            HomeView()
+            HomeView(model: model)
         case .search:
             Text("SearchView")
-//            SearchView()
         case .library:
             Text("LibraryView")
-//            LibraryView()
         case .setting:
             Text("SettingsView")
-//
         }
     }
     
     func hash(into hasher: inout Hasher) {
-        hasher.combine(self.title)
-        hasher.combine(self.iconName)
+        hasher.combine(self.id)
     }
 }
 

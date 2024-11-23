@@ -11,9 +11,9 @@ import SFSafeSymbols
 struct Player: View {
     @Environment(\.openWindow) var openWindow
     
-    var namespace: Namespace.ID
+    @Bindable var model: PlayerModel
     
-    @State var model: PlayerModel = .shared
+    var namespace: Namespace.ID
     
     @State private var isProgressBarActive: Bool = false
     @State private var isVolumeBarActive: Bool = false
@@ -146,7 +146,7 @@ struct Player: View {
             Spacer()
             
             ShrinkableMarqueeScrollView {
-                MusicTitle(model: model)
+                MusicTitle(metadata: model.currentMetadata, url: model.currentURL)
             }
             .contentTransition(.numericText())
             .animation(.default, value: model.currentIndex)
@@ -154,7 +154,7 @@ struct Player: View {
             Spacer()
             
             AliveButton(enabledStyle: .init(.secondary)) {
-                openWindow(id: "mini-player")
+//                openWindow(id: "mini-player")
             } label: {
                 Image(systemSymbol: .arrowDownRightAndArrowUpLeft)
                     .imageScale(.large)
