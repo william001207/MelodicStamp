@@ -12,65 +12,59 @@ struct PlaylistItemView: View {
     
     var item: PlaylistItem
     var isSelected: Bool
-    var action: () -> Void
     
     @State private var isHovering: Bool = false
     
     var body: some View {
-        AliveButton(scaleFactor: 0.975) {
-            action()
-        } label: {
-            HStack(alignment: .center) {
-                VStack(alignment: .leading) {
-                    MarqueeScrollView(animate: false) {
-                        MusicTitle(metadata: item.metadata, url: item.url)
-                            .font(.title3)
-                    }
-                    
-                    Text(item.url.lastPathComponent)
-                        .font(.caption)
-                        .foregroundStyle(.placeholder)
+        HStack(alignment: .center) {
+            VStack(alignment: .leading) {
+                MarqueeScrollView(animate: false) {
+                    MusicTitle(metadata: item.metadata, url: item.url)
+                        .font(.title3)
                 }
                 
-                Spacer()
-                
-                AliveButton {
-                    player.play(item)
-                } label: {
-                    ZStack {
-                        Group {
-                            if let image = item.metadata.attachedPictures.first?.image {
-                                Image(nsImage: image)
-                                    .resizable()
-                                    .aspectRatio(contentMode: .fit)
-                                    .frame(maxWidth: .infinity)
-                                    .overlay {
-                                        if isHovering {
-                                            Color.black
-                                                .opacity(0.35)
-                                                .blendMode(.darken)
-                                        }
-                                    }
-                            } else {
-                                Color.clear
-                            }
-                        }
-                        .overlay {
-                            if isHovering {
-                                Image(systemSymbol: .playFill)
-                                    .font(.title3)
-                                    .foregroundStyle(.white)
-                            }
-                        }
-                        .clipShape(.rect(cornerRadius: 4))
-                    }
-                    .frame(width: 32, height: 32)
-                }
+                Text(item.url.lastPathComponent)
+                    .font(.caption)
+                    .foregroundStyle(.placeholder)
             }
-            .padding(.vertical, 10)
-            .padding(.horizontal, 16)
+            
+            Spacer()
+            
+            AliveButton {
+                player.play(item)
+            } label: {
+                ZStack {
+                    Group {
+                        if let image = item.metadata.attachedPictures.first?.image {
+                            Image(nsImage: image)
+                                .resizable()
+                                .aspectRatio(contentMode: .fit)
+                                .frame(maxWidth: .infinity)
+                                .overlay {
+                                    if isHovering {
+                                        Color.black
+                                            .opacity(0.35)
+                                            .blendMode(.darken)
+                                    }
+                                }
+                        } else {
+                            Color.clear
+                        }
+                    }
+                    .overlay {
+                        if isHovering {
+                            Image(systemSymbol: .playFill)
+                                .font(.title3)
+                                .foregroundStyle(.white)
+                        }
+                    }
+                    .clipShape(.rect(cornerRadius: 4))
+                }
+                .frame(width: 32, height: 32)
+            }
         }
-        .frame(height: 65)
+        .padding(.vertical, 10)
+        .padding(.horizontal, 16)
         .onHover { hover in
             withAnimation(.default.speed(5)) {
                 isHovering = hover

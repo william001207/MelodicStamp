@@ -71,9 +71,15 @@ struct FloatingTabBarView: View {
                                 .opacity(isSelected || isTabHovering ? 1 : 0.75)
                                 .background {
                                     if isSelected {
-                                        RoundedRectangle(cornerRadius: 20)
-                                            .stroke(.tint)
-                                            .fill(.tint.quaternary)
+                                        if isHovering {
+                                            RoundedRectangle(cornerRadius: 20)
+                                                .stroke(.tint)
+                                                .fill(.tint.quaternary)
+                                        } else {
+                                            RoundedRectangle(cornerRadius: 20)
+                                                .stroke(.quaternary)
+                                                .fill(.quaternary)
+                                        }
                                     } else if isTabHovering {
                                         RoundedRectangle(cornerRadius: 20)
                                             .stroke(.quinary)

@@ -13,19 +13,16 @@ import SFSafeSymbols
 struct PlaylistView: View {
     @Bindable var player: PlayerModel
     
-    @State var selection: Set<PlaylistItem> = []
-    @State var lastSelection: PlaylistItem? = nil
+    @Binding var selection: Set<PlaylistItem>
+    @Binding var lastSelection: PlaylistItem?
     
     @State private var isFileOpenerPresented: Bool = false
     @State private var isFileAdderPresented: Bool = false
     
     var body: some View {
         Group {
-            if player.isPlaylistEmpty {
-                EmptyMusicNoteView()
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-            } else {
-                ScrollView(.vertical) {
+            if !player.isPlaylistEmpty {
+                AutoScrollView(.vertical) {
                     LazyVStack(spacing: 12) {
                         LuminareList(
                             items: $player.playlist,
@@ -33,28 +30,24 @@ struct PlaylistView: View {
                             id: \.id,
                             removeKey: .init("Remove")
                         ) { item in
-                            PlaylistItemView(player: player, item: item.wrappedValue, isSelected: selection.contains(item.wrappedValue)) {
-                                let hasShift = NSEvent.modifierFlags.contains(.shift)
-                                let hasCommand = NSEvent.modifierFlags.contains(.command)
-                                handleSelection(of: item.wrappedValue, isShiftPressed: hasShift, isCommandPressed: hasCommand)
-                            }
-                            .swipeActions {
-                                Button {
-                                    player.play(item.wrappedValue)
-                                } label: {
-                                    Image(systemSymbol: .play)
-                                    Text("Play")
+                            PlaylistItemView(player: player, item: item.wrappedValue, isSelected: selection.contains(item.wrappedValue))
+                                .swipeActions {
+                                    Button {
+                                        player.play(item.wrappedValue)
+                                    } label: {
+                                        Image(systemSymbol: .play)
+                                        Text("Play")
+                                    }
+                                    .tint(.accentColor)
+                                    
+                                    Button {
+                                        player.removeFromPlaylist(items: [item.wrappedValue])
+                                    } label: {
+                                        Image(systemSymbol: .trash)
+                                        Text("Delete")
+                                    }
+                                    .tint(.red)
                                 }
-                                .tint(.accentColor)
-                                
-                                Button {
-                                    player.removeFromPlaylist(items: [item.wrappedValue])
-                                } label: {
-                                    Image(systemSymbol: .trash)
-                                    Text("Delete")
-                                }
-                                .tint(.red)
-                            }
                         } actions: {
                             Button {
                                 let hasShift = NSEvent.modifierFlags.contains(.shift)
@@ -81,6 +74,13 @@ struct PlaylistView: View {
                 }
                 .contentMargins(.top, 48)
                 .contentMargins(.bottom, 72)
+                .onChange(of: selection) { oldValue, newValue in
+                    // TODO: update this
+                    lastSelection = newValue.first
+                }
+            } else {
+                EmptyMusicNoteView()
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
         }
         .toolbar(content: toolbar)
@@ -98,11 +98,10 @@ struct PlaylistView: View {
             }
             .padding(.horizontal, 2)
         }
-        .fileImporter(isPresented: $isFileOpenerPresented, allowedContentTypes: allowedContentTypes, allowsMultipleSelection: false) { result in
+        .fileImporter(isPresented: $isFileOpenerPresented, allowedContentTypes: allowedContentTypes) { result in
             switch result {
-            case .success(let success):
-                guard !success.isEmpty else { return }
-                player.play(success[0])
+            case .success(let url):
+                player.play(url)
             case .failure:
                 break
             }
@@ -121,36 +120,11 @@ struct PlaylistView: View {
         }
         .fileImporter(isPresented: $isFileAdderPresented, allowedContentTypes: allowedContentTypes, allowsMultipleSelection: true) { result in
             switch result {
-            case .success(let success):
-                player.addToPlaylist(urls: success)
+            case .success(let urls):
+                player.addToPlaylist(urls: urls)
             case .failure:
                 break
             }
         }
     }
-    
-    private func handleSelection(of item: PlaylistItem, isShiftPressed: Bool, isCommandPressed: Bool) {
-        if isShiftPressed, let last = lastSelection {
-            if let startIndex = player.playlist.firstIndex(of: last),
-               let endIndex = player.playlist.firstIndex(of: item) {
-                let range = min(startIndex, endIndex)...max(startIndex, endIndex)
-                let itemsInRange = player.playlist[range]
-                selection.formUnion(itemsInRange)
-            }
-        } else if isCommandPressed {
-            if selection.contains(item) {
-                selection.remove(item)
-            } else {
-                selection.insert(item)
-            }
-        } else {
-            selection = [item]
-        }
-        
-        lastSelection = item
-    }
-}
-
-#Preview {
-    PlaylistView(player: .init())
 }

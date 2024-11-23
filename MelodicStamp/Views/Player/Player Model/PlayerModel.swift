@@ -297,6 +297,16 @@ enum PlaybackMode: String, CaseIterable, Identifiable {
         removeFromPlaylist(urls: items.map(\.url))
     }
     
+    func reload(urls: [URL]) {
+        removeFromPlaylist(urls: urls)
+        addToPlaylist(urls: urls)
+    }
+    
+    func reload(items: [PlaylistItem]) {
+        removeFromPlaylist(items: items)
+        addToPlaylist(items: items)
+    }
+    
     func updateDeviceMenu() {
         do {
             outputDevices = try AudioDevice.devices.filter { try $0.supportsOutput }
@@ -383,10 +393,7 @@ enum PlaybackMode: String, CaseIterable, Identifiable {
 
 extension PlayerModel: AudioPlayer.Delegate {
     func audioPlayer(_ audioPlayer: AudioPlayer, decodingComplete decoder: PCMDecoding) {
-        if
-            let audioDecoder = decoder as? AudioDecoder,
-            let url = audioDecoder.inputSource.url
-        {
+        if let audioDecoder = decoder as? AudioDecoder {
             switch playbackMode {
             case .single:
                 // play again

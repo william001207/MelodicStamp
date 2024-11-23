@@ -6,10 +6,13 @@
 //
 
 import SwiftUI
+import SFSafeSymbols
 
 struct EmptyMusicNoteView: View {
+    var systemSymbol: SFSymbol = .musicNote
+    
     var body: some View {
-        Image(systemSymbol: .musicNote)
+        Image(systemSymbol: systemSymbol)
             .resizable()
             .aspectRatio(contentMode: .fit)
             .frame(height: 32)

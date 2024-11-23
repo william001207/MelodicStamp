@@ -14,6 +14,9 @@ struct MainView: View {
     
     @Binding var selectedTabs: Set<SidebarTab>
     
+    @State private var selection: Set<PlaylistItem> = .init()
+    @State private var lastSelection: PlaylistItem?
+    
     var body: some View {
         // use `ZStack` to eliminate safe area animation problems
         ZStack {
@@ -24,16 +27,20 @@ struct MainView: View {
                     ForEach(Array(selectedTabs).sorted { $0.order < $1.order }) { tab in
                         switch tab {
                         case .playlist:
-                            PlaylistView(player: player)
-                                .frame(minWidth: 200)
+                            PlaylistView(player: player, selection: $selection, lastSelection: $lastSelection)
+                                .frame(minWidth: 400)
+                                .background {
+                                    VisualEffectView(material: .popover, blendingMode: .behindWindow)
+                                }
                         case .inspector:
-                            Color.red
-                                .frame(minWidth: 200)
+                            InspectorView(player: player, selection: $selection, lastSelection: $lastSelection)
+                                .frame(minWidth: 250)
                         case .metadata:
-                            Color.blue
-                                .frame(minWidth: 200)
+                            MetadataView()
+                                .frame(minWidth: 250)
                         }
                     }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
                     .edgesIgnoringSafeArea(.top)
                 }
             } else {

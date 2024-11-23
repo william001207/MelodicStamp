@@ -14,6 +14,10 @@ struct PlaylistItem: Identifiable, Equatable, Hashable {
     let url: URL
     var properties: AudioProperties
     var metadata: AudioMetadata
+    
+    static func ==(lhs: PlaylistItem, rhs: PlaylistItem) -> Bool {
+        lhs.id == rhs.id
+    }
 
     init?(_ url: URL) {
         guard url.startAccessingSecurityScopedResource() else { return nil }
@@ -43,14 +47,18 @@ struct PlaylistItem: Identifiable, Equatable, Hashable {
         
         return nil
     }
-
-    static func ==(lhs: PlaylistItem, rhs: PlaylistItem) -> Bool {
-        lhs.id == rhs.id
-    }
-}
-
-extension AttachedPicture {
-    var image: NSImage? {
-        NSImage(data: imageData)
+    
+    func writeMetadata(_ operation: (inout AudioMetadata) -> Void) {
+        do {
+            guard url.startAccessingSecurityScopedResource() else { return }
+            defer { url.stopAccessingSecurityScopedResource() }
+            
+            let file = try AudioFile(url: url)
+            file.metadata = metadata
+            operation(&file.metadata)
+            try file.writeMetadata()
+        } catch {
+            
+        }
     }
 }
