@@ -38,6 +38,7 @@ struct MarqueeScrollView<Content>: View where Content: View {
     var duration: TimeInterval = 5
     var delay: TimeInterval = 1
     var overflow: CGFloat = 12
+    var animate: Bool = true
     @ViewBuilder var content: () -> Content
     
     @State private var offset: CGFloat = .zero
@@ -56,7 +57,11 @@ struct MarqueeScrollView<Content>: View where Content: View {
                 .onGeometryChange(for: CGSize.self) { proxy in
                     proxy.size
                 } action: { size in
-                    withAnimation {
+                    if animate {
+                        withAnimation {
+                            contentSize = size
+                        }
+                    } else {
                         contentSize = size
                     }
                     
@@ -74,8 +79,18 @@ struct MarqueeScrollView<Content>: View where Content: View {
         .onGeometryChange(for: CGSize.self) { proxy in
             proxy.size
         } action: { size in
-            withAnimation {
+            if animate {
+                withAnimation {
+                    containerSize = size
+                }
+            } else {
                 containerSize = size
+            }
+            
+            DispatchQueue.main.async {
+                pauseAnimation()
+                resetScrollPosition()
+                unidle()
             }
         }
         .onScrollGeometryChange(for: CGFloat.self) { proxy in

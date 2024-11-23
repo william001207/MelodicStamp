@@ -22,8 +22,10 @@ struct PlaylistItemView: View {
         } label: {
             HStack(alignment: .center) {
                 VStack(alignment: .leading) {
-                    MusicTitle(metadata: item.metadata, url: item.url)
-                        .font(.title3)
+                    MarqueeScrollView(animate: false) {
+                        MusicTitle(metadata: item.metadata, url: item.url)
+                            .font(.title3)
+                    }
                     
                     Text(item.url.lastPathComponent)
                         .font(.caption)
@@ -42,14 +44,19 @@ struct PlaylistItemView: View {
                                     .resizable()
                                     .aspectRatio(contentMode: .fit)
                                     .frame(maxWidth: .infinity)
+                                    .overlay {
+                                        if isHovering {
+                                            Color.black
+                                                .opacity(0.35)
+                                                .blendMode(.darken)
+                                        }
+                                    }
+                            } else {
+                                Color.clear
                             }
                         }
                         .overlay {
                             if isHovering {
-                                Color.black
-                                    .opacity(0.35)
-                                    .blendMode(.darken)
-                                
                                 Image(systemSymbol: .playFill)
                                     .font(.title3)
                                     .foregroundStyle(.white)

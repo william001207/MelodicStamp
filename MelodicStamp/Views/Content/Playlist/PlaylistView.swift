@@ -23,7 +23,7 @@ struct PlaylistView: View {
         Group {
             if player.isPlaylistEmpty {
                 EmptyMusicNoteView()
-                    .frame(maxHeight: .infinity)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {
                 ScrollView(.vertical) {
                     LazyVStack(spacing: 12) {

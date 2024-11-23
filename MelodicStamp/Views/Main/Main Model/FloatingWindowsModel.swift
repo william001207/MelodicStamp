@@ -12,8 +12,10 @@ import AppKit
     private(set) var isTabBarAdded: Bool = false
     private(set) var isPlayerAdded: Bool = false
     
-    private var tabBarIdentifier: UUID = .init()
-    private var playerIdentifier: UUID = .init()
+    private let tabBarIdentifier: UUID = .init()
+    private let playerIdentifier: UUID = .init()
+    
+    private var isInFullScreen: Bool = false
     
     var tabBarWindow: NSWindow? {
         NSApp.windows.first(where: { $0.title == tabBarIdentifier.uuidString })
@@ -21,6 +23,44 @@ import AppKit
     
     var playerWindow: NSWindow? {
         NSApp.windows.first(where: { $0.title == playerIdentifier.uuidString })
+    }
+    
+    func observeFullScreen() {
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(windowWillEnterFullScreen(_:)),
+            name: NSWindow.willEnterFullScreenNotification,
+            object: NSApp.mainWindow
+        )
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(windowDidEnterFullScreen(_:)),
+            name: NSWindow.didEnterFullScreenNotification,
+            object: NSApp.mainWindow
+        )
+        
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(windowWillExitFullScreen(_:)),
+            name: NSWindow.willExitFullScreenNotification,
+            object: NSApp.mainWindow
+        )
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(windowDidExitFullScreen(_:)),
+            name: NSWindow.didExitFullScreenNotification,
+            object: NSApp.mainWindow
+        )
+    }
+    
+    func hide() {
+        tabBarWindow?.animator().alphaValue = 0
+        playerWindow?.animator().alphaValue = 0
+    }
+    
+    func show() {
+        tabBarWindow?.animator().alphaValue = 1
+        playerWindow?.animator().alphaValue = 1
     }
 
     func addTabBar(@ViewBuilder content: () -> some View) {
@@ -30,6 +70,8 @@ import AppKit
         floatingWindow.styleMask = .borderless
         floatingWindow.contentView = NSHostingView(rootView: content())
         floatingWindow.backgroundColor = .clear
+        floatingWindow.level = .floating
+        floatingWindow.collectionBehavior = [.fullScreenNone]
         floatingWindow.title = tabBarIdentifier.uuidString
         
         floatingWindow.alphaValue = 0
@@ -38,7 +80,7 @@ import AppKit
         DispatchQueue.main.async {
             self.isTabBarAdded = true
             self.updateTabBarPosition(window: floatingWindow, in: applicationWindow)
-            floatingWindow.alphaValue = 1
+            floatingWindow.animator().alphaValue = 1
         }
     }
     
@@ -49,6 +91,8 @@ import AppKit
         floatingWindow.styleMask = .borderless
         floatingWindow.contentView = NSHostingView(rootView: content())
         floatingWindow.backgroundColor = .clear
+        floatingWindow.level = .floating
+        floatingWindow.collectionBehavior = [.fullScreenNone]
         floatingWindow.title = playerIdentifier.uuidString
         
         floatingWindow.alphaValue = 0
@@ -57,7 +101,7 @@ import AppKit
         DispatchQueue.main.async {
             self.isPlayerAdded = true
             self.updatePlayerPosition(window: floatingWindow, in: applicationWindow)
-            floatingWindow.alphaValue = 1
+            floatingWindow.animator().alphaValue = 1
         }
     }
     
@@ -86,12 +130,12 @@ import AppKit
         let tabBarFrame = tabBarWindow.frame
         let windowFrame = applicationWindow.frame
         
-        let centerX = windowFrame.origin.x - 75
+        let leadingX = windowFrame.origin.x - 16 - 48
         let bottomY = windowFrame.origin.y + (windowFrame.height - tabBarFrame.height) / 2
         
         tabBarWindow.setFrame(
-            NSRect(
-                x: centerX,
+            .init(
+                x: isInFullScreen ? max(8, leadingX) : leadingX,
                 y: bottomY,
                 width: tabBarFrame.width,
                 height: tabBarFrame.height
@@ -110,16 +154,36 @@ import AppKit
         let windowFrame = applicationWindow.frame
         
         let centerX = windowFrame.origin.x + (windowFrame.width - playerFrame.width) / 2
-        let bottomY = windowFrame.origin.y - 50
+        let bottomY = windowFrame.origin.y - 32
         
         playerWindow.setFrame(
-            NSRect(
+            .init(
                 x: centerX,
-                y: bottomY,
+                y: isInFullScreen ? max(8, bottomY) : bottomY,
                 width: playerFrame.width,
                 height: playerFrame.height
             ),
             display: true
         )
+    }
+}
+
+extension FloatingWindowsModel {
+    @objc func windowWillEnterFullScreen(_ notification: Notification) {
+        isInFullScreen = true
+        hide()
+    }
+    
+    @objc func windowDidEnterFullScreen(_ notification: Notification) {
+        show()
+    }
+    
+    @objc func windowWillExitFullScreen(_ notification: Notification) {
+        isInFullScreen = false
+        hide()
+    }
+    
+    @objc func windowDidExitFullScreen(_ notification: Notification) {
+        show()
     }
 }

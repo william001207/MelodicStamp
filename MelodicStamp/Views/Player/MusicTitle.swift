@@ -42,10 +42,10 @@ struct MusicTitle: View {
             HStack(spacing: 12) {
                 if mode.hasTitle {
                     Group {
-                        if let title = metadata.title {
+                        if let title = metadata.title, !title.isEmpty {
                             Text(title)
                         } else if let url {
-                            Text(url.lastPathComponent)
+                            Text(url.lastPathComponent.dropLast(url.pathExtension.count + 1))
                         } else {
                             Text("Unknown Music")
                                 .foregroundStyle(.placeholder)

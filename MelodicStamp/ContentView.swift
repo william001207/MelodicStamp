@@ -50,6 +50,9 @@ struct ContentView: View {
                     }
             }
         }
+        .onAppear {
+            floatingWindows.observeFullScreen()
+        }
         .onChange(of: isActive) { oldValue, newValue in
             switch windowStyle {
             case .main:

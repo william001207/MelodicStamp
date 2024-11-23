@@ -41,9 +41,8 @@ struct MainView: View {
             }
         }
         .toolbar {
-            ToolbarItem(placement: .principal) {
-                Color.clear
-            }
+            // in order to preserve the titlebar style
+            Color.clear
         }
     }
 }
