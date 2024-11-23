@@ -46,23 +46,24 @@ struct ContentView: View {
                     }
             }
         }
-        .onChange(of: isActive, initial: true) { oldValue, newValue in
-            guard newValue else { return }
-            
+        .onChange(of: isActive) { oldValue, newValue in
             switch windowStyle {
             case .main:
-                initializeFloatingWindows()
+                if isActive {
+                    initializeFloatingWindows()
+                } else {
+                    destroyFloatingWindows()
+                }
             case .miniPlayer:
-                break
+                destroyFloatingWindows()
             }
         }
-        .onChange(of: windowStyle, initial: true) { oldValue, newValue in
+        .onChange(of: windowStyle) { oldValue, newValue in
             switch newValue {
             case .main:
                 initializeFloatingWindows()
             case .miniPlayer:
-                floatingWindows.removeTabBar()
-                floatingWindows.removePlayer()
+                destroyFloatingWindows()
             }
         }
     }
@@ -87,5 +88,10 @@ struct ContentView: View {
                 self.windowStyle = windowStyle
             }
         }
+    }
+    
+    private func destroyFloatingWindows() {
+        floatingWindows.removeTabBar()
+        floatingWindows.removePlayer()
     }
 }

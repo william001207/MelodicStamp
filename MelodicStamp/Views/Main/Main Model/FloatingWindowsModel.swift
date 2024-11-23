@@ -16,13 +16,11 @@ import AppKit
     private var playerIdentifier: UUID = .init()
     
     var tabBarWindow: NSWindow? {
-        guard isTabBarAdded else { return nil }
-        return NSApp.windows.first(where: { $0.title == tabBarIdentifier.uuidString })
+        NSApp.windows.first(where: { $0.title == tabBarIdentifier.uuidString })
     }
     
     var playerWindow: NSWindow? {
-        guard isPlayerAdded else { return nil }
-        return NSApp.windows.first(where: { $0.title == playerIdentifier.uuidString })
+        NSApp.windows.first(where: { $0.title == playerIdentifier.uuidString })
     }
 
     func addTabBar(@ViewBuilder content: () -> some View) {
@@ -34,12 +32,13 @@ import AppKit
         floatingWindow.backgroundColor = .clear
         floatingWindow.title = tabBarIdentifier.uuidString
         
+        floatingWindow.alphaValue = 0
         applicationWindow.addChildWindow(floatingWindow, ordered: .above)
-        floatingWindow.orderFront(nil)
-        isTabBarAdded = true
         
         DispatchQueue.main.async {
-            self.updateTabBarPosition()
+            self.isTabBarAdded = true
+            self.updateTabBarPosition(window: floatingWindow, in: applicationWindow)
+            floatingWindow.alphaValue = 1
         }
     }
     
@@ -51,13 +50,14 @@ import AppKit
         floatingWindow.contentView = NSHostingView(rootView: content())
         floatingWindow.backgroundColor = .clear
         floatingWindow.title = playerIdentifier.uuidString
-
+        
+        floatingWindow.alphaValue = 0
         applicationWindow.addChildWindow(floatingWindow, ordered: .above)
-        floatingWindow.orderFront(nil)
-        isPlayerAdded = true
         
         DispatchQueue.main.async {
-            self.updatePlayerPosition()
+            self.isPlayerAdded = true
+            self.updatePlayerPosition(window: floatingWindow, in: applicationWindow)
+            floatingWindow.alphaValue = 1
         }
     }
     
@@ -77,43 +77,49 @@ import AppKit
         isPlayerAdded = false
     }
     
-    func updateTabBarPosition() {
-        if let tabBarWindow, let applicationWindow = NSApp.mainWindow {
-            let windowFrame = applicationWindow.frame
-            let tabBarFrame = tabBarWindow.frame
-            
-            let centerX = windowFrame.origin.x - 75
-            let bottomY = windowFrame.origin.y + (windowFrame.height - tabBarFrame.height) / 2
-            
-            tabBarWindow.setFrame(
-                NSRect(
-                    x: centerX,
-                    y: bottomY,
-                    width: tabBarFrame.width,
-                    height: tabBarFrame.height
-                ),
-                display: true
-            )
-        }
+    func updateTabBarPosition(window: NSWindow? = nil, in mainWindow: NSWindow? = nil) {
+        guard
+            let tabBarWindow = window ?? self.tabBarWindow,
+            let applicationWindow = mainWindow ?? NSApp.mainWindow
+        else { return }
+        
+        let tabBarFrame = tabBarWindow.frame
+        let windowFrame = applicationWindow.frame
+        
+        let centerX = windowFrame.origin.x - 75
+        let bottomY = windowFrame.origin.y + (windowFrame.height - tabBarFrame.height) / 2
+        
+        tabBarWindow.setFrame(
+            NSRect(
+                x: centerX,
+                y: bottomY,
+                width: tabBarFrame.width,
+                height: tabBarFrame.height
+            ),
+            display: true
+        )
     }
     
-    func updatePlayerPosition() {
-        if let playerWindow, let applicationWindow = NSApp.mainWindow {
-            let windowFrame = applicationWindow.frame
-            let playerFrame = playerWindow.frame
-
-            let centerX = windowFrame.origin.x + (windowFrame.width - playerFrame.width) / 2
-            let bottomY = windowFrame.origin.y - 50
-
-            playerWindow.setFrame(
-                NSRect(
-                    x: centerX,
-                    y: bottomY,
-                    width: playerFrame.width,
-                    height: playerFrame.height
-                ),
-                display: true
-            )
-        }
+    func updatePlayerPosition(window: NSWindow? = nil, in mainWindow: NSWindow? = nil) {
+        guard
+            let playerWindow = window ?? self.playerWindow,
+            let applicationWindow = mainWindow ?? NSApp.mainWindow
+        else { return }
+        
+        let playerFrame = playerWindow.frame
+        let windowFrame = applicationWindow.frame
+        
+        let centerX = windowFrame.origin.x + (windowFrame.width - playerFrame.width) / 2
+        let bottomY = windowFrame.origin.y - 50
+        
+        playerWindow.setFrame(
+            NSRect(
+                x: centerX,
+                y: bottomY,
+                width: playerFrame.width,
+                height: playerFrame.height
+            ),
+            display: true
+        )
     }
 }

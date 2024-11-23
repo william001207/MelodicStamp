@@ -15,21 +15,16 @@ struct MainView: View {
     @Binding var selectedTab: SidebarItem
     
     var body: some View {
-        Group {
-            switch selectedTab {
-            case .home:
-                HomeView(player: player)
-            case .search:
-                Text("SearchView")
-            case .library:
-                Text("LibraryView")
-            case .setting:
-                Text("SettingsView")
+        // use `ZStack` to eliminate safe area animation problems
+        ZStack {
+            VisualEffectView(material: .contentBackground, blendingMode: .behindWindow)
+            
+            Group {
+                switch selectedTab {
+                case .home:
+                    HomeView(player: player)
+                }
             }
-        }
-        .transition(.blurReplace.animation(.smooth.speed(2)))
-        .background {
-            VisualEffectView(material: .sidebar, blendingMode: .behindWindow)
         }
         .frame(minWidth: 1000, minHeight: 600)
         .edgesIgnoringSafeArea(.top)
