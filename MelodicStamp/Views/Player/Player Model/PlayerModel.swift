@@ -278,6 +278,10 @@ enum PlaybackMode: String, CaseIterable, Identifiable {
         }
     }
     
+    func addToPlaylist(items: [PlaylistItem]) {
+        addToPlaylist(urls: items.map(\.url))
+    }
+    
     func removeFromPlaylist(urls: [URL]) {
         for url in urls {
             if let index = playlist.firstIndex(where: { $0.url == url }) {
@@ -287,6 +291,10 @@ enum PlaybackMode: String, CaseIterable, Identifiable {
                 playlist.remove(at: index)
             }
         }
+    }
+    
+    func removeFromPlaylist(items: [PlaylistItem]) {
+        removeFromPlaylist(urls: items.map(\.url))
     }
     
     func updateDeviceMenu() {

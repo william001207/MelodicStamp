@@ -38,6 +38,23 @@ struct PlaylistView: View {
                                 let hasCommand = NSEvent.modifierFlags.contains(.command)
                                 handleSelection(of: item.wrappedValue, isShiftPressed: hasShift, isCommandPressed: hasCommand)
                             }
+                            .swipeActions {
+                                Button {
+                                    player.play(item.wrappedValue)
+                                } label: {
+                                    Image(systemSymbol: .play)
+                                    Text("Play")
+                                }
+                                .tint(.accentColor)
+                                
+                                Button {
+                                    player.removeFromPlaylist(items: [item.wrappedValue])
+                                } label: {
+                                    Image(systemSymbol: .trash)
+                                    Text("Delete")
+                                }
+                                .tint(.red)
+                            }
                         } actions: {
                             Button {
                                 let hasShift = NSEvent.modifierFlags.contains(.shift)

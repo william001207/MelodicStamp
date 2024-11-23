@@ -44,15 +44,18 @@ struct PlaylistItemView: View {
                                     .frame(maxWidth: .infinity)
                             }
                         }
-                        .clipShape(.rect(cornerRadius: 4))
                         .overlay {
                             if isHovering {
-                                Color.black.opacity(0.35)
+                                Color.black
+                                    .opacity(0.35)
+                                    .blendMode(.darken)
                                 
                                 Image(systemSymbol: .playFill)
                                     .font(.title3)
+                                    .foregroundStyle(.white)
                             }
                         }
+                        .clipShape(.rect(cornerRadius: 4))
                     }
                     .frame(width: 32, height: 32)
                 }

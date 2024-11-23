@@ -18,6 +18,8 @@ struct ContentView: View {
     @State private var player: PlayerModel = .init()
     @State private var windowStyle: MelodicStampWindowStyle = .main
     
+    @State private var widthRestriction: CGFloat?
+    
     var body: some View {
         Group {
             switch windowStyle {
@@ -29,6 +31,8 @@ struct ContentView: View {
                         floatingWindows.updateTabBarPosition()
                         floatingWindows.updatePlayerPosition()
                     }
+                    .frame(minWidth: 1000, minHeight: 600)
+                    .edgesIgnoringSafeArea(.top)
             case .miniPlayer:
                 MiniPlayer(player: player, namespace: namespace)
                     .padding(8)
@@ -62,10 +66,19 @@ struct ContentView: View {
             switch newValue {
             case .main:
                 initializeFloatingWindows()
+                widthRestriction = 960
             case .miniPlayer:
                 destroyFloatingWindows()
+                widthRestriction = 500
             }
         }
+        .onChange(of: widthRestriction) { oldValue, newValue in
+            guard newValue != nil else { return }
+            DispatchQueue.main.async {
+                widthRestriction = nil
+            }
+        }
+        .frame(maxWidth: widthRestriction)
     }
     
     private func initializeFloatingWindows() {

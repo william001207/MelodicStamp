@@ -40,9 +40,6 @@ struct MainView: View {
                 EmptyMusicNoteView()
             }
         }
-        .frame(minWidth: 1000, minHeight: 600)
-        .edgesIgnoringSafeArea(.top)
-        
         .toolbar {
             ToolbarItem(placement: .principal) {
                 Color.clear

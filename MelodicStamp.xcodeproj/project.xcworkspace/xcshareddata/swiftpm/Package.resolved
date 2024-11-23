@@ -123,8 +123,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/Cement-Labs/Luminare.git",
       "state" : {
-        "branch" : "main",
-        "revision" : "86a65ee1bada0c05a72d47bdfd02a9894c51ba83"
+        "branch" : "docs",
+        "revision" : "03f18994460e6b5d82e83fd6199a78e5c2d76357"
       }
     },
     {
@@ -188,6 +188,15 @@
       "state" : {
         "revision" : "52f73460dc04ba789ad3007ad004faa328b732dd",
         "version" : "0.1.2"
+      }
+    },
+    {
+      "identity" : "swiftlintplugins",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/SimplyDanny/SwiftLintPlugins",
+      "state" : {
+        "revision" : "7c80ce6f142164b0201871e580b021d1b2c69804",
+        "version" : "0.57.0"
       }
     },
     {
