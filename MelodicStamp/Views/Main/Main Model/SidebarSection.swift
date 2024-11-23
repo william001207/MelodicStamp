@@ -22,40 +22,38 @@ struct SidebarSection: Hashable, Identifiable {
 }
 
 enum SidebarItem: Hashable, Identifiable, CaseIterable {
-    case playlist
-    case inspector
-    case metadata
+    case home
+    case search
+    case library
+    case setting
     
     var id: String {
         .init(describing: self)
     }
     
-    var isComposable: Bool {
-        switch self {
-        case .playlist, .inspector, .metadata:
-            true
-        }
-    }
-    
     var title: String {
         switch self {
-        case .playlist:
-                .init(localized: "Playlist")
-        case .inspector:
-                .init(localized: "Inspector")
-        case .metadata:
-                .init(localized: "Metadata")
+        case .home:
+                .init(localized: "Home")
+        case .search:
+                .init(localized: "Search")
+        case .library:
+                .init(localized: "Library")
+        case .setting:
+                .init(localized: "Settings")
         }
     }
     
     var icon: Image {
         switch self {
-        case .playlist:
-                .init(systemSymbol: .musicNoteList)
-        case .inspector:
-                .init(systemSymbol: .photo)
-        case .metadata:
-                .init(systemSymbol: <#T##SFSymbol#>)
+        case .home:
+                .init(systemSymbol: .house)
+        case .search:
+                .init(systemSymbol: .magnifyingglass)
+        case .library:
+                .init(systemSymbol: .playSquareStack)
+        case .setting:
+                .init(systemSymbol: .gearshape)
         }
     }
     
