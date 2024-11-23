@@ -9,13 +9,10 @@ import SwiftUI
 
 struct MainView: View {
     @Environment(\.appearsActive) private var isActive
-    @Environment(\.melodicStampWindowStyle) private var windowStyle
-    @Environment(\.changeMelodicStampWindowStyle) private var changeWindowStyle
     
     @Bindable var player: PlayerModel
     
-    @State private var floatingWindows: FloatingWindowsModel = .init()
-    @State private var selectedTab: SidebarItem = .home
+    @Binding var selectedTab: SidebarItem
     
     var body: some View {
         Group {
@@ -42,45 +39,11 @@ struct MainView: View {
                 Color.clear
             }
         }
-        .onGeometryChange(for: CGRect.self) { proxy in
-            proxy.frame(in: .global)
-        } action: { newValue in
-            floatingWindows.updateTabBarPosition()
-            floatingWindows.updatePlayerPosition()
-        }
-        .onChange(of: isActive, initial: true) { oldValue, newValue in
-            switch windowStyle {
-            case .main:
-                if newValue {
-                    floatingWindows.addTabBar {
-                        FloatingTabBarView(
-                            floatingWindows: floatingWindows,
-                            sections: [
-                                .init(items: [.home, .search, .library, .setting])
-                            ],
-                            selectedItem: $selectedTab
-                        )
-                    }
-                    floatingWindows.addPlayer {
-                        FloatingPlayerView(
-                            floatingWindows: floatingWindows,
-                            player: player
-                        )
-                        .environment(\.melodicStampWindowStyle, windowStyle)
-                        .environment(\.changeMelodicStampWindowStyle, changeWindowStyle)
-                    }
-                }
-            default:
-                break
-            }
-        }
-        .onDisappear {
-            floatingWindows.removeTabBar()
-            floatingWindows.removePlayer()
-        }
     }
 }
 
 #Preview {
-    MainView(player: .init())
+    @Previewable @State var selectedTab: SidebarItem = .home
+    
+    MainView(player: .init(), selectedTab: $selectedTab)
 }
