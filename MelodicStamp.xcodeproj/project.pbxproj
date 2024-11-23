@@ -386,7 +386,7 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/Cement-Labs/Luminare.git";
 			requirement = {
-				branch = main;
+				branch = docs;
 				kind = branch;
 			};
 		};

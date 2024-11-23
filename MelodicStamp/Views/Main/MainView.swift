@@ -37,11 +37,7 @@ struct MainView: View {
                     .edgesIgnoringSafeArea(.top)
                 }
             } else {
-                Image(systemSymbol: .musicNote)
-                    .resizable()
-                    .aspectRatio(contentMode: .fit)
-                    .frame(height: 32)
-                    .foregroundStyle(.placeholder)
+                EmptyMusicNoteView()
             }
         }
         .frame(minWidth: 1000, minHeight: 600)

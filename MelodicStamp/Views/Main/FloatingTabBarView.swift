@@ -10,8 +10,8 @@ import SwiftUI
 struct FloatingTabBarView: View {
     @Bindable var floatingWindows: FloatingWindowsModel
     
-    @State private var hoveringStates: [SidebarTab: Bool] = [:]
     @State private var isHovering: Bool = false
+    @State private var hoveringTabs: Set<SidebarTab> = .init()
     
     var sections: [SidebarSection]
     
@@ -34,7 +34,7 @@ struct FloatingTabBarView: View {
                         }
                         
                         ForEach(section.items) { tab in
-                            let isTabHovering = hoveringStates[tab] ?? false
+                            let isTabHovering = hoveringTabs.contains(tab)
                             let isSelected = selectedTabs.contains(tab)
                             
                             AliveButton {
@@ -80,7 +80,11 @@ struct FloatingTabBarView: View {
                                 }
                                 .onHover { hover in
                                     withAnimation(.default.speed(2)) {
-                                        hoveringStates[tab] = hover
+                                        if hover {
+                                            hoveringTabs.insert(tab)
+                                        } else {
+                                            hoveringTabs.remove(tab)
+                                        }
                                     }
                                 }
                             }

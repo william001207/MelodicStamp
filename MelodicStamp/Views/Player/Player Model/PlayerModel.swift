@@ -54,7 +54,6 @@ enum PlaybackMode: String, CaseIterable, Identifiable {
 @Observable class PlayerModel: NSObject {
     private let player = AudioPlayer()
     
-    private var playlist: [PlaylistItem] = []
     private var current: PlaylistItem?
     
     private var outputDevices: [AudioDevice] = []
@@ -64,6 +63,7 @@ enum PlaybackMode: String, CaseIterable, Identifiable {
 //    var showError: Bool = false
 //    var showSecondWindow: Bool = false
     
+    var playlist: [PlaylistItem] = []
     var playbackMode: PlaybackMode = .sequential
     
     var duration: Duration { player.time?.total.map { .seconds($0) } ?? .zero }
@@ -122,6 +122,10 @@ enum PlaybackMode: String, CaseIterable, Identifiable {
 //                handleError(error)
             }
         }
+    }
+    
+    var isPlaylistEmpty: Bool {
+        playlist.isEmpty
     }
     
     var hasCurrentTrack: Bool {
@@ -226,24 +230,6 @@ enum PlaybackMode: String, CaseIterable, Identifiable {
         } else {
             return playlist.indices.randomElement()
         }
-    }
-    
-    func playlist<R>(in offsets: IndexSet? = nil, _ operation: @escaping (PlaylistItem) -> R) -> [R] {
-        playlist
-            .enumerated()
-            .filter {
-                if let offsets {
-                    offsets.contains($0.offset)
-                } else {
-                    true
-                }
-            }
-            .map { $0.element }
-            .map(operation)
-    }
-    
-    func playlist(in offsets: IndexSet? = nil) -> [PlaylistItem] {
-        playlist(in: offsets) { $0 }
     }
     
     func loadPlaylist() {
