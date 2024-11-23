@@ -185,15 +185,16 @@ struct ProgressBar: View {
         if isDelegated {
             switch interactionState {
             case .propagating:
-                value = total * percentage
                 interactionState = .receiving
+                
+                guard percentage != value / total else { return }
+                value = total * percentage
             default:
                 break
             }
         } else {
-            let value = total * percentage
-            guard self.value != value else { return }
-            self.value = value
+            guard percentage != value / total else { return }
+            value = total * percentage
         }
     }
 }

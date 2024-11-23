@@ -78,6 +78,11 @@ enum PlaybackMode: String, CaseIterable, Identifiable {
         }
         
         set {
+            // debounce and cancel if adjustment is smaller than 0.1s
+            let difference = abs(newValue - progress)
+            let timeDifference = duration.toTimeInterval() * difference
+            guard timeDifference >= 1 / 10 else { return }
+            
             player.seek(position: max(0, min(1, newValue)))
         }
     }

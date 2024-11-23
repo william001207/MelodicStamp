@@ -84,10 +84,10 @@ struct Player: View {
             }
         }
         
-        // handle left arrow/right arrow down/up -> adjust progress and navigate track
+        // handle left arrow/right arrow down/repeat/up -> adjust progress and navigate track
         .onKeyPress(keys: [.leftArrow, .rightArrow], phases: .all) { key in
             switch key.phase {
-            case .down:
+            case .down, .repeat:
                 guard model.hasCurrentTrack else { return .ignored }
                 
                 let sign: FloatingPointSign = key.key == .leftArrow ? .minus : .plus
