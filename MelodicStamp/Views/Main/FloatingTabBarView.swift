@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct FloatingTabBarView: View {
-    @EnvironmentObject private var model: FloatingWindowsModel
+    @State var model: FloatingWindowsModel
     
     @State private var hoveringStates: [SidebarItem: Bool] = [:]
     @State private var onHover: Bool = false
@@ -82,6 +82,6 @@ struct FloatingTabBarView: View {
 
 #Preview {
     @Previewable @State var selectedItem: SidebarItem = .home
-    FloatingTabBarView(sections: sidebarSections, selectedItem: $selectedItem)
-        .environmentObject(FloatingWindowsModel())
+    
+    FloatingTabBarView(model: .init(), sections: sidebarSections, selectedItem: $selectedItem)
 }

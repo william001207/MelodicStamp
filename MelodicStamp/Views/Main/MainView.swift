@@ -39,7 +39,7 @@ struct MainView: View {
         .onChange(of: isActive) { oldValue, newValue in
             if newValue {
                 model.addTabBar()
-                model.addPlayBar()
+                model.addPlayer()
             }
         }
     }

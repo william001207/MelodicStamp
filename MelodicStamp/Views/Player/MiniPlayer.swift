@@ -2,7 +2,7 @@
 //  MiniPlayer.swift
 //  MelodicStamp
 //
-//  Created by Xinshao_Air on 2024/11/20.
+//  Created by KrLite on 2024/11/20.
 //
 
 

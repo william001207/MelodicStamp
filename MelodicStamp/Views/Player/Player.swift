@@ -2,14 +2,13 @@
 //  Player.swift
 //  MelodicStamp
 //
-//  Created by Xinshao_Air on 2024/11/22.
+//  Created by KrLite on 2024/11/22.
 //
 
 import SwiftUI
 import SFSafeSymbols
 
 struct Player: View {
-    
     @Environment(\.openWindow) var openWindow
     
     var namespace: Namespace.ID

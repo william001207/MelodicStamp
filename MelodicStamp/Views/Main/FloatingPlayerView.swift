@@ -1,5 +1,5 @@
 //
-//  FloatingPlayBarView.swift
+//  FloatingPlayerView.swift
 //  MelodicStamp
 //
 //  Created by Xinshao_Air on 2024/11/22.
@@ -7,8 +7,9 @@
 
 import SwiftUI
 
-struct FloatingPlayBarView: View {
-    @EnvironmentObject private var model: FloatingWindowsModel
+struct FloatingPlayerView: View {
+    @State var model: FloatingWindowsModel
+    
     @Namespace private var namespace
     
     @State var onHover: Bool = false
