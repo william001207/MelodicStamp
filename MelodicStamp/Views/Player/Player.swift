@@ -132,12 +132,12 @@ struct Player: View {
     
     @ViewBuilder private func header() -> some View {
         HStack(alignment: .center, spacing: 12) {
-            AliveButton(enabledStyle: .init(.secondary)) {
+            AliveButton(enabledStyle: .init(.tertiary), hoveringStyle: .init(.secondary)) {
                 let hasShift = NSEvent.modifierFlags.contains(.shift)
                 model.playbackMode = model.playbackMode.cycle(negate: hasShift)
             } label: {
                 model.playbackMode.image
-                    .imageScale(.large)
+                    .font(.headline)
                     .contentTransition(.symbolEffect(.replace))
                     .frame(width: 20)
             }
@@ -150,14 +150,15 @@ struct Player: View {
             }
             .contentTransition(.numericText())
             .animation(.default, value: model.currentIndex)
+            .padding(.bottom, 2)
             
             Spacer()
             
-            AliveButton(enabledStyle: .init(.secondary)) {
-//                openWindow(id: "mini-player")
+            AliveButton(enabledStyle: .init(.tertiary), hoveringStyle: .init(.secondary)) {
+                openWindow(id: "mini-player")
             } label: {
                 Image(systemSymbol: .arrowDownRightAndArrowUpLeft)
-                    .imageScale(.large)
+                    .font(.headline)
                     .frame(width: 20)
             }
             .matchedGeometryEffect(id: PlayerNamespace.expandShrinkButton, in: namespace)
@@ -171,7 +172,7 @@ struct Player: View {
                 previousSongButtonBounceAnimation.toggle()
             } label: {
                 Image(systemSymbol: .backwardFill)
-                    .imageScale(.large)
+                    .font(.headline)
             }
             .disabled(!model.hasPreviousTrack)
             .symbolEffect(.bounce, value: previousSongButtonBounceAnimation)
@@ -182,8 +183,9 @@ struct Player: View {
                 isPressingSpace = false
             } label: {
                 model.playPauseImage
+                    .font(.title)
                     .contentTransition(.symbolEffect(.replace.upUp))
-                    .frame(width: 24)
+                    .frame(width: 20)
             }
             .scaleEffect(isPressingSpace ? 0.75 : 1, anchor: .center)
             .animation(.bouncy, value: isPressingSpace)
@@ -194,7 +196,7 @@ struct Player: View {
                 nextSongButtonBounceAnimation.toggle()
             } label: {
                 Image(systemSymbol: .forwardFill)
-                    .imageScale(.large)
+                    .font(.headline)
             }
             .disabled(!model.hasNextTrack)
             .symbolEffect(.bounce, value: nextSongButtonBounceAnimation)
@@ -221,7 +223,7 @@ struct Player: View {
             model.isMuted.toggle()
         } label: {
             model.speakerImage
-                .imageScale(.large)
+                .font(.headline)
                 .contentTransition(.symbolEffect(.replace))
                 .frame(width: 16)
         }

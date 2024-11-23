@@ -210,6 +210,7 @@ struct MiniPlayer: View {
                     previousSongButtonBounceAnimation.toggle()
                 } label: {
                     Image(systemSymbol: .backwardFill)
+                        .font(.headline)
                 }
                 .disabled(!model.hasPreviousTrack)
                 .symbolEffect(.bounce, value: previousSongButtonBounceAnimation)
@@ -220,7 +221,7 @@ struct MiniPlayer: View {
                     isPressingSpace = false
                 } label: {
                     model.playPauseImage
-                        .imageScale(.large)
+                        .font(.title)
                         .contentTransition(.symbolEffect(.replace.upUp))
                         .frame(width: 16)
                 }
@@ -233,6 +234,7 @@ struct MiniPlayer: View {
                     nextSongButtonBounceAnimation.toggle()
                 } label: {
                     Image(systemSymbol: .forwardFill)
+                        .font(.headline)
                 }
                 .disabled(!model.hasNextTrack)
                 .symbolEffect(.bounce, value: nextSongButtonBounceAnimation)
@@ -246,6 +248,7 @@ struct MiniPlayer: View {
         if activeControl == .volume {
             Group {
                 if isProgressBarExpanded {
+                    // preserves spacing
                     Spacer()
                         .frame(width: 0)
                 } else {
@@ -268,9 +271,8 @@ struct MiniPlayer: View {
                 }
             } label: {
                 model.speakerImage
-                    .imageScale(.large)
                     .contentTransition(.symbolEffect(.replace))
-                    .frame(width: 20)
+                    .frame(width: 20, height: 16)
             }
             .symbolEffect(.bounce, value: activeControl)
             .symbolEffect(.bounce, value: speakerButtonBounceAnimation)
@@ -279,7 +281,6 @@ struct MiniPlayer: View {
             AliveButton {
             } label: {
                 Image(systemSymbol: .listTriangle)
-                    .imageScale(.large)
             }
             .matchedGeometryEffect(id: PlayerNamespace.playlistButton, in: namespace)
         }

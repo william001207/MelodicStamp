@@ -15,10 +15,12 @@ struct AliveButton<Label>: View where Label: View {
     var shadowRadius: CGFloat = 4
     var duration: TimeInterval = 0.45
     var enabledStyle: AnyShapeStyle = .init(.primary)
+    var hoveringStyle: AnyShapeStyle?
     var disabledStyle: AnyShapeStyle = .init(.quinary)
     var action: () -> Void
     @ViewBuilder var label: () -> Label
     
+    @State private var isHovering: Bool = false
     @State private var isActive: Bool = false
     @State private var frame: CGRect = .zero
     
@@ -45,11 +47,15 @@ struct AliveButton<Label>: View where Label: View {
             } action: { frame in
                 self.frame = frame
             }
+            .onHover { hover in
+                isHovering = hover
+            }
         
-            .foregroundStyle(isEnabled ? enabledStyle : disabledStyle)
+            .foregroundStyle(isEnabled ? isHovering ? hoveringStyle ?? enabledStyle : enabledStyle : disabledStyle)
             .scaleEffect(isActive ? scaleFactor : 1, anchor: .center)
             .shadow(radius: isActive ? shadowRadius : 0)
         
+            .animation(.default, value: isHovering)
             .animation(.bouncy, value: isActive)
             .animation(.default, value: isEnabled)
     }
