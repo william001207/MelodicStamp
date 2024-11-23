@@ -16,69 +16,21 @@ struct HomeView: View {
     @State var selectedItems: Set<PlaylistItem> = []
     @State var lastSelectedItem: PlaylistItem? = nil
     
+    @State private var searchText: String = ""
     @State private var showEditMetadata: Bool = false
     @State private var showBatchEdit: Bool = false
     
     var body: some View {
-        HStack(alignment: .top) {
-            homeTitle()
-                .padding([.leading, .vertical], 20)
-                .padding(.bottom, 50)
-                .padding(.top, 35)
+        HStack(spacing: 20) {
             
-            ScrollView(.vertical, showsIndicators: false) {
-                LazyVStack(spacing: 10) {
-                    ForEach(model.playlist()) { item in
-                        AliveButton {
-                            let hasShift = NSEvent.modifierFlags.contains(.shift)
-                            let hasCommand = NSEvent.modifierFlags.contains(.command)
-                            handleSelection(of: item, isShiftPressed: hasShift, isCommandPressed: hasCommand)
-                        } label: {
-                            HStack {
-                                VStack(alignment: .leading) {
-                                    Text(item.metadata.title ?? item.url.lastPathComponent)
-                                        .font(.headline.bold())
-                                    Text(item.metadata.artist ?? "Unknown Artist")
-                                        .font(.subheadline)
-                                        .foregroundColor(.secondary)
-                                    Text(item.url.lastPathComponent)
-                                        .font(.caption)
-                                        .foregroundColor(.secondary)
-                                }
-                                
-                                Spacer()
-                                
-                                AliveButton {
-                                    model.play(item)
-                                } label: {
-                                    Image(systemSymbol: .playCircle)
-                                        .font(.system(size: 18.0).bold())
-                                        .frame(width: 35, height: 35)
-                                }
-                            }
-                            .padding(10)
-                            .contentShape(Rectangle())
-                            .background {
-                                Group {
-                                    if selectedItems.contains(item) {
-                                        RoundedRectangle(cornerRadius: 15)
-                                            .fill( Color.blue.opacity(0.2))
-                                            .stroke(Color.blue, lineWidth: 2)
-                                    } else {
-                                        RoundedRectangle(cornerRadius: 15)
-                                            .fill(.quinary)
-                                            .stroke(.quinary, lineWidth: 1)
-                                    }
-                                }
-                                .animation(.smooth(duration: 0.25), value: selectedItems.contains(item))
-                            }
-                        }
-                    }
-                }
-                .padding([.horizontal, .vertical], 20)
-                .padding(.bottom, 50)
-                .padding(.top, 35)
+            siderBar()
+            
+            VStack(alignment: .leading, spacing: 20) {
+                homeTitle()
+                
+                playList()
             }
+            .padding(.top, 20)
             .frame(maxWidth: .infinity)
             
             eidtView()
@@ -87,96 +39,174 @@ struct HomeView: View {
                 .padding(.top, 35)
             
         }
-        .toolbar {
-            ToolbarItemGroup(placement: .automatic){
-                Button("Open File") {
-                    openFile()
-                }
-                .keyboardShortcut("O", modifiers: [.command])
-                
-                Button("Add Files") {
-                    addFiles()
-                }
-                .keyboardShortcut("A", modifiers: [.command])
-                
-                Button("Edit Metadata") {
-                    if selectedItems.count == 1 {
-                        showEditMetadata.toggle()
-                    } else if selectedItems.count > 1 {
-                        showBatchEdit.toggle()
+        .frame(minWidth: 1000, minHeight: 600)
+    }
+    
+    // MARK: - ViewBuilder
+    
+    @ViewBuilder
+    private func siderBar() -> some View {
+        ZStack {
+            VisualEffectView(material: .popover, blendingMode: .behindWindow)
+            VStack(alignment: .trailing, spacing: 10) {
+                VStack {
+                    LuminareSection {
+                        
+                        LuminareTextField("Search", text: $searchText)
+                        
+                        HStack(spacing: 2) {
+                            Button("Open File") {
+                                openFile()
+                            }
+                            .buttonStyle(LuminareButtonStyle())
+                            .keyboardShortcut("O", modifiers: [.command])
+                            
+                            Button("Add Files") {
+                                addFiles()
+                            }
+                            .buttonStyle(LuminareButtonStyle())
+                            .keyboardShortcut("A", modifiers: [.command])
+                            
+                        }
+                        .frame(height: 45)
                     }
+                    
+                    Spacer()
+                    
+                    LuminareSection {
+                        Button("Edit Metadata") {
+                            withAnimation {
+                                if selectedItems.count == 1 {
+                                    showEditMetadata.toggle()
+                                } else if selectedItems.count > 1 {
+                                    showBatchEdit.toggle()
+                                }
+                            }
+                        }
+                        .disabled(selectedItems.isEmpty)
+                        .buttonStyle(LuminareButtonStyle())
+                    }
+                    .frame(height: 45)
                 }
-                .disabled(selectedItems.isEmpty)
+                .padding(.horizontal, 10)
+                .padding(.top, 50)
+                .padding(.bottom, 10)
             }
+        }
+        .frame(width: 250)
+        .background {
+            RoundedRectangle(cornerRadius: 0.0)
+                .fill(.quaternary)
+                .frame(width: 250)
         }
     }
     
     @ViewBuilder
     private func homeTitle() -> some View {
-        VStack {
-            ZStack {
-                RoundedRectangle(cornerRadius: 12.5)
-                    .fill(Color.gray)
-                    .shadow(radius: 10)
-                Image(systemSymbol: .photo)
-                    .font(.system(size: 100.0).bold())
+        HStack {
+            VStack {
+                Text("Title")
+                    .font(.title.bold())
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                
+                Text("subHeading")
+                    .font(.title3.bold())
+                    .foregroundStyle(Color.blue)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                
+                Text("Folder Place")
+                    .font(.subheadline.bold())
+                    .foregroundStyle(Color.secondary)
+                    .frame(maxWidth: .infinity, alignment: .leading)
             }
-            .frame(width: 200, height: 200)
             
-            Text("PlayList")
-                .font(.title.bold())
-                .frame(maxWidth: .infinity, alignment: .leading)
-            
-            Text("Founder")
-                .font(.title3.bold())
-                .foregroundStyle(Color.blue)
-                .frame(maxWidth: .infinity, alignment: .leading)
-            
-            Text("Place")
-                .font(.subheadline.bold())
-                .foregroundStyle(Color.secondary)
-                .frame(maxWidth: .infinity, alignment: .leading)
+            Spacer()
             
             HStack(spacing: 10) {
                 AliveButton {
                     
                 } label: {
-                    ZStack {
-                        RoundedRectangle(cornerRadius: 12.5)
-                            .foregroundStyle(Color.blue)
-                            .frame(width: 95, height: 40)
-                        HStack {
-                            Group {
-                                Image(systemSymbol: .playFill)
-                                Text("Play")
-                            }
-                            .font(.headline)
-                            .foregroundStyle(Color.white)
+                    Image(systemSymbol: .playFill)
+                        .font(.headline)
+                        .foregroundStyle(Color.white)
+                        .background {
+                            Circle()
+                                .foregroundStyle(Color.blue)
+                                .frame(width: 40, height: 40)
                         }
-                    }
                 }
+                .frame(width: 40, height: 40)
                 
                 AliveButton {
                     
                 } label: {
-                    ZStack {
-                        RoundedRectangle(cornerRadius: 12.5)
-                            .foregroundStyle(Color.blue.opacity(0.25))
-                            .frame(width: 95, height: 40)
+                    Image(systemSymbol: .shuffle)
+                        .font(.headline)
+                        .foregroundStyle(Color.white)
+                        .background {
+                            Circle()
+                                .foregroundStyle(Color.blue.opacity(0.25))
+                                .frame(width: 40, height: 40)
+                        }
+                }
+                .frame(width: 40, height: 40)
+            }
+        }
+    }
+    
+    @ViewBuilder
+    private func playList() -> some View {
+        ScrollView(.vertical, showsIndicators: false) {
+            LazyVStack(spacing: 10) {
+                ForEach(model.playlist()) { item in
+                    AliveButton {
+                        let hasShift = NSEvent.modifierFlags.contains(.shift)
+                        let hasCommand = NSEvent.modifierFlags.contains(.command)
+                        handleSelection(of: item, isShiftPressed: hasShift, isCommandPressed: hasCommand)
+                    } label: {
                         HStack {
-                            Group {
-                                Image(systemSymbol: .shuffle)
-                                Text("Shuffle")
+                            VStack(alignment: .leading) {
+                                Text(item.metadata.title ?? item.url.lastPathComponent)
+                                    .font(.headline.bold())
+                                Text(item.metadata.artist ?? "Unknown Artist")
+                                    .font(.subheadline)
+                                    .foregroundColor(.secondary)
+                                Text(item.url.lastPathComponent)
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
                             }
-                            .font(.headline)
-                            .foregroundStyle(Color.blue)
+                            
+                            Spacer()
+                            
+                            AliveButton {
+                                model.play(item)
+                            } label: {
+                                Image(systemSymbol: .playCircle)
+                                    .font(.system(size: 18.0).bold())
+                                    .frame(width: 35, height: 35)
+                            }
+                        }
+                        .padding(10)
+                        .contentShape(Rectangle())
+                        .background {
+                            Group {
+                                if selectedItems.contains(item) {
+                                    RoundedRectangle(cornerRadius: 15)
+                                        .fill(Color.blue.opacity(0.2))
+                                        .stroke(Color.blue, lineWidth: 2)
+                                } else {
+                                    RoundedRectangle(cornerRadius: 15)
+                                        .fill(.quinary)
+                                        .stroke(.quinary, lineWidth: 1)
+                                }
+                            }
+                            .animation(.smooth(duration: 0.25), value: selectedItems.contains(item))
                         }
                     }
+                    .frame(height: 65)
                 }
             }
-            .frame(maxWidth: .infinity, alignment: .leading)
         }
-        .frame(maxWidth: 200)
     }
     
     @ViewBuilder

@@ -19,7 +19,7 @@ struct FloatingTabBarView: View {
     
     var body: some View {
         ZStack {
-            VisualEffectView(material: .popover, blendingMode: .withinWindow)
+            VisualEffectView(material: .popover, blendingMode: .behindWindow)
             ForEach(self.sections) { section in
                 VStack(alignment:.center, spacing: 2.5) {
                     ForEach(section.items) { item in

@@ -57,11 +57,6 @@ struct Player: View {
         .padding(.horizontal, 32)
         .padding(.vertical, 24)
         .frame(maxWidth: .infinity)
-        .background {
-            Rectangle()
-                .foregroundStyle(.thickMaterial)
-        }
-        
         .focusable()
         .focusEffectDisabled()
         
