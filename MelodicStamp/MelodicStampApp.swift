@@ -21,7 +21,7 @@ struct MelodicStampApp: App {
     var body: some Scene {
         WindowGroup {
             MainView()
-                .frame(minWidth: 900, minHeight: 600)
+                .frame(minWidth: 1000, minHeight: 600)
                 .edgesIgnoringSafeArea(.top)
         }
         .windowResizability(.contentSize)

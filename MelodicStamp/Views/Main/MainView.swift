@@ -13,13 +13,13 @@ struct MainView: View {
     
     var body: some View {
         ZStack(alignment: .topLeading) {
-            VisualEffectView(material: .popover, blendingMode: .behindWindow)
+            VisualEffectView(material: .sidebar, blendingMode: .behindWindow)
             
             model.selectedSidebarItem.content
                 .transition(.blurReplace.animation(.smooth(duration: 0.65)))
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
-        .frame(minWidth: 900, minHeight: 600)
+        .frame(minWidth: 1000, minHeight: 600)
         .toolbar {
             ToolbarItem(placement: .principal) {
                 Color.clear

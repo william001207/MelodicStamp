@@ -15,10 +15,15 @@ struct FloatingPlayerView: View {
     @State var onHover: Bool = false
     
     var body: some View {
-        Player(namespace: namespace)
-            .background(.clear)
+        ZStack {
             
-            .frame(width: 800, height: 100)
-            .clipShape(.rect(cornerRadius: 25))
+            VisualEffectView(material: .popover, blendingMode: .behindWindow)
+            
+            Player(namespace: namespace)
+                .background(.clear)
+            
+        }
+        .frame(width: 800, height: 100)
+        .clipShape(.rect(cornerRadius: 25))
     }
 }
