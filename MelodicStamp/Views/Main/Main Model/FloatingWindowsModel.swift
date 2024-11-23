@@ -10,10 +10,10 @@ import AppKit
 
 @Observable class FloatingWindowsModel {
     private(set) var isTabBarAdded: Bool = false
-    private(set) var isPlayBarAdded: Bool = false
+    private(set) var isPlayerAdded: Bool = false
     
-    private var tabBarIdentifier: NSUserInterfaceItemIdentifier?
-    private var playerIdentifier: NSUserInterfaceItemIdentifier?
+    private var tabBarIdentifier: UUID = .init()
+    private var playerIdentifier: UUID = .init()
     
     var selectedSidebarItem: SidebarItem = .home
 
@@ -34,17 +34,19 @@ import AppKit
             floatingWindow.styleMask = .borderless
             floatingWindow.contentView = content
             floatingWindow.backgroundColor = .clear
+            floatingWindow.title = tabBarIdentifier.uuidString
             
             applicationWindow.addChildWindow(floatingWindow, ordered: .above)
-            tabBarIdentifier = floatingWindow.identifier
             isTabBarAdded = true
             
-            updateTabBarPosition()
+            DispatchQueue.main.async {
+                self.updateTabBarPosition()
+            }
         }
     }
     
     func addPlayer(model: PlayerModel) {
-        guard !isPlayBarAdded else { return }
+        guard !isPlayerAdded else { return }
 
         if let applicationWindow = NSApp.mainWindow {
             let content = NSHostingView(rootView: FloatingPlayerView(floatingWindowsModel: self, playerModel: model))
@@ -52,16 +54,19 @@ import AppKit
             floatingWindow.styleMask = .borderless
             floatingWindow.contentView = content
             floatingWindow.backgroundColor = .clear
+            floatingWindow.title = playerIdentifier.uuidString
 
             applicationWindow.addChildWindow(floatingWindow, ordered: .above)
-            playerIdentifier = floatingWindow.identifier
-            isPlayBarAdded = true
-            updatePlayerPosition()
+            isPlayerAdded = true
+            
+            DispatchQueue.main.async {
+                self.updatePlayerPosition()
+            }
         }
     }
     
     func updateTabBarPosition() {
-        if let floatingWindow = NSApp.windows.first(where: { $0.identifier == tabBarIdentifier }), let applicationWindow = NSApp.mainWindow {
+        if let floatingWindow = NSApp.windows.first(where: { $0.title == tabBarIdentifier.uuidString }), let applicationWindow = NSApp.mainWindow {
             let windowFrame = applicationWindow.frame
             let tabBarFrame = floatingWindow.frame
             
@@ -81,7 +86,7 @@ import AppKit
     }
     
     func updatePlayerPosition() {
-        if let floatingWindow = NSApp.windows.first(where: { $0.identifier == playerIdentifier }), let applicationWindow = NSApp.mainWindow {
+        if let floatingWindow = NSApp.windows.first(where: { $0.title == playerIdentifier.uuidString }), let applicationWindow = NSApp.mainWindow {
             let windowFrame = applicationWindow.frame
             let playerFrame = floatingWindow.frame
 

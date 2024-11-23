@@ -30,7 +30,6 @@ struct MainView: View {
         .onGeometryChange(for: CGRect.self) { proxy in
             proxy.frame(in: .global)
         } action: { newValue in
-            print(1)
             floatingWindowsModel.updateTabBarPosition()
             floatingWindowsModel.updatePlayerPosition()
         }
