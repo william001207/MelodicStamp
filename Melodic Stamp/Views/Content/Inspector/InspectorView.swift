@@ -91,7 +91,7 @@ struct InspectorView: View {
     }
     
     private func save(item: PlaylistItem?) {
-        guard var metadata = item?.metadata else { return }
+        guard let metadata = item?.metadata else { return }
         
         metadata.removeAllAttachedPictures()
         if let cover = cover?.attachedPicture {
