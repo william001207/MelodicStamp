@@ -1,5 +1,5 @@
 {
-  "originHash" : "043156be2f849b1a25969011e8501071b1733dcf585a34378a1ea5cdd9dff39f",
+  "originHash" : "2e341d065a854aab4ea0910d91e250e52d625f0418564e30fb5951054a0506b2",
   "pins" : [
     {
       "identity" : "avfaudioextensions",
@@ -121,10 +121,10 @@
     {
       "identity" : "luminare",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/Cement-Labs/Luminare.git",
+      "location" : "https://github.com/Cement-Labs/Luminare",
       "state" : {
         "branch" : "docs",
-        "revision" : "03f18994460e6b5d82e83fd6199a78e5c2d76357"
+        "revision" : "cb976c514dc7055e15c2c689556ed6915133aa6b"
       }
     },
     {

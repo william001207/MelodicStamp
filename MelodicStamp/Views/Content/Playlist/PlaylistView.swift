@@ -74,7 +74,7 @@ struct PlaylistView: View {
                                 HStack {
                                     Image(systemSymbol: .clockArrow2Circlepath)
                                     
-                                    Text("Revert")
+                                    Text("Reload")
                                 }
                             }
                         } removeView: {
@@ -98,44 +98,48 @@ struct PlaylistView: View {
     }
     
     @ViewBuilder private func toolbar() -> some View {
-        Button {
-            isFileOpenerPresented = true
-        } label: {
-            HStack(alignment: .lastTextBaseline) {
-                Image(systemSymbol: .playFill)
-                    .imageScale(.small)
-                
-                Text("Open File")
+        Group {
+            Button {
+                isFileOpenerPresented = true
+            } label: {
+                HStack(alignment: .lastTextBaseline) {
+                    Image(systemSymbol: .playFill)
+                        .imageScale(.small)
+                    
+                    Text("Open File")
+                }
+                .padding(.horizontal, 2)
             }
-            .padding(.horizontal, 2)
-        }
-        .fileImporter(isPresented: $isFileOpenerPresented, allowedContentTypes: allowedContentTypes) { result in
-            switch result {
-            case .success(let url):
-                player.play(url)
-            case .failure:
-                break
+            .fileImporter(isPresented: $isFileOpenerPresented, allowedContentTypes: allowedContentTypes) { result in
+                switch result {
+                case .success(let url):
+                    player.play(url)
+                case .failure:
+                    break
+                }
+            }
+            
+            Button {
+                isFileAdderPresented = true
+            } label: {
+                HStack(alignment: .lastTextBaseline) {
+                    Image(systemSymbol: .textLineLastAndArrowtriangleForward)
+                        .imageScale(.small)
+                    
+                    Text("Add to Playlist")
+                }
+                .padding(.horizontal, 2)
+            }
+            .fileImporter(isPresented: $isFileAdderPresented, allowedContentTypes: allowedContentTypes, allowsMultipleSelection: true) { result in
+                switch result {
+                case .success(let urls):
+                    player.addToPlaylist(urls: urls)
+                case .failure:
+                    break
+                }
             }
         }
-        
-        Button {
-            isFileAdderPresented = true
-        } label: {
-            HStack(alignment: .lastTextBaseline) {
-                Image(systemSymbol: .textLineLastAndArrowtriangleForward)
-                    .imageScale(.small)
-                
-                Text("Add to Playlist")
-            }
-            .padding(.horizontal, 2)
-        }
-        .fileImporter(isPresented: $isFileAdderPresented, allowedContentTypes: allowedContentTypes, allowsMultipleSelection: true) { result in
-            switch result {
-            case .success(let urls):
-                player.addToPlaylist(urls: urls)
-            case .failure:
-                break
-            }
-        }
+        .background(.thinMaterial)
+        .clipShape(.buttonBorder)
     }
 }

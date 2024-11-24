@@ -58,7 +58,7 @@ struct MainView: View {
 }
 
 #Preview {
-    @Previewable @State var selectedTabs: Set<SidebarTab> = .init([.playlist])
+    @Previewable @State var selectedTabs: Set<SidebarTab> = .init(SidebarTab.allCases)
     
     MainView(player: .init(), selectedTabs: $selectedTabs)
 }

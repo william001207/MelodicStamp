@@ -384,7 +384,7 @@
 		};
 		65F1DA9E2CEDBDBE00389E37 /* XCRemoteSwiftPackageReference "Luminare" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/Cement-Labs/Luminare.git";
+			repositoryURL = "https://github.com/Cement-Labs/Luminare";
 			requirement = {
 				branch = docs;
 				kind = branch;
