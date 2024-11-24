@@ -54,15 +54,10 @@ enum PlaybackMode: String, CaseIterable, Identifiable {
 @Observable class PlayerModel: NSObject {
     private let player = AudioPlayer()
     
-    private var current: PlaylistItem?
-    
     private var outputDevices: [AudioDevice] = []
     private var selectedDevice: AudioDevice?
     
-//    var errorMessage: String?
-//    var showError: Bool = false
-//    var showSecondWindow: Bool = false
-    
+    private(set) var current: PlaylistItem?
     var playlist: [PlaylistItem] = []
     var playbackMode: PlaybackMode = .sequential
     
@@ -196,21 +191,6 @@ enum PlaybackMode: String, CaseIterable, Identifiable {
             return (currentIndex + playlist.count - 1) % playlist.count
         case .shuffle:
             return randomIndex()
-        }
-    }
-    
-    var currentURL: URL? {
-        current?.url
-    }
-    
-    var currentMetadata: AudioMetadata? {
-        get {
-            current?.metadata
-        }
-        
-        set {
-            guard var current, let newValue else { return }
-            current.metadata = newValue
         }
     }
     

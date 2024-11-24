@@ -19,7 +19,7 @@ struct PlaylistItemView: View {
         HStack(alignment: .center) {
             VStack(alignment: .leading) {
                 MarqueeScrollView(animate: false) {
-                    MusicTitle(metadata: item.metadata, url: item.url)
+                    MusicTitle(item: item)
                         .font(.title3)
                 }
                 

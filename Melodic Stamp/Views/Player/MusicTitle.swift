@@ -34,27 +34,23 @@ struct MusicTitle: View {
     }
     
     var mode: DisplayMode = .comprehensive
-    var metadata: AudioMetadata?
-    var url: URL?
+    var item: PlaylistItem?
     
     var body: some View {
-        if let metadata {
+        if let item {
             HStack(spacing: 12) {
                 if mode.hasTitle {
                     Group {
-                        if let title = metadata.title, !title.isEmpty {
+                        if let title = item.metadata.title, !title.isEmpty {
                             Text(title)
-                        } else if let url {
-                            Text(url.lastPathComponent.dropLast(url.pathExtension.count + 1))
                         } else {
-                            Text("Unknown Music")
-                                .foregroundStyle(.placeholder)
+                            Text(item.url.lastPathComponent.dropLast(item.url.pathExtension.count + 1))
                         }
                     }
                     .bold()
                 }
                 
-                if mode.hasArtists, let artist = metadata.artist {
+                if mode.hasArtists, let artist = item.metadata.artist {
                     HStack(spacing: 4) {
                         let artists = splitArtists(from: artist)
                         ForEach(Array(artists.enumerated()), id: \.offset) { offset, composer in

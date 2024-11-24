@@ -67,52 +67,53 @@ struct InspectorView: View {
             }
         }
         .onChange(of: lastSelection, initial: true) { oldValue, newValue in
+            save(item: oldValue)
             load(item: newValue)
         }
         .toolbar(content: toolbar)
     }
     
     private func load(item: PlaylistItem?) {
-        _cover.reinit(with: item?.metadata.attachedPictures.first?.image)
+        _cover.reinit(with: item?.metadata.attachedPictures.first?.image, initialValue: item?.initialMetadata.attachedPictures.first?.image)
         
-        _title.reinit(with: item?.metadata.title)
-        _artist.reinit(with: item?.metadata.artist)
-        _composer.reinit(with: item?.metadata.composer)
+        _title.reinit(with: item?.metadata.title, initialValue: item?.initialMetadata.title)
+        _artist.reinit(with: item?.metadata.artist, initialValue: item?.initialMetadata.artist)
+        _composer.reinit(with: item?.metadata.composer, initialValue: item?.initialMetadata.composer)
         
-        _albumTitle.reinit(with: item?.metadata.albumTitle)
-        _albumArtist.reinit(with: item?.metadata.albumArtist)
+        _albumTitle.reinit(with: item?.metadata.albumTitle, initialValue: item?.initialMetadata.albumTitle)
+        _albumArtist.reinit(with: item?.metadata.albumArtist, initialValue: item?.initialMetadata.albumArtist)
         
-        _bpm.reinit(with: item?.metadata.bpm)
-        _trackNumber.reinit(with: item?.metadata.trackNumber)
-        _trackTotal.reinit(with: item?.metadata.trackTotal)
-        _discNumber.reinit(with: item?.metadata.discNumber)
-        _discTotal.reinit(with: item?.metadata.discTotal)
+        _bpm.reinit(with: item?.metadata.bpm, initialValue: item?.initialMetadata.bpm)
+        _trackNumber.reinit(with: item?.metadata.trackNumber, initialValue: item?.initialMetadata.trackNumber)
+        _trackTotal.reinit(with: item?.metadata.trackTotal, initialValue: item?.initialMetadata.trackTotal)
+        _discNumber.reinit(with: item?.metadata.discNumber, initialValue: item?.initialMetadata.discNumber)
+        _discTotal.reinit(with: item?.metadata.discTotal, initialValue: item?.initialMetadata.discTotal)
     }
     
-    private func save() {
-        guard let lastSelection else { return }
+    private func save(item: PlaylistItem?) {
+        guard var metadata = item?.metadata else { return }
         
-        lastSelection.writeMetadata { metadata in
-            metadata.removeAllAttachedPictures()
-            if let cover = cover?.attachedPicture {
-                metadata.attachPicture(cover)
-            }
-            
-            metadata.title = title
-            metadata.artist = artist
-            metadata.composer = composer
-            
-            metadata.albumTitle = albumTitle
-            metadata.albumArtist = albumArtist
-            
-            metadata.bpm = bpm
-            metadata.trackNumber = trackNumber
-            metadata.trackTotal = trackTotal
-            metadata.discNumber = discNumber
-            metadata.discTotal = discTotal
+        metadata.removeAllAttachedPictures()
+        if let cover = cover?.attachedPicture {
+            metadata.attachPicture(cover)
         }
         
-        load(item: lastSelection)
+        metadata.title = title
+        metadata.artist = artist
+        metadata.composer = composer
+        
+        metadata.albumTitle = albumTitle
+        metadata.albumArtist = albumArtist
+        
+        metadata.bpm = bpm
+        metadata.trackNumber = trackNumber
+        metadata.trackTotal = trackTotal
+        metadata.discNumber = discNumber
+        metadata.discTotal = discTotal
+    }
+    
+    private func write(item: PlaylistItem?) {
+        item?.writeMetadata()
     }
     
     @ViewBuilder private func coverEditor() -> some View {
@@ -206,10 +207,7 @@ struct InspectorView: View {
     @ViewBuilder private func toolbar() -> some View {
         Group {
             Button {
-                save()
-                if let lastSelection {
-                    player.reload(items: [lastSelection])
-                }
+                write(item: lastSelection)
             } label: {
                 HStack(alignment: .lastTextBaseline) {
                     Image(systemSymbol: .trayAndArrowDownFill)
@@ -221,6 +219,7 @@ struct InspectorView: View {
             }
             
             Button {
+                lastSelection?.revertMetadata()
                 load(item: lastSelection)
             } label: {
                 HStack(alignment: .lastTextBaseline) {

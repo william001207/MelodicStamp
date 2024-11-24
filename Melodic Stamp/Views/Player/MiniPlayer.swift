@@ -189,7 +189,7 @@ struct MiniPlayer: View {
             .matchedGeometryEffect(id: PlayerNamespace.playbackModeButton, in: namespace)
             
             ShrinkableMarqueeScrollView {
-                MusicTitle(metadata: player.currentMetadata, url: player.currentURL)
+                MusicTitle(item: player.current)
             }
             .contentTransition(.numericText())
             .animation(.default, value: player.currentIndex)

@@ -8,12 +8,16 @@
 import SwiftUI
 
 @propertyWrapper struct Watched<V>: DynamicProperty where V: Equatable {
-    @State private var internalValue: V
-    @State private var initialValue: V
+    @State private(set) var internalValue: V
+    @State private(set) var initialValue: V
+    
+    init(_ wrappedValue: V, initialValue: V) {
+        self.internalValue = wrappedValue
+        self.initialValue = initialValue
+    }
     
     init(wrappedValue: V) {
-        self.internalValue = wrappedValue
-        self.initialValue = wrappedValue
+        self.init(wrappedValue, initialValue: wrappedValue)
     }
     
     var wrappedValue: V {
@@ -44,8 +48,12 @@ import SwiftUI
     }
     
     func reinit(with value: V) {
-        internalValue = value
-        initialValue = value
+        reinit(with: value, initialValue: value)
+    }
+    
+    func reinit(with value: V, initialValue: V) {
+        self.internalValue = value
+        self.initialValue = initialValue
     }
     
     func revert() {

@@ -11,7 +11,7 @@ import SFSafeSymbols
 struct Player: View {
     @Environment(\.changeMelodicStampWindowStyle) private var changeWindowStyle
     
-    @Bindable var model: PlayerModel
+    @Bindable var player: PlayerModel
     
     var namespace: Namespace.ID
     
@@ -61,13 +61,13 @@ struct Player: View {
         
         // handle space down/up -> toggle play pause
         .onKeyPress(keys: [.space], phases: .all) { key in
-            guard model.hasCurrentTrack else { return .ignored }
+            guard player.hasCurrentTrack else { return .ignored }
             
             switch key.phase {
             case .down:
                 guard !isPressingSpace else { return .ignored }
                 
-                model.togglePlayPause()
+                player.togglePlayPause()
                 isPressingSpace = true
                 return .handled
             case .up:
@@ -82,7 +82,7 @@ struct Player: View {
         .onKeyPress(keys: [.leftArrow, .rightArrow], phases: .all) { key in
             switch key.phase {
             case .down, .repeat:
-                guard model.hasCurrentTrack else { return .ignored }
+                guard player.hasCurrentTrack else { return .ignored }
                 
                 let sign: FloatingPointSign = key.key == .leftArrow ? .minus : .plus
                 let modifiers = key.modifiers
@@ -90,10 +90,10 @@ struct Player: View {
                 if modifiers.contains(.command) {
                     switch sign {
                     case .plus:
-                        model.nextTrack()
+                        player.nextTrack()
                         nextSongButtonBounceAnimation.toggle()
                     case .minus:
-                        model.previousTrack()
+                        player.previousTrack()
                         previousSongButtonBounceAnimation.toggle()
                     }
                     
@@ -108,7 +108,7 @@ struct Player: View {
                     0.1
                 } else { 1 }
                 
-                let inRange = model.adjustTime(multiplier: multiplier, sign: sign)
+                let inRange = player.adjustTime(multiplier: multiplier, sign: sign)
                 
                 if !inRange {
                     progressBarExternalOvershootSign = sign
@@ -125,7 +125,7 @@ struct Player: View {
         
         // handle m -> toggle mute
         .onKeyPress(keys: ["m"], phases: .down) { key in
-            model.isMuted.toggle()
+            player.isMuted.toggle()
             return .handled
         }
     }
@@ -134,9 +134,9 @@ struct Player: View {
         HStack(alignment: .center, spacing: 12) {
             AliveButton(enabledStyle: .init(.tertiary), hoveringStyle: .init(.secondary)) {
                 let hasShift = NSEvent.modifierFlags.contains(.shift)
-                model.playbackMode = model.playbackMode.cycle(negate: hasShift)
+                player.playbackMode = player.playbackMode.cycle(negate: hasShift)
             } label: {
-                model.playbackMode.image
+                player.playbackMode.image
                     .font(.headline)
                     .contentTransition(.symbolEffect(.replace))
                     .frame(width: 20)
@@ -146,10 +146,10 @@ struct Player: View {
             Spacer()
             
             ShrinkableMarqueeScrollView {
-                MusicTitle(metadata: model.currentMetadata, url: model.currentURL)
+                MusicTitle(item: player.current)
             }
             .contentTransition(.numericText())
-            .animation(.default, value: model.currentIndex)
+            .animation(.default, value: player.currentIndex)
             .padding(.bottom, 2)
             
             Spacer()
@@ -168,21 +168,21 @@ struct Player: View {
     @ViewBuilder private func leadingControls() -> some View {
         Group {
             AliveButton(enabledStyle: .init(.secondary)) {
-                model.previousTrack()
+                player.previousTrack()
                 previousSongButtonBounceAnimation.toggle()
             } label: {
                 Image(systemSymbol: .backwardFill)
                     .font(.headline)
             }
-            .disabled(!model.hasPreviousTrack)
+            .disabled(!player.hasPreviousTrack)
             .symbolEffect(.bounce, value: previousSongButtonBounceAnimation)
             .matchedGeometryEffect(id: PlayerNamespace.previousSongButton, in: namespace)
             
             AliveButton {
-                model.togglePlayPause()
+                player.togglePlayPause()
                 isPressingSpace = false
             } label: {
-                model.playPauseImage
+                player.playPauseImage
                     .font(.title)
                     .contentTransition(.symbolEffect(.replace.upUp))
                     .frame(width: 20)
@@ -192,37 +192,37 @@ struct Player: View {
             .matchedGeometryEffect(id: PlayerNamespace.playPauseButton, in: namespace)
             
             AliveButton(enabledStyle: .init(.secondary)) {
-                model.nextTrack()
+                player.nextTrack()
                 nextSongButtonBounceAnimation.toggle()
             } label: {
                 Image(systemSymbol: .forwardFill)
                     .font(.headline)
             }
-            .disabled(!model.hasNextTrack)
+            .disabled(!player.hasNextTrack)
             .symbolEffect(.bounce, value: nextSongButtonBounceAnimation)
             .matchedGeometryEffect(id: PlayerNamespace.nextSongButton, in: namespace)
         }
-        .disabled(!model.hasCurrentTrack)
+        .disabled(!player.hasCurrentTrack)
     }
     
     @ViewBuilder private func trailingControls() -> some View {
-        ProgressBar(value: $model.volume, isActive: $isVolumeBarActive, isDelegated: true) { oldValue, newValue in
+        ProgressBar(value: $player.volume, isActive: $isVolumeBarActive, isDelegated: true) { oldValue, newValue in
             adjustmentPercentage = newValue
         } onOvershootOffsetChange: { oldValue, newValue in
             if oldValue <= 0 && newValue > 0 {
                 speakerButtonBounceAnimation.toggle()
             }
         }
-        .foregroundStyle(isVolumeBarActive ? .primary : model.isMuted ? .quaternary : .secondary)
+        .foregroundStyle(isVolumeBarActive ? .primary : player.isMuted ? .quaternary : .secondary)
         .backgroundStyle(.quinary)
         .frame(width: 72, height: 12)
-        .animation(.default.speed(2), value: model.isMuted)
+        .animation(.default.speed(2), value: player.isMuted)
         .matchedGeometryEffect(id: PlayerNamespace.volumeBar, in: namespace)
         
         AliveButton {
-            model.isMuted.toggle()
+            player.isMuted.toggle()
         } label: {
-            model.speakerImage
+            player.speakerImage
                 .font(.headline)
                 .contentTransition(.symbolEffect(.replace))
                 .frame(width: 16)
@@ -235,16 +235,16 @@ struct Player: View {
         let time: TimeInterval = if isProgressBarActive {
             // use adjustment time
             if shouldUseRemainingDuration {
-                model.duration.toTimeInterval() * (1 - adjustmentPercentage)
+                player.duration.toTimeInterval() * (1 - adjustmentPercentage)
             } else {
-                model.duration.toTimeInterval() * adjustmentPercentage
+                player.duration.toTimeInterval() * adjustmentPercentage
             }
         } else {
             // use track time
             if shouldUseRemainingDuration {
-                model.timeRemaining
+                player.timeRemaining
             } else {
-                model.timeElapsed
+                player.timeElapsed
             }
         }
         
@@ -259,14 +259,14 @@ struct Player: View {
         }
         .matchedGeometryEffect(id: PlayerNamespace.timeText, in: namespace)
         
-        ProgressBar(value: $model.progress, isActive: $isProgressBarActive, externalOvershootSign: progressBarExternalOvershootSign)
+        ProgressBar(value: $player.progress, isActive: $isProgressBarActive, externalOvershootSign: progressBarExternalOvershootSign)
             .foregroundStyle(isProgressBarActive ? .primary : .secondary)
             .backgroundStyle(.quinary)
             .frame(height: 12)
             .matchedGeometryEffect(id: PlayerNamespace.progressBar, in: namespace)
             .padding(.horizontal, isProgressBarActive ? 0 : 12)
         
-        DurationText(duration: model.duration)
+        DurationText(duration: player.duration)
         .frame(width: 40)
         .foregroundStyle(.secondary)
         .matchedGeometryEffect(id: PlayerNamespace.durationText, in: namespace)
