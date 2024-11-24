@@ -9,12 +9,10 @@ import SwiftUI
 import CSFBAudioEngine
 
 struct Metadata: Identifiable {
-    var id: URL {
-        url
-    }
+    var id: URL { url }
     var url: URL
     
-    var coverImages: Set<NSImage>?
+    var coverImages: Set<NSImage>
     
     var title: String?
     var titleSortOrder: String?
@@ -56,6 +54,8 @@ struct Metadata: Identifiable {
     var replayGainTrackPeak: Double?
     var replayGainReferenceLoudness: Double?
     
+    var additional: [AnyHashable: Any]
+    
     init(
         url: URL,
         coverImages: Set<NSImage>? = nil,
@@ -79,7 +79,8 @@ struct Metadata: Identifiable {
         releaseDate: String? = nil,
         replayGainAlbumGain: Double? = nil, replayGainAlbumPeak: Double? = nil,
         replayGainTrackGain: Double? = nil, replayGainTrackPeak: Double? = nil,
-        replayGainReferenceLoudness: Double? = nil
+        replayGainReferenceLoudness: Double? = nil,
+        additional: [AnyHashable: Any]? = nil
     ) {
         self.url = url
         self.coverImages = coverImages ?? .init()
@@ -115,6 +116,7 @@ struct Metadata: Identifiable {
         self.replayGainTrackGain = replayGainTrackGain
         self.replayGainTrackPeak = replayGainTrackPeak
         self.replayGainReferenceLoudness = replayGainReferenceLoudness
+        self.additional = additional ?? .init()
     }
     
     init(url: URL, from metadata: AudioMetadata?) {
@@ -140,7 +142,76 @@ struct Metadata: Identifiable {
             rating: metadata?.rating, releaseDate: metadata?.releaseDate,
             replayGainAlbumGain: metadata?.replayGainAlbumGain, replayGainAlbumPeak: metadata?.replayGainAlbumPeak,
             replayGainTrackGain: metadata?.replayGainTrackGain, replayGainTrackPeak: metadata?.replayGainTrackPeak,
-            replayGainReferenceLoudness: metadata?.replayGainReferenceLoudness
+            replayGainReferenceLoudness: metadata?.replayGainReferenceLoudness,
+            additional: metadata?.additionalMetadata
         )
+    }
+    
+    var packed: AudioMetadata {
+        .init(dictionaryRepresentation: [
+            .attachedPictures: Set(coverImages.compactMap(\.attachedPicture)) as Any,
+            .title: title as Any, .titleSortOrder: titleSortOrder as Any,
+            .artist: artist as Any, .artistSortOrder: artistSortOrder as Any,
+            .composer: composer as Any, .composerSortOrder: composerSortOrder as Any,
+            .genre: genre as Any, .genreSortOrder: genreSortOrder as Any,
+            .BPM: bpm as Any,
+            .albumTitle: albumTitle as Any, .albumTitleSortOrder: albumTitleSortOrder as Any,
+            .albumArtist: albumArtist as Any, .albumArtistSortOrder: albumArtistSortOrder as Any,
+            .trackNumber: trackNumber as Any, .trackTotal: trackTotal as Any,
+            .discNumber: discNumber as Any, .discTotal: discTotal as Any,
+            .comment: comment as Any,
+            .grouping: grouping as Any,
+            .compilation: isCompilation as Any,
+            .ISRC: isrc as Any,
+            .lyrics: lyrics as Any,
+            .MCN: mcn as Any,
+            .musicBrainzRecordingID: musicBrainzRecordingID as Any, .musicBrainzReleaseID: musicBrainzReleaseID as Any,
+            .rating: rating as Any, .releaseDate: releaseDate as Any,
+            .replayGainAlbumGain: replayGainAlbumGain as Any, .replayGainAlbumPeak: replayGainAlbumPeak as Any,
+            .replayGainTrackGain: replayGainTrackGain as Any, .replayGainTrackPeak: replayGainTrackPeak as Any,
+            .replayGainReferenceLoudness: replayGainReferenceLoudness as Any,
+            .additionalMetadata: additional
+        ])
+    }
+}
+
+extension AudioMetadata.Key {
+    var keyPath: PartialKeyPath<Metadata> {
+        switch self {
+        case .attachedPictures: \.coverImages
+        case .title: \.title
+        case .titleSortOrder: \.titleSortOrder
+        case .artist: \.artist
+        case .artistSortOrder: \.artistSortOrder
+        case .composer: \.composer
+        case .composerSortOrder: \.composerSortOrder
+        case .genre: \.genre
+        case .genreSortOrder: \.genreSortOrder
+        case .BPM: \.bpm
+        case .albumTitle: \.albumTitle
+        case .albumTitleSortOrder: \.albumTitleSortOrder
+        case .albumArtist: \.albumArtist
+        case .albumArtistSortOrder: \.albumArtistSortOrder
+        case .trackNumber: \.trackNumber
+        case .trackTotal: \.trackTotal
+        case .discNumber: \.discNumber
+        case .discTotal: \.discTotal
+        case .comment: \.comment
+        case .grouping: \.grouping
+        case .compilation: \.isCompilation
+        case .ISRC: \.isrc
+        case .lyrics: \.lyrics
+        case .MCN: \.mcn
+        case .musicBrainzRecordingID: \.musicBrainzRecordingID
+        case .musicBrainzReleaseID: \.musicBrainzReleaseID
+        case .rating: \.rating
+        case .releaseDate: \.releaseDate
+        case .replayGainAlbumGain: \.replayGainAlbumGain
+        case .replayGainAlbumPeak: \.replayGainAlbumPeak
+        case .replayGainTrackGain: \.replayGainTrackGain
+        case .replayGainTrackPeak: \.replayGainTrackPeak
+        case .replayGainReferenceLoudness: \.replayGainReferenceLoudness
+        default: \.additional
+        }
     }
 }
