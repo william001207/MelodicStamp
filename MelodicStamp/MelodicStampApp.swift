@@ -22,22 +22,62 @@ struct MelodicStampApp: App {
         .windowResizability(.contentSize)
         .windowStyle(.hiddenTitleBar)
         .windowToolbarStyle(.unified)
+        .commands {
+            CommandGroup(replacing: .appInfo) {
+                Button("About \(Bundle.main.displayName)") {
+                    openWindow(id: "about")
+                }
+            }
+            
+            CommandGroup(after: .newItem) {
+                Divider()
+                
+                Menu("Open File") {
+                    Button("In Current Playlist") {
+                        
+                    }
+                    .keyboardShortcut("o", modifiers: .command)
+                    
+                    Button("Replacing Current Playlist") {
+                        
+                    }
+                    .keyboardShortcut("o", modifiers: [.command, .shift])
+                    
+                    Divider()
+                    
+                    Button("Form New Playlist") {
+                        
+                    }
+                    .keyboardShortcut("o", modifiers: [.command, .shift, .option])
+                }
+                
+                Menu("Add Files") {
+                    Button("To Current Playlist") {
+                        
+                    }
+                    .keyboardShortcut("a", modifiers: .command)
+                    
+                    Button("Replacing Current Playlist") {
+                        
+                    }
+                    .keyboardShortcut("a", modifiers: [.command, .shift])
+                    
+                    Divider()
+                    
+                    Button("Form New Playlist") {
+                        
+                    }
+                    .keyboardShortcut("a", modifiers: [.command, .shift, .option])
+                }
+            }
+        }
         
-//        WindowGroup("Mini Player", id: "mini-player") {
-//            MiniPlayer(player: .init(), namespace: namespace)
-//                .padding(8)
-//                .background {
-//                    VisualEffectView(material: .popover, blendingMode: .behindWindow)
-//                }
-//                .padding(.bottom, -32)
-//                .edgesIgnoringSafeArea(.all)
-//                .frame(minWidth: 500, idealWidth: 500)
-//                .fixedSize(horizontal: false, vertical: true)
-//        }
-//        .defaultSize(width: 500, height: 0)
-//        .windowResizability(.contentSize)
-//        .windowStyle(.hiddenTitleBar)
-//        .windowToolbarStyle(.unified)
+        Window("About \(Bundle.main.displayName)", id: "about") {
+            AboutView()
+        }
+        .windowResizability(.contentSize)
+        .windowStyle(.hiddenTitleBar)
+        .windowToolbarStyle(.unified)
     }
 }
 

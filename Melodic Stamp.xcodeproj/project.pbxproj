@@ -16,7 +16,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		65F1DA012CECCEE900389E37 /* MelodicStamp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MelodicStamp.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		65F1DA012CECCEE900389E37 /* Melodic Stamp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Melodic Stamp.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -55,7 +55,7 @@
 		65F1DA022CECCEE900389E37 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				65F1DA012CECCEE900389E37 /* MelodicStamp.app */,
+				65F1DA012CECCEE900389E37 /* Melodic Stamp.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -63,9 +63,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		65F1DA002CECCEE900389E37 /* MelodicStamp */ = {
+		65F1DA002CECCEE900389E37 /* Melodic Stamp */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 65F1DA102CECCEEB00389E37 /* Build configuration list for PBXNativeTarget "MelodicStamp" */;
+			buildConfigurationList = 65F1DA102CECCEEB00389E37 /* Build configuration list for PBXNativeTarget "Melodic Stamp" */;
 			buildPhases = (
 				65F1D9FD2CECCEE900389E37 /* Sources */,
 				65F1D9FE2CECCEE900389E37 /* Frameworks */,
@@ -78,7 +78,7 @@
 			fileSystemSynchronizedGroups = (
 				28BFA4D12CEE173A00448374 /* MelodicStamp */,
 			);
-			name = MelodicStamp;
+			name = "Melodic Stamp";
 			packageProductDependencies = (
 				65F1DA7C2CED77F100389E37 /* SFBAudioEngine */,
 				65F1DA832CED788D00389E37 /* CAAudioHardware */,
@@ -88,7 +88,7 @@
 				65F1DAB22CEDBED700389E37 /* SFSafeSymbols */,
 			);
 			productName = MelodicStamp;
-			productReference = 65F1DA012CECCEE900389E37 /* MelodicStamp.app */;
+			productReference = 65F1DA012CECCEE900389E37 /* Melodic Stamp.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -106,12 +106,13 @@
 					};
 				};
 			};
-			buildConfigurationList = 65F1D9FC2CECCEE900389E37 /* Build configuration list for PBXProject "MelodicStamp" */;
+			buildConfigurationList = 65F1D9FC2CECCEE900389E37 /* Build configuration list for PBXProject "Melodic Stamp" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
 				Base,
+				"zh-Hans",
 			);
 			mainGroup = 65F1D9F82CECCEE900389E37;
 			minimizedProjectReferenceProxies = 1;
@@ -128,7 +129,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				65F1DA002CECCEE900389E37 /* MelodicStamp */,
+				65F1DA002CECCEE900389E37 /* Melodic Stamp */,
 			);
 		};
 /* End PBXProject section */
@@ -213,6 +214,7 @@
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;
@@ -269,6 +271,7 @@
 				MTL_FAST_MATH = YES;
 				SDKROOT = macosx;
 				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_EMIT_LOC_STRINGS = YES;
 			};
 			name = Release;
 		};
@@ -329,7 +332,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		65F1D9FC2CECCEE900389E37 /* Build configuration list for PBXProject "MelodicStamp" */ = {
+		65F1D9FC2CECCEE900389E37 /* Build configuration list for PBXProject "Melodic Stamp" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				65F1DA0E2CECCEEB00389E37 /* Debug */,
@@ -338,7 +341,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		65F1DA102CECCEEB00389E37 /* Build configuration list for PBXNativeTarget "MelodicStamp" */ = {
+		65F1DA102CECCEEB00389E37 /* Build configuration list for PBXNativeTarget "Melodic Stamp" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				65F1DA112CECCEEB00389E37 /* Debug */,

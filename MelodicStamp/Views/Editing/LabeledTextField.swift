@@ -8,16 +8,19 @@
 import SwiftUI
 import Luminare
 
-struct LabeledTextField<F, Label>: View where F: ParseableFormatStyle, F.FormatOutput == String, Label: View {
+struct LabeledTextField<F, Label>: View where F: ParseableFormatStyle, F.FormatOutput == String, F.FormatInput: Equatable, Label: View {
     @Environment(\.luminareAnimation) private var animation
     
     private let minHeight: CGFloat, horizontalPadding: CGFloat, cornerRadius: CGFloat
     private let isBordered: Bool
+    private let showsLabel: Bool
     
     @Binding private var value: F.FormatInput?
     private let format: F
     private let placeholder: LocalizedStringKey
     @ViewBuilder private let label: () -> Label
+    
+    @State private var isLabelHovering: Bool = false
     
     init(
         _ placeholder: LocalizedStringKey,
@@ -25,12 +28,14 @@ struct LabeledTextField<F, Label>: View where F: ParseableFormatStyle, F.FormatO
         minHeight: CGFloat = 34, horizontalPadding: CGFloat = 8,
         cornerRadius: CGFloat = 8,
         isBordered: Bool = true,
+        showsLabel: Bool = true,
         @ViewBuilder label: @escaping () -> Label
     ) {
         self.minHeight = minHeight
         self.horizontalPadding = horizontalPadding
         self.cornerRadius = cornerRadius
         self.isBordered = isBordered
+        self.showsLabel = showsLabel
         self._value = value
         self.format = format
         self.placeholder = placeholder
@@ -42,14 +47,16 @@ struct LabeledTextField<F, Label>: View where F: ParseableFormatStyle, F.FormatO
         value: Binding<F.FormatInput?>, format: F,
         minHeight: CGFloat = 34, horizontalPadding: CGFloat = 8,
         cornerRadius: CGFloat = 8,
-        isBordered: Bool = true
+        isBordered: Bool = true,
+        showsLabel: Bool = true
     ) where Label == EmptyView {
         self.init(
             placeholder,
             value: value, format: format,
             minHeight: minHeight, horizontalPadding: horizontalPadding,
             cornerRadius: cornerRadius,
-            isBordered: isBordered
+            isBordered: isBordered,
+            showsLabel: showsLabel
         ) {
             EmptyView()
         }
@@ -100,8 +107,13 @@ struct LabeledTextField<F, Label>: View where F: ParseableFormatStyle, F.FormatO
                 cornerRadius: cornerRadius,
                 isBordered: isBordered
             )
+            .onKeyPress(keys: [.delete], phases: .down) { key in
+                guard key.modifiers.contains(.command) else { return .ignored }
+                value = nil
+                return .handled
+            }
             
-            if isActive {
+            if showsLabel && isActive {
                 Group {
                     if Label.self != EmptyView.self {
                         label()
@@ -109,9 +121,25 @@ struct LabeledTextField<F, Label>: View where F: ParseableFormatStyle, F.FormatO
                         Text(placeholder)
                     }
                 }
+                .blur(radius: isLabelHovering ? 8 : 0)
+                .overlay {
+                    if isLabelHovering {
+                        AliveButton {
+                            value = nil
+                        } label: {
+                            Image(systemSymbol: .trashFill)
+                                .foregroundStyle(.red)
+                        }
+                    }
+                }
                 .foregroundStyle(.secondary)
                 .frame(height: minHeight)
                 .fixedSize()
+                .onHover { hover in
+                    withAnimation {
+                        isLabelHovering = hover
+                    }
+                }
             }
         }
         .animation(animation, value: isActive)

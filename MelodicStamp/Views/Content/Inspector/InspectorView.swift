@@ -144,7 +144,48 @@ struct InspectorView: View {
     }
     
     @ViewBuilder private func trackAndDiscEditor() -> some View {
-        LabeledTextField("BPM", value: $bpm, format: .number)
+        LuminarePopover(arrowEdge: .top, trigger: .forceTouch()) {
+            LuminareStepper(
+                value: .init {
+                    CGFloat(bpm ?? .zero)
+                } set: { _ in
+                    // do nothing
+                },
+                source: .infinite(),
+                indicatorSpacing: 16,
+                onRoundedValueChange: { oldValue, newValue in
+                    bpm = Int(newValue)
+                }
+            )
+        } badge: {
+            LabeledTextField("BPM", value: $bpm, format: .number)
+        }
+        
+        HStack {
+            LabeledTextField("No.", value: $trackNumber, format: .number, showsLabel: false)
+                .frame(maxWidth: 72)
+            
+            Image(systemSymbol: .poweron)
+                .imageScale(.large)
+                .rotationEffect(.degrees(21))
+                .frame(width: 4)
+                .foregroundStyle(.placeholder)
+            
+            LabeledTextField("Tracks", value: $trackTotal, format: .number)
+        }
+        
+        HStack {
+            LabeledTextField("No.", value: $discNumber, format: .number, showsLabel: false)
+                .frame(maxWidth: 72)
+            
+            Image(systemSymbol: .poweron)
+                .imageScale(.large)
+                .rotationEffect(.degrees(21))
+                .frame(width: 4)
+                .foregroundStyle(.placeholder)
+            
+            LabeledTextField("Discs", value: $discTotal, format: .number)
+        }
     }
     
     @ViewBuilder private func toolbar() -> some View {
