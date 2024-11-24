@@ -1,5 +1,5 @@
 //
-//  EditorSection.swift
+//  LabeledSection.swift
 //  MelodicStamp
 //
 //  Created by KrLite on 2024/11/24.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct EditorSection<Content, Label>: View where Content: View, Label: View {
+struct LabeledSection<Content, Label>: View where Content: View, Label: View {
     @ViewBuilder private var content: () -> Content
     @ViewBuilder private var label: () -> Label
     
@@ -54,7 +54,7 @@ struct EditorSection<Content, Label>: View where Content: View, Label: View {
 }
 
 #Preview {
-    EditorSection {
+    LabeledSection {
         Button("Button") {
             
         }

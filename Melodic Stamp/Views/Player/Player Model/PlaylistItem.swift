@@ -12,21 +12,12 @@ import CSFBAudioEngine
 struct PlaylistItem: Identifiable {
     let id = UUID()
     let url: URL
-    var properties: AudioProperties
-    var metadata: Metadata
+    var editableMetadata: EditableMetadata
 
     init?(url: URL) {
-        guard url.startAccessingSecurityScopedResource() else { return nil }
-        defer { url.stopAccessingSecurityScopedResource() }
-        
         self.url = url
-        if let audioFile = try? AudioFile(readingPropertiesAndMetadataFrom: url) {
-            self.properties = audioFile.properties
-            self.metadata = .init(url: url, from: audioFile.metadata)
-        } else {
-            self.properties = .init()
-            self.metadata = .init(url: url)
-        }
+        guard let metadata = EditableMetadata(url: url) else { return nil }
+        self.editableMetadata = metadata
     }
 
     func decoder(enableDoP: Bool = false) throws -> PCMDecoding? {

@@ -10,46 +10,29 @@ import Luminare
 
 struct InspectorView: View {
     @Bindable var player: PlayerModel
-    @Bindable var metadataEditing: MetadataEditingModel = .init()
+    @Bindable var metadataEditing: MetadataEditingModel
     
-    @Binding var selection: Set<PlaylistItem>
-    @Binding var lastSelection: PlaylistItem?
-    
-    @Watched private var cover: NSImage?
     @State private var isCoverPickerPresented: Bool = false
-    
-    @Watched private var title: MetadataType.Title?
-    @Watched private var artist: MetadataType.Artist?
-    @Watched private var composer: MetadataType.Composer?
-    
-    @Watched private var albumTitle: MetadataType.AlbumTitle?
-    @Watched private var albumArtist: MetadataType.AlbumArtist?
-    
-    @Watched private var bpm: MetadataType.BPM?
-    @Watched private var trackNumber: MetadataType.TrackNumber?
-    @Watched private var trackTotal: MetadataType.TrackTotal?
-    @Watched private var discNumber: MetadataType.DiscNumber?
-    @Watched private var discTotal: MetadataType.DiscTotal?
     
     var body: some View {
         Group {
-            if lastSelection != nil {
+            if metadataEditing.hasEditableMetadata {
                 AutoScrollView(.vertical) {
                     VStack(spacing: 24) {
                         coverEditor()
                             .frame(maxWidth: .infinity)
                         
-                        EditorSection {
+                        LabeledSection {
                             generalEditor()
                         }
                         
-                        EditorSection {
+                        LabeledSection {
                             albumEditor()
                         } label: {
                             Text("Album")
                         }
                         
-                        EditorSection {
+                        LabeledSection {
                             trackAndDiscEditor()
                         } label: {
                             Text("Track and Disc")
@@ -66,119 +49,90 @@ struct InspectorView: View {
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
         }
-        .onChange(of: lastSelection, initial: true) { oldValue, newValue in
-            save(item: oldValue)
-            load(item: newValue)
-        }
         .toolbar(content: toolbar)
     }
     
-    private func load(item: PlaylistItem?) {
-        _cover.reinit(with: item?.metadata.attachedPictures.first?.image, initialValue: item?.initialMetadata.attachedPictures.first?.image)
-        
-        _title.reinit(with: item?.metadata.title, initialValue: item?.initialMetadata.title)
-        _artist.reinit(with: item?.metadata.artist, initialValue: item?.initialMetadata.artist)
-        _composer.reinit(with: item?.metadata.composer, initialValue: item?.initialMetadata.composer)
-        
-        _albumTitle.reinit(with: item?.metadata.albumTitle, initialValue: item?.initialMetadata.albumTitle)
-        _albumArtist.reinit(with: item?.metadata.albumArtist, initialValue: item?.initialMetadata.albumArtist)
-        
-        _bpm.reinit(with: item?.metadata.bpm, initialValue: item?.initialMetadata.bpm)
-        _trackNumber.reinit(with: item?.metadata.trackNumber, initialValue: item?.initialMetadata.trackNumber)
-        _trackTotal.reinit(with: item?.metadata.trackTotal, initialValue: item?.initialMetadata.trackTotal)
-        _discNumber.reinit(with: item?.metadata.discNumber, initialValue: item?.initialMetadata.discNumber)
-        _discTotal.reinit(with: item?.metadata.discTotal, initialValue: item?.initialMetadata.discTotal)
-    }
-    
-    private func save(item: PlaylistItem?) {
-        guard let metadata = item?.metadata else { return }
-        
-        metadata.removeAllAttachedPictures()
-        if let cover = cover?.attachedPicture {
-            metadata.attachPicture(cover)
-        }
-        
-        metadata.title = title
-        metadata.artist = artist
-        metadata.composer = composer
-        
-        metadata.albumTitle = albumTitle
-        metadata.albumArtist = albumArtist
-        
-        metadata.bpm = bpm
-        metadata.trackNumber = trackNumber
-        metadata.trackTotal = trackTotal
-        metadata.discNumber = discNumber
-        metadata.discTotal = discTotal
-    }
-    
-    private func write(item: PlaylistItem?) {
-        item?.writeMetadata()
-    }
-    
     @ViewBuilder private func coverEditor() -> some View {
-        if let cover  {
-            AliveButton {
-                isCoverPickerPresented = true
-            } label: {
-                Image(nsImage: cover)
-                    .resizable()
-                    .aspectRatio(contentMode: .fit)
-                    .clipShape(.rect(cornerRadius: 8))
-            }
-            .fileImporter(
-                isPresented: $isCoverPickerPresented,
-                allowedContentTypes: [.jpeg, .png, .tiff, .bmp, .gif, .heic, .heif, .rawImage]
-            ) { result in
-                switch result {
-                case .success(let url):
-                    guard url.startAccessingSecurityScopedResource() else { break }
-                    defer { url.stopAccessingSecurityScopedResource() }
-                    
-                    if let newCover = NSImage(contentsOf: url) {
-                        self.cover = newCover
-                    }
-                case .failure:
-                    break
+        let coverImages = metadataEditing[extracting: \.coverImages]
+        
+        switch coverImages {
+        case .undefined:
+            EmptyView()
+        case .fine(let values):
+            if !values.current.isEmpty {
+                AliveButton {
+                    isCoverPickerPresented = true
+                } label: {
+                    Image(nsImage: values.current.first!)
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .clipShape(.rect(cornerRadius: 8))
                 }
+                .fileImporter(
+                    isPresented: $isCoverPickerPresented,
+                    allowedContentTypes: [.jpeg, .png, .tiff, .bmp, .gif, .heic, .heif, .rawImage],
+                    allowsMultipleSelection: true
+                ) { result in
+                    switch result {
+                    case .success(let urls):
+                        let selectedImages: Set<NSImage> = Set(urls.compactMap { url in
+                            guard url.startAccessingSecurityScopedResource() else { return nil }
+                            defer { url.stopAccessingSecurityScopedResource() }
+                            
+                            return NSImage(contentsOf: url)
+                        })
+                        values.current = selectedImages
+                    case .failure:
+                        break
+                    }
+                }
+            } else {
+                Color.yellow
             }
+        case .varied(let valueSetter):
+            Color.blue
         }
     }
     
     @ViewBuilder private func generalEditor() -> some View {
-        LabeledTextField("Title", text: _title)
+        LabeledTextField("Title", text: metadataEditing[extracting: \.title])
         
-        LabeledTextField("Artist", text: _artist)
+        LabeledTextField("Artist", text: metadataEditing[extracting: \.artist])
         
-        LabeledTextField("Composer", text: _composer)
+        LabeledTextField("Composer", text: metadataEditing[extracting: \.composer])
     }
     
     @ViewBuilder private func albumEditor() -> some View {
-        LabeledTextField("Album Title", text: _albumTitle)
+        LabeledTextField("Album Title", text: metadataEditing[extracting: \.albumTitle])
         
-        LabeledTextField("Album Artist", text: _albumArtist)
+        LabeledTextField("Album Artist", text: metadataEditing[extracting: \.albumArtist])
     }
     
     @ViewBuilder private func trackAndDiscEditor() -> some View {
         LuminarePopover(arrowEdge: .top, trigger: .forceTouch()) {
-            LuminareStepper(
-                value: .init {
-                    CGFloat(bpm ?? .zero)
-                } set: { _ in
-                    // do nothing
-                },
-                source: .infinite(),
-                indicatorSpacing: 16,
-                onRoundedValueChange: { oldValue, newValue in
-                    bpm = Int(newValue)
-                }
-            )
+            switch metadataEditing[extracting: \.bpm] {
+            case .fine(let values):
+                LuminareStepper(
+                    value: .init {
+                        CGFloat(values.current ?? .zero)
+                    } set: { _ in
+                        // do nothing
+                    },
+                    source: .infinite(),
+                    indicatorSpacing: 16,
+                    onRoundedValueChange: { oldValue, newValue in
+                        values.current = Int(newValue)
+                    }
+                )
+            default:
+                EmptyView()
+            }
         } badge: {
-            LabeledTextField("BPM", value: _bpm, format: .number)
+            LabeledTextField("BPM", value: metadataEditing[extracting: \.bpm], format: .number)
         }
         
         HStack {
-            LabeledTextField("No.", value: _trackNumber, format: .number, showsLabel: false)
+            LabeledTextField("No.", value: metadataEditing[extracting: \.trackNumber], format: .number, showsLabel: false)
                 .frame(maxWidth: 72)
             
             Image(systemSymbol: .poweron)
@@ -187,11 +141,11 @@ struct InspectorView: View {
                 .frame(width: 4)
                 .foregroundStyle(.placeholder)
             
-            LabeledTextField("Tracks", value: _trackTotal, format: .number)
+            LabeledTextField("Tracks", value: metadataEditing[extracting: \.trackTotal], format: .number)
         }
         
         HStack {
-            LabeledTextField("No.", value: _discNumber, format: .number, showsLabel: false)
+            LabeledTextField("No.", value: metadataEditing[extracting: \.discNumber], format: .number, showsLabel: false)
                 .frame(maxWidth: 72)
             
             Image(systemSymbol: .poweron)
@@ -200,14 +154,18 @@ struct InspectorView: View {
                 .frame(width: 4)
                 .foregroundStyle(.placeholder)
             
-            LabeledTextField("Discs", value: _discTotal, format: .number)
+            LabeledTextField("Discs", value: metadataEditing[extracting: \.discTotal], format: .number)
         }
     }
     
     @ViewBuilder private func toolbar() -> some View {
         Group {
             Button {
-                write(item: lastSelection)
+                do {
+                    try metadataEditing.writeAll()
+                } catch {
+                    
+                }
             } label: {
                 HStack(alignment: .lastTextBaseline) {
                     Image(systemSymbol: .trayAndArrowDownFill)
@@ -219,8 +177,7 @@ struct InspectorView: View {
             }
             
             Button {
-                lastSelection?.revertMetadata()
-                load(item: lastSelection)
+                metadataEditing.revertAll()
             } label: {
                 HStack(alignment: .lastTextBaseline) {
                     Image(systemSymbol: .clockArrowCirclepath)

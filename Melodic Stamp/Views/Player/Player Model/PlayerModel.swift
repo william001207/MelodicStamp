@@ -211,22 +211,22 @@ enum PlaybackMode: String, CaseIterable, Identifiable {
         }
     }
     
-    func play(_ url: URL) {
+    func play(url: URL) {
         addToPlaylist(urls: [url])
         
         if let item = playlist.first(where: { $0.url == url }) {
-            play(item)
+            play(item: item)
         }
     }
     
-    func play(_ item: PlaylistItem) {
+    func play(item: PlaylistItem) {
         do {
             if let decoder = try item.decoder() {
                 try player.play(decoder)
                 current = item
             }
         } catch {
-//            handleError(error)
+            
         }
     }
     
@@ -234,14 +234,10 @@ enum PlaybackMode: String, CaseIterable, Identifiable {
         for url in urls {
             guard !playlist.contains(where: { $0.url == url }) else { continue }
             
-            if let item = PlaylistItem(url) {
+            if let item = PlaylistItem(url: url) {
                 playlist.append(item)
             }
         }
-    }
-    
-    func addToPlaylist(items: [PlaylistItem]) {
-        addToPlaylist(urls: items.map(\.url))
     }
     
     func removeFromPlaylist(urls: [URL]) {
@@ -253,24 +249,6 @@ enum PlaybackMode: String, CaseIterable, Identifiable {
                 playlist.remove(at: index)
             }
         }
-    }
-    
-    func removeFromPlaylist(items: [PlaylistItem]) {
-        removeFromPlaylist(urls: items.map(\.url))
-    }
-    
-    func reload(urls: [URL]) {
-        removeFromPlaylist(urls: urls)
-        addToPlaylist(urls: urls)
-    }
-    
-    func reload(items: [PlaylistItem]) {
-        removeFromPlaylist(items: items)
-        addToPlaylist(items: items)
-    }
-    
-    func reloadPlaylist() {
-        reload(items: playlist)
     }
     
     func updateDeviceMenu() {
@@ -313,12 +291,12 @@ enum PlaybackMode: String, CaseIterable, Identifiable {
     
     func nextTrack() {
         guard let nextIndex else { return }
-        play(playlist[nextIndex])
+        play(item: playlist[nextIndex])
     }
 
     func previousTrack() {
         guard let previousIndex else { return }
-        play(playlist[previousIndex])
+        play(item: playlist[previousIndex])
     }
     
     func analyzeFiles(urls: [URL]) {
@@ -329,30 +307,23 @@ enum PlaybackMode: String, CaseIterable, Identifiable {
             }.joined(separator: ", "))
             // TODO: notice user we're done
         } catch {
-//            handleError(error)
+
         }
     }
     
-    func exportWAVEFile(url: URL) {
-        let destURL = url.deletingPathExtension().appendingPathExtension("wav")
-        if FileManager.default.fileExists(atPath: destURL.path) {
-            // TODO: handle this
-            return
-        }
-        
-        do {
-            try AudioConverter.convert(url, to: destURL)
-            try? AudioFile.copyMetadata(from: url, to: destURL)
-        } catch {
-            try? FileManager.default.trashItem(at: destURL, resultingItemURL: nil)
-//            handleError(error)
-        }
-    }
-    
-//    func handleError(_ error: Error) {
-//        DispatchQueue.main.async {
-//            self.errorMessage = error.localizedDescription
-//            self.showError = true
+//    func exportWAVEFile(url: URL) {
+//        let destURL = url.deletingPathExtension().appendingPathExtension("wav")
+//        if FileManager.default.fileExists(atPath: destURL.path) {
+//            // TODO: handle this
+//            return
+//        }
+//        
+//        do {
+//            try AudioConverter.convert(url, to: destURL)
+//            try? AudioFile.copyMetadata(from: url, to: destURL)
+//        } catch {
+//            try? FileManager.default.trashItem(at: destURL, resultingItemURL: nil)
+//
 //        }
 //    }
 }
@@ -369,11 +340,8 @@ extension PlayerModel: AudioPlayer.Delegate {
                         try player.enqueue(decoder)
                     }
                 } catch {
-//                    DispatchQueue.main.async {
-//                        self.handleError(error)
-//                    }
+                    
                 }
-
             default:
                 // jump to next track
                 guard let nextIndex else { break }
@@ -382,9 +350,7 @@ extension PlayerModel: AudioPlayer.Delegate {
                         try player.enqueue(decoder)
                     }
                 } catch {
-//                    DispatchQueue.main.async {
-//                        self.handleError(error)
-//                    }
+                    
                 }
             }
         } else {
@@ -408,9 +374,6 @@ extension PlayerModel: AudioPlayer.Delegate {
     
     func audioPlayer(_ audioPlayer: AudioPlayer, encounteredError error: Error) {
         audioPlayer.stop()
-//        DispatchQueue.main.async {
-//            self.handleError(error)
-//        }
     }
 }
 

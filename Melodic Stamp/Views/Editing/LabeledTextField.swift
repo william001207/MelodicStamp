@@ -15,7 +15,7 @@ struct LabeledTextField<F, Label>: View where F: ParseableFormatStyle, F.FormatO
     private let isBordered: Bool
     private let showsLabel: Bool
     
-    @Watched private var value: F.FormatInput?
+    private var value: MetadataValueState<F.FormatInput?>
     private let format: F
     private let placeholder: LocalizedStringKey
     @ViewBuilder private let label: () -> Label
@@ -24,7 +24,7 @@ struct LabeledTextField<F, Label>: View where F: ParseableFormatStyle, F.FormatO
     
     init(
         _ placeholder: LocalizedStringKey,
-        value: Watched<F.FormatInput?>, format: F,
+        value: MetadataValueState<F.FormatInput?>, format: F,
         minHeight: CGFloat = 34, horizontalPadding: CGFloat = 8,
         cornerRadius: CGFloat = 8,
         isBordered: Bool = true,
@@ -36,7 +36,7 @@ struct LabeledTextField<F, Label>: View where F: ParseableFormatStyle, F.FormatO
         self.cornerRadius = cornerRadius
         self.isBordered = isBordered
         self.showsLabel = showsLabel
-        self._value = value
+        self.value = value
         self.format = format
         self.placeholder = placeholder
         self.label = label
@@ -44,7 +44,7 @@ struct LabeledTextField<F, Label>: View where F: ParseableFormatStyle, F.FormatO
     
     init(
         _ placeholder: LocalizedStringKey,
-        value: Watched<F.FormatInput?>, format: F,
+        value: MetadataValueState<F.FormatInput?>, format: F,
         minHeight: CGFloat = 34, horizontalPadding: CGFloat = 8,
         cornerRadius: CGFloat = 8,
         isBordered: Bool = true,
@@ -64,7 +64,7 @@ struct LabeledTextField<F, Label>: View where F: ParseableFormatStyle, F.FormatO
     
     init(
         _ placeholder: LocalizedStringKey,
-        text: Watched<String?>,
+        text: MetadataValueState<String?>,
         minHeight: CGFloat = 34, horizontalPadding: CGFloat = 8,
         cornerRadius: CGFloat = 8,
         isBordered: Bool = true,
@@ -82,7 +82,7 @@ struct LabeledTextField<F, Label>: View where F: ParseableFormatStyle, F.FormatO
     
     init(
         _ placeholder: LocalizedStringKey,
-        text: Watched<String?>,
+        text: MetadataValueState<String?>,
         minHeight: CGFloat = 34, horizontalPadding: CGFloat = 8,
         cornerRadius: CGFloat = 8,
         isBordered: Bool = true
@@ -100,89 +100,95 @@ struct LabeledTextField<F, Label>: View where F: ParseableFormatStyle, F.FormatO
     
     var body: some View {
         HStack {
-            LuminareTextField(
-                placeholder,
-                value: $value.projectedValue, format: format,
-                minHeight: minHeight, horizontalPadding: horizontalPadding,
-                cornerRadius: cornerRadius,
-                isBordered: isBordered
-            )
-            .overlay {
-                Group {
-                    if _value.isModified {
-                        RoundedRectangle(cornerRadius: cornerRadius)
-                            .stroke(.primary)
-                            .fill(.quinary.opacity(0.5))
-                            .foregroundStyle(.tint)
-                    }
-                }
-                .allowsHitTesting(false)
-            }
-            
-            if showsLabel && isActive {
-                Group {
-                    if Label.self != EmptyView.self {
-                        label()
-                    } else {
-                        Text(placeholder)
-                    }
-                }
-                .blur(radius: isLabelHovering ? 8 : 0)
-                .overlay {
-                    if isLabelHovering {
-                        HStack {
-                            AliveButton {
-                                _value.revert()
-                            } label: {
-                                Image(systemSymbol: .return)
-                                    .foregroundStyle(.tint)
-                            }
-                            
-                            AliveButton {
-                                value = nil
-                            } label: {
-                                Image(systemSymbol: .trashFill)
-                                    .foregroundStyle(.red)
-                            }
-                        }
-                    }
-                }
-                .foregroundStyle(.secondary)
-                .frame(height: minHeight)
-                .fixedSize()
-                .onHover { hover in
-                    withAnimation {
-                        isLabelHovering = hover
-                    }
-                }
+            switch value {
+            case .undefined:
+                EmptyView()
+            case .fine(let values):
+                fine(values: values)
+            case .varied(let valueSetter):
+                varied(setter: valueSetter)
             }
         }
         .animation(animation, value: isActive)
     }
     
     private var isActive: Bool {
-        guard let value else { return false }
-        return if let value = value as? String {
-            !value.isEmpty
-        } else {
-            true
+        switch value {
+        case .undefined:
+            return false
+        case .fine(let values):
+            guard let current = values.current else { return false }
+            return if let current = current as? String {
+                // empty strings are empty too, as placeholders will display
+                !current.isEmpty
+            } else {
+                true
+            }
+        case .varied:
+            return false
         }
     }
-}
-
-private struct LabeledTextFieldPreview: View {
-    @Watched var text: String?
-    @Watched var value: Int?
     
-    var body: some View {
-        LabeledTextField("Placeholder (String 1)", text: _text)
+    @ViewBuilder private func fine(values: EditableMetadata.Values<F.FormatInput?>) -> some View {
+        LuminareTextField(
+            placeholder,
+            value: values.projectedValue, format: format,
+            minHeight: minHeight, horizontalPadding: horizontalPadding,
+            cornerRadius: cornerRadius,
+            isBordered: isBordered
+        )
+        .overlay {
+            Group {
+                if values.isModified {
+                    RoundedRectangle(cornerRadius: cornerRadius)
+                        .stroke(.primary)
+                        .fill(.quinary.opacity(0.5))
+                        .foregroundStyle(.tint)
+                }
+            }
+            .allowsHitTesting(false)
+        }
         
-        LabeledTextField("Placeholder (String 2)", text: _text)
-        
-        LabeledTextField("Placeholder (Int)", value: _value, format: .number)
+        if showsLabel && isActive {
+            Group {
+                if Label.self != EmptyView.self {
+                    label()
+                } else {
+                    Text(placeholder)
+                }
+            }
+            .blur(radius: isLabelHovering ? 8 : 0)
+            .overlay {
+                if isLabelHovering {
+                    HStack {
+                        AliveButton {
+                            values.revert()
+                        } label: {
+                            Image(systemSymbol: .return)
+                                .foregroundStyle(.tint)
+                        }
+                        
+                        AliveButton {
+                            values.current = nil
+                        } label: {
+                            Image(systemSymbol: .trashFill)
+                                .foregroundStyle(.red)
+                        }
+                    }
+                }
+            }
+            .foregroundStyle(.secondary)
+            .frame(height: minHeight)
+            .fixedSize()
+            .onHover { hover in
+                withAnimation {
+                    isLabelHovering = hover
+                }
+            }
+        }
     }
-}
-
-#Preview {
-    LabeledTextFieldPreview()
+    
+    @ViewBuilder private func varied(setter: EditableMetadata.ValueSetter<F.FormatInput?>) -> some View {
+        Color.blue
+    }
 }

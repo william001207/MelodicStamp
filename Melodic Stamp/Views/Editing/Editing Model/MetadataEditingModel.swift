@@ -6,96 +6,9 @@
 //
 
 import SwiftUI
-import CSFBAudioEngine
 
-struct EditableMetadata: Identifiable {
-    struct Values<V> {
-        let keyPath: WritableKeyPath<Metadata, V>
-        let metadata: EditableMetadata
-        
-        var current: V {
-            get { metadata.metadata[keyPath: keyPath] }
-            nonmutating set { metadata.metadata[keyPath: keyPath] = newValue }
-        }
-        
-        private(set) var initlal: V {
-            get { metadata.initialMetadata[keyPath: keyPath] }
-            nonmutating set { metadata.initialMetadata[keyPath: keyPath] = newValue }
-        }
-        
-        func revert() {
-            current = initlal
-        }
-        
-        func apply() {
-            self.initlal = current
-        }
-    }
-    
-    struct ValueSetter<V> {
-        let keyPath: WritableKeyPath<Metadata, V>
-        let metadatas: Set<EditableMetadata>
-        
-        func set(_ value: V) {
-            metadatas.forEach { $0.metadata[keyPath: keyPath] = value }
-        }
-    }
-    
-    var id: URL { url }
-    let url: URL
-    
-    @State var metadata: Metadata
-    @State private(set) var initialMetadata: Metadata
-    
-    init(url: URL, metadata: Metadata) {
-        self.url = url
-        self.metadata = metadata
-        self.initialMetadata = metadata
-    }
-    
-    init(item: PlaylistItem) {
-        self.init(url: item.url, metadata: item.metadata)
-    }
-    
-    func revert() {
-        metadata = initialMetadata
-    }
-    
-    func apply() {
-        initialMetadata = metadata
-    }
-    
-    func write() throws {
-        guard url.startAccessingSecurityScopedResource() else { return }
-        defer { url.stopAccessingSecurityScopedResource() }
-        
-        let file = try AudioFile(url: url)
-        file.metadata = metadata.packed
-        try file.writeMetadata()
-        
-        print("Successfully written metadata to \(url)")
-        initialMetadata = metadata
-    }
-    
-    subscript<V>(extracting keyPath: WritableKeyPath<Metadata, V>) -> Values<V> {
-        .init(keyPath: keyPath, metadata: self)
-    }
-}
-
-extension EditableMetadata: Equatable {
-    static func == (lhs: EditableMetadata, rhs: EditableMetadata) -> Bool {
-        lhs.id == rhs.id
-    }
-}
-
-extension EditableMetadata: Hashable {
-    func hash(into hasher: inout Hasher) {
-        hasher.combine(id)
-    }
-}
-
-enum MetadataValueState<V> {
-    case undefined(EditableMetadata.ValueSetter<V>)
+enum MetadataValueState<V: Equatable> {
+    case undefined
     case fine(EditableMetadata.Values<V>)
     case varied(EditableMetadata.ValueSetter<V>)
 }
@@ -103,21 +16,29 @@ enum MetadataValueState<V> {
 @Observable class MetadataEditingModel: Identifiable {
     let id: UUID = .init()
     
-    var metadatas: Set<EditableMetadata> = .init()
+    var items: Set<PlaylistItem> = .init()
     
-    func update(items: [PlaylistItem]) {
-        metadatas = .init(items.map { .init(item: $0) })
+    var editableMetadatas: Set<EditableMetadata> {
+        Set(items.map(\.editableMetadata))
     }
     
-    func write() throws {
-        try metadatas.forEach { try $0.write() }
+    var hasEditableMetadata: Bool {
+        !editableMetadatas.isEmpty
+    }
+    
+    func revertAll() {
+        editableMetadatas.forEach { $0.revert() }
+    }
+    
+    func writeAll() throws {
+        try editableMetadatas.forEach { try $0.write() }
     }
     
     subscript<V: Equatable>(extracting keyPath: WritableKeyPath<Metadata, V>) -> MetadataValueState<V> {
-        let setter = EditableMetadata.ValueSetter(keyPath: keyPath, metadatas: metadatas)
-        guard !metadatas.isEmpty else { return .undefined(setter) }
+        guard hasEditableMetadata else { return .undefined }
         
-        let values = metadatas
+        let setter = EditableMetadata.ValueSetter(keyPath: keyPath, editableMetadatas: editableMetadatas)
+        let values = editableMetadatas
             .map { $0[extracting: keyPath] }
         let areIdentical = values.allSatisfy { $0.current == values[0].current }
         
