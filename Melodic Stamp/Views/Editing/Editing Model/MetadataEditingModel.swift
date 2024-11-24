@@ -8,7 +8,7 @@
 import SwiftUI
 import CSFBAudioEngine
 
-struct EditableMetadata: Identifiable, Hashable {
+struct EditableMetadata: Identifiable {
     struct Values<V> {
         let keyPath: WritableKeyPath<Metadata, V>
         let metadata: EditableMetadata
@@ -32,7 +32,7 @@ struct EditableMetadata: Identifiable, Hashable {
         }
     }
     
-    struct Setter<V> {
+    struct ValueSetter<V> {
         let keyPath: WritableKeyPath<Metadata, V>
         let metadatas: Set<EditableMetadata>
         
@@ -57,15 +57,23 @@ struct EditableMetadata: Identifiable, Hashable {
         self.init(url: item.url, metadata: item.metadata)
     }
     
-    func hash(into hasher: inout Hasher) {
-        hasher.combine(id)
-    }
-    
     func revert() {
         metadata = initialMetadata
     }
     
     func apply() {
+        initialMetadata = metadata
+    }
+    
+    func write() throws {
+        guard url.startAccessingSecurityScopedResource() else { return }
+        defer { url.stopAccessingSecurityScopedResource() }
+        
+        let file = try AudioFile(url: url)
+        file.metadata = metadata.packed
+        try file.writeMetadata()
+        
+        print("Successfully written metadata to \(url)")
         initialMetadata = metadata
     }
     
@@ -80,10 +88,16 @@ extension EditableMetadata: Equatable {
     }
 }
 
+extension EditableMetadata: Hashable {
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
+    }
+}
+
 enum MetadataValueState<V> {
-    case undefined(EditableMetadata.Setter<V>)
+    case undefined(EditableMetadata.ValueSetter<V>)
     case fine(EditableMetadata.Values<V>)
-    case varied(EditableMetadata.Setter<V>)
+    case varied(EditableMetadata.ValueSetter<V>)
 }
 
 @Observable class MetadataEditingModel: Identifiable {
@@ -95,8 +109,12 @@ enum MetadataValueState<V> {
         metadatas = .init(items.map { .init(item: $0) })
     }
     
+    func write() throws {
+        try metadatas.forEach { try $0.write() }
+    }
+    
     subscript<V: Equatable>(extracting keyPath: WritableKeyPath<Metadata, V>) -> MetadataValueState<V> {
-        let setter = EditableMetadata.Setter(keyPath: keyPath, metadatas: metadatas)
+        let setter = EditableMetadata.ValueSetter(keyPath: keyPath, metadatas: metadatas)
         guard !metadatas.isEmpty else { return .undefined(setter) }
         
         let values = metadatas

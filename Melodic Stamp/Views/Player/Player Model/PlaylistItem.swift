@@ -15,7 +15,7 @@ struct PlaylistItem: Identifiable {
     var properties: AudioProperties
     var metadata: Metadata
 
-    init?(_ url: URL) {
+    init?(url: URL) {
         guard url.startAccessingSecurityScopedResource() else { return nil }
         defer { url.stopAccessingSecurityScopedResource() }
         
@@ -43,35 +43,6 @@ struct PlaylistItem: Identifiable {
         
         return nil
     }
-    
-//    func revertMetadata() {
-//        _metadata.revert()
-//    }
-//    
-//    func reinitMetadata() {
-//        _metadata.reinit()
-//    }
-//    
-//    func reinitMetadata(with metadata: AudioMetadata) {
-//        _metadata.reinit(with: metadata)
-//    }
-//    
-//    func writeMetadata(_ operation: (inout AudioMetadata) -> Void = { _ in }) {
-//        do {
-//            guard url.startAccessingSecurityScopedResource() else { return }
-//            defer { url.stopAccessingSecurityScopedResource() }
-//            
-//            let file = try AudioFile(url: url)
-//            file.metadata = metadata
-//            operation(&file.metadata)
-//            try file.writeMetadata()
-//            
-//            print("Successfully written metadata to \(url)")
-//            reinitMetadata()
-//        } catch {
-//            
-//        }
-//    }
 }
 
 extension PlaylistItem: Equatable {
