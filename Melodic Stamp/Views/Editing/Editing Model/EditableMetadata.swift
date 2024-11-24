@@ -8,7 +8,7 @@
 import SwiftUI
 import CSFBAudioEngine
 
-struct EditableMetadata: Identifiable {
+@Observable class EditableMetadata: Identifiable {
     struct Values<V: Equatable> {
         let keyPath: WritableKeyPath<Metadata, V>
         let metadata: EditableMetadata
@@ -25,9 +25,10 @@ struct EditableMetadata: Identifiable {
         
         var projectedValue: Binding<V> {
             Binding(get: {
-                current
+                metadata.current[keyPath: keyPath]
             }, set: { newValue in
-                current = newValue
+                metadata.current[keyPath: keyPath] = newValue
+                print(metadata.current[keyPath: keyPath])
             })
         }
         
@@ -36,11 +37,11 @@ struct EditableMetadata: Identifiable {
         }
         
         func revert() {
-            current = initlal
+            metadata.current[keyPath: keyPath] = initlal
         }
         
         func apply() {
-            self.initlal = current
+            metadata.initial[keyPath: keyPath] = current
         }
     }
     
@@ -57,8 +58,8 @@ struct EditableMetadata: Identifiable {
     let url: URL
     
     let properties: AudioProperties
-    @State var current: Metadata
-    @State private(set) var initial: Metadata
+    var current: Metadata
+    private(set) var initial: Metadata
     
     init?(url: URL) {
         guard url.startAccessingSecurityScopedResource() else { return nil }

@@ -5,14 +5,14 @@
 //  Created by Xinshao_Air on 2024/11/20.
 //
 
-import Foundation
+import SwiftUI
 import AppKit
 import CSFBAudioEngine
 
 struct PlaylistItem: Identifiable {
     let id = UUID()
     let url: URL
-    var editableMetadata: EditableMetadata
+    @State var editableMetadata: EditableMetadata
 
     init?(url: URL) {
         self.url = url
