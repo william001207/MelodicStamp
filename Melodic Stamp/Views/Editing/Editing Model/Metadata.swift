@@ -10,7 +10,7 @@ import CSFBAudioEngine
 
 struct Metadata: Identifiable {
     var id: URL { url }
-    var url: URL
+    let url: URL
     
     var coverImages: Set<NSImage>
     
@@ -172,46 +172,5 @@ struct Metadata: Identifiable {
             .replayGainReferenceLoudness: replayGainReferenceLoudness as Any,
             .additionalMetadata: additional
         ])
-    }
-}
-
-extension AudioMetadata.Key {
-    var keyPath: PartialKeyPath<Metadata> {
-        switch self {
-        case .attachedPictures: \.coverImages
-        case .title: \.title
-        case .titleSortOrder: \.titleSortOrder
-        case .artist: \.artist
-        case .artistSortOrder: \.artistSortOrder
-        case .composer: \.composer
-        case .composerSortOrder: \.composerSortOrder
-        case .genre: \.genre
-        case .genreSortOrder: \.genreSortOrder
-        case .BPM: \.bpm
-        case .albumTitle: \.albumTitle
-        case .albumTitleSortOrder: \.albumTitleSortOrder
-        case .albumArtist: \.albumArtist
-        case .albumArtistSortOrder: \.albumArtistSortOrder
-        case .trackNumber: \.trackNumber
-        case .trackTotal: \.trackTotal
-        case .discNumber: \.discNumber
-        case .discTotal: \.discTotal
-        case .comment: \.comment
-        case .grouping: \.grouping
-        case .compilation: \.isCompilation
-        case .ISRC: \.isrc
-        case .lyrics: \.lyrics
-        case .MCN: \.mcn
-        case .musicBrainzRecordingID: \.musicBrainzRecordingID
-        case .musicBrainzReleaseID: \.musicBrainzReleaseID
-        case .rating: \.rating
-        case .releaseDate: \.releaseDate
-        case .replayGainAlbumGain: \.replayGainAlbumGain
-        case .replayGainAlbumPeak: \.replayGainAlbumPeak
-        case .replayGainTrackGain: \.replayGainTrackGain
-        case .replayGainTrackPeak: \.replayGainTrackPeak
-        case .replayGainReferenceLoudness: \.replayGainReferenceLoudness
-        default: \.additional
-        }
     }
 }

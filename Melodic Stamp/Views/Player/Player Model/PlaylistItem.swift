@@ -13,7 +13,7 @@ struct PlaylistItem: Identifiable {
     let id = UUID()
     let url: URL
     var properties: AudioProperties
-    @Watched var metadata: AudioMetadata
+    var metadata: Metadata
 
     init?(_ url: URL) {
         guard url.startAccessingSecurityScopedResource() else { return nil }
@@ -22,15 +22,11 @@ struct PlaylistItem: Identifiable {
         self.url = url
         if let audioFile = try? AudioFile(readingPropertiesAndMetadataFrom: url) {
             self.properties = audioFile.properties
-            self.metadata = audioFile.metadata
+            self.metadata = .init(url: url, from: audioFile.metadata)
         } else {
             self.properties = .init()
-            self.metadata = .init()
+            self.metadata = .init(url: url)
         }
-    }
-    
-    var initialMetadata: AudioMetadata {
-        _metadata.initialValue
     }
 
     func decoder(enableDoP: Bool = false) throws -> PCMDecoding? {
@@ -48,34 +44,34 @@ struct PlaylistItem: Identifiable {
         return nil
     }
     
-    func revertMetadata() {
-        _metadata.revert()
-    }
-    
-    func reinitMetadata() {
-        _metadata.reinit()
-    }
-    
-    func reinitMetadata(with metadata: AudioMetadata) {
-        _metadata.reinit(with: metadata)
-    }
-    
-    func writeMetadata(_ operation: (inout AudioMetadata) -> Void = { _ in }) {
-        do {
-            guard url.startAccessingSecurityScopedResource() else { return }
-            defer { url.stopAccessingSecurityScopedResource() }
-            
-            let file = try AudioFile(url: url)
-            file.metadata = metadata
-            operation(&file.metadata)
-            try file.writeMetadata()
-            
-            print("Successfully written metadata to \(url)")
-            reinitMetadata()
-        } catch {
-            
-        }
-    }
+//    func revertMetadata() {
+//        _metadata.revert()
+//    }
+//    
+//    func reinitMetadata() {
+//        _metadata.reinit()
+//    }
+//    
+//    func reinitMetadata(with metadata: AudioMetadata) {
+//        _metadata.reinit(with: metadata)
+//    }
+//    
+//    func writeMetadata(_ operation: (inout AudioMetadata) -> Void = { _ in }) {
+//        do {
+//            guard url.startAccessingSecurityScopedResource() else { return }
+//            defer { url.stopAccessingSecurityScopedResource() }
+//            
+//            let file = try AudioFile(url: url)
+//            file.metadata = metadata
+//            operation(&file.metadata)
+//            try file.writeMetadata()
+//            
+//            print("Successfully written metadata to \(url)")
+//            reinitMetadata()
+//        } catch {
+//            
+//        }
+//    }
 }
 
 extension PlaylistItem: Equatable {

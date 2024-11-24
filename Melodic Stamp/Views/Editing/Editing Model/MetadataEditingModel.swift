@@ -8,8 +8,38 @@
 import SwiftUI
 import CSFBAudioEngine
 
-struct EditableMetadata: Identifiable {
-    typealias Values = (initial: Any, current: Any)
+struct EditableMetadata: Identifiable, Hashable {
+    struct Values<V> {
+        let keyPath: WritableKeyPath<Metadata, V>
+        let metadata: EditableMetadata
+        
+        var current: V {
+            get { metadata.metadata[keyPath: keyPath] }
+            nonmutating set { metadata.metadata[keyPath: keyPath] = newValue }
+        }
+        
+        private(set) var initlal: V {
+            get { metadata.initialMetadata[keyPath: keyPath] }
+            nonmutating set { metadata.initialMetadata[keyPath: keyPath] = newValue }
+        }
+        
+        func revert() {
+            current = initlal
+        }
+        
+        func apply() {
+            self.initlal = current
+        }
+    }
+    
+    struct Setter<V> {
+        let keyPath: WritableKeyPath<Metadata, V>
+        let metadatas: Set<EditableMetadata>
+        
+        func set(_ value: V) {
+            metadatas.forEach { $0.metadata[keyPath: keyPath] = value }
+        }
+    }
     
     var id: URL { url }
     let url: URL
@@ -23,6 +53,14 @@ struct EditableMetadata: Identifiable {
         self.initialMetadata = metadata
     }
     
+    init(item: PlaylistItem) {
+        self.init(url: item.url, metadata: item.metadata)
+    }
+    
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
+    }
+    
     func revert() {
         metadata = initialMetadata
     }
@@ -31,42 +69,40 @@ struct EditableMetadata: Identifiable {
         initialMetadata = metadata
     }
     
-    subscript(_ key: AudioMetadata.Key) -> Values {
-        (self.initialMetadata[keyPath: key.keyPath], self.metadata[keyPath: key.keyPath])
+    subscript<V>(extracting keyPath: WritableKeyPath<Metadata, V>) -> Values<V> {
+        .init(keyPath: keyPath, metadata: self)
     }
 }
 
-enum MetadataValueState {
-    case undefined
-    case fine(Any)
-    case varied
+extension EditableMetadata: Equatable {
+    static func == (lhs: EditableMetadata, rhs: EditableMetadata) -> Bool {
+        lhs.id == rhs.id
+    }
+}
+
+enum MetadataValueState<V> {
+    case undefined(EditableMetadata.Setter<V>)
+    case fine(EditableMetadata.Values<V>)
+    case varied(EditableMetadata.Setter<V>)
 }
 
 @Observable class MetadataEditingModel: Identifiable {
     let id: UUID = .init()
     
-    var metadatas: [EditableMetadata] = []
+    var metadatas: Set<EditableMetadata> = .init()
     
-    private func areAllElementsIdentical(_ array: [Any]) -> Bool {
-        guard let first = array.first else { return true }
-        
-        for element in array {
-            let firstRef = first as AnyObject
-            let elementRef = element as AnyObject
-            
-            if firstRef !== elementRef {
-                return false
-            }
-        }
-        return true
+    func update(items: [PlaylistItem]) {
+        metadatas = .init(items.map { .init(item: $0) })
     }
     
-    subscript(_ key: AudioMetadata.Key) -> MetadataValueState {
-        guard !metadatas.isEmpty else { return .undefined }
+    subscript<V: Equatable>(extracting keyPath: WritableKeyPath<Metadata, V>) -> MetadataValueState<V> {
+        let setter = EditableMetadata.Setter(keyPath: keyPath, metadatas: metadatas)
+        guard !metadatas.isEmpty else { return .undefined(setter) }
+        
         let values = metadatas
-            .map { $0[key] }
-            .map(\.current)
-        let areIdentical = areAllElementsIdentical(values)
-        return areIdentical ? .fine(values[0]) : .varied
+            .map { $0[extracting: keyPath] }
+        let areIdentical = values.allSatisfy { $0.current == values[0].current }
+        
+        return areIdentical ? .fine(values[0]) : .varied(setter)
     }
 }
