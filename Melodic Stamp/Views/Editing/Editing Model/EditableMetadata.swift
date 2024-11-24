@@ -18,30 +18,29 @@ import CSFBAudioEngine
             nonmutating set { metadata.current[keyPath: keyPath] = newValue }
         }
         
-        private(set) var initlal: V {
+        private(set) var initial: V {
             get { metadata.initial[keyPath: keyPath] }
             nonmutating set { metadata.initial[keyPath: keyPath] = newValue }
         }
         
         var projectedValue: Binding<V> {
             Binding(get: {
-                metadata.current[keyPath: keyPath]
+                current
             }, set: { newValue in
-                metadata.current[keyPath: keyPath] = newValue
-                print(metadata.current[keyPath: keyPath])
+                current = newValue
             })
         }
         
         var isModified: Bool {
-            current != initlal
+            current != initial
         }
         
         func revert() {
-            metadata.current[keyPath: keyPath] = initlal
+            current = initial
         }
         
         func apply() {
-            metadata.initial[keyPath: keyPath] = current
+            initial = current
         }
     }
     
