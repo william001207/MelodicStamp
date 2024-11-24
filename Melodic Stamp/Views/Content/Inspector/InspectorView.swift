@@ -59,11 +59,11 @@ struct InspectorView: View {
         case .undefined:
             EmptyView()
         case .fine(let values):
-            if !values.current.isEmpty {
+            if let coverImages = values.current {
                 AliveButton {
                     isCoverPickerPresented = true
                 } label: {
-                    MusicCover(coverImages: values.current)
+                    MusicCover(coverImages: coverImages)
                 }
                 .fileImporter(
                     isPresented: $isCoverPickerPresented,
@@ -158,11 +158,7 @@ struct InspectorView: View {
     @ViewBuilder private func toolbar() -> some View {
         Group {
             Button {
-                do {
-                    try metadataEditing.writeAll()
-                } catch {
-                    
-                }
+                metadataEditing.writeAll()
             } label: {
                 HStack(alignment: .lastTextBaseline) {
                     Image(systemSymbol: .trayAndArrowDownFill)

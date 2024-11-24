@@ -30,8 +30,12 @@ enum MetadataValueState<V: Equatable> {
         editableMetadatas.forEach { $0.revert() }
     }
     
-    func writeAll() throws {
-        try editableMetadatas.forEach { try $0.write() }
+    func writeAll() {
+        editableMetadatas.forEach { editableMetadata in
+            Task {
+                try await editableMetadata.write()
+            }
+        }
     }
     
     subscript<V: Equatable>(extracting keyPath: WritableKeyPath<Metadata, V>) -> MetadataValueState<V> {

@@ -266,7 +266,7 @@ enum PlaybackMode: String, CaseIterable, Identifiable {
                 }
             }
         } catch {
-//            handleError(error)
+
         }
     }
     
@@ -274,18 +274,28 @@ enum PlaybackMode: String, CaseIterable, Identifiable {
         do {
             try player.setOutputDeviceID(device.objectID)
             selectedDevice = device
-            // TODO: use `Defaults`
-            //UserDefaults.standard.set(device.uid, forKey: "deviceUID")
         } catch {
-//            handleError(error)
+
         }
+    }
+    
+    func play() {
+        do {
+            try player.play()
+        } catch {
+            
+        }
+    }
+    
+    func pause() {
+        player.pause()
     }
     
     func togglePlayPause() {
         do {
             try player.togglePlayPause()
         } catch {
-//            handleError(error)
+
         }
     }
     

@@ -8,11 +8,10 @@
 import SwiftUI
 import CSFBAudioEngine
 
-struct Metadata: Identifiable {
-    var id: URL { url }
-    let url: URL
-    
-    var coverImages: Set<NSImage>
+typealias AdditionalMetadata = [AnyHashable: Any]
+
+struct Metadata {
+    var coverImages: Set<NSImage>?
     
     var title: String?
     var titleSortOrder: String?
@@ -54,10 +53,9 @@ struct Metadata: Identifiable {
     var replayGainTrackPeak: Double?
     var replayGainReferenceLoudness: Double?
     
-    var additional: [AnyHashable: Any]
+    var additional: AdditionalMetadata?
     
     init(
-        url: URL,
         coverImages: Set<NSImage>? = nil,
         title: String? = nil, titleSortOrder: String? = nil,
         artist: String? = nil, artistSortOrder: String? = nil,
@@ -80,10 +78,9 @@ struct Metadata: Identifiable {
         replayGainAlbumGain: Double? = nil, replayGainAlbumPeak: Double? = nil,
         replayGainTrackGain: Double? = nil, replayGainTrackPeak: Double? = nil,
         replayGainReferenceLoudness: Double? = nil,
-        additional: [AnyHashable: Any]? = nil
+        additional: AdditionalMetadata? = nil
     ) {
-        self.url = url
-        self.coverImages = coverImages ?? .init()
+        self.coverImages = coverImages
         self.title = title
         self.titleSortOrder = titleSortOrder
         self.artist = artist
@@ -116,12 +113,11 @@ struct Metadata: Identifiable {
         self.replayGainTrackGain = replayGainTrackGain
         self.replayGainTrackPeak = replayGainTrackPeak
         self.replayGainReferenceLoudness = replayGainReferenceLoudness
-        self.additional = additional ?? .init()
+        self.additional = additional
     }
     
-    init(url: URL, from metadata: AudioMetadata?) {
+    init(from metadata: AudioMetadata?) {
         self.init(
-            url: url,
             coverImages: (metadata?.attachedPictures.compactMap(\.image)).map { Set($0) },
             title: metadata?.title, titleSortOrder: metadata?.titleSortOrder,
             artist: metadata?.artist, artistSortOrder: metadata?.artistSortOrder,
@@ -148,29 +144,59 @@ struct Metadata: Identifiable {
     }
     
     var packed: AudioMetadata {
-        .init(dictionaryRepresentation: [
-            .attachedPictures: Set(coverImages.compactMap(\.attachedPicture)) as Any,
-            .title: title as Any, .titleSortOrder: titleSortOrder as Any,
-            .artist: artist as Any, .artistSortOrder: artistSortOrder as Any,
-            .composer: composer as Any, .composerSortOrder: composerSortOrder as Any,
-            .genre: genre as Any, .genreSortOrder: genreSortOrder as Any,
-            .BPM: bpm as Any,
-            .albumTitle: albumTitle as Any, .albumTitleSortOrder: albumTitleSortOrder as Any,
-            .albumArtist: albumArtist as Any, .albumArtistSortOrder: albumArtistSortOrder as Any,
-            .trackNumber: trackNumber as Any, .trackTotal: trackTotal as Any,
-            .discNumber: discNumber as Any, .discTotal: discTotal as Any,
-            .comment: comment as Any,
-            .grouping: grouping as Any,
-            .compilation: isCompilation as Any,
-            .ISRC: isrc as Any,
-            .lyrics: lyrics as Any,
-            .MCN: mcn as Any,
-            .musicBrainzRecordingID: musicBrainzRecordingID as Any, .musicBrainzReleaseID: musicBrainzReleaseID as Any,
-            .rating: rating as Any, .releaseDate: releaseDate as Any,
-            .replayGainAlbumGain: replayGainAlbumGain as Any, .replayGainAlbumPeak: replayGainAlbumPeak as Any,
-            .replayGainTrackGain: replayGainTrackGain as Any, .replayGainTrackPeak: replayGainTrackPeak as Any,
-            .replayGainReferenceLoudness: replayGainReferenceLoudness as Any,
-            .additionalMetadata: additional
-        ])
+        let metadata = AudioMetadata()
+        coverImages?.compactMap(\.attachedPicture).forEach(metadata.attachPicture(_:))
+        metadata.title = title
+        metadata.titleSortOrder = titleSortOrder
+        metadata.artist = artist
+        metadata.artistSortOrder = artistSortOrder
+        metadata.composer = composer
+        metadata.composerSortOrder = composerSortOrder
+        metadata.genre = genre
+        metadata.genreSortOrder = genreSortOrder
+        metadata.bpm = bpm
+        metadata.albumTitle = albumTitle
+        metadata.albumArtist = albumArtist
+        metadata.trackNumber = trackNumber
+        metadata.trackTotal = trackTotal
+        metadata.discNumber = discNumber
+        metadata.discTotal = discTotal
+        metadata.comment = comment
+        metadata.grouping = grouping
+        metadata.isCompilation = isCompilation
+        metadata.isrc = isrc
+        metadata.lyrics = lyrics
+        metadata.mcn = mcn
+        metadata.musicBrainzRecordingID = musicBrainzRecordingID
+        metadata.musicBrainzReleaseID = musicBrainzReleaseID
+        metadata.rating = rating
+        metadata.releaseDate = releaseDate
+        metadata.replayGainAlbumGain = replayGainAlbumGain
+        metadata.replayGainAlbumPeak = replayGainAlbumPeak
+        metadata.replayGainTrackGain = replayGainTrackGain
+        metadata.replayGainTrackPeak = replayGainTrackPeak
+        metadata.replayGainReferenceLoudness = replayGainReferenceLoudness
+        metadata.additionalMetadata = additional
+        return metadata
+    }
+    
+    private static func areDictsEqual(_ dict1: [AnyHashable: Any], _ dict2: [AnyHashable: Any]) -> Bool {
+        guard dict1.count == dict2.count else { return false }
+        
+        for (key, value1) in dict1 {
+            guard let value2 = dict2[key] else { return false }
+            
+            if !areEqual(value1, value2) {
+                return false
+            }
+        }
+        
+        return true
+    }
+}
+
+extension Metadata: Equatable {
+    static func == (lhs: Metadata, rhs: Metadata) -> Bool {
+        areDictsEqual(lhs.packed.dictionaryRepresentation, rhs.packed.dictionaryRepresentation)
     }
 }

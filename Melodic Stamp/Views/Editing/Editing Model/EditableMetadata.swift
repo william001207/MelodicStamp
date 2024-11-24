@@ -6,9 +6,9 @@
 //
 
 import SwiftUI
-import CSFBAudioEngine
+@preconcurrency import CSFBAudioEngine
 
-@Observable class EditableMetadata: Identifiable {
+@Observable final class EditableMetadata: Identifiable, Sendable {
     struct Values<V: Equatable> {
         let keyPath: WritableKeyPath<Metadata, V>
         let metadata: EditableMetadata
@@ -67,11 +67,15 @@ import CSFBAudioEngine
         self.url = url
         
         guard let audioFile = try? AudioFile(readingPropertiesAndMetadataFrom: url) else { return nil }
-        let metadata = Metadata(url: url, from: audioFile.metadata)
+        let metadata = Metadata(from: audioFile.metadata)
         self.current = metadata
         self.initial = metadata
         
         self.properties = audioFile.properties
+    }
+    
+    var isModified: Bool {
+        current != initial
     }
     
     func revert() {
@@ -82,16 +86,27 @@ import CSFBAudioEngine
         initial = current
     }
     
-    func write() throws {
-        guard url.startAccessingSecurityScopedResource() else { return }
-        defer { url.stopAccessingSecurityScopedResource() }
-        
-        let file = try AudioFile(url: url)
-        file.metadata = current.packed
-        try file.writeMetadata()
-        
-        print("Successfully written metadata to \(url)")
-        initial = current
+    func write() async throws -> AsyncThrowingStream<Void, Error> {
+        .init { continuation in
+            DispatchQueue.global(qos: .background).async { [weak self] in
+                guard let self, self.isModified else { return }
+                guard self.url.startAccessingSecurityScopedResource() else { return }
+                defer { self.url.stopAccessingSecurityScopedResource() }
+                
+                do {
+                    print("Started writing metadata to \(self.url)")
+                    let file = try AudioFile(url: self.url)
+                    file.metadata = self.current.packed
+                    try file.writeMetadata()
+                    
+                    print("Successfully written metadata to \(self.url)")
+                    self.initial = self.current
+                    continuation.finish()
+                } catch {
+                    continuation.finish(throwing: error)
+                }
+            }
+        }
     }
     
     subscript<V>(extracting keyPath: WritableKeyPath<Metadata, V>) -> Values<V> {
