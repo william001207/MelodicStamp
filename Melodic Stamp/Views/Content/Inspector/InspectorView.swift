@@ -92,12 +92,27 @@ struct InspectorView: View {
     private func save() {
         guard let lastSelection else { return }
         
-        if let cover = cover?.attachedPicture {
-            lastSelection.writeMetadata { metadata in
-                metadata.removeAllAttachedPictures()
+        lastSelection.writeMetadata { metadata in
+            metadata.removeAllAttachedPictures()
+            if let cover = cover?.attachedPicture {
                 metadata.attachPicture(cover)
             }
+            
+            metadata.title = title
+            metadata.artist = artist
+            metadata.composer = composer
+            
+            metadata.albumTitle = albumTitle
+            metadata.albumArtist = albumArtist
+            
+            metadata.bpm = bpm
+            metadata.trackNumber = trackNumber
+            metadata.trackTotal = trackTotal
+            metadata.discNumber = discNumber
+            metadata.discTotal = discTotal
         }
+        
+        load(item: lastSelection)
     }
     
     @ViewBuilder private func coverEditor() -> some View {
@@ -130,17 +145,17 @@ struct InspectorView: View {
     }
     
     @ViewBuilder private func generalEditor() -> some View {
-        LabeledTextField("Title", text: $title.projectedValue)
+        LabeledTextField("Title", text: _title)
         
-        LabeledTextField("Artist", text: $artist.projectedValue)
+        LabeledTextField("Artist", text: _artist)
         
-        LabeledTextField("Composer", text: $composer.projectedValue)
+        LabeledTextField("Composer", text: _composer)
     }
     
     @ViewBuilder private func albumEditor() -> some View {
-        LabeledTextField("Album Title", text: $albumTitle.projectedValue)
+        LabeledTextField("Album Title", text: _albumTitle)
         
-        LabeledTextField("Album Artist", text: $albumArtist.projectedValue)
+        LabeledTextField("Album Artist", text: _albumArtist)
     }
     
     @ViewBuilder private func trackAndDiscEditor() -> some View {
@@ -158,11 +173,11 @@ struct InspectorView: View {
                 }
             )
         } badge: {
-            LabeledTextField("BPM", value: $bpm.projectedValue, format: .number)
+            LabeledTextField("BPM", value: _bpm, format: .number)
         }
         
         HStack {
-            LabeledTextField("No.", value: $trackNumber.projectedValue, format: .number, showsLabel: false)
+            LabeledTextField("No.", value: _trackNumber, format: .number, showsLabel: false)
                 .frame(maxWidth: 72)
             
             Image(systemSymbol: .poweron)
@@ -171,11 +186,11 @@ struct InspectorView: View {
                 .frame(width: 4)
                 .foregroundStyle(.placeholder)
             
-            LabeledTextField("Tracks", value: $trackTotal.projectedValue, format: .number)
+            LabeledTextField("Tracks", value: _trackTotal, format: .number)
         }
         
         HStack {
-            LabeledTextField("No.", value: $discNumber.projectedValue, format: .number, showsLabel: false)
+            LabeledTextField("No.", value: _discNumber, format: .number, showsLabel: false)
                 .frame(maxWidth: 72)
             
             Image(systemSymbol: .poweron)
@@ -184,7 +199,7 @@ struct InspectorView: View {
                 .frame(width: 4)
                 .foregroundStyle(.placeholder)
             
-            LabeledTextField("Discs", value: $discTotal.projectedValue, format: .number)
+            LabeledTextField("Discs", value: _discTotal, format: .number)
         }
     }
     

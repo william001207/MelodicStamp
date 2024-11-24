@@ -8,14 +8,14 @@
 import SwiftUI
 import Luminare
 
-struct LabeledTextField<F, Label>: View where F: ParseableFormatStyle, F.FormatOutput == String, Label: View {
+struct LabeledTextField<F, Label>: View where F: ParseableFormatStyle, F.FormatOutput == String, F.FormatInput: Equatable, Label: View {
     @Environment(\.luminareAnimation) private var animation
     
     private let minHeight: CGFloat, horizontalPadding: CGFloat, cornerRadius: CGFloat
     private let isBordered: Bool
     private let showsLabel: Bool
     
-    @Binding private var value: F.FormatInput?
+    @Watched private var value: F.FormatInput?
     private let format: F
     private let placeholder: LocalizedStringKey
     @ViewBuilder private let label: () -> Label
@@ -24,7 +24,7 @@ struct LabeledTextField<F, Label>: View where F: ParseableFormatStyle, F.FormatO
     
     init(
         _ placeholder: LocalizedStringKey,
-        value: Binding<F.FormatInput?>, format: F,
+        value: Watched<F.FormatInput?>, format: F,
         minHeight: CGFloat = 34, horizontalPadding: CGFloat = 8,
         cornerRadius: CGFloat = 8,
         isBordered: Bool = true,
@@ -44,7 +44,7 @@ struct LabeledTextField<F, Label>: View where F: ParseableFormatStyle, F.FormatO
     
     init(
         _ placeholder: LocalizedStringKey,
-        value: Binding<F.FormatInput?>, format: F,
+        value: Watched<F.FormatInput?>, format: F,
         minHeight: CGFloat = 34, horizontalPadding: CGFloat = 8,
         cornerRadius: CGFloat = 8,
         isBordered: Bool = true,
@@ -64,7 +64,7 @@ struct LabeledTextField<F, Label>: View where F: ParseableFormatStyle, F.FormatO
     
     init(
         _ placeholder: LocalizedStringKey,
-        text: Binding<String?>,
+        text: Watched<String?>,
         minHeight: CGFloat = 34, horizontalPadding: CGFloat = 8,
         cornerRadius: CGFloat = 8,
         isBordered: Bool = true,
@@ -82,7 +82,7 @@ struct LabeledTextField<F, Label>: View where F: ParseableFormatStyle, F.FormatO
     
     init(
         _ placeholder: LocalizedStringKey,
-        text: Binding<String?>,
+        text: Watched<String?>,
         minHeight: CGFloat = 34, horizontalPadding: CGFloat = 8,
         cornerRadius: CGFloat = 8,
         isBordered: Bool = true
@@ -102,15 +102,21 @@ struct LabeledTextField<F, Label>: View where F: ParseableFormatStyle, F.FormatO
         HStack {
             LuminareTextField(
                 placeholder,
-                value: $value, format: format,
+                value: $value.projectedValue, format: format,
                 minHeight: minHeight, horizontalPadding: horizontalPadding,
                 cornerRadius: cornerRadius,
                 isBordered: isBordered
             )
-            .onKeyPress(keys: [.delete], phases: .down) { key in
-                guard key.modifiers.contains(.command) else { return .ignored }
-                value = nil
-                return .handled
+            .overlay {
+                Group {
+                    if _value.isModified {
+                        RoundedRectangle(cornerRadius: cornerRadius)
+                            .stroke(.primary)
+                            .fill(.quinary.opacity(0.5))
+                            .foregroundStyle(.tint)
+                    }
+                }
+                .allowsHitTesting(false)
             }
             
             if showsLabel && isActive {
@@ -124,11 +130,20 @@ struct LabeledTextField<F, Label>: View where F: ParseableFormatStyle, F.FormatO
                 .blur(radius: isLabelHovering ? 8 : 0)
                 .overlay {
                     if isLabelHovering {
-                        AliveButton {
-                            value = nil
-                        } label: {
-                            Image(systemSymbol: .trashFill)
-                                .foregroundStyle(.red)
+                        HStack {
+                            AliveButton {
+                                _value.revert()
+                            } label: {
+                                Image(systemSymbol: .return)
+                                    .foregroundStyle(.tint)
+                            }
+                            
+                            AliveButton {
+                                value = nil
+                            } label: {
+                                Image(systemSymbol: .trashFill)
+                                    .foregroundStyle(.red)
+                            }
                         }
                     }
                 }
@@ -155,10 +170,19 @@ struct LabeledTextField<F, Label>: View where F: ParseableFormatStyle, F.FormatO
     }
 }
 
-#Preview {
-    @Previewable @State var text: String?
-    @Previewable @State var value: Int?
+private struct LabeledTextFieldPreview: View {
+    @Watched var text: String?
+    @Watched var value: Int?
     
-    LabeledTextField("Placeholder (String)", text: $text)
-    LabeledTextField("Placeholder (Int)", value: $value, format: .number)
+    var body: some View {
+        LabeledTextField("Placeholder (String 1)", text: _text)
+        
+        LabeledTextField("Placeholder (String 2)", text: _text)
+        
+        LabeledTextField("Placeholder (Int)", value: _value, format: .number)
+    }
+}
+
+#Preview {
+    LabeledTextFieldPreview()
 }

@@ -28,48 +28,6 @@ struct MelodicStampApp: App {
                     openWindow(id: "about")
                 }
             }
-            
-            CommandGroup(after: .newItem) {
-                Divider()
-                
-                Menu("Open File") {
-                    Button("In Current Playlist") {
-                        
-                    }
-                    .keyboardShortcut("o", modifiers: .command)
-                    
-                    Button("Replacing Current Playlist") {
-                        
-                    }
-                    .keyboardShortcut("o", modifiers: [.command, .shift])
-                    
-                    Divider()
-                    
-                    Button("Form New Playlist") {
-                        
-                    }
-                    .keyboardShortcut("o", modifiers: [.command, .shift, .option])
-                }
-                
-                Menu("Add Files") {
-                    Button("To Current Playlist") {
-                        
-                    }
-                    .keyboardShortcut("a", modifiers: .command)
-                    
-                    Button("Replacing Current Playlist") {
-                        
-                    }
-                    .keyboardShortcut("a", modifiers: [.command, .shift])
-                    
-                    Divider()
-                    
-                    Button("Form New Playlist") {
-                        
-                    }
-                    .keyboardShortcut("a", modifiers: [.command, .shift, .option])
-                }
-            }
         }
         
         Window("About \(Bundle.main.displayName)", id: "about") {
