@@ -33,7 +33,7 @@ struct FloatingTabBarView: View {
                                 .foregroundStyle(.secondary)
                         }
                         
-                        ForEach(section.items) { tab in
+                        ForEach(section.tabs) { tab in
                             let isTabHovering = hoveringTabs.contains(tab)
                             let isSelected = selectedTabs.contains(tab)
                             
@@ -54,7 +54,7 @@ struct FloatingTabBarView: View {
                                 }
                             } label: {
                                 HStack(alignment: .center) {
-                                    tab.icon
+                                    Image(systemSymbol: tab.systemSymbol)
                                         .font(.system(size: 18))
                                         .bold()
                                         .frame(width: 32, height: 32)
@@ -136,5 +136,5 @@ struct FloatingTabBarView: View {
 #Preview {
     @Previewable @State var selectedTabs: Set<SidebarTab> = .init([.playlist])
     
-    FloatingTabBarView(floatingWindows: .init(), sections: [.init(items: SidebarTab.allCases)], selectedTabs: $selectedTabs)
+    FloatingTabBarView(floatingWindows: .init(), sections: [.init(tabs: SidebarTab.allCases)], selectedTabs: $selectedTabs)
 }

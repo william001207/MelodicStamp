@@ -217,7 +217,6 @@ enum PlaybackMode: String, CaseIterable, Identifiable {
     override init() {
         super.init()
         player.delegate = self
-        loadPlaylist()
         updateDeviceMenu()
     }
     
@@ -230,23 +229,6 @@ enum PlaybackMode: String, CaseIterable, Identifiable {
         } else {
             return playlist.indices.randomElement()
         }
-    }
-    
-    func loadPlaylist() {
-//        if let urls = UserDefaults.standard.object(forKey: "playlistURLs") as? [String] {
-//            for urlString in urls {
-//                if let url = URL(string: urlString) {
-//                    if let item = PlaylistItem(url) {
-//                        playlist.append(item)
-//                    }
-//                }
-//            }
-//        }
-    }
-    
-    func savePlaylist() {
-//        let urls = playlist.map { $0.url.absoluteString }
-//        UserDefaults.standard.set(urls, forKey: "playlistURLs")
     }
     
     func play(_ url: URL) {
@@ -305,6 +287,10 @@ enum PlaybackMode: String, CaseIterable, Identifiable {
     func reload(items: [PlaylistItem]) {
         removeFromPlaylist(items: items)
         addToPlaylist(items: items)
+    }
+    
+    func reloadPlaylist() {
+        reload(items: playlist)
     }
     
     func updateDeviceMenu() {

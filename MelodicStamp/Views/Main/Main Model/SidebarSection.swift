@@ -10,7 +10,7 @@ import SFSafeSymbols
 
 struct SidebarSection: Hashable, Identifiable {
     let title: String? = nil
-    let items: [SidebarTab]
+    let tabs: [SidebarTab]
     
     var id: Int {
         return self.hashValue
@@ -60,14 +60,14 @@ enum SidebarTab: Hashable, Identifiable, CaseIterable {
         }
     }
     
-    var icon: Image {
+    var systemSymbol: SFSymbol {
         switch self {
         case .playlist:
-                .init(systemSymbol: .musicNoteList)
+                .musicNoteList
         case .inspector:
-                .init(systemSymbol: .photo)
+                .photoOnRectangleAngled
         case .metadata:
-                .init(systemSymbol: .textBadgePlus)
+                .textBadgePlus
         }
     }
     
@@ -75,9 +75,3 @@ enum SidebarTab: Hashable, Identifiable, CaseIterable {
         hasher.combine(self.id)
     }
 }
-
-//enum NavigationTarget: Hashable {
-//    case artist(Artist)
-//    case album(Album)
-//    case playlist(Playlist)
-//}

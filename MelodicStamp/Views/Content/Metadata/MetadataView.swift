@@ -9,7 +9,7 @@ import SwiftUI
 
 struct MetadataView: View {
     var body: some View {
-        EmptyMusicNoteView()
+        EmptyMusicNoteView(systemSymbol: SidebarTab.metadata.systemSymbol)
             .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 }

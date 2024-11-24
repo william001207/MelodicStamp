@@ -18,6 +18,7 @@ struct ContentView: View {
     @State private var player: PlayerModel = .init()
     @State private var windowStyle: MelodicStampWindowStyle = .main
     
+    @State private var mainFrame: CGRect = .zero
     @State private var widthRestriction: CGFloat?
     
     var body: some View {
@@ -27,11 +28,13 @@ struct ContentView: View {
                 MainView(player: player, selectedTabs: $selectedTabs)
                     .onGeometryChange(for: CGRect.self) { proxy in
                         proxy.frame(in: .global)
-                    } action: { newValue in
+                    } action: { frame in
+                        mainFrame = frame
                         floatingWindows.updateTabBarPosition()
                         floatingWindows.updatePlayerPosition()
                     }
                     .frame(minWidth: 1000, minHeight: 600)
+                    .fakeProgressiveBlur(startPoint: .init(x: 0, y: 72 / mainFrame.height), endPoint: .init(x: 0, y: 20 / mainFrame.height))
                     .edgesIgnoringSafeArea(.top)
             case .miniPlayer:
                 MiniPlayer(player: player, namespace: namespace)
@@ -89,7 +92,7 @@ struct ContentView: View {
             FloatingTabBarView(
                 floatingWindows: floatingWindows,
                 sections: [
-                    .init(items: [.playlist, .inspector, .metadata])
+                    .init(tabs: [.playlist, .inspector, .metadata])
                 ],
                 selectedTabs: $selectedTabs
             )

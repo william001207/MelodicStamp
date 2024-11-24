@@ -35,6 +35,9 @@ struct MainView: View {
                         case .inspector:
                             InspectorView(player: player, selection: $selection, lastSelection: $lastSelection)
                                 .frame(minWidth: 250)
+                                .background {
+                                    VisualEffectView(material: .headerView, blendingMode: .behindWindow)
+                                }
                         case .metadata:
                             MetadataView()
                                 .frame(minWidth: 250)

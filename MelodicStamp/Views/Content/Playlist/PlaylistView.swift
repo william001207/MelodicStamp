@@ -27,8 +27,7 @@ struct PlaylistView: View {
                         LuminareList(
                             items: $player.playlist,
                             selection: $selection,
-                            id: \.id,
-                            removeKey: .init("Remove")
+                            id: \.id
                         ) { item in
                             PlaylistItemView(player: player, item: item.wrappedValue, isSelected: selection.contains(item.wrappedValue))
                                 .swipeActions {
@@ -68,6 +67,18 @@ struct PlaylistView: View {
                                     }
                                 }
                             }
+                            
+                            Button {
+                                player.reloadPlaylist()
+                            } label: {
+                                HStack {
+                                    Image(systemSymbol: .clockArrow2Circlepath)
+                                    
+                                    Text("Revert")
+                                }
+                            }
+                        } removeView: {
+                            Image(systemSymbol: .trashFill)
                         }
                     }
                     .padding(8)
@@ -79,7 +90,7 @@ struct PlaylistView: View {
                     lastSelection = newValue.first
                 }
             } else {
-                EmptyMusicNoteView()
+                EmptyMusicNoteView(systemSymbol: SidebarTab.playlist.systemSymbol)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
         }

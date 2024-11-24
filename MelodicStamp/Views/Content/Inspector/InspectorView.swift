@@ -32,15 +32,18 @@ struct InspectorView: View {
                 .contentMargins(.top, 48)
                 .contentMargins(.bottom, 72)
             } else {
-                EmptyMusicNoteView(systemSymbol: .photoOnRectangleAngled)
+                EmptyMusicNoteView(systemSymbol: SidebarTab.inspector.systemSymbol)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
+        }
+        .onChange(of: lastSelection, initial: true) { oldValue, newValue in
+            load(item: newValue)
         }
         .toolbar(content: toolbar)
     }
     
     @ViewBuilder private func image() -> some View {
-        if let lastSelection, let cover = self.cover ?? lastSelection.metadata.attachedPictures.first?.image {
+        if let lastSelection, let cover  {
             AliveButton {
                 isCoverPickerPresented = true
             } label: {
@@ -48,11 +51,6 @@ struct InspectorView: View {
                     .resizable()
                     .aspectRatio(contentMode: .fit)
                     .clipShape(.rect(cornerRadius: 8))
-            }
-            .onAppear {
-                if self.cover == nil {
-                    self.cover = cover
-                }
             }
             .fileImporter(
                 isPresented: $isCoverPickerPresented,
@@ -76,16 +74,35 @@ struct InspectorView: View {
     @ViewBuilder private func toolbar() -> some View {
         Button {
             save()
-            player.reload(items: player.playlist)
+            if let lastSelection {
+                player.reload(items: [lastSelection])
+            }
         } label: {
             HStack(alignment: .lastTextBaseline) {
-                Image(systemSymbol: .repeat)
+                Image(systemSymbol: .trayAndArrowDownFill)
                     .imageScale(.small)
                 
-                Text("Reload")
+                Text("Save")
             }
             .padding(.horizontal, 2)
         }
+        
+        Button {
+            load(item: lastSelection)
+        } label: {
+            HStack(alignment: .lastTextBaseline) {
+                Image(systemSymbol: .clockArrowCirclepath)
+                    .imageScale(.small)
+                
+                Text("Revert")
+            }
+            .padding(.horizontal, 2)
+            .foregroundStyle(.red)
+        }
+    }
+    
+    private func load(item: PlaylistItem?) {
+        cover = item?.metadata.attachedPictures.first?.image
     }
     
     private func save() {
