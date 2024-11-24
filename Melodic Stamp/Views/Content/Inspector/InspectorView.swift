@@ -15,21 +15,21 @@ struct InspectorView: View {
     @Binding var selection: Set<PlaylistItem>
     @Binding var lastSelection: PlaylistItem?
     
-    @State private var cover: NSImage?
+    @Watched private var cover: NSImage?
     @State private var isCoverPickerPresented: Bool = false
     
-    @State private var title: MetadataType.Title?
-    @State private var artist: MetadataType.Artist?
-    @State private var composer: MetadataType.Composer?
+    @Watched private var title: MetadataType.Title?
+    @Watched private var artist: MetadataType.Artist?
+    @Watched private var composer: MetadataType.Composer?
     
-    @State private var albumTitle: MetadataType.AlbumTitle?
-    @State private var albumArtist: MetadataType.AlbumArtist?
+    @Watched private var albumTitle: MetadataType.AlbumTitle?
+    @Watched private var albumArtist: MetadataType.AlbumArtist?
     
-    @State private var bpm: MetadataType.BPM?
-    @State private var trackNumber: MetadataType.TrackNumber?
-    @State private var trackTotal: MetadataType.TrackTotal?
-    @State private var discNumber: MetadataType.DiscNumber?
-    @State private var discTotal: MetadataType.DiscTotal?
+    @Watched private var bpm: MetadataType.BPM?
+    @Watched private var trackNumber: MetadataType.TrackNumber?
+    @Watched private var trackTotal: MetadataType.TrackTotal?
+    @Watched private var discNumber: MetadataType.DiscNumber?
+    @Watched private var discTotal: MetadataType.DiscTotal?
     
     var body: some View {
         Group {
@@ -73,20 +73,20 @@ struct InspectorView: View {
     }
     
     private func load(item: PlaylistItem?) {
-        cover = item?.metadata.attachedPictures.first?.image
+        _cover.reinit(with: item?.metadata.attachedPictures.first?.image)
         
-        title = item?.metadata.title
-        artist = item?.metadata.artist
-        composer = item?.metadata.composer
+        _title.reinit(with: item?.metadata.title)
+        _artist.reinit(with: item?.metadata.artist)
+        _composer.reinit(with: item?.metadata.composer)
         
-        albumTitle = item?.metadata.albumTitle
-        albumArtist = item?.metadata.albumArtist
+        _albumTitle.reinit(with: item?.metadata.albumTitle)
+        _albumArtist.reinit(with: item?.metadata.albumArtist)
         
-        bpm = item?.metadata.bpm
-        trackNumber = item?.metadata.trackNumber
-        trackTotal = item?.metadata.trackTotal
-        discNumber = item?.metadata.discNumber
-        discTotal = item?.metadata.discTotal
+        _bpm.reinit(with: item?.metadata.bpm)
+        _trackNumber.reinit(with: item?.metadata.trackNumber)
+        _trackTotal.reinit(with: item?.metadata.trackTotal)
+        _discNumber.reinit(with: item?.metadata.discNumber)
+        _discTotal.reinit(with: item?.metadata.discTotal)
     }
     
     private func save() {
@@ -130,17 +130,17 @@ struct InspectorView: View {
     }
     
     @ViewBuilder private func generalEditor() -> some View {
-        LabeledTextField("Title", text: $title)
+        LabeledTextField("Title", text: $title.projectedValue)
         
-        LabeledTextField("Artist", text: $artist)
+        LabeledTextField("Artist", text: $artist.projectedValue)
         
-        LabeledTextField("Composer", text: $composer)
+        LabeledTextField("Composer", text: $composer.projectedValue)
     }
     
     @ViewBuilder private func albumEditor() -> some View {
-        LabeledTextField("Album Title", text: $albumTitle)
+        LabeledTextField("Album Title", text: $albumTitle.projectedValue)
         
-        LabeledTextField("Album Artist", text: $albumArtist)
+        LabeledTextField("Album Artist", text: $albumArtist.projectedValue)
     }
     
     @ViewBuilder private func trackAndDiscEditor() -> some View {
@@ -158,11 +158,11 @@ struct InspectorView: View {
                 }
             )
         } badge: {
-            LabeledTextField("BPM", value: $bpm, format: .number)
+            LabeledTextField("BPM", value: $bpm.projectedValue, format: .number)
         }
         
         HStack {
-            LabeledTextField("No.", value: $trackNumber, format: .number, showsLabel: false)
+            LabeledTextField("No.", value: $trackNumber.projectedValue, format: .number, showsLabel: false)
                 .frame(maxWidth: 72)
             
             Image(systemSymbol: .poweron)
@@ -171,11 +171,11 @@ struct InspectorView: View {
                 .frame(width: 4)
                 .foregroundStyle(.placeholder)
             
-            LabeledTextField("Tracks", value: $trackTotal, format: .number)
+            LabeledTextField("Tracks", value: $trackTotal.projectedValue, format: .number)
         }
         
         HStack {
-            LabeledTextField("No.", value: $discNumber, format: .number, showsLabel: false)
+            LabeledTextField("No.", value: $discNumber.projectedValue, format: .number, showsLabel: false)
                 .frame(maxWidth: 72)
             
             Image(systemSymbol: .poweron)
@@ -184,7 +184,7 @@ struct InspectorView: View {
                 .frame(width: 4)
                 .foregroundStyle(.placeholder)
             
-            LabeledTextField("Discs", value: $discTotal, format: .number)
+            LabeledTextField("Discs", value: $discTotal.projectedValue, format: .number)
         }
     }
     

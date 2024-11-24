@@ -8,7 +8,7 @@
 import SwiftUI
 import Luminare
 
-struct LabeledTextField<F, Label>: View where F: ParseableFormatStyle, F.FormatOutput == String, F.FormatInput: Equatable, Label: View {
+struct LabeledTextField<F, Label>: View where F: ParseableFormatStyle, F.FormatOutput == String, Label: View {
     @Environment(\.luminareAnimation) private var animation
     
     private let minHeight: CGFloat, horizontalPadding: CGFloat, cornerRadius: CGFloat

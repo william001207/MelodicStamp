@@ -7,11 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		287F978D2CF3160700C60307 /* Luminare in Frameworks */ = {isa = PBXBuildFile; productRef = 287F978C2CF3160700C60307 /* Luminare */; };
 		65F1DA7D2CED77F100389E37 /* SFBAudioEngine in Frameworks */ = {isa = PBXBuildFile; productRef = 65F1DA7C2CED77F100389E37 /* SFBAudioEngine */; };
 		65F1DA842CED788D00389E37 /* CAAudioHardware in Frameworks */ = {isa = PBXBuildFile; productRef = 65F1DA832CED788D00389E37 /* CAAudioHardware */; };
 		65F1DA8D2CED83F800389E37 /* FullDiskAccess in Frameworks */ = {isa = PBXBuildFile; productRef = 65F1DA8C2CED83F800389E37 /* FullDiskAccess */; };
 		65F1DA9D2CEDBD8700389E37 /* Defaults in Frameworks */ = {isa = PBXBuildFile; productRef = 65F1DA9C2CEDBD8700389E37 /* Defaults */; };
-		65F1DAA02CEDBDBE00389E37 /* Luminare in Frameworks */ = {isa = PBXBuildFile; productRef = 65F1DA9F2CEDBDBE00389E37 /* Luminare */; };
 		65F1DAB32CEDBED700389E37 /* SFSafeSymbols in Frameworks */ = {isa = PBXBuildFile; productRef = 65F1DAB22CEDBED700389E37 /* SFSafeSymbols */; };
 /* End PBXBuildFile section */
 
@@ -33,10 +33,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				65F1DAB32CEDBED700389E37 /* SFSafeSymbols in Frameworks */,
+				287F978D2CF3160700C60307 /* Luminare in Frameworks */,
 				65F1DA9D2CEDBD8700389E37 /* Defaults in Frameworks */,
 				65F1DA8D2CED83F800389E37 /* FullDiskAccess in Frameworks */,
 				65F1DA7D2CED77F100389E37 /* SFBAudioEngine in Frameworks */,
-				65F1DAA02CEDBDBE00389E37 /* Luminare in Frameworks */,
 				65F1DA842CED788D00389E37 /* CAAudioHardware in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -84,8 +84,8 @@
 				65F1DA832CED788D00389E37 /* CAAudioHardware */,
 				65F1DA8C2CED83F800389E37 /* FullDiskAccess */,
 				65F1DA9C2CEDBD8700389E37 /* Defaults */,
-				65F1DA9F2CEDBDBE00389E37 /* Luminare */,
 				65F1DAB22CEDBED700389E37 /* SFSafeSymbols */,
+				287F978C2CF3160700C60307 /* Luminare */,
 			);
 			productName = MelodicStamp;
 			productReference = 65F1DA012CECCEE900389E37 /* Melodic Stamp.app */;
@@ -121,8 +121,8 @@
 				65F1DA822CED788D00389E37 /* XCRemoteSwiftPackageReference "CAAudioHardware" */,
 				65F1DA8B2CED83F800389E37 /* XCRemoteSwiftPackageReference "FullDiskAccess" */,
 				65F1DA9B2CEDBD8700389E37 /* XCRemoteSwiftPackageReference "Defaults" */,
-				65F1DA9E2CEDBDBE00389E37 /* XCRemoteSwiftPackageReference "Luminare" */,
 				65F1DAB12CEDBED700389E37 /* XCRemoteSwiftPackageReference "SFSafeSymbols" */,
+				287F978B2CF3160600C60307 /* XCRemoteSwiftPackageReference "Luminare" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 65F1DA022CECCEE900389E37 /* Products */;
@@ -353,6 +353,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		287F978B2CF3160600C60307 /* XCRemoteSwiftPackageReference "Luminare" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Cement-Labs/Luminare";
+			requirement = {
+				branch = docs;
+				kind = branch;
+			};
+		};
 		65F1DA7B2CED77F100389E37 /* XCRemoteSwiftPackageReference "SFBAudioEngine" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/sbooth/SFBAudioEngine";
@@ -385,14 +393,6 @@
 				kind = branch;
 			};
 		};
-		65F1DA9E2CEDBDBE00389E37 /* XCRemoteSwiftPackageReference "Luminare" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/Cement-Labs/Luminare";
-			requirement = {
-				branch = docs;
-				kind = branch;
-			};
-		};
 		65F1DAB12CEDBED700389E37 /* XCRemoteSwiftPackageReference "SFSafeSymbols" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/SFSafeSymbols/SFSafeSymbols";
@@ -404,6 +404,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		287F978C2CF3160700C60307 /* Luminare */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 287F978B2CF3160600C60307 /* XCRemoteSwiftPackageReference "Luminare" */;
+			productName = Luminare;
+		};
 		65F1DA7C2CED77F100389E37 /* SFBAudioEngine */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 65F1DA7B2CED77F100389E37 /* XCRemoteSwiftPackageReference "SFBAudioEngine" */;
@@ -423,11 +428,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 65F1DA9B2CEDBD8700389E37 /* XCRemoteSwiftPackageReference "Defaults" */;
 			productName = Defaults;
-		};
-		65F1DA9F2CEDBDBE00389E37 /* Luminare */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 65F1DA9E2CEDBDBE00389E37 /* XCRemoteSwiftPackageReference "Luminare" */;
-			productName = Luminare;
 		};
 		65F1DAB22CEDBED700389E37 /* SFSafeSymbols */ = {
 			isa = XCSwiftPackageProductDependency;
