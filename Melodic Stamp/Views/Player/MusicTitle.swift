@@ -41,7 +41,8 @@ struct MusicTitle: View {
             HStack(spacing: 12) {
                 if mode.hasTitle {
                     Group {
-                        if let title = item.metadata.title, !title.isEmpty {
+                        let values = item.editableMetadata[extracting: \.title]
+                        if let title = values.current, !title.isEmpty {
                             Text(title)
                         } else {
                             Text(item.url.lastPathComponent.dropLast(item.url.pathExtension.count + 1))
@@ -50,17 +51,21 @@ struct MusicTitle: View {
                     .bold()
                 }
                 
-                if mode.hasArtists, let artist = item.metadata.artist {
-                    HStack(spacing: 4) {
-                        let artists = splitArtists(from: artist)
-                        ForEach(Array(artists.enumerated()), id: \.offset) { offset, composer in
-                            if offset > 0 {
-                                Text("·")
-                                    .foregroundStyle(.placeholder)
+                if mode.hasArtists {
+                    let values = item.editableMetadata[extracting: \.artist]
+                    
+                    if let artist = values.current {
+                        HStack(spacing: 4) {
+                            let artists = PlayerModel.splitArtists(from: artist)
+                            ForEach(Array(artists.enumerated()), id: \.offset) { offset, composer in
+                                if offset > 0 {
+                                    Text("·")
+                                        .foregroundStyle(.placeholder)
+                                }
+                                
+                                Text(composer)
+                                    .foregroundStyle(.secondary)
                             }
-                            
-                            Text(composer)
-                                .foregroundStyle(.secondary)
                         }
                     }
                 }
@@ -70,9 +75,5 @@ struct MusicTitle: View {
                 .bold()
                 .foregroundStyle(.placeholder)
         }
-    }
-    
-    private func splitArtists(from artist: String) -> [Substring] {
-        artist.split(separator: /[\/,]\s*/)
     }
 }

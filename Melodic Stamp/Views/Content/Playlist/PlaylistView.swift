@@ -12,9 +12,9 @@ import SFSafeSymbols
 
 struct PlaylistView: View {
     @Bindable var player: PlayerModel
+    @Bindable var metadataEditing: MetadataEditingModel
     
-    @Binding var selection: Set<PlaylistItem>
-    @Binding var lastSelection: PlaylistItem?
+    @State private var lastSelection: PlaylistItem?
     
     @State private var isFileOpenerPresented: Bool = false
     @State private var isFileAdderPresented: Bool = false
@@ -26,27 +26,31 @@ struct PlaylistView: View {
                     LazyVStack(spacing: 12) {
                         LuminareList(
                             items: $player.playlist,
-                            selection: $selection,
+                            selection: $metadataEditing.items,
                             id: \.id
                         ) { item in
-                            PlaylistItemView(player: player, item: item.wrappedValue, isSelected: selection.contains(item.wrappedValue))
-                                .swipeActions {
-                                    Button {
-                                        player.play(item.wrappedValue)
-                                    } label: {
-                                        Image(systemSymbol: .play)
-                                        Text("Play")
-                                    }
-                                    .tint(.accentColor)
-                                    
-                                    Button {
-                                        player.removeFromPlaylist(items: [item.wrappedValue])
-                                    } label: {
-                                        Image(systemSymbol: .trash)
-                                        Text("Delete")
-                                    }
-                                    .tint(.red)
+                            PlaylistItemView(
+                                player: player,
+                                item: item.wrappedValue,
+                                isSelected: metadataEditing.items.contains(item.wrappedValue)
+                            )
+                            .swipeActions {
+                                Button {
+                                    player.play(item: item.wrappedValue)
+                                } label: {
+                                    Image(systemSymbol: .play)
+                                    Text("Play")
                                 }
+                                .tint(.accentColor)
+                                
+                                Button {
+                                    player.removeFromPlaylist(urls: [item.wrappedValue.url])
+                                } label: {
+                                    Image(systemSymbol: .trash)
+                                    Text("Delete")
+                                }
+                                .tint(.red)
+                            }
                         } actions: {
                             Button {
                                 let hasShift = NSEvent.modifierFlags.contains(.shift)
@@ -67,16 +71,6 @@ struct PlaylistView: View {
                                     }
                                 }
                             }
-                            
-                            Button {
-                                player.reloadPlaylist()
-                            } label: {
-                                HStack {
-                                    Image(systemSymbol: .clockArrow2Circlepath)
-                                    
-                                    Text("Reload")
-                                }
-                            }
                         } removeView: {
                             Image(systemSymbol: .trashFill)
                         }
@@ -85,7 +79,7 @@ struct PlaylistView: View {
                 }
                 .contentMargins(.top, 48)
                 .contentMargins(.bottom, 72)
-                .onChange(of: selection) { oldValue, newValue in
+                .onChange(of: metadataEditing.items) { oldValue, newValue in
                     // TODO: update this
                     lastSelection = newValue.first
                 }
@@ -113,7 +107,7 @@ struct PlaylistView: View {
             .fileImporter(isPresented: $isFileOpenerPresented, allowedContentTypes: allowedContentTypes) { result in
                 switch result {
                 case .success(let url):
-                    player.play(url)
+                    player.play(url: url)
                 case .failure:
                     break
                 }

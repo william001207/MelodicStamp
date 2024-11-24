@@ -424,5 +424,10 @@ extension PlayerModel {
         
         return volume >= 0 && volume <= 1
     }
+}
 
+extension PlayerModel {
+    static func splitArtists(from artist: String) -> [Substring] {
+        artist.split(separator: /[\/,]\s*/)
+    }
 }

@@ -63,10 +63,7 @@ struct InspectorView: View {
                 AliveButton {
                     isCoverPickerPresented = true
                 } label: {
-                    Image(nsImage: values.current.first!)
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
-                        .clipShape(.rect(cornerRadius: 8))
+                    MusicCover(coverImages: values.current)
                 }
                 .fileImporter(
                     isPresented: $isCoverPickerPresented,

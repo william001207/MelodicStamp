@@ -31,25 +31,21 @@ struct PlaylistItemView: View {
             Spacer()
             
             AliveButton {
-                player.play(item)
+                player.play(item: item)
             } label: {
                 ZStack {
                     Group {
-                        if let image = item.metadata.attachedPictures.first?.image {
-                            Image(nsImage: image)
-                                .resizable()
-                                .aspectRatio(contentMode: .fit)
-                                .frame(maxWidth: .infinity)
-                                .overlay {
-                                    if isHovering {
-                                        Color.black
-                                            .opacity(0.35)
-                                            .blendMode(.darken)
-                                    }
+                        let values = item.editableMetadata[extracting: \.coverImages]
+                        
+                        MusicCover(coverImages: values.current)
+                            .frame(maxWidth: .infinity)
+                            .overlay {
+                                if isHovering {
+                                    Color.black
+                                        .opacity(0.35)
+                                        .blendMode(.darken)
                                 }
-                        } else {
-                            Color.clear
-                        }
+                            }
                     }
                     .overlay {
                         if isHovering {
