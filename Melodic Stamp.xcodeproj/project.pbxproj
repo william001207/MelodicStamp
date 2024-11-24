@@ -20,9 +20,9 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		28BFA4D12CEE173A00448374 /* MelodicStamp */ = {
+		28BFA4D12CEE173A00448374 /* Melodic Stamp */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			path = MelodicStamp;
+			path = "Melodic Stamp";
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -47,7 +47,7 @@
 		65F1D9F82CECCEE900389E37 = {
 			isa = PBXGroup;
 			children = (
-				28BFA4D12CEE173A00448374 /* MelodicStamp */,
+				28BFA4D12CEE173A00448374 /* Melodic Stamp */,
 				65F1DA022CECCEE900389E37 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -76,7 +76,7 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				28BFA4D12CEE173A00448374 /* MelodicStamp */,
+				28BFA4D12CEE173A00448374 /* Melodic Stamp */,
 			);
 			name = "Melodic Stamp";
 			packageProductDependencies = (
@@ -280,11 +280,11 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = MelodicStamp/MelodicStamp.entitlements;
+				CODE_SIGN_ENTITLEMENTS = "Melodic Stamp/Melodic Stamp.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 20241120MA;
-				DEVELOPMENT_ASSET_PATHS = "\"MelodicStamp/Preview Content\"";
+				DEVELOPMENT_ASSET_PATHS = "\"Melodic Stamp/Preview Content\"";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = "Melodic Stamp";
@@ -307,11 +307,11 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = MelodicStamp/MelodicStamp.entitlements;
+				CODE_SIGN_ENTITLEMENTS = "Melodic Stamp/Melodic Stamp.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 20241120MA;
-				DEVELOPMENT_ASSET_PATHS = "\"MelodicStamp/Preview Content\"";
+				DEVELOPMENT_ASSET_PATHS = "\"Melodic Stamp/Preview Content\"";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = "Melodic Stamp";

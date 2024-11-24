@@ -17,6 +17,8 @@ struct MainView: View {
     @State private var selection: Set<PlaylistItem> = .init()
     @State private var lastSelection: PlaylistItem?
     
+    @State private var size: CGSize = .zero
+    
     var body: some View {
         // use `ZStack` to eliminate safe area animation problems
         ZStack {
@@ -46,6 +48,7 @@ struct MainView: View {
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                     .edgesIgnoringSafeArea(.top)
                 }
+                .fakeProgressiveBlur(startPoint: .init(x: 0, y: 72 / size.height), endPoint: .init(x: 0, y: 20 / size.height))
             } else {
                 EmptyMusicNoteView()
             }
@@ -53,6 +56,11 @@ struct MainView: View {
         .toolbar {
             // in order to preserve the titlebar style
             Color.clear
+        }
+        .onGeometryChange(for: CGSize.self) { proxy in
+            proxy.size
+        } action: { size in
+            self.size = size
         }
     }
 }

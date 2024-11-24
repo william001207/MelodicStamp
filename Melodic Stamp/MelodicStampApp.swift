@@ -75,6 +75,7 @@ struct MelodicStampApp: App {
         Window("About \(Bundle.main.displayName)", id: "about") {
             AboutView()
         }
+        .defaultLaunchBehavior(.suppressed)
         .windowResizability(.contentSize)
         .windowStyle(.hiddenTitleBar)
         .windowToolbarStyle(.unified)

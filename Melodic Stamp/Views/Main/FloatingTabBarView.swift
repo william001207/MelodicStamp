@@ -56,7 +56,6 @@ struct FloatingTabBarView: View {
                                 HStack(alignment: .center) {
                                     Image(systemSymbol: tab.systemSymbol)
                                         .font(.system(size: 18))
-                                        .bold()
                                         .frame(width: 32, height: 32)
                                     if isHovering {
                                         Text(tab.title)

@@ -26,7 +26,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "MelodicStamp"
+            "value" : "Melodic Stamp"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "音律纹章"
           }
         }
       }

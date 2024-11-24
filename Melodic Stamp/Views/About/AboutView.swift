@@ -10,11 +10,14 @@ import SwiftUI
 struct AboutView: View {
     var body: some View {
         Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
-            .padding()
+            .padding(20)
+            .padding(.top, 16)
             .background {
-                VisualEffectView(material: .fullScreenUI, blendingMode: .behindWindow)
+                VisualEffectView(material: .titlebar, blendingMode: .behindWindow)
             }
             .edgesIgnoringSafeArea(.all)
+            .padding(.bottom, -28)
+            .fixedSize()
     }
 }
 

@@ -18,7 +18,6 @@ struct ContentView: View {
     @State private var player: PlayerModel = .init()
     @State private var windowStyle: MelodicStampWindowStyle = .main
     
-    @State private var mainFrame: CGRect = .zero
     @State private var widthRestriction: CGFloat?
     
     var body: some View {
@@ -29,12 +28,10 @@ struct ContentView: View {
                     .onGeometryChange(for: CGRect.self) { proxy in
                         proxy.frame(in: .global)
                     } action: { frame in
-                        mainFrame = frame
                         floatingWindows.updateTabBarPosition()
                         floatingWindows.updatePlayerPosition()
                     }
                     .frame(minWidth: 1000, minHeight: 600)
-                    .fakeProgressiveBlur(startPoint: .init(x: 0, y: 72 / mainFrame.height), endPoint: .init(x: 0, y: 20 / mainFrame.height))
                     .edgesIgnoringSafeArea(.top)
             case .miniPlayer:
                 MiniPlayer(player: player, namespace: namespace)
