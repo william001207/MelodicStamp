@@ -10,13 +10,13 @@ import Luminare
 
 struct InspectorView: View {
     @Bindable var player: PlayerModel
-    @Bindable var metadataEditing: MetadataEditingModel
+    @Bindable var metadataEditor: MetadataEditorModel
     
     @State private var isCoverPickerPresented: Bool = false
     
     var body: some View {
         Group {
-            if metadataEditing.hasEditableMetadata {
+            if metadataEditor.hasEditableMetadata {
                 AutoScrollView(.vertical) {
                     VStack(spacing: 24) {
                         coverEditor()
@@ -53,7 +53,7 @@ struct InspectorView: View {
     }
     
     @ViewBuilder private func coverEditor() -> some View {
-        let coverImages = metadataEditing[extracting: \.coverImages]
+        let coverImages = metadataEditor[extracting: \.coverImages]
         
         switch coverImages {
         case .undefined:
@@ -92,22 +92,22 @@ struct InspectorView: View {
     }
     
     @ViewBuilder private func generalEditor() -> some View {
-        LabeledTextField("Title", text: metadataEditing[extracting: \.title])
+        LabeledTextField("Title", text: metadataEditor[extracting: \.title])
         
-        LabeledTextField("Artist", text: metadataEditing[extracting: \.artist])
+        LabeledTextField("Artist", text: metadataEditor[extracting: \.artist])
         
-        LabeledTextField("Composer", text: metadataEditing[extracting: \.composer])
+        LabeledTextField("Composer", text: metadataEditor[extracting: \.composer])
     }
     
     @ViewBuilder private func albumEditor() -> some View {
-        LabeledTextField("Album Title", text: metadataEditing[extracting: \.albumTitle])
+        LabeledTextField("Album Title", text: metadataEditor[extracting: \.albumTitle])
         
-        LabeledTextField("Album Artist", text: metadataEditing[extracting: \.albumArtist])
+        LabeledTextField("Album Artist", text: metadataEditor[extracting: \.albumArtist])
     }
     
     @ViewBuilder private func trackAndDiscEditor() -> some View {
         LuminarePopover(arrowEdge: .top, trigger: .forceTouch()) {
-            switch metadataEditing[extracting: \.bpm] {
+            switch metadataEditor[extracting: \.bpm] {
             case .fine(let values):
                 LuminareStepper(
                     value: .init {
@@ -125,11 +125,11 @@ struct InspectorView: View {
                 EmptyView()
             }
         } badge: {
-            LabeledTextField("BPM", value: metadataEditing[extracting: \.bpm], format: .number)
+            LabeledTextField("BPM", value: metadataEditor[extracting: \.bpm], format: .number)
         }
         
         HStack {
-            LabeledTextField("No.", value: metadataEditing[extracting: \.trackNumber], format: .number, showsLabel: false)
+            LabeledTextField("No.", value: metadataEditor[extracting: \.trackNumber], format: .number, showsLabel: false)
                 .frame(maxWidth: 72)
             
             Image(systemSymbol: .poweron)
@@ -138,11 +138,11 @@ struct InspectorView: View {
                 .frame(width: 4)
                 .foregroundStyle(.placeholder)
             
-            LabeledTextField("Tracks", value: metadataEditing[extracting: \.trackTotal], format: .number)
+            LabeledTextField("Tracks", value: metadataEditor[extracting: \.trackTotal], format: .number)
         }
         
         HStack {
-            LabeledTextField("No.", value: metadataEditing[extracting: \.discNumber], format: .number, showsLabel: false)
+            LabeledTextField("No.", value: metadataEditor[extracting: \.discNumber], format: .number, showsLabel: false)
                 .frame(maxWidth: 72)
             
             Image(systemSymbol: .poweron)
@@ -151,14 +151,14 @@ struct InspectorView: View {
                 .frame(width: 4)
                 .foregroundStyle(.placeholder)
             
-            LabeledTextField("Discs", value: metadataEditing[extracting: \.discTotal], format: .number)
+            LabeledTextField("Discs", value: metadataEditor[extracting: \.discTotal], format: .number)
         }
     }
     
     @ViewBuilder private func toolbar() -> some View {
         Group {
             Button {
-                metadataEditing.writeAll()
+                metadataEditor.writeAll()
             } label: {
                 HStack(alignment: .lastTextBaseline) {
                     Image(systemSymbol: .trayAndArrowDownFill)
@@ -170,7 +170,7 @@ struct InspectorView: View {
             }
             
             Button {
-                metadataEditing.revertAll()
+                metadataEditor.revertAll()
             } label: {
                 HStack(alignment: .lastTextBaseline) {
                     Image(systemSymbol: .clockArrowCirclepath)

@@ -14,7 +14,7 @@ struct MainView: View {
     
     @Binding var selectedTabs: Set<SidebarTab>
     
-    @State private var metadataEditing: MetadataEditingModel = .init()
+    @State private var metadataEditor: MetadataEditorModel = .init()
     @State private var lastSelection: PlaylistItem?
     
     @State private var size: CGSize = .zero
@@ -29,13 +29,13 @@ struct MainView: View {
                     ForEach(Array(selectedTabs).sorted { $0.order < $1.order }) { tab in
                         switch tab {
                         case .playlist:
-                            PlaylistView(player: player, metadataEditing: metadataEditing)
+                            PlaylistView(player: player, metadataEditor: metadataEditor)
                                 .frame(minWidth: 400)
                                 .background {
                                     VisualEffectView(material: .popover, blendingMode: .behindWindow)
                                 }
                         case .inspector:
-                            InspectorView(player: player, metadataEditing: metadataEditing)
+                            InspectorView(player: player, metadataEditor: metadataEditor)
                                 .frame(minWidth: 250)
                                 .background {
                                     VisualEffectView(material: .headerView, blendingMode: .behindWindow)

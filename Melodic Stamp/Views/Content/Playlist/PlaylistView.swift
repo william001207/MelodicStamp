@@ -12,7 +12,7 @@ import SFSafeSymbols
 
 struct PlaylistView: View {
     @Bindable var player: PlayerModel
-    @Bindable var metadataEditing: MetadataEditingModel
+    @Bindable var metadataEditor: MetadataEditorModel
     
     @State private var lastSelection: PlaylistItem?
     
@@ -26,13 +26,13 @@ struct PlaylistView: View {
                     LazyVStack(spacing: 12) {
                         LuminareList(
                             items: $player.playlist,
-                            selection: $metadataEditing.items,
+                            selection: $metadataEditor.items,
                             id: \.id
                         ) { item in
                             PlaylistItemView(
                                 player: player,
                                 item: item.wrappedValue,
-                                isSelected: metadataEditing.items.contains(item.wrappedValue)
+                                isSelected: metadataEditor.items.contains(item.wrappedValue)
                             )
                             .swipeActions {
                                 Button {
@@ -79,7 +79,7 @@ struct PlaylistView: View {
                 }
                 .contentMargins(.top, 48)
                 .contentMargins(.bottom, 72)
-                .onChange(of: metadataEditing.items) { oldValue, newValue in
+                .onChange(of: metadataEditor.items) { oldValue, newValue in
                     // TODO: update this
                     lastSelection = newValue.first
                 }

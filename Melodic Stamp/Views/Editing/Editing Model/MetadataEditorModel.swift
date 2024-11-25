@@ -1,5 +1,5 @@
 //
-//  MetadataEditingModel.swift
+//  MetadataEditorModel.swift
 //  MelodicStamp
 //
 //  Created by KrLite on 2024/11/24.
@@ -13,7 +13,7 @@ enum MetadataValueState<V: Equatable> {
     case varied(EditableMetadata.ValueSetter<V>)
 }
 
-@Observable class MetadataEditingModel: Identifiable {
+@Observable class MetadataEditorModel: Identifiable {
     let id: UUID = .init()
     
     var items: Set<PlaylistItem> = .init()
