@@ -13,6 +13,21 @@ enum MetadataValueState<V: Equatable> {
     case varied(EditableMetadata.ValueSetter<V>)
 }
 
+enum MetadataEditingState {
+    case fine
+    case partialSaving
+    case saving
+    
+    var isAvailable: Bool {
+        switch self {
+        case .fine:
+            true
+        default:
+            false
+        }
+    }
+}
+
 @Observable class MetadataEditorModel: Identifiable {
     let id: UUID = .init()
     
@@ -26,8 +41,29 @@ enum MetadataValueState<V: Equatable> {
         !editableMetadatas.isEmpty
     }
     
+    var state: MetadataEditingState {
+        let states = editableMetadatas.map(\.state)
+        return if states.allSatisfy({ $0 == .fine }) {
+            .fine
+        } else if states.allSatisfy({ $0 == .saving }) {
+            .saving
+        } else {
+            .partialSaving
+        }
+    }
+    
     func revertAll() {
         editableMetadatas.forEach { $0.revert() }
+    }
+    
+    func updateAll() {
+        do {
+            try editableMetadatas.forEach { editableMetadata in
+                try editableMetadata.update()
+            }
+        } catch {
+            
+        }
     }
     
     func writeAll() {

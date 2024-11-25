@@ -9,11 +9,11 @@ import SwiftUI
 
 struct MusicCover: View {
     var cornerRadius: CGFloat = 8
-    var coverImages: Set<NSImage>?
+    var coverImages: Set<NSImage>
     
     var body: some View {
         Group {
-            if let coverImages, let image = coverImages.first {
+            if let image = coverImages.first {
                 Image(nsImage: image)
                     .resizable()
                     .aspectRatio(contentMode: .fit)

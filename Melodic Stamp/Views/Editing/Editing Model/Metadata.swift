@@ -11,7 +11,7 @@ import CSFBAudioEngine
 typealias AdditionalMetadata = [AnyHashable: Any]
 
 struct Metadata {
-    var coverImages: Set<NSImage>?
+    var coverImages: Set<NSImage>
     
     var title: String?
     var titleSortOrder: String?
@@ -56,7 +56,7 @@ struct Metadata {
     var additional: AdditionalMetadata?
     
     init(
-        coverImages: Set<NSImage>? = nil,
+        coverImages: Set<NSImage> = [],
         title: String? = nil, titleSortOrder: String? = nil,
         artist: String? = nil, artistSortOrder: String? = nil,
         composer: String? = nil, composerSortOrder: String? = nil,
@@ -118,7 +118,7 @@ struct Metadata {
     
     init(from metadata: AudioMetadata?) {
         self.init(
-            coverImages: (metadata?.attachedPictures.compactMap(\.image)).map { Set($0) },
+            coverImages: (metadata?.attachedPictures.compactMap(\.image)).map { Set($0) } ?? [],
             title: metadata?.title, titleSortOrder: metadata?.titleSortOrder,
             artist: metadata?.artist, artistSortOrder: metadata?.artistSortOrder,
             composer: metadata?.composer, composerSortOrder: metadata?.composerSortOrder,
@@ -143,9 +143,7 @@ struct Metadata {
         )
     }
     
-    var packed: AudioMetadata {
-        let metadata = AudioMetadata()
-        coverImages?.compactMap(\.attachedPicture).forEach(metadata.attachPicture(_:))
+    func pack(_ metadata: inout AudioMetadata) {
         metadata.title = title
         metadata.titleSortOrder = titleSortOrder
         metadata.artist = artist
@@ -177,7 +175,17 @@ struct Metadata {
         metadata.replayGainTrackPeak = replayGainTrackPeak
         metadata.replayGainReferenceLoudness = replayGainReferenceLoudness
         metadata.additionalMetadata = additional
-        return metadata
+        
+        coverImages.compactMap(\.attachedPicture).forEach(metadata.attachPicture(_:))
+    }
+}
+
+extension Metadata: Equatable {
+    static func == (lhs: Metadata, rhs: Metadata) -> Bool {
+        var lhsMetadata = AudioMetadata(), rhsMetadata = AudioMetadata()
+        lhs.pack(&lhsMetadata)
+        rhs.pack(&rhsMetadata)
+        return areDictsEqual(lhsMetadata.dictionaryRepresentation, rhsMetadata.dictionaryRepresentation)
     }
     
     private static func areDictsEqual(_ dict1: [AnyHashable: Any], _ dict2: [AnyHashable: Any]) -> Bool {
@@ -192,11 +200,5 @@ struct Metadata {
         }
         
         return true
-    }
-}
-
-extension Metadata: Equatable {
-    static func == (lhs: Metadata, rhs: Metadata) -> Bool {
-        areDictsEqual(lhs.packed.dictionaryRepresentation, rhs.packed.dictionaryRepresentation)
     }
 }

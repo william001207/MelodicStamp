@@ -45,13 +45,13 @@ struct FileToolbar: View {
                     fileManager.fileAdderPresentationStyle = .toCurrentPlaylist
                     fileManager.isFileAdderPresented = true
                 }
-                .keyboardShortcut("a", modifiers: .command)
+                .keyboardShortcut("p", modifiers: .command)
                 
                 Button("Replacing Current Playlist") {
                     fileManager.fileAdderPresentationStyle = .replacingCurrentPlaylist
                     fileManager.isFileAdderPresented = true
                 }
-                .keyboardShortcut("a", modifiers: [.command, .shift])
+                .keyboardShortcut("p", modifiers: [.command, .shift])
                 
                 Divider()
                 
@@ -59,7 +59,7 @@ struct FileToolbar: View {
                     fileManager.fileAdderPresentationStyle = .formNewPlaylist
                     fileManager.isFileAdderPresented = true
                 }
-                .keyboardShortcut("a", modifiers: [.command, .shift, .option])
+                .keyboardShortcut("p", modifiers: [.command, .shift, .option])
             } label: {
                 ToolbarLabel {
                     Text("Add")

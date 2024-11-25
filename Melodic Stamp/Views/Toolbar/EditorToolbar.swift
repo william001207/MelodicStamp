@@ -17,12 +17,22 @@ struct EditorToolbar: View {
                 metadataEditor.writeAll()
             } label: {
                 ToolbarLabel {
-                    Image(systemSymbol: .trayAndArrowDownFill)
-                        .imageScale(.small)
-                    
-                    Text("Save")
+                    switch metadataEditor.state {
+                    case .fine:
+                        Image(systemSymbol: .trayAndArrowDownFill)
+                            .imageScale(.small)
+                        
+                        Text("Save")
+                    case .partialSaving, .saving:
+                        ProgressView()
+                            .progressViewStyle(.circular)
+                            .controlSize(.small)
+                        
+                        Text("Saving…")
+                    }
                 }
             }
+            .disabled(!metadataEditor.state.isAvailable)
             
             Button {
                 metadataEditor.revertAll()
@@ -35,6 +45,7 @@ struct EditorToolbar: View {
                 }
                 .foregroundStyle(.red)
             }
+            .disabled(!metadataEditor.state.isAvailable)
         }
         .background(.thinMaterial)
         .clipShape(.buttonBorder)

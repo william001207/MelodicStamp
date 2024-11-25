@@ -15,33 +15,38 @@ struct InspectorView: View {
     @State private var isCoverPickerPresented: Bool = false
     
     var body: some View {
-        AutoScrollView(.vertical) {
-            VStack(spacing: 24) {
-                coverEditor()
-                    .frame(maxWidth: .infinity)
-                
-                LabeledSection {
-                    generalEditor()
+        if metadataEditor.hasEditableMetadata {
+            AutoScrollView(.vertical) {
+                VStack(spacing: 24) {
+                    coverEditor()
+                        .frame(maxWidth: .infinity)
+                    
+                    LabeledSection {
+                        generalEditor()
+                    }
+                    
+                    LabeledSection {
+                        albumEditor()
+                    } label: {
+                        Text("Album")
+                    }
+                    
+                    LabeledSection {
+                        trackAndDiscEditor()
+                    } label: {
+                        Text("Track and Disc")
+                    }
+                    
+                    Spacer()
                 }
-                
-                LabeledSection {
-                    albumEditor()
-                } label: {
-                    Text("Album")
-                }
-                
-                LabeledSection {
-                    trackAndDiscEditor()
-                } label: {
-                    Text("Track and Disc")
-                }
-                
-                Spacer()
+                .padding(16)
             }
-            .padding(16)
+            .contentMargins(.top, 48)
+            .contentMargins(.bottom, 72)
+        } else {
+            InspectorExcerpt()
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
-        .contentMargins(.top, 48)
-        .contentMargins(.bottom, 72)
     }
     
     @ViewBuilder private func coverEditor() -> some View {
@@ -51,32 +56,29 @@ struct InspectorView: View {
         case .undefined:
             EmptyView()
         case .fine(let values):
-            if let coverImages = values.current {
-                AliveButton {
-                    isCoverPickerPresented = true
-                } label: {
-                    MusicCover(coverImages: coverImages)
+            let coverImages = values.current
+            AliveButton {
+                isCoverPickerPresented = true
+            } label: {
+                MusicCover(coverImages: coverImages)
+            }
+            .fileImporter(
+                isPresented: $isCoverPickerPresented,
+                allowedContentTypes: [.jpeg, .png, .tiff, .bmp, .gif, .heic, .heif, .rawImage],
+                allowsMultipleSelection: true
+            ) { result in
+                switch result {
+                case .success(let urls):
+                    let selectedImages: Set<NSImage> = Set(urls.compactMap { url in
+                        guard url.startAccessingSecurityScopedResource() else { return nil }
+                        defer { url.stopAccessingSecurityScopedResource() }
+                        
+                        return NSImage(contentsOf: url)
+                    })
+                    values.current = selectedImages
+                case .failure:
+                    break
                 }
-                .fileImporter(
-                    isPresented: $isCoverPickerPresented,
-                    allowedContentTypes: [.jpeg, .png, .tiff, .bmp, .gif, .heic, .heif, .rawImage],
-                    allowsMultipleSelection: true
-                ) { result in
-                    switch result {
-                    case .success(let urls):
-                        let selectedImages: Set<NSImage> = Set(urls.compactMap { url in
-                            guard url.startAccessingSecurityScopedResource() else { return nil }
-                            defer { url.stopAccessingSecurityScopedResource() }
-                            
-                            return NSImage(contentsOf: url)
-                        })
-                        values.current = selectedImages
-                    case .failure:
-                        break
-                    }
-                }
-            } else {
-                Color.yellow
             }
         case .varied(let valueSetter):
             Color.blue

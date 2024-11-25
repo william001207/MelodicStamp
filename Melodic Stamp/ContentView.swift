@@ -54,7 +54,12 @@ struct ContentView: View {
         .onAppear {
             floatingWindows.observeFullScreen()
         }
-        .onChange(of: isActive) { oldValue, newValue in
+        .onChange(of: isActive, initial: true) { oldValue, newValue in
+            if let window = NSApp.mainWindow {
+                window.tabbingMode = .disallowed
+                window.titlebarAppearsTransparent = true
+            }
+            
             switch windowStyle {
             case .main:
                 if isActive {
@@ -83,9 +88,6 @@ struct ContentView: View {
             }
         }
         .frame(maxWidth: widthRestriction)
-        .onAppear {
-            NSApp.mainWindow?.tabbingMode = .disallowed
-        }
     }
     
     private func initializeFloatingWindows() {

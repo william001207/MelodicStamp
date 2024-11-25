@@ -33,19 +33,19 @@ struct FileCommands: Commands {
                 Button("To Current Playlist") {
                     
                 }
-                .keyboardShortcut("a", modifiers: .command)
+                .keyboardShortcut("p", modifiers: .command)
                 
                 Button("Replacing Current Playlist") {
                     
                 }
-                .keyboardShortcut("a", modifiers: [.command, .shift])
+                .keyboardShortcut("p", modifiers: [.command, .shift])
                 
                 Divider()
                 
                 Button("Form New Playlist") {
                     
                 }
-                .keyboardShortcut("a", modifiers: [.command, .shift, .option])
+                .keyboardShortcut("p", modifiers: [.command, .shift, .option])
             }
         }
     }

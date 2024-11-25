@@ -53,6 +53,20 @@ import SwiftUI
         }
     }
     
+    enum State {
+        case fine
+        case saving
+        
+        var isAvailable: Bool {
+            switch self {
+            case .fine:
+                true
+            default:
+                false
+            }
+        }
+    }
+    
     var id: URL { url }
     let url: URL
     
@@ -60,18 +74,22 @@ import SwiftUI
     var current: Metadata
     private(set) var initial: Metadata
     
-    init?(url: URL) {
+    var state: State = .fine
+    
+    static func read(url: URL) throws -> AudioFile? {
+        try? AudioFile(readingPropertiesAndMetadataFrom: url)
+    }
+    
+    init?(url: URL) throws {
         guard url.startAccessingSecurityScopedResource() else { return nil }
         defer { url.stopAccessingSecurityScopedResource() }
         
         self.url = url
+        self.current = .init()
+        self.initial = .init()
+        self.properties = .init()
         
-        guard let audioFile = try? AudioFile(readingPropertiesAndMetadataFrom: url) else { return nil }
-        let metadata = Metadata(from: audioFile.metadata)
-        self.current = metadata
-        self.initial = metadata
-        
-        self.properties = audioFile.properties
+        try self.update()
     }
     
     var isModified: Bool {
@@ -86,6 +104,14 @@ import SwiftUI
         initial = current
     }
     
+    func update() throws {
+        guard let file = try Self.read(url: url) else { return }
+        let metadata = Metadata(from: file.metadata)
+        self.current = metadata
+        self.initial = metadata
+        print("Updated metadata from \(self.url)")
+    }
+    
     func write() async throws -> AsyncThrowingStream<Void, Error> {
         .init { continuation in
             DispatchQueue.global(qos: .background).async { [weak self] in
@@ -95,12 +121,16 @@ import SwiftUI
                 
                 do {
                     print("Started writing metadata to \(self.url)")
+                    self.state = .saving
+                    
                     let file = try AudioFile(url: self.url)
-                    file.metadata = self.current.packed
+                    self.current.pack(&file.metadata)
                     try file.writeMetadata()
                     
                     print("Successfully written metadata to \(self.url)")
-                    self.initial = self.current
+                    try self.update()
+                    self.state = .fine
+                    
                     continuation.finish()
                 } catch {
                     continuation.finish(throwing: error)

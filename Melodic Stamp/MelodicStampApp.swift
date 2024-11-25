@@ -28,6 +28,10 @@ struct MelodicStampApp: App {
                     openWindow(id: "about")
                 }
             }
+            
+            FileCommands()
+            
+            EditingCommands()
         }
         
         Window("About \(Bundle.main.displayName)", id: "about") {
