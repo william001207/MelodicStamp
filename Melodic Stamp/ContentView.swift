@@ -21,8 +21,6 @@ struct ContentView: View {
     
     @State private var widthRestriction: CGFloat?
     
-    @State private var window: NSWindow?
-    
     var body: some View {
         Group {
             switch windowStyle {
@@ -85,8 +83,8 @@ struct ContentView: View {
             }
         }
         .frame(maxWidth: widthRestriction)
-        .background {
-            WindowAccessor(window: $window)
+        .onAppear {
+            NSApp.mainWindow?.tabbingMode = .disallowed
         }
     }
     
