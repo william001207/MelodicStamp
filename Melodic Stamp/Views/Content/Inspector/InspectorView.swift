@@ -15,41 +15,33 @@ struct InspectorView: View {
     @State private var isCoverPickerPresented: Bool = false
     
     var body: some View {
-        Group {
-            if metadataEditor.hasEditableMetadata {
-                AutoScrollView(.vertical) {
-                    VStack(spacing: 24) {
-                        coverEditor()
-                            .frame(maxWidth: .infinity)
-                        
-                        LabeledSection {
-                            generalEditor()
-                        }
-                        
-                        LabeledSection {
-                            albumEditor()
-                        } label: {
-                            Text("Album")
-                        }
-                        
-                        LabeledSection {
-                            trackAndDiscEditor()
-                        } label: {
-                            Text("Track and Disc")
-                        }
-                        
-                        Spacer()
-                    }
-                    .padding(16)
+        AutoScrollView(.vertical) {
+            VStack(spacing: 24) {
+                coverEditor()
+                    .frame(maxWidth: .infinity)
+                
+                LabeledSection {
+                    generalEditor()
                 }
-                .contentMargins(.top, 48)
-                .contentMargins(.bottom, 72)
-            } else {
-                EmptyMusicNoteView(systemSymbol: SidebarTab.inspector.systemSymbol)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                
+                LabeledSection {
+                    albumEditor()
+                } label: {
+                    Text("Album")
+                }
+                
+                LabeledSection {
+                    trackAndDiscEditor()
+                } label: {
+                    Text("Track and Disc")
+                }
+                
+                Spacer()
             }
+            .padding(16)
         }
-        .toolbar(content: toolbar)
+        .contentMargins(.top, 48)
+        .contentMargins(.bottom, 72)
     }
     
     @ViewBuilder private func coverEditor() -> some View {
@@ -153,36 +145,5 @@ struct InspectorView: View {
             
             LabeledTextField("Discs", value: metadataEditor[extracting: \.discTotal], format: .number)
         }
-    }
-    
-    @ViewBuilder private func toolbar() -> some View {
-        Group {
-            Button {
-                metadataEditor.writeAll()
-            } label: {
-                HStack(alignment: .lastTextBaseline) {
-                    Image(systemSymbol: .trayAndArrowDownFill)
-                        .imageScale(.small)
-                    
-                    Text("Save")
-                }
-                .padding(.horizontal, 2)
-            }
-            
-            Button {
-                metadataEditor.revertAll()
-            } label: {
-                HStack(alignment: .lastTextBaseline) {
-                    Image(systemSymbol: .clockArrowCirclepath)
-                        .imageScale(.small)
-                    
-                    Text("Revert")
-                }
-                .padding(.horizontal, 2)
-                .foregroundStyle(.red)
-            }
-        }
-        .background(.thinMaterial)
-        .clipShape(.buttonBorder)
     }
 }

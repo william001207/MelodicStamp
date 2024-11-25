@@ -7,10 +7,10 @@
     "About %@" : {
 
     },
-    "Add Files" : {
+    "Add" : {
 
     },
-    "Add to Playlist" : {
+    "Add Files" : {
 
     },
     "Album" : {
@@ -56,6 +56,9 @@
 
     },
     "Nothing to Play" : {
+
+    },
+    "Open" : {
 
     },
     "Open File" : {
