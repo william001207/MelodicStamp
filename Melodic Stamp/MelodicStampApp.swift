@@ -20,7 +20,7 @@ struct MelodicStampApp: App {
             ContentView()
         }
         .windowResizability(.contentSize)
-        .windowStyle(.hiddenTitleBar)
+        .windowStyle(.titleBar)
         .windowToolbarStyle(.unified)
         .commands {
             CommandGroup(replacing: .appInfo) {

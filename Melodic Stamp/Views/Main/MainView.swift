@@ -49,7 +49,7 @@ struct MainView: View {
                         }
                     }
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .edgesIgnoringSafeArea(.top)
+                    .ignoresSafeArea()
                 }
                 .fakeProgressiveBlur(startPoint: .init(x: 0, y: 72 / size.height), endPoint: .init(x: 0, y: 20 / size.height))
             } else {
@@ -71,7 +71,7 @@ struct MainView: View {
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                     }
                     .padding(24)
-                    .padding(.bottom, 72)
+                    .padding(.bottom, 16)
                 }
             }
         }

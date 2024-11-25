@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Combine
 
 struct ContentView: View {
     @Environment(\.appearsActive) private var isActive
@@ -20,6 +21,8 @@ struct ContentView: View {
     
     @State private var widthRestriction: CGFloat?
     
+    @State private var window: NSWindow?
+    
     var body: some View {
         Group {
             switch windowStyle {
@@ -32,7 +35,7 @@ struct ContentView: View {
                         floatingWindows.updatePlayerPosition()
                     }
                     .frame(minWidth: 1000, minHeight: 600)
-                    .edgesIgnoringSafeArea(.top)
+                    .ignoresSafeArea()
             case .miniPlayer:
                 MiniPlayer(player: player, namespace: namespace)
                     .padding(8)
@@ -40,7 +43,7 @@ struct ContentView: View {
                         VisualEffectView(material: .popover, blendingMode: .behindWindow)
                     }
                     .padding(.bottom, -32)
-                    .edgesIgnoringSafeArea(.all)
+                    .ignoresSafeArea()
                     .frame(minWidth: 500, idealWidth: 500)
                     .fixedSize(horizontal: false, vertical: true)
                 
@@ -82,6 +85,9 @@ struct ContentView: View {
             }
         }
         .frame(maxWidth: widthRestriction)
+        .background {
+            WindowAccessor(window: $window)
+        }
     }
     
     private func initializeFloatingWindows() {
