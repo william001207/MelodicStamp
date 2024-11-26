@@ -211,14 +211,6 @@ enum PlaybackMode: String, CaseIterable, Identifiable {
         }
     }
     
-    func play(url: URL) {
-        addToPlaylist(urls: [url])
-        
-        if let item = playlist.first(where: { $0.url == url }) {
-            play(item: item)
-        }
-    }
-    
     func play(item: PlaylistItem) {
         do {
             if let decoder = try item.decoder() {
@@ -230,11 +222,19 @@ enum PlaybackMode: String, CaseIterable, Identifiable {
         }
     }
     
-    func addToPlaylist(urls: [URL]) {
+    func play(url: URL) async throws {
+        try await addToPlaylist(urls: [url])
+        
+        if let item = playlist.first(where: { $0.url == url }) {
+            play(item: item)
+        }
+    }
+    
+    func addToPlaylist(urls: [URL]) async throws {
         for url in urls {
             guard !playlist.contains(where: { $0.url == url }) else { continue }
             
-            if let item = PlaylistItem(url: url) {
+            if let item = try await PlaylistItem(url: url) {
                 playlist.append(item)
             }
         }

@@ -116,7 +116,9 @@ struct MainView: View {
                 case .success(let url):
                     switch fileManager.fileOpenerPresentationStyle {
                     case .inCurrentPlaylist:
-                        player.play(url: url)
+                        Task.detached {
+                            try await player.play(url: url)
+                        }
                     case .replacingCurrentPlaylist:
                         break
                     case .formNewPlaylist:
@@ -137,7 +139,9 @@ struct MainView: View {
                 case .success(let urls):
                     switch fileManager.fileAdderPresentationStyle {
                     case .toCurrentPlaylist:
-                        player.addToPlaylist(urls: urls)
+                        Task.detached {
+                            try await player.addToPlaylist(urls: urls)
+                        }
                     case .replacingCurrentPlaylist:
                         break
                     case .formNewPlaylist:

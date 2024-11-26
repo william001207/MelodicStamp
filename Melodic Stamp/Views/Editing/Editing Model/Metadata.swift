@@ -143,7 +143,9 @@ struct Metadata {
         )
     }
     
-    func pack(_ metadata: inout AudioMetadata) {
+    var packed: AudioMetadata {
+        var metadata = AudioMetadata()
+        
         metadata.title = title
         metadata.titleSortOrder = titleSortOrder
         metadata.artist = artist
@@ -177,15 +179,14 @@ struct Metadata {
         metadata.additionalMetadata = additional
         
         coverImages.compactMap(\.attachedPicture).forEach(metadata.attachPicture(_:))
+        
+        return metadata
     }
 }
 
 extension Metadata: Equatable {
     static func == (lhs: Metadata, rhs: Metadata) -> Bool {
-        var lhsMetadata = AudioMetadata(), rhsMetadata = AudioMetadata()
-        lhs.pack(&lhsMetadata)
-        rhs.pack(&rhsMetadata)
-        return areDictsEqual(lhsMetadata.dictionaryRepresentation, rhsMetadata.dictionaryRepresentation)
+        areDictsEqual(lhs.packed.dictionaryRepresentation, rhs.packed.dictionaryRepresentation)
     }
     
     private static func areDictsEqual(_ dict1: [AnyHashable: Any], _ dict2: [AnyHashable: Any]) -> Bool {

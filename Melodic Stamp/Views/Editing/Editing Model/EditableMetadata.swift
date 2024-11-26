@@ -76,20 +76,13 @@ import SwiftUI
     
     var state: State = .fine
     
-    static func read(url: URL) throws -> AudioFile? {
-        try? AudioFile(readingPropertiesAndMetadataFrom: url)
-    }
-    
-    init?(url: URL) throws {
-        guard url.startAccessingSecurityScopedResource() else { return nil }
-        defer { url.stopAccessingSecurityScopedResource() }
-        
+    init?(url: URL) async throws {
         self.url = url
         self.current = .init()
         self.initial = .init()
         self.properties = .init()
         
-        try self.update()
+        try await self.update()
     }
     
     var isModified: Bool {
@@ -104,37 +97,46 @@ import SwiftUI
         initial = current
     }
     
-    func update() throws {
-        guard let file = try Self.read(url: url) else { return }
-        let metadata = Metadata(from: file.metadata)
-        self.current = metadata
-        self.initial = metadata
-        print("Updated metadata from \(self.url)")
+    func update() async throws {
+        return try await withCheckedThrowingContinuation { [weak self] continuation in
+            guard let self else { return continuation.resume() }
+            guard url.startAccessingSecurityScopedResource() else { return }
+            defer { url.stopAccessingSecurityScopedResource() }
+            
+            do {
+                let file = try AudioFile(readingPropertiesAndMetadataFrom: url)
+                self.current = .init(from: file.metadata)
+                self.initial = self.current
+                print("Updated metadata from \(self.url)")
+                
+                continuation.resume()
+            } catch {
+                continuation.resume(throwing: error)
+            }
+        }
     }
     
-    func write() async throws -> AsyncThrowingStream<Void, Error> {
-        .init { continuation in
-            DispatchQueue.global(qos: .background).async { [weak self] in
-                guard let self, self.isModified else { return }
-                guard self.url.startAccessingSecurityScopedResource() else { return }
-                defer { self.url.stopAccessingSecurityScopedResource() }
+    func write() async throws {
+        return try await withCheckedThrowingContinuation { [weak self] continuation in
+            guard let self, self.isModified else { return continuation.resume() }
+            guard self.url.startAccessingSecurityScopedResource() else { return }
+            defer { self.url.stopAccessingSecurityScopedResource() }
+            
+            do {
+                self.state = .saving
+                self.initial = self.current
+                print("Started writing metadata to \(self.url)")
                 
-                do {
-                    print("Started writing metadata to \(self.url)")
-                    self.state = .saving
-                    
-                    let file = try AudioFile(url: self.url)
-                    self.current.pack(&file.metadata)
-                    try file.writeMetadata()
-                    
-                    print("Successfully written metadata to \(self.url)")
-                    try self.update()
-                    self.state = .fine
-                    
-                    continuation.finish()
-                } catch {
-                    continuation.finish(throwing: error)
-                }
+                let file = try AudioFile(url: self.url)
+                file.metadata = self.current.packed
+                try file.writeMetadata()
+                
+                self.state = .fine
+                print("Successfully written metadata to \(self.url)")
+                
+                continuation.resume()
+            } catch {
+                continuation.resume(throwing: error)
             }
         }
     }

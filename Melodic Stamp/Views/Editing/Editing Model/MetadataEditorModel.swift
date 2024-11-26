@@ -57,18 +57,16 @@ enum MetadataEditingState {
     }
     
     func updateAll() {
-        do {
-            try editableMetadatas.forEach { editableMetadata in
-                try editableMetadata.update()
+        editableMetadatas.forEach { editableMetadata in
+            Task.detached {
+                try await editableMetadata.update()
             }
-        } catch {
-            
         }
     }
     
     func writeAll() {
         editableMetadatas.forEach { editableMetadata in
-            Task {
+            Task.detached {
                 try await editableMetadata.write()
             }
         }

@@ -14,15 +14,11 @@ struct PlaylistItem: Identifiable {
     let url: URL
     @State var editableMetadata: EditableMetadata
 
-    init?(url: URL) {
+    init?(url: URL) async throws {
         self.url = url
         
-        do {
-            guard let metadata = try EditableMetadata(url: url) else { return nil }
-            self.editableMetadata = metadata
-        } catch {
-            return nil
-        }
+        guard let metadata = try await EditableMetadata(url: url) else { return nil }
+        self.editableMetadata = metadata
     }
 
     func decoder(enableDoP: Bool = false) throws -> PCMDecoding? {
