@@ -51,13 +51,13 @@ struct MainView: View {
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                     .ignoresSafeArea()
                 }
-                .fakeProgressiveBlur(startPoint: .init(x: 0, y: 72 / size.height), endPoint: .init(x: 0, y: 20 / size.height))
+                .fakeProgressiveBlur(startPoint: .init(x: 0, y: 54 / size.height), endPoint: .init(x: 0, y: 16 / size.height))
             } else {
                 if selectedTabs.isEmpty {
                     EmptyMusicNoteView()
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                 } else {
-                    HStack {
+                    HStack(alignment: .top) {
                         ForEach(Array(selectedTabs).sorted { $0.order < $1.order }) { tab in
                             switch tab {
                             case .playlist:
@@ -68,8 +68,9 @@ struct MainView: View {
                                 MetadataExcerpt()
                             }
                         }
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .frame(maxWidth: .infinity)
                     }
+                    .frame(maxHeight: .infinity)
                     .padding(24)
                     .padding(.bottom, 16)
                 }

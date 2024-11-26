@@ -12,42 +12,38 @@ struct EditorToolbar: View {
     @Bindable var metadataEditor: MetadataEditorModel
     
     var body: some View {
-        Group {
-            Button {
-                metadataEditor.writeAll()
-            } label: {
-                ToolbarLabel {
-                    switch metadataEditor.state {
-                    case .fine:
-                        Image(systemSymbol: .trayAndArrowDownFill)
-                            .imageScale(.small)
-                        
-                        Text("Save")
-                    case .partialSaving, .saving:
-                        ProgressView()
-                            .progressViewStyle(.circular)
-                            .controlSize(.small)
-                        
-                        Text("Saving…")
-                    }
-                }
-            }
-            .disabled(!metadataEditor.state.isAvailable)
-            
-            Button {
-                metadataEditor.revertAll()
-            } label: {
-                ToolbarLabel {
-                    Image(systemSymbol: .clockArrowCirclepath)
+        Button {
+            metadataEditor.writeAll()
+        } label: {
+            ToolbarLabel {
+                switch metadataEditor.state {
+                case .fine:
+                    Image(systemSymbol: .trayAndArrowDownFill)
                         .imageScale(.small)
                     
-                    Text("Revert")
+                    Text("Save")
+                case .partialSaving, .saving:
+                    ProgressView()
+                        .progressViewStyle(.circular)
+                        .controlSize(.small)
+                    
+                    Text("Saving…")
                 }
-                .foregroundStyle(.red)
             }
-            .disabled(!metadataEditor.state.isAvailable)
         }
-        .background(.thinMaterial)
-        .clipShape(.buttonBorder)
+        .disabled(!metadataEditor.state.isAvailable)
+        
+        Button {
+            metadataEditor.revertAll()
+        } label: {
+            ToolbarLabel {
+                Image(systemSymbol: .clockArrowCirclepath)
+                    .imageScale(.small)
+                
+                Text("Revert")
+            }
+            .foregroundStyle(.red)
+        }
+        .disabled(!metadataEditor.state.isAvailable)
     }
 }

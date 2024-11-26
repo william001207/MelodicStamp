@@ -13,7 +13,7 @@ struct EditingCommands: Commands {
             Button("Set to Undefined") {
                 
             }
-            .keyboardShortcut(.delete, modifiers: .command)
+            .keyboardShortcut(.delete, modifiers: [.command, .shift])
             
             Button("Revert") {
                 

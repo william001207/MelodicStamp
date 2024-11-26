@@ -13,60 +13,56 @@ struct FileToolbar: View {
     @Bindable var fileManager: FileManagerModel
     
     var body: some View {
-        Group {
-            Menu {
-                Button("In Current Playlist") {
-                    fileManager.fileOpenerPresentationStyle = .inCurrentPlaylist
-                    fileManager.isFileOpenerPresented = true
-                }
-                .keyboardShortcut("o", modifiers: .command)
-                
-                Button("Replacing Current Playlist") {
-                    fileManager.fileOpenerPresentationStyle = .replacingCurrentPlaylist
-                    fileManager.isFileOpenerPresented = true
-                }
-                .keyboardShortcut("o", modifiers: [.command, .shift])
-                
-                Divider()
-                
-                Button("Form New Playlist") {
-                    fileManager.fileOpenerPresentationStyle = .formNewPlaylist
-                    fileManager.isFileOpenerPresented = true
-                }
-                .keyboardShortcut("o", modifiers: [.command, .shift, .option])
-            } label: {
-                ToolbarLabel {
-                    Text("Open")
-                }
+        Menu {
+            Button("In Current Playlist") {
+                fileManager.fileOpenerPresentationStyle = .inCurrentPlaylist
+                fileManager.isFileOpenerPresented = true
             }
+            .keyboardShortcut("o", modifiers: .command)
             
-            Menu {
-                Button("To Current Playlist") {
-                    fileManager.fileAdderPresentationStyle = .toCurrentPlaylist
-                    fileManager.isFileAdderPresented = true
-                }
-                .keyboardShortcut("p", modifiers: .command)
-                
-                Button("Replacing Current Playlist") {
-                    fileManager.fileAdderPresentationStyle = .replacingCurrentPlaylist
-                    fileManager.isFileAdderPresented = true
-                }
-                .keyboardShortcut("p", modifiers: [.command, .shift])
-                
-                Divider()
-                
-                Button("Form New Playlist") {
-                    fileManager.fileAdderPresentationStyle = .formNewPlaylist
-                    fileManager.isFileAdderPresented = true
-                }
-                .keyboardShortcut("p", modifiers: [.command, .shift, .option])
-            } label: {
-                ToolbarLabel {
-                    Text("Add")
-                }
+            Button("Replacing Current Playlist") {
+                fileManager.fileOpenerPresentationStyle = .replacingCurrentPlaylist
+                fileManager.isFileOpenerPresented = true
+            }
+            .keyboardShortcut("o", modifiers: [.command, .shift])
+            
+            Divider()
+            
+            Button("Form New Playlist") {
+                fileManager.fileOpenerPresentationStyle = .formNewPlaylist
+                fileManager.isFileOpenerPresented = true
+            }
+            .keyboardShortcut("o", modifiers: [.command, .shift, .option])
+        } label: {
+            ToolbarLabel {
+                Text("Open")
             }
         }
-        .background(.thinMaterial)
-        .clipShape(.buttonBorder)
+        
+        Menu {
+            Button("To Current Playlist") {
+                fileManager.fileAdderPresentationStyle = .toCurrentPlaylist
+                fileManager.isFileAdderPresented = true
+            }
+            .keyboardShortcut("p", modifiers: .command)
+            
+            Button("Replacing Current Playlist") {
+                fileManager.fileAdderPresentationStyle = .replacingCurrentPlaylist
+                fileManager.isFileAdderPresented = true
+            }
+            .keyboardShortcut("p", modifiers: [.command, .shift])
+            
+            Divider()
+            
+            Button("Form New Playlist") {
+                fileManager.fileAdderPresentationStyle = .formNewPlaylist
+                fileManager.isFileAdderPresented = true
+            }
+            .keyboardShortcut("p", modifiers: [.command, .shift, .option])
+        } label: {
+            ToolbarLabel {
+                Text("Add")
+            }
+        }
     }
 }
