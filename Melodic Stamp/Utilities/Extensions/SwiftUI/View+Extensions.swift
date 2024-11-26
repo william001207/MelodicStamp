@@ -13,11 +13,10 @@ extension View {
     }
     
     @ViewBuilder func fakeProgressiveBlur(
-        _ material: NSVisualEffectView.Material = .hudWindow,
         startPoint: UnitPoint, endPoint: UnitPoint, isActive: Bool = true
     ) -> some View {
         if isActive {
-            modifier(FakeProgressiveBlurViewModifier(material: material, startPoint: startPoint, endPoint: endPoint))
+            modifier(FakeProgressiveBlurViewModifier(startPoint: startPoint, endPoint: endPoint))
         } else {
             self
         }

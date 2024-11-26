@@ -51,7 +51,7 @@ struct MainView: View {
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                     .ignoresSafeArea()
                 }
-                .fakeProgressiveBlur(startPoint: .init(x: 0, y: 54 / size.height), endPoint: .init(x: 0, y: 16 / size.height))
+                .fakeProgressiveBlur(startPoint: .init(x: 0, y: 54 / size.height), endPoint: .init(x: 0, y: 22 / size.height))
             } else {
                 if selectedTabs.isEmpty {
                     EmptyMusicNoteView()

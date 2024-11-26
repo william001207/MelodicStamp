@@ -18,8 +18,58 @@ struct InspectorView: View {
         if metadataEditor.hasEditableMetadata {
             AutoScrollView(.vertical) {
                 VStack(spacing: 24) {
-                    coverEditor()
-                        .frame(maxWidth: .infinity)
+                    AutoScrollView(.horizontal) {
+                        HStack {
+                            coverEditor()
+                                .padding(16)
+                                .containerRelativeFrame(.horizontal, alignment: .center) { length, axis in
+                                    switch axis {
+                                    case .horizontal:
+                                        let maxLength: CGFloat = 300
+                                        return length / floor((length + maxLength) / maxLength)
+                                    case .vertical:
+                                        return length
+                                    }
+                                }
+                            
+                            Color.red
+                                .containerRelativeFrame(.horizontal, alignment: .center) { length, axis in
+                                    switch axis {
+                                    case .horizontal:
+                                        let maxLength: CGFloat = 300
+                                        return length / floor((length + maxLength) / maxLength)
+                                    case .vertical:
+                                        return length
+                                    }
+                                }
+                            
+                            Color.blue
+                                .containerRelativeFrame(.horizontal, alignment: .center) { length, axis in
+                                    switch axis {
+                                    case .horizontal:
+                                        let maxLength: CGFloat = 300
+                                        return length / floor((length + maxLength) / maxLength)
+                                    case .vertical:
+                                        return length
+                                    }
+                                }
+                            
+                            Color.yellow
+                                .containerRelativeFrame(.horizontal, alignment: .center) { length, axis in
+                                    switch axis {
+                                    case .horizontal:
+                                        let maxLength: CGFloat = 300
+                                        return length / floor((length + maxLength) / maxLength)
+                                    case .vertical:
+                                        return length
+                                    }
+                                }
+                        }
+                        .scrollTargetLayout()
+                    }
+                    .scrollTargetBehavior(.viewAligned)
+                    .padding(.horizontal, -16)
+                    .contentMargins(.horizontal, 16, for: .scrollIndicators)
                     
                     LabeledSection {
                         generalEditor()
@@ -40,9 +90,11 @@ struct InspectorView: View {
                     Spacer()
                 }
                 .padding(16)
+                
+                Spacer()
+                    .frame(height: 72)
             }
             .contentMargins(.top, 48)
-            .contentMargins(.bottom, 72)
         } else {
             InspectorExcerpt()
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -81,7 +133,7 @@ struct InspectorView: View {
                 }
             }
         case .varied(let valueSetter):
-            Color.blue
+            EmptyView()
         }
     }
     

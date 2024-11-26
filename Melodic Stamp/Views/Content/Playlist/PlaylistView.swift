@@ -69,8 +69,10 @@ struct PlaylistView: View {
                 }
             }
             .padding(8)
+            
+            Spacer()
+                .frame(height: 72)
         }
         .contentMargins(.top, 48)
-        .contentMargins(.bottom, 72)
     }
 }

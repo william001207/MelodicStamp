@@ -8,7 +8,6 @@
 import SwiftUI
 
 struct FakeProgressiveBlurViewModifier: ViewModifier {
-    var material: NSVisualEffectView.Material = .hudWindow
     var startPoint: UnitPoint, endPoint: UnitPoint
     
     @State private var opacity: CGFloat = .zero
@@ -18,7 +17,7 @@ struct FakeProgressiveBlurViewModifier: ViewModifier {
             content
                 .overlay {
                     Rectangle()
-                        .fill(.ultraThinMaterial)
+                        .fill(.regularMaterial)
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                         .mask {
                             LinearGradient(
