@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Luminare
 
 struct MainView: View {
     @Environment(\.appearsActive) private var isActive

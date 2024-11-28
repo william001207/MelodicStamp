@@ -152,7 +152,7 @@ struct InspectorView: View {
     }
     
     @ViewBuilder private func trackAndDiscEditor() -> some View {
-        LuminarePopover(arrowEdge: .top, trigger: .forceTouch()) {
+        LuminarePopover(arrowEdge: .top) {
             switch metadataEditor[extracting: \.bpm] {
             case .fine(let values):
                 LuminareStepper(
@@ -173,6 +173,7 @@ struct InspectorView: View {
         } badge: {
             LabeledTextField("BPM", value: metadataEditor[extracting: \.bpm], format: .number)
         }
+        .luminarePopoverTrigger(.forceTouch)
         
         HStack {
             LabeledTextField("No.", value: metadataEditor[extracting: \.trackNumber], format: .number, showsLabel: false)
