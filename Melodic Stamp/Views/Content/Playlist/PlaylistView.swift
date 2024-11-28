@@ -45,6 +45,14 @@ struct PlaylistView: View {
                 }
             } actions: {
                 Button {
+                    metadataEditor.items = []
+                } label: {
+                    Image(systemSymbol: .xmark)
+                }
+                .disabled(!metadataEditor.hasEditableMetadata)
+                .aspectRatio(1, contentMode: .fit)
+                
+                Button {
                     let hasShift = NSEvent.modifierFlags.contains(.shift)
                     player.playbackMode = player.playbackMode.cycle(negate: hasShift)
                 } label: {

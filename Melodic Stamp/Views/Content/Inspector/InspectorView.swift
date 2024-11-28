@@ -21,7 +21,7 @@ struct InspectorView: View {
                     AutoScrollView(.horizontal) {
                         HStack {
                             coverEditor()
-                                .padding(16)
+                                .padding(.horizontal, 16)
                                 .containerRelativeFrame(.horizontal, alignment: .center) { length, axis in
                                     switch axis {
                                     case .horizontal:
@@ -89,7 +89,8 @@ struct InspectorView: View {
                     
                     Spacer()
                 }
-                .padding(16)
+                .padding(.horizontal, 16)
+                .padding(.top, 4)
                 
                 Spacer()
                     .frame(height: 72)
