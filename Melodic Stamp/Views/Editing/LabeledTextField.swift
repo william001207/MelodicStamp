@@ -85,22 +85,25 @@ struct LabeledTextField<F, Label>: View where F: ParseableFormatStyle, F.FormatO
             }
         }
         .animation(animation, value: isActive)
+        .onChange(of: value) { oldValue, newValue in
+            switch newValue {
+            case .fine(let values):
+                guard isEmpty(value: values.current) else { return }
+                values.current = nil
+            default:
+                break
+            }
+        }
     }
     
     private var isActive: Bool {
         switch value {
         case .undefined:
-            return false
+            false
         case .fine(let values):
-            guard let current = values.current else { return false }
-            return if let current = current as? String {
-                // empty strings are empty too, as placeholders will display
-                !current.isEmpty
-            } else {
-                true
-            }
+            !isEmpty(value: values.current)
         case .varied:
-            return false
+            false
         }
     }
     
@@ -162,5 +165,15 @@ struct LabeledTextField<F, Label>: View where F: ParseableFormatStyle, F.FormatO
     
     @ViewBuilder private func varied(setter: EditableMetadata.ValueSetter<F.FormatInput?>) -> some View {
         Color.blue
+    }
+    
+    private func isEmpty(value: F.FormatInput?) -> Bool {
+        guard let value else { return true }
+        return if let value = value as? String {
+            // empty strings are empty too, as placeholders will display
+            value.isEmpty
+        } else {
+            false
+        }
     }
 }

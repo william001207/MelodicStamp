@@ -7,13 +7,13 @@
 
 import SwiftUI
 
-enum MetadataValueState<V: Equatable> {
+enum MetadataValueState<V: Equatable>: Equatable {
     case undefined
     case fine(EditableMetadata.Values<V>)
     case varied(EditableMetadata.ValueSetter<V>)
 }
 
-enum MetadataEditingState {
+enum MetadataEditingState: Equatable {
     case fine
     case partialSaving
     case saving

@@ -9,7 +9,7 @@ import SwiftUI
 @preconcurrency import CSFBAudioEngine
 
 @Observable final class EditableMetadata: Identifiable, Sendable {
-    struct Values<V: Equatable> {
+    struct Values<V: Equatable>: Equatable {
         let keyPath: WritableKeyPath<Metadata, V>
         let metadata: EditableMetadata
         
@@ -44,7 +44,7 @@ import SwiftUI
         }
     }
     
-    struct ValueSetter<V> {
+    struct ValueSetter<V>: Equatable {
         let keyPath: WritableKeyPath<Metadata, V>
         let editableMetadatas: Set<EditableMetadata>
         
