@@ -39,30 +39,22 @@ enum FileAdderPresentationStyle {
     func open(url: URL, using player: PlayerModel) {
         switch fileOpenerPresentationStyle {
         case .inCurrentPlaylist:
-            Task.detached {
-                try await player.play(url: url)
-            }
+            player.play(url: url)
         case .replacingCurrentPlaylistOrSelection:
             player.removeAll()
-            Task.detached {
-                try await player.play(url: url)
-            }
+            player.play(url: url)
         case .formingNewPlaylist:
             break
         }
     }
     
-    func add(urls: [URL], using player: PlayerModel) {
+    func add(urls: [URL], to player: PlayerModel) {
         switch fileAdderPresentationStyle {
         case .toCurrentPlaylist:
-            Task.detached {
-                try await player.addToPlaylist(urls: urls)
-            }
+            player.addToPlaylist(urls: urls)
         case .replacingCurrentPlaylistOrSelection:
             player.removeAll()
-            Task.detached {
-                try await player.addToPlaylist(urls: urls)
-            }
+            player.addToPlaylist(urls: urls)
         case .formingNewPlaylist:
             break
         }

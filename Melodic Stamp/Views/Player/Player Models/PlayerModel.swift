@@ -222,19 +222,19 @@ enum PlaybackMode: String, CaseIterable, Identifiable {
         }
     }
     
-    func play(url: URL) async throws {
-        try await addToPlaylist(urls: [url])
+    func play(url: URL) {
+        addToPlaylist(urls: [url])
         
         if let item = playlist.first(where: { $0.url == url }) {
             play(item: item)
         }
     }
     
-    func addToPlaylist(urls: [URL]) async throws {
+    func addToPlaylist(urls: [URL]) {
         for url in urls {
             guard !playlist.contains(where: { $0.url == url }) else { continue }
             
-            if let item = try await PlaylistItem(url: url) {
+            if let item = PlaylistItem(url: url) {
                 addToPlaylist(items: [item])
             }
         }

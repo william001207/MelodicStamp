@@ -14,10 +14,10 @@ struct PlaylistItem: Identifiable {
     let url: URL
     @State var editableMetadata: EditableMetadata
 
-    init?(url: URL) async throws {
+    init?(url: URL) {
         self.url = url
         
-        guard let metadata = try await EditableMetadata(url: url) else { return nil }
+        guard let metadata = EditableMetadata(url: url) else { return nil }
         self.editableMetadata = metadata
     }
 

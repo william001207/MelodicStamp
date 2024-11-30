@@ -47,14 +47,13 @@ struct PlaylistItemView: View {
                                 }
                             }
                     }
-                    .overlay {
-                        if isHovering {
-                            Image(systemSymbol: .playFill)
-                                .font(.title3)
-                                .foregroundStyle(.white)
-                        }
-                    }
                     .clipShape(.rect(cornerRadius: 8))
+                    
+                    if isHovering {
+                        Image(systemSymbol: .playFill)
+                            .font(.title3)
+                            .foregroundStyle(.white)
+                    }
                 }
                 .frame(width: 32, height: 32)
             }

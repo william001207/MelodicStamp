@@ -33,7 +33,7 @@ struct FileImporters: View {
             ) { result in
                 switch result {
                 case .success(let urls):
-                    fileManager.add(urls: urls, using: player)
+                    fileManager.add(urls: urls, to: player)
                 case .failure:
                     break
                 }

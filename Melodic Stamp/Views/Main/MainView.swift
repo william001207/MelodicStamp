@@ -35,9 +35,6 @@ struct MainView: View {
             VisualEffectView(
                 material: .contentBackground, blendingMode: .behindWindow)
 
-            FileImporters(fileManager: fileManager, player: player)
-                .allowsHitTesting(false)
-
             if !player.isPlaylistEmpty {
                 let morphedGradient = LinearGradient(
                     colors: [.white, .black], startPoint: .top,

@@ -61,6 +61,10 @@ struct ContentView: View {
                     }
             }
         }
+        .background {
+            FileImporters(fileManager: fileManager, player: player)
+                .allowsHitTesting(false)
+        }
         .onAppear {
             floatingWindows.observeFullScreen()
         }

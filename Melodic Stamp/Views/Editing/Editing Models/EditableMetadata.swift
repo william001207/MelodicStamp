@@ -54,6 +54,7 @@ import SwiftUI
     }
     
     enum State {
+        case loading
         case fine
         case saving
         
@@ -74,15 +75,18 @@ import SwiftUI
     var current: Metadata
     private(set) var initial: Metadata
     
-    var state: State = .fine
+    private(set) var state: State = .loading
     
-    init?(url: URL) async throws {
+    init?(url: URL) {
         self.url = url
         self.current = .init()
         self.initial = .init()
         self.properties = .init()
         
-        try await self.update()
+        Task.detached {
+            try await self.update()
+            self.state = .fine
+        }
     }
     
     var isModified: Bool {
