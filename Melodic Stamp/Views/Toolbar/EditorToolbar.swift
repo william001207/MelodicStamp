@@ -22,7 +22,7 @@ struct EditorToolbar: View {
                         .imageScale(.small)
                     
                     Text("Save")
-                case .partialSaving, .saving:
+                case .partiallySaving, .saving:
                     ProgressView()
                         .progressViewStyle(.circular)
                         .controlSize(.small)
@@ -31,7 +31,7 @@ struct EditorToolbar: View {
                 }
             }
         }
-        .disabled(!metadataEditor.state.isAvailable)
+        .disabled(!metadataEditor.state.isEditable)
         
         Button {
             metadataEditor.revertAll()

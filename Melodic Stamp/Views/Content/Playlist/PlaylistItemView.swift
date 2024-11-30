@@ -17,11 +17,30 @@ struct PlaylistItemView: View {
     
     var body: some View {
         HStack(alignment: .center) {
+            let isMetadataLoaded = item.editableMetadata.state.isLoaded
+            let isMetadataModified = item.editableMetadata.isModified
+            
             VStack(alignment: .leading) {
-                MarqueeScrollView(animate: false) {
-                    MusicTitle(item: item)
-                        .font(.title3)
+                HStack {
+                    if isMetadataModified {
+                        Image(systemSymbol: .pencilLine)
+                            .bold()
+                            .foregroundStyle(.tint)
+                    }
+                    
+                    if isMetadataLoaded {
+                        MarqueeScrollView(animate: false) {
+                            MusicTitle(item: item)
+                        }
+                    } else {
+                        Text("Loading…")
+                            .foregroundStyle(.placeholder)
+                    }
                 }
+                .font(.title3)
+                .transition(.blurReplace)
+                .animation(.default, value: isMetadataLoaded)
+                .animation(.default, value: isMetadataModified)
                 
                 Text(item.url.lastPathComponent)
                     .font(.caption)
@@ -34,32 +53,36 @@ struct PlaylistItemView: View {
                 player.play(item: item)
             } label: {
                 ZStack {
-                    Group {
-                        let values = item.editableMetadata[extracting: \.coverImages]
-                        
-                        MusicCover(cornerRadius: 0, coverImages: values.current)
-                            .frame(maxWidth: .infinity)
-                            .overlay {
-                                if isHovering {
-                                    Color.black
-                                        .opacity(0.35)
-                                        .blendMode(.darken)
+                    if isMetadataLoaded {
+                        Group {
+                            let values = item.editableMetadata[extracting: \.coverImages]
+                            
+                            MusicCover(cornerRadius: 0, coverImages: values.current)
+                                .frame(maxWidth: .infinity)
+                                .overlay {
+                                    if isHovering {
+                                        Color.black
+                                            .opacity(0.35)
+                                            .blendMode(.darken)
+                                    }
                                 }
-                            }
+                        }
+                        .clipShape(.rect(cornerRadius: 6))
                     }
-                    .clipShape(.rect(cornerRadius: 8))
                     
                     if isHovering {
-                        Image(systemSymbol: .playFill)
+                        Image(systemSymbol: isMetadataLoaded ? .playFill : .playSlashFill)
                             .font(.title3)
                             .foregroundStyle(.white)
+                            .contentTransition(.symbolEffect(.replace))
                     }
                 }
-                .frame(width: 32, height: 32)
+                .frame(width: 40, height: 40)
             }
         }
         .padding(.vertical, 10)
-        .padding(.horizontal, 16)
+        .padding(.leading, 12)
+        .padding(.trailing, 6)
         .onHover { hover in
             withAnimation(.default.speed(5)) {
                 isHovering = hover

@@ -8,6 +8,7 @@
 import SwiftUI
 import AppKit
 import CSFBAudioEngine
+import Luminare
 
 struct PlaylistItem: Identifiable {
     let id = UUID()
@@ -46,5 +47,11 @@ extension PlaylistItem: Equatable {
 extension PlaylistItem: Hashable {
     func hash(into hasher: inout Hasher) {
         hasher.combine(id)
+    }
+}
+
+extension PlaylistItem: LuminareSelectionData {
+    var isSelectable: Bool {
+        editableMetadata.state.isLoaded
     }
 }

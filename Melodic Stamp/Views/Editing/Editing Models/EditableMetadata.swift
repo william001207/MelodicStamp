@@ -58,12 +58,21 @@ import SwiftUI
         case fine
         case saving
         
-        var isAvailable: Bool {
+        var isEditable: Bool {
             switch self {
             case .fine:
                 true
             default:
                 false
+            }
+        }
+        
+        var isLoaded: Bool {
+            switch self {
+            case .loading:
+                false
+            default:
+                true
             }
         }
     }
@@ -109,6 +118,7 @@ import SwiftUI
             
             do {
                 let file = try AudioFile(readingPropertiesAndMetadataFrom: url)
+                self.state = .fine
                 self.current = .init(from: file.metadata)
                 self.initial = self.current
                 print("Updated metadata from \(self.url)")
@@ -122,7 +132,7 @@ import SwiftUI
     
     func write() async throws {
         return try await withCheckedThrowingContinuation { [weak self] continuation in
-            guard let self, self.isModified else { return continuation.resume() }
+            guard let self, self.state.isEditable && self.isModified else { return continuation.resume() }
             guard self.url.startAccessingSecurityScopedResource() else { return }
             defer { self.url.stopAccessingSecurityScopedResource() }
             

@@ -15,10 +15,10 @@ enum MetadataValueState<V: Equatable>: Equatable {
 
 enum MetadataEditingState: Equatable {
     case fine
-    case partialSaving
+    case partiallySaving
     case saving
     
-    var isAvailable: Bool {
+    var isEditable: Bool {
         switch self {
         case .fine:
             true
@@ -43,12 +43,12 @@ enum MetadataEditingState: Equatable {
     
     var state: MetadataEditingState {
         let states = editableMetadatas.map(\.state)
-        return if states.allSatisfy({ $0 == .fine }) {
+        return if states.allSatisfy(\.isEditable) {
             .fine
-        } else if states.allSatisfy({ $0 == .saving }) {
+        } else if states.allSatisfy({ !$0.isEditable }) {
             .saving
         } else {
-            .partialSaving
+            .partiallySaving
         }
     }
     

@@ -16,6 +16,7 @@ struct MusicCover: View {
             if let image = coverImages.first {
                 Image(nsImage: image)
                     .resizable()
+                    .interpolation(.medium)
                     .aspectRatio(contentMode: .fit)
             } else {
                 Color.clear
