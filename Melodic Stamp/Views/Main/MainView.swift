@@ -5,61 +5,109 @@
 //  Created by Xinshao_Air on 2024/11/22.
 //
 
-import SwiftUI
 import Luminare
+import Morphed
+import SwiftUI
 
 struct MainView: View {
     @Environment(\.appearsActive) private var isActive
-    
+
     @Bindable var player: PlayerModel
-    
+
     @Binding var selectedTabs: Set<SidebarTab>
-    
+
     @State private var metadataEditor: MetadataEditorModel = .init()
     @State private var fileManager: FileManagerModel = .init()
-    
+
     @State private var size: CGSize = .zero
-    
+
     var body: some View {
         // use `ZStack` to eliminate safe area animation problems
         ZStack {
-            VisualEffectView(material: .contentBackground, blendingMode: .behindWindow)
-            
+            VisualEffectView(
+                material: .contentBackground, blendingMode: .behindWindow)
+
             fileImporters()
                 .allowsHitTesting(false)
-            
+
             if !player.isPlaylistEmpty {
+                let morphedGradient = LinearGradient(
+                    colors: [.white, .black], startPoint: .top,
+                    endPoint: .bottom)
+
                 HSplitView {
-                    ForEach(Array(selectedTabs).sorted { $0.order < $1.order }) { tab in
+                    ForEach(Array(selectedTabs).sorted { $0.order < $1.order })
+                    { tab in
                         switch tab {
                         case .playlist:
-                            PlaylistView(player: player, metadataEditor: metadataEditor)
-                                .frame(minWidth: 400)
-                                .background {
-                                    VisualEffectView(material: .popover, blendingMode: .behindWindow)
-                                }
+                            PlaylistView(
+                                player: player, metadataEditor: metadataEditor
+                            )
+                            .frame(minWidth: 400)
+                            .ignoresSafeArea()
+
+                            .morphed(
+                                insets: .init(
+                                    bottom: .fixed(length: 72).mirrored),
+                                morphedGradient
+                            )
+                            .ignoresSafeArea()
+
+                            .background {
+                                VisualEffectView(
+                                    material: .popover,
+                                    blendingMode: .behindWindow)
+                            }
                         case .inspector:
-                            InspectorView(player: player, metadataEditor: metadataEditor)
-                                .frame(minWidth: 250)
-                                .background {
-                                    VisualEffectView(material: .headerView, blendingMode: .behindWindow)
-                                }
+                            InspectorView(
+                                player: player, metadataEditor: metadataEditor
+                            )
+                            .frame(minWidth: 250)
+                            .ignoresSafeArea()
+
+                            .morphed(
+                                insets: .init(
+                                    bottom: .fixed(length: 72).mirrored),
+                                morphedGradient
+                            )
+                            .ignoresSafeArea()
+
+                            .background {
+                                VisualEffectView(
+                                    material: .headerView,
+                                    blendingMode: .behindWindow)
+                            }
                         case .metadata:
                             MetadataView()
                                 .frame(minWidth: 250)
+                                .ignoresSafeArea()
+
+                                .morphed(
+                                    insets: .init(
+                                        bottom: .fixed(length: 72).mirrored),
+                                    morphedGradient
+                                )
+                                .ignoresSafeArea()
+
+                                .background {
+                                    VisualEffectView(
+                                        material: .headerView,
+                                        blendingMode: .behindWindow)
+                                }
                         }
                     }
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
                     .ignoresSafeArea()
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
                 }
-                .fakeProgressiveBlur(startPoint: .init(x: 0, y: 54 / size.height), endPoint: .init(x: 0, y: 22 / size.height))
             } else {
                 if selectedTabs.isEmpty {
                     EmptyMusicNoteView()
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                 } else {
                     HStack(alignment: .top) {
-                        ForEach(Array(selectedTabs).sorted { $0.order < $1.order }) { tab in
+                        ForEach(
+                            Array(selectedTabs).sorted { $0.order < $1.order }
+                        ) { tab in
                             switch tab {
                             case .playlist:
                                 PlaylistExcerpt()
@@ -82,7 +130,7 @@ struct MainView: View {
         } action: { size in
             self.size = size
         }
-        
+
         // toolbar
         .toolbar {
             // at least to preserve the titlebar style
@@ -92,7 +140,7 @@ struct MainView: View {
             ToolbarItemGroup(placement: .navigation) {
                 FileToolbar(player: player, fileManager: fileManager)
             }
-            
+
             if isEditorToolbarPresented {
                 ToolbarItemGroup(placement: .primaryAction) {
                     EditorToolbar(metadataEditor: metadataEditor)
@@ -100,13 +148,14 @@ struct MainView: View {
             }
         }
     }
-    
+
     private var isEditorToolbarPresented: Bool {
-        let hasEditor = !selectedTabs.intersection([.inspector, .metadata]).isEmpty
+        let hasEditor = !selectedTabs.intersection([.inspector, .metadata])
+            .isEmpty
         let hasPlaylist = !player.isPlaylistEmpty
         return hasEditor && hasPlaylist
     }
-    
+
     @ViewBuilder private func fileImporters() -> some View {
         Color.clear
             .fileImporter(
@@ -129,7 +178,7 @@ struct MainView: View {
                     break
                 }
             }
-        
+
         Color.clear
             .fileImporter(
                 isPresented: $fileManager.isFileAdderPresented,
@@ -156,8 +205,9 @@ struct MainView: View {
 }
 
 #Preview {
-    @Previewable @State var selectedTabs: Set<SidebarTab> = .init(SidebarTab.allCases)
-    
+    @Previewable @State var selectedTabs: Set<SidebarTab> = .init(
+        SidebarTab.allCases)
+
     MainView(player: .init(), selectedTabs: $selectedTabs)
         .frame(minWidth: 1000, minHeight: 600)
 }

@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2810E2452CFB169E006FF94A /* Morphed in Frameworks */ = {isa = PBXBuildFile; productRef = 2810E2442CFB169E006FF94A /* Morphed */; };
 		287F978D2CF3160700C60307 /* Luminare in Frameworks */ = {isa = PBXBuildFile; productRef = 287F978C2CF3160700C60307 /* Luminare */; };
 		65F1DA7D2CED77F100389E37 /* SFBAudioEngine in Frameworks */ = {isa = PBXBuildFile; productRef = 65F1DA7C2CED77F100389E37 /* SFBAudioEngine */; };
 		65F1DA842CED788D00389E37 /* CAAudioHardware in Frameworks */ = {isa = PBXBuildFile; productRef = 65F1DA832CED788D00389E37 /* CAAudioHardware */; };
@@ -32,6 +33,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2810E2452CFB169E006FF94A /* Morphed in Frameworks */,
 				65F1DAB32CEDBED700389E37 /* SFSafeSymbols in Frameworks */,
 				287F978D2CF3160700C60307 /* Luminare in Frameworks */,
 				65F1DA9D2CEDBD8700389E37 /* Defaults in Frameworks */,
@@ -86,6 +88,7 @@
 				65F1DA9C2CEDBD8700389E37 /* Defaults */,
 				65F1DAB22CEDBED700389E37 /* SFSafeSymbols */,
 				287F978C2CF3160700C60307 /* Luminare */,
+				2810E2442CFB169E006FF94A /* Morphed */,
 			);
 			productName = MelodicStamp;
 			productReference = 65F1DA012CECCEE900389E37 /* Melodic Stamp.app */;
@@ -123,6 +126,7 @@
 				65F1DA9B2CEDBD8700389E37 /* XCRemoteSwiftPackageReference "Defaults" */,
 				65F1DAB12CEDBED700389E37 /* XCRemoteSwiftPackageReference "SFSafeSymbols" */,
 				287F978B2CF3160600C60307 /* XCRemoteSwiftPackageReference "Luminare" */,
+				2810E2432CFB169E006FF94A /* XCRemoteSwiftPackageReference "Morphed" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 65F1DA022CECCEE900389E37 /* Products */;
@@ -353,6 +357,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		2810E2432CFB169E006FF94A /* XCRemoteSwiftPackageReference "Morphed" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Cement-Labs/Morphed";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
 		287F978B2CF3160600C60307 /* XCRemoteSwiftPackageReference "Luminare" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/Cement-Labs/Luminare";
@@ -404,6 +416,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		2810E2442CFB169E006FF94A /* Morphed */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 2810E2432CFB169E006FF94A /* XCRemoteSwiftPackageReference "Morphed" */;
+			productName = Morphed;
+		};
 		287F978C2CF3160700C60307 /* Luminare */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 287F978B2CF3160600C60307 /* XCRemoteSwiftPackageReference "Luminare" */;

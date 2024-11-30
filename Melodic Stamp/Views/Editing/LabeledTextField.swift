@@ -85,15 +85,6 @@ struct LabeledTextField<F, Label>: View where F: ParseableFormatStyle, F.FormatO
             }
         }
         .animation(animation, value: isActive)
-        .onChange(of: value) { oldValue, newValue in
-            switch newValue {
-            case .fine(let values):
-                guard isEmpty(value: values.current) else { return }
-                values.current = nil
-            default:
-                break
-            }
-        }
     }
     
     private var isActive: Bool {
