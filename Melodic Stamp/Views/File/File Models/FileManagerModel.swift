@@ -32,7 +32,7 @@ enum FileAdderPresentationStyle {
     }
     
     func emitAdd(style: FileAdderPresentationStyle = .toCurrentPlaylist) {
-        isFileOpenerPresented = true
+        isFileAdderPresented = true
         fileAdderPresentationStyle = style
     }
     
