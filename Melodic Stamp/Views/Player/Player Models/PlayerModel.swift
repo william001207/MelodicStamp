@@ -235,8 +235,15 @@ enum PlaybackMode: String, CaseIterable, Identifiable {
             guard !playlist.contains(where: { $0.url == url }) else { continue }
             
             if let item = try await PlaylistItem(url: url) {
-                playlist.append(item)
+                addToPlaylist(items: [item])
             }
+        }
+    }
+    
+    func addToPlaylist(items: [PlaylistItem]) {
+        for item in items {
+            guard !playlist.contains(item) else { continue }
+            playlist.append(item)
         }
     }
     
@@ -249,6 +256,14 @@ enum PlaybackMode: String, CaseIterable, Identifiable {
                 playlist.remove(at: index)
             }
         }
+    }
+    
+    func removeFromPlaylist(items: [PlaylistItem]) {
+        removeFromPlaylist(urls: items.map(\.url))
+    }
+    
+    func removeAll() {
+        removeFromPlaylist(items: playlist)
     }
     
     func updateDeviceMenu() {

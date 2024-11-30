@@ -23,7 +23,7 @@ struct FileToolbar: View {
             .keyboardShortcut("o", modifiers: .command)
             
             Button {
-                fileManager.emitOpen(style: .replacingCurrentPlaylist)
+                fileManager.emitOpen(style: .replacingCurrentPlaylistOrSelection)
             } label: {
                 Image(systemSymbol: .textInsert)
                 Text("Replacing Current Playlist")
@@ -55,7 +55,7 @@ struct FileToolbar: View {
             .keyboardShortcut("p", modifiers: .command)
             
             Button {
-                fileManager.emitAdd(style: .replacingCurrentPlaylist)
+                fileManager.emitAdd(style: .replacingCurrentPlaylistOrSelection)
             } label: {
                 Image(systemSymbol: .textInsert)
                 Text("Replacing Current Playlist")

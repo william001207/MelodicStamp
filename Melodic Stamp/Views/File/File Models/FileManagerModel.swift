@@ -9,13 +9,13 @@ import SwiftUI
 
 enum FileOpenerPresentationStyle {
     case inCurrentPlaylist
-    case replacingCurrentPlaylist
+    case replacingCurrentPlaylistOrSelection
     case formingNewPlaylist
 }
 
 enum FileAdderPresentationStyle {
     case toCurrentPlaylist
-    case replacingCurrentPlaylist
+    case replacingCurrentPlaylistOrSelection
     case formingNewPlaylist
 }
 
@@ -42,8 +42,11 @@ enum FileAdderPresentationStyle {
             Task.detached {
                 try await player.play(url: url)
             }
-        case .replacingCurrentPlaylist:
-            break
+        case .replacingCurrentPlaylistOrSelection:
+            player.removeAll()
+            Task.detached {
+                try await player.play(url: url)
+            }
         case .formingNewPlaylist:
             break
         }
@@ -55,8 +58,11 @@ enum FileAdderPresentationStyle {
             Task.detached {
                 try await player.addToPlaylist(urls: urls)
             }
-        case .replacingCurrentPlaylist:
-            break
+        case .replacingCurrentPlaylistOrSelection:
+            player.removeAll()
+            Task.detached {
+                try await player.addToPlaylist(urls: urls)
+            }
         case .formingNewPlaylist:
             break
         }

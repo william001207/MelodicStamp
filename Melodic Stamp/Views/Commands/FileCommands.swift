@@ -19,7 +19,7 @@ struct FileCommands: Commands {
                 .keyboardShortcut("o", modifiers: .command)
                 
                 Button("Replacing Current Playlist") {
-                    fileManager?.emitOpen(style: .replacingCurrentPlaylist)
+                    fileManager?.emitOpen(style: .replacingCurrentPlaylistOrSelection)
                 }
                 .keyboardShortcut("o", modifiers: [.command, .shift])
                 
@@ -39,7 +39,7 @@ struct FileCommands: Commands {
                 .keyboardShortcut("p", modifiers: .command)
                 
                 Button("Replacing Current Playlist") {
-                    fileManager?.emitAdd(style: .replacingCurrentPlaylist)
+                    fileManager?.emitAdd(style: .replacingCurrentPlaylistOrSelection)
                 }
                 .keyboardShortcut("p", modifiers: [.command, .shift])
                 
