@@ -37,13 +37,12 @@ struct EditorToolbar: View {
             metadataEditor.revertAll()
         } label: {
             ToolbarLabel {
-                Image(systemSymbol: .clockArrowCirclepath)
+                Image(systemSymbol: .arrowUturnLeft)
                     .imageScale(.small)
                 
                 Text("Revert")
             }
             .foregroundStyle(.red)
         }
-        .disabled(!metadataEditor.state.isAvailable)
     }
 }

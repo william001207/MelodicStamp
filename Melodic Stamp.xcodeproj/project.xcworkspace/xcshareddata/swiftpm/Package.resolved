@@ -124,7 +124,7 @@
       "location" : "https://github.com/Cement-Labs/Luminare",
       "state" : {
         "branch" : "environments",
-        "revision" : "e276c1434f6b9ed688d1586acd42466351ca0cdf"
+        "revision" : "acd6a0aa885678b0bd93dd9ee66c1620f27927dc"
       }
     },
     {
@@ -133,7 +133,7 @@
       "location" : "https://github.com/Cement-Labs/Morphed",
       "state" : {
         "branch" : "main",
-        "revision" : "2bb491b2f3c9f6564ac3e9b40dd387b30f84d047"
+        "revision" : "94cedd8703af64eceb75c0d3279aa5d82149cb56"
       }
     },
     {

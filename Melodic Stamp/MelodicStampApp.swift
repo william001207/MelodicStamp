@@ -13,11 +13,14 @@ import UniformTypeIdentifiers
 struct MelodicStampApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     
-    @Environment(\.openWindow) var openWindow
+    @Environment(\.openWindow) private var openWindow
     
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .onAppear {
+                    NSWindow.allowsAutomaticWindowTabbing = false
+                }
         }
         .windowResizability(.contentSize)
         .windowStyle(.titleBar)

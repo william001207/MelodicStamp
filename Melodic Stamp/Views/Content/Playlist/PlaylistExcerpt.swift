@@ -9,7 +9,17 @@ import SwiftUI
 
 struct PlaylistExcerpt: View {
     var body: some View {
-        EmptyMusicNoteView(systemSymbol: SidebarTab.playlist.systemSymbol)
+        VStack {
+            EmptyMusicNoteView(systemSymbol: SidebarTab.playlist.systemSymbol)
+                .frame(height: 64)
+                .alignmentGuide(ExcerptAlignment.alignment) { d in
+                    d[.bottom]
+                }
+            
+            Text("Playlist")
+                .font(.title3)
+                .foregroundStyle(.quaternary)
+        }
     }
 }
 

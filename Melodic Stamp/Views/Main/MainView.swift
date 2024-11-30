@@ -9,15 +9,23 @@ import Luminare
 import Morphed
 import SwiftUI
 
+struct ExcerptAlignment: AlignmentID {
+    static func defaultValue(in context: ViewDimensions) -> CGFloat {
+        context[.bottom]
+    }
+    
+    static let alignment: VerticalAlignment = .init(ExcerptAlignment.self)
+}
+
 struct MainView: View {
     @Environment(\.appearsActive) private var isActive
 
+    @Bindable var fileManager: FileManagerModel
     @Bindable var player: PlayerModel
 
     @Binding var selectedTabs: Set<SidebarTab>
 
     @State private var metadataEditor: MetadataEditorModel = .init()
-    @State private var fileManager: FileManagerModel = .init()
 
     @State private var size: CGSize = .zero
 
@@ -27,7 +35,7 @@ struct MainView: View {
             VisualEffectView(
                 material: .contentBackground, blendingMode: .behindWindow)
 
-            fileImporters()
+            FileImporters(fileManager: fileManager, player: player)
                 .allowsHitTesting(false)
 
             if !player.isPlaylistEmpty {
@@ -48,7 +56,7 @@ struct MainView: View {
 
                             .morphed(
                                 insets: .init(
-                                    bottom: .fixed(length: 72).mirrored),
+                                    bottom: .fixed(length: 64).mirrored),
                                 morphedGradient
                             )
                             .ignoresSafeArea()
@@ -67,7 +75,7 @@ struct MainView: View {
 
                             .morphed(
                                 insets: .init(
-                                    bottom: .fixed(length: 72).mirrored),
+                                    bottom: .fixed(length: 64).mirrored),
                                 morphedGradient
                             )
                             .ignoresSafeArea()
@@ -84,7 +92,7 @@ struct MainView: View {
 
                                 .morphed(
                                     insets: .init(
-                                        bottom: .fixed(length: 72).mirrored),
+                                        bottom: .fixed(length: 64).mirrored),
                                     morphedGradient
                                 )
                                 .ignoresSafeArea()
@@ -104,7 +112,7 @@ struct MainView: View {
                     EmptyMusicNoteView()
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                 } else {
-                    HStack(alignment: .top) {
+                    HStack(alignment: ExcerptAlignment.alignment) {
                         ForEach(
                             Array(selectedTabs).sorted { $0.order < $1.order }
                         ) { tab in
@@ -139,11 +147,15 @@ struct MainView: View {
         .toolbar {
             ToolbarItemGroup(placement: .navigation) {
                 FileToolbar(player: player, fileManager: fileManager)
+                    .background(.ultraThinMaterial)
+                    .clipShape(.buttonBorder)
             }
 
             if isEditorToolbarPresented {
                 ToolbarItemGroup(placement: .primaryAction) {
                     EditorToolbar(metadataEditor: metadataEditor)
+                        .background(.ultraThinMaterial)
+                        .clipShape(.buttonBorder)
                 }
             }
         }
@@ -155,59 +167,12 @@ struct MainView: View {
         let hasPlaylist = !player.isPlaylistEmpty
         return hasEditor && hasPlaylist
     }
-
-    @ViewBuilder private func fileImporters() -> some View {
-        Color.clear
-            .fileImporter(
-                isPresented: $fileManager.isFileOpenerPresented,
-                allowedContentTypes: allowedContentTypes
-            ) { result in
-                switch result {
-                case .success(let url):
-                    switch fileManager.fileOpenerPresentationStyle {
-                    case .inCurrentPlaylist:
-                        Task.detached {
-                            try await player.play(url: url)
-                        }
-                    case .replacingCurrentPlaylist:
-                        break
-                    case .formNewPlaylist:
-                        break
-                    }
-                case .failure:
-                    break
-                }
-            }
-
-        Color.clear
-            .fileImporter(
-                isPresented: $fileManager.isFileAdderPresented,
-                allowedContentTypes: allowedContentTypes,
-                allowsMultipleSelection: true
-            ) { result in
-                switch result {
-                case .success(let urls):
-                    switch fileManager.fileAdderPresentationStyle {
-                    case .toCurrentPlaylist:
-                        Task.detached {
-                            try await player.addToPlaylist(urls: urls)
-                        }
-                    case .replacingCurrentPlaylist:
-                        break
-                    case .formNewPlaylist:
-                        break
-                    }
-                case .failure:
-                    break
-                }
-            }
-    }
 }
 
 #Preview {
     @Previewable @State var selectedTabs: Set<SidebarTab> = .init(
         SidebarTab.allCases)
 
-    MainView(player: .init(), selectedTabs: $selectedTabs)
+    MainView(fileManager: .init(), player: .init(), selectedTabs: $selectedTabs)
         .frame(minWidth: 1000, minHeight: 600)
 }

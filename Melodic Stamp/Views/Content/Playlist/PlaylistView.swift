@@ -75,7 +75,6 @@ struct PlaylistView: View {
                 Image(systemSymbol: .trashFill)
             }
             .luminareBordered(false)
-            .luminareMinHeight(54)
             .luminareButtonCornerRadius(8)
             
             Spacer()

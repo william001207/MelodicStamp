@@ -14,54 +14,66 @@ struct FileToolbar: View {
     
     var body: some View {
         Menu {
-            Button("In Current Playlist") {
-                fileManager.fileOpenerPresentationStyle = .inCurrentPlaylist
-                fileManager.isFileOpenerPresented = true
+            Button {
+                fileManager.emitOpen(style: .inCurrentPlaylist)
+            } label: {
+                Image(systemSymbol: .textLineLastAndArrowtriangleForward)
+                Text("In Current Playlist")
             }
             .keyboardShortcut("o", modifiers: .command)
             
-            Button("Replacing Current Playlist") {
-                fileManager.fileOpenerPresentationStyle = .replacingCurrentPlaylist
-                fileManager.isFileOpenerPresented = true
+            Button {
+                fileManager.emitOpen(style: .replacingCurrentPlaylist)
+            } label: {
+                Image(systemSymbol: .textInsert)
+                Text("Replacing Current Playlist")
             }
             .keyboardShortcut("o", modifiers: [.command, .shift])
             
             Divider()
             
-            Button("Form New Playlist") {
-                fileManager.fileOpenerPresentationStyle = .formNewPlaylist
-                fileManager.isFileOpenerPresented = true
+            Button {
+                fileManager.emitOpen(style: .formingNewPlaylist)
+            } label: {
+                Image(systemSymbol: .textBadgePlus)
+                Text("Forming New Playlist")
             }
             .keyboardShortcut("o", modifiers: [.command, .shift, .option])
         } label: {
             ToolbarLabel {
-                Text("Open")
+                Image(systemSymbol: .playFill)
             }
         }
         
         Menu {
-            Button("To Current Playlist") {
-                fileManager.fileAdderPresentationStyle = .toCurrentPlaylist
-                fileManager.isFileAdderPresented = true
+            Button {
+                fileManager.emitAdd(style: .toCurrentPlaylist)
+            } label: {
+                Image(systemSymbol: .textLineLastAndArrowtriangleForward)
+                Text("To Current Playlist")
             }
             .keyboardShortcut("p", modifiers: .command)
             
-            Button("Replacing Current Playlist") {
-                fileManager.fileAdderPresentationStyle = .replacingCurrentPlaylist
-                fileManager.isFileAdderPresented = true
+            Button {
+                fileManager.emitAdd(style: .replacingCurrentPlaylist)
+            } label: {
+                Image(systemSymbol: .textInsert)
+                Text("Replacing Current Playlist")
             }
             .keyboardShortcut("p", modifiers: [.command, .shift])
             
             Divider()
             
-            Button("Form New Playlist") {
-                fileManager.fileAdderPresentationStyle = .formNewPlaylist
-                fileManager.isFileAdderPresented = true
+            Button {
+                fileManager.emitAdd(style: .formingNewPlaylist)
+            } label: {
+                Image(systemSymbol: .textBadgePlus)
+                Text("Forming New Playlist")
             }
             .keyboardShortcut("p", modifiers: [.command, .shift, .option])
         } label: {
             ToolbarLabel {
-                Text("Add")
+                Image(systemSymbol: .plus)
             }
         }
     }

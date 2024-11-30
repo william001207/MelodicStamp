@@ -9,7 +9,17 @@ import SwiftUI
 
 struct MetadataExcerpt: View {
     var body: some View {
-        EmptyMusicNoteView(systemSymbol: SidebarTab.metadata.systemSymbol)
+        VStack {
+            EmptyMusicNoteView(systemSymbol: SidebarTab.metadata.systemSymbol)
+                .frame(height: 64)
+                .alignmentGuide(ExcerptAlignment.alignment) { d in
+                    d[.bottom]
+                }
+            
+            Text("Metadata")
+                .font(.title3)
+                .foregroundStyle(.quaternary)
+        }
     }
 }
 

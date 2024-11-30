@@ -8,6 +8,15 @@
 import SwiftUI
 import Combine
 
+enum MelodicStampWindowStyle: String, Equatable, Hashable, Identifiable {
+    case main
+    case miniPlayer
+    
+    var id: Self {
+        self
+    }
+}
+
 struct ContentView: View {
     @Environment(\.appearsActive) private var isActive
     
@@ -16,16 +25,17 @@ struct ContentView: View {
     @State private var selectedTabs: Set<SidebarTab> = .init([.playlist])
     
     @State private var floatingWindows: FloatingWindowsModel = .init()
+    @State private var fileManager: FileManagerModel = .init()
     @State private var player: PlayerModel = .init()
-    @State private var windowStyle: MelodicStampWindowStyle = .main
     
+    @State private var windowStyle: MelodicStampWindowStyle = .main
     @State private var widthRestriction: CGFloat?
     
     var body: some View {
         Group {
             switch windowStyle {
             case .main:
-                MainView(player: player, selectedTabs: $selectedTabs)
+                MainView(fileManager: fileManager, player: player, selectedTabs: $selectedTabs)
                     .onGeometryChange(for: CGRect.self) { proxy in
                         proxy.frame(in: .global)
                     } action: { frame in
@@ -56,7 +66,6 @@ struct ContentView: View {
         }
         .onChange(of: isActive, initial: true) { oldValue, newValue in
             if let window = NSApp.mainWindow {
-                window.tabbingMode = .disallowed
                 window.titlebarAppearsTransparent = true
             }
             
@@ -88,6 +97,10 @@ struct ContentView: View {
             }
         }
         .frame(maxWidth: widthRestriction)
+        
+        .focusable()
+        .focusEffectDisabled()
+        .focusedValue(\.fileManager, fileManager)
     }
     
     private func initializeFloatingWindows() {

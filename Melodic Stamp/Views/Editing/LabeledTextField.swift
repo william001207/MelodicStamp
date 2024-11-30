@@ -11,13 +11,12 @@ import Luminare
 struct LabeledTextField<F, Label>: View where F: ParseableFormatStyle, F.FormatOutput == String, F.FormatInput: Equatable, Label: View {
     @Environment(\.luminareAnimation) private var animation
     @Environment(\.luminareMinHeight) private var minHeight
-    @Environment(\.luminareCornerRadius) private var cornerRadius
-    
-    private let showsLabel: Bool
+    @Environment(\.luminareCompactButtonCornerRadius) private var buttonCornerRadius
     
     private var value: MetadataValueState<F.FormatInput?>
     private let format: F
     private let placeholder: LocalizedStringKey
+    private let showsLabel: Bool
     @ViewBuilder private let label: () -> Label
     
     @State private var isLabelHovering: Bool = false
@@ -28,10 +27,10 @@ struct LabeledTextField<F, Label>: View where F: ParseableFormatStyle, F.FormatO
         showsLabel: Bool = true,
         @ViewBuilder label: @escaping () -> Label
     ) {
-        self.showsLabel = showsLabel
         self.value = value
         self.format = format
         self.placeholder = placeholder
+        self.showsLabel = showsLabel
         self.label = label
     }
     
@@ -106,7 +105,7 @@ struct LabeledTextField<F, Label>: View where F: ParseableFormatStyle, F.FormatO
         .overlay {
             Group {
                 if values.isModified {
-                    RoundedRectangle(cornerRadius: cornerRadius)
+                    RoundedRectangle(cornerRadius: buttonCornerRadius)
                         .stroke(.primary)
                         .fill(.quinary.opacity(0.5))
                         .foregroundStyle(.tint)
@@ -126,21 +125,22 @@ struct LabeledTextField<F, Label>: View where F: ParseableFormatStyle, F.FormatO
             .blur(radius: isLabelHovering ? 8 : 0)
             .overlay {
                 if isLabelHovering {
-                    HStack {
+                    HStack(spacing: 2) {
                         AliveButton {
                             values.revert()
                         } label: {
-                            Image(systemSymbol: .return)
-                                .foregroundStyle(.tint)
+                            Image(systemSymbol: .arrowUturnLeft)
                         }
+                        .disabled(!values.isModified)
                         
                         AliveButton {
                             values.current = nil
                         } label: {
-                            Image(systemSymbol: .trashFill)
-                                .foregroundStyle(.red)
+                            Image(systemSymbol: .trash)
                         }
                     }
+                    .foregroundStyle(.red)
+                    .bold()
                 }
             }
             .foregroundStyle(.secondary)
