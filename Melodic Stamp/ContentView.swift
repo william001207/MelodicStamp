@@ -112,7 +112,9 @@ struct ContentView: View {
             FloatingTabBarView(
                 floatingWindows: floatingWindows,
                 sections: [
-                    .init(tabs: [.playlist, .inspector, .metadata])
+                    .init(tabs: [.playlist]),
+                    .init(title: .init(localized: "Metadata"), tabs: [.inspector, .metadata]),
+                    .init(title: .init(localized: "Lyrics"), tabs: [.lyrics])
                 ],
                 selectedTabs: $selectedTabs
             )

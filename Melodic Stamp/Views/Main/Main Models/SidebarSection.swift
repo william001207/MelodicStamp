@@ -9,8 +9,8 @@ import SwiftUI
 import SFSafeSymbols
 
 struct SidebarSection: Hashable, Identifiable {
-    let title: String? = nil
-    let tabs: [SidebarTab]
+    var title: String? = nil
+    var tabs: [SidebarTab]
     
     var id: Int {
         return self.hashValue
@@ -21,20 +21,54 @@ struct SidebarSection: Hashable, Identifiable {
     }
 }
 
-enum SidebarTab: Hashable, Identifiable, CaseIterable {
+enum SidebarComposable: String, Hashable, Identifiable, CaseIterable {
     case playlist
+    case metadata
+    case lyrics
+    
+    var id: String {
+        self.rawValue
+    }
+    
+    var opposites: [Self] {
+        switch self {
+        case .playlist:
+            []
+        case .metadata:
+            [.lyrics]
+        case .lyrics:
+            [.metadata]
+        }
+    }
+}
+
+enum SidebarTab: String, Hashable, Identifiable, CaseIterable {
+    case playlist
+    
+    // composable - metadata
     case inspector
     case metadata
     
+    // composable - lyrics
+    case lyrics
+    
     var id: String {
-        .init(describing: self)
+        self.rawValue
     }
     
-    var isComposable: Bool {
+    var composable: SidebarComposable {
         switch self {
-        case .playlist, .inspector, .metadata:
-            true
+        case .playlist:
+                .playlist
+        case .inspector, .metadata:
+                .metadata
+        case .lyrics:
+                .lyrics
         }
+    }
+    
+    var opposites: [Self] {
+        SidebarTab.allCases.filter { self.composable.opposites.contains($0.composable) }
     }
     
     /// A larger value prefers a place closer to the trailing edge.
@@ -45,6 +79,8 @@ enum SidebarTab: Hashable, Identifiable, CaseIterable {
         case .inspector:
             2
         case .metadata:
+            1
+        case .lyrics:
             1
         }
     }
@@ -57,6 +93,8 @@ enum SidebarTab: Hashable, Identifiable, CaseIterable {
                 .init(localized: "Inspector")
         case .metadata:
                 .init(localized: "Metadata")
+        case .lyrics:
+                .init(localized: "Lyrics")
         }
     }
     
@@ -68,10 +106,8 @@ enum SidebarTab: Hashable, Identifiable, CaseIterable {
                 .photoOnRectangleAngled
         case .metadata:
                 .textBadgePlus
+        case .lyrics:
+                .textQuote
         }
-    }
-    
-    func hash(into hasher: inout Hasher) {
-        hasher.combine(self.id)
     }
 }

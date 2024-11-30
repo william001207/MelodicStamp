@@ -210,6 +210,7 @@ struct MiniPlayer: View {
                     case .lyrics:
                         // TODO: add lyrics control
                         Text("Lyrics")
+                            .bold()
                     }
                 }
                 .contentTransition(.numericText())

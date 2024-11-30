@@ -26,7 +26,7 @@ struct MainView: View {
     @Binding var selectedTabs: Set<SidebarTab>
 
     @State private var metadataEditor: MetadataEditorModel = .init()
-
+    
     @State private var size: CGSize = .zero
 
     var body: some View {
@@ -99,6 +99,23 @@ struct MainView: View {
                                         material: .headerView,
                                         blendingMode: .behindWindow)
                                 }
+                        case .lyrics:
+                            LyricsView()
+                                .frame(minWidth: 250)
+                                .ignoresSafeArea()
+                            
+                                .morphed(
+                                    insets: .init(
+                                        bottom: .fixed(length: 64).mirrored),
+                                    morphedGradient
+                                )
+                                .ignoresSafeArea()
+                            
+                                .background {
+                                    VisualEffectView(
+                                        material: .headerView,
+                                        blendingMode: .behindWindow)
+                                }
                         }
                     }
                     .ignoresSafeArea()
@@ -120,6 +137,8 @@ struct MainView: View {
                                 InspectorExcerpt()
                             case .metadata:
                                 MetadataExcerpt()
+                            case .lyrics:
+                                LyricsExcerpt()
                             }
                         }
                         .frame(maxWidth: .infinity)
