@@ -113,7 +113,7 @@ struct InspectorView: View {
             AliveButton {
                 isCoverPickerPresented = true
             } label: {
-                MusicCover(coverImages: coverImages)
+                MusicCover(coverImages: coverImages, maxResolution: 128)
             }
             .fileImporter(
                 isPresented: $isCoverPickerPresented,

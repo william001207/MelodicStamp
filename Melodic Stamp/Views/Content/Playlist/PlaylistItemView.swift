@@ -57,7 +57,7 @@ struct PlaylistItemView: View {
                         Group {
                             let values = item.editableMetadata[extracting: \.coverImages]
                             
-                            MusicCover(cornerRadius: 0, coverImages: values.current)
+                            MusicCover(cornerRadius: 0, coverImages: values.current, maxResolution: 32)
                                 .frame(maxWidth: .infinity)
                                 .overlay {
                                     if isHovering {

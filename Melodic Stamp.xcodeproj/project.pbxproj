@@ -20,9 +20,22 @@
 		65F1DA012CECCEE900389E37 /* Melodic Stamp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Melodic Stamp.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
+		65761F3E2CFB742B003C83D3 /* Exceptions for "Melodic Stamp" folder in "Copy Bundle Resources" phase from "Melodic Stamp" target */ = {
+			isa = PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet;
+			buildPhase = 65F1D9FF2CECCEE900389E37 /* Resources */;
+			membershipExceptions = (
+				"Utilities/Extensions/Foundation/String+Extension.swift",
+			);
+		};
+/* End PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		28BFA4D12CEE173A00448374 /* Melodic Stamp */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				65761F3E2CFB742B003C83D3 /* Exceptions for "Melodic Stamp" folder in "Copy Bundle Resources" phase from "Melodic Stamp" target */,
+			);
 			path = "Melodic Stamp";
 			sourceTree = "<group>";
 		};

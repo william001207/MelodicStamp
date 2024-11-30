@@ -61,6 +61,9 @@ enum PlaybackMode: String, CaseIterable, Identifiable {
     var playlist: [PlaylistItem] = []
     var playbackMode: PlaybackMode = .sequential
     
+    var lyricLines: [Lyricline] = []
+    var currentLyricIndex: Int = 0
+    
     var duration: Duration { player.time?.total.map { .seconds($0) } ?? .zero }
     var timeElapsed: TimeInterval { player.time?.current ?? .zero }
     var timeRemaining: TimeInterval { player.time?.remaining ?? .zero }
@@ -211,11 +214,50 @@ enum PlaybackMode: String, CaseIterable, Identifiable {
         }
     }
     
+    func fetchAndParseLyrics() {
+        guard let current = current else {
+            lyricLines = []
+            return
+        }
+        let lyricStr = current.editableMetadata.current.lyrics ?? ""
+        guard !lyricStr.isEmpty else {
+            lyricLines = []
+            return
+        }
+        
+        let lyric = Lyric(lyricStr)
+        var lines: [Lyricline] = []
+        
+        for (time, text) in lyric.lyrics {
+            if let last = lines.last, last.time == time {
+                lines[lines.count - 1].stringS = text
+                lines[lines.count - 1].type = .both
+            } else {
+                let lyricLine = Lyricline(stringF: text, stringS: nil, time: time, type: .first)
+                lines.append(lyricLine)
+            }
+        }
+        
+        lyricLines = lines.sorted { $0.time.totalMS < $1.time.totalMS }
+    }
+    
+    func updateCurrentLyricIndex(currentTime: TimeInterval) {
+        guard !lyricLines.isEmpty else { return }
+        
+        let currentMS = Int(currentTime * 1000)
+        if let index = lyricLines.lastIndex(where: { $0.time.totalMS <= currentMS }) {
+            if index != currentLyricIndex {
+                currentLyricIndex = index
+            }
+        }
+    }
+    
     func play(item: PlaylistItem) {
         do {
             if let decoder = try item.decoder() {
                 try player.play(decoder)
                 current = item
+                fetchAndParseLyrics()
             }
         } catch {
             

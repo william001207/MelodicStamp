@@ -32,17 +32,16 @@ struct MainView: View {
     var body: some View {
         // use `ZStack` to eliminate safe area animation problems
         ZStack {
-            VisualEffectView(
-                material: .contentBackground, blendingMode: .behindWindow)
-
+            
+            VisualEffectView( material: .contentBackground, blendingMode: .behindWindow)
+            
             if !player.isPlaylistEmpty {
                 let morphedGradient = LinearGradient(
                     colors: [.white, .black], startPoint: .top,
                     endPoint: .bottom)
 
                 HSplitView {
-                    ForEach(Array(selectedTabs).sorted { $0.order < $1.order })
-                    { tab in
+                    ForEach(Array(selectedTabs).sorted { $0.order < $1.order }) { tab in
                         switch tab {
                         case .playlist:
                             PlaylistView(
@@ -100,7 +99,7 @@ struct MainView: View {
                                         blendingMode: .behindWindow)
                                 }
                         case .lyrics:
-                            LyricsView()
+                            LyricsView(player: player)
                                 .frame(minWidth: 250)
                                 .ignoresSafeArea()
                             
