@@ -22,6 +22,11 @@ struct MiniPlayer: View {
         }
     }
     
+    enum HeaderControl: Equatable {
+        case title
+        case lyrics
+    }
+    
     @Environment(\.changeMelodicStampWindowStyle) private var changeWindowStyle
     
     @Bindable var player: PlayerModel
@@ -29,6 +34,7 @@ struct MiniPlayer: View {
     var namespace: Namespace.ID
     
     @State private var activeControl: ActiveControl = .progress
+    @State private var headerControl: HeaderControl = .title
     
     @State private var isTitleHovering: Bool = false
     @State private var isProgressBarHovering: Bool = false
@@ -68,6 +74,7 @@ struct MiniPlayer: View {
             .animation(.default, value: isProgressBarHovering)
             .animation(.default, value: isProgressBarActive)
             .animation(.default, value: activeControl)
+            .animation(.default, value: headerControl)
         }
         .padding(12)
         .background(Color.clear)
@@ -188,12 +195,28 @@ struct MiniPlayer: View {
             }
             .matchedGeometryEffect(id: PlayerNamespace.playbackModeButton, in: namespace)
             
-            ShrinkableMarqueeScrollView {
-                MusicTitle(item: player.current)
+            AliveButton {
+                headerControl = switch headerControl {
+                case .title:
+                        .lyrics
+                case .lyrics:
+                        .title
+                }
+            } label: {
+                ShrinkableMarqueeScrollView {
+                    switch headerControl {
+                    case .title:
+                        MusicTitle(item: player.current)
+                    case .lyrics:
+                        // TODO: add lyrics control
+                        Text("Lyrics")
+                    }
+                }
+                .contentTransition(.numericText())
+                .animation(.default, value: player.currentIndex)
+                .padding(.bottom, 2)
+                .matchedGeometryEffect(id: PlayerNamespace.title, in: namespace)
             }
-            .contentTransition(.numericText())
-            .animation(.default, value: player.currentIndex)
-            .padding(.bottom, 2)
             
             AliveButton(enabledStyle: .init(.tertiary), hoveringStyle: .init(.secondary)) {
                 changeWindowStyle(.main)

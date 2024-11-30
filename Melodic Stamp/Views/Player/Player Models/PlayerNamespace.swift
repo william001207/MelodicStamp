@@ -9,6 +9,7 @@
 import SwiftUI
 
 enum PlayerNamespace: String, Identifiable, Hashable, Equatable {
+    case title
     case progressBar
     case volumeBar
     
