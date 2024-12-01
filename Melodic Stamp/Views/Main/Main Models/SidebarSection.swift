@@ -5,17 +5,17 @@
 //  Created by Xinshao_Air on 2024/11/22.
 //
 
-import SwiftUI
 import SFSafeSymbols
+import SwiftUI
 
 struct SidebarSection: Hashable, Identifiable {
     var title: String? = nil
     var tabs: [SidebarTab]
-    
+
     var id: Int {
-        return self.hashValue
+        return hashValue
     }
-    
+
     static func == (lhs: SidebarSection, rhs: SidebarSection) -> Bool {
         return lhs.hashValue == rhs.hashValue
     }
@@ -25,11 +25,11 @@ enum SidebarComposable: String, Hashable, Identifiable, CaseIterable {
     case playlist
     case metadata
     case lyrics
-    
+
     var id: String {
-        self.rawValue
+        rawValue
     }
-    
+
     var opposites: [Self] {
         switch self {
         case .playlist:
@@ -44,33 +44,33 @@ enum SidebarComposable: String, Hashable, Identifiable, CaseIterable {
 
 enum SidebarTab: String, Hashable, Identifiable, CaseIterable {
     case playlist
-    
+
     // composable - metadata
     case inspector
     case metadata
-    
+
     // composable - lyrics
     case lyrics
-    
+
     var id: String {
-        self.rawValue
+        rawValue
     }
-    
+
     var composable: SidebarComposable {
         switch self {
         case .playlist:
-                .playlist
+            .playlist
         case .inspector, .metadata:
-                .metadata
+            .metadata
         case .lyrics:
-                .lyrics
+            .lyrics
         }
     }
-    
+
     var opposites: [Self] {
         SidebarTab.allCases.filter { self.composable.opposites.contains($0.composable) }
     }
-    
+
     /// A larger value prefers a place closer to the trailing edge.
     var order: Int {
         switch self {
@@ -84,30 +84,30 @@ enum SidebarTab: String, Hashable, Identifiable, CaseIterable {
             1
         }
     }
-    
+
     var title: String {
         switch self {
         case .playlist:
-                .init(localized: "Playlist")
+            .init(localized: "Playlist")
         case .inspector:
-                .init(localized: "Inspector")
+            .init(localized: "Inspector")
         case .metadata:
-                .init(localized: "Metadata")
+            .init(localized: "Metadata")
         case .lyrics:
-                .init(localized: "Lyrics")
+            .init(localized: "Lyrics")
         }
     }
-    
+
     var systemSymbol: SFSymbol {
         switch self {
         case .playlist:
-                .musicNoteList
+            .musicNoteList
         case .inspector:
-                .photoOnRectangleAngled
+            .photoOnRectangleAngled
         case .metadata:
-                .textBadgePlus
+            .textBadgePlus
         case .lyrics:
-                .textQuote
+            .textQuote
         }
     }
 }

@@ -9,9 +9,9 @@ import SwiftUI
 
 struct FakeProgressiveBlurViewModifier: ViewModifier {
     var startPoint: UnitPoint, endPoint: UnitPoint
-    
+
     @State private var opacity: CGFloat = .zero
-    
+
     func body(content: Content) -> some View {
         ZStack {
             content
@@ -21,7 +21,7 @@ struct FakeProgressiveBlurViewModifier: ViewModifier {
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                         .mask {
                             LinearGradient(
-                                colors: [Color.black.opacity(0),  // sin(x * pi / 2)
+                                colors: [Color.black.opacity(0), // sin(x * pi / 2)
                                          Color.black.opacity(0.383),
                                          Color.black.opacity(0.707),
                                          Color.black.opacity(0.924),

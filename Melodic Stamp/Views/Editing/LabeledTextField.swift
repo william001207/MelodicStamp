@@ -5,22 +5,22 @@
 //  Created by KrLite on 2024/11/24.
 //
 
-import SwiftUI
 import Luminare
+import SwiftUI
 
 struct LabeledTextField<F, Label>: View where F: ParseableFormatStyle, F.FormatOutput == String, F.FormatInput: Equatable, Label: View {
     @Environment(\.luminareAnimation) private var animation
     @Environment(\.luminareMinHeight) private var minHeight
     @Environment(\.luminareCompactButtonCornerRadius) private var buttonCornerRadius
-    
+
     private var value: MetadataValueState<F.FormatInput?>
     private let format: F
     private let placeholder: LocalizedStringKey
     private let showsLabel: Bool
     @ViewBuilder private let label: () -> Label
-    
+
     @State private var isLabelHovering: Bool = false
-    
+
     init(
         _ placeholder: LocalizedStringKey,
         value: MetadataValueState<F.FormatInput?>, format: F,
@@ -33,7 +33,7 @@ struct LabeledTextField<F, Label>: View where F: ParseableFormatStyle, F.FormatO
         self.showsLabel = showsLabel
         self.label = label
     }
-    
+
     init(
         _ placeholder: LocalizedStringKey,
         value: MetadataValueState<F.FormatInput?>, format: F,
@@ -47,7 +47,7 @@ struct LabeledTextField<F, Label>: View where F: ParseableFormatStyle, F.FormatO
             EmptyView()
         }
     }
-    
+
     init(
         _ placeholder: LocalizedStringKey,
         text: MetadataValueState<String?>,
@@ -59,7 +59,7 @@ struct LabeledTextField<F, Label>: View where F: ParseableFormatStyle, F.FormatO
             label: label
         )
     }
-    
+
     init(
         _ placeholder: LocalizedStringKey,
         text: MetadataValueState<String?>
@@ -71,32 +71,32 @@ struct LabeledTextField<F, Label>: View where F: ParseableFormatStyle, F.FormatO
             EmptyView()
         }
     }
-    
+
     var body: some View {
         HStack {
             switch value {
             case .undefined:
                 EmptyView()
-            case .fine(let values):
+            case let .fine(values):
                 fine(values: values)
-            case .varied(let valueSetter):
+            case let .varied(valueSetter):
                 varied(setter: valueSetter)
             }
         }
         .animation(animation, value: isActive)
     }
-    
+
     private var isActive: Bool {
         switch value {
         case .undefined:
             false
-        case .fine(let values):
+        case let .fine(values):
             !isEmpty(value: values.current)
         case .varied:
             false
         }
     }
-    
+
     @ViewBuilder private func fine(values: EditableMetadata.Values<F.FormatInput?>) -> some View {
         LuminareTextField(
             placeholder,
@@ -113,7 +113,7 @@ struct LabeledTextField<F, Label>: View where F: ParseableFormatStyle, F.FormatO
             }
             .allowsHitTesting(false)
         }
-        
+
         if showsLabel && isActive {
             Group {
                 if Label.self != EmptyView.self {
@@ -132,7 +132,7 @@ struct LabeledTextField<F, Label>: View where F: ParseableFormatStyle, F.FormatO
                             Image(systemSymbol: .arrowUturnLeft)
                         }
                         .disabled(!values.isModified)
-                        
+
                         AliveButton {
                             values.current = nil
                         } label: {
@@ -153,11 +153,11 @@ struct LabeledTextField<F, Label>: View where F: ParseableFormatStyle, F.FormatO
             }
         }
     }
-    
-    @ViewBuilder private func varied(setter: EditableMetadata.ValueSetter<F.FormatInput?>) -> some View {
+
+    @ViewBuilder private func varied(setter _: EditableMetadata.ValueSetter<F.FormatInput?>) -> some View {
         Color.blue
     }
-    
+
     private func isEmpty(value: F.FormatInput?) -> Bool {
         guard let value else { return true }
         return if let value = value as? String {

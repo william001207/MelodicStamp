@@ -5,13 +5,13 @@
 //  Created by KrLite on 2024/11/25.
 //
 
-import SwiftUI
 import SFSafeSymbols
+import SwiftUI
 
 struct FileToolbar: View {
     @Bindable var player: PlayerModel
     @Bindable var fileManager: FileManagerModel
-    
+
     var body: some View {
         Menu {
             Button {
@@ -21,7 +21,7 @@ struct FileToolbar: View {
                 Text("In Current Playlist")
             }
             .keyboardShortcut("o", modifiers: .command)
-            
+
             Button {
                 fileManager.emitOpen(style: .replacingCurrentPlaylistOrSelection)
             } label: {
@@ -29,9 +29,9 @@ struct FileToolbar: View {
                 Text("Replacing Current Playlist")
             }
             .keyboardShortcut("o", modifiers: [.command, .shift])
-            
+
             Divider()
-            
+
             Button {
                 fileManager.emitOpen(style: .formingNewPlaylist)
             } label: {
@@ -44,7 +44,7 @@ struct FileToolbar: View {
                 Image(systemSymbol: .playFill)
             }
         }
-        
+
         Menu {
             Button {
                 fileManager.emitAdd(style: .toCurrentPlaylist)
@@ -53,7 +53,7 @@ struct FileToolbar: View {
                 Text("To Current Playlist")
             }
             .keyboardShortcut("p", modifiers: .command)
-            
+
             Button {
                 fileManager.emitAdd(style: .replacingCurrentPlaylistOrSelection)
             } label: {
@@ -61,9 +61,9 @@ struct FileToolbar: View {
                 Text("Replacing Current Playlist")
             }
             .keyboardShortcut("p", modifiers: [.command, .shift])
-            
+
             Divider()
-            
+
             Button {
                 fileManager.emitAdd(style: .formingNewPlaylist)
             } label: {

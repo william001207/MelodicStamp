@@ -15,7 +15,7 @@ struct InspectorExcerpt: View {
                 .alignmentGuide(ExcerptAlignment.alignment) { d in
                     d[.bottom]
                 }
-            
+
             Text("Inspector")
                 .font(.title3)
                 .foregroundStyle(.quaternary)

@@ -15,7 +15,7 @@ struct LyricsExcerpt: View {
                 .alignmentGuide(ExcerptAlignment.alignment) { d in
                     d[.bottom]
                 }
-            
+
             Text("Lyrics")
                 .font(.title3)
                 .foregroundStyle(.quaternary)

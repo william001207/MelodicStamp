@@ -15,7 +15,7 @@ struct MetadataExcerpt: View {
                 .alignmentGuide(ExcerptAlignment.alignment) { d in
                     d[.bottom]
                 }
-            
+
             Text("Metadata")
                 .font(.title3)
                 .foregroundStyle(.quaternary)

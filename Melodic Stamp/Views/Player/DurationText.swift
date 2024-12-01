@@ -10,13 +10,13 @@ import SwiftUI
 struct DurationText: View {
     var duration: Duration?
     var sign: FloatingPointSign = .plus
-    
+
     var body: some View {
         Text(formattedSign + (formattedDuration ?? "--:--"))
             .contentTransition(.numericText())
             .animation(.bouncy, value: duration)
     }
-    
+
     private var formattedSign: String {
         switch sign {
         case .plus:
@@ -25,7 +25,7 @@ struct DurationText: View {
             "-"
         }
     }
-    
+
     private var formattedDuration: String? {
         duration.map {
             $0.formatted(.time(pattern: .minuteSecond))

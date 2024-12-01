@@ -14,7 +14,7 @@ protocol LyricLine: Equatable, Hashable, Identifiable {
     var startTime: TimeInterval? { get set }
     var endTime: TimeInterval? { get set }
     var content: String { get set }
-    
+
     var isValid: Bool { get }
 }
 
@@ -28,9 +28,9 @@ extension LyricLine {
 
 protocol LyricsParser {
     associatedtype Line: LyricLine
-    
+
     var lines: [Line] { get set }
-    
+
     init(string: String) throws
 }
 
@@ -40,7 +40,7 @@ enum LyricsType: String, Hashable, Identifiable, CaseIterable {
     case raw // raw splitted string, unparsed
     case lrc // sentence based
     case ttml // word based
-    
+
     var id: String {
         rawValue
     }
@@ -52,26 +52,41 @@ enum LyricsStorage {
     case raw(parser: RawLyricsParser)
     case lrc(parser: LRCLyricsParser)
     case ttml(parser: TTMLLyricsParser)
+
+    var type: LyricsType {
+        switch self {
+        case .raw: .raw
+        case .lrc: .lrc
+        case .ttml: .ttml
+        }
+    }
 }
 
 // MARK: Lyrics Model
 
 @Observable class LyricsModel {
     private(set) var storage: LyricsStorage?
-    
-    func load(type: LyricsType = .raw, string: String?) throws {
+    var type: LyricsType = .raw
+
+    private var cache: String?
+
+    func load(string: String?) throws {
+        // debounce
+        guard type != storage?.type || string != cache else { return }
+
+        cache = string
         guard let string else {
-            self.storage = nil
+            storage = nil
             return
         }
-        
-        self.storage = switch type {
+
+        storage = switch type {
         case .raw:
-                .raw(parser: try .init(string: string))
+            try .raw(parser: .init(string: string))
         case .lrc:
-                .lrc(parser: try .init(string: string))
+            try .lrc(parser: .init(string: string))
         case .ttml:
-                .ttml(parser: try .init(string: string))
+            try .ttml(parser: .init(string: string))
         }
     }
 }

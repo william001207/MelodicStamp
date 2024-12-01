@@ -10,72 +10,57 @@ import SwiftUI
 struct LyricsView: View {
     @Bindable var metadataEditor: MetadataEditorModel
     @Bindable var lyrics: LyricsModel
-    
-    @State private var lyricsType: LyricsType = .lrc
-    
+
     var body: some View {
         Group {
             switch lyricsState {
             case .undefined:
                 Color.red
             case .fine:
-                TimelineView(.animation) { context in
-                    ScrollViewReader { proxy in
+                TimelineView(.animation) { _ in
+                    ScrollViewReader { _ in
                         ScrollView {
-                            VStack(alignment: .center, spacing: 10) {
+                            LazyVStack(alignment: .center, spacing: 10) {
                                 lyricLines()
                             }
-                            .padding()
-                            
+                            .padding(.horizontal)
+
                             Spacer()
-                                .frame(height: 72)
+                                .frame(height: 150)
                         }
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                         .scrollContentBackground(.hidden)
-                        .contentMargins(.top, 48)
+                        .contentMargins(.top, 64)
+                        .contentMargins(.bottom, 94)
                     }
                 }
-            case .varied(let valueSetter):
+            case let .varied(valueSetter):
                 Color.blue
             }
         }
-        .onChange(of: lyricsState) { oldValue, newValue in
-            switch lyricsState {
-            case .fine(let values):
-                do {
-                    try lyrics.load(type: lyricsType, string: values.current)
-                } catch {
-                    
-                }
-            default:
-                break
-            }
+        .onChange(of: lyricsState, initial: true) { _, _ in
+            loadLyrics()
         }
-        
-        .toolbar {
-            ToolbarItemGroup(placement: .confirmationAction) {
-                LyricsToolbar(lyricsType: $lyricsType)
-                    .background(.ultraThinMaterial)
-                    .clipShape(.buttonBorder)
-            }
+        .onChange(of: lyrics.type) { _, _ in
+            loadLyrics()
         }
     }
-    
+
     private var lyricsState: MetadataValueState<String?> {
         metadataEditor[extracting: \.lyrics]
     }
-    
+
     @ViewBuilder private func lyricLines() -> some View {
         switch lyrics.storage {
-        case .raw(let parser):
+        case let .raw(parser):
             ForEach(parser.lines) { line in
                 rawLyricLine(line: line)
             }
-        case .lrc(let parser):
+        case let .lrc(parser):
             ForEach(parser.lines) { line in
                 lrcLyricLine(line: line)
             }
-        case .ttml(let parser):
+        case let .ttml(parser):
             ForEach(parser.lines) { line in
                 ttmlLyricLine(line: line)
             }
@@ -83,10 +68,9 @@ struct LyricsView: View {
             EmptyView()
         }
     }
-    
-    @ViewBuilder private func rawLyricLine(line: RawLyricLine) -> some View {
-    }
-    
+
+    @ViewBuilder private func rawLyricLine(line _: RawLyricLine) -> some View {}
+
     @ViewBuilder private func lrcLyricLine(line: LRCLyricLine) -> some View {
         HStack {
             ForEach(line.tags) { tag in
@@ -112,22 +96,32 @@ struct LyricsView: View {
                 }
             }
             .foregroundStyle(.secondary)
-            
+
             if line.isValid && !line.content.isEmpty {
                 switch line.type {
                 case .main:
                     Text(line.content)
-                case .translation(let locale):
+                case let .translation(locale):
                     Text(locale)
                         .foregroundStyle(.placeholder)
-                    
+
                     Text(line.content)
                         .foregroundStyle(.secondary)
                 }
             }
         }
     }
-    
-    @ViewBuilder private func ttmlLyricLine(line: TTMLLyricLine) -> some View {
+
+    @ViewBuilder private func ttmlLyricLine(line _: TTMLLyricLine) -> some View {}
+
+    private func loadLyrics() {
+        switch lyricsState {
+        case let .fine(values):
+            do {
+                try lyrics.load(string: values.current)
+            } catch {}
+        default:
+            break
+        }
     }
 }

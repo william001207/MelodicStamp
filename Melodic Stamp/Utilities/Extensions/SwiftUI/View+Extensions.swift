@@ -11,7 +11,7 @@ extension View {
     func observeAnimation<Value: VectorArithmetic>(for observedValue: Value, onChange: ((Value) -> Void)? = nil, onComplete: (() -> Void)? = nil) -> some View {
         modifier(AnimationObserverModifier(for: observedValue, onChange: onChange, onComplete: onComplete))
     }
-    
+
     @ViewBuilder func fakeProgressiveBlur(
         startPoint: UnitPoint, endPoint: UnitPoint, isActive: Bool = true
     ) -> some View {
@@ -22,4 +22,3 @@ extension View {
         }
     }
 }
-

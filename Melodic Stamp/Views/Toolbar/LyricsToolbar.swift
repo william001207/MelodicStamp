@@ -9,17 +9,17 @@ import SwiftUI
 
 struct LyricsToolbar: View {
     @Binding var lyricsType: LyricsType
-    
+
     var body: some View {
         Picker(selection: $lyricsType) {
             label(of: .raw)
                 .tag(LyricsType.raw)
-            
+
             Divider()
-            
+
             label(of: .lrc)
                 .tag(LyricsType.lrc)
-            
+
             label(of: .ttml)
                 .tag(LyricsType.ttml)
         } label: {
@@ -28,7 +28,7 @@ struct LyricsToolbar: View {
             }
         }
     }
-    
+
     @ViewBuilder private func label(of type: LyricsType) -> some View {
         switch type {
         case .raw:

@@ -5,12 +5,12 @@
 //  Created by KrLite on 2024/11/23.
 //
 
-import SwiftUI
 import SFSafeSymbols
+import SwiftUI
 
 struct EmptyMusicNoteView: View {
     var systemSymbol: SFSymbol = .musicNote
-    
+
     var body: some View {
         Image(systemSymbol: systemSymbol)
             .resizable()

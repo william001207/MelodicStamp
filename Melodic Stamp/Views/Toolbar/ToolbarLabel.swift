@@ -9,9 +9,9 @@ import SwiftUI
 
 struct ToolbarLabel<Content: View>: View {
     @Environment(\.isEnabled) private var isEnabled
-    
+
     @ViewBuilder var content: () -> Content
-    
+
     var body: some View {
         HStack(alignment: .lastTextBaseline) {
             content()

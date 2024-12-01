@@ -14,7 +14,7 @@ extension Animation {
 extension Animation {
     func `repeat`(while condition: Bool, autoreverses: Bool = true) -> Animation {
         if condition {
-            return self.repeatForever(autoreverses: autoreverses)
+            return repeatForever(autoreverses: autoreverses)
         } else {
             return self
         }

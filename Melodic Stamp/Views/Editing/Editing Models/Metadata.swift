@@ -5,14 +5,14 @@
 //  Created by KrLite on 2024/11/24.
 //
 
-import SwiftUI
 import CSFBAudioEngine
+import SwiftUI
 
 typealias AdditionalMetadata = [AnyHashable: Any]
 
 struct Metadata {
     var coverImages: Set<NSImage>
-    
+
     var title: String?
     var titleSortOrder: String?
     var artist: String?
@@ -22,39 +22,39 @@ struct Metadata {
     var genre: String?
     var genreSortOrder: String?
     var bpm: Int?
-    
+
     var albumTitle: String?
     var albumTitleSortOrder: String?
     var albumArtist: String?
     var albumArtistSortOrder: String?
-    
+
     var trackNumber: Int?
     var trackTotal: Int?
     var discNumber: Int?
     var discTotal: Int?
-    
+
     var comment: String?
     var grouping: String?
     var isCompilation: Bool?
-    
+
     var isrc: String?
     var lyrics: String?
     var mcn: String?
-    
+
     var musicBrainzRecordingID: String?
     var musicBrainzReleaseID: String?
-    
+
     var rating: Int?
     var releaseDate: String?
-    
+
     var replayGainAlbumGain: Double?
     var replayGainAlbumPeak: Double?
     var replayGainTrackGain: Double?
     var replayGainTrackPeak: Double?
     var replayGainReferenceLoudness: Double?
-    
+
     var additional: AdditionalMetadata?
-    
+
     init(
         coverImages: Set<NSImage> = [],
         title: String? = nil, titleSortOrder: String? = nil,
@@ -115,7 +115,7 @@ struct Metadata {
         self.replayGainReferenceLoudness = replayGainReferenceLoudness
         self.additional = additional
     }
-    
+
     init(from metadata: AudioMetadata?) {
         self.init(
             coverImages: (metadata?.attachedPictures.compactMap(\.image)).map { Set($0) } ?? [],
@@ -142,10 +142,10 @@ struct Metadata {
             additional: metadata?.additionalMetadata
         )
     }
-    
+
     var packed: AudioMetadata {
         let metadata = AudioMetadata()
-        
+
         metadata.title = title
         metadata.titleSortOrder = titleSortOrder
         metadata.artist = artist
@@ -177,9 +177,9 @@ struct Metadata {
         metadata.replayGainTrackPeak = replayGainTrackPeak
         metadata.replayGainReferenceLoudness = replayGainReferenceLoudness
         metadata.additionalMetadata = additional
-        
+
         coverImages.compactMap(\.attachedPicture).forEach(metadata.attachPicture(_:))
-        
+
         return metadata
     }
 }
@@ -188,18 +188,18 @@ extension Metadata: Equatable {
     static func == (lhs: Metadata, rhs: Metadata) -> Bool {
         areDictsEqual(lhs.packed.dictionaryRepresentation, rhs.packed.dictionaryRepresentation)
     }
-    
+
     private static func areDictsEqual(_ dict1: [AnyHashable: Any], _ dict2: [AnyHashable: Any]) -> Bool {
         guard dict1.count == dict2.count else { return false }
-        
+
         for (key, value1) in dict1 {
             guard let value2 = dict2[key] else { return false }
-            
+
             if !areEqual(value1, value2) {
                 return false
             }
         }
-        
+
         return true
     }
 }

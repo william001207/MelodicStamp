@@ -14,7 +14,7 @@ extension Equatable {
         }
         return self == other
     }
-    
+
     private func isExactlyEqual(_ other: any Equatable) -> Bool {
         guard let other = other as? Self else {
             return false
@@ -28,6 +28,6 @@ func areEqual(_ first: Any, _ second: Any) -> Bool {
         let equatableOne = first as? any Equatable,
         let equatableTwo = second as? any Equatable
     else { return false }
-    
+
     return equatableOne.isEqual(equatableTwo)
 }

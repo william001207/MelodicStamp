@@ -20,24 +20,23 @@ struct LRCLyricTag: Hashable, Identifiable, Equatable {
         case editor = "re"
         case version = "ve"
         case translation = "tr"
-        
+
         var id: String {
             rawValue
         }
-        
+
         var isMetadata: Bool {
             switch self {
             case .length, .offset, .translation: true
             default: false
             }
         }
-        
+
         var name: String {
             switch self {
             case .length: .init(localized: "Length")
             case .offset: .init(localized: "Offset")
             case .translation: .init(localized: "Translation")
-                
             case .artist: .init(localized: "Artist")
             case .album: .init(localized: "Album")
             case .title: .init(localized: "Title")
@@ -47,14 +46,14 @@ struct LRCLyricTag: Hashable, Identifiable, Equatable {
             case .version: .init(localized: "Version")
             }
         }
-        
+
         static var regex: Regex<Substring> {
             Regex {
                 ChoiceOf {
                     length.rawValue
                     offset.rawValue
                     translation.rawValue
-                    
+
                     artist.rawValue
                     album.rawValue
                     title.rawValue
@@ -66,29 +65,29 @@ struct LRCLyricTag: Hashable, Identifiable, Equatable {
             }
         }
     }
-    
+
     var id: LyricTagType {
         type
     }
-    
+
     var type: LyricTagType
     var content: String
 }
 
 struct LRCLyricLine: LyricLine {
     typealias Tag = LRCLyricTag
-    
+
     enum LRCLyricType: Hashable, Equatable {
         case main
         case translation(locale: String)
     }
-    
+
     let id: UUID = .init()
 
     var type: LRCLyricType = .main
     var startTime: TimeInterval?
     var endTime: TimeInterval?
-    
+
     var tags: [LRCLyricTag] = []
     var content: String
 }
@@ -100,7 +99,7 @@ struct LRCLyricLine: LyricLine {
     var lines: [LRCLyricLine]
 
     required init(string: String) throws {
-        self.lines = []
+        lines = []
 
         let contents = string
             .split(separator: .newlineSequence)
@@ -130,7 +129,7 @@ struct LRCLyricLine: LyricLine {
                     in: $0.trimmingCharacters(in: .whitespacesAndNewlines))
             else { return }
             // output: (original, tagString, _, content)
-            
+
             let tagString = String(match.output.1).trimmingCharacters(in: .whitespacesAndNewlines)
             let content = String(match.output.3).trimmingCharacters(in: .whitespacesAndNewlines)
 
@@ -138,7 +137,7 @@ struct LRCLyricLine: LyricLine {
             for match in tagString.matches(of: tagRegex) {
                 tags.append(String(match.output.1).trimmingCharacters(in: .whitespacesAndNewlines))
             }
-            
+
             print("Extracting lyric line: \(tags), \"\(content)\"")
 
             var line: LRCLyricLine = .init(content: content)
@@ -169,9 +168,7 @@ struct LRCLyricLine: LyricLine {
                                 line.tags.append(tag)
                             }
                         }
-                    } catch {
-
-                    }
+                    } catch {}
                 }
             }
 

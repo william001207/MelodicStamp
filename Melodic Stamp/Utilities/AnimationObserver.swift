@@ -12,13 +12,13 @@ public struct AnimationObserverModifier<Value: VectorArithmetic> {
     private let observedValue: Value
     private let onChange: ((Value) -> Void)?
     private let onComplete: (() -> Void)?
-    
+
     public var animatableData: Value {
         didSet {
             notifyProgress()
         }
     }
-    
+
     public init(for observedValue: Value, onChange: ((Value) -> Void)? = nil, onComplete: (() -> Void)? = nil) {
         self.observedValue = observedValue
         self.onChange = onChange

@@ -5,13 +5,13 @@
 //  Created by KrLite on 2024/11/23.
 //
 
-import SwiftUI
 import Combine
+import SwiftUI
 
 enum MelodicStampWindowStyle: String, Equatable, Hashable, Identifiable {
     case main
     case miniPlayer
-    
+
     var id: Self {
         self
     }
@@ -19,18 +19,18 @@ enum MelodicStampWindowStyle: String, Equatable, Hashable, Identifiable {
 
 struct ContentView: View {
     @Environment(\.appearsActive) private var isActive
-    
+
     @Namespace private var namespace
-    
+
     @State private var selectedTabs: Set<SidebarTab> = .init([.playlist])
-    
+
     @State private var floatingWindows: FloatingWindowsModel = .init()
     @State private var fileManager: FileManagerModel = .init()
     @State private var player: PlayerModel = .init()
-    
+
     @State private var windowStyle: MelodicStampWindowStyle = .main
     @State private var widthRestriction: CGFloat?
-    
+
     var body: some View {
         Group {
             switch windowStyle {
@@ -38,7 +38,7 @@ struct ContentView: View {
                 MainView(fileManager: fileManager, player: player, selectedTabs: $selectedTabs)
                     .onGeometryChange(for: CGRect.self) { proxy in
                         proxy.frame(in: .global)
-                    } action: { frame in
+                    } action: { _ in
                         floatingWindows.updateTabBarPosition()
                         floatingWindows.updatePlayerPosition()
                     }
@@ -54,7 +54,6 @@ struct ContentView: View {
                     .ignoresSafeArea()
                     .frame(minWidth: 500, idealWidth: 500)
                     .fixedSize(horizontal: false, vertical: true)
-                
                     .environment(\.melodicStampWindowStyle, windowStyle)
                     .environment(\.changeMelodicStampWindowStyle) { windowStyle in
                         self.windowStyle = windowStyle
@@ -68,11 +67,11 @@ struct ContentView: View {
         .onAppear {
             floatingWindows.observeFullScreen()
         }
-        .onChange(of: isActive, initial: true) { oldValue, newValue in
+        .onChange(of: isActive, initial: true) { _, _ in
             if let window = NSApp.mainWindow {
                 window.titlebarAppearsTransparent = true
             }
-            
+
             switch windowStyle {
             case .main:
                 if isActive {
@@ -84,7 +83,7 @@ struct ContentView: View {
                 destroyFloatingWindows()
             }
         }
-        .onChange(of: windowStyle) { oldValue, newValue in
+        .onChange(of: windowStyle) { _, newValue in
             switch newValue {
             case .main:
                 initializeFloatingWindows()
@@ -94,19 +93,18 @@ struct ContentView: View {
                 widthRestriction = 500
             }
         }
-        .onChange(of: widthRestriction) { oldValue, newValue in
+        .onChange(of: widthRestriction) { _, newValue in
             guard newValue != nil else { return }
             DispatchQueue.main.async {
                 widthRestriction = nil
             }
         }
         .frame(maxWidth: widthRestriction)
-        
         .focusable()
         .focusEffectDisabled()
         .focusedValue(\.fileManager, fileManager)
     }
-    
+
     private func initializeFloatingWindows() {
         floatingWindows.addTabBar {
             FloatingTabBarView(
@@ -114,7 +112,7 @@ struct ContentView: View {
                 sections: [
                     .init(tabs: [.playlist]),
                     .init(title: .init(localized: "Metadata"), tabs: [.inspector, .metadata]),
-                    .init(title: .init(localized: "Lyrics"), tabs: [.lyrics])
+                    .init(title: .init(localized: "Lyrics"), tabs: [.lyrics]),
                 ],
                 selectedTabs: $selectedTabs
             )
@@ -130,7 +128,7 @@ struct ContentView: View {
             }
         }
     }
-    
+
     private func destroyFloatingWindows() {
         floatingWindows.removeTabBar()
         floatingWindows.removePlayer()

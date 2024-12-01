@@ -9,20 +9,20 @@ import SwiftUI
 
 struct FloatingTabBarView: View {
     @Bindable var floatingWindows: FloatingWindowsModel
-    
+
     @State private var isHovering: Bool = true
     @State private var hoveringTabs: Set<SidebarTab> = []
-    
+
     var sections: [SidebarSection]
-    
+
     @Binding var selectedTabs: Set<SidebarTab>
-    
+
     @State private var composables: Set<SidebarComposable> = []
-    
+
     var body: some View {
         ZStack {
             VisualEffectView(material: .popover, blendingMode: .behindWindow)
-            
+
             VStack(alignment: .leading, spacing: 0) {
                 ForEach(sections) { section in
                     Group {
@@ -41,7 +41,7 @@ struct FloatingTabBarView: View {
                             .padding(.horizontal, 8)
                             .transition(.blurReplace)
                         }
-                        
+
                         ForEach(section.tabs) { tab in
                             tabView(for: tab)
                                 .onHover { hover in
@@ -82,15 +82,14 @@ struct FloatingTabBarView: View {
         .background(.clear)
         .frame(width: isHovering ? nil : 48)
         .clipShape(.rect(cornerRadius: 24))
-        
         .frame(maxWidth: .infinity, alignment: .leading)
         .contentShape(.rect(cornerRadius: 24))
     }
-    
+
     @ViewBuilder private func tabView(for tab: SidebarTab) -> some View {
         let isTabHovering = hoveringTabs.contains(tab)
         let isSelected = selectedTabs.contains(tab)
-        
+
         AliveButton {
             if isComposingAvailable(for: tab.composable, in: composables) {
                 if isSelected {
@@ -108,7 +107,7 @@ struct FloatingTabBarView: View {
             } else {
                 tab.opposites.forEach { selectedTabs.remove($0) }
                 tab.composable.opposites.forEach { composables.remove($0) }
-                
+
                 selectedTabs.insert(tab)
                 composables.insert(tab.composable)
             }
@@ -117,7 +116,7 @@ struct FloatingTabBarView: View {
                 Image(systemSymbol: tab.systemSymbol)
                     .font(.system(size: 18))
                     .frame(width: 32, height: 32)
-                
+
                 if isHovering {
                     Text(tab.title)
                         .font(.headline)
@@ -148,7 +147,7 @@ struct FloatingTabBarView: View {
             }
         }
     }
-    
+
     private func isComposingAvailable(for composable: SidebarComposable, in composables: Set<SidebarComposable>) -> Bool {
         !composables.flatMap(\.opposites).contains(composable)
     }
@@ -156,6 +155,6 @@ struct FloatingTabBarView: View {
 
 #Preview {
     @Previewable @State var selectedTabs: Set<SidebarTab> = .init([.playlist])
-    
+
     FloatingTabBarView(floatingWindows: .init(), sections: [.init(tabs: SidebarTab.allCases)], selectedTabs: $selectedTabs)
 }

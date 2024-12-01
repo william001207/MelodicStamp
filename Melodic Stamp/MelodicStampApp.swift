@@ -5,16 +5,16 @@
 //  Created by Xinshao_Air on 2024/11/19.
 //
 
-import SwiftUI
 import CSFBAudioEngine
+import SwiftUI
 import UniformTypeIdentifiers
 
 @main
 struct MelodicStampApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
-    
+
     @Environment(\.openWindow) private var openWindow
-    
+
     var body: some Scene {
         WindowGroup {
             ContentView()
@@ -31,12 +31,12 @@ struct MelodicStampApp: App {
                     openWindow(id: "about")
                 }
             }
-            
+
             FileCommands()
-            
+
             EditingCommands()
         }
-        
+
         Window("About \(Bundle.main.displayName)", id: "about") {
             AboutView()
         }

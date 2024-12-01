@@ -9,21 +9,21 @@ import SwiftUI
 
 struct OffsetEffect: GeometryEffect {
     var offset: CGPoint
-    
+
     init(offset: CGPoint) {
         self.offset = offset
     }
-    
+
     init(x: CGFloat = .zero, y: CGFloat = .zero) {
         self.init(offset: .init(x: x, y: y))
     }
-    
+
     var animatableData: CGPoint.AnimatableData {
         get { CGPoint.AnimatableData(offset.x, offset.y) }
         set { offset = .init(x: newValue.first, y: newValue.second) }
     }
-    
-    public func effectValue(size: CGSize) -> ProjectionTransform {
+
+    public func effectValue(size _: CGSize) -> ProjectionTransform {
         return ProjectionTransform(CGAffineTransform(translationX: offset.x, y: offset.y))
     }
 }
@@ -34,23 +34,23 @@ struct MarqueeScrollView<Content>: View where Content: View {
         case preparing
         case animating
     }
-    
+
     var duration: TimeInterval = 5
     var delay: TimeInterval = 1
     var overflow: CGFloat = 12
     var animate: Bool = true
     @ViewBuilder var content: () -> Content
-    
+
     @State private var offset: CGFloat = .zero
     @State private var animationOffset: CGFloat = .zero
-    
+
     @State private var contentSize: CGSize = .zero
     @State private var containerSize: CGSize = .zero
     @State private var scrollPosition: ScrollPosition = .init()
-    
+
     @State private var idleTimer: Timer?
     @State private var stage: AnimationStage = .idle
-    
+
     var body: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             content()
@@ -64,7 +64,7 @@ struct MarqueeScrollView<Content>: View where Content: View {
                     } else {
                         contentSize = size
                     }
-                    
+
                     DispatchQueue.main.async {
                         pauseAnimation()
                         resetScrollPosition()
@@ -75,7 +75,6 @@ struct MarqueeScrollView<Content>: View where Content: View {
         }
         .scrollPosition($scrollPosition, anchor: .leading)
         .scrollDisabled(!canMarquee)
-        
         .onGeometryChange(for: CGSize.self) { proxy in
             proxy.size
         } action: { size in
@@ -86,7 +85,7 @@ struct MarqueeScrollView<Content>: View where Content: View {
             } else {
                 containerSize = size
             }
-            
+
             DispatchQueue.main.async {
                 pauseAnimation()
                 resetScrollPosition()
@@ -95,21 +94,21 @@ struct MarqueeScrollView<Content>: View where Content: View {
         }
         .onScrollGeometryChange(for: CGFloat.self) { proxy in
             proxy.contentOffset.x
-        } action: { oldValue, newValue in
+        } action: { _, newValue in
             offset = newValue
-            
+
             if scrollPosition.isPositionedByUser {
                 idle()
             }
         }
-        .onScrollPhaseChange { oldPhase, newPhase, context in
+        .onScrollPhaseChange { oldPhase, newPhase, _ in
             if newPhase.isScrolling {
                 idle()
             } else if oldPhase.isScrolling {
                 unidle()
             }
         }
-        
+
         .padding(.horizontal, -overflow)
         .contentMargins(.horizontal, overflow)
         .mask {
@@ -117,10 +116,10 @@ struct MarqueeScrollView<Content>: View where Content: View {
                 HStack(spacing: 0) {
                     LinearGradient(colors: [.clear, .white], startPoint: .leading, endPoint: .trailing)
                         .frame(width: overflow)
-                    
+
                     Color.white
                         .frame(width: max(0, visibleLength))
-                    
+
                     LinearGradient(colors: [.white, .clear], startPoint: .leading, endPoint: .trailing)
                         .frame(width: overflow)
                 }
@@ -128,56 +127,56 @@ struct MarqueeScrollView<Content>: View where Content: View {
                 Color.white
             }
         }
-        
+
         .observeAnimation(for: animationOffset) { newValue in
             offset = newValue
         }
     }
-    
+
     private var visibleLength: CGFloat {
         containerSize.width - 2 * overflow
     }
-    
+
     private var scrollableLength: CGFloat {
         contentSize.width
     }
-    
+
     private var canMarquee: Bool {
         // do not overflow
         contentSize.width > visibleLength
     }
-    
+
     private func duration(percentage: CGFloat) -> TimeInterval {
         max(0, duration * percentage)
     }
-    
+
     private func idle() {
         idleTimer?.invalidate()
         idleTimer = nil
-        
+
         if stage != .idle {
             pauseAnimation()
             scrollPosition.scrollTo(x: offset)
         }
     }
-    
+
     private func unidle() {
         idleTimer?.invalidate()
-        
+
         guard canMarquee else { return }
-        
+
         idleTimer = .scheduledTimer(withTimeInterval: delay, repeats: false) { _ in
             resumeAnimation()
         }
     }
-    
+
     private func resetScrollPosition() {
         scrollPosition.scrollTo(x: 0)
     }
-    
+
     private func resumeAnimation() {
         guard canMarquee else { return }
-        
+
         resetScrollPosition()
         switch stage {
         case .idle:
@@ -200,7 +199,7 @@ struct MarqueeScrollView<Content>: View where Content: View {
             }
         }
     }
-    
+
     private func pauseAnimation() {
         withAnimation(.instant) {
             stage = .idle
@@ -214,9 +213,9 @@ struct ShrinkableMarqueeScrollView<Content>: View where Content: View {
     var delay: TimeInterval = 1
     var overflow: CGFloat = 12
     @ViewBuilder var content: () -> Content
-    
+
     @State private var contentSize: CGSize = .zero
-    
+
     var body: some View {
         MarqueeScrollView(
             duration: duration,
@@ -243,7 +242,7 @@ struct ShrinkableMarqueeScrollView<Content>: View where Content: View {
                 .padding(4)
         }
         .background(.quinary)
-        
+
         MarqueeScrollView {
             Text("Lorem consequat anim ea. Ad est id mollit proident elit esse quis. Sint elit officia irure voluptate dolor labore voluptate excepteur sit sunt nostrud.")
                 .padding(4)
@@ -261,7 +260,7 @@ struct ShrinkableMarqueeScrollView<Content>: View where Content: View {
                 .padding(4)
         }
         .background(.quinary)
-        
+
         ShrinkableMarqueeScrollView {
             Text("Lorem consequat anim ea. Ad est id mollit proident elit esse quis. Sint elit officia irure voluptate dolor labore voluptate excepteur sit sunt nostrud.")
                 .padding(4)

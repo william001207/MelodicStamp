@@ -5,10 +5,10 @@
 //  Created by Xinshao_Air on 2024/11/20.
 //
 
-import SwiftUI
 import AppKit
 import CSFBAudioEngine
 import Luminare
+import SwiftUI
 
 struct PlaylistItem: Identifiable {
     let id = UUID()
@@ -17,15 +17,15 @@ struct PlaylistItem: Identifiable {
 
     init?(url: URL) {
         self.url = url
-        
+
         guard let metadata = EditableMetadata(url: url) else { return nil }
-        self.editableMetadata = metadata
+        editableMetadata = metadata
     }
 
     func decoder(enableDoP: Bool = false) throws -> PCMDecoding? {
         guard url.startAccessingSecurityScopedResource() else { return nil }
         defer { url.stopAccessingSecurityScopedResource() }
-        
+
         let pathExtension = url.pathExtension.lowercased()
         if AudioDecoder.handlesPaths(withExtension: pathExtension) {
             return try AudioDecoder(url: url)
@@ -33,13 +33,13 @@ struct PlaylistItem: Identifiable {
             let dsdDecoder = try DSDDecoder(url: url)
             return enableDoP ? try DoPDecoder(decoder: dsdDecoder) : try DSDPCMDecoder(decoder: dsdDecoder)
         }
-        
+
         return nil
     }
 }
 
 extension PlaylistItem: Equatable {
-    static func ==(lhs: PlaylistItem, rhs: PlaylistItem) -> Bool {
+    static func == (lhs: PlaylistItem, rhs: PlaylistItem) -> Bool {
         lhs.id == rhs.id
     }
 }

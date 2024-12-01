@@ -15,7 +15,7 @@ struct PlaylistExcerpt: View {
                 .alignmentGuide(ExcerptAlignment.alignment) { d in
                     d[.bottom]
                 }
-            
+
             Text("Playlist")
                 .font(.title3)
                 .foregroundStyle(.quaternary)

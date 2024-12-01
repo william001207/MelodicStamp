@@ -5,24 +5,24 @@
 //  Created by KrLite on 2024/11/24.
 //
 
-import SwiftUI
 @preconcurrency import CSFBAudioEngine
+import SwiftUI
 
 @Observable final class EditableMetadata: Identifiable, Sendable {
     struct Values<V: Equatable>: Equatable {
         let keyPath: WritableKeyPath<Metadata, V>
         let metadata: EditableMetadata
-        
+
         var current: V {
             get { metadata.current[keyPath: keyPath] }
             nonmutating set { metadata.current[keyPath: keyPath] = newValue }
         }
-        
+
         private(set) var initial: V {
             get { metadata.initial[keyPath: keyPath] }
             nonmutating set { metadata.initial[keyPath: keyPath] = newValue }
         }
-        
+
         var projectedValue: Binding<V> {
             Binding(get: {
                 current
@@ -30,34 +30,34 @@ import SwiftUI
                 current = newValue
             })
         }
-        
+
         var isModified: Bool {
             current != initial
         }
-        
+
         func revert() {
             current = initial
         }
-        
+
         func apply() {
             initial = current
         }
     }
-    
+
     struct ValueSetter<V>: Equatable {
         let keyPath: WritableKeyPath<Metadata, V>
         let editableMetadatas: Set<EditableMetadata>
-        
+
         func set(_ value: V) {
             editableMetadatas.forEach { $0.current[keyPath: keyPath] = value }
         }
     }
-    
+
     enum State {
         case loading
         case fine
         case saving
-        
+
         var isEditable: Bool {
             switch self {
             case .fine:
@@ -66,7 +66,7 @@ import SwiftUI
                 false
             }
         }
-        
+
         var isLoaded: Bool {
             switch self {
             case .loading:
@@ -76,85 +76,85 @@ import SwiftUI
             }
         }
     }
-    
+
     var id: URL { url }
     let url: URL
-    
+
     let properties: AudioProperties
     var current: Metadata
     private(set) var initial: Metadata
-    
+
     private(set) var state: State = .loading
-    
+
     init?(url: URL) {
         self.url = url
-        self.current = .init()
-        self.initial = .init()
-        self.properties = .init()
-        
+        current = .init()
+        initial = .init()
+        properties = .init()
+
         Task.detached {
             try await self.update()
             self.state = .fine
         }
     }
-    
+
     var isModified: Bool {
         current != initial
     }
-    
+
     func revert() {
         current = initial
     }
-    
+
     func apply() {
         initial = current
     }
-    
+
     func update() async throws {
         return try await withCheckedThrowingContinuation { [weak self] continuation in
             guard let self else { return continuation.resume() }
             guard url.startAccessingSecurityScopedResource() else { return }
             defer { url.stopAccessingSecurityScopedResource() }
-            
+
             do {
                 let file = try AudioFile(readingPropertiesAndMetadataFrom: url)
                 self.state = .fine
                 self.current = .init(from: file.metadata)
                 self.initial = self.current
                 print("Updated metadata from \(self.url)")
-                
+
                 continuation.resume()
             } catch {
                 continuation.resume(throwing: error)
             }
         }
     }
-    
+
     func write() async throws {
         return try await withCheckedThrowingContinuation { [weak self] continuation in
             guard let self, self.state.isEditable && self.isModified else { return continuation.resume() }
             guard self.url.startAccessingSecurityScopedResource() else { return }
             defer { self.url.stopAccessingSecurityScopedResource() }
-            
+
             do {
                 self.state = .saving
                 self.initial = self.current
                 print("Started writing metadata to \(self.url)")
-                
+
                 let file = try AudioFile(url: self.url)
                 file.metadata = self.current.packed
                 try file.writeMetadata()
-                
+
                 self.state = .fine
                 print("Successfully written metadata to \(self.url)")
-                
+
                 continuation.resume()
             } catch {
                 continuation.resume(throwing: error)
             }
         }
     }
-    
+
     subscript<V>(extracting keyPath: WritableKeyPath<Metadata, V>) -> Values<V> {
         .init(keyPath: keyPath, metadata: self)
     }

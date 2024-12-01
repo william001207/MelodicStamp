@@ -5,15 +5,15 @@
 //  Created by KrLite on 2024/11/17.
 //
 
-import SwiftUI
 import CSFBAudioEngine
+import SwiftUI
 
 struct MusicTitle: View {
     enum DisplayMode {
         case comprehensive
         case title
         case artists
-        
+
         var hasTitle: Bool {
             switch self {
             case .artists:
@@ -22,7 +22,7 @@ struct MusicTitle: View {
                 true
             }
         }
-        
+
         var hasArtists: Bool {
             switch self {
             case .title:
@@ -32,10 +32,10 @@ struct MusicTitle: View {
             }
         }
     }
-    
+
     var mode: DisplayMode = .comprehensive
     var item: PlaylistItem?
-    
+
     var body: some View {
         if let item {
             HStack(spacing: 12) {
@@ -50,10 +50,10 @@ struct MusicTitle: View {
                     }
                     .bold()
                 }
-                
+
                 if mode.hasArtists {
                     let values = item.editableMetadata[extracting: \.artist]
-                    
+
                     if let artist = values.current {
                         HStack(spacing: 4) {
                             let artists = PlayerModel.splitArtists(from: artist)
@@ -62,7 +62,7 @@ struct MusicTitle: View {
                                     Text("·")
                                         .foregroundStyle(.placeholder)
                                 }
-                                
+
                                 Text(composer)
                                     .foregroundStyle(.secondary)
                             }

@@ -19,6 +19,6 @@ extension String {
         } else {
             self.endIndex
         }
-        return self[startIndex..<endIndex]
+        return self[startIndex ..< endIndex]
     }
 }

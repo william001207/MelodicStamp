@@ -6,14 +6,14 @@
 //
 
 import AppKit
-import SwiftUI
 import Luminare
 import SFSafeSymbols
+import SwiftUI
 
 struct PlaylistView: View {
     @Bindable var player: PlayerModel
     @Bindable var metadataEditor: MetadataEditorModel
-    
+
     var body: some View {
         AutoScrollView(.vertical) {
             LuminareList(
@@ -34,7 +34,7 @@ struct PlaylistView: View {
                         Text("Play")
                     }
                     .tint(.accentColor)
-                    
+
                     Button {
                         player.removeFromPlaylist(urls: [item.wrappedValue.url])
                     } label: {
@@ -51,14 +51,14 @@ struct PlaylistView: View {
                 }
                 .disabled(!metadataEditor.hasEditableMetadata)
                 .aspectRatio(1, contentMode: .fit)
-                
+
                 Button {
                     let hasShift = NSEvent.modifierFlags.contains(.shift)
                     player.playbackMode = player.playbackMode.cycle(negate: hasShift)
                 } label: {
                     HStack {
                         player.playbackMode.image
-                        
+
                         switch player.playbackMode {
                         case .single:
                             Text("Single Loop")
@@ -76,10 +76,12 @@ struct PlaylistView: View {
             }
             .luminareBordered(false)
             .luminareButtonCornerRadius(8)
-            
+            .padding(.horizontal)
+
             Spacer()
-                .frame(height: 72)
+                .frame(height: 150)
         }
-        .contentMargins(.top, 48)
+        .contentMargins(.top, 64)
+        .contentMargins(.bottom, 94)
     }
 }

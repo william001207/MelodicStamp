@@ -10,7 +10,7 @@ import SwiftUI
 struct LabeledSection<Content, Label>: View where Content: View, Label: View {
     @ViewBuilder private var content: () -> Content
     @ViewBuilder private var label: () -> Label
-    
+
     init(
         content: @escaping () -> Content,
         label: @escaping () -> Label
@@ -18,7 +18,7 @@ struct LabeledSection<Content, Label>: View where Content: View, Label: View {
         self.content = content
         self.label = label
     }
-    
+
     init(
         _ key: LocalizedStringKey,
         content: @escaping () -> Content
@@ -27,7 +27,7 @@ struct LabeledSection<Content, Label>: View where Content: View, Label: View {
             Text(key)
         }
     }
-    
+
     init(
         content: @escaping () -> Content
     ) where Label == EmptyView {
@@ -35,7 +35,7 @@ struct LabeledSection<Content, Label>: View where Content: View, Label: View {
             EmptyView()
         }
     }
-    
+
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             if Label.self != EmptyView.self {
@@ -43,11 +43,11 @@ struct LabeledSection<Content, Label>: View where Content: View, Label: View {
                     label()
                         .font(.caption)
                         .foregroundStyle(.secondary)
-                    
+
                     Spacer()
                 }
             }
-            
+
             content()
         }
     }
@@ -55,9 +55,7 @@ struct LabeledSection<Content, Label>: View where Content: View, Label: View {
 
 #Preview {
     LabeledSection {
-        Button("Button") {
-            
-        }
+        Button("Button") {}
     } label: {
         Text("Label")
     }

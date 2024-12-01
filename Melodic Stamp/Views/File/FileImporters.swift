@@ -10,7 +10,7 @@ import SwiftUI
 struct FileImporters: View {
     @Bindable var fileManager: FileManagerModel
     @Bindable var player: PlayerModel
-    
+
     var body: some View {
         Color.clear
             .fileImporter(
@@ -18,13 +18,13 @@ struct FileImporters: View {
                 allowedContentTypes: allowedContentTypes
             ) { result in
                 switch result {
-                case .success(let url):
+                case let .success(url):
                     fileManager.open(url: url, using: player)
                 case .failure:
                     break
                 }
             }
-        
+
         Color.clear
             .fileImporter(
                 isPresented: $fileManager.isFileAdderPresented,
@@ -32,7 +32,7 @@ struct FileImporters: View {
                 allowsMultipleSelection: true
             ) { result in
                 switch result {
-                case .success(let urls):
+                case let .success(urls):
                     fileManager.add(urls: urls, to: player)
                 case .failure:
                     break

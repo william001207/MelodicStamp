@@ -9,7 +9,7 @@ import SwiftUI
 
 struct FileCommands: Commands {
     @FocusedValue(\.fileManager) private var fileManager
-    
+
     var body: some Commands {
         CommandGroup(after: .newItem) {
             Menu("Open File") {
@@ -17,34 +17,34 @@ struct FileCommands: Commands {
                     fileManager?.emitOpen(style: .inCurrentPlaylist)
                 }
                 .keyboardShortcut("o", modifiers: .command)
-                
+
                 Button("Replacing Current Playlist") {
                     fileManager?.emitOpen(style: .replacingCurrentPlaylistOrSelection)
                 }
                 .keyboardShortcut("o", modifiers: [.command, .shift])
-                
+
                 Divider()
-                
+
                 Button("Forming New Playlist") {
                     fileManager?.emitOpen(style: .formingNewPlaylist)
                 }
                 .keyboardShortcut("o", modifiers: [.command, .shift, .option])
             }
             .disabled(fileManager == nil)
-            
+
             Menu("Add Files") {
                 Button("To Current Playlist") {
                     fileManager?.emitAdd(style: .toCurrentPlaylist)
                 }
                 .keyboardShortcut("p", modifiers: .command)
-                
+
                 Button("Replacing Current Playlist") {
                     fileManager?.emitAdd(style: .replacingCurrentPlaylistOrSelection)
                 }
                 .keyboardShortcut("p", modifiers: [.command, .shift])
-                
+
                 Divider()
-                
+
                 Button("Forming New Playlist") {
                     fileManager?.emitAdd(style: .formingNewPlaylist)
                 }

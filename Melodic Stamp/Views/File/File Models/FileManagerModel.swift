@@ -22,20 +22,20 @@ enum FileAdderPresentationStyle {
 @Observable class FileManagerModel {
     var isFileOpenerPresented: Bool = false
     private var fileOpenerPresentationStyle: FileOpenerPresentationStyle = .inCurrentPlaylist
-    
+
     var isFileAdderPresented: Bool = false
     private var fileAdderPresentationStyle: FileAdderPresentationStyle = .toCurrentPlaylist
-    
+
     func emitOpen(style: FileOpenerPresentationStyle = .inCurrentPlaylist) {
         isFileOpenerPresented = true
         fileOpenerPresentationStyle = style
     }
-    
+
     func emitAdd(style: FileAdderPresentationStyle = .toCurrentPlaylist) {
         isFileAdderPresented = true
         fileAdderPresentationStyle = style
     }
-    
+
     func open(url: URL, using player: PlayerModel) {
         switch fileOpenerPresentationStyle {
         case .inCurrentPlaylist:
@@ -47,7 +47,7 @@ enum FileAdderPresentationStyle {
             break
         }
     }
-    
+
     func add(urls: [URL], to player: PlayerModel) {
         switch fileAdderPresentationStyle {
         case .toCurrentPlaylist:

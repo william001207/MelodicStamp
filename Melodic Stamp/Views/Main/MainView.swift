@@ -9,11 +9,34 @@ import Luminare
 import Morphed
 import SwiftUI
 
+private extension View {
+    @ViewBuilder func morphed() -> some View {
+        morphed(
+            insets: .init(bottom: .fixed(length: 64).mirrored),
+            LinearGradient(
+                colors: [.white, .black],
+                startPoint: .top,
+                endPoint: .bottom
+            )
+        )
+        .ignoresSafeArea()
+        .morphed(
+            insets: .init(top: .fixed(length: 94).mirrored),
+            LinearGradient(
+                colors: [.white, .black],
+                startPoint: .bottom,
+                endPoint: .top
+            )
+        )
+        .ignoresSafeArea()
+    }
+}
+
 struct ExcerptAlignment: AlignmentID {
     static func defaultValue(in context: ViewDimensions) -> CGFloat {
         context[.bottom]
     }
-    
+
     static let alignment: VerticalAlignment = .init(ExcerptAlignment.self)
 }
 
@@ -27,19 +50,19 @@ struct MainView: View {
 
     @State private var metadataEditor: MetadataEditorModel = .init()
     @State private var lyrics: LyricsModel = .init()
-    
+
     @State private var size: CGSize = .zero
 
     var body: some View {
         // use `ZStack` to eliminate safe area animation problems
         ZStack {
-            
-            VisualEffectView( material: .contentBackground, blendingMode: .behindWindow)
-            
+            VisualEffectView(material: .contentBackground, blendingMode: .behindWindow)
+
             if !player.isPlaylistEmpty {
                 let morphedGradient = LinearGradient(
                     colors: [.white, .black], startPoint: .top,
-                    endPoint: .bottom)
+                    endPoint: .bottom
+                )
 
                 HSplitView {
                     ForEach(Array(selectedTabs).sorted { $0.order < $1.order }) { tab in
@@ -50,18 +73,12 @@ struct MainView: View {
                             )
                             .frame(minWidth: 400)
                             .ignoresSafeArea()
-
-                            .morphed(
-                                insets: .init(
-                                    bottom: .fixed(length: 64).mirrored),
-                                morphedGradient
-                            )
-                            .ignoresSafeArea()
-
+                            .morphed()
                             .background {
                                 VisualEffectView(
                                     material: .popover,
-                                    blendingMode: .behindWindow)
+                                    blendingMode: .behindWindow
+                                )
                             }
                         case .inspector:
                             InspectorView(
@@ -69,52 +86,34 @@ struct MainView: View {
                             )
                             .frame(minWidth: 250)
                             .ignoresSafeArea()
-
-                            .morphed(
-                                insets: .init(
-                                    bottom: .fixed(length: 64).mirrored),
-                                morphedGradient
-                            )
-                            .ignoresSafeArea()
-
+                            .morphed()
                             .background {
                                 VisualEffectView(
                                     material: .titlebar,
-                                    blendingMode: .behindWindow)
+                                    blendingMode: .behindWindow
+                                )
                             }
                         case .metadata:
                             MetadataView()
                                 .frame(minWidth: 250)
                                 .ignoresSafeArea()
-
-                                .morphed(
-                                    insets: .init(
-                                        bottom: .fixed(length: 64).mirrored),
-                                    morphedGradient
-                                )
-                                .ignoresSafeArea()
-
+                                .morphed()
                                 .background {
                                     VisualEffectView(
                                         material: .titlebar,
-                                        blendingMode: .behindWindow)
+                                        blendingMode: .behindWindow
+                                    )
                                 }
                         case .lyrics:
                             LyricsView(metadataEditor: metadataEditor, lyrics: lyrics)
                                 .frame(minWidth: 250)
                                 .ignoresSafeArea()
-                            
-                                .morphed(
-                                    insets: .init(
-                                        bottom: .fixed(length: 64).mirrored),
-                                    morphedGradient
-                                )
-                                .ignoresSafeArea()
-                            
+                                .morphed()
                                 .background {
                                     VisualEffectView(
                                         material: .titlebar,
-                                        blendingMode: .behindWindow)
+                                        blendingMode: .behindWindow
+                                    )
                                 }
                         }
                     }
@@ -174,21 +173,36 @@ struct MainView: View {
                         .clipShape(.buttonBorder)
                 }
             }
+
+            if isLyricsToolbarPresented {
+                ToolbarItemGroup(placement: .confirmationAction) {
+                    LyricsToolbar(lyricsType: $lyrics.type)
+                        .background(.ultraThinMaterial)
+                        .clipShape(.buttonBorder)
+                }
+            }
         }
     }
 
     private var isEditorToolbarPresented: Bool {
         let hasEditor = !Set(selectedTabs.map(\.composable))
-            .intersection([.metadata, .lyrics])
+            .intersection([.metadata])
+            .isEmpty
+        return hasEditor && !player.isPlaylistEmpty
+    }
+
+    private var isLyricsToolbarPresented: Bool {
+        let hasEditor = !Set(selectedTabs.map(\.composable))
+            .intersection([.lyrics])
             .isEmpty
         return hasEditor && !player.isPlaylistEmpty
     }
 }
 
-#Preview {
-    @Previewable @State var selectedTabs: Set<SidebarTab> = .init(
-        SidebarTab.allCases)
-
-    MainView(fileManager: .init(), player: .init(), selectedTabs: $selectedTabs)
-        .frame(minWidth: 1000, minHeight: 600)
-}
+// #Preview {
+//    @Previewable @State var selectedTabs: Set<SidebarTab> = .init(
+//        SidebarTab.allCases)
+//
+//    MainView(fileManager: .init(), player: .init(), selectedTabs: $selectedTabs)
+//        .frame(minWidth: 1000, minHeight: 600)
+// }

@@ -9,17 +9,17 @@ import SwiftUI
 
 struct PlaylistItemView: View {
     @Bindable var player: PlayerModel
-    
+
     var item: PlaylistItem
     var isSelected: Bool
-    
+
     @State private var isHovering: Bool = false
-    
+
     var body: some View {
         HStack(alignment: .center) {
             let isMetadataLoaded = item.editableMetadata.state.isLoaded
             let isMetadataModified = item.editableMetadata.isModified
-            
+
             VStack(alignment: .leading) {
                 HStack {
                     if isMetadataModified {
@@ -27,7 +27,7 @@ struct PlaylistItemView: View {
                             .bold()
                             .foregroundStyle(.tint)
                     }
-                    
+
                     if isMetadataLoaded {
                         MarqueeScrollView(animate: false) {
                             MusicTitle(item: item)
@@ -41,14 +41,14 @@ struct PlaylistItemView: View {
                 .transition(.blurReplace)
                 .animation(.default, value: isMetadataLoaded)
                 .animation(.default, value: isMetadataModified)
-                
+
                 Text(item.url.lastPathComponent)
                     .font(.caption)
                     .foregroundStyle(.placeholder)
             }
-            
+
             Spacer()
-            
+
             AliveButton {
                 player.play(item: item)
             } label: {
@@ -56,7 +56,7 @@ struct PlaylistItemView: View {
                     if isMetadataLoaded {
                         Group {
                             let values = item.editableMetadata[extracting: \.coverImages]
-                            
+
                             MusicCover(cornerRadius: 0, coverImages: values.current, maxResolution: 32)
                                 .frame(maxWidth: .infinity)
                                 .overlay {
@@ -69,7 +69,7 @@ struct PlaylistItemView: View {
                         }
                         .clipShape(.rect(cornerRadius: 6))
                     }
-                    
+
                     if isHovering {
                         Image(systemSymbol: isMetadataLoaded ? .playFill : .playSlashFill)
                             .font(.title3)
