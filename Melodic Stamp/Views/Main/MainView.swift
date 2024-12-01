@@ -79,7 +79,7 @@ struct MainView: View {
 
                             .background {
                                 VisualEffectView(
-                                    material: .headerView,
+                                    material: .titlebar,
                                     blendingMode: .behindWindow)
                             }
                         case .metadata:
@@ -96,7 +96,7 @@ struct MainView: View {
 
                                 .background {
                                     VisualEffectView(
-                                        material: .headerView,
+                                        material: .titlebar,
                                         blendingMode: .behindWindow)
                                 }
                         case .lyrics:
@@ -113,7 +113,7 @@ struct MainView: View {
                             
                                 .background {
                                     VisualEffectView(
-                                        material: .headerView,
+                                        material: .titlebar,
                                         blendingMode: .behindWindow)
                                 }
                         }

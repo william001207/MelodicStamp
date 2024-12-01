@@ -15,12 +15,12 @@ protocol LyricLine: Equatable, Hashable, Identifiable {
     var endTime: TimeInterval? { get set }
     var content: String { get set }
     
-    var isEmpty: Bool { get }
+    var isValid: Bool { get }
 }
 
 extension LyricLine {
-    var isEmpty: Bool {
-        startTime == nil && endTime == nil && content.isEmpty
+    var isValid: Bool {
+        startTime != nil || endTime != nil
     }
 }
 
@@ -29,77 +29,9 @@ extension LyricLine {
 protocol LyricsParser {
     associatedtype Line: LyricLine
     
-    var tags: [LyricTag] { get set }
     var lines: [Line] { get set }
     
     init(string: String) throws
-}
-
-// MARK: - Lyric Tag
-
-struct LyricTag: Identifiable {
-    enum LyricTagType: String, Identifiable, CaseIterable {
-        case artist = "ar"
-        case album = "al"
-        case title = "ti"
-        case author = "au"
-        case length
-        case creator = "by"
-        case offset
-        case editor = "re"
-        case version = "ve"
-        case translation = "tr"
-        
-        var id: String {
-            rawValue
-        }
-        
-        var isMetadata: Bool {
-            switch self {
-            case .length, .offset: true
-            default: false
-            }
-        }
-        
-        var name: String {
-            switch self {
-            case .artist: .init(localized: "Artist")
-            case .album: .init(localized: "Album")
-            case .title: .init(localized: "Title")
-            case .author: .init(localized: "Author")
-            case .length: .init(localized: "Length")
-            case .creator: .init(localized: "Creator")
-            case .offset: .init(localized: "Offset")
-            case .editor: .init(localized: "Editor")
-            case .version: .init(localized: "Version")
-            case .translation: .init(localized: "Translation")
-            }
-        }
-        
-        static var regex: Regex<Substring> {
-            Regex {
-                ChoiceOf {
-                    artist.rawValue
-                    album.rawValue
-                    title.rawValue
-                    author.rawValue
-                    length.rawValue
-                    creator.rawValue
-                    offset.rawValue
-                    editor.rawValue
-                    version.rawValue
-                    translation.rawValue
-                }
-            }
-        }
-    }
-    
-    var id: LyricTagType {
-        type
-    }
-    
-    var type: LyricTagType
-    var content: String
 }
 
 // MARK: Lyrics Type

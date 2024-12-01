@@ -66,46 +66,16 @@ struct LyricsView: View {
     }
     
     @ViewBuilder private func lyricLines() -> some View {
-//        ForEach(Array(player.lyricLines.enumerated()), id: \.offset) { index, line in
-//            VStack(spacing: 2) {
-//                let isCurrent = isCurrent(line: index)
-//                if let stringF = line.stringF {
-//                    Text(stringF)
-//                        .font(isCurrent ? .headline : .body)
-//                        .foregroundColor(isCurrent ? .blue : .primary)
-//                }
-//                
-//                if let stringS = line.stringS {
-//                    Text(stringS)
-//                        .font(isCurrent ? .subheadline : .caption)
-//                        .foregroundColor(isCurrent ? .gray : .secondary)
-//                }
-//            }
-//            .id(index)
-//        }
-        
         switch lyrics.storage {
         case .raw(let parser):
-            ForEach(parser.tags) { tag in
-                lyricTag(tag: tag)
-            }
-            
             ForEach(parser.lines) { line in
                 rawLyricLine(line: line)
             }
         case .lrc(let parser):
-            ForEach(parser.tags) { tag in
-                lyricTag(tag: tag)
-            }
-            
             ForEach(parser.lines) { line in
                 lrcLyricLine(line: line)
             }
         case .ttml(let parser):
-            ForEach(parser.tags) { tag in
-                lyricTag(tag: tag)
-            }
-            
             ForEach(parser.lines) { line in
                 ttmlLyricLine(line: line)
             }
@@ -114,19 +84,50 @@ struct LyricsView: View {
         }
     }
     
-    @ViewBuilder private func lyricTag(tag: LyricTag) -> some View {
-        Text(tag.content)
-    }
-    
     @ViewBuilder private func rawLyricLine(line: RawLyricLine) -> some View {
-        Text(line.content)
     }
     
     @ViewBuilder private func lrcLyricLine(line: LRCLyricLine) -> some View {
-        Text(line.content)
+        HStack {
+            ForEach(line.tags) { tag in
+                if !tag.type.isMetadata {
+                    switch tag.type {
+                    case .artist:
+                        Text(tag.content)
+                    case .album:
+                        Text(tag.content)
+                    case .title:
+                        Text(tag.content)
+                    case .author:
+                        Text(tag.content)
+                    case .creator:
+                        Text(tag.content)
+                    case .editor:
+                        Text(tag.content)
+                    case .version:
+                        Text(tag.content)
+                    default:
+                        EmptyView()
+                    }
+                }
+            }
+            .foregroundStyle(.secondary)
+            
+            if line.isValid && !line.content.isEmpty {
+                switch line.type {
+                case .main:
+                    Text(line.content)
+                case .translation(let locale):
+                    Text(locale)
+                        .foregroundStyle(.placeholder)
+                    
+                    Text(line.content)
+                        .foregroundStyle(.secondary)
+                }
+            }
+        }
     }
     
     @ViewBuilder private func ttmlLyricLine(line: TTMLLyricLine) -> some View {
-        Text(line.content)
     }
 }

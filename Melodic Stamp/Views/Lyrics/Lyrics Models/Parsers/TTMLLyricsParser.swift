@@ -11,22 +11,17 @@ struct TTMLLyricLine: LyricLine {
     var startTime: TimeInterval?
     var endTime: TimeInterval?
     var content: String
-}
-
-extension TTMLLyricLine: Identifiable {
-    var id: Int {
-        hashValue
-    }
+    
+    let id: UUID = .init()
 }
 
 @Observable class TTMLLyricsParser: LyricsParser {
     typealias Line = TTMLLyricLine
     
-    var tags: [LyricTag]
     var lines: [TTMLLyricLine]
     
     required init(string: String) throws {
-        // TODO: parse ttml lyrics
-        fatalError()
+        // TODO: handle ttml parse
+        self.lines = []
     }
 }

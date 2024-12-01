@@ -11,22 +11,16 @@ struct RawLyricLine: LyricLine {
     var startTime: TimeInterval?
     var endTime: TimeInterval?
     var content: String
-}
-
-extension RawLyricLine: Identifiable {
-    var id: Int {
-        hashValue
-    }
+    
+    let id: UUID = .init()
 }
 
 @Observable class RawLyricsParser: LyricsParser {
     typealias Line = RawLyricLine
     
-    var tags: [LyricTag]
     var lines: [RawLyricLine]
     
     required init(string: String) throws {
-        self.tags = []
         self.lines = string
             .split(separator: .newlineSequence)
             .map(String.init(_:))
