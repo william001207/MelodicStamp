@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		2810E2452CFB169E006FF94A /* Morphed in Frameworks */ = {isa = PBXBuildFile; productRef = 2810E2442CFB169E006FF94A /* Morphed */; };
 		287F978D2CF3160700C60307 /* Luminare in Frameworks */ = {isa = PBXBuildFile; productRef = 287F978C2CF3160700C60307 /* Luminare */; };
+		65DFF89D2CFC2A6F00285040 /* SwiftSoup in Frameworks */ = {isa = PBXBuildFile; productRef = 65DFF89C2CFC2A6F00285040 /* SwiftSoup */; };
 		65F1DA7D2CED77F100389E37 /* SFBAudioEngine in Frameworks */ = {isa = PBXBuildFile; productRef = 65F1DA7C2CED77F100389E37 /* SFBAudioEngine */; };
 		65F1DA842CED788D00389E37 /* CAAudioHardware in Frameworks */ = {isa = PBXBuildFile; productRef = 65F1DA832CED788D00389E37 /* CAAudioHardware */; };
 		65F1DA8D2CED83F800389E37 /* FullDiskAccess in Frameworks */ = {isa = PBXBuildFile; productRef = 65F1DA8C2CED83F800389E37 /* FullDiskAccess */; };
@@ -51,6 +52,7 @@
 				287F978D2CF3160700C60307 /* Luminare in Frameworks */,
 				65F1DA9D2CEDBD8700389E37 /* Defaults in Frameworks */,
 				65F1DA8D2CED83F800389E37 /* FullDiskAccess in Frameworks */,
+				65DFF89D2CFC2A6F00285040 /* SwiftSoup in Frameworks */,
 				65F1DA7D2CED77F100389E37 /* SFBAudioEngine in Frameworks */,
 				65F1DA842CED788D00389E37 /* CAAudioHardware in Frameworks */,
 			);
@@ -102,6 +104,7 @@
 				65F1DAB22CEDBED700389E37 /* SFSafeSymbols */,
 				287F978C2CF3160700C60307 /* Luminare */,
 				2810E2442CFB169E006FF94A /* Morphed */,
+				65DFF89C2CFC2A6F00285040 /* SwiftSoup */,
 			);
 			productName = MelodicStamp;
 			productReference = 65F1DA012CECCEE900389E37 /* Melodic Stamp.app */;
@@ -140,6 +143,7 @@
 				65F1DAB12CEDBED700389E37 /* XCRemoteSwiftPackageReference "SFSafeSymbols" */,
 				287F978B2CF3160600C60307 /* XCRemoteSwiftPackageReference "Luminare" */,
 				2810E2432CFB169E006FF94A /* XCRemoteSwiftPackageReference "Morphed" */,
+				65DFF89B2CFC2A6F00285040 /* XCRemoteSwiftPackageReference "SwiftSoup" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 65F1DA022CECCEE900389E37 /* Products */;
@@ -392,6 +396,14 @@
 				kind = branch;
 			};
 		};
+		65DFF89B2CFC2A6F00285040 /* XCRemoteSwiftPackageReference "SwiftSoup" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/scinfu/SwiftSoup.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.7.6;
+			};
+		};
 		65F1DA7B2CED77F100389E37 /* XCRemoteSwiftPackageReference "SFBAudioEngine" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/sbooth/SFBAudioEngine";
@@ -444,6 +456,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 287F978B2CF3160600C60307 /* XCRemoteSwiftPackageReference "Luminare" */;
 			productName = Luminare;
+		};
+		65DFF89C2CFC2A6F00285040 /* SwiftSoup */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 65DFF89B2CFC2A6F00285040 /* XCRemoteSwiftPackageReference "SwiftSoup" */;
+			productName = SwiftSoup;
 		};
 		65F1DA7C2CED77F100389E37 /* SFBAudioEngine */ = {
 			isa = XCSwiftPackageProductDependency;
