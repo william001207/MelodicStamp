@@ -10,23 +10,15 @@ import CSFBAudioEngine
 
 struct MusicCover: View {
     var cornerRadius: CGFloat = 8
-    var image: NSImage? = nil
+    var images: [NSImage] = []
     var hasPlaceholder: Bool = true
     var maxResolution: CGFloat? = 128
 
     var body: some View {
         Group {
-            if let image {
-                let resizedImage = if let maxResolution, let resizedImage = resizeImage(image, maxResolution: maxResolution) {
-                    resizedImage
-                } else {
-                    image
-                }
-                
-                Image(nsImage: resizedImage)
-                    .resizable()
-                    .interpolation(.medium)
-                    .aspectRatio(contentMode: .fit)
+            if !images.isEmpty {
+                // TODO: handle multiple images
+                imageView(images.first!)
             } else {
                 Group {
                     if hasPlaceholder {
@@ -46,6 +38,19 @@ struct MusicCover: View {
             }
         }
         .clipShape(.rect(cornerRadius: cornerRadius))
+    }
+    
+    @ViewBuilder private func imageView(_ image: NSImage) -> some View {
+        let resizedImage = if let maxResolution, let resizedImage = resizeImage(image, maxResolution: maxResolution) {
+            resizedImage
+        } else {
+            image
+        }
+        
+        Image(nsImage: resizedImage)
+            .resizable()
+            .interpolation(.medium)
+            .aspectRatio(contentMode: .fit)
     }
 
     private func resizeImage(

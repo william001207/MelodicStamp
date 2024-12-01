@@ -16,66 +16,86 @@ struct AdaptableMusicCovers: View {
 
     var layout: Layout = .flow
     var maxWidth: CGFloat = 300
-    var value: MetadataValueState<Set<AttachedPicture>>
-    
+    var state: MetadataValueState<Set<AttachedPicture>>
+
     @State private var contentSize: CGSize = .zero
 
     var body: some View {
-        switch value {
+        switch layout {
+        case .flow:
+            flowView()
+        case .grid:
+            gridView()
+        }
+    }
+    
+    private var types: Set<AttachedPicture.`Type`> {
+        switch state {
         case .undefined:
-            Color.red
-        case .fine(let values):
-            if values.current.isEmpty {
-                MusicCover()
-            } else {
-                switch layout {
-                case .flow:
-                    flowView(values: values)
-                case .grid:
-                    gridView(values: values)
-                }
-            }
-        case .varied(let valueSetter):
-            Color.blue
+            []
+        case .fine(let value):
+            Set(value.current.map(\.type))
+        case .varied(let values):
+            Set(values.current.values.flatMap(\.self).map(\.type))
         }
     }
 
-    @ViewBuilder private func flowView(values: EditableMetadata.Values<Set<AttachedPicture>>) -> some View {
+    private var count: Int {
+        types.count
+    }
+
+    @ViewBuilder private func cover(type: AttachedPicture.`Type`) -> some View {
+        let attachedPictures: [AttachedPicture] = switch state {
+        case .undefined:
+            []
+        case .fine(let value):
+                .init(value.current)
+        case .varied(let values):
+            values.current.values.flatMap(\.self)
+        }
+        
+        let images = attachedPictures.compactMap(\.image)
+        
+        VStack(spacing: 8) {
+            attachedPictureType(type)
+                .font(.caption)
+                .foregroundStyle(.placeholder)
+                .padding(.vertical, 2)
+                .padding(.horizontal, 6)
+                .background {
+                    Rectangle()
+                        .fill(.regularMaterial)
+                        .background(.placeholder)
+                }
+                .clipShape(.capsule)
+            
+            MusicCover(
+                images: images,
+                maxResolution: 64 * max(1, round(contentSize.width / 64))
+            )
+            .padding(.horizontal, 16)
+            .containerRelativeFrame(
+                .horizontal, alignment: .center
+            ) { length, axis in
+                switch axis {
+                case .horizontal:
+                    let count = max(1, count)
+                    let proportional =
+                    length / floor((length + maxWidth) / maxWidth)
+                    return max(proportional, length / CGFloat(count))
+                case .vertical:
+                    return length
+                }
+            }
+        }
+        .padding(.bottom, 8)
+    }
+
+    @ViewBuilder private func flowView() -> some View {
         ScrollView(.horizontal) {
             LazyHStack(alignment: .center, spacing: 0) {
-                ForEach(Array(values.current), id: \.type) {
-                    attachedPicture in
-                    if let image = attachedPicture.image {
-                        VStack(spacing: 8) {
-                            attachedPictureType(attachedPicture.type)
-                                .font(.caption)
-                                .foregroundStyle(.placeholder)
-                                .padding(.vertical, 2)
-                                .padding(.horizontal, 6)
-                                .background {
-                                    Rectangle()
-                                        .fill(.regularMaterial)
-                                        .background(.placeholder)
-                                }
-                                .clipShape(.capsule)
-                            
-                            MusicCover(image: image, maxResolution: 64 * max(1, round(contentSize.width / 64)))
-                                .padding(.horizontal, 16)
-                                .containerRelativeFrame(
-                                    .horizontal, alignment: .center
-                                ) { length, axis in
-                                    switch axis {
-                                    case .horizontal:
-                                        let count = max(1, values.current.count)
-                                        let proportional = length / floor((length + maxWidth) / maxWidth)
-                                        return max(proportional, length / CGFloat(count))
-                                    case .vertical:
-                                        return length
-                                    }
-                                }
-                        }
-                        .padding(.bottom, 8)
-                    }
+                ForEach(Array(types), id: \.self) { type in
+                    cover(type: type)
                 }
             }
             .scrollTargetLayout()
@@ -86,14 +106,18 @@ struct AdaptableMusicCovers: View {
             }
         }
         .scrollTargetBehavior(.viewAligned)
-        .scrollDisabled(values.current.count <= 1 || contentSize.width >= maxWidth * CGFloat(values.current.count))
+        .scrollDisabled(
+           count <= 1 || contentSize.width >= maxWidth * CGFloat(count)
+        )
     }
 
-    @ViewBuilder private func gridView(values: EditableMetadata.Values<Set<AttachedPicture>>) -> some View {
+    @ViewBuilder private func gridView() -> some View {
 
     }
-    
-    @ViewBuilder private func attachedPictureType(_ type: AttachedPicture.`Type`) -> some View {
+
+    @ViewBuilder private func attachedPictureType(
+        _ type: AttachedPicture.`Type`
+    ) -> some View {
         switch type {
         case .other:
             Text("Other")

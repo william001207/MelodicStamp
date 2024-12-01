@@ -18,7 +18,7 @@ struct InspectorView: View {
         if metadataEditor.hasEditableMetadata {
             AutoScrollView(.vertical) {
                 VStack(spacing: 24) {
-                    AdaptableMusicCovers(value: metadataEditor[extracting: \.attachedPictures])
+                    AdaptableMusicCovers(state: metadataEditor[extracting: \.attachedPictures])
                         .padding(.horizontal, -16)
                         .contentMargins(.horizontal, 16, for: .scrollIndicators)
                         .frame(height: 250)
@@ -89,12 +89,12 @@ struct InspectorView: View {
                 EmptyView()
             }
         } badge: {
-            LabeledTextField("BPM", value: metadataEditor[extracting: \.bpm], format: .number)
+            LabeledTextField("BPM", state: metadataEditor[extracting: \.bpm], format: .number)
         }
         .luminarePopoverTrigger(.forceTouch)
 
         HStack {
-            LabeledTextField("No.", value: metadataEditor[extracting: \.trackNumber], format: .number, showsLabel: false)
+            LabeledTextField("No.", state: metadataEditor[extracting: \.trackNumber], format: .number, showsLabel: false)
                 .frame(maxWidth: 72)
 
             Image(systemSymbol: .poweron)
@@ -103,11 +103,11 @@ struct InspectorView: View {
                 .frame(width: 4)
                 .foregroundStyle(.placeholder)
 
-            LabeledTextField("Tracks", value: metadataEditor[extracting: \.trackTotal], format: .number)
+            LabeledTextField("Tracks", state: metadataEditor[extracting: \.trackTotal], format: .number)
         }
 
         HStack {
-            LabeledTextField("No.", value: metadataEditor[extracting: \.discNumber], format: .number, showsLabel: false)
+            LabeledTextField("No.", state: metadataEditor[extracting: \.discNumber], format: .number, showsLabel: false)
                 .frame(maxWidth: 72)
 
             Image(systemSymbol: .poweron)
@@ -116,7 +116,7 @@ struct InspectorView: View {
                 .frame(width: 4)
                 .foregroundStyle(.placeholder)
 
-            LabeledTextField("Discs", value: metadataEditor[extracting: \.discTotal], format: .number)
+            LabeledTextField("Discs", state: metadataEditor[extracting: \.discTotal], format: .number)
         }
     }
 }

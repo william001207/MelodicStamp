@@ -7,10 +7,10 @@
 
 import SwiftUI
 
-enum MetadataValueState<V: Equatable>: Equatable {
+enum MetadataValueState<V: Equatable & Hashable>: Equatable {
     case undefined
-    case fine(EditableMetadata.Values<V>)
-    case varied(EditableMetadata.ValueSetter<V>)
+    case fine(EditableMetadata.Value<V>)
+    case varied(EditableMetadata.Values<V>)
 }
 
 enum MetadataEditingState: Equatable {
@@ -72,14 +72,16 @@ enum MetadataEditingState: Equatable {
         }
     }
 
-    subscript<V: Equatable>(extracting keyPath: WritableKeyPath<Metadata, V>) -> MetadataValueState<V> {
+    subscript<V: Equatable & Hashable>(extracting keyPath: WritableKeyPath<Metadata, V>) -> MetadataValueState<V> {
         guard hasEditableMetadata else { return .undefined }
 
-        let setter = EditableMetadata.ValueSetter(keyPath: keyPath, editableMetadatas: editableMetadatas)
-        let values = editableMetadatas
-            .map { $0[extracting: keyPath] }
-        let areIdentical = values.allSatisfy { $0.current == values[0].current }
+        let values = editableMetadatas.map(\.current).map { $0[keyPath: keyPath] }
+        let areIdentical = values.allSatisfy { $0 == values[0] }
 
-        return areIdentical ? .fine(values[0]) : .varied(setter)
+        return if areIdentical {
+            .fine(.init(keyPath: keyPath, metadatas: editableMetadatas))
+        } else {
+            .varied(.init(keyPath: keyPath, metadatas: editableMetadatas))
+        }
     }
 }

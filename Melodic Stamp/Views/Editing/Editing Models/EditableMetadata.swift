@@ -9,20 +9,20 @@
 import SwiftUI
 
 @Observable final class EditableMetadata: Identifiable, Sendable {
-    struct Values<V: Equatable>: Equatable {
+    struct Value<V: Equatable>: Equatable {
         let keyPath: WritableKeyPath<Metadata, V>
-        let metadata: EditableMetadata
-
+        let metadatas: Set<EditableMetadata>
+        
         var current: V {
-            get { metadata.current[keyPath: keyPath] }
-            nonmutating set { metadata.current[keyPath: keyPath] = newValue }
+            get { metadatas.first!.current[keyPath: keyPath] }
+            nonmutating set { metadatas.forEach { $0.current[keyPath: keyPath] = newValue } }
         }
-
+        
         private(set) var initial: V {
-            get { metadata.initial[keyPath: keyPath] }
-            nonmutating set { metadata.initial[keyPath: keyPath] = newValue }
+            get { metadatas.first!.initial[keyPath: keyPath] }
+            nonmutating set { metadatas.forEach { $0.initial[keyPath: keyPath] = newValue } }
         }
-
+        
         var projectedValue: Binding<V> {
             Binding(get: {
                 current
@@ -30,26 +30,70 @@ import SwiftUI
                 current = newValue
             })
         }
-
+        
         var isModified: Bool {
             current != initial
         }
-
+        
         func revert() {
             current = initial
         }
-
+        
         func apply() {
             initial = current
         }
     }
-
-    struct ValueSetter<V>: Equatable {
+    
+    struct Values<V: Equatable & Hashable>: Equatable {
         let keyPath: WritableKeyPath<Metadata, V>
-        let editableMetadatas: Set<EditableMetadata>
-
-        func set(_ value: V) {
-            editableMetadatas.forEach { $0.current[keyPath: keyPath] = value }
+        let metadatas: Set<EditableMetadata>
+        
+        var current: [EditableMetadata.ID: V] {
+            get {
+                Dictionary(
+                    uniqueKeysWithValues: metadatas.map { ($0.id, $0.current[keyPath: keyPath]) }
+                )
+            }
+            
+            nonmutating set {
+                for (id, newValue) in newValue {
+                    metadatas.first(where: { $0.id == id })?.current[keyPath: keyPath] = newValue
+                }
+            }
+        }
+        
+        private(set) var initial: [EditableMetadata.ID: V] {
+            get {
+                Dictionary(
+                    uniqueKeysWithValues: metadatas.map { ($0.id, $0.initial[keyPath: keyPath]) }
+                )
+            }
+            
+            nonmutating set {
+                for (id, newValue) in newValue {
+                    metadatas.first(where: { $0.id == id })?.initial[keyPath: keyPath] = newValue
+                }
+            }
+        }
+        
+        var projectedValue: Binding<[ID: V]> {
+            Binding(get: {
+                current
+            }, set: { newValue in
+                current = newValue
+            })
+        }
+        
+        var isModified: Bool {
+            current != initial
+        }
+        
+        func revertAll() {
+            current = initial
+        }
+        
+        func applyAll() {
+            initial = current
         }
     }
 
@@ -155,8 +199,8 @@ import SwiftUI
         }
     }
 
-    subscript<V>(extracting keyPath: WritableKeyPath<Metadata, V>) -> Values<V> {
-        .init(keyPath: keyPath, metadata: self)
+    subscript<V>(extracting keyPath: WritableKeyPath<Metadata, V>) -> Value<V> {
+        .init(keyPath: keyPath, metadatas: [self])
     }
 }
 
