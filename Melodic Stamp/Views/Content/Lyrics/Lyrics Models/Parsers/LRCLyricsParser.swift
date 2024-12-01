@@ -149,7 +149,7 @@ struct LRCLyricLine: LyricLine {
                         // save as start time
                         line.startTime = time
                     } else if line.endTime == nil {
-                        // save as end time or drop
+                        // save as end time
                         line.endTime = time
                     }
                 } else {
@@ -174,6 +174,29 @@ struct LRCLyricLine: LyricLine {
 
             lines.append(line)
         }
+    }
+    
+    func find(at time: TimeInterval) -> IndexSet {
+        var nearestStartTime: TimeInterval = .zero
+        var indices: IndexSet = []
+        
+        for startTime in lines.compactMap(\.startTime) {
+            guard startTime <= time && startTime >= nearestStartTime else { continue }
+            nearestStartTime = startTime
+        }
+        
+        for (index, line) in lines.enumerated() {
+            guard let startTime = line.startTime, startTime <= time && startTime >= nearestStartTime else { continue }
+            
+            if let endTime = line.endTime {
+                guard endTime > time else { continue }
+                indices.insert(index)
+            } else {
+                indices.insert(index)
+            }
+        }
+        
+        return indices
     }
 
     static func parseTag(string: String) throws -> Tag? {

@@ -24,4 +24,8 @@ struct TTMLLyricLine: LyricLine {
         // TODO: handle ttml parse
         lines = []
     }
+    
+    func find(at time: TimeInterval) -> IndexSet {
+        []
+    }
 }

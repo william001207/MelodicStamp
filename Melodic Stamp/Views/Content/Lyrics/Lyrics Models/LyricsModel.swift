@@ -32,6 +32,8 @@ protocol LyricsParser {
     var lines: [Line] { get set }
 
     init(string: String) throws
+    
+    func find(at time: TimeInterval) -> IndexSet
 }
 
 // MARK: Lyrics Type
@@ -60,21 +62,34 @@ enum LyricsStorage {
         case .ttml: .ttml
         }
     }
+    
+    func find(at time: TimeInterval) -> IndexSet {
+        switch self {
+        case .raw(let parser):
+            parser.find(at: time)
+        case .lrc(let parser):
+            parser.find(at: time)
+        case .ttml(let parser):
+            parser.find(at: time)
+        }
+    }
 }
 
 // MARK: Lyrics Model
 
 @Observable class LyricsModel {
     private(set) var storage: LyricsStorage?
+    private(set) var url: URL?
     var type: LyricsType = .raw
 
     private var cache: String?
 
-    func load(string: String?) throws {
+    func load(string: String?, in url: URL?) throws {
         // debounce
-        guard type != storage?.type || string != cache else { return }
+        guard type != storage?.type || string != cache || url != self.url else { return }
 
         cache = string
+        self.url = url
         guard let string else {
             storage = nil
             return
@@ -88,5 +103,10 @@ enum LyricsStorage {
         case .ttml:
             try .ttml(parser: .init(string: string))
         }
+    }
+    
+    func find(at time: TimeInterval, in url: URL?) -> IndexSet {
+        guard let storage, let url, url == self.url else { return [] }
+        return storage.find(at: time)
     }
 }

@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct LyricsView: View {
+    @Bindable var player: PlayerModel
     @Bindable var metadataEditor: MetadataEditorModel
     @Bindable var lyrics: LyricsModel
 
@@ -20,7 +21,7 @@ struct LyricsView: View {
                 TimelineView(.animation) { _ in
                     ScrollViewReader { _ in
                         ScrollView {
-                            LazyVStack(alignment: .center, spacing: 10) {
+                            VStack(alignment: .center, spacing: 10) {
                                 lyricLines()
                             }
                             .padding(.horizontal)
@@ -49,29 +50,35 @@ struct LyricsView: View {
     private var lyricsState: MetadataValueState<String?> {
         metadataEditor[extracting: \.lyrics]
     }
+    
+    private var highlightedIndices: IndexSet {
+        lyrics.find(at: player.timeElapsed, in: player.current?.url)
+    }
 
     @ViewBuilder private func lyricLines() -> some View {
         switch lyrics.storage {
         case let .raw(parser):
-            ForEach(parser.lines) { line in
-                rawLyricLine(line: line)
+            ForEach(Array(parser.lines.enumerated()), id: \.element) { index, line in
+                rawLyricLine(index: index, line: line)
             }
         case let .lrc(parser):
-            ForEach(parser.lines) { line in
-                lrcLyricLine(line: line)
+            ForEach(Array(parser.lines.enumerated()), id: \.element) { index, line in
+                lrcLyricLine(index: index, line: line)
             }
         case let .ttml(parser):
-            ForEach(parser.lines) { line in
-                ttmlLyricLine(line: line)
+            ForEach(Array(parser.lines.enumerated()), id: \.element) { index, line in
+                ttmlLyricLine(index: index, line: line)
             }
         case .none:
             EmptyView()
         }
     }
 
-    @ViewBuilder private func rawLyricLine(line _: RawLyricLine) -> some View {}
+    @ViewBuilder private func rawLyricLine(index: Int, line _: RawLyricLine) -> some View {}
 
-    @ViewBuilder private func lrcLyricLine(line: LRCLyricLine) -> some View {
+    @ViewBuilder private func lrcLyricLine(index: Int, line: LRCLyricLine) -> some View {
+        let isHighlighted = highlightedIndices.contains(index)
+        
         HStack {
             ForEach(line.tags) { tag in
                 if !tag.type.isMetadata {
@@ -110,15 +117,16 @@ struct LyricsView: View {
                 }
             }
         }
+        .foregroundStyle(isHighlighted ? AnyShapeStyle(.tint) : AnyShapeStyle(.primary))
     }
 
-    @ViewBuilder private func ttmlLyricLine(line _: TTMLLyricLine) -> some View {}
+    @ViewBuilder private func ttmlLyricLine(index: Int, line _: TTMLLyricLine) -> some View {}
 
     private func loadLyrics() {
         switch lyricsState {
         case let .fine(values):
             do {
-                try lyrics.load(string: values.current)
+                try lyrics.load(string: values.current, in: player.current?.url)
             } catch {}
         default:
             break

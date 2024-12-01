@@ -105,7 +105,7 @@ struct MainView: View {
                                     )
                                 }
                         case .lyrics:
-                            LyricsView(metadataEditor: metadataEditor, lyrics: lyrics)
+                            LyricsView(player: player, metadataEditor: metadataEditor, lyrics: lyrics)
                                 .frame(minWidth: 250)
                                 .ignoresSafeArea()
                                 .morphed()
