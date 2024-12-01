@@ -1,5 +1,5 @@
 {
-  "originHash" : "8af311790365436b23ce04fe4853dc1e490109cba5c3bcb14a4d68c76ecfafbe",
+  "originHash" : "09de87deeb1104c978b498a23f8031364ceffd77b3166b4fb216be116157a3a1",
   "pins" : [
     {
       "identity" : "avfaudioextensions",
@@ -206,6 +206,15 @@
       "state" : {
         "revision" : "0687f71944021d616d34d922343dcef086855920",
         "version" : "600.0.1"
+      }
+    },
+    {
+      "identity" : "swiftsoup",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/scinfu/SwiftSoup.git",
+      "state" : {
+        "revision" : "0837db354faf9c9deb710dc597046edaadf5360f",
+        "version" : "2.7.6"
       }
     },
     {
