@@ -11,6 +11,8 @@ import CSFBAudioEngine
 struct AdaptableMusicCoverControl: View {
     @Namespace private var namespace
     
+    @Bindable var attachedPicturesHandler: AttachedPicturesHandlerModel
+    
     var state: MetadataValueState<Set<AttachedPicture>>
     var type: AttachedPicture.`Type`
     var maxResolution: CGFloat? = 128
@@ -23,11 +25,10 @@ struct AdaptableMusicCoverControl: View {
         case .undefined:
             []
         case .fine(let value):
-                .init(value.current)
+            .init(value.current)
         case .varied(let values):
             values.current.values.flatMap(\.self)
         }
-        
         let images = attachedPictures.compactMap(\.image)
         
         AliveButton {
@@ -41,7 +42,7 @@ struct AdaptableMusicCoverControl: View {
         }
         .fileImporter(
             isPresented: $isImagePickerPresented,
-            allowedContentTypes: [.jpeg, .png, .tiff, .bmp, .gif, .heic, .heif, .rawImage]
+            allowedContentTypes: AttachedPicturesHandlerModel.allowedContentTypes
         ) { result in
             switch result {
             case .success(let url):
@@ -49,17 +50,7 @@ struct AdaptableMusicCoverControl: View {
                 defer { url.stopAccessingSecurityScopedResource() }
                 
                 guard let image = NSImage(contentsOf: url), let attachedPicture = image.attachedPicture(of: type) else { break }
-                
-                switch state {
-                case .undefined:
-                    break
-                case .fine(let value):
-                    value.current = replacingAttachedPictures([attachedPicture], in: value.current)
-                case .varied(let values):
-                    values.current = values.current.mapValues { attachedPictures in
-                        replacingAttachedPictures([attachedPicture], in: attachedPictures)
-                    }
-                }
+                attachedPicturesHandler.replacingAndAddingAttachedPictures([attachedPicture], state: state)
             case .failure:
                 break
             }
@@ -90,16 +81,7 @@ struct AdaptableMusicCoverControl: View {
                     .disabled(!isModified)
                     
                     AliveButton {
-                        switch state {
-                        case .undefined:
-                            break
-                        case .fine(let value):
-                            value.current = []
-                        case .varied(let values):
-                            values.current = values.current.mapValues {
-                                removingAttachedPictures(of: [type], in: $0)
-                            }
-                        }
+                        attachedPicturesHandler.removingAttachedPictures(of: [type], state: state)
                     } label: {
                         Image(systemSymbol: .trash)
                     }
@@ -115,7 +97,8 @@ struct AdaptableMusicCoverControl: View {
                         .matchedGeometryEffect(id: "headerBackground", in: namespace)
                 }
             } else {
-                AttachedPictureType(type: type)
+                AttachedPictureTypeView(type: type)
+                    .fixedSize()
                     .font(.caption)
                     .foregroundStyle(.placeholder)
                     .padding(.vertical, 2)
@@ -132,29 +115,5 @@ struct AdaptableMusicCoverControl: View {
             isHeaderHovering = hover
         }
         .animation(.default, value: isHeaderHovering)
-    }
-    
-    private func replacingAttachedPictures(
-        _ newAttachedPictures: [AttachedPicture],
-        in attachedPictures: Set<AttachedPicture>
-    ) -> Set<AttachedPicture> {
-        let types = newAttachedPictures.map(\.type)
-        return attachedPictures.reduce(into: Set<AttachedPicture>()) { result, original in
-            if types.contains(original.type), let attachedPicture = newAttachedPictures.first(where: { $0.type == original.type }) {
-                result.insert(attachedPicture)
-            } else {
-                result.insert(original)
-            }
-        }
-    }
-    
-    private func removingAttachedPictures(
-        of types: [AttachedPicture.`Type`],
-        in attachedPictures: Set<AttachedPicture>
-    ) -> Set<AttachedPicture> {
-        attachedPictures.reduce(into: Set<AttachedPicture>()) { result, original in
-            guard !types.contains(original.type) else { return }
-            result.insert(original)
-        }
     }
 }

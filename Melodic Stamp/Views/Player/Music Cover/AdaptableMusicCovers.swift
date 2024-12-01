@@ -13,6 +13,8 @@ struct AdaptableMusicCovers: View {
         case flow
         case grid
     }
+    
+    @Bindable var attachedPicturesHandler: AttachedPicturesHandlerModel
 
     var layout: Layout = .flow
     var maxWidth: CGFloat = 300
@@ -30,25 +32,15 @@ struct AdaptableMusicCovers: View {
     }
     
     private var types: Set<AttachedPicture.`Type`> {
-        switch state {
-        case .undefined:
-            []
-        case .fine(let value):
-            Set(value.current.map(\.type))
-        case .varied(let values):
-            Set(values.current.values.flatMap(\.self).map(\.type))
-        }
-    }
-
-    private var count: Int {
-        types.count
+        attachedPicturesHandler.types(state: state)
     }
 
     @ViewBuilder private func flowView() -> some View {
         ScrollView(.horizontal) {
             LazyHStack(alignment: .center, spacing: 0) {
-                ForEach(Array(types), id: \.self) { type in
+                ForEach(Array(types).sorted(by: <), id: \.self) { type in
                     AdaptableMusicCoverControl(
+                        attachedPicturesHandler: attachedPicturesHandler,
                         state: state,
                         type: type,
                         maxResolution: max(1, round(contentSize.width / 64) * 64)
@@ -58,7 +50,7 @@ struct AdaptableMusicCovers: View {
                     ) { length, axis in
                         switch axis {
                         case .horizontal:
-                            let count = max(1, count)
+                            let count = max(1, types.count)
                             let proportional =
                             length / floor((length + maxWidth) / maxWidth)
                             return max(proportional, length / CGFloat(count))
@@ -78,7 +70,7 @@ struct AdaptableMusicCovers: View {
         }
         .scrollTargetBehavior(.viewAligned)
         .scrollDisabled(
-           count <= 1 || contentSize.width >= maxWidth * CGFloat(count)
+            types.count <= 1 || contentSize.width >= maxWidth * CGFloat(types.count)
         )
     }
 

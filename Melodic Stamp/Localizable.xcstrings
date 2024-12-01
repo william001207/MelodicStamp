@@ -55,9 +55,6 @@
     "Creator" : {
 
     },
-    "Delete" : {
-
-    },
     "Discs" : {
 
     },
@@ -157,6 +154,15 @@
     "Recording Location" : {
 
     },
+    "Remove" : {
+
+    },
+    "Remove All" : {
+
+    },
+    "Remove from Playlist" : {
+
+    },
     "Replacing Current Playlist" : {
 
     },
@@ -172,6 +178,9 @@
     "Saving…" : {
 
     },
+    "Scenes" : {
+
+    },
     "Sequential" : {
 
     },
@@ -185,6 +194,9 @@
 
     },
     "Single Loop" : {
+
+    },
+    "Staff" : {
 
     },
     "Timed Text (.ttml)" : {

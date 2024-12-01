@@ -88,7 +88,7 @@ enum LyricsStorage {
         self.url = url
     }
 
-    func load(string: String?) throws {
+    func load(string: String?) {
         // debounce
         guard type != storage?.type || string != cache || url != self.url else { return }
 
@@ -99,13 +99,17 @@ enum LyricsStorage {
             return
         }
 
-        storage = switch type {
-        case .raw:
-            try .raw(parser: .init(string: string))
-        case .lrc:
-            try .lrc(parser: .init(string: string))
-        case .ttml:
-            try .ttml(parser: .init(string: string))
+        do {
+            storage = switch type {
+            case .raw:
+                try .raw(parser: .init(string: string))
+            case .lrc:
+                try .lrc(parser: .init(string: string))
+            case .ttml:
+                try .ttml(parser: .init(string: string))
+            }
+        } catch {
+            storage = nil
         }
     }
     

@@ -1,5 +1,5 @@
 //
-//  AttachedPictureType.swift
+//  AttachedPictureTypeView.swift
 //  Melodic Stamp
 //
 //  Created by KrLite on 2024/12/1.
@@ -8,7 +8,7 @@
 import SwiftUI
 import CSFBAudioEngine
 
-struct AttachedPictureType: View {
+struct AttachedPictureTypeView: View {
     var type: AttachedPicture.`Type`
     
     var body: some View {

@@ -28,6 +28,7 @@ struct LyricsView: View {
                             
                             LazyVStack(alignment: alignment, spacing: 10) {
                                 lyricLines()
+                                    .textSelection(.enabled)
                             }
                             .padding(.horizontal)
 
@@ -148,9 +149,7 @@ struct LyricsView: View {
     private func loadLyrics() {
         switch lyricsState {
         case let .fine(values):
-            do {
-                try lyrics.load(string: values.current)
-            } catch {}
+            lyrics.load(string: values.current)
         default:
             break
         }

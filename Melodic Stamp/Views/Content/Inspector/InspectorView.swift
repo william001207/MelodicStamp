@@ -7,21 +7,34 @@
 
 import Luminare
 import SwiftUI
+import CSFBAudioEngine
 
 struct InspectorView: View {
+    @Environment(\.luminareListActionsHeight) private var actionsMinHeight
+    
     @Bindable var player: PlayerModel
     @Bindable var metadataEditor: MetadataEditorModel
+    
+    @State private var attachedPicturesHandler: AttachedPicturesHandlerModel = .init()
 
     @State private var isCoverPickerPresented: Bool = false
+    @State private var chosenAttachedPictureType: AttachedPicture.`Type` = .frontCover
 
     var body: some View {
         if metadataEditor.hasEditableMetadata {
             AutoScrollView(.vertical) {
                 VStack(spacing: 24) {
-                    AdaptableMusicCovers(state: metadataEditor[extracting: \.attachedPictures])
+                    VStack(spacing: 8) {
+                        coverEditor()
+                        
+                        AdaptableMusicCovers(
+                            attachedPicturesHandler: attachedPicturesHandler,
+                            state: metadataEditor[extracting: \.attachedPictures]
+                        )
                         .padding(.horizontal, -16)
                         .contentMargins(.horizontal, 16, for: .scrollIndicators)
                         .frame(height: 250)
+                    }
 
                     LabeledSection {
                         generalEditor()
@@ -42,7 +55,6 @@ struct InspectorView: View {
                     Spacer()
                 }
                 .padding(.horizontal, 16)
-                .padding(.top, 4)
 
                 Spacer()
                     .frame(height: 150)
@@ -52,6 +64,76 @@ struct InspectorView: View {
         } else {
             InspectorExcerpt()
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
+        }
+    }
+    
+    @ViewBuilder private func coverEditor() -> some View {
+        HStack(spacing: 0) {
+            Spacer()
+            
+            LuminareSection {
+                HStack(spacing: 2) {
+                    let state = metadataEditor[extracting: \.attachedPictures]
+                    let types = attachedPicturesHandler.types(state: state)
+                    let availableTypes = Set(AttachedPicture.allTypes).subtracting(types)
+                    
+                    Button {
+                        attachedPicturesHandler.removingAttachedPictures(state: state)
+                    } label: {
+                        HStack {
+                            Image(systemSymbol: .trashFill)
+                            Text("Remove All")
+                        }
+                    }
+                    .buttonStyle(LuminareDestructiveButtonStyle())
+                    .frame(maxWidth: 150)
+                    .disabled(types.isEmpty)
+                    
+                    Menu {
+                        ForEach(AttachedPictureCategory.allCases) { category in
+                            let availableTypesInCategory = availableTypes.intersection(category.allTypes)
+                            
+                            Section {
+                                ForEach(Array(availableTypesInCategory).sorted(by: <), id: \.self) { type in
+                                    Button {
+                                        chosenAttachedPictureType = type
+                                        isCoverPickerPresented = true
+                                    } label: {
+                                        AttachedPictureTypeView(type: type)
+                                    }
+                                }
+                            } header: {
+                                AttachedPictureCategoryView(category: category)
+                            }
+                        }
+                    } label: {
+                        Image(systemSymbol: .plus)
+                    }
+                    .buttonStyle(LuminareButtonStyle())
+                    .aspectRatio(1, contentMode: .fit)
+                    .disabled(availableTypes.isEmpty)
+                    .fileImporter(
+                        isPresented: $isCoverPickerPresented,
+                        allowedContentTypes: AttachedPicturesHandlerModel.allowedContentTypes
+                    ) { result in
+                        switch result {
+                        case .success(let url):
+                            guard url.startAccessingSecurityScopedResource() else { break }
+                            defer { url.stopAccessingSecurityScopedResource() }
+                            
+                            guard
+                                let image = NSImage(contentsOf: url),
+                                let attachedPicture = image.attachedPicture(of: chosenAttachedPictureType)
+                            else { break }
+                            attachedPicturesHandler.replacingAndAddingAttachedPictures([attachedPicture], state: state)
+                        case .failure:
+                            break
+                        }
+                    }
+                }
+                .frame(maxHeight: actionsMinHeight)
+            }
+            .luminareSectionMaxWidth(nil)
         }
     }
 

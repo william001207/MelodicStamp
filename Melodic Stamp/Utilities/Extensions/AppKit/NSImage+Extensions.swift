@@ -8,17 +8,11 @@
 import AppKit
 import CSFBAudioEngine
 
-extension AttachedPicture {
-    var image: NSImage? {
-        .init(data: imageData)
-    }
-}
-
 extension NSImage {
     var attachedPicture: AttachedPicture? {
         tiffRepresentation.flatMap { .init(imageData: $0) }
     }
-    
+
     func attachedPicture(of type: AttachedPicture.`Type`) -> AttachedPicture? {
         guard let tiffRepresentation else { return nil }
         return .init(imageData: tiffRepresentation, type: type)

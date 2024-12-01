@@ -39,7 +39,7 @@ struct PlaylistView: View {
                         player.removeFromPlaylist(urls: [item.wrappedValue.url])
                     } label: {
                         Image(systemSymbol: .trash)
-                        Text("Delete")
+                        Text("Remove")
                     }
                     .tint(.red)
                 }
@@ -72,7 +72,10 @@ struct PlaylistView: View {
                     }
                 }
             } removeView: {
-                Image(systemSymbol: .trashFill)
+                HStack {
+                    Image(systemSymbol: .trashFill)
+                    Text("Remove from Playlist")
+                }
             }
             .luminareBordered(false)
             .luminareButtonCornerRadius(8)
