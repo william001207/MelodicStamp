@@ -61,7 +61,7 @@ enum PlaybackMode: String, CaseIterable, Identifiable {
     var playlist: [PlaylistItem] = []
     var playbackMode: PlaybackMode = .sequential
     
-    var lyricLines: [Lyricline] = []
+    var lyricLines: [LRCLyricLine] = []
     var currentLyricIndex: Int = 0
     
     var duration: Duration { player.time?.total.map { .seconds($0) } ?? .zero }
@@ -226,15 +226,15 @@ enum PlaybackMode: String, CaseIterable, Identifiable {
         }
         
         do {
-            let lyric = try Lyrics(lyricStr)
-            var lines: [Lyricline] = []
+            let lyric = try LRCLyricsParser(lyricStr)
+            var lines: [LRCLyricLine] = []
             
             for (time, text) in lyric.lyrics {
                 if let last = lines.last, last.time == time {
                     lines[lines.count - 1].stringS = text
                     lines[lines.count - 1].type = .both
                 } else {
-                    let lyricLine = Lyricline(stringF: text, stringS: nil, time: time, type: .first)
+                    let lyricLine = LRCLyricLine(stringF: text, stringS: nil, time: time, type: .first)
                     lines.append(lyricLine)
                 }
             }

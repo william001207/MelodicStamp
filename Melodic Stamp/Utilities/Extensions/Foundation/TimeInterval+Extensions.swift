@@ -8,7 +8,7 @@
 import Foundation
 
 extension TimeInterval {
-    init?(lyricTimeStamp string: String) throws {
+    init?(lyricTimestamp string: String) throws {
         let regex = /^(\d+):(\d+)\.(\d+)$/
         
         guard let match = try regex.wholeMatch(in: string) else { return nil }
@@ -18,7 +18,7 @@ extension TimeInterval {
             .compactMap { Int($0) }
         guard components.count == 3 else { return nil }
         
-        let minutes = Double(components[0]), seconds = Double(components[1]), milliseconds = Double(components[2])
-        self.init(floatLiteral: minutes * 60 + seconds + milliseconds / 1000)
+        let minutes = Double(components[0]), seconds = Double(components[1]), centiseconds = Double(components[2])
+        self.init(floatLiteral: minutes * 60 + seconds + centiseconds / 100)
     }
 }

@@ -34,10 +34,16 @@ struct LyricsView: View {
                         }
                     }
                     .padding()
+                    
+                    Spacer()
+                        .frame(height: 72)
                 }
-                .onChange(of: player.currentLyricIndex) { oldIndex, newIndex in
+                .scrollContentBackground(.hidden)
+                .contentMargins(.top, 48)
+                
+                .onChange(of: player.currentLyricIndex) { oldValue, newValue in
                     withAnimation {
-                        proxy.scrollTo(newIndex, anchor: .center)
+                        proxy.scrollTo(newValue, anchor: .center)
                     }
                 }
                 .onChange(of: player.timeElapsed) { oldValue, newValue in

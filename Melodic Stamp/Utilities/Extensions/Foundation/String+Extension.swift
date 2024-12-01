@@ -8,33 +8,17 @@
 import Foundation
 
 extension String {
-    func subString(from startString: String, to endString: String) -> String {
-        var str = self
-        if let startIndex = self.range(of: startString)?.upperBound {
-            str.removeSubrange(str.startIndex ..< startIndex)
-            if let endIndex = str.range(of: endString)?.lowerBound {
-                str.removeSubrange(endIndex ..< str.endIndex)
-                return str
-            }
+    func extractNearest(from startString: String? = nil, to endString: String? = nil) -> Substring {
+        let startIndex = if let startString, let index = range(of: startString)?.lowerBound {
+            index
+        } else {
+            self.startIndex
         }
-        return ""
-    }
-    
-    func subString(from startString: String) -> String {
-        var str = self
-        if let startIndex = self.range(of: startString)?.upperBound {
-            str.removeSubrange(self.startIndex ..< startIndex)
-            return str
+        let endIndex = if let endString, let index = String(self[..<startIndex]).range(of: endString)?.upperBound {
+            index
+        } else {
+            self.endIndex
         }
-        return ""
-    }
-    
-    func subString(to endString: String) -> String {
-        var str = self
-        if let endIndex = self.range(of: endString)?.lowerBound {
-            str.removeSubrange(endIndex ..< str.endIndex)
-            return str
-        }
-        return ""
+        return self[startIndex..<endIndex]
     }
 }

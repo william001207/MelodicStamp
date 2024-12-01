@@ -144,7 +144,7 @@ struct Metadata {
     }
     
     var packed: AudioMetadata {
-        var metadata = AudioMetadata()
+        let metadata = AudioMetadata()
         
         metadata.title = title
         metadata.titleSortOrder = titleSortOrder
