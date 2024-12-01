@@ -25,6 +25,7 @@ struct MainView: View {
 
     @Binding var selectedTabs: Set<SidebarTab>
 
+    @State private var lyrics: LyricsModel = .init()
     @State private var metadataEditor: MetadataEditorModel = .init()
     
     @State private var size: CGSize = .zero
@@ -99,7 +100,7 @@ struct MainView: View {
                                         blendingMode: .behindWindow)
                                 }
                         case .lyrics:
-                            LyricsView(player: player)
+                            LyricsView(lyrics: lyrics)
                                 .frame(minWidth: 250)
                                 .ignoresSafeArea()
                             

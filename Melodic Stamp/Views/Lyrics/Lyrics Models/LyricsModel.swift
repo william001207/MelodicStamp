@@ -8,8 +8,8 @@
 import Foundation
 import RegexBuilder
 
-struct LyricTag {
-    enum LyricTagType: String, CaseIterable {
+struct LyricTag: Identifiable {
+    enum LyricTagType: String, Identifiable, CaseIterable {
         case artist = "ar"
         case album = "al"
         case title = "ti"
@@ -19,6 +19,31 @@ struct LyricTag {
         case offset
         case editor = "re"
         case version = "ve"
+        
+        var id: String {
+            rawValue
+        }
+        
+        var isMetadata: Bool {
+            switch self {
+            case .length, .offset: true
+            default: false
+            }
+        }
+        
+        var name: String {
+            switch self {
+            case .artist: .init(localized: "Artist")
+            case .album: .init(localized: "Album")
+            case .title: .init(localized: "Title")
+            case .author: .init(localized: "Author")
+            case .length: .init(localized: "Length")
+            case .creator: .init(localized: "Creator")
+            case .offset: .init(localized: "Offset")
+            case .editor: .init(localized: "Editor")
+            case .version: .init(localized: "Version")
+            }
+        }
         
         static var regex: Regex<Substring> {
             Regex {
@@ -37,42 +62,12 @@ struct LyricTag {
         }
     }
     
+    var id: LyricTagType {
+        type
+    }
+    
     var type: LyricTagType
     var content: String
-    
-    init(type: LyricTagType, content: String) {
-        self.type = type
-        self.content = content
-    }
-    
-    init?(string: String) throws {
-        let regex = Regex {
-            "["
-            Capture {
-                LyricTagType.regex
-            }
-            ":"
-            Capture {
-                OneOrMore {
-                    CharacterClass(.anyNonNewline)
-                }
-            }
-            "]"
-        }
-        
-        guard let match = try regex.wholeMatch(in: string) else { return nil }
-        let key = String(match.output.1), value = String(match.output.2)
-        
-        guard let type = LyricTagType(rawValue: key) else { return nil }
-        self.type = type
-        self.content = value
-    }
-}
-
-enum LyricType {
-    case raw // raw string, unparsed
-    case lrc(LRCLyricsParser) // sentence based
-    case ttml(TTMLLyricsParser) // word based
 }
 
 protocol LyricsParser {
@@ -84,12 +79,40 @@ protocol LyricsParser {
     init(string: String) throws
 }
 
-protocol LyricLine: Equatable {
-    var startTime: TimeInterval { get set }
+protocol LyricLine: Equatable, Hashable, Identifiable {
+    var startTime: TimeInterval? { get set }
     var endTime: TimeInterval? { get set }
     var content: String { get set }
 }
 
+enum LyricsType: String, CaseIterable {
+    case raw // raw splitted string, unparsed
+    case lrc // sentence based
+    case ttml // word based
+}
+
+enum LyricsStorage {
+    case raw(parser: RawLyricsParser)
+    case lrc(parser: LRCLyricsParser)
+    case ttml(parser: TTMLLyricsParser)
+}
+
 @Observable class LyricsModel {
-    var string: String = ""
+    private(set) var storage: LyricsStorage?
+    
+    func load(type: LyricsType = .raw, string: String?) throws {
+        guard let string else {
+            self.storage = nil
+            return
+        }
+        
+        self.storage = switch type {
+        case .raw:
+                .raw(parser: try .init(string: string))
+        case .lrc:
+                .lrc(parser: try .init(string: string))
+        case .ttml:
+                .ttml(parser: try .init(string: string))
+        }
+    }
 }

@@ -8,9 +8,15 @@
 import Foundation
 
 struct TTMLLyricLine: LyricLine {
-    var startTime: TimeInterval
+    var startTime: TimeInterval?
     var endTime: TimeInterval?
     var content: String
+}
+
+extension TTMLLyricLine: Identifiable {
+    var id: Int {
+        hashValue
+    }
 }
 
 @Observable class TTMLLyricsParser: LyricsParser {

@@ -2,7 +2,7 @@
 //  PlayerModel.swift
 //  MelodicStamp
 //
-//  Created by Xinshao_Air on 2024/11/20.
+//  Created by KrLite on 2024/11/20.
 //
 
 import SwiftUI
@@ -214,53 +214,11 @@ enum PlaybackMode: String, CaseIterable, Identifiable {
         }
     }
     
-    func fetchAndParseLyrics() {
-        guard let current = current else {
-            lyricLines = []
-            return
-        }
-        let lyricStr = current.editableMetadata.current.lyrics ?? ""
-        guard !lyricStr.isEmpty else {
-            lyricLines = []
-            return
-        }
-        
-        do {
-            let lyric = try LRCLyricsParser(lyricStr)
-            var lines: [LRCLyricLine] = []
-            
-            for (time, text) in lyric.lyrics {
-                if let last = lines.last, last.time == time {
-                    lines[lines.count - 1].stringS = text
-                    lines[lines.count - 1].type = .both
-                } else {
-                    let lyricLine = LRCLyricLine(stringF: text, stringS: nil, time: time, type: .first)
-                    lines.append(lyricLine)
-                }
-            }
-            
-            lyricLines = lines.sorted { $0.time < $1.time }
-        } catch {
-            
-        }
-    }
-    
-    func updateCurrentLyricIndex(currentTime: TimeInterval) {
-        guard !lyricLines.isEmpty else { return }
-        
-        if let index = lyricLines.lastIndex(where: { $0.time <= currentTime }) {
-            if index != currentLyricIndex {
-                currentLyricIndex = index
-            }
-        }
-    }
-    
     func play(item: PlaylistItem) {
         do {
             if let decoder = try item.decoder() {
                 try player.play(decoder)
                 current = item
-                fetchAndParseLyrics()
             }
         } catch {
             
