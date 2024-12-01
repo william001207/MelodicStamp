@@ -30,44 +30,42 @@ struct AdaptableMusicCoverControl: View {
         
         let images = attachedPictures.compactMap(\.image)
         
-        VStack(spacing: 8) {
-            header()
-            
-            AliveButton {
-                isImagePickerPresented = true
-            } label: {
-                MusicCover(
-                    images: images,
-                    maxResolution: maxResolution
-                )
-                .padding(.horizontal, 16)
-            }
-            .fileImporter(
-                isPresented: $isImagePickerPresented,
-                allowedContentTypes: [.jpeg, .png, .tiff, .bmp, .gif, .heic, .heif, .rawImage]
-            ) { result in
-                switch result {
-                case .success(let url):
-                    guard url.startAccessingSecurityScopedResource() else { break }
-                    defer { url.stopAccessingSecurityScopedResource() }
-                    
-                    guard let image = NSImage(contentsOf: url), let attachedPicture = image.attachedPicture(of: type) else { break }
-                    
-                    switch state {
-                    case .undefined:
-                        break
-                    case .fine(let value):
-                        value.current = replacingAttachedPictures([attachedPicture], in: value.current)
-                    case .varied(let values):
-                        values.current = values.current.mapValues { attachedPictures in
-                            replacingAttachedPictures([attachedPicture], in: attachedPictures)
-                        }
-                    }
-                case .failure:
+        AliveButton {
+            isImagePickerPresented = true
+        } label: {
+            MusicCover(
+                images: images,
+                maxResolution: maxResolution
+            )
+            .padding(.horizontal, 16)
+        }
+        .fileImporter(
+            isPresented: $isImagePickerPresented,
+            allowedContentTypes: [.jpeg, .png, .tiff, .bmp, .gif, .heic, .heif, .rawImage]
+        ) { result in
+            switch result {
+            case .success(let url):
+                guard url.startAccessingSecurityScopedResource() else { break }
+                defer { url.stopAccessingSecurityScopedResource() }
+                
+                guard let image = NSImage(contentsOf: url), let attachedPicture = image.attachedPicture(of: type) else { break }
+                
+                switch state {
+                case .undefined:
                     break
+                case .fine(let value):
+                    value.current = replacingAttachedPictures([attachedPicture], in: value.current)
+                case .varied(let values):
+                    values.current = values.current.mapValues { attachedPictures in
+                        replacingAttachedPictures([attachedPicture], in: attachedPictures)
+                    }
                 }
+            case .failure:
+                break
             }
         }
+        .padding(.top, 8)
+        .overlay(alignment: .top, content: header)
     }
     
     @ViewBuilder private func header() -> some View {
@@ -98,7 +96,9 @@ struct AdaptableMusicCoverControl: View {
                         case .fine(let value):
                             value.current = []
                         case .varied(let values):
-                            values.current = values.current.mapValues { _ in [] }
+                            values.current = values.current.mapValues {
+                                removingAttachedPictures(of: [type], in: $0)
+                            }
                         }
                     } label: {
                         Image(systemSymbol: .trash)
@@ -106,6 +106,14 @@ struct AdaptableMusicCoverControl: View {
                 }
                 .foregroundStyle(.red)
                 .bold()
+                .padding(.vertical, 6)
+                .padding(.horizontal, 10)
+                .background {
+                    Rectangle()
+                        .fill(.ultraThickMaterial)
+                        .clipShape(.capsule)
+                        .matchedGeometryEffect(id: "headerBackground", in: namespace)
+                }
             } else {
                 AttachedPictureType(type: type)
                     .font(.caption)
@@ -121,10 +129,9 @@ struct AdaptableMusicCoverControl: View {
             }
         }
         .onHover { hover in
-            withAnimation {
-                isHeaderHovering = hover
-            }
+            isHeaderHovering = hover
         }
+        .animation(.default, value: isHeaderHovering)
     }
     
     private func replacingAttachedPictures(

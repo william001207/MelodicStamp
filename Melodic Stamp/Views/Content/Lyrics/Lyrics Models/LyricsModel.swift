@@ -83,8 +83,12 @@ enum LyricsStorage {
     var type: LyricsType = .raw
 
     private var cache: String?
+    
+    func identify(url: URL?) {
+        self.url = url
+    }
 
-    func load(string: String?, in url: URL?) throws {
+    func load(string: String?) throws {
         // debounce
         guard type != storage?.type || string != cache || url != self.url else { return }
 

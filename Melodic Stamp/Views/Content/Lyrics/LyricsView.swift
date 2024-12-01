@@ -21,7 +21,12 @@ struct LyricsView: View {
                 TimelineView(.animation) { _ in
                     ScrollViewReader { _ in
                         ScrollView {
-                            VStack(alignment: .center, spacing: 10) {
+                            // do not apply `.contentMargins()` to the header
+                            // otherwise causing `LazyVStack` related glitches
+                            Spacer()
+                                .frame(height: 64)
+                            
+                            LazyVStack(alignment: alignment, spacing: 10) {
                                 lyricLines()
                             }
                             .padding(.horizontal)
@@ -31,11 +36,11 @@ struct LyricsView: View {
                         }
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                         .scrollContentBackground(.hidden)
-                        .contentMargins(.top, 64)
+                        .contentMargins(.vertical, 64, for: .scrollIndicators)
                         .contentMargins(.bottom, 94)
                     }
                 }
-            case let .varied(valueSetter):
+            case .varied(let values):
                 Color.blue
             }
         }
@@ -44,6 +49,20 @@ struct LyricsView: View {
         }
         .onChange(of: lyrics.type) { _, _ in
             loadLyrics()
+        }
+        .onChange(of: player.current) { oldValue, newValue in
+            lyrics.identify(url: newValue?.url)
+        }
+    }
+    
+    private var alignment: HorizontalAlignment {
+        switch lyrics.type {
+        case .raw:
+                .leading
+        case .lrc:
+                .center
+        case .ttml:
+                .leading
         }
     }
 
@@ -74,7 +93,9 @@ struct LyricsView: View {
         }
     }
 
-    @ViewBuilder private func rawLyricLine(index: Int, line _: RawLyricLine) -> some View {}
+    @ViewBuilder private func rawLyricLine(index: Int, line: RawLyricLine) -> some View {
+        Text(line.content)
+    }
 
     @ViewBuilder private func lrcLyricLine(index: Int, line: LRCLyricLine) -> some View {
         let isHighlighted = highlightedIndices.contains(index)
@@ -120,13 +141,15 @@ struct LyricsView: View {
         .foregroundStyle(isHighlighted ? AnyShapeStyle(.tint) : AnyShapeStyle(.primary))
     }
 
-    @ViewBuilder private func ttmlLyricLine(index: Int, line _: TTMLLyricLine) -> some View {}
+    @ViewBuilder private func ttmlLyricLine(index: Int, line: TTMLLyricLine) -> some View {
+        Text(line.content)
+    }
 
     private func loadLyrics() {
         switch lyricsState {
         case let .fine(values):
             do {
-                try lyrics.load(string: values.current, in: player.current?.url)
+                try lyrics.load(string: values.current)
             } catch {}
         default:
             break
