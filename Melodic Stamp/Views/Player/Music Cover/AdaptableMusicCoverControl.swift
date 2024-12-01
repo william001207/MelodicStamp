@@ -29,7 +29,9 @@ struct AdaptableMusicCoverControl: View {
         case .varied(let values):
             values.current.values.flatMap(\.self)
         }
-        let images = attachedPictures.compactMap(\.image)
+        let images = attachedPictures
+            .filter { $0.type == type }
+            .compactMap(\.image)
         
         AliveButton {
             isImagePickerPresented = true
@@ -114,6 +116,6 @@ struct AdaptableMusicCoverControl: View {
         .onHover { hover in
             isHeaderHovering = hover
         }
-        .animation(.default, value: isHeaderHovering)
+        .animation(.smooth(duration: 0.25), value: isHeaderHovering)
     }
 }
