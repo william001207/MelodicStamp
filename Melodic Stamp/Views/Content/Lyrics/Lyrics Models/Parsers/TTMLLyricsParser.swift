@@ -67,19 +67,19 @@ public struct TTMLLyricTag: Hashable, Identifiable, Equatable {
 }
 
 struct TTMLLyricLine: LyricLine {
-    
     typealias Tag = TTMLLyricTag
     
-    var id = UUID()
     var indexNum: Int
     var position: TtmlLyricPositionType
     var beginTime: TimeInterval
     var endTime: TimeInterval?
     var tags: [TTMLLyricTag] = []
-    var mainLyric: [SubTtmlLyric]?
-    var bgLyric: BgTtmlLyric?
+    var mainLyric: [TTMLSubLyric]?
+    var bgLyric: TTMLBgLyric?
     var translation: String?
     var roman: String?
+    
+    let id: UUID = .init()
     
     var startTime: TimeInterval? {
         get { beginTime }
@@ -97,18 +97,21 @@ struct TTMLLyricLine: LyricLine {
     var isValid: Bool {
         return startTime != nil || endTime != nil
     }
+}
 
-    // Implementing Equatable and Hashable
+extension TTMLLyricLine: Equatable {
     static func == (lhs: TTMLLyricLine, rhs: TTMLLyricLine) -> Bool {
         lhs.id == rhs.id
     }
+}
 
+extension TTMLLyricLine: Hashable {
     func hash(into hasher: inout Hasher) {
         hasher.combine(id)
     }
 }
 
-public struct SubTtmlLyric {
+public struct TTMLSubLyric {
     public var beginTime: TimeInterval
     public var endTime: TimeInterval
     public var text: String
@@ -120,12 +123,12 @@ public struct SubTtmlLyric {
     }
 }
 
-public struct BgTtmlLyric {
-    public var subLyric: [SubTtmlLyric]?
+public struct TTMLBgLyric {
+    public var subLyric: [TTMLSubLyric]?
     public var translation: String?
     public var roman: String?
     
-    public init(subLyric: [SubTtmlLyric]? = nil, translation: String? = nil, roman: String? = nil) {
+    public init(subLyric: [TTMLSubLyric]? = nil, translation: String? = nil, roman: String? = nil) {
         self.subLyric = subLyric
         self.translation = translation
         self.roman = roman
@@ -215,7 +218,7 @@ public class TTMLLyricsParser: NSObject, LyricsParser {
                 if let textNode = node as? TextNode {
                     let text = textNode.text().trimmingCharacters(in: .whitespacesAndNewlines)
                     if !text.isEmpty {
-                        let subLyric = SubTtmlLyric(beginTime: beginTime, endTime: endTime, text: text)
+                        let subLyric = TTMLSubLyric(beginTime: beginTime, endTime: endTime, text: text)
                         lyricLine.mainLyric?.append(subLyric)
                     }
                 } else if let spanElement = node as? Element, spanElement.tagName() == "span" {
@@ -236,16 +239,16 @@ public class TTMLLyricsParser: NSObject, LyricsParser {
                             lyricLine.tags.append(tag)
                         }
                     case "x-bg":
-                        var bgLyric = BgTtmlLyric(subLyric: [], translation: nil, roman: nil)
+                        var bgLyric = TTMLBgLyric(subLyric: [], translation: nil, roman: nil)
                         let bgSpanElements = try spanElement.getElementsByTag("span")
-                        var bgSubTtmlLyricList: [SubTtmlLyric] = []
+                        var bgSubTtmlLyricList: [TTMLSubLyric] = []
 
                         for bgSpanElement in bgSpanElements {
                             let bgBeginTime = try bgSpanElement.attr("begin").toTimeInterval()
                             let bgEndTime = try bgSpanElement.attr("end").toTimeInterval()
                             let bgText = try bgSpanElement.getPreservedText().normalizeSpaces().replacingOccurrences(of: "[()]", with: "", options: .regularExpression)
 
-                            let bgSubLyric = SubTtmlLyric(
+                            let bgSubLyric = TTMLSubLyric(
                                 beginTime: bgBeginTime,
                                 endTime: bgEndTime,
                                 text: bgText
