@@ -20,14 +20,8 @@ struct PlaylistItemView: View {
             let isMetadataLoaded = item.editableMetadata.state.isLoaded
             let isMetadataModified = item.editableMetadata.isModified
 
-            VStack(alignment: .leading) {
+            VStack(alignment: .leading, spacing: 2) {
                 HStack {
-                    if isMetadataModified {
-                        Image(systemSymbol: .pencilLine)
-                            .bold()
-                            .foregroundStyle(.tint)
-                    }
-
                     if isMetadataLoaded {
                         MarqueeScrollView(animate: false) {
                             MusicTitle(item: item)
@@ -38,14 +32,24 @@ struct PlaylistItemView: View {
                     }
                 }
                 .font(.title3)
-                .transition(.blurReplace)
-                .animation(.default, value: isMetadataLoaded)
-                .animation(.default, value: isMetadataModified)
+                .frame(height: 24)
 
-                Text(item.url.lastPathComponent)
-                    .font(.caption)
-                    .foregroundStyle(.placeholder)
+                HStack(alignment: .center, spacing: 4) {
+                    if isMetadataModified {
+                        Circle()
+                            .foregroundStyle(.tint)
+                            .padding(2)
+                    }
+
+                    Text(item.url.lastPathComponent)
+                        .font(.caption)
+                        .foregroundStyle(.placeholder)
+                }
+                .frame(height: 12)
             }
+            .transition(.blurReplace)
+            .animation(.default.speed(2), value: isMetadataLoaded)
+            .animation(.default.speed(2), value: isMetadataModified)
 
             Spacer()
 
@@ -57,12 +61,13 @@ struct PlaylistItemView: View {
                         Group {
                             let values = item.editableMetadata[extracting: \.coverImages]
 
-                            MusicCover(cornerRadius: 0, coverImages: values.current, maxResolution: 32)
+                            MusicCover(cornerRadius: 0, coverImages: values.current, hasPlaceholder: false, maxResolution: 32)
                                 .frame(maxWidth: .infinity)
                                 .overlay {
                                     if isHovering {
-                                        Color.black
-                                            .opacity(0.35)
+                                        Rectangle()
+                                            .foregroundStyle(.placeholder)
+                                            .opacity(0.25)
                                             .blendMode(.darken)
                                     }
                                 }
