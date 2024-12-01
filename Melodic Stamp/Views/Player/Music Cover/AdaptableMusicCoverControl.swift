@@ -52,7 +52,7 @@ struct AdaptableMusicCoverControl: View {
                 defer { url.stopAccessingSecurityScopedResource() }
                 
                 guard let image = NSImage(contentsOf: url), let attachedPicture = image.attachedPicture(of: type) else { break }
-                attachedPicturesHandler.replacingAndAddingAttachedPictures([attachedPicture], state: state)
+                attachedPicturesHandler.replace([attachedPicture], state: state)
             case .failure:
                 break
             }
@@ -72,18 +72,14 @@ struct AdaptableMusicCoverControl: View {
                     }
                     
                     AliveButton {
-                        switch state {
-                        case .undefined: break
-                        case .fine(let value): value.revert()
-                        case .varied(let values): values.revertAll()
-                        }
+                        attachedPicturesHandler.revert(of: [type], state: state)
                     } label: {
                         Image(systemSymbol: .arrowUturnLeft)
                     }
                     .disabled(!isModified)
                     
                     AliveButton {
-                        attachedPicturesHandler.removingAttachedPictures(of: [type], state: state)
+                        attachedPicturesHandler.remove(of: [type], state: state)
                     } label: {
                         Image(systemSymbol: .trash)
                     }

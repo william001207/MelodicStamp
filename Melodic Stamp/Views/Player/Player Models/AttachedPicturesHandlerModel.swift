@@ -25,7 +25,7 @@ import CSFBAudioEngine
         }
     }
     
-    func replacingAndAddingAttachedPictures(
+    func replacing(
         _ newAttachedPictures: [AttachedPicture],
         in attachedPictures: Set<AttachedPicture>
     ) -> Set<AttachedPicture> {
@@ -34,7 +34,7 @@ import CSFBAudioEngine
         return removed.union(newAttachedPictures)
     }
     
-    func replacingAndAddingAttachedPictures(
+    func replace(
         _ newAttachedPictures: [AttachedPicture],
         state: MetadataValueState<Set<AttachedPicture>>
     ) {
@@ -42,15 +42,15 @@ import CSFBAudioEngine
         case .undefined:
             break
         case .fine(let value):
-            value.current = replacingAndAddingAttachedPictures(newAttachedPictures, in: value.current)
+            value.current = replacing(newAttachedPictures, in: value.current)
         case .varied(let values):
             values.current = values.current.mapValues { attachedPictures in
-                replacingAndAddingAttachedPictures(newAttachedPictures, in: attachedPictures)
+                replacing(newAttachedPictures, in: attachedPictures)
             }
         }
     }
     
-    func removingAttachedPictures(
+    func removing(
         of types: [AttachedPicture.`Type`]? = nil,
         in attachedPictures: Set<AttachedPicture>
     ) -> Set<AttachedPicture> {
@@ -61,7 +61,7 @@ import CSFBAudioEngine
         }
     }
     
-    func removingAttachedPictures(
+    func remove(
         of types: [AttachedPicture.`Type`]? = nil,
         state: MetadataValueState<Set<AttachedPicture>>
     ) {
@@ -69,10 +69,39 @@ import CSFBAudioEngine
         case .undefined:
             break
         case .fine(let value):
-            value.current = removingAttachedPictures(of: types, in: value.current)
+            value.current = removing(of: types, in: value.current)
         case .varied(let values):
             values.current = values.current.mapValues { attachedPictures in
-                removingAttachedPictures(of: types, in: attachedPictures)
+                removing(of: types, in: attachedPictures)
+            }
+        }
+    }
+    
+    func revert(
+        of types: [AttachedPicture.`Type`]? = nil,
+        state: MetadataValueState<Set<AttachedPicture>>
+    ) {
+        guard let types else {
+            switch state {
+            case .undefined:
+                break
+            case .fine(let value):
+                value.revert()
+            case .varied(let values):
+                values.revertAll()
+            }
+            return
+        }
+        
+        switch state {
+        case .undefined:
+            break
+        case .fine(let value):
+            replace(value.initial.filter({ types.contains($0.type) }), state: state)
+        case .varied(let values):
+            values.current.keys.forEach { key in
+                let value = values.initial[key] ?? []
+                replace(value.filter({ types.contains($0.type) }), state: state)
             }
         }
     }

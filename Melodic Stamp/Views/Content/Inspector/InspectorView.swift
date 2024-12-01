@@ -78,7 +78,7 @@ struct InspectorView: View {
                     let availableTypes = Set(AttachedPicture.allTypes).subtracting(types)
                     
                     Button {
-                        attachedPicturesHandler.removingAttachedPictures(state: state)
+                        attachedPicturesHandler.remove(state: state)
                     } label: {
                         HStack {
                             Image(systemSymbol: .trashFill)
@@ -125,7 +125,7 @@ struct InspectorView: View {
                                 let image = NSImage(contentsOf: url),
                                 let attachedPicture = image.attachedPicture(of: chosenAttachedPictureType)
                             else { break }
-                            attachedPicturesHandler.replacingAndAddingAttachedPictures([attachedPicture], state: state)
+                            attachedPicturesHandler.replace([attachedPicture], state: state)
                         case .failure:
                             break
                         }
