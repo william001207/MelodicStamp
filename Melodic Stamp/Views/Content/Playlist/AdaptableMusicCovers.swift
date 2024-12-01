@@ -46,20 +46,35 @@ struct AdaptableMusicCovers: View {
                 ForEach(Array(values.current), id: \.type) {
                     attachedPicture in
                     if let image = attachedPicture.image {
-                        MusicCover(image: image, maxResolution: 64 * max(1, round(contentSize.width / 64)))
-                            .padding(16)
-                            .containerRelativeFrame(
-                                .horizontal, alignment: .center
-                            ) { length, axis in
-                                switch axis {
-                                case .horizontal:
-                                    let count = max(1, values.current.count)
-                                    let proportional = length / floor((length + maxWidth) / maxWidth)
-                                    return max(proportional, length / CGFloat(count))
-                                case .vertical:
-                                    return length
+                        VStack(spacing: 8) {
+                            attachedPictureType(attachedPicture.type)
+                                .font(.caption)
+                                .foregroundStyle(.placeholder)
+                                .padding(.vertical, 2)
+                                .padding(.horizontal, 6)
+                                .background {
+                                    Rectangle()
+                                        .fill(.regularMaterial)
+                                        .background(.placeholder)
                                 }
-                            }
+                                .clipShape(.capsule)
+                            
+                            MusicCover(image: image, maxResolution: 64 * max(1, round(contentSize.width / 64)))
+                                .padding(.horizontal, 16)
+                                .containerRelativeFrame(
+                                    .horizontal, alignment: .center
+                                ) { length, axis in
+                                    switch axis {
+                                    case .horizontal:
+                                        let count = max(1, values.current.count)
+                                        let proportional = length / floor((length + maxWidth) / maxWidth)
+                                        return max(proportional, length / CGFloat(count))
+                                    case .vertical:
+                                        return length
+                                    }
+                                }
+                        }
+                        .padding(.bottom, 8)
                     }
                 }
             }
@@ -76,5 +91,54 @@ struct AdaptableMusicCovers: View {
 
     @ViewBuilder private func gridView(values: EditableMetadata.Values<Set<AttachedPicture>>) -> some View {
 
+    }
+    
+    @ViewBuilder private func attachedPictureType(_ type: AttachedPicture.`Type`) -> some View {
+        switch type {
+        case .other:
+            Text("Other")
+        case .fileIcon:
+            Text("File Icon")
+        case .otherFileIcon:
+            Text("Other File Icon")
+        case .frontCover:
+            Text("Front Cover")
+        case .backCover:
+            Text("Back Cover")
+        case .leafletPage:
+            Text("Leaflet Page")
+        case .media:
+            Text("Media")
+        case .leadArtist:
+            Text("Lead Artist")
+        case .artist:
+            Text("Artist")
+        case .conductor:
+            Text("Conductor")
+        case .band:
+            Text("Band")
+        case .composer:
+            Text("Composer")
+        case .lyricist:
+            Text("Lyricist")
+        case .recordingLocation:
+            Text("Recording Location")
+        case .duringRecording:
+            Text("During Recording")
+        case .duringPerformance:
+            Text("During Performance")
+        case .movieScreenCapture:
+            Text("Movie Screen Capture")
+        case .colouredFish:
+            Text("Coloured Fish")
+        case .illustration:
+            Text("Illustration")
+        case .bandLogo:
+            Text("Band Logo")
+        case .publisherLogo:
+            Text("Publisher Logo")
+        @unknown default:
+            EmptyView()
+        }
     }
 }

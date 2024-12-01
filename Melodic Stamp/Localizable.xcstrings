@@ -28,13 +28,28 @@
     "Author" : {
 
     },
+    "Back Cover" : {
+
+    },
+    "Band" : {
+
+    },
+    "Band Logo" : {
+
+    },
     "Begin" : {
 
     },
     "BPM" : {
 
     },
+    "Coloured Fish" : {
+
+    },
     "Composer" : {
+
+    },
+    "Conductor" : {
 
     },
     "Creator" : {
@@ -46,16 +61,31 @@
     "Discs" : {
 
     },
+    "During Performance" : {
+
+    },
+    "During Recording" : {
+
+    },
     "Editor" : {
 
     },
     "End" : {
 
     },
+    "File Icon" : {
+
+    },
     "Forming New Playlist" : {
 
     },
+    "Front Cover" : {
+
+    },
     "Hello, World!" : {
+
+    },
+    "Illustration" : {
 
     },
     "In Current Playlist" : {
@@ -67,10 +97,19 @@
     "iTunes Key" : {
 
     },
+    "Lead Artist" : {
+
+    },
+    "Leaflet Page" : {
+
+    },
     "Length" : {
 
     },
     "Loading…" : {
+
+    },
+    "Lyricist" : {
 
     },
     "Lyrics" : {
@@ -79,7 +118,13 @@
     "Lyrics (.lrc)" : {
 
     },
+    "Media" : {
+
+    },
     "Metadata" : {
+
+    },
+    "Movie Screen Capture" : {
 
     },
     "No." : {
@@ -94,10 +139,22 @@
     "Open File" : {
 
     },
+    "Other" : {
+
+    },
+    "Other File Icon" : {
+
+    },
     "Play" : {
 
     },
     "Playlist" : {
+
+    },
+    "Publisher Logo" : {
+
+    },
+    "Recording Location" : {
 
     },
     "Replacing Current Playlist" : {
