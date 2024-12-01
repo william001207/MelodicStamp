@@ -11,7 +11,7 @@ import SwiftUI
 typealias AdditionalMetadata = [AnyHashable: Any]
 
 struct Metadata {
-    var coverImages: Set<NSImage>
+    var attachedPictures: Set<AttachedPicture>
 
     var title: String?
     var titleSortOrder: String?
@@ -56,7 +56,7 @@ struct Metadata {
     var additional: AdditionalMetadata?
 
     init(
-        coverImages: Set<NSImage> = [],
+        coverImages: Set<AttachedPicture> = [],
         title: String? = nil, titleSortOrder: String? = nil,
         artist: String? = nil, artistSortOrder: String? = nil,
         composer: String? = nil, composerSortOrder: String? = nil,
@@ -80,7 +80,7 @@ struct Metadata {
         replayGainReferenceLoudness: Double? = nil,
         additional: AdditionalMetadata? = nil
     ) {
-        self.coverImages = coverImages
+        self.attachedPictures = coverImages
         self.title = title
         self.titleSortOrder = titleSortOrder
         self.artist = artist
@@ -118,7 +118,7 @@ struct Metadata {
 
     init(from metadata: AudioMetadata?) {
         self.init(
-            coverImages: (metadata?.attachedPictures.compactMap(\.image)).map { Set($0) } ?? [],
+            coverImages: metadata?.attachedPictures ?? [],
             title: metadata?.title, titleSortOrder: metadata?.titleSortOrder,
             artist: metadata?.artist, artistSortOrder: metadata?.artistSortOrder,
             composer: metadata?.composer, composerSortOrder: metadata?.composerSortOrder,
@@ -178,7 +178,7 @@ struct Metadata {
         metadata.replayGainReferenceLoudness = replayGainReferenceLoudness
         metadata.additionalMetadata = additional
 
-        coverImages.compactMap(\.attachedPicture).forEach(metadata.attachPicture(_:))
+        attachedPictures.forEach(metadata.attachPicture(_:))
 
         return metadata
     }

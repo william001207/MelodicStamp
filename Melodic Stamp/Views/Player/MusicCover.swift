@@ -6,19 +6,23 @@
 //
 
 import SwiftUI
+import CSFBAudioEngine
 
 struct MusicCover: View {
     var cornerRadius: CGFloat = 8
-    var coverImages: Set<NSImage>
+    var image: NSImage? = nil
     var hasPlaceholder: Bool = true
-    var maxResolution: CGFloat = 128
+    var maxResolution: CGFloat? = 128
 
     var body: some View {
         Group {
-            if let image = coverImages.first,
-                let resizedImage = resizeImage(
-                    image, maxResolution: maxResolution)
-            {
+            if let image {
+                let resizedImage = if let maxResolution, let resizedImage = resizeImage(image, maxResolution: maxResolution) {
+                    resizedImage
+                } else {
+                    image
+                }
+                
                 Image(nsImage: resizedImage)
                     .resizable()
                     .interpolation(.medium)

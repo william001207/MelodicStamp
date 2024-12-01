@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import CSFBAudioEngine
 
 struct PlaylistItemView: View {
     @Bindable var player: PlayerModel
@@ -58,21 +59,22 @@ struct PlaylistItemView: View {
             } label: {
                 ZStack {
                     if isMetadataLoaded {
-                        Group {
-                            let values = item.editableMetadata[extracting: \.coverImages]
-
-                            MusicCover(cornerRadius: 0, coverImages: values.current, hasPlaceholder: false, maxResolution: 32)
-                                .frame(maxWidth: .infinity)
-                                .overlay {
-                                    if isHovering {
-                                        Rectangle()
-                                            .foregroundStyle(.placeholder)
-                                            .opacity(0.25)
-                                            .blendMode(.darken)
+                        let attachedPictures = item.editableMetadata[extracting: \.attachedPictures]
+                        if let cover = getCover(from: attachedPictures.current), let image = cover.image {
+                            Group {
+                                MusicCover(cornerRadius: 0, image: image, hasPlaceholder: false, maxResolution: 32)
+                                    .frame(maxWidth: .infinity)
+                                    .overlay {
+                                        if isHovering {
+                                            Rectangle()
+                                                .foregroundStyle(.placeholder)
+                                                .opacity(0.25)
+                                                .blendMode(.darken)
+                                        }
                                     }
-                                }
+                            }
+                            .clipShape(.rect(cornerRadius: 6))
                         }
-                        .clipShape(.rect(cornerRadius: 6))
                     }
 
                     if isHovering {
@@ -93,5 +95,14 @@ struct PlaylistItemView: View {
                 isHovering = hover
             }
         }
+    }
+    
+    private func getCover(from attachedPictures: Set<AttachedPicture>) -> AttachedPicture? {
+        guard !attachedPictures.isEmpty else { return nil }
+        let frontCover = attachedPictures.first { $0.type == .frontCover }
+        let backCover = attachedPictures.first { $0.type == .backCover }
+        let illustration = attachedPictures.first { $0.type == .illustration }
+        let fileIcon = attachedPictures.first { $0.type == .fileIcon }
+        return frontCover ?? backCover ?? illustration ?? fileIcon ?? attachedPictures.first
     }
 }

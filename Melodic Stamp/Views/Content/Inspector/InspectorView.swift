@@ -18,58 +18,10 @@ struct InspectorView: View {
         if metadataEditor.hasEditableMetadata {
             AutoScrollView(.vertical) {
                 VStack(spacing: 24) {
-                    AutoScrollView(.horizontal) {
-                        HStack {
-                            coverEditor()
-                                .padding(.horizontal, 16)
-                                .containerRelativeFrame(.horizontal, alignment: .center) { length, axis in
-                                    switch axis {
-                                    case .horizontal:
-                                        let maxLength: CGFloat = 300
-                                        return length / floor((length + maxLength) / maxLength)
-                                    case .vertical:
-                                        return length
-                                    }
-                                }
-
-                            Color.red
-                                .containerRelativeFrame(.horizontal, alignment: .center) { length, axis in
-                                    switch axis {
-                                    case .horizontal:
-                                        let maxLength: CGFloat = 300
-                                        return length / floor((length + maxLength) / maxLength)
-                                    case .vertical:
-                                        return length
-                                    }
-                                }
-
-                            Color.blue
-                                .containerRelativeFrame(.horizontal, alignment: .center) { length, axis in
-                                    switch axis {
-                                    case .horizontal:
-                                        let maxLength: CGFloat = 300
-                                        return length / floor((length + maxLength) / maxLength)
-                                    case .vertical:
-                                        return length
-                                    }
-                                }
-
-                            Color.yellow
-                                .containerRelativeFrame(.horizontal, alignment: .center) { length, axis in
-                                    switch axis {
-                                    case .horizontal:
-                                        let maxLength: CGFloat = 300
-                                        return length / floor((length + maxLength) / maxLength)
-                                    case .vertical:
-                                        return length
-                                    }
-                                }
-                        }
-                        .scrollTargetLayout()
-                    }
-                    .scrollTargetBehavior(.viewAligned)
-                    .padding(.horizontal, -16)
-                    .contentMargins(.horizontal, 16, for: .scrollIndicators)
+                    AdaptableMusicCovers(value: metadataEditor[extracting: \.attachedPictures])
+                        .padding(.horizontal, -16)
+                        .contentMargins(.horizontal, 16, for: .scrollIndicators)
+                        .frame(height: 250)
 
                     LabeledSection {
                         generalEditor()
@@ -100,42 +52,6 @@ struct InspectorView: View {
         } else {
             InspectorExcerpt()
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
-        }
-    }
-
-    @ViewBuilder private func coverEditor() -> some View {
-        let coverImages = metadataEditor[extracting: \.coverImages]
-
-        switch coverImages {
-        case .undefined:
-            EmptyView()
-        case let .fine(values):
-            let coverImages = values.current
-            AliveButton {
-                isCoverPickerPresented = true
-            } label: {
-                MusicCover(coverImages: coverImages, maxResolution: 128)
-            }
-            .fileImporter(
-                isPresented: $isCoverPickerPresented,
-                allowedContentTypes: [.jpeg, .png, .tiff, .bmp, .gif, .heic, .heif, .rawImage],
-                allowsMultipleSelection: true
-            ) { result in
-                switch result {
-                case let .success(urls):
-                    let selectedImages: Set<NSImage> = Set(urls.compactMap { url in
-                        guard url.startAccessingSecurityScopedResource() else { return nil }
-                        defer { url.stopAccessingSecurityScopedResource() }
-
-                        return NSImage(contentsOf: url)
-                    })
-                    values.current = selectedImages
-                case .failure:
-                    break
-                }
-            }
-        case let .varied(valueSetter):
-            EmptyView()
         }
     }
 
