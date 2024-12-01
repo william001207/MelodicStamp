@@ -22,16 +22,25 @@
     "Artist" : {
 
     },
+    "Author" : {
+
+    },
     "BPM" : {
 
     },
     "Composer" : {
 
     },
+    "Creator" : {
+
+    },
     "Delete" : {
 
     },
     "Discs" : {
+
+    },
+    "Editor" : {
 
     },
     "Forming New Playlist" : {
@@ -46,10 +55,16 @@
     "Inspector" : {
 
     },
+    "Length" : {
+
+    },
     "Loading…" : {
 
     },
     "Lyrics" : {
+
+    },
+    "Lyrics (.lrc)" : {
 
     },
     "Metadata" : {
@@ -59,6 +74,9 @@
 
     },
     "Nothing to Play" : {
+
+    },
+    "Offset" : {
 
     },
     "Open File" : {
@@ -97,6 +115,9 @@
     "Single Loop" : {
 
     },
+    "Timed Text (.ttml)" : {
+
+    },
     "Title" : {
 
     },
@@ -107,6 +128,12 @@
 
     },
     "Tracks" : {
+
+    },
+    "Unprocessed" : {
+
+    },
+    "Version" : {
 
     }
   },

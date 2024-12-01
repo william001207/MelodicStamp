@@ -8,24 +8,61 @@
 import SwiftUI
 
 struct LyricsView: View {
+    @Bindable var metadataEditor: MetadataEditorModel
     @Bindable var lyrics: LyricsModel
     
+    @State private var lyricsType: LyricsType = .lrc
+    
     var body: some View {
-        TimelineView(.animation) { context in
-            ScrollViewReader { proxy in
-                ScrollView {
-                    VStack(alignment: .center, spacing: 10) {
-                        lyricLines()
+        Group {
+            switch lyricsState {
+            case .undefined:
+                Color.red
+            case .fine:
+                TimelineView(.animation) { context in
+                    ScrollViewReader { proxy in
+                        ScrollView {
+                            VStack(alignment: .center, spacing: 10) {
+                                lyricLines()
+                            }
+                            .padding()
+                            
+                            Spacer()
+                                .frame(height: 72)
+                        }
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .scrollContentBackground(.hidden)
+                        .contentMargins(.top, 48)
                     }
-                    .padding()
-                    
-                    Spacer()
-                        .frame(height: 72)
                 }
-                .scrollContentBackground(.hidden)
-                .contentMargins(.top, 48)
+            case .varied(let valueSetter):
+                Color.blue
             }
         }
+        .onChange(of: lyricsState) { oldValue, newValue in
+            switch lyricsState {
+            case .fine(let values):
+                do {
+                    try lyrics.load(type: lyricsType, string: values.current)
+                } catch {
+                    
+                }
+            default:
+                break
+            }
+        }
+        
+        .toolbar {
+            ToolbarItemGroup(placement: .confirmationAction) {
+                LyricsToolbar(lyricsType: $lyricsType)
+                    .background(.ultraThinMaterial)
+                    .clipShape(.buttonBorder)
+            }
+        }
+    }
+    
+    private var lyricsState: MetadataValueState<String?> {
+        metadataEditor[extracting: \.lyrics]
     }
     
     @ViewBuilder private func lyricLines() -> some View {
@@ -46,6 +83,7 @@ struct LyricsView: View {
 //            }
 //            .id(index)
 //        }
+        
         switch lyrics.storage {
         case .raw(let parser):
             ForEach(parser.tags) { tag in
@@ -77,18 +115,18 @@ struct LyricsView: View {
     }
     
     @ViewBuilder private func lyricTag(tag: LyricTag) -> some View {
-        
+        Text(tag.content)
     }
     
     @ViewBuilder private func rawLyricLine(line: RawLyricLine) -> some View {
-        
+        Text(line.content)
     }
     
     @ViewBuilder private func lrcLyricLine(line: LRCLyricLine) -> some View {
-        
+        Text(line.content)
     }
     
     @ViewBuilder private func ttmlLyricLine(line: TTMLLyricLine) -> some View {
-        
+        Text(line.content)
     }
 }

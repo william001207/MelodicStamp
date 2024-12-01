@@ -25,8 +25,8 @@ struct MainView: View {
 
     @Binding var selectedTabs: Set<SidebarTab>
 
-    @State private var lyrics: LyricsModel = .init()
     @State private var metadataEditor: MetadataEditorModel = .init()
+    @State private var lyrics: LyricsModel = .init()
     
     @State private var size: CGSize = .zero
 
@@ -100,7 +100,7 @@ struct MainView: View {
                                         blendingMode: .behindWindow)
                                 }
                         case .lyrics:
-                            LyricsView(lyrics: lyrics)
+                            LyricsView(metadataEditor: metadataEditor, lyrics: lyrics)
                                 .frame(minWidth: 250)
                                 .ignoresSafeArea()
                             
@@ -178,10 +178,10 @@ struct MainView: View {
     }
 
     private var isEditorToolbarPresented: Bool {
-        let hasEditor = !selectedTabs.intersection([.inspector, .metadata])
+        let hasEditor = !Set(selectedTabs.map(\.composable))
+            .intersection([.metadata, .lyrics])
             .isEmpty
-        let hasPlaylist = !player.isPlaylistEmpty
-        return hasEditor && hasPlaylist
+        return hasEditor && !player.isPlaylistEmpty
     }
 }
 

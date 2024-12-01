@@ -13,7 +13,7 @@ struct LRCLyricLine: LyricLine {
         case main
         case translation
     }
-    
+
     var type: LRCLyricType = .main
     var startTime: TimeInterval?
     var endTime: TimeInterval?
@@ -28,32 +28,56 @@ extension LRCLyricLine: Identifiable {
 
 @Observable class LRCLyricsParser: LyricsParser {
     typealias Line = LRCLyricLine
-    
+
     var tags: [LyricTag]
     var lines: [LRCLyricLine]
-    
+
     required init(string: String) throws {
         self.tags = []
         self.lines = []
-        
-        let contents = string
+
+        let contents =
+            string
             .split(separator: .newlineSequence)
             .map(String.init(_:))
-        
+
         try contents.forEach {
-            var content = $0.trimmingCharacters(in: .whitespacesAndNewlines)
-            var headers: [String] = []
+            let headerRegex = Regex {
+                "["
+                Capture {
+                    OneOrMore(.anyNonNewline, .reluctant)
+                }
+                "]"
+            }
+            let lineRegex = Regex {
+                Capture {
+                    ZeroOrMore {
+                        headerRegex
+                    }
+                }
+                Capture {
+                    ZeroOrMore(.anyNonNewline)
+                }
+            }
+
+            guard
+                let match = try lineRegex.wholeMatch(
+                    in: $0.trimmingCharacters(in: .whitespacesAndNewlines))
+            else { return }
+            // output: (original, headerString, _, content)
             
-            while content.starts(with: "["), content.contains("]") {
-                let header = String(content.extractNearest(from: "[", to: "]"))
-                headers.append(header)
-                content = String(content.extractNearest(from: "]"))
+            let headersString = String(match.output.1).trimmingCharacters(in: .whitespacesAndNewlines)
+            let content = String(match.output.3).trimmingCharacters(in: .whitespacesAndNewlines)
+
+            var headers: [String] = []
+            for match in headersString.matches(of: headerRegex) {
+                headers.append(String(match.output.1).trimmingCharacters(in: .whitespacesAndNewlines))
             }
             
-            // TODO: handle translation
-            let isTranslation = false
-            var line: LRCLyricLine = .init(type: isTranslation ? .translation : .main, content: content)
-            
+            print("Extracting lyric line: \(headers), \"\(content)\"")
+
+            var line: LRCLyricLine = .init(content: content)
+
             for header in headers {
                 if let time = try TimeInterval(lyricTimestamp: header) {
                     // parse timestamp
@@ -75,18 +99,19 @@ extension LRCLyricLine: Identifiable {
                             }
                         }
                     } catch {
-                        
+
                     }
                 }
             }
-            
-            lines.append(line)
+
+            if !line.isEmpty {
+                lines.append(line)
+            }
         }
     }
-    
+
     static func parseTag(string: String) throws -> LyricTag? {
         let regex = Regex {
-            "["
             Capture {
                 LyricTag.LyricTagType.regex
             }
@@ -96,13 +121,15 @@ extension LRCLyricLine: Identifiable {
                     CharacterClass(.anyNonNewline)
                 }
             }
-            "]"
         }
-        
+
         guard let match = try regex.wholeMatch(in: string) else { return nil }
-        let key = String(match.output.1), value = String(match.output.2)
-        
-        guard let type = LyricTag.LyricTagType(rawValue: key) else { return nil }
+        let key = String(match.output.1)
+        let value = String(match.output.2)
+
+        guard let type = LyricTag.LyricTagType(rawValue: key) else {
+            return nil
+        }
         return .init(type: type, content: value)
     }
 }

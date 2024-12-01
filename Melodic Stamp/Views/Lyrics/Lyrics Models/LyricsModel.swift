@@ -8,6 +8,35 @@
 import Foundation
 import RegexBuilder
 
+// MARK: - Lyric Line (Protocol)
+
+protocol LyricLine: Equatable, Hashable, Identifiable {
+    var startTime: TimeInterval? { get set }
+    var endTime: TimeInterval? { get set }
+    var content: String { get set }
+    
+    var isEmpty: Bool { get }
+}
+
+extension LyricLine {
+    var isEmpty: Bool {
+        startTime == nil && endTime == nil && content.isEmpty
+    }
+}
+
+// MARK: - Lyrics Parser (Protocol)
+
+protocol LyricsParser {
+    associatedtype Line: LyricLine
+    
+    var tags: [LyricTag] { get set }
+    var lines: [Line] { get set }
+    
+    init(string: String) throws
+}
+
+// MARK: - Lyric Tag
+
 struct LyricTag: Identifiable {
     enum LyricTagType: String, Identifiable, CaseIterable {
         case artist = "ar"
@@ -19,6 +48,7 @@ struct LyricTag: Identifiable {
         case offset
         case editor = "re"
         case version = "ve"
+        case translation = "tr"
         
         var id: String {
             rawValue
@@ -42,6 +72,7 @@ struct LyricTag: Identifiable {
             case .offset: .init(localized: "Offset")
             case .editor: .init(localized: "Editor")
             case .version: .init(localized: "Version")
+            case .translation: .init(localized: "Translation")
             }
         }
         
@@ -57,6 +88,7 @@ struct LyricTag: Identifiable {
                     offset.rawValue
                     editor.rawValue
                     version.rawValue
+                    translation.rawValue
                 }
             }
         }
@@ -70,32 +102,27 @@ struct LyricTag: Identifiable {
     var content: String
 }
 
-protocol LyricsParser {
-    associatedtype Line: LyricLine
-    
-    var tags: [LyricTag] { get set }
-    var lines: [Line] { get set }
-    
-    init(string: String) throws
-}
+// MARK: Lyrics Type
 
-protocol LyricLine: Equatable, Hashable, Identifiable {
-    var startTime: TimeInterval? { get set }
-    var endTime: TimeInterval? { get set }
-    var content: String { get set }
-}
-
-enum LyricsType: String, CaseIterable {
+enum LyricsType: String, Hashable, Identifiable, CaseIterable {
     case raw // raw splitted string, unparsed
     case lrc // sentence based
     case ttml // word based
+    
+    var id: String {
+        rawValue
+    }
 }
+
+// MARK: Lyrics Storage
 
 enum LyricsStorage {
     case raw(parser: RawLyricsParser)
     case lrc(parser: LRCLyricsParser)
     case ttml(parser: TTMLLyricsParser)
 }
+
+// MARK: Lyrics Model
 
 @Observable class LyricsModel {
     private(set) var storage: LyricsStorage?
