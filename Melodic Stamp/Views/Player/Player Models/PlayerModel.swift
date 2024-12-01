@@ -98,7 +98,7 @@ enum PlaybackMode: String, CaseIterable, Identifiable {
             do {
                 try player.setVolume(Float(newValue))
             } catch {
-//                handleError(error)
+                
             }
         }
     }
@@ -117,7 +117,7 @@ enum PlaybackMode: String, CaseIterable, Identifiable {
                     try player.setVolume(Float(mutedVolume))
                 }
             } catch {
-//                handleError(error)
+
             }
         }
     }
