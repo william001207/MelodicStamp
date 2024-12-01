@@ -63,7 +63,6 @@ struct PlaylistItemView: View {
                         if let cover = getCover(from: attachedPictures.current), let image = cover.image {
                             Group {
                                 MusicCover(cornerRadius: 0, images: [image], hasPlaceholder: false, maxResolution: 32)
-                                    .frame(maxWidth: .infinity)
                                     .overlay {
                                         if isHovering {
                                             Rectangle()
