@@ -8,7 +8,6 @@
 import SwiftUI
 
 struct LyricsView: View {
-    
     @Bindable var player: PlayerModel
     
     var body: some View {
@@ -18,15 +17,17 @@ struct LyricsView: View {
                     VStack(alignment: .center, spacing: 10) {
                         ForEach(Array(player.lyricLines.enumerated()), id: \.offset) { index, line in
                             VStack(spacing: 2) {
+                                let isCurrent = isCurrent(line: index)
                                 if let stringF = line.stringF {
                                     Text(stringF)
-                                        .font(lineIsCurrent(index: index) ? .headline : .body)
-                                        .foregroundColor(lineIsCurrent(index: index) ? .blue : .primary)
+                                        .font(isCurrent ? .headline : .body)
+                                        .foregroundColor(isCurrent ? .blue : .primary)
                                 }
+                                
                                 if let stringS = line.stringS {
                                     Text(stringS)
-                                        .font(lineIsCurrent(index: index) ? .subheadline : .caption)
-                                        .foregroundColor(lineIsCurrent(index: index) ? .gray : .secondary)
+                                        .font(isCurrent ? .subheadline : .caption)
+                                        .foregroundColor(isCurrent ? .gray : .secondary)
                                 }
                             }
                             .id(index)
@@ -45,7 +46,8 @@ struct LyricsView: View {
             }
         }
     }
-    private func lineIsCurrent(index: Int) -> Bool {
-        index == player.currentLyricIndex
+    
+    private func isCurrent(line: Int) -> Bool {
+        line == player.currentLyricIndex
     }
 }

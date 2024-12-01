@@ -225,27 +225,30 @@ enum PlaybackMode: String, CaseIterable, Identifiable {
             return
         }
         
-        let lyric = Lyric(lyricStr)
-        var lines: [Lyricline] = []
-        
-        for (time, text) in lyric.lyrics {
-            if let last = lines.last, last.time == time {
-                lines[lines.count - 1].stringS = text
-                lines[lines.count - 1].type = .both
-            } else {
-                let lyricLine = Lyricline(stringF: text, stringS: nil, time: time, type: .first)
-                lines.append(lyricLine)
+        do {
+            let lyric = try Lyrics(lyricStr)
+            var lines: [Lyricline] = []
+            
+            for (time, text) in lyric.lyrics {
+                if let last = lines.last, last.time == time {
+                    lines[lines.count - 1].stringS = text
+                    lines[lines.count - 1].type = .both
+                } else {
+                    let lyricLine = Lyricline(stringF: text, stringS: nil, time: time, type: .first)
+                    lines.append(lyricLine)
+                }
             }
+            
+            lyricLines = lines.sorted { $0.time < $1.time }
+        } catch {
+            
         }
-        
-        lyricLines = lines.sorted { $0.time.totalMS < $1.time.totalMS }
     }
     
     func updateCurrentLyricIndex(currentTime: TimeInterval) {
         guard !lyricLines.isEmpty else { return }
         
-        let currentMS = Int(currentTime * 1000)
-        if let index = lyricLines.lastIndex(where: { $0.time.totalMS <= currentMS }) {
+        if let index = lyricLines.lastIndex(where: { $0.time <= currentTime }) {
             if index != currentLyricIndex {
                 currentLyricIndex = index
             }

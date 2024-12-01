@@ -1,11 +1,11 @@
 //
 //  Duration+Extensions.swift
-//  MelodicStamp
+//  Melodic Stamp
 //
-//  Created by KrLite on 2024/11/22.
+//  Created by KrLite on 2024/12/1.
 //
 
-import SwiftUI
+import Foundation
 
 extension Duration {
     func toTimeInterval() -> TimeInterval {

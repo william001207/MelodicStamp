@@ -1,5 +1,5 @@
 //
-//  Lyricline.swift
+//  Lyrics.swift
 //  Melodic Stamp
 //
 //  Created by Xinshao_Air on 2024/12/1.
@@ -9,17 +9,19 @@ import Foundation
 
 struct Lyricline: Equatable {
     enum LyricType: Equatable {
-        case first, second, both
+        case first
+        case second
+        case both
     }
     
     var stringF: String?
     var stringS: String?
-    let time: LyricTime
+    let time: TimeInterval
     var type: LyricType
     var highlighted = false
 }
 
-class Lyric: NSObject {
+class Lyrics: NSObject {
     enum LyricTag: String {
         case artist = "ar"
         case album = "al"
@@ -33,11 +35,12 @@ class Lyric: NSObject {
     }
     
     var tags = [LyricTag: String]()
-    var lyrics = [(LyricTime, String)]()
+    var lyrics = [(TimeInterval, String)]()
     
-    convenience init(_ lyricStr: String) {
+    convenience init(_ string: String) throws {
         self.init()
-        lyricStr.split(separator: "\n").map(String.init).forEach {
+        
+        try string.split(separator: "\n").map(String.init).forEach {
             var heads = [String]()
             var line = $0
             while line.starts(with: "["), line.contains("]") {
@@ -47,7 +50,7 @@ class Lyric: NSObject {
             }
             
             if heads.count == 1, let h = heads.first {
-                if let time = LyricTime(h) {
+                if let time = try TimeInterval(lyricTimeStamp: h) {
                     lyrics.append((time, line))
                 } else {
                     let kv = h.split(separator: ":").map(String.init)
@@ -59,7 +62,7 @@ class Lyric: NSObject {
                 }
             } else {
                 let isTranslation = heads.contains { $0.starts(with: "tr:") }
-                if let time = heads.compactMap({ LyricTime($0) }).first {
+                if let time = try heads.compactMap({ try TimeInterval(lyricTimeStamp: $0) }).first {
                     lyrics.append((time, line))
                     if isTranslation {
                         lyrics.append((time, line))
@@ -67,29 +70,5 @@ class Lyric: NSObject {
                 }
             }
         }
-    }
-}
-
-struct LyricTime: Hashable {
-    var minute: Int
-    var second: Int
-    var millisecond: Int
-    var totalMS: Int
-    
-    var timeInterval: TimeInterval {
-        return TimeInterval(totalMS) / 1000.0
-    }
-    
-    init?(_ str: String) {
-        let minS = str.split(separator: ":").map(String.init)
-        guard minS.count == 2, let min = Int(minS.first ?? "") else { return nil }
-        minute = min
-        let sm = minS.last?.split(separator: ".").map(String.init)
-        guard sm?.count == 2,
-              let s = Int(sm?.first ?? ""),
-              let ms = Int(sm?.last ?? "") else { return nil }
-        second = s
-        millisecond = ms
-        totalMS = ((minute * 60) + second) * 1000 + millisecond
     }
 }
