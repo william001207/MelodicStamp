@@ -19,6 +19,7 @@ struct AdaptableMusicCovers: View {
     var state: MetadataValueState<Set<AttachedPicture>>
 
     @State private var contentSize: CGSize = .zero
+    @State private var isImagePickerPresented: Bool = false
 
     var body: some View {
         switch layout {
@@ -69,22 +70,51 @@ struct AdaptableMusicCovers: View {
                 }
                 .clipShape(.capsule)
             
-            MusicCover(
-                images: images,
-                maxResolution: 64 * max(1, round(contentSize.width / 64))
-            )
-            .padding(.horizontal, 16)
-            .containerRelativeFrame(
-                .horizontal, alignment: .center
-            ) { length, axis in
-                switch axis {
-                case .horizontal:
-                    let count = max(1, count)
-                    let proportional =
-                    length / floor((length + maxWidth) / maxWidth)
-                    return max(proportional, length / CGFloat(count))
-                case .vertical:
-                    return length
+            AliveButton {
+                isImagePickerPresented = true
+            } label: {
+                MusicCover(
+                    images: images,
+                    maxResolution: 64 * max(1, round(contentSize.width / 64))
+                )
+                .padding(.horizontal, 16)
+                .containerRelativeFrame(
+                    .horizontal, alignment: .center
+                ) { length, axis in
+                    switch axis {
+                    case .horizontal:
+                        let count = max(1, count)
+                        let proportional =
+                        length / floor((length + maxWidth) / maxWidth)
+                        return max(proportional, length / CGFloat(count))
+                    case .vertical:
+                        return length
+                    }
+                }
+            }
+            .fileImporter(
+                isPresented: $isImagePickerPresented,
+                allowedContentTypes: [.jpeg, .png, .tiff, .bmp, .gif, .heic, .heif, .rawImage]
+            ) { result in
+                switch result {
+                case .success(let url):
+                    guard url.startAccessingSecurityScopedResource() else { break }
+                    defer { url.stopAccessingSecurityScopedResource() }
+                    
+                    guard let image = NSImage(contentsOf: url), let attachedPicture = image.attachedPicture(of: type) else { break }
+                    
+                    switch state {
+                    case .undefined:
+                        break
+                    case .fine(let value):
+                        value.current = replacingAttachedPictures([attachedPicture], in: value.current)
+                    case .varied(let values):
+                        values.current = values.current.mapValues { attachedPictures in
+                            replacingAttachedPictures([attachedPicture], in: attachedPictures)
+                        }
+                    }
+                case .failure:
+                    break
                 }
             }
         }
@@ -163,6 +193,20 @@ struct AdaptableMusicCovers: View {
             Text("Publisher Logo")
         @unknown default:
             EmptyView()
+        }
+    }
+    
+    private func replacingAttachedPictures(
+        _ newAttachedPictures: [AttachedPicture],
+        in attachedPictures: Set<AttachedPicture>
+    ) -> Set<AttachedPicture> {
+        let types = newAttachedPictures.map(\.type)
+        return attachedPictures.reduce(into: Set<AttachedPicture>()) { result, original in
+            if types.contains(original.type), let attachedPicture = newAttachedPictures.first(where: { $0.type == original.type }) {
+                result.insert(attachedPicture)
+            } else {
+                result.insert(original)
+            }
         }
     }
 }
