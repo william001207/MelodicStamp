@@ -153,8 +153,8 @@ struct FloatingTabBarView: View {
     }
 }
 
-#Preview {
-    @Previewable @State var selectedTabs: Set<SidebarTab> = .init([.playlist])
-
-    FloatingTabBarView(floatingWindows: .init(), sections: [.init(tabs: SidebarTab.allCases)], selectedTabs: $selectedTabs)
-}
+//#Preview {
+//    @Previewable @State var selectedTabs: Set<SidebarTab> = [.inspector]
+//
+//    FloatingTabBarView(floatingWindows: .init(), sections: [.init(tabs: SidebarTab.allCases)], selectedTabs: $selectedTabs)
+//}

@@ -22,7 +22,7 @@ struct ContentView: View {
 
     @Namespace private var namespace
 
-    @State private var selectedTabs: Set<SidebarTab> = .init([.playlist])
+    @State private var selectedTabs: Set<SidebarTab> = []
 
     @State private var floatingWindows: FloatingWindowsModel = .init()
     @State private var fileManager: FileManagerModel = .init()
@@ -68,9 +68,7 @@ struct ContentView: View {
             floatingWindows.observeFullScreen()
         }
         .onChange(of: isActive, initial: true) { _, _ in
-            if let window = NSApp.mainWindow {
-                window.titlebarAppearsTransparent = true
-            }
+            NSApp.mainWindow?.titlebarAppearsTransparent = true
 
             switch windowStyle {
             case .main:
@@ -110,8 +108,7 @@ struct ContentView: View {
             FloatingTabBarView(
                 floatingWindows: floatingWindows,
                 sections: [
-                    .init(tabs: [.playlist]),
-                    .init(title: .init(localized: "Metadata"), tabs: [.inspector, .metadata]),
+                    .init(tabs: [.inspector, .metadata]),
                     .init(title: .init(localized: "Lyrics"), tabs: [.lyrics]),
                 ],
                 selectedTabs: $selectedTabs

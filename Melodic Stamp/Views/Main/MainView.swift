@@ -51,103 +51,47 @@ struct MainView: View {
     @State private var metadataEditor: MetadataEditorModel = .init()
     @State private var lyrics: LyricsModel = .init()
 
-    @State private var size: CGSize = .zero
-
     var body: some View {
-        // use `ZStack` to eliminate safe area animation problems
-        ZStack {
-            VisualEffectView(material: .contentBackground, blendingMode: .behindWindow)
-
-            if !player.isPlaylistEmpty {
-                HSplitView {
-                    ForEach(Array(selectedTabs).sorted { $0.order < $1.order }) { tab in
+        HSplitView {
+            Group {
+                PlaylistView(player: player, metadataEditor: metadataEditor)
+                    .frame(minWidth: 600)
+                    .ignoresSafeArea()
+                    .morphed()
+                    .background {
+                        VisualEffectView(material: .menu, blendingMode: .behindWindow)
+                    }
+                
+                ForEach(Array(selectedTabs).sorted(by: { $0.order < $1.order })) { tab in
+                    Group {
                         switch tab {
-                        case .playlist:
-                            PlaylistView(
-                                player: player, metadataEditor: metadataEditor
-                            )
-                            .frame(minWidth: 400)
-                            .ignoresSafeArea()
-                            .morphed()
-                            .background {
-                                VisualEffectView(
-                                    material: .menu,
-                                    blendingMode: .behindWindow
-                                )
-                            }
                         case .inspector:
-                            InspectorView(
-                                player: player, metadataEditor: metadataEditor
-                            )
-                            .frame(minWidth: 250)
-                            .ignoresSafeArea()
-                            .morphed()
-                            .background {
-                                VisualEffectView(
-                                    material: .titlebar,
-                                    blendingMode: .behindWindow
-                                )
-                            }
+                            InspectorView(player: player, metadataEditor: metadataEditor)
+                                .frame(minWidth: 250)
                         case .metadata:
                             MetadataView()
                                 .frame(minWidth: 250)
-                                .ignoresSafeArea()
-                                .morphed()
-                                .background {
-                                    VisualEffectView(
-                                        material: .titlebar,
-                                        blendingMode: .behindWindow
-                                    )
-                                }
                         case .lyrics:
                             LyricsView(player: player, metadataEditor: metadataEditor, lyrics: lyrics)
-                                .frame(minWidth: 250)
-                                .ignoresSafeArea()
-                                .morphed()
-                                .background {
-                                    VisualEffectView(
-                                        material: .headerView,
-                                        blendingMode: .behindWindow
-                                    )
-                                }
+                                .frame(minWidth: 350)
                         }
                     }
                     .ignoresSafeArea()
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                }
-            } else {
-                if selectedTabs.isEmpty {
-                    EmptyMusicNoteView()
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
-                } else {
-                    HStack(alignment: ExcerptAlignment.alignment) {
-                        ForEach(
-                            Array(selectedTabs).sorted { $0.order < $1.order }
-                        ) { tab in
-                            switch tab {
-                            case .playlist:
-                                PlaylistExcerpt()
-                            case .inspector:
-                                InspectorExcerpt()
-                            case .metadata:
-                                MetadataExcerpt()
-                            case .lyrics:
-                                LyricsExcerpt()
-                            }
-                        }
-                        .frame(maxWidth: .infinity)
+                    .morphed()
+                    .background {
+                        VisualEffectView(material: tab.material, blendingMode: .behindWindow)
                     }
-                    .frame(maxHeight: .infinity)
-                    .padding(24)
-                    .padding(.bottom, 16)
                 }
             }
+            .frame(maxHeight: .infinity)
+            .ignoresSafeArea()
+            .inspector(isPresented: .constant(true)) {
+                Text("Test")
+                    .ignoresSafeArea()
+            }
+            .ignoresSafeArea()
         }
-        .onGeometryChange(for: CGSize.self) { proxy in
-            proxy.size
-        } action: { size in
-            self.size = size
-        }
+        .ignoresSafeArea()
 
         // toolbar
         .toolbar {

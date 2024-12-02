@@ -22,7 +22,6 @@ struct SidebarSection: Hashable, Identifiable {
 }
 
 enum SidebarComposable: String, Hashable, Identifiable, CaseIterable {
-    case playlist
     case metadata
     case lyrics
 
@@ -32,8 +31,6 @@ enum SidebarComposable: String, Hashable, Identifiable, CaseIterable {
 
     var opposites: [Self] {
         switch self {
-        case .playlist:
-            []
         case .metadata:
             [.lyrics]
         case .lyrics:
@@ -43,8 +40,6 @@ enum SidebarComposable: String, Hashable, Identifiable, CaseIterable {
 }
 
 enum SidebarTab: String, Hashable, Identifiable, CaseIterable {
-    case playlist
-
     // composable - metadata
     case inspector
     case metadata
@@ -56,10 +51,17 @@ enum SidebarTab: String, Hashable, Identifiable, CaseIterable {
         rawValue
     }
 
+    /// A larger number represents a stronger preference to stick to the trailing edge
+    var order: Int {
+        switch self {
+        case .inspector: .max
+        case .metadata: 0
+        case .lyrics: 0
+        }
+    }
+
     var composable: SidebarComposable {
         switch self {
-        case .playlist:
-            .playlist
         case .inspector, .metadata:
             .metadata
         case .lyrics:
@@ -68,27 +70,13 @@ enum SidebarTab: String, Hashable, Identifiable, CaseIterable {
     }
 
     var opposites: [Self] {
-        SidebarTab.allCases.filter { self.composable.opposites.contains($0.composable) }
-    }
-
-    /// A larger value prefers a place closer to the trailing edge.
-    var order: Int {
-        switch self {
-        case .playlist:
-            0
-        case .inspector:
-            2
-        case .metadata:
-            1
-        case .lyrics:
-            1
+        SidebarTab.allCases.filter {
+            self.composable.opposites.contains($0.composable)
         }
     }
 
     var title: String {
         switch self {
-        case .playlist:
-            .init(localized: "Playlist")
         case .inspector:
             .init(localized: "Inspector")
         case .metadata:
@@ -100,14 +88,23 @@ enum SidebarTab: String, Hashable, Identifiable, CaseIterable {
 
     var systemSymbol: SFSymbol {
         switch self {
-        case .playlist:
-            .musicNoteList
         case .inspector:
             .photoOnRectangleAngled
         case .metadata:
             .textBadgePlus
         case .lyrics:
             .textQuote
+        }
+    }
+
+    var material: NSVisualEffectView.Material {
+        switch self {
+        case .inspector:
+            .titlebar
+        case .metadata:
+            .titlebar
+        case .lyrics:
+            .headerView
         }
     }
 }

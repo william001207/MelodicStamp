@@ -10,7 +10,7 @@ import SwiftUI
 struct PlaylistExcerpt: View {
     var body: some View {
         VStack {
-            EmptyMusicNoteView(systemSymbol: SidebarTab.playlist.systemSymbol)
+            EmptyMusicNoteView(systemSymbol: .musicNoteList)
                 .frame(height: 64)
                 .alignmentGuide(ExcerptAlignment.alignment) { d in
                     d[.bottom]
