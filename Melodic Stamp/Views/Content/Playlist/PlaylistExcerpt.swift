@@ -12,9 +12,6 @@ struct PlaylistExcerpt: View {
         VStack {
             EmptyMusicNoteView(systemSymbol: .musicNoteList)
                 .frame(height: 64)
-                .alignmentGuide(ExcerptAlignment.alignment) { d in
-                    d[.bottom]
-                }
 
             Text("Playlist")
                 .font(.title3)

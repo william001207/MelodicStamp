@@ -21,58 +21,13 @@ struct SidebarSection: Hashable, Identifiable {
     }
 }
 
-enum SidebarComposable: String, Hashable, Identifiable, CaseIterable {
-    case metadata
-    case lyrics
-
-    var id: String {
-        rawValue
-    }
-
-    var opposites: [Self] {
-        switch self {
-        case .metadata:
-            [.lyrics]
-        case .lyrics:
-            [.metadata]
-        }
-    }
-}
-
 enum SidebarTab: String, Hashable, Identifiable, CaseIterable {
-    // composable - metadata
     case inspector
     case metadata
-
-    // composable - lyrics
     case lyrics
 
     var id: String {
         rawValue
-    }
-
-    /// A larger number represents a stronger preference to stick to the trailing edge
-    var order: Int {
-        switch self {
-        case .inspector: .max
-        case .metadata: 0
-        case .lyrics: 0
-        }
-    }
-
-    var composable: SidebarComposable {
-        switch self {
-        case .inspector, .metadata:
-            .metadata
-        case .lyrics:
-            .lyrics
-        }
-    }
-
-    var opposites: [Self] {
-        SidebarTab.allCases.filter {
-            self.composable.opposites.contains($0.composable)
-        }
     }
 
     var title: String {

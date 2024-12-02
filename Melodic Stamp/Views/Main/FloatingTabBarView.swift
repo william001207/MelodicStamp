@@ -15,9 +15,8 @@ struct FloatingTabBarView: View {
 
     var sections: [SidebarSection]
 
-    @Binding var selectedTabs: Set<SidebarTab>
-
-    @State private var composables: Set<SidebarComposable> = []
+    @Binding var isInspectorPresented: Bool
+    @Binding var selectedTab: SidebarTab
 
     var body: some View {
         ZStack {
@@ -63,17 +62,6 @@ struct FloatingTabBarView: View {
             // avoid glitches on first hover
             isHovering = false
         }
-        .onAppear {
-            var composables: Set<SidebarComposable> = []
-            for tab in selectedTabs {
-                if isComposingAvailable(for: tab.composable, in: composables) {
-                    composables.insert(tab.composable)
-                } else {
-                    selectedTabs.remove(tab)
-                }
-            }
-            self.composables = composables
-        }
         .onHover(perform: { hover in
             withAnimation(.default.speed(2)) {
                 isHovering = hover
@@ -88,28 +76,14 @@ struct FloatingTabBarView: View {
 
     @ViewBuilder private func tabView(for tab: SidebarTab) -> some View {
         let isTabHovering = hoveringTabs.contains(tab)
-        let isSelected = selectedTabs.contains(tab)
+        let isSelected = isInspectorPresented && tab == selectedTab
 
         AliveButton {
-            if isComposingAvailable(for: tab.composable, in: composables) {
-                if isSelected {
-                    selectedTabs.remove(tab)
-                    let hasRemaining = !selectedTabs
-                        .filter { $0.composable == tab.composable }
-                        .isEmpty
-                    if !hasRemaining {
-                        composables.remove(tab.composable)
-                    }
-                } else {
-                    selectedTabs.insert(tab)
-                    composables.insert(tab.composable)
-                }
+            if selectedTab == tab {
+                isInspectorPresented.toggle()
             } else {
-                tab.opposites.forEach { selectedTabs.remove($0) }
-                tab.composable.opposites.forEach { composables.remove($0) }
-
-                selectedTabs.insert(tab)
-                composables.insert(tab.composable)
+                isInspectorPresented = true
+                selectedTab = tab
             }
         } label: {
             HStack(alignment: .center) {
@@ -147,14 +121,10 @@ struct FloatingTabBarView: View {
             }
         }
     }
-
-    private func isComposingAvailable(for composable: SidebarComposable, in composables: Set<SidebarComposable>) -> Bool {
-        !composables.flatMap(\.opposites).contains(composable)
-    }
 }
 
 //#Preview {
-//    @Previewable @State var selectedTabs: Set<SidebarTab> = [.inspector]
+//    @Previewable @State var selectedTab: SidebarTab = .inspector
 //
-//    FloatingTabBarView(floatingWindows: .init(), sections: [.init(tabs: SidebarTab.allCases)], selectedTabs: $selectedTabs)
+//    FloatingTabBarView(floatingWindows: .init(), sections: [.init(tabs: SidebarTab.allCases)], selectedTab: $selectedTab)
 //}

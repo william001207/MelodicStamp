@@ -12,9 +12,6 @@ struct MetadataExcerpt: View {
         VStack {
             EmptyMusicNoteView(systemSymbol: SidebarTab.metadata.systemSymbol)
                 .frame(height: 64)
-                .alignmentGuide(ExcerptAlignment.alignment) { d in
-                    d[.bottom]
-                }
 
             Text("Metadata")
                 .font(.title3)

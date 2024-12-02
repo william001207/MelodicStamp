@@ -12,9 +12,6 @@ struct InspectorExcerpt: View {
         VStack {
             EmptyMusicNoteView(systemSymbol: SidebarTab.inspector.systemSymbol)
                 .frame(height: 64)
-                .alignmentGuide(ExcerptAlignment.alignment) { d in
-                    d[.bottom]
-                }
 
             Text("Inspector")
                 .font(.title3)

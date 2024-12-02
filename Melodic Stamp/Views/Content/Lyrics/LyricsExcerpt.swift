@@ -12,9 +12,6 @@ struct LyricsExcerpt: View {
         VStack {
             EmptyMusicNoteView(systemSymbol: SidebarTab.lyrics.systemSymbol)
                 .frame(height: 64)
-                .alignmentGuide(ExcerptAlignment.alignment) { d in
-                    d[.bottom]
-                }
 
             Text("Lyrics")
                 .font(.title3)
