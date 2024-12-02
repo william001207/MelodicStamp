@@ -135,7 +135,7 @@ import SwiftUI
 
         tabBarWindow.setFrame(
             .init(
-                x: isInFullScreen ? max(8, leadingX) : leadingX,
+                x: max(8, leadingX),
                 y: bottomY,
                 width: tabBarFrame.width,
                 height: tabBarFrame.height
@@ -159,7 +159,7 @@ import SwiftUI
         playerWindow.setFrame(
             .init(
                 x: centerX,
-                y: isInFullScreen ? max(8, bottomY) : bottomY,
+                y: max(8, bottomY),
                 width: playerFrame.width,
                 height: playerFrame.height
             ),

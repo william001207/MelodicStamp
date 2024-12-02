@@ -46,16 +46,22 @@ struct MainView: View {
 
     var body: some View {
         playlist()
+            .frame(minWidth: 500)
             .inspector(isPresented: $isInspectorPresented) {
                 inspector()
                     .ignoresSafeArea()
+                    .inspectorColumnWidth(min: 250, ideal: 350, max: 500)
             }
-            .inspectorColumnWidth(min: 250, ideal: 350, max: 500)
             .ignoresSafeArea()
 
             .toolbar {
                 // at least to preserve the titlebar style
                 Color.clear
+            }
+            .toolbar {
+                ToolbarItemGroup(placement: .navigation) {
+                    FileToolbar(player: player, fileManager: fileManager)
+                }
             }
     }
 
@@ -75,12 +81,32 @@ struct MainView: View {
             switch selectedTab {
             case .inspector:
                 InspectorView(player: player, metadataEditor: metadataEditor)
+                    .toolbar {
+                        EditorToolbar(metadataEditor: metadataEditor)
+                            .opacity(isInspectorPresented ? 1 : 0)
+                            .allowsHitTesting(isInspectorPresented)
+                            .animation(.default, value: isInspectorPresented)
+                    }
             case .metadata:
-                MetadataView()
+                MetadataView(metadataEditor: metadataEditor)
+                    .toolbar {
+                        EditorToolbar(metadataEditor: metadataEditor)
+                            .opacity(isInspectorPresented ? 1 : 0)
+                            .allowsHitTesting(isInspectorPresented)
+                            .animation(.default, value: isInspectorPresented)
+                    }
             case .lyrics:
                 LyricsView(
                     player: player, metadataEditor: metadataEditor,
-                    lyrics: lyrics)
+                    lyrics: lyrics
+                )
+                .toolbar {
+                    LyricsToolbar(lyricsType: $lyrics.type)
+                        .opacity(isInspectorPresented ? 1 : 0)
+                        .allowsHitTesting(isInspectorPresented)
+                        .animation(.default, value: isInspectorPresented)
+
+                }
             }
         }
         .ignoresSafeArea()

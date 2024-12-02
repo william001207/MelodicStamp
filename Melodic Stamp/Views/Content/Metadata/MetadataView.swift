@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct MetadataView: View {
+    @Bindable var metadataEditor: MetadataEditorModel
+
     var body: some View {
         EmptyMusicNoteView(systemSymbol: SidebarTab.metadata.systemSymbol)
             .frame(maxWidth: .infinity, maxHeight: .infinity)

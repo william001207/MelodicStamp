@@ -26,6 +26,8 @@ struct MelodicStampApp: App {
         .windowStyle(.titleBar)
         .windowToolbarStyle(.unified)
         .commands {
+            InspectorCommands()
+            
             CommandGroup(replacing: .appInfo) {
                 Button("About \(Bundle.main.displayName)") {
                     openWindow(id: "about")

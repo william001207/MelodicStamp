@@ -43,7 +43,7 @@ struct ContentView: View {
                         floatingWindows.updateTabBarPosition()
                         floatingWindows.updatePlayerPosition()
                     }
-                    .frame(minWidth: 1000, minHeight: 600)
+                    .frame(minHeight: 600)
                     .ignoresSafeArea()
             case .miniPlayer:
                 MiniPlayer(player: player, namespace: namespace)

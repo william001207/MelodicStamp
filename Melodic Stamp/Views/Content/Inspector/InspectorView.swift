@@ -5,20 +5,22 @@
 //  Created by KrLite on 2024/11/24.
 //
 
+import CSFBAudioEngine
 import Luminare
 import SwiftUI
-import CSFBAudioEngine
 
 struct InspectorView: View {
     @Environment(\.luminareListActionsHeight) private var actionsMinHeight
-    
+
     @Bindable var player: PlayerModel
     @Bindable var metadataEditor: MetadataEditorModel
-    
-    @State private var attachedPicturesHandler: AttachedPicturesHandlerModel = .init()
+
+    @State private var attachedPicturesHandler: AttachedPicturesHandlerModel =
+        .init()
 
     @State private var isCoverPickerPresented: Bool = false
-    @State private var chosenAttachedPictureType: AttachedPicture.`Type` = .frontCover
+    @State private var chosenAttachedPictureType: AttachedPicture.`Type` =
+        .frontCover
 
     var body: some View {
         if metadataEditor.hasEditableMetadata {
@@ -26,13 +28,16 @@ struct InspectorView: View {
                 VStack(spacing: 24) {
                     VStack(spacing: 8) {
                         attachedPicturesEditor()
-                        
+
                         AdaptableMusicCovers(
-                            attachedPicturesHandler: attachedPicturesHandler,
-                            state: metadataEditor[extracting: \.attachedPictures]
+                            attachedPicturesHandler:
+                                attachedPicturesHandler,
+                            state: metadataEditor[
+                                extracting: \.attachedPictures]
                         )
                         .padding(.horizontal, -16)
-                        .contentMargins(.horizontal, 16, for: .scrollIndicators)
+                        .contentMargins(
+                            .horizontal, 16, for: .scrollIndicators)
                     }
 
                     LabeledSection {
@@ -66,20 +71,21 @@ struct InspectorView: View {
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
     }
-    
+
     @ViewBuilder private func attachedPicturesEditor() -> some View {
         HStack(alignment: .center, spacing: 0) {
             Text("Pictures")
                 .foregroundStyle(.secondary)
-            
+
             Spacer()
-            
+
             LuminareSection {
                 HStack(spacing: 2) {
                     let state = metadataEditor[extracting: \.attachedPictures]
                     let types = attachedPicturesHandler.types(state: state)
-                    let availableTypes = Set(AttachedPicture.allTypes).subtracting(types)
-                    
+                    let availableTypes = Set(AttachedPicture.allTypes)
+                        .subtracting(types)
+
                     Button {
                         attachedPicturesHandler.remove(state: state)
                     } label: {
@@ -91,13 +97,17 @@ struct InspectorView: View {
                     .buttonStyle(LuminareDestructiveButtonStyle())
                     .frame(maxWidth: 150)
                     .disabled(types.isEmpty)
-                    
+
                     Menu {
                         ForEach(AttachedPictureCategory.allCases) { category in
-                            let availableTypesInCategory = availableTypes.intersection(category.allTypes)
-                            
+                            let availableTypesInCategory =
+                                availableTypes.intersection(category.allTypes)
+
                             Section {
-                                ForEach(Array(availableTypesInCategory).sorted(by: <), id: \.self) { type in
+                                ForEach(
+                                    Array(availableTypesInCategory).sorted(
+                                        by: <), id: \.self
+                                ) { type in
                                     Button {
                                         chosenAttachedPictureType = type
                                         isCoverPickerPresented = true
@@ -117,18 +127,22 @@ struct InspectorView: View {
                     .disabled(availableTypes.isEmpty)
                     .fileImporter(
                         isPresented: $isCoverPickerPresented,
-                        allowedContentTypes: AttachedPicturesHandlerModel.allowedContentTypes
+                        allowedContentTypes: AttachedPicturesHandlerModel
+                            .allowedContentTypes
                     ) { result in
                         switch result {
                         case .success(let url):
-                            guard url.startAccessingSecurityScopedResource() else { break }
+                            guard url.startAccessingSecurityScopedResource()
+                            else { break }
                             defer { url.stopAccessingSecurityScopedResource() }
-                            
+
                             guard
                                 let image = NSImage(contentsOf: url),
-                                let attachedPicture = image.attachedPicture(of: chosenAttachedPictureType)
+                                let attachedPicture = image.attachedPicture(
+                                    of: chosenAttachedPictureType)
                             else { break }
-                            attachedPicturesHandler.replace([attachedPicture], state: state)
+                            attachedPicturesHandler.replace(
+                                [attachedPicture], state: state)
                         case .failure:
                             break
                         }
@@ -147,13 +161,16 @@ struct InspectorView: View {
 
         LabeledTextField("Artist", text: metadataEditor[extracting: \.artist])
 
-        LabeledTextField("Composer", text: metadataEditor[extracting: \.composer])
+        LabeledTextField(
+            "Composer", text: metadataEditor[extracting: \.composer])
     }
 
     @ViewBuilder private func albumEditor() -> some View {
-        LabeledTextField("Album Title", text: metadataEditor[extracting: \.albumTitle])
+        LabeledTextField(
+            "Album Title", text: metadataEditor[extracting: \.albumTitle])
 
-        LabeledTextField("Album Artist", text: metadataEditor[extracting: \.albumArtist])
+        LabeledTextField(
+            "Album Artist", text: metadataEditor[extracting: \.albumArtist])
     }
 
     @ViewBuilder private func trackAndDiscEditor() -> some View {
@@ -176,13 +193,18 @@ struct InspectorView: View {
                 EmptyView()
             }
         } badge: {
-            LabeledTextField("BPM", state: metadataEditor[extracting: \.bpm], format: .number)
+            LabeledTextField(
+                "BPM", state: metadataEditor[extracting: \.bpm], format: .number
+            )
         }
         .luminarePopoverTrigger(.forceTouch)
 
         HStack {
-            LabeledTextField("No.", state: metadataEditor[extracting: \.trackNumber], format: .number, showsLabel: false)
-                .frame(maxWidth: 72)
+            LabeledTextField(
+                "No.", state: metadataEditor[extracting: \.trackNumber],
+                format: .number, showsLabel: false
+            )
+            .frame(maxWidth: 72)
 
             Image(systemSymbol: .poweron)
                 .imageScale(.large)
@@ -190,12 +212,17 @@ struct InspectorView: View {
                 .frame(width: 4)
                 .foregroundStyle(.placeholder)
 
-            LabeledTextField("Tracks", state: metadataEditor[extracting: \.trackTotal], format: .number)
+            LabeledTextField(
+                "Tracks", state: metadataEditor[extracting: \.trackTotal],
+                format: .number)
         }
 
         HStack {
-            LabeledTextField("No.", state: metadataEditor[extracting: \.discNumber], format: .number, showsLabel: false)
-                .frame(maxWidth: 72)
+            LabeledTextField(
+                "No.", state: metadataEditor[extracting: \.discNumber],
+                format: .number, showsLabel: false
+            )
+            .frame(maxWidth: 72)
 
             Image(systemSymbol: .poweron)
                 .imageScale(.large)
@@ -203,7 +230,9 @@ struct InspectorView: View {
                 .frame(width: 4)
                 .foregroundStyle(.placeholder)
 
-            LabeledTextField("Discs", state: metadataEditor[extracting: \.discTotal], format: .number)
+            LabeledTextField(
+                "Discs", state: metadataEditor[extracting: \.discTotal],
+                format: .number)
         }
     }
 }
