@@ -10,11 +10,42 @@ import UniformTypeIdentifiers
 import CSFBAudioEngine
 
 @Observable class AttachedPicturesHandlerModel {
+    typealias APType = AttachedPicture.`Type`
+    typealias State = MetadataValueState<Set<AttachedPicture>>
+    
     static var allowedContentTypes: [UTType] {
         [.jpeg, .png, .tiff, .bmp, .gif, .heic, .heif, .rawImage]
     }
     
-    func types(state: MetadataValueState<Set<AttachedPicture>>) -> Set<AttachedPicture.`Type`> {
+    func isModified(
+        of types: [APType]? = nil,
+        state: State
+    ) -> Bool {
+        guard let types else { return false }
+        return switch state {
+        case .undefined:
+            false
+        case .fine(let value):
+            !value.current
+                .filter { types.contains($0.type) }
+                .filter { currentValue in
+                    guard let initialValue = value.initial.filter({ $0.type == currentValue.type }).first else { return false }
+                    return currentValue != initialValue
+                }
+                .isEmpty
+        case .varied(let values):
+            values.current.values
+                .filter { currentValues in
+                    currentValues
+                        .filter { types.contains($0.type) }
+                        .filter { currentValue in
+                            guard let initialValue =
+                        }
+                }
+        }
+    }
+    
+    func types(state: State) -> Set<APType> {
         switch state {
         case .undefined:
             []
@@ -36,7 +67,7 @@ import CSFBAudioEngine
     
     func replace(
         _ newAttachedPictures: [AttachedPicture],
-        state: MetadataValueState<Set<AttachedPicture>>
+        state: State
     ) {
         switch state {
         case .undefined:
@@ -51,7 +82,7 @@ import CSFBAudioEngine
     }
     
     func removing(
-        of types: [AttachedPicture.`Type`]? = nil,
+        of types: [APType]? = nil,
         in attachedPictures: Set<AttachedPicture>
     ) -> Set<AttachedPicture> {
         if let types {
@@ -62,8 +93,8 @@ import CSFBAudioEngine
     }
     
     func remove(
-        of types: [AttachedPicture.`Type`]? = nil,
-        state: MetadataValueState<Set<AttachedPicture>>
+        of types: [APType]? = nil,
+        state: State
     ) {
         switch state {
         case .undefined:
@@ -78,8 +109,8 @@ import CSFBAudioEngine
     }
     
     func revert(
-        of types: [AttachedPicture.`Type`]? = nil,
-        state: MetadataValueState<Set<AttachedPicture>>
+        of types: [APType]? = nil,
+        state: State
     ) {
         guard let types else {
             switch state {
@@ -97,11 +128,23 @@ import CSFBAudioEngine
         case .undefined:
             break
         case .fine(let value):
-            replace(value.initial.filter({ types.contains($0.type) }), state: state)
+            let initialAttachedPictures: [AttachedPicture] = value.initial.filter { types.contains($0.type) }
+            
+            if initialAttachedPictures.isEmpty {
+                remove(of: types, state: state)
+            } else {
+                replace(initialAttachedPictures, state: state)
+            }
         case .varied(let values):
             values.current.keys.forEach { key in
-                let value = values.initial[key] ?? []
-                replace(value.filter({ types.contains($0.type) }), state: state)
+                let initialValue = values.initial[key] ?? []
+                let initialAttachedPictures: [AttachedPicture] = initialValue.filter { types.contains($0.type) }
+                
+                if initialAttachedPictures.isEmpty {
+                    remove(of: types, state: state)
+                } else {
+                    replace(initialAttachedPictures, state: state)
+                }
             }
         }
     }

@@ -42,6 +42,10 @@ import SwiftUI
         func apply() {
             initial = current
         }
+        
+        subscript<S: Equatable>(isModified keyPath: KeyPath<V, S>) -> Bool {
+            current[keyPath: keyPath] != initial[keyPath: keyPath]
+        }
     }
     
     struct Values<V: Equatable & Hashable>: Equatable {
@@ -94,6 +98,14 @@ import SwiftUI
         
         func applyAll() {
             initial = current
+        }
+        
+        subscript<S: Equatable>(isModified keyPath: KeyPath<V, S>) -> Bool {
+            !current.filter { key, value in
+                guard let initialValue = initial[key] else { return false }
+                return value[keyPath: keyPath] != initialValue[keyPath: keyPath]
+            }
+            .isEmpty
         }
     }
 

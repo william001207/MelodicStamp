@@ -67,7 +67,7 @@ struct AdaptableMusicCoverControl: View {
                 HStack(spacing: 2) {
                     let isModified = switch state {
                     case .undefined: false
-                    case .fine(let value): value.isModified
+                    case .fine(let value): value.current.
                     case .varied(let values): values.isModified
                     }
                     
