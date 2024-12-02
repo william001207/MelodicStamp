@@ -34,11 +34,14 @@ struct LyricsView: View {
 
                             Spacer()
                                 .frame(height: 150)
+                            
+                            Spacer()
+                                .frame(height: 94)
                         }
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                         .scrollContentBackground(.hidden)
-                        .contentMargins(.vertical, 64, for: .scrollIndicators)
-                        .contentMargins(.bottom, 94)
+                        .contentMargins(.top, 64, for: .scrollIndicators)
+                        .contentMargins(.bottom, 94, for: .scrollIndicators)
                     }
                 }
             case .varied(let values):
