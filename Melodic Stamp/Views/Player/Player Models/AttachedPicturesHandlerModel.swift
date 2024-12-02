@@ -5,46 +5,47 @@
 //  Created by KrLite on 2024/12/1.
 //
 
+import CSFBAudioEngine
 import SwiftUI
 import UniformTypeIdentifiers
-import CSFBAudioEngine
 
 @Observable class AttachedPicturesHandlerModel {
     typealias APType = AttachedPicture.`Type`
+    typealias Value = EditableMetadata.Value<Set<AttachedPicture>>
     typealias State = MetadataValueState<Set<AttachedPicture>>
-    
+
     static var allowedContentTypes: [UTType] {
         [.jpeg, .png, .tiff, .bmp, .gif, .heic, .heif, .rawImage]
     }
-    
-    func isModified(
-        of types: [APType]? = nil,
-        state: State
-    ) -> Bool {
+
+    private func isModified(of types: [APType]? = nil, value: Value, countAsEmpty fallback: Bool = true) -> Bool {
         guard let types else { return false }
-        return switch state {
+        return !value.current
+            .filter { types.contains($0.type) }
+            .filter { currentValue in
+                guard
+                    let initialValue = value.initial.filter({
+                        $0.type == currentValue.type
+                    }).first
+                else { return fallback }
+                return currentValue != initialValue
+            }
+            .isEmpty
+    }
+
+    func isModified(of types: [APType]? = nil, state: State, countAsEmpty fallback: Bool = true) -> Bool {
+        switch state {
         case .undefined:
             false
         case .fine(let value):
-            !value.current
-                .filter { types.contains($0.type) }
-                .filter { currentValue in
-                    guard let initialValue = value.initial.filter({ $0.type == currentValue.type }).first else { return false }
-                    return currentValue != initialValue
-                }
-                .isEmpty
+            isModified(of: types, value: value, countAsEmpty: fallback)
         case .varied(let values):
-            values.current.values
-                .filter { currentValues in
-                    currentValues
-                        .filter { types.contains($0.type) }
-                        .filter { currentValue in
-                            guard let initialValue =
-                        }
-                }
+            !values.values
+                .filter { isModified(of: types, value: $0, countAsEmpty: fallback) }
+                .isEmpty
         }
     }
-    
+
     func types(state: State) -> Set<APType> {
         switch state {
         case .undefined:
@@ -52,10 +53,10 @@ import CSFBAudioEngine
         case .fine(let value):
             Set(value.current.map(\.type))
         case .varied(let values):
-            Set(values.current.values.flatMap(\.self).map(\.type))
+            Set(values.values.flatMap(\.current).map(\.type))
         }
     }
-    
+
     func replacing(
         _ newAttachedPictures: [AttachedPicture],
         in attachedPictures: Set<AttachedPicture>
@@ -64,26 +65,25 @@ import CSFBAudioEngine
         let removed = attachedPictures.filter { !types.contains($0.type) }
         return removed.union(newAttachedPictures)
     }
-    
-    func replace(
-        _ newAttachedPictures: [AttachedPicture],
-        state: State
-    ) {
+
+    private func replace(_ newAttachedPictures: [AttachedPicture], value: Value)
+    {
+        value.current = replacing(newAttachedPictures, in: value.current)
+    }
+
+    func replace(_ newAttachedPictures: [AttachedPicture], state: State) {
         switch state {
         case .undefined:
             break
         case .fine(let value):
-            value.current = replacing(newAttachedPictures, in: value.current)
+            replace(newAttachedPictures, value: value)
         case .varied(let values):
-            values.current = values.current.mapValues { attachedPictures in
-                replacing(newAttachedPictures, in: attachedPictures)
-            }
+            values.values.forEach { replace(newAttachedPictures, value: $0) }
         }
     }
-    
+
     func removing(
-        of types: [APType]? = nil,
-        in attachedPictures: Set<AttachedPicture>
+        of types: [APType]? = nil, in attachedPictures: Set<AttachedPicture>
     ) -> Set<AttachedPicture> {
         if let types {
             attachedPictures.filter { !types.contains($0.type) }
@@ -91,27 +91,40 @@ import CSFBAudioEngine
             []
         }
     }
-    
-    func remove(
-        of types: [APType]? = nil,
-        state: State
-    ) {
+
+    private func remove(of types: [APType]? = nil, value: Value) {
+        value.current = removing(of: types, in: value.current)
+    }
+
+    func remove(of types: [APType]? = nil, state: State) {
         switch state {
         case .undefined:
             break
         case .fine(let value):
-            value.current = removing(of: types, in: value.current)
+            remove(of: types, value: value)
         case .varied(let values):
-            values.current = values.current.mapValues { attachedPictures in
-                removing(of: types, in: attachedPictures)
-            }
+            values.values.forEach { remove(of: types, value: $0) }
         }
     }
-    
-    func revert(
-        of types: [APType]? = nil,
-        state: State
-    ) {
+
+    private func revert(of types: [APType]? = nil, value: Value) {
+        guard let types else {
+            value.revert()
+            return
+        }
+
+        let initialAttachedPictures: [AttachedPicture] = value.initial.filter {
+            types.contains($0.type)
+        }
+
+        if initialAttachedPictures.isEmpty {
+            remove(of: types, value: value)
+        } else {
+            replace(initialAttachedPictures, value: value)
+        }
+    }
+
+    func revert(of types: [APType]? = nil, state: State) {
         guard let types else {
             switch state {
             case .undefined:
@@ -123,29 +136,14 @@ import CSFBAudioEngine
             }
             return
         }
-        
+
         switch state {
         case .undefined:
             break
         case .fine(let value):
-            let initialAttachedPictures: [AttachedPicture] = value.initial.filter { types.contains($0.type) }
-            
-            if initialAttachedPictures.isEmpty {
-                remove(of: types, state: state)
-            } else {
-                replace(initialAttachedPictures, state: state)
-            }
+            revert(of: types, value: value)
         case .varied(let values):
-            values.current.keys.forEach { key in
-                let initialValue = values.initial[key] ?? []
-                let initialAttachedPictures: [AttachedPicture] = initialValue.filter { types.contains($0.type) }
-                
-                if initialAttachedPictures.isEmpty {
-                    remove(of: types, state: state)
-                } else {
-                    replace(initialAttachedPictures, state: state)
-                }
-            }
+            values.values.forEach { revert(of: types, value: $0) }
         }
     }
 }

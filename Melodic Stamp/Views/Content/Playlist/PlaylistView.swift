@@ -78,7 +78,9 @@ struct PlaylistView: View {
                 }
             }
             .luminareBordered(false)
-            .luminareButtonCornerRadius(8)
+            .luminareSectionMasked(true)
+            .luminareListItemCornerRadius(8)
+            .luminareListActionsStyle(.borderless)
             .padding(.horizontal)
 
             Spacer()

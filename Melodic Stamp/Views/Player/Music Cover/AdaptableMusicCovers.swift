@@ -17,22 +17,34 @@ struct AdaptableMusicCovers: View {
     @Bindable var attachedPicturesHandler: AttachedPicturesHandlerModel
 
     var layout: Layout = .flow
-    var maxWidth: CGFloat = 300
+    var contentWidth: CGFloat = 300, contentHeight: CGFloat = 200
     var state: MetadataValueState<Set<AttachedPicture>>
 
     @State private var contentSize: CGSize = .zero
 
     var body: some View {
-        switch layout {
-        case .flow:
-            flowView()
-        case .grid:
-            gridView()
+        Group {
+            if types.isEmpty {
+                emptyView()
+            } else {
+                switch layout {
+                case .flow:
+                    flowView()
+                case .grid:
+                    gridView()
+                }
+            }
         }
+        .transition(.blurReplace)
+        .animation(.bouncy, value: types)
     }
     
     private var types: Set<AttachedPicture.`Type`> {
         attachedPicturesHandler.types(state: state)
+    }
+    
+    @ViewBuilder private func emptyView() -> some View {
+        
     }
 
     @ViewBuilder private func flowView() -> some View {
@@ -52,13 +64,14 @@ struct AdaptableMusicCovers: View {
                         case .horizontal:
                             let count = max(1, types.count)
                             let proportional =
-                            length / floor((length + maxWidth) / maxWidth)
+                            length / floor((length + contentWidth) / contentWidth)
                             return max(proportional, length / CGFloat(count))
                         case .vertical:
                             return length
                         }
                     }
                 }
+                .frame(height: contentHeight)
                 .padding(.bottom, 8)
             }
             .scrollTargetLayout()
@@ -70,7 +83,7 @@ struct AdaptableMusicCovers: View {
         }
         .scrollTargetBehavior(.viewAligned)
         .scrollDisabled(
-            types.count <= 1 || contentSize.width >= maxWidth * CGFloat(types.count)
+            types.count <= 1 || contentSize.width >= contentWidth * CGFloat(types.count)
         )
     }
 

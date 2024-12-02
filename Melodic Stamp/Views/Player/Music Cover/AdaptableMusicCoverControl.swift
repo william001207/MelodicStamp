@@ -27,8 +27,9 @@ struct AdaptableMusicCoverControl: View {
         case .fine(let value):
             .init(value.current)
         case .varied(let values):
-            values.current.values.flatMap(\.self)
+            values.values.flatMap(\.current)
         }
+        
         let images = attachedPictures
             .filter { $0.type == type }
             .compactMap(\.image)
@@ -65,18 +66,12 @@ struct AdaptableMusicCoverControl: View {
         Group {
             if isHeaderHovering {
                 HStack(spacing: 2) {
-                    let isModified = switch state {
-                    case .undefined: false
-                    case .fine(let value): value.current.
-                    case .varied(let values): values.isModified
-                    }
-                    
                     AliveButton {
                         attachedPicturesHandler.revert(of: [type], state: state)
                     } label: {
                         Image(systemSymbol: .arrowUturnLeft)
                     }
-                    .disabled(!isModified)
+                    .disabled(!attachedPicturesHandler.isModified(of: [type], state: state))
                     
                     AliveButton {
                         attachedPicturesHandler.remove(of: [type], state: state)

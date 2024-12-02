@@ -59,11 +59,6 @@ struct MainView: View {
             VisualEffectView(material: .contentBackground, blendingMode: .behindWindow)
 
             if !player.isPlaylistEmpty {
-                let morphedGradient = LinearGradient(
-                    colors: [.white, .black], startPoint: .top,
-                    endPoint: .bottom
-                )
-
                 HSplitView {
                     ForEach(Array(selectedTabs).sorted { $0.order < $1.order }) { tab in
                         switch tab {
@@ -76,7 +71,7 @@ struct MainView: View {
                             .morphed()
                             .background {
                                 VisualEffectView(
-                                    material: .popover,
+                                    material: .menu,
                                     blendingMode: .behindWindow
                                 )
                             }
@@ -111,7 +106,7 @@ struct MainView: View {
                                 .morphed()
                                 .background {
                                     VisualEffectView(
-                                        material: .titlebar,
+                                        material: .headerView,
                                         blendingMode: .behindWindow
                                     )
                                 }

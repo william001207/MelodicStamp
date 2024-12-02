@@ -25,7 +25,7 @@ struct InspectorView: View {
             AutoScrollView(.vertical) {
                 VStack(spacing: 24) {
                     VStack(spacing: 8) {
-                        coverEditor()
+                        attachedPicturesEditor()
                         
                         AdaptableMusicCovers(
                             attachedPicturesHandler: attachedPicturesHandler,
@@ -33,7 +33,6 @@ struct InspectorView: View {
                         )
                         .padding(.horizontal, -16)
                         .contentMargins(.horizontal, 16, for: .scrollIndicators)
-                        .frame(height: 250)
                     }
 
                     LabeledSection {
@@ -55,6 +54,7 @@ struct InspectorView: View {
                     Spacer()
                 }
                 .padding(.horizontal, 16)
+                .padding(.top, 2)
 
                 Spacer()
                     .frame(height: 150)
@@ -67,8 +67,11 @@ struct InspectorView: View {
         }
     }
     
-    @ViewBuilder private func coverEditor() -> some View {
-        HStack(spacing: 0) {
+    @ViewBuilder private func attachedPicturesEditor() -> some View {
+        HStack(alignment: .center, spacing: 0) {
+            Text("Pictures")
+                .foregroundStyle(.secondary)
+            
             Spacer()
             
             LuminareSection {
@@ -133,6 +136,8 @@ struct InspectorView: View {
                 }
                 .frame(maxHeight: actionsMinHeight)
             }
+            .luminareBordered(false)
+            .luminareSectionMasked(true)
             .luminareSectionMaxWidth(nil)
         }
     }

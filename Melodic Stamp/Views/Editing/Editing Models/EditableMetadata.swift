@@ -52,60 +52,24 @@ import SwiftUI
         let keyPath: WritableKeyPath<Metadata, V>
         let metadatas: Set<EditableMetadata>
         
-        var current: [EditableMetadata.ID: V] {
-            get {
-                Dictionary(
-                    uniqueKeysWithValues: metadatas.map { ($0.id, $0.current[keyPath: keyPath]) }
-                )
-            }
-            
-            nonmutating set {
-                for (id, newValue) in newValue {
-                    metadatas.first(where: { $0.id == id })?.current[keyPath: keyPath] = newValue
-                }
-            }
-        }
-        
-        private(set) var initial: [EditableMetadata.ID: V] {
-            get {
-                Dictionary(
-                    uniqueKeysWithValues: metadatas.map { ($0.id, $0.initial[keyPath: keyPath]) }
-                )
-            }
-            
-            nonmutating set {
-                for (id, newValue) in newValue {
-                    metadatas.first(where: { $0.id == id })?.initial[keyPath: keyPath] = newValue
-                }
-            }
-        }
-        
-        var projectedValue: Binding<[ID: V]> {
-            Binding(get: {
-                current
-            }, set: { newValue in
-                current = newValue
-            })
+        var values: [Value<V>] {
+            metadatas.map { $0[extracting: keyPath] }
         }
         
         var isModified: Bool {
-            current != initial
+            !values.filter(\.isModified).isEmpty
         }
         
         func revertAll() {
-            current = initial
+            values.forEach { $0.revert() }
         }
         
         func applyAll() {
-            initial = current
+            values.forEach { $0.apply() }
         }
         
         subscript<S: Equatable>(isModified keyPath: KeyPath<V, S>) -> Bool {
-            !current.filter { key, value in
-                guard let initialValue = initial[key] else { return false }
-                return value[keyPath: keyPath] != initialValue[keyPath: keyPath]
-            }
-            .isEmpty
+            !values.filter(\.[isModified: keyPath]).isEmpty
         }
     }
 
