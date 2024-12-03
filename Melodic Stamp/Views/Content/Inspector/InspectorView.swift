@@ -10,7 +10,7 @@ import Luminare
 import SwiftUI
 
 struct InspectorView: View {
-    @Environment(\.luminareListActionsHeight) private var actionsMinHeight
+    @Environment(\.luminareMinHeight) private var minHeight
 
     @Bindable var player: PlayerModel
     @Bindable var metadataEditor: MetadataEditorModel
@@ -39,7 +39,6 @@ struct InspectorView: View {
                         .contentMargins(
                             .horizontal, 16, for: .scrollIndicators)
                     }
-                    .padding(.top, -4) // align with playlist
 
                     LabeledSection {
                         generalEditor()
@@ -81,7 +80,7 @@ struct InspectorView: View {
 
             Spacer()
 
-            LuminareSection {
+            LuminareSection(hasPadding: false) {
                 HStack(spacing: 2) {
                     let state = metadataEditor[extracting: \.attachedPictures]
                     let types = attachedPicturesHandler.types(state: state)
@@ -95,9 +94,10 @@ struct InspectorView: View {
                             Image(systemSymbol: .trashFill)
                             Text("Remove All")
                         }
+                        .padding()
                     }
                     .buttonStyle(LuminareDestructiveButtonStyle())
-                    .frame(maxWidth: 150)
+                    .fixedSize(horizontal: true, vertical: false)
                     .disabled(types.isEmpty)
 
                     Menu {
@@ -123,8 +123,9 @@ struct InspectorView: View {
                         }
                     } label: {
                         Image(systemSymbol: .plus)
+                            .padding()
                     }
-                    .buttonStyle(LuminareButtonStyle())
+                    .buttonStyle(LuminareProminentButtonStyle())
                     .aspectRatio(1, contentMode: .fit)
                     .disabled(availableTypes.isEmpty)
                     .fileImporter(
@@ -150,12 +151,14 @@ struct InspectorView: View {
                         }
                     }
                 }
-                .frame(maxHeight: actionsMinHeight)
+                .luminareMinHeight(minHeight)
+                .frame(height: minHeight)
             }
             .luminareBordered(false)
             .luminareButtonMaterial(.ultraThin)
             .luminareSectionMasked(true)
             .luminareSectionMaxWidth(nil)
+            .shadow(color: .black.opacity(0.5), radius: 32)
         }
     }
 

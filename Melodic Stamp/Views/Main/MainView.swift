@@ -50,9 +50,10 @@ struct MainView: View {
             .inspector(isPresented: $isInspectorPresented) {
                 inspector()
                     .ignoresSafeArea()
-                    .inspectorColumnWidth(min: 250, ideal: 350, max: 600)
+                    .inspectorColumnWidth(min: 300, ideal: 400, max: 650)
             }
             .ignoresSafeArea()
+            .luminareMinHeight(38)
 
             .toolbar {
                 // at least to preserve the titlebar style
