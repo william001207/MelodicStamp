@@ -51,15 +51,4 @@ enum SidebarTab: String, Hashable, Identifiable, CaseIterable {
             .textQuote
         }
     }
-
-    var material: NSVisualEffectView.Material {
-        switch self {
-        case .inspector:
-            .titlebar
-        case .metadata:
-            .titlebar
-        case .lyrics:
-            .headerView
-        }
-    }
 }

@@ -39,6 +39,7 @@ struct InspectorView: View {
                         .contentMargins(
                             .horizontal, 16, for: .scrollIndicators)
                     }
+                    .padding(.top, -4) // align with playlist
 
                     LabeledSection {
                         generalEditor()
@@ -59,7 +60,6 @@ struct InspectorView: View {
                     Spacer()
                 }
                 .padding(.horizontal, 16)
-                .padding(.top, 2)
                 .safeAreaPadding(.top, 64)
                 .safeAreaPadding(.bottom, 94)
 
@@ -153,6 +153,7 @@ struct InspectorView: View {
                 .frame(maxHeight: actionsMinHeight)
             }
             .luminareBordered(false)
+            .luminareButtonMaterial(.ultraThin)
             .luminareSectionMasked(true)
             .luminareSectionMaxWidth(nil)
         }

@@ -50,7 +50,7 @@ struct MainView: View {
             .inspector(isPresented: $isInspectorPresented) {
                 inspector()
                     .ignoresSafeArea()
-                    .inspectorColumnWidth(min: 250, ideal: 350, max: 500)
+                    .inspectorColumnWidth(min: 250, ideal: 350, max: 600)
             }
             .ignoresSafeArea()
 
@@ -71,7 +71,7 @@ struct MainView: View {
 
             .morphed()
             .background {
-                VisualEffectView(material: .menu, blendingMode: .behindWindow)
+                VisualEffectView(material: .titlebar, blendingMode: .behindWindow)
             }
             .ignoresSafeArea()
     }
@@ -112,10 +112,6 @@ struct MainView: View {
         .ignoresSafeArea()
 
         .morphed()
-        .background {
-            VisualEffectView(
-                material: selectedTab.material, blendingMode: .behindWindow)
-        }
         .ignoresSafeArea()
     }
 }
