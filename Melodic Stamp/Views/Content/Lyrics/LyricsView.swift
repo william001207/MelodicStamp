@@ -21,22 +21,18 @@ struct LyricsView: View {
                 TimelineView(.animation) { _ in
                     ScrollViewReader { _ in
                         ScrollView {
-                            // do not apply `.contentMargins()` to the header
+                            // do not apply `.contentMargins()`
                             // otherwise causing `LazyVStack` related glitches
-                            Spacer()
-                                .frame(height: 64)
-                            
                             LazyVStack(alignment: alignment, spacing: 10) {
                                 lyricLines()
                                     .textSelection(.enabled)
                             }
                             .padding(.horizontal)
+                            .safeAreaPadding(.top, 64)
+                            .safeAreaPadding(.bottom, 94)
 
                             Spacer()
                                 .frame(height: 150)
-                            
-                            Spacer()
-                                .frame(height: 94)
                         }
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                         .scrollContentBackground(.hidden)

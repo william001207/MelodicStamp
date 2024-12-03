@@ -66,6 +66,8 @@ struct InspectorView: View {
                 Spacer()
                     .frame(height: 150)
             }
+            .contentMargins(.top, 64, for: .scrollIndicators)
+            .contentMargins(.bottom, 94, for: .scrollIndicators)
         } else {
             InspectorExcerpt()
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
