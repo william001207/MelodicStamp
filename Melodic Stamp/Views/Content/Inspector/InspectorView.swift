@@ -60,12 +60,12 @@ struct InspectorView: View {
                 }
                 .padding(.horizontal, 16)
                 .padding(.top, 2)
+                .safeAreaPadding(.top, 64)
+                .safeAreaPadding(.bottom, 94)
 
                 Spacer()
                     .frame(height: 150)
             }
-            .contentMargins(.top, 64)
-            .contentMargins(.bottom, 94)
         } else {
             InspectorExcerpt()
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
