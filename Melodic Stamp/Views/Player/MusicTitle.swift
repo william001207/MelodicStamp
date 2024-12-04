@@ -42,7 +42,7 @@ struct MusicTitle: View {
                 if mode.hasTitle {
                     Group {
                         let values = item.editableMetadata[extracting: \.title]
-                        if let title = values.current, !title.isEmpty {
+                        if let title = values.initial, !title.isEmpty {
                             Text(title)
                         } else {
                             Text(item.url.lastPathComponent.dropLast(item.url.pathExtension.count + 1))
@@ -54,7 +54,7 @@ struct MusicTitle: View {
                 if mode.hasArtists {
                     let values = item.editableMetadata[extracting: \.artist]
 
-                    if let artist = values.current {
+                    if let artist = values.initial {
                         HStack(spacing: 4) {
                             let artists = PlayerModel.splitArtists(from: artist)
                             ForEach(Array(artists.enumerated()), id: \.offset) { offset, composer in

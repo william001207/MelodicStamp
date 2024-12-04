@@ -72,12 +72,12 @@ import SwiftUI
             !values.filter(\.[isModified: keyPath]).isEmpty
         }
     }
-
+    
     enum State {
         case loading
         case fine
         case saving
-
+        
         var isEditable: Bool {
             switch self {
             case .fine:
@@ -86,7 +86,7 @@ import SwiftUI
                 false
             }
         }
-
+        
         var isLoaded: Bool {
             switch self {
             case .loading:
@@ -96,30 +96,36 @@ import SwiftUI
             }
         }
     }
-
+    
     var id: URL { url }
     let url: URL
-
+    
     let properties: AudioProperties
     var current: Metadata
     private(set) var initial: Metadata
-
+    
     private(set) var state: State = .loading
-
+    
     init?(url: URL) {
         self.url = url
         current = .init()
         initial = .init()
         properties = .init()
-
+        
         Task.detached {
             try await self.update()
             self.state = .fine
         }
     }
+}
 
+extension EditableMetadata {
     var isModified: Bool {
         current != initial
+    }
+    
+    var actor: Actor {
+        .init(self)
     }
 
     func revert() {
@@ -165,6 +171,7 @@ import SwiftUI
                 file.metadata = self.current.packed
                 try file.writeMetadata()
 
+                self.apply()
                 self.state = .fine
                 print("Successfully written metadata to \(self.url)")
 

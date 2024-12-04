@@ -24,7 +24,11 @@ struct PlaylistItemView: View {
             VStack(alignment: .leading, spacing: 2) {
                 HStack {
                     if isMetadataLoaded {
-                        MarqueeScrollView(animate: false) {
+                        if isPlaying {
+                            MarqueeScrollView(animate: false) {
+                                MusicTitle(item: item)
+                            }
+                        } else {
                             MusicTitle(item: item)
                         }
                     } else {
@@ -34,6 +38,7 @@ struct PlaylistItemView: View {
                 }
                 .font(.title3)
                 .frame(height: 24)
+                .opacity(!player.hasCurrentTrack || isPlaying ? 1 : 0.5)
 
                 HStack(alignment: .center, spacing: 4) {
                     if isMetadataModified {
@@ -51,6 +56,7 @@ struct PlaylistItemView: View {
             .transition(.blurReplace)
             .animation(.default.speed(2), value: isMetadataLoaded)
             .animation(.default.speed(2), value: isMetadataModified)
+            .animation(.default.speed(2), value: isPlaying)
 
             Spacer()
 
@@ -94,6 +100,10 @@ struct PlaylistItemView: View {
                 isHovering = hover
             }
         }
+    }
+    
+    private var isPlaying: Bool {
+        player.current == item
     }
     
     private func getCover(from attachedPictures: Set<AttachedPicture>) -> AttachedPicture? {

@@ -57,8 +57,6 @@ struct PlaylistView: View {
                                 player.removeFromPlaylist(items: .init(metadataEditor.items))
                             }
                         }
-                        .buttonStyle(.borderedProminent)
-                        .tint(.red)
                     }
                 } actions: {
                     LuminareSection(hasPadding: false) {
