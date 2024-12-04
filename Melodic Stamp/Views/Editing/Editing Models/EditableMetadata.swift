@@ -9,80 +9,6 @@
 import SwiftUI
 
 @Observable final class EditableMetadata: Identifiable, Sendable {
-    struct Value<V: Equatable>: Equatable {
-        let keyPath: WritableKeyPath<Metadata, V>
-        let metadatas: Set<EditableMetadata>
-        
-        var current: V {
-            get { internalCurrent }
-            nonmutating set {
-            }
-        }
-        
-        private var internalCurrent: V {
-            get { metadatas.first!.current[keyPath: keyPath] }
-            nonmutating set {
-                metadatas.forEach { $0.current[keyPath: keyPath] = newValue }
-            }
-        }
-        
-        private(set) var initial: V {
-            get { metadatas.first!.initial[keyPath: keyPath] }
-            nonmutating set {
-                metadatas.forEach { $0.initial[keyPath: keyPath] = newValue }
-            }
-        }
-        
-        var projectedValue: Binding<V> {
-            Binding(get: {
-                current
-            }, set: { newValue in
-                current = newValue
-            })
-        }
-        
-        var isModified: Bool {
-            current != initial
-        }
-        
-        func revert() {
-            current = initial
-        }
-        
-        func apply() {
-            initial = current
-        }
-        
-        subscript<S: Equatable>(isModified keyPath: KeyPath<V, S>) -> Bool {
-            current[keyPath: keyPath] != initial[keyPath: keyPath]
-        }
-    }
-    
-    struct Values<V: Equatable & Hashable>: Equatable {
-        let keyPath: WritableKeyPath<Metadata, V>
-        let metadatas: Set<EditableMetadata>
-        
-        var values: [Value<V>] {
-            metadatas.map { $0[extracting: keyPath] }
-        }
-        
-        var isModified: Bool {
-            !values.filter(\.isModified).isEmpty
-        }
-        
-        func revertAll() {
-            values.forEach { $0.revert() }
-        }
-        
-        func applyAll() {
-            values.forEach { $0.apply() }
-        }
-        
-        subscript<S: Equatable>(isModified keyPath: KeyPath<V, S>) -> Bool {
-            !values.filter(\.[isModified: keyPath]).isEmpty
-        }
-    }
-    
     enum State {
         case loading
         case fine
@@ -224,7 +150,12 @@ extension EditableMetadata: Hashable {
         set {
             task?.cancel()
             task = Task.detached {
-                self.editableMetadatas.forEach { $0.current[keyPath: self.keyPath] = newValue }
+                self.editableMetadatas.forEach { editableMetadata in
+                    Task { @MainActor in
+                        editableMetadata.current[keyPath: self.keyPath] = newValue
+                        print(1)
+                    }
+                }
             }
         }
     }

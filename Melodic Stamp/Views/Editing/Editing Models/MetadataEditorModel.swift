@@ -7,10 +7,10 @@
 
 import SwiftUI
 
-enum MetadataValueState<V: Equatable & Hashable>: Equatable {
+enum MetadataValueState<V: Equatable & Hashable> {
     case undefined
-    case fine(EditableMetadata.Value<V>)
-    case varied(EditableMetadata.Values<V>)
+    case fine(value: BatchEditableMetadataValue<V>)
+    case varied(values: BatchEditableMetadataValues<V>)
 }
 
 enum MetadataEditingState: Equatable {
@@ -79,9 +79,9 @@ enum MetadataEditingState: Equatable {
         let areIdentical = values.allSatisfy { $0 == values[0] }
 
         return if areIdentical {
-            .fine(.init(keyPath: keyPath, metadatas: editableMetadatas))
+            .fine(value: .init(keyPath: keyPath, editableMetadatas: editableMetadatas))
         } else {
-            .varied(.init(keyPath: keyPath, metadatas: editableMetadatas))
+            .varied(values: .init(keyPath: keyPath, editableMetadatas: editableMetadatas))
         }
     }
 }

@@ -11,7 +11,7 @@ import UniformTypeIdentifiers
 
 @Observable class AttachedPicturesHandlerModel {
     typealias APType = AttachedPicture.`Type`
-    typealias Value = EditableMetadata.Value<Set<AttachedPicture>>
+    typealias Value = BatchEditableMetadataValue<Set<AttachedPicture>>
     typealias State = MetadataValueState<Set<AttachedPicture>>
 
     static var allowedContentTypes: [UTType] {

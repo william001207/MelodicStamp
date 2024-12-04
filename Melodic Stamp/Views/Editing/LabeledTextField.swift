@@ -97,7 +97,7 @@ struct LabeledTextField<F, Label>: View where F: ParseableFormatStyle, F.FormatO
         }
     }
 
-    @ViewBuilder private func fine(value: EditableMetadata.Value<F.FormatInput?>) -> some View {
+    @ViewBuilder private func fine(value: BatchEditableMetadataValue<F.FormatInput?>) -> some View {
         LuminareTextField(
             placeholder,
             value: value.projectedValue, format: format
@@ -154,7 +154,7 @@ struct LabeledTextField<F, Label>: View where F: ParseableFormatStyle, F.FormatO
         }
     }
 
-    @ViewBuilder private func varied(values: EditableMetadata.Values<F.FormatInput?>) -> some View {
+    @ViewBuilder private func varied(values: BatchEditableMetadataValues<F.FormatInput?>) -> some View {
         Color.blue
     }
 

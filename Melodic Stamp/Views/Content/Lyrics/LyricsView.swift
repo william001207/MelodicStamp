@@ -44,9 +44,10 @@ struct LyricsView: View {
                 Color.blue
             }
         }
-        .onChange(of: lyricsState, initial: true) { _, _ in
-            loadLyrics()
-        }
+        // TODO: restore this
+//        .onChange(of: lyricsState, initial: true) { _, _ in
+//            loadLyrics()
+//        }
         .onChange(of: lyrics.type) { _, _ in
             loadLyrics()
         }
