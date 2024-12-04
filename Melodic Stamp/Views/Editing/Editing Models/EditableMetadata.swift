@@ -14,13 +14,23 @@ import SwiftUI
         let metadatas: Set<EditableMetadata>
         
         var current: V {
+            get { internalCurrent }
+            nonmutating set {
+            }
+        }
+        
+        private var internalCurrent: V {
             get { metadatas.first!.current[keyPath: keyPath] }
-            nonmutating set { metadatas.forEach { $0.current[keyPath: keyPath] = newValue } }
+            nonmutating set {
+                metadatas.forEach { $0.current[keyPath: keyPath] = newValue }
+            }
         }
         
         private(set) var initial: V {
             get { metadatas.first!.initial[keyPath: keyPath] }
-            nonmutating set { metadatas.forEach { $0.initial[keyPath: keyPath] = newValue } }
+            nonmutating set {
+                metadatas.forEach { $0.initial[keyPath: keyPath] = newValue }
+            }
         }
         
         var projectedValue: Binding<V> {
@@ -102,7 +112,7 @@ import SwiftUI
     
     let properties: AudioProperties
     var current: Metadata
-    private(set) var initial: Metadata
+    fileprivate(set) var initial: Metadata
     
     private(set) var state: State = .loading
     
@@ -122,10 +132,6 @@ import SwiftUI
 extension EditableMetadata {
     var isModified: Bool {
         current != initial
-    }
-    
-    var actor: Actor {
-        .init(self)
     }
 
     func revert() {
@@ -182,8 +188,8 @@ extension EditableMetadata {
         }
     }
 
-    subscript<V>(extracting keyPath: WritableKeyPath<Metadata, V>) -> Value<V> {
-        .init(keyPath: keyPath, metadatas: [self])
+    subscript<V>(extracting keyPath: WritableKeyPath<Metadata, V>) -> BatchEditableMetadataValue<V> {
+        .init(keyPath: keyPath, editableMetadatas: [self])
     }
 }
 
@@ -196,5 +202,94 @@ extension EditableMetadata: Equatable {
 extension EditableMetadata: Hashable {
     func hash(into hasher: inout Hasher) {
         hasher.combine(id)
+    }
+}
+
+@Observable final class BatchEditableMetadataValue<V: Equatable>: Identifiable {
+    let keyPath: WritableKeyPath<Metadata, V>
+    let editableMetadatas: Set<EditableMetadata>
+    
+    private var task: Task<Void, Never>?
+    
+    init(keyPath: WritableKeyPath<Metadata, V>, editableMetadatas: Set<EditableMetadata>) {
+        self.keyPath = keyPath
+        self.editableMetadatas = editableMetadatas
+    }
+    
+    var current: V {
+        get {
+            editableMetadatas.first!.current[keyPath: keyPath]
+        }
+        
+        set {
+            task?.cancel()
+            task = Task.detached {
+                self.editableMetadatas.forEach { $0.current[keyPath: self.keyPath] = newValue }
+            }
+        }
+    }
+    
+    private(set) var initial: V {
+        get {
+            editableMetadatas.first!.initial[keyPath: keyPath]
+        }
+        
+        set {
+            editableMetadatas.forEach { $0.initial[keyPath: keyPath] = newValue }
+        }
+    }
+    
+    var projectedValue: Binding<V> {
+        Binding(get: {
+            self.current
+        }, set: { newValue in
+            self.current = newValue
+        })
+    }
+    
+    var isModified: Bool {
+        current != initial
+    }
+    
+    func revert() {
+        current = initial
+    }
+    
+    func apply() {
+        initial = current
+    }
+    
+    subscript<S: Equatable>(isModified keyPath: KeyPath<V, S>) -> Bool {
+        current[keyPath: keyPath] != initial[keyPath: keyPath]
+    }
+}
+
+@Observable final class BatchEditableMetadataValues<V: Equatable>: Identifiable {
+    let keyPath: WritableKeyPath<Metadata, V>
+    let editableMetadatas: Set<EditableMetadata>
+    
+    init(keyPath: WritableKeyPath<Metadata, V>, editableMetadatas: Set<EditableMetadata>) {
+        self.keyPath = keyPath
+        self.editableMetadatas = editableMetadatas
+    }
+    
+    var values: [BatchEditableMetadataValue<V>] {
+        editableMetadatas.map { $0[extracting: keyPath] }
+    }
+    
+    var isModified: Bool {
+        !values.filter(\.isModified).isEmpty
+    }
+    
+    func revertAll() {
+        values.forEach { $0.revert() }
+    }
+    
+    func applyAll() {
+        values.forEach { $0.apply() }
+    }
+    
+    subscript<S: Equatable>(isModified keyPath: KeyPath<V, S>) -> Bool {
+        !values.filter(\.[isModified: keyPath]).isEmpty
     }
 }
