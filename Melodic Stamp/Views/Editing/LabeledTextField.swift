@@ -77,10 +77,10 @@ struct LabeledTextField<F, Label>: View where F: ParseableFormatStyle, F.FormatO
             switch state {
             case .undefined:
                 EmptyView()
-            case let .fine(value):
-                fine(value: value)
-            case let .varied(values):
-                varied(values: values)
+            case let .fine(entry):
+                fine(entry: value)
+            case let .varied(entries):
+                varied(entries: values)
             }
         }
         .animation(animation, value: isActive)
@@ -97,7 +97,7 @@ struct LabeledTextField<F, Label>: View where F: ParseableFormatStyle, F.FormatO
         }
     }
 
-    @ViewBuilder private func fine(value: BatchEditableMetadataValue<F.FormatInput?>) -> some View {
+    @ViewBuilder private func fine(entry _: MetadataBatchEditingEntry<F.FormatInput?>) -> some View {
         LuminareTextField(
             placeholder,
             value: value.projectedValue, format: format
@@ -154,7 +154,7 @@ struct LabeledTextField<F, Label>: View where F: ParseableFormatStyle, F.FormatO
         }
     }
 
-    @ViewBuilder private func varied(values _: BatchEditableMetadataValues<F.FormatInput?>) -> some View {
+    @ViewBuilder private func varied(entries _: MetadataBatchEditingEntries<F.FormatInput?>) -> some View {
         Color.blue
     }
 

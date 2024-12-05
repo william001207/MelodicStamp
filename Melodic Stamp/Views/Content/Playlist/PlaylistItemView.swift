@@ -18,8 +18,8 @@ struct PlaylistItemView: View {
 
     var body: some View {
         HStack(alignment: .center) {
-            let isMetadataLoaded = item.editableMetadata.state.isLoaded
-            let isMetadataModified = item.editableMetadata.isModified
+            let isMetadataLoaded = item.metadata.state.isLoaded
+            let isMetadataModified = item.metadata.isModified
 
             VStack(alignment: .leading, spacing: 2) {
                 HStack {
@@ -65,7 +65,7 @@ struct PlaylistItemView: View {
 //            } label: {
 //                ZStack {
 //                    if isMetadataLoaded {
-//                        let attachedPictures = item.editableMetadata[extracting: \.attachedPictures]
+//                        let attachedPictures = item.metadata[extracting: \.attachedPictures]
 //                        if let cover = getCover(from: attachedPictures.current), let image = cover.image {
 //                            Group {
 //                                MusicCover(cornerRadius: 0, images: [image], hasPlaceholder: false, maxResolution: 32)

@@ -1,5 +1,5 @@
 //
-//  EditableMetadata.swift
+//  Metadata.swift
 //  Melodic Stamp
 //
 //  Created by KrLite on 2024/11/24.
@@ -8,112 +8,13 @@
 @preconcurrency import CSFBAudioEngine
 import SwiftUI
 
-// MARK: - Modifiable
-
-protocol Modifiable {
-    var isModified: Bool { get }
-}
-
-// MARK: - Restorable
-
-protocol Restorable: Equatable, Modifiable {
-    associatedtype V: Equatable
-    
-    var current: V { get set }
-    var initial: V { get set }
-    
-    mutating func restore()
-    mutating func apply()
-}
-
-extension Restorable {
-    var isModified: Bool {
-        current != initial
-    }
-    
-    mutating func restore() {
-        current = initial
-    }
-    
-    mutating func apply() {
-        initial = current
-    }
-}
-
-// MARK: - Additional Metadata
-
-struct NonHashableWrapper: Hashable {
-    let description: String
-    
-    init(_ value: Any) {
-        self.description = String(describing: value)
-    }
-}
-
-typealias AdditionalMetadata = [AnyHashable: AnyHashable]
-
-extension AdditionalMetadata {
-    init(_ dictionary: [AnyHashable: Any]) {
-        self = dictionary.reduce(into: [AnyHashable: AnyHashable]()) { result, pair in
-            let (key, value) = pair
-            if let hashableValue = value as? AnyHashable {
-                result[key] = hashableValue
-            } else {
-                result[key] = NonHashableWrapper(value)
-            }
-        }
-    }
-    
-//    var asAny: [AnyHashable: Any] {
-//        self.reduce(into: [AnyHashable: Any]()) { result, pair in
-//            let (key, value) = pair
-//            if let wrapper = value as? NonHashableWrapper {
-//                result[key] = wrapper.description // TODO: replace this with recovery logic if needed
-//            } else {
-//                result[key] = value
-//            }
-//        }
-//    }
-}
-
-// MARK: - Metadata Value
-
-@Observable final class EditableMetadataValue<V: Hashable & Equatable>: Restorable {
-    var current: V {
-        didSet {
-            print("Set current value to \(current)")
-        }
-    }
-    var initial: V {
-        didSet {
-            print("Set initial value to \(current)")
-        }
-    }
-    
-    init(_ value: V) {
-        self.current = value
-        self.initial = value
-    }
-}
-
-extension EditableMetadataValue: Hashable {
-    func hash(into hasher: inout Hasher) {
-        hasher.combine(current)
-        hasher.combine(initial)
-    }
-}
-
-extension EditableMetadataValue: Equatable {
-    static func == (lhs: EditableMetadataValue<V>, rhs: EditableMetadataValue<V>) -> Bool {
-        lhs.hashValue == rhs.hashValue
-    }
-}
-
 // MARK: - Metadata
 
-@Observable final class EditableMetadata: Identifiable, Sendable {
-    typealias Value = EditableMetadataValue
-    
+// MARK: Definition
+
+@Observable final class Metadata: Identifiable, Sendable {
+    typealias Entry = MetadataEntry
+
     enum State {
         case loading
         case fine
@@ -143,50 +44,50 @@ extension EditableMetadataValue: Equatable {
 
     private(set) var properties: AudioProperties!
     private(set) var state: State
-    
-    var attachedPictures: Value<Set<AttachedPicture>>!
-    
-    var title: Value<String?>!
-    var titleSortOrder: Value<String?>!
-    var artist: Value<String?>!
-    var artistSortOrder: Value<String?>!
-    var composer: Value<String?>!
-    var composerSortOrder: Value<String?>!
-    var genre: Value<String?>!
-    var genreSortOrder: Value<String?>!
-    var bpm: Value<Int?>!
-    
-    var albumTitle: Value<String?>!
-    var albumTitleSortOrder: Value<String?>!
-    var albumArtist: Value<String?>!
-    var albumArtistSortOrder: Value<String?>!
-    
-    var trackNumber: Value<Int?>!
-    var trackTotal: Value<Int?>!
-    var discNumber: Value<Int?>!
-    var discTotal: Value<Int?>!
-    
-    var comment: Value<String?>!
-    var grouping: Value<String?>!
-    var isCompilation: Value<Bool?>!
-    
-    var isrc: Value<String?>!
-    var lyrics: Value<String?>!
-    var mcn: Value<String?>!
-    
-    var musicBrainzRecordingID: Value<String?>!
-    var musicBrainzReleaseID: Value<String?>!
-    
-    var rating: Value<Int?>!
-    var releaseDate: Value<String?>!
-    
-    var replayGainAlbumGain: Value<Double?>!
-    var replayGainAlbumPeak: Value<Double?>!
-    var replayGainTrackGain: Value<Double?>!
-    var replayGainTrackPeak: Value<Double?>!
-    var replayGainReferenceLoudness: Value<Double?>!
-    
-    var additional: Value<AdditionalMetadata?>!
+
+    var attachedPictures: Entry<Set<AttachedPicture>>!
+
+    var title: Entry<String?>!
+    var titleSortOrder: Entry<String?>!
+    var artist: Entry<String?>!
+    var artistSortOrder: Entry<String?>!
+    var composer: Entry<String?>!
+    var composerSortOrder: Entry<String?>!
+    var genre: Entry<String?>!
+    var genreSortOrder: Entry<String?>!
+    var bpm: Entry<Int?>!
+
+    var albumTitle: Entry<String?>!
+    var albumTitleSortOrder: Entry<String?>!
+    var albumArtist: Entry<String?>!
+    var albumArtistSortOrder: Entry<String?>!
+
+    var trackNumber: Entry<Int?>!
+    var trackTotal: Entry<Int?>!
+    var discNumber: Entry<Int?>!
+    var discTotal: Entry<Int?>!
+
+    var comment: Entry<String?>!
+    var grouping: Entry<String?>!
+    var isCompilation: Entry<Bool?>!
+
+    var isrc: Entry<String?>!
+    var lyrics: Entry<String?>!
+    var mcn: Entry<String?>!
+
+    var musicBrainzRecordingID: Entry<String?>!
+    var musicBrainzReleaseID: Entry<String?>!
+
+    var rating: Entry<Int?>!
+    var releaseDate: Entry<String?>!
+
+    var replayGainAlbumGain: Entry<Double?>!
+    var replayGainAlbumPeak: Entry<Double?>!
+    var replayGainTrackGain: Entry<Double?>!
+    var replayGainTrackPeak: Entry<Double?>!
+    var replayGainReferenceLoudness: Entry<Double?>!
+
+    var additional: Entry<AdditionalMetadata?>!
 
     init?(url: URL) {
         self.state = .loading
@@ -197,7 +98,7 @@ extension EditableMetadataValue: Equatable {
             self.state = .fine
         }
     }
-    
+
     fileprivate var restorables: [any Restorable] {
         guard state.isLoaded else { return [] }
         return [
@@ -214,8 +115,10 @@ extension EditableMetadataValue: Equatable {
     }
 }
 
-extension EditableMetadata {
-    fileprivate func load(
+// MARK: Loading Functions
+
+private extension Metadata {
+    func load(
         coverImages: Set<AttachedPicture> = [],
         title: String? = nil, titleSortOrder: String? = nil,
         artist: String? = nil, artistSortOrder: String? = nil,
@@ -240,7 +143,7 @@ extension EditableMetadata {
         replayGainReferenceLoudness: Double? = nil,
         additional: AdditionalMetadata? = nil
     ) {
-        self.attachedPictures = .init(coverImages)
+        attachedPictures = .init(coverImages)
         self.title = .init(title)
         self.titleSortOrder = .init(titleSortOrder)
         self.artist = .init(artist)
@@ -275,8 +178,8 @@ extension EditableMetadata {
         self.replayGainReferenceLoudness = .init(replayGainReferenceLoudness)
         self.additional = .init(additional)
     }
-    
-    fileprivate func load(from metadata: AudioMetadata?) {
+
+    func load(from metadata: AudioMetadata?) {
         load(
             coverImages: metadata?.attachedPictures ?? [],
             title: metadata?.title, titleSortOrder: metadata?.titleSortOrder,
@@ -302,10 +205,10 @@ extension EditableMetadata {
             additional: metadata?.additionalMetadata.map(AdditionalMetadata.init(_:))
         )
     }
-    
-    fileprivate func pack() -> AudioMetadata {
+
+    func pack() -> AudioMetadata {
         let metadata = AudioMetadata()
-        
+
         metadata.title = title.current
         metadata.titleSortOrder = titleSortOrder.current
         metadata.artist = artist.current
@@ -337,28 +240,30 @@ extension EditableMetadata {
         metadata.replayGainTrackPeak = replayGainTrackPeak.current
         metadata.replayGainReferenceLoudness = replayGainReferenceLoudness.current
         metadata.additionalMetadata = additional.current
-        
+
         attachedPictures.current.forEach(metadata.attachPicture(_:))
-        
+
         return metadata
     }
 }
 
-extension EditableMetadata {
+// MARK: Manipulating Functions
+
+extension Metadata {
     var isModified: Bool {
-        guard self.state.isLoaded else { return false }
+        guard state.isLoaded else { return false }
         return !restorables.filter(\.isModified).isEmpty
     }
 
     func restore() {
-        guard self.state.isLoaded else { return }
+        guard state.isLoaded else { return }
         for var restorable in self.restorables {
             restorable.restore()
         }
     }
 
     func apply() {
-        guard self.state.isLoaded else { return }
+        guard state.isLoaded else { return }
         for var restorable in self.restorables {
             restorable.apply()
         }
@@ -414,111 +319,21 @@ extension EditableMetadata {
         }
     }
 
-    subscript<V>(extracting keyPath: WritableKeyPath<EditableMetadata, Value<V>>) -> BatchEditableMetadataValue<V> {
-        .init(keyPath: keyPath, editableMetadatas: [self])
+    subscript<V>(extracting keyPath: WritableKeyPath<Metadata, Entry<V>>) -> MetadataBatchEditingEntry<V> {
+        .init(keyPath: keyPath, metadatas: [self])
     }
 }
 
-extension EditableMetadata: Equatable {
-    static func == (lhs: EditableMetadata, rhs: EditableMetadata) -> Bool {
+// MARK: Extensions
+
+extension Metadata: Equatable {
+    static func == (lhs: Metadata, rhs: Metadata) -> Bool {
         lhs.id == rhs.id
     }
 }
 
-extension EditableMetadata: Hashable {
+extension Metadata: Hashable {
     func hash(into hasher: inout Hasher) {
         hasher.combine(id)
-    }
-}
-
-// MARK: - Metadata Value (Batch Editing)
-
-@Observable final class BatchEditableMetadataValue<V: Hashable & Equatable>: Identifiable {
-    typealias Value = EditableMetadataValue
-    
-    let keyPath: WritableKeyPath<EditableMetadata, Value<V>>
-    let editableMetadatas: Set<EditableMetadata>
-
-    init(keyPath: WritableKeyPath<EditableMetadata, Value<V>>, editableMetadatas: Set<EditableMetadata>) {
-        self.keyPath = keyPath
-        self.editableMetadatas = editableMetadatas
-    }
-
-    var current: V {
-        get {
-            editableMetadatas.first![keyPath: keyPath].current
-        }
-
-        set {
-            editableMetadatas.forEach { $0[keyPath: keyPath].current = newValue }
-        }
-    }
-
-    private(set) var initial: V {
-        get {
-            editableMetadatas.first![keyPath: keyPath].initial
-        }
-        
-        set {
-            editableMetadatas.forEach { $0[keyPath: keyPath].initial = newValue }
-        }
-    }
-
-    var projectedValue: Binding<V> {
-        Binding(get: {
-            self.current
-        }, set: { newValue in
-            self.current = newValue
-        })
-    }
-
-    var isModified: Bool {
-        current != initial
-    }
-
-    func restore() {
-        current = initial
-    }
-
-    func apply() {
-        initial = current
-    }
-
-    subscript(isModified keyPath: KeyPath<V, some Equatable>) -> Bool {
-        current[keyPath: keyPath] != initial[keyPath: keyPath]
-    }
-}
-
-// MARK: - Metadata Values (Batch Editing)
-
-@Observable final class BatchEditableMetadataValues<V: Hashable & Equatable>: Identifiable {
-    typealias Value = EditableMetadataValue
-    
-    let keyPath: WritableKeyPath<EditableMetadata, Value<V>>
-    let editableMetadatas: Set<EditableMetadata>
-
-    init(keyPath: WritableKeyPath<EditableMetadata, Value<V>>, editableMetadatas: Set<EditableMetadata>) {
-        self.keyPath = keyPath
-        self.editableMetadatas = editableMetadatas
-    }
-
-    var values: [BatchEditableMetadataValue<V>] {
-        editableMetadatas.map { $0[extracting: keyPath] }
-    }
-
-    var isModified: Bool {
-        !values.filter(\.isModified).isEmpty
-    }
-
-    func revertAll() {
-        values.forEach { $0.restore() }
-    }
-
-    func applyAll() {
-        values.forEach { $0.apply() }
-    }
-
-    subscript(isModified keyPath: KeyPath<V, some Equatable>) -> Bool {
-        !values.filter(\.[isModified: keyPath]).isEmpty
     }
 }

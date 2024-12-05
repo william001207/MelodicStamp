@@ -11,7 +11,7 @@ import UniformTypeIdentifiers
 
 @Observable class AttachedPicturesHandlerModel {
     typealias APType = AttachedPicture.`Type`
-    typealias Value = BatchEditableMetadataValue<Set<AttachedPicture>>
+    typealias Value = MetadataBatchEditingEntry<Set<AttachedPicture>>
     typealias State = MetadataValueState<Set<AttachedPicture>>
 
     static var allowedContentTypes: [UTType] {
@@ -37,9 +37,9 @@ import UniformTypeIdentifiers
         switch state {
         case .undefined:
             false
-        case let .fine(value):
+        case let .fine(entry):
             isModified(of: types, value: value, countAsEmpty: fallback)
-        case let .varied(values):
+        case let .varied(entries):
             !values.values
                 .filter { isModified(of: types, value: $0, countAsEmpty: fallback) }
                 .isEmpty
@@ -50,9 +50,9 @@ import UniformTypeIdentifiers
         switch state {
         case .undefined:
             []
-        case let .fine(value):
+        case let .fine(entry):
             Set(value.current.map(\.type))
-        case let .varied(values):
+        case let .varied(entries):
             Set(values.values.flatMap(\.current).map(\.type))
         }
     }
@@ -74,9 +74,9 @@ import UniformTypeIdentifiers
         switch state {
         case .undefined:
             break
-        case let .fine(value):
+        case let .fine(entry):
             replace(newAttachedPictures, value: value)
-        case let .varied(values):
+        case let .varied(entries):
             values.values.forEach { replace(newAttachedPictures, value: $0) }
         }
     }
@@ -99,9 +99,9 @@ import UniformTypeIdentifiers
         switch state {
         case .undefined:
             break
-        case let .fine(value):
+        case let .fine(entry):
             remove(of: types, value: value)
-        case let .varied(values):
+        case let .varied(entries):
             values.values.forEach { remove(of: types, value: $0) }
         }
     }
@@ -128,9 +128,9 @@ import UniformTypeIdentifiers
             switch state {
             case .undefined:
                 break
-            case let .fine(value):
+            case let .fine(entry):
                 value.restore()
-            case let .varied(values):
+            case let .varied(entries):
                 values.revertAll()
             }
             return
@@ -139,9 +139,9 @@ import UniformTypeIdentifiers
         switch state {
         case .undefined:
             break
-        case let .fine(value):
+        case let .fine(entry):
             restore(of: types, value: value)
-        case let .varied(values):
+        case let .varied(entries):
             values.values.forEach { restore(of: types, value: $0) }
         }
     }

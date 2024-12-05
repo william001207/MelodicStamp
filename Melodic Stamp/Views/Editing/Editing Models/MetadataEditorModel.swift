@@ -9,8 +9,8 @@ import SwiftUI
 
 enum MetadataValueState<V: Equatable & Hashable> {
     case undefined
-    case fine(value: BatchEditableMetadataValue<V>)
-    case varied(values: BatchEditableMetadataValues<V>)
+    case fine(entry: MetadataBatchEditingEntry<V>)
+    case varied(entries: MetadataBatchEditingEntries<V>)
 }
 
 enum MetadataEditingState: Equatable {
@@ -33,16 +33,16 @@ enum MetadataEditingState: Equatable {
 
     var items: Set<PlaylistItem> = .init()
 
-    var editableMetadatas: Set<EditableMetadata> {
-        Set(items.map(\.editableMetadata))
+    var metadatas: Set<Metadata> {
+        Set(items.map(\.metadata))
     }
 
-    var hasEditableMetadata: Bool {
-        !editableMetadatas.isEmpty
+    var isEditable: Bool {
+        !metadatas.isEmpty
     }
 
     var state: MetadataEditingState {
-        let states = editableMetadatas.map(\.state)
+        let states = metadatas.map(\.state)
         return if states.allSatisfy(\.isEditable) {
             .fine
         } else if states.allSatisfy({ !$0.isEditable }) {
@@ -53,35 +53,35 @@ enum MetadataEditingState: Equatable {
     }
 
     func restoreAll() {
-        editableMetadatas.forEach { $0.restore() }
+        metadatas.forEach { $0.restore() }
     }
 
     func updateAll() {
-        for editableMetadata in editableMetadatas {
+        for metadata in metadatas {
             Task.detached {
-                try await editableMetadata.update()
+                try await metadata.update()
             }
         }
     }
 
     func writeAll() {
-        for editableMetadata in editableMetadatas {
+        for metadata in metadatas {
             Task.detached {
-                try await editableMetadata.write()
+                try await metadata.write()
             }
         }
     }
 
-    subscript<V: Equatable & Hashable>(extracting keyPath: WritableKeyPath<EditableMetadata, EditableMetadataValue<V>>) -> MetadataValueState<V> {
-        guard hasEditableMetadata else { return .undefined }
+    subscript<V: Equatable & Hashable>(extracting keyPath: WritableKeyPath<Metadata, MetadataEntry<V>>) -> MetadataValueState<V> {
+        guard isEditable else { return .undefined }
 
-        let values = editableMetadatas.map(\.[extracting: keyPath]).map(\.current)
+        let values = metadatas.map(\.[extracting: keyPath]).map(\.current)
         let areIdentical = values.allSatisfy { $0 == values[0] }
 
         return if areIdentical {
-            .fine(value: .init(keyPath: keyPath, editableMetadatas: editableMetadatas))
+            .fine(entry: .init(keyPath: keyPath, metadatas: metadatas))
         } else {
-            .varied(values: .init(keyPath: keyPath, editableMetadatas: editableMetadatas))
+            .varied(entries: .init(keyPath: keyPath, metadatas: metadatas))
         }
     }
 }

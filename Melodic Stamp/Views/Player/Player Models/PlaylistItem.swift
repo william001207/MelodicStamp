@@ -13,13 +13,13 @@ import SwiftUI
 struct PlaylistItem: Identifiable {
     let id = UUID()
     let url: URL
-    @State var editableMetadata: EditableMetadata
+    @State var metadata: Metadata
 
     init?(url: URL) {
         self.url = url
 
-        guard let metadata = EditableMetadata(url: url) else { return nil }
-        self.editableMetadata = metadata
+        guard let metadata = Metadata(url: url) else { return nil }
+        self.metadata = metadata
     }
 
     func decoder(enableDoP: Bool = false) throws -> PCMDecoding? {
@@ -52,6 +52,6 @@ extension PlaylistItem: Hashable {
 
 extension PlaylistItem: LuminareSelectionData {
     var isSelectable: Bool {
-        editableMetadata.state.isLoaded
+        metadata.state.isLoaded
     }
 }

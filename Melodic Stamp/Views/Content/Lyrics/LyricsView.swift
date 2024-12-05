@@ -40,7 +40,7 @@ struct LyricsView: View {
                         .contentMargins(.bottom, 94, for: .scrollIndicators)
                     }
                 }
-            case let .varied(values):
+            case let .varied(entries):
                 Color.blue
             }
         }

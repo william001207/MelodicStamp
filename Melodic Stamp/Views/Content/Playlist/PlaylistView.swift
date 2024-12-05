@@ -88,7 +88,7 @@ struct PlaylistView: View {
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
     }
-    
+
     @ViewBuilder private func actions() -> some View {
         HStack(spacing: 2) {
             Button {
@@ -100,7 +100,7 @@ struct PlaylistView: View {
             .buttonStyle(LuminareButtonStyle())
             .aspectRatio(1, contentMode: .fit)
             .disabled(metadataEditor.items.isEmpty)
-            
+
             Button {
                 let hasShift = NSEvent.modifierFlags.contains(.shift)
                 player.playbackMode = player.playbackMode.cycle(
@@ -108,7 +108,7 @@ struct PlaylistView: View {
             } label: {
                 HStack {
                     player.playbackMode.image
-                    
+
                     switch player.playbackMode {
                     case .single:
                         Text("Single Loop")
@@ -123,7 +123,7 @@ struct PlaylistView: View {
                 .padding()
             }
             .fixedSize(horizontal: true, vertical: false)
-            
+
             Button {
                 player.removeFromPlaylist(items: .init(metadataEditor.items))
             } label: {

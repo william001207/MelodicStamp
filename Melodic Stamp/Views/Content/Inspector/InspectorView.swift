@@ -23,7 +23,7 @@ struct InspectorView: View {
         .frontCover
 
     var body: some View {
-        if metadataEditor.hasEditableMetadata {
+        if metadataEditor.isEditable {
             AutoScrollView(.vertical) {
                 VStack(spacing: 24) {
                     VStack(spacing: 8) {

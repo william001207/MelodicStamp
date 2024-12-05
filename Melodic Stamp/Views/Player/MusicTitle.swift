@@ -41,7 +41,7 @@ struct MusicTitle: View {
             HStack(spacing: 12) {
                 if mode.hasTitle {
                     Group {
-                        let values = item.editableMetadata[extracting: \.title]
+                        let values = item.metadata[extracting: \.title]
                         if let title = values.initial, !title.isEmpty {
                             Text(title)
                         } else {
@@ -52,7 +52,7 @@ struct MusicTitle: View {
                 }
 
                 if mode.hasArtists {
-                    let values = item.editableMetadata[extracting: \.artist]
+                    let values = item.metadata[extracting: \.artist]
 
                     if let artist = values.initial {
                         HStack(spacing: 4) {
