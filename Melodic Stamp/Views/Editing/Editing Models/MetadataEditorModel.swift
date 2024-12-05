@@ -52,7 +52,7 @@ enum MetadataEditingState: Equatable {
         }
     }
 
-    func revertAll() {
+    func restoreAll() {
         editableMetadatas.forEach { $0.restore() }
     }
 
@@ -72,10 +72,10 @@ enum MetadataEditingState: Equatable {
         }
     }
 
-    subscript<V: Equatable & Hashable>(extracting keyPath: WritableKeyPath<Metadata, V>) -> MetadataValueState<V> {
+    subscript<V: Equatable & Hashable>(extracting keyPath: WritableKeyPath<EditableMetadata, EditableMetadataValue<V>>) -> MetadataValueState<V> {
         guard hasEditableMetadata else { return .undefined }
 
-        let values = editableMetadatas.map(\.current).map { $0[keyPath: keyPath] }
+        let values = editableMetadatas.map(\.[extracting: keyPath]).map(\.current)
         let areIdentical = values.allSatisfy { $0 == values[0] }
 
         return if areIdentical {

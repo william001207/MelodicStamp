@@ -8,9 +8,13 @@
 @preconcurrency import CSFBAudioEngine
 import SwiftUI
 
+// MARK: - Modifiable
+
 protocol Modifiable {
     var isModified: Bool { get }
 }
+
+// MARK: - Restorable
 
 protocol Restorable: Equatable, Modifiable {
     associatedtype V: Equatable
@@ -35,6 +39,8 @@ extension Restorable {
         initial = current
     }
 }
+
+// MARK: - Additional Metadata
 
 struct NonHashableWrapper: Hashable {
     let description: String
@@ -70,9 +76,19 @@ extension AdditionalMetadata {
 //    }
 }
 
+// MARK: - Metadata Value
+
 @Observable final class EditableMetadataValue<V: Hashable & Equatable>: Restorable {
-    var current: V
-    var initial: V
+    var current: V {
+        didSet {
+            print("Set current value to \(current)")
+        }
+    }
+    var initial: V {
+        didSet {
+            print("Set initial value to \(current)")
+        }
+    }
     
     init(_ value: V) {
         self.current = value
@@ -92,6 +108,8 @@ extension EditableMetadataValue: Equatable {
         lhs.hashValue == rhs.hashValue
     }
 }
+
+// MARK: - Metadata
 
 @Observable final class EditableMetadata: Identifiable, Sendable {
     typealias Value = EditableMetadataValue
@@ -413,6 +431,8 @@ extension EditableMetadata: Hashable {
     }
 }
 
+// MARK: - Metadata Value (Batch Editing)
+
 @Observable final class BatchEditableMetadataValue<V: Hashable & Equatable>: Identifiable {
     typealias Value = EditableMetadataValue
     
@@ -468,6 +488,8 @@ extension EditableMetadata: Hashable {
         current[keyPath: keyPath] != initial[keyPath: keyPath]
     }
 }
+
+// MARK: - Metadata Values (Batch Editing)
 
 @Observable final class BatchEditableMetadataValues<V: Hashable & Equatable>: Identifiable {
     typealias Value = EditableMetadataValue

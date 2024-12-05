@@ -34,7 +34,7 @@ struct EditorToolbar: View {
         .disabled(!metadataEditor.state.isEditable)
 
         Button {
-            metadataEditor.revertAll()
+            metadataEditor.restoreAll()
         } label: {
             ToolbarLabel {
                 Image(systemSymbol: .arrowUturnLeft)
