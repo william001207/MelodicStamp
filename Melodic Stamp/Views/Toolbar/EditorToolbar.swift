@@ -31,7 +31,7 @@ struct EditorToolbar: View {
                 }
             }
         }
-        .disabled(!metadataEditor.state.isEditable)
+        .disabled(!(metadataEditor.state.isEditable && metadataEditor.isModified))
 
         Button {
             metadataEditor.restoreAll()
@@ -40,9 +40,10 @@ struct EditorToolbar: View {
                 Image(systemSymbol: .arrowUturnLeft)
                     .imageScale(.small)
 
-                Text("Revert")
+                Text("Restore")
             }
             .foregroundStyle(.red)
         }
+        .disabled(!metadataEditor.isModified)
     }
 }

@@ -37,7 +37,7 @@ enum MetadataEditingState: Equatable {
         Set(items.map(\.metadata))
     }
 
-    var isEditable: Bool {
+    var isVisible: Bool {
         !metadatas.isEmpty
     }
 
@@ -73,7 +73,7 @@ enum MetadataEditingState: Equatable {
     }
 
     subscript<V: Equatable & Hashable>(extracting keyPath: WritableKeyPath<Metadata, MetadataEntry<V>>) -> MetadataValueState<V> {
-        guard isEditable else { return .undefined }
+        guard isVisible else { return .undefined }
 
         let values = metadatas.map(\.[extracting: keyPath]).map(\.current)
         let areIdentical = values.allSatisfy { $0 == values[0] }
@@ -83,5 +83,11 @@ enum MetadataEditingState: Equatable {
         } else {
             .varied(entries: .init(keyPath: keyPath, metadatas: metadatas))
         }
+    }
+}
+
+extension MetadataEditorModel: Modifiable {
+    var isModified: Bool {
+        !metadatas.filter(\.isModified).isEmpty
     }
 }

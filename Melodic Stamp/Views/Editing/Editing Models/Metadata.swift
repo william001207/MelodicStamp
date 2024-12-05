@@ -249,12 +249,14 @@ private extension Metadata {
 
 // MARK: Manipulating Functions
 
-extension Metadata {
+extension Metadata: Modifiable {
     var isModified: Bool {
         guard state.isLoaded else { return false }
         return !restorables.filter(\.isModified).isEmpty
     }
+}
 
+extension Metadata {
     func restore() {
         guard state.isLoaded else { return }
         for var restorable in self.restorables {
@@ -280,6 +282,7 @@ extension Metadata {
                 properties = file.properties
                 load(from: file.metadata)
                 state = .fine
+                
                 switch state {
                 case .loading:
                     print("Loaded metadata from \(url)")
