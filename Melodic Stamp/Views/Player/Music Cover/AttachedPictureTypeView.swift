@@ -5,12 +5,12 @@
 //  Created by KrLite on 2024/12/1.
 //
 
-import SwiftUI
 import CSFBAudioEngine
+import SwiftUI
 
 struct AttachedPictureTypeView: View {
     var type: AttachedPicture.`Type`
-    
+
     var body: some View {
         switch type {
         case .other:

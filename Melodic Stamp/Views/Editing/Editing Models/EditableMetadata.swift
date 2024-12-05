@@ -13,7 +13,7 @@ import SwiftUI
         case loading
         case fine
         case saving
-        
+
         var isEditable: Bool {
             switch self {
             case .fine:
@@ -22,7 +22,7 @@ import SwiftUI
                 false
             }
         }
-        
+
         var isLoaded: Bool {
             switch self {
             case .loading:
@@ -32,22 +32,22 @@ import SwiftUI
             }
         }
     }
-    
+
     var id: URL { url }
     let url: URL
-    
+
     let properties: AudioProperties
     var current: Metadata
     fileprivate(set) var initial: Metadata
-    
+
     private(set) var state: State = .loading
-    
+
     init?(url: URL) {
         self.url = url
         current = .init()
         initial = .init()
         properties = .init()
-        
+
         Task.detached {
             try await self.update()
             self.state = .fine
@@ -69,17 +69,17 @@ extension EditableMetadata {
     }
 
     func update() async throws {
-        return try await withCheckedThrowingContinuation { [weak self] continuation in
+        try await withCheckedThrowingContinuation { [weak self] continuation in
             guard let self else { return continuation.resume() }
             guard url.startAccessingSecurityScopedResource() else { return }
             defer { url.stopAccessingSecurityScopedResource() }
 
             do {
                 let file = try AudioFile(readingPropertiesAndMetadataFrom: url)
-                self.state = .fine
-                self.current = .init(from: file.metadata)
-                self.initial = self.current
-                print("Updated metadata from \(self.url)")
+                state = .fine
+                current = .init(from: file.metadata)
+                initial = current
+                print("Updated metadata from \(url)")
 
                 continuation.resume()
             } catch {
@@ -89,23 +89,23 @@ extension EditableMetadata {
     }
 
     func write() async throws {
-        return try await withCheckedThrowingContinuation { [weak self] continuation in
-            guard let self, self.state.isEditable && self.isModified else { return continuation.resume() }
-            guard self.url.startAccessingSecurityScopedResource() else { return }
+        try await withCheckedThrowingContinuation { [weak self] continuation in
+            guard let self, state.isEditable, isModified else { return continuation.resume() }
+            guard url.startAccessingSecurityScopedResource() else { return }
             defer { self.url.stopAccessingSecurityScopedResource() }
 
             do {
-                self.state = .saving
-                self.initial = self.current
-                print("Started writing metadata to \(self.url)")
+                state = .saving
+                initial = current
+                print("Started writing metadata to \(url)")
 
-                let file = try AudioFile(url: self.url)
-                file.metadata = self.current.packed
+                let file = try AudioFile(url: url)
+                file.metadata = current.packed
                 try file.writeMetadata()
 
-                self.apply()
-                self.state = .fine
-                print("Successfully written metadata to \(self.url)")
+                apply()
+                state = .fine
+                print("Successfully written metadata to \(url)")
 
                 continuation.resume()
             } catch {
@@ -134,23 +134,23 @@ extension EditableMetadata: Hashable {
 @Observable final class BatchEditableMetadataValue<V: Equatable>: Identifiable {
     let keyPath: WritableKeyPath<Metadata, V>
     let editableMetadatas: Set<EditableMetadata>
-    
+
     private var task: Task<Void, Never>?
-    
+
     init(keyPath: WritableKeyPath<Metadata, V>, editableMetadatas: Set<EditableMetadata>) {
         self.keyPath = keyPath
         self.editableMetadatas = editableMetadatas
     }
-    
+
     var current: V {
         get {
             editableMetadatas.first!.current[keyPath: keyPath]
         }
-        
+
         set {
             task?.cancel()
             task = Task.detached {
-                self.editableMetadatas.forEach { editableMetadata in
+                for editableMetadata in self.editableMetadatas {
                     Task { @MainActor in
                         editableMetadata.current[keyPath: self.keyPath] = newValue
                         print(1)
@@ -159,17 +159,17 @@ extension EditableMetadata: Hashable {
             }
         }
     }
-    
+
     private(set) var initial: V {
         get {
             editableMetadatas.first!.initial[keyPath: keyPath]
         }
-        
+
         set {
             editableMetadatas.forEach { $0.initial[keyPath: keyPath] = newValue }
         }
     }
-    
+
     var projectedValue: Binding<V> {
         Binding(get: {
             self.current
@@ -177,20 +177,20 @@ extension EditableMetadata: Hashable {
             self.current = newValue
         })
     }
-    
+
     var isModified: Bool {
         current != initial
     }
-    
+
     func revert() {
         current = initial
     }
-    
+
     func apply() {
         initial = current
     }
-    
-    subscript<S: Equatable>(isModified keyPath: KeyPath<V, S>) -> Bool {
+
+    subscript(isModified keyPath: KeyPath<V, some Equatable>) -> Bool {
         current[keyPath: keyPath] != initial[keyPath: keyPath]
     }
 }
@@ -198,29 +198,29 @@ extension EditableMetadata: Hashable {
 @Observable final class BatchEditableMetadataValues<V: Equatable>: Identifiable {
     let keyPath: WritableKeyPath<Metadata, V>
     let editableMetadatas: Set<EditableMetadata>
-    
+
     init(keyPath: WritableKeyPath<Metadata, V>, editableMetadatas: Set<EditableMetadata>) {
         self.keyPath = keyPath
         self.editableMetadatas = editableMetadatas
     }
-    
+
     var values: [BatchEditableMetadataValue<V>] {
         editableMetadatas.map { $0[extracting: keyPath] }
     }
-    
+
     var isModified: Bool {
         !values.filter(\.isModified).isEmpty
     }
-    
+
     func revertAll() {
         values.forEach { $0.revert() }
     }
-    
+
     func applyAll() {
         values.forEach { $0.apply() }
     }
-    
-    subscript<S: Equatable>(isModified keyPath: KeyPath<V, S>) -> Bool {
+
+    subscript(isModified keyPath: KeyPath<V, some Equatable>) -> Bool {
         !values.filter(\.[isModified: keyPath]).isEmpty
     }
 }

@@ -26,8 +26,8 @@ struct RawLyricLine: LyricLine {
             .map(String.init(_:))
             .map { .init(content: $0) }
     }
-    
-    func find(at time: TimeInterval) -> IndexSet {
+
+    func find(at _: TimeInterval) -> IndexSet {
         []
     }
 }

@@ -5,8 +5,8 @@
 //  Created by KrLite on 2024/11/23.
 //
 
-import SwiftUI
 import CSFBAudioEngine
+import SwiftUI
 
 struct PlaylistItemView: View {
     @Bindable var player: PlayerModel
@@ -101,11 +101,11 @@ struct PlaylistItemView: View {
             }
         }
     }
-    
+
     private var isPlaying: Bool {
         player.current == item
     }
-    
+
     private func getCover(from attachedPictures: Set<AttachedPicture>) -> AttachedPicture? {
         guard !attachedPictures.isEmpty else { return nil }
         let frontCover = attachedPictures.first { $0.type == .frontCover }

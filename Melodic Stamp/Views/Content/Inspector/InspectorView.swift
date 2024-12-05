@@ -31,13 +31,15 @@ struct InspectorView: View {
 
                         AdaptableMusicCovers(
                             attachedPicturesHandler:
-                                attachedPicturesHandler,
+                            attachedPicturesHandler,
                             state: metadataEditor[
-                                extracting: \.attachedPictures]
+                                extracting: \.attachedPictures
+                            ]
                         )
                         .padding(.horizontal, -16)
                         .contentMargins(
-                            .horizontal, 16, for: .scrollIndicators)
+                            .horizontal, 16, for: .scrollIndicators
+                        )
                     }
 
                     LabeledSection {
@@ -134,7 +136,7 @@ struct InspectorView: View {
                             .allowedContentTypes
                     ) { result in
                         switch result {
-                        case .success(let url):
+                        case let .success(url):
                             guard url.startAccessingSecurityScopedResource()
                             else { break }
                             defer { url.stopAccessingSecurityScopedResource() }
@@ -145,7 +147,8 @@ struct InspectorView: View {
                                     of: chosenAttachedPictureType)
                             else { break }
                             attachedPicturesHandler.replace(
-                                [attachedPicture], state: state)
+                                [attachedPicture], state: state
+                            )
                         case .failure:
                             break
                         }
@@ -168,15 +171,18 @@ struct InspectorView: View {
         LabeledTextField("Artist", text: metadataEditor[extracting: \.artist])
 
         LabeledTextField(
-            "Composer", text: metadataEditor[extracting: \.composer])
+            "Composer", text: metadataEditor[extracting: \.composer]
+        )
     }
 
     @ViewBuilder private func albumEditor() -> some View {
         LabeledTextField(
-            "Album Title", text: metadataEditor[extracting: \.albumTitle])
+            "Album Title", text: metadataEditor[extracting: \.albumTitle]
+        )
 
         LabeledTextField(
-            "Album Artist", text: metadataEditor[extracting: \.albumArtist])
+            "Album Artist", text: metadataEditor[extracting: \.albumArtist]
+        )
     }
 
     @ViewBuilder private func trackAndDiscEditor() -> some View {
@@ -220,7 +226,8 @@ struct InspectorView: View {
 
             LabeledTextField(
                 "Tracks", state: metadataEditor[extracting: \.trackTotal],
-                format: .number)
+                format: .number
+            )
         }
 
         HStack {
@@ -238,7 +245,8 @@ struct InspectorView: View {
 
             LabeledTextField(
                 "Discs", state: metadataEditor[extracting: \.discTotal],
-                format: .number)
+                format: .number
+            )
         }
     }
 }

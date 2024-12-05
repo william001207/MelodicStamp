@@ -97,9 +97,7 @@ enum PlaybackMode: String, CaseIterable, Identifiable {
             isMuted = false
             do {
                 try player.setVolume(Float(newValue))
-            } catch {
-                
-            }
+            } catch {}
         }
     }
 
@@ -116,9 +114,7 @@ enum PlaybackMode: String, CaseIterable, Identifiable {
                 } else {
                     try player.setVolume(Float(mutedVolume))
                 }
-            } catch {
-
-            }
+            } catch {}
         }
     }
 
@@ -400,7 +396,7 @@ extension PlayerModel {
     }
 
     var playPauseImage: Image {
-        if hasCurrentTrack && isPlaying {
+        if hasCurrentTrack, isPlaying {
             Image(systemSymbol: .pauseFill)
         } else {
             Image(systemSymbol: .playFill)
@@ -414,7 +410,7 @@ extension PlayerModel {
         case .minus:
             -multiplier
         }
-        let progress = self.progress + delta * adjustedMultiplier
+        let progress = progress + delta * adjustedMultiplier
         self.progress = progress
 
         return progress >= 0 && progress <= 1
@@ -432,7 +428,7 @@ extension PlayerModel {
         case .minus:
             -multiplier
         }
-        let volume = self.volume + delta * multiplier
+        let volume = volume + delta * multiplier
         self.volume = volume
 
         return volume >= 0 && volume <= 1

@@ -32,7 +32,7 @@ protocol LyricsParser {
     var lines: [Line] { get set }
 
     init(string: String) throws
-    
+
     func find(at time: TimeInterval) -> IndexSet
 }
 
@@ -62,14 +62,14 @@ enum LyricsStorage {
         case .ttml: .ttml
         }
     }
-    
+
     func find(at time: TimeInterval) -> IndexSet {
         switch self {
-        case .raw(let parser):
+        case let .raw(parser):
             parser.find(at: time)
-        case .lrc(let parser):
+        case let .lrc(parser):
             parser.find(at: time)
-        case .ttml(let parser):
+        case let .ttml(parser):
             parser.find(at: time)
         }
     }
@@ -83,17 +83,17 @@ enum LyricsStorage {
     var type: LyricsType = .raw
 
     private var cache: String?
-    
+
     func identify(url: URL?) {
         self.url = url
     }
 
     func load(string: String?) {
         // debounce
-        guard type != storage?.type || string != cache || url != self.url else { return }
+        guard type != storage?.type || string != cache || url != url else { return }
 
         cache = string
-        self.url = url
+        url = url
         guard let string else {
             storage = nil
             return
@@ -112,7 +112,7 @@ enum LyricsStorage {
             storage = nil
         }
     }
-    
+
     func find(at time: TimeInterval, in url: URL?) -> IndexSet {
         guard let storage, let url, url == self.url else { return [] }
         return storage.find(at: time)

@@ -5,35 +5,35 @@
 //  Created by KrLite on 2024/12/1.
 //
 
-import SwiftUI
 import CSFBAudioEngine
+import SwiftUI
 
 struct AdaptableMusicCoverControl: View {
     @Namespace private var namespace
-    
+
     @Bindable var attachedPicturesHandler: AttachedPicturesHandlerModel
-    
+
     var state: MetadataValueState<Set<AttachedPicture>>
     var type: AttachedPicture.`Type`
     var maxResolution: CGFloat? = 128
-    
+
     @State private var isImagePickerPresented: Bool = false
     @State private var isHeaderHovering: Bool = false
-    
+
     var body: some View {
         let attachedPictures: [AttachedPicture] = switch state {
         case .undefined:
             []
-        case .fine(let value):
+        case let .fine(value):
             .init(value.current)
-        case .varied(let values):
+        case let .varied(values):
             values.values.flatMap(\.current)
         }
-        
+
         let images = attachedPictures
             .filter { $0.type == type }
             .compactMap(\.image)
-        
+
         AliveButton {
             isImagePickerPresented = true
         } label: {
@@ -48,10 +48,10 @@ struct AdaptableMusicCoverControl: View {
             allowedContentTypes: AttachedPicturesHandlerModel.allowedContentTypes
         ) { result in
             switch result {
-            case .success(let url):
+            case let .success(url):
                 guard url.startAccessingSecurityScopedResource() else { break }
                 defer { url.stopAccessingSecurityScopedResource() }
-                
+
                 guard let image = NSImage(contentsOf: url), let attachedPicture = image.attachedPicture(of: type) else { break }
                 attachedPicturesHandler.replace([attachedPicture], state: state)
             case .failure:
@@ -61,7 +61,7 @@ struct AdaptableMusicCoverControl: View {
         .padding(.top, 8)
         .overlay(alignment: .top, content: header)
     }
-    
+
     @ViewBuilder private func header() -> some View {
         Group {
             if isHeaderHovering {
@@ -72,7 +72,7 @@ struct AdaptableMusicCoverControl: View {
                         Image(systemSymbol: .arrowUturnLeft)
                     }
                     .disabled(!attachedPicturesHandler.isModified(of: [type], state: state))
-                    
+
                     AliveButton {
                         attachedPicturesHandler.remove(of: [type], state: state)
                     } label: {

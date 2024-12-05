@@ -40,7 +40,7 @@ struct LyricsView: View {
                         .contentMargins(.bottom, 94, for: .scrollIndicators)
                     }
                 }
-            case .varied(let values):
+            case let .varied(values):
                 Color.blue
             }
         }
@@ -51,26 +51,26 @@ struct LyricsView: View {
         .onChange(of: lyrics.type) { _, _ in
             loadLyrics()
         }
-        .onChange(of: player.current) { oldValue, newValue in
+        .onChange(of: player.current) { _, newValue in
             lyrics.identify(url: newValue?.url)
         }
     }
-    
+
     private var alignment: HorizontalAlignment {
         switch lyrics.type {
         case .raw:
-                .leading
+            .leading
         case .lrc:
-                .center
+            .center
         case .ttml:
-                .leading
+            .leading
         }
     }
 
     private var lyricsState: MetadataValueState<String?> {
         metadataEditor[extracting: \.lyrics]
     }
-    
+
     private var highlightedIndices: IndexSet {
         lyrics.find(at: player.timeElapsed, in: player.current?.url)
     }
@@ -94,13 +94,13 @@ struct LyricsView: View {
         }
     }
 
-    @ViewBuilder private func rawLyricLine(index: Int, line: RawLyricLine) -> some View {
+    @ViewBuilder private func rawLyricLine(index _: Int, line: RawLyricLine) -> some View {
         Text(line.content)
     }
 
     @ViewBuilder private func lrcLyricLine(index: Int, line: LRCLyricLine) -> some View {
         let isHighlighted = highlightedIndices.contains(index)
-        
+
         HStack {
             ForEach(line.tags) { tag in
                 if !tag.type.isMetadata {
@@ -126,7 +126,7 @@ struct LyricsView: View {
             }
             .foregroundStyle(.secondary)
 
-            if line.isValid && !line.content.isEmpty {
+            if line.isValid, !line.content.isEmpty {
                 switch line.type {
                 case .main:
                     Text(line.content)
@@ -142,7 +142,7 @@ struct LyricsView: View {
         .foregroundStyle(isHighlighted ? AnyShapeStyle(.tint) : AnyShapeStyle(.primary))
     }
 
-    @ViewBuilder private func ttmlLyricLine(index: Int, line: TTMLLyricLine) -> some View {
+    @ViewBuilder private func ttmlLyricLine(index _: Int, line: TTMLLyricLine) -> some View {
         Text(line.content)
     }
 

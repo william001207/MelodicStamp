@@ -9,7 +9,7 @@ import Foundation
 
 extension Duration {
     func toTimeInterval() -> TimeInterval {
-        let components = self.components
+        let components = components
         return TimeInterval(components.seconds) + TimeInterval(components.attoseconds) * 1e-18
     }
 }

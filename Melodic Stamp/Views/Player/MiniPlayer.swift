@@ -128,9 +128,9 @@ struct MiniPlayer: View {
 
                 let hasShift = modifiers.contains(.shift)
                 let hasOption = modifiers.contains(.option)
-                let multiplier: CGFloat = if hasShift && !hasOption {
+                let multiplier: CGFloat = if hasShift, !hasOption {
                     5
-                } else if hasOption && !hasShift {
+                } else if hasOption, !hasShift {
                     0.1
                 } else { 1 }
 
@@ -356,7 +356,7 @@ struct MiniPlayer: View {
                 ) { _, newValue in
                     adjustmentPercentage = newValue
                 } onOvershootOffsetChange: { oldValue, newValue in
-                    if activeControl == .volume && oldValue <= 0 && newValue > 0 {
+                    if activeControl == .volume, oldValue <= 0, newValue > 0 {
                         speakerButtonBounceAnimation.toggle()
                     }
                 }
@@ -367,7 +367,7 @@ struct MiniPlayer: View {
             .padding(.horizontal, !isProgressBarHovering || isProgressBarActive ? 0 : 12)
             .onHover { hover in
                 let canHover = player.hasCurrentTrack || activeControl == .volume
-                guard canHover && hover else { return }
+                guard canHover, hover else { return }
 
                 isProgressBarHovering = true
             }

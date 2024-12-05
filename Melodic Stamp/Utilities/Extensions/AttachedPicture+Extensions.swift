@@ -12,11 +12,11 @@ extension AttachedPicture {
     var image: NSImage? {
         .init(data: imageData)
     }
-    
+
     var category: AttachedPictureCategory {
         type.category
     }
-    
+
     // hack
     static var allTypes: [AttachedPicture.`Type`] {
         [
@@ -40,7 +40,7 @@ extension AttachedPicture {
             .colouredFish,
             .illustration,
             .bandLogo,
-            .publisherLogo
+            .publisherLogo,
         ]
     }
 }
@@ -51,15 +51,15 @@ enum AttachedPictureCategory: String, Hashable, Identifiable, Equatable, CaseIte
     case staff
     case scenes
     case metadata
-    
+
     var id: String {
         rawValue
     }
-    
+
     var allTypes: [AttachedPicture.`Type`] {
         AttachedPicture.allTypes.filter { $0.category == self }
     }
-    
+
     var order: Int {
         switch self {
         case .media: 0
@@ -85,31 +85,26 @@ extension AttachedPicture.`Type` {
         case .illustration: 0x2
         case .leafletPage: 0x3
         case .media: 0x4
-            
         case .bandLogo: 0x10
         case .publisherLogo: 0x11
         case .band: 0x12
-            
         case .leadArtist: 0x20
         case .artist: 0x21
         case .composer: 0x22
         case .conductor: 0x23
         case .lyricist: 0x24
-        
         case .duringPerformance: 0x30
         case .duringRecording: 0x31
         case .recordingLocation: 0x32
         case .movieScreenCapture: 0x33
-            
         case .fileIcon: 0x40
         case .otherFileIcon: 0x41
         case .colouredFish: 0x42
         case .other: 0x43
-            
         @unknown default: .max
         }
     }
-    
+
     var category: AttachedPictureCategory {
         switch self {
         case .frontCover, .backCover, .illustration, .leafletPage, .media: .media

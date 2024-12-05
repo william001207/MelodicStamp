@@ -13,7 +13,7 @@ struct AdaptableMusicCovers: View {
         case flow
         case grid
     }
-    
+
     @Bindable var attachedPicturesHandler: AttachedPicturesHandlerModel
 
     var layout: Layout = .flow
@@ -38,14 +38,12 @@ struct AdaptableMusicCovers: View {
         .transition(.blurReplace)
         .animation(.bouncy, value: types)
     }
-    
+
     private var types: Set<AttachedPicture.`Type`> {
         attachedPicturesHandler.types(state: state)
     }
-    
-    @ViewBuilder private func emptyView() -> some View {
-        
-    }
+
+    @ViewBuilder private func emptyView() -> some View {}
 
     @ViewBuilder private func flowView() -> some View {
         ScrollView(.horizontal) {
@@ -64,7 +62,7 @@ struct AdaptableMusicCovers: View {
                         case .horizontal:
                             let count = max(1, types.count)
                             let proportional =
-                            length / floor((length + contentWidth) / contentWidth)
+                                length / floor((length + contentWidth) / contentWidth)
                             return max(proportional, length / CGFloat(count))
                         case .vertical:
                             return length
@@ -87,7 +85,5 @@ struct AdaptableMusicCovers: View {
         )
     }
 
-    @ViewBuilder private func gridView() -> some View {
-
-    }
+    @ViewBuilder private func gridView() -> some View {}
 }

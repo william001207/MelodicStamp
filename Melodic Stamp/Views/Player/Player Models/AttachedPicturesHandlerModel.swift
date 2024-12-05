@@ -37,9 +37,9 @@ import UniformTypeIdentifiers
         switch state {
         case .undefined:
             false
-        case .fine(let value):
+        case let .fine(value):
             isModified(of: types, value: value, countAsEmpty: fallback)
-        case .varied(let values):
+        case let .varied(values):
             !values.values
                 .filter { isModified(of: types, value: $0, countAsEmpty: fallback) }
                 .isEmpty
@@ -50,9 +50,9 @@ import UniformTypeIdentifiers
         switch state {
         case .undefined:
             []
-        case .fine(let value):
+        case let .fine(value):
             Set(value.current.map(\.type))
-        case .varied(let values):
+        case let .varied(values):
             Set(values.values.flatMap(\.current).map(\.type))
         }
     }
@@ -66,8 +66,7 @@ import UniformTypeIdentifiers
         return removed.union(newAttachedPictures)
     }
 
-    private func replace(_ newAttachedPictures: [AttachedPicture], value: Value)
-    {
+    private func replace(_ newAttachedPictures: [AttachedPicture], value: Value) {
         value.current = replacing(newAttachedPictures, in: value.current)
     }
 
@@ -75,9 +74,9 @@ import UniformTypeIdentifiers
         switch state {
         case .undefined:
             break
-        case .fine(let value):
+        case let .fine(value):
             replace(newAttachedPictures, value: value)
-        case .varied(let values):
+        case let .varied(values):
             values.values.forEach { replace(newAttachedPictures, value: $0) }
         }
     }
@@ -100,9 +99,9 @@ import UniformTypeIdentifiers
         switch state {
         case .undefined:
             break
-        case .fine(let value):
+        case let .fine(value):
             remove(of: types, value: value)
-        case .varied(let values):
+        case let .varied(values):
             values.values.forEach { remove(of: types, value: $0) }
         }
     }
@@ -129,9 +128,9 @@ import UniformTypeIdentifiers
             switch state {
             case .undefined:
                 break
-            case .fine(let value):
+            case let .fine(value):
                 value.revert()
-            case .varied(let values):
+            case let .varied(values):
                 values.revertAll()
             }
             return
@@ -140,9 +139,9 @@ import UniformTypeIdentifiers
         switch state {
         case .undefined:
             break
-        case .fine(let value):
+        case let .fine(value):
             revert(of: types, value: value)
-        case .varied(let values):
+        case let .varied(values):
             values.values.forEach { revert(of: types, value: $0) }
         }
     }

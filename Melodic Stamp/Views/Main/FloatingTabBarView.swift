@@ -123,8 +123,8 @@ struct FloatingTabBarView: View {
     }
 }
 
-//#Preview {
+// #Preview {
 //    @Previewable @State var selectedTab: SidebarTab = .inspector
 //
 //    FloatingTabBarView(floatingWindows: .init(), sections: [.init(tabs: SidebarTab.allCases)], selectedTab: $selectedTab)
-//}
+// }

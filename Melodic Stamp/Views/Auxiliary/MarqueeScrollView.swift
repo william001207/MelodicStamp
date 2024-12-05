@@ -24,7 +24,7 @@ struct OffsetEffect: GeometryEffect {
     }
 
     public func effectValue(size _: CGSize) -> ProjectionTransform {
-        return ProjectionTransform(CGAffineTransform(translationX: offset.x, y: offset.y))
+        ProjectionTransform(CGAffineTransform(translationX: offset.x, y: offset.y))
     }
 }
 

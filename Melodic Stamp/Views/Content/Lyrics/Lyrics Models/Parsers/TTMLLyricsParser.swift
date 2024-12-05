@@ -6,8 +6,8 @@
 //
 
 import Foundation
-import SwiftSoup
 import RegexBuilder
+import SwiftSoup
 
 public struct TTMLLyricTag: Hashable, Identifiable, Equatable {
     public enum LyricTagType: String, Hashable, Identifiable, Equatable, CaseIterable {
@@ -17,28 +17,28 @@ public struct TTMLLyricTag: Hashable, Identifiable, Equatable {
         case itunesKey = "itunes:key"
         case translation = "ttm:translation"
         case roman = "ttm:roman"
-        
+
         public var id: String {
             rawValue
         }
-        
+
         public var name: String {
             switch self {
             case .begin:
-                return NSLocalizedString("Begin", comment: "")
+                NSLocalizedString("Begin", comment: "")
             case .end:
-                return NSLocalizedString("End", comment: "")
+                NSLocalizedString("End", comment: "")
             case .agent:
-                return NSLocalizedString("Agent", comment: "")
+                NSLocalizedString("Agent", comment: "")
             case .itunesKey:
-                return NSLocalizedString("iTunes Key", comment: "")
+                NSLocalizedString("iTunes Key", comment: "")
             case .translation:
-                return NSLocalizedString("Translation", comment: "")
+                NSLocalizedString("Translation", comment: "")
             case .roman:
-                return NSLocalizedString("Roman", comment: "")
+                NSLocalizedString("Roman", comment: "")
             }
         }
-        
+
         public static var regex: Regex<Substring> {
             Regex {
                 ChoiceOf {
@@ -52,14 +52,14 @@ public struct TTMLLyricTag: Hashable, Identifiable, Equatable {
             }
         }
     }
-    
+
     public var id: LyricTagType {
         type
     }
-    
+
     public var type: LyricTagType
     public var content: String
-    
+
     public init(type: LyricTagType, content: String) {
         self.type = type
         self.content = content
@@ -68,7 +68,7 @@ public struct TTMLLyricTag: Hashable, Identifiable, Equatable {
 
 struct TTMLLyricLine: LyricLine {
     typealias Tag = TTMLLyricTag
-    
+
     var indexNum: Int
     var position: TtmlLyricPositionType
     var beginTime: TimeInterval
@@ -78,24 +78,23 @@ struct TTMLLyricLine: LyricLine {
     var bgLyric: TTMLBgLyric?
     var translation: String?
     var roman: String?
-    
+
     let id: UUID = .init()
-    
+
     var startTime: TimeInterval? {
         get { beginTime }
-        set { if let newValue = newValue { beginTime = newValue } }
+        set { if let newValue { beginTime = newValue } }
     }
-    
+
     var content: String {
         get {
-            mainLyric?.map { $0.text }.joined(separator: " ") ?? ""
+            mainLyric?.map(\.text).joined(separator: " ") ?? ""
         }
-        set {
-        }
+        set {}
     }
 
     var isValid: Bool {
-        return startTime != nil || endTime != nil
+        startTime != nil || endTime != nil
     }
 }
 
@@ -115,7 +114,7 @@ public struct TTMLSubLyric {
     public var beginTime: TimeInterval
     public var endTime: TimeInterval
     public var text: String
-    
+
     public init(beginTime: TimeInterval, endTime: TimeInterval, text: String) {
         self.beginTime = beginTime
         self.endTime = endTime
@@ -127,7 +126,7 @@ public struct TTMLBgLyric {
     public var subLyric: [TTMLSubLyric]?
     public var translation: String?
     public var roman: String?
-    
+
     public init(subLyric: [TTMLSubLyric]? = nil, translation: String? = nil, roman: String? = nil) {
         self.subLyric = subLyric
         self.translation = translation
@@ -144,31 +143,32 @@ public enum TtmlLyricPositionType {
 public class TTMLLyricsParser: NSObject, LyricsParser {
     typealias Tag = TTMLLyricTag
     typealias Line = TTMLLyricLine
-    
+
     var lines: [TTMLLyricLine] = []
-    
+
     required init(string: String) throws {
         super.init()
-        try self.parseLyrics(from: string)
+        try parseLyrics(from: string)
     }
-    
-    required override init() {
+
+    override required init() {
         super.init()
     }
-    
+
     func find(at time: TimeInterval) -> IndexSet {
         var indices = IndexSet()
         for (index, line) in lines.enumerated() {
             if let startTime = line.beginTime as TimeInterval?,
-               let endTime = line.endTime as TimeInterval? {
-                if time >= startTime && time <= endTime {
+               let endTime = line.endTime as TimeInterval?
+            {
+                if time >= startTime, time <= endTime {
                     indices.insert(index)
                 }
             }
         }
         return indices
     }
-    
+
     private func parseLyrics(from string: String) throws {
         guard let doc = try? SwiftSoup.parse(string) else {
             throw NSError(domain: "ParseError", code: -1, userInfo: nil)
@@ -263,20 +263,20 @@ public class TTMLLyricsParser: NSObject, LyricsParser {
                     }
                 }
             }
-            
+
             lines.append(lyricLine)
         }
-        
+
         if lines.isEmpty {
             throw NSError(domain: "EmptyLyrics", code: -1, userInfo: nil)
         }
     }
-    
+
     private func getPositionFromAgent(_ agent: String) -> TtmlLyricPositionType {
         if agent == "v1" { return .main }
         return .sub
     }
-    
+
     public static func parseTag(string: String) throws -> TTMLLyricTag? {
         let regex = Regex {
             Capture {
@@ -289,11 +289,11 @@ public class TTMLLyricsParser: NSObject, LyricsParser {
                 }
             }
         }
-        
+
         guard let match = try regex.wholeMatch(in: string) else { return nil }
         let key = String(match.output.1)
         let value = String(match.output.2)
-        
+
         guard let type = Tag.LyricTagType(rawValue: key) else {
             return nil
         }
@@ -304,7 +304,7 @@ public class TTMLLyricsParser: NSObject, LyricsParser {
 extension Element {
     func getPreservedText() throws -> String {
         var result = ""
-        for node in self.getChildNodes() {
+        for node in getChildNodes() {
             if let textNode = node as? TextNode {
                 result += textNode.text()
                 if textNode.text().hasSuffix(" ") {
@@ -328,12 +328,12 @@ extension Element {
      public var position     : TtmlLyricPositionType
      public var beginTime    : TimeInterval
      public var endTime      : TimeInterval
-     
+
      public var mainLyric    : [SubTtmlLyric]?
      public var bgLyric      : BgTtmlLyric?
      public var translation  : String?
      public var roman        : String?
-     
+
      public static func == (lhs: TtmlLyric, rhs: TtmlLyric) -> Bool {
          lhs.id == rhs.id
      }
@@ -398,7 +398,7 @@ extension Element {
                          translation: nil,
                          roman: nil
                      )
-                     
+
                      var currentSubTtmlLyrics: [SubTtmlLyric] = []
                      var currentTranslation: String?
                      var currentRoman: String?
@@ -434,9 +434,9 @@ extension Element {
                                      let bgEndTime = try bgSpanElement.attr("end")
                                      let bgSpanElementRole = try bgSpanElement.attr("ttm:role")
                                      var bgSpanElementText = try bgSpanElement.getPreservedText().normalizeSpaces()
-                                     
+
                                      bgSpanElementText = bgSpanElementText.replacingOccurrences(of: "[()]", with: "", options: .regularExpression)
-                                     
+
                                      if bgSpanElementRole == "x-translation" {
                                          currentBgLyric?.translation = bgSpanElementText
                                      } else if bgSpanElementRole == "x-roman" {
@@ -465,12 +465,12 @@ extension Element {
                              }
                          }
                      }
-                     
+
                      currentTtmlLyric.mainLyric = currentSubTtmlLyrics
                      currentTtmlLyric.bgLyric = currentBgLyric
                      currentTtmlLyric.translation = currentTranslation
                      currentTtmlLyric.roman = currentRoman
-                     
+
                      ttmlLyrics.append(currentTtmlLyric)
                  }
              }
@@ -513,7 +513,7 @@ extension Element {
          let pattern = #"(\d+):(\d+)\.(\d+)"#
          let regex = try! NSRegularExpression(pattern: pattern)
          let matches = regex.matches(in: self, range: NSRange(self.startIndex..., in: self))
-         
+
          guard let match = matches.first,
                match.numberOfRanges == 4,
                let minutesRange = Range(match.range(at: 1), in: self),
@@ -524,10 +524,10 @@ extension Element {
                let milliseconds = Double(self[millisecondsRange]) else {
              return TimeInterval(0)
          }
-         
+
          let totalMilliseconds = (minutes * 60 + seconds) * 1000 + milliseconds
          let timeInterval = totalMilliseconds / 1000
-         
+
          return timeInterval
      }
  }
@@ -565,7 +565,7 @@ extension Element {
      } catch {
          print("Error loading file: \(error)")
      }
-     
+
      return nil
  }
 

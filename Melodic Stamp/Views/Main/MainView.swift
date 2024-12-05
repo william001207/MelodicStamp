@@ -9,8 +9,8 @@ import Luminare
 import Morphed
 import SwiftUI
 
-extension View {
-    @ViewBuilder fileprivate func morphed() -> some View {
+private extension View {
+    @ViewBuilder func morphed() -> some View {
         morphed(
             insets: .init(bottom: .fixed(length: 64).mirrored),
             LinearGradient(
@@ -54,7 +54,6 @@ struct MainView: View {
             }
             .ignoresSafeArea()
             .luminareMinHeight(38)
-
             .toolbar {
                 // at least to preserve the titlebar style
                 Color.clear
@@ -69,7 +68,6 @@ struct MainView: View {
     @ViewBuilder private func playlist() -> some View {
         PlaylistView(player: player, metadataEditor: metadataEditor)
             .ignoresSafeArea()
-
             .morphed()
             .background {
                 VisualEffectView(material: .titlebar, blendingMode: .behindWindow)
@@ -106,12 +104,10 @@ struct MainView: View {
                         .opacity(isInspectorPresented ? 1 : 0)
                         .allowsHitTesting(isInspectorPresented)
                         .animation(.default, value: isInspectorPresented)
-
                 }
             }
         }
         .ignoresSafeArea()
-
         .morphed()
         .ignoresSafeArea()
     }

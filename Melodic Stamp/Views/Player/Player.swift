@@ -101,9 +101,9 @@ struct Player: View {
 
                 let hasShift = modifiers.contains(.shift)
                 let hasOption = modifiers.contains(.option)
-                let multiplier: CGFloat = if hasShift && !hasOption {
+                let multiplier: CGFloat = if hasShift, !hasOption {
                     5
-                } else if hasOption && !hasShift {
+                } else if hasOption, !hasShift {
                     0.1
                 } else { 1 }
 
@@ -208,7 +208,7 @@ struct Player: View {
         ProgressBar(value: $player.volume, isActive: $isVolumeBarActive, isDelegated: true) { _, newValue in
             adjustmentPercentage = newValue
         } onOvershootOffsetChange: { oldValue, newValue in
-            if oldValue <= 0 && newValue > 0 {
+            if oldValue <= 0, newValue > 0 {
                 speakerButtonBounceAnimation.toggle()
             }
         }

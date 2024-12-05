@@ -9,7 +9,7 @@ import SwiftUI
 
 struct AttachedPictureCategoryView: View {
     var category: AttachedPictureCategory
-    
+
     var body: some View {
         switch category {
         case .media:

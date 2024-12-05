@@ -13,11 +13,11 @@ struct SidebarSection: Hashable, Identifiable {
     var tabs: [SidebarTab]
 
     var id: Int {
-        return hashValue
+        hashValue
     }
 
     static func == (lhs: SidebarSection, rhs: SidebarSection) -> Bool {
-        return lhs.hashValue == rhs.hashValue
+        lhs.hashValue == rhs.hashValue
     }
 }
 

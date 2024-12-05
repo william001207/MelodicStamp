@@ -114,7 +114,7 @@ struct LabeledTextField<F, Label>: View where F: ParseableFormatStyle, F.FormatO
             .allowsHitTesting(false)
         }
 
-        if showsLabel && isActive {
+        if showsLabel, isActive {
             Group {
                 if Label.self != EmptyView.self {
                     label()
@@ -154,7 +154,7 @@ struct LabeledTextField<F, Label>: View where F: ParseableFormatStyle, F.FormatO
         }
     }
 
-    @ViewBuilder private func varied(values: BatchEditableMetadataValues<F.FormatInput?>) -> some View {
+    @ViewBuilder private func varied(values _: BatchEditableMetadataValues<F.FormatInput?>) -> some View {
         Color.blue
     }
 

@@ -5,8 +5,8 @@
 //  Created by KrLite on 2024/11/24.
 //
 
-import SwiftUI
 import CSFBAudioEngine
+import SwiftUI
 
 struct MusicCover: View {
     var cornerRadius: CGFloat = 8
@@ -39,14 +39,14 @@ struct MusicCover: View {
         }
         .clipShape(.rect(cornerRadius: cornerRadius))
     }
-    
+
     @ViewBuilder private func imageView(_ image: NSImage) -> some View {
         let resizedImage = if let maxResolution, let resizedImage = resizeImage(image, maxResolution: maxResolution) {
             resizedImage
         } else {
             image
         }
-        
+
         Image(nsImage: resizedImage)
             .resizable()
             .interpolation(.medium)
@@ -59,9 +59,11 @@ struct MusicCover: View {
     ) -> NSImage? {
         let size = image.size
         let scale = min(
-            maxResolution / size.width, maxResolution / size.height, 1)
+            maxResolution / size.width, maxResolution / size.height, 1
+        )
         let newSize = NSSize(
-            width: size.width * scale, height: size.height * scale)
+            width: size.width * scale, height: size.height * scale
+        )
 
         let resizedImage = NSImage(size: newSize)
         resizedImage.lockFocus()

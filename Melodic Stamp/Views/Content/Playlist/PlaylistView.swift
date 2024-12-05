@@ -12,7 +12,7 @@ import SwiftUI
 
 struct PlaylistView: View {
     @Environment(\.luminareMinHeight) private var minHeight
-    
+
     @Bindable var player: PlayerModel
     @Bindable var metadataEditor: MetadataEditorModel
 
@@ -37,7 +37,7 @@ struct PlaylistView: View {
                             Image(systemSymbol: .play)
                         }
                         .tint(.accentColor)
-                        
+
                         Button {
                             player.removeFromPlaylist(items: [item.wrappedValue])
                         } label: {
@@ -49,7 +49,7 @@ struct PlaylistView: View {
                         Button("Play") {
                             player.play(item: item.wrappedValue)
                         }
-                        
+
                         Button("Remove") {
                             if metadataEditor.items.isEmpty {
                                 player.removeFromPlaylist(items: [item.wrappedValue])
@@ -70,7 +70,7 @@ struct PlaylistView: View {
                             .buttonStyle(LuminareButtonStyle())
                             .aspectRatio(1, contentMode: .fit)
                             .disabled(metadataEditor.items.isEmpty)
-                            
+
                             Button {
                                 let hasShift = NSEvent.modifierFlags.contains(.shift)
                                 player.playbackMode = player.playbackMode.cycle(
@@ -78,7 +78,7 @@ struct PlaylistView: View {
                             } label: {
                                 HStack {
                                     player.playbackMode.image
-                                    
+
                                     switch player.playbackMode {
                                     case .single:
                                         Text("Single Loop")
@@ -93,7 +93,7 @@ struct PlaylistView: View {
                                 .padding()
                             }
                             .fixedSize(horizontal: true, vertical: false)
-                            
+
                             Button {
                                 player.removeFromPlaylist(items: .init(metadataEditor.items))
                             } label: {
@@ -110,7 +110,7 @@ struct PlaylistView: View {
                     }
                     .luminareSectionMasked(true)
                     .luminareSectionMaxWidth(nil)
-                    
+
                     Spacer()
                 }
                 .luminareBordered(false)
