@@ -66,7 +66,8 @@ extension MetadataEntry: Equatable {
 
 // MARK: - Metadata Batch Editing Entry
 
-@Observable final class MetadataBatchEditingEntry<V: Hashable & Equatable>: Identifiable {
+@Observable
+final class MetadataBatchEditingEntry<V: Hashable & Equatable>: Identifiable {
     typealias Entry = MetadataEntry
     typealias EntryKeyPath = WritableKeyPath<Metadata, Entry<V>>
 
@@ -99,11 +100,13 @@ extension MetadataEntry: Equatable {
     }
 
     var projectedValue: Binding<V> {
-        Binding(get: {
-            self.current
-        }, set: { newValue in
-            self.current = newValue
-        })
+        Binding(
+            get: {
+                self.current
+            },
+            set: { newValue in
+                self.current = newValue
+            })
     }
 
     var isModified: Bool {
@@ -137,23 +140,25 @@ extension MetadataEntry: Equatable {
         self.metadatas = metadatas
     }
 
-    var values: [MetadataBatchEditingEntry<V>] {
-        metadatas.map { $0[extracting: keyPath] }
-    }
-
     var isModified: Bool {
-        !values.filter(\.isModified).isEmpty
+        !filter(\.isModified).isEmpty
     }
 
     func revertAll() {
-        values.forEach { $0.restore() }
+        forEach { $0.restore() }
     }
 
     func applyAll() {
-        values.forEach { $0.apply() }
+        forEach { $0.apply() }
     }
 
     subscript(isModified keyPath: KeyPath<V, some Equatable>) -> Bool {
-        !values.filter(\.[isModified: keyPath]).isEmpty
+        !filter(\.[isModified: keyPath]).isEmpty
+    }
+}
+
+extension MetadataBatchEditingEntries: Sequence {
+    func makeIterator() -> Array<MetadataBatchEditingEntry<V>>.Iterator {
+        metadatas.map { $0[extracting: keyPath] }.makeIterator()
     }
 }

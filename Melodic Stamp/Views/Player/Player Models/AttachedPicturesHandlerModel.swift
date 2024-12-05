@@ -11,20 +11,20 @@ import UniformTypeIdentifiers
 
 @Observable class AttachedPicturesHandlerModel {
     typealias APType = AttachedPicture.`Type`
-    typealias Value = MetadataBatchEditingEntry<Set<AttachedPicture>>
+    typealias Entry = MetadataBatchEditingEntry<Set<AttachedPicture>>
     typealias State = MetadataValueState<Set<AttachedPicture>>
 
     static var allowedContentTypes: [UTType] {
         [.jpeg, .png, .tiff, .bmp, .gif, .heic, .heif, .rawImage]
     }
 
-    private func isModified(of types: [APType]? = nil, value: Value, countAsEmpty fallback: Bool = true) -> Bool {
+    private func isModified(of types: [APType]? = nil, entry: Entry, countAsEmpty fallback: Bool = true) -> Bool {
         guard let types else { return false }
-        return !value.current
+        return !entry.current
             .filter { types.contains($0.type) }
             .filter { currentValue in
                 guard
-                    let initialValue = value.initial.filter({
+                    let initialValue = entry.initial.filter({
                         $0.type == currentValue.type
                     }).first
                 else { return fallback }
@@ -38,10 +38,10 @@ import UniformTypeIdentifiers
         case .undefined:
             false
         case let .fine(entry):
-            isModified(of: types, value: value, countAsEmpty: fallback)
+            isModified(of: types, entry: entry, countAsEmpty: fallback)
         case let .varied(entries):
-            !values.values
-                .filter { isModified(of: types, value: $0, countAsEmpty: fallback) }
+            !entries
+                .filter { isModified(of: types, entry: $0, countAsEmpty: fallback) }
                 .isEmpty
         }
     }
@@ -51,9 +51,9 @@ import UniformTypeIdentifiers
         case .undefined:
             []
         case let .fine(entry):
-            Set(value.current.map(\.type))
+            Set(entry.current.map(\.type))
         case let .varied(entries):
-            Set(values.values.flatMap(\.current).map(\.type))
+            Set(entries.flatMap(\.current).map(\.type))
         }
     }
 
@@ -66,8 +66,8 @@ import UniformTypeIdentifiers
         return removed.union(newAttachedPictures)
     }
 
-    private func replace(_ newAttachedPictures: [AttachedPicture], value: Value) {
-        value.current = replacing(newAttachedPictures, in: value.current)
+    private func replace(_ newAttachedPictures: [AttachedPicture], entry: Entry) {
+        entry.current = replacing(newAttachedPictures, in: entry.current)
     }
 
     func replace(_ newAttachedPictures: [AttachedPicture], state: State) {
@@ -75,9 +75,9 @@ import UniformTypeIdentifiers
         case .undefined:
             break
         case let .fine(entry):
-            replace(newAttachedPictures, value: value)
+            replace(newAttachedPictures, entry: entry)
         case let .varied(entries):
-            values.values.forEach { replace(newAttachedPictures, value: $0) }
+            entries.forEach { replace(newAttachedPictures, entry: $0) }
         }
     }
 
@@ -91,8 +91,8 @@ import UniformTypeIdentifiers
         }
     }
 
-    private func remove(of types: [APType]? = nil, value: Value) {
-        value.current = removing(of: types, in: value.current)
+    private func remove(of types: [APType]? = nil, entry: Entry) {
+        entry.current = removing(of: types, in: entry.current)
     }
 
     func remove(of types: [APType]? = nil, state: State) {
@@ -100,26 +100,26 @@ import UniformTypeIdentifiers
         case .undefined:
             break
         case let .fine(entry):
-            remove(of: types, value: value)
+            remove(of: types, entry: entry)
         case let .varied(entries):
-            values.values.forEach { remove(of: types, value: $0) }
+            entries.forEach { remove(of: types, entry: $0) }
         }
     }
 
-    private func restore(of types: [APType]? = nil, value: Value) {
+    private func restore(of types: [APType]? = nil, entry: Entry) {
         guard let types else {
-            value.restore()
+            entry.restore()
             return
         }
 
-        let initialAttachedPictures: [AttachedPicture] = value.initial.filter {
+        let initialAttachedPictures: [AttachedPicture] = entry.initial.filter {
             types.contains($0.type)
         }
 
         if initialAttachedPictures.isEmpty {
-            remove(of: types, value: value)
+            remove(of: types, entry: entry)
         } else {
-            replace(initialAttachedPictures, value: value)
+            replace(initialAttachedPictures, entry: entry)
         }
     }
 
@@ -129,9 +129,9 @@ import UniformTypeIdentifiers
             case .undefined:
                 break
             case let .fine(entry):
-                value.restore()
+                entry.restore()
             case let .varied(entries):
-                values.revertAll()
+                entries.revertAll()
             }
             return
         }
@@ -140,9 +140,9 @@ import UniformTypeIdentifiers
         case .undefined:
             break
         case let .fine(entry):
-            restore(of: types, value: value)
+            restore(of: types, entry: entry)
         case let .varied(entries):
-            values.values.forEach { restore(of: types, value: $0) }
+            entries.forEach { restore(of: types, entry: $0) }
         }
     }
 }

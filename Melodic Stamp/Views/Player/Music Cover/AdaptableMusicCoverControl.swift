@@ -25,9 +25,9 @@ struct AdaptableMusicCoverControl: View {
         case .undefined:
             []
         case let .fine(entry):
-            .init(value.current)
+            .init(entry.current)
         case let .varied(entries):
-            values.values.flatMap(\.current)
+            entries.flatMap(\.current)
         }
 
         let images = attachedPictures

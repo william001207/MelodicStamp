@@ -15,8 +15,8 @@ enum MetadataValueState<V: Equatable & Hashable> {
 
 enum MetadataEditingState: Equatable {
     case fine
-    case partiallySaving
     case saving
+    case partiallySaving
 
     var isEditable: Bool {
         switch self {

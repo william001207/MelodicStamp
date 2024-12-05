@@ -78,9 +78,9 @@ struct LabeledTextField<F, Label>: View where F: ParseableFormatStyle, F.FormatO
             case .undefined:
                 EmptyView()
             case let .fine(entry):
-                fine(entry: value)
+                fine(entry: entry)
             case let .varied(entries):
-                varied(entries: values)
+                varied(entries: entries)
             }
         }
         .animation(animation, value: isActive)
@@ -90,21 +90,21 @@ struct LabeledTextField<F, Label>: View where F: ParseableFormatStyle, F.FormatO
         switch state {
         case .undefined:
             false
-        case let .fine(values):
-            !isEmpty(value: values.current)
+        case let .fine(entries):
+            !isEmpty(value: entries.current)
         case .varied:
             false
         }
     }
 
-    @ViewBuilder private func fine(entry _: MetadataBatchEditingEntry<F.FormatInput?>) -> some View {
+    @ViewBuilder private func fine(entry : MetadataBatchEditingEntry<F.FormatInput?>) -> some View {
         LuminareTextField(
             placeholder,
-            value: value.projectedValue, format: format
+            value: entry.projectedValue, format: format
         )
         .overlay {
             Group {
-                if value.isModified {
+                if entry.isModified {
                     RoundedRectangle(cornerRadius: buttonCornerRadius)
                         .stroke(.primary)
                         .fill(.quinary.opacity(0.5))
@@ -127,14 +127,14 @@ struct LabeledTextField<F, Label>: View where F: ParseableFormatStyle, F.FormatO
                 if isLabelHovering {
                     HStack(spacing: 2) {
                         AliveButton {
-                            value.restore()
+                            entry.restore()
                         } label: {
                             Image(systemSymbol: .arrowUturnLeft)
                         }
-                        .disabled(!value.isModified)
+                        .disabled(!entry.isModified)
 
                         AliveButton {
-                            value.current = nil
+                            entry.current = nil
                         } label: {
                             Image(systemSymbol: .trash)
                         }
