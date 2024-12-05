@@ -53,7 +53,7 @@ enum MetadataEditingState: Equatable {
     }
 
     func revertAll() {
-        editableMetadatas.forEach { $0.revert() }
+        editableMetadatas.forEach { $0.restore() }
     }
 
     func updateAll() {

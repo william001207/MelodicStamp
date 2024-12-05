@@ -127,7 +127,7 @@ struct LabeledTextField<F, Label>: View where F: ParseableFormatStyle, F.FormatO
                 if isLabelHovering {
                     HStack(spacing: 2) {
                         AliveButton {
-                            value.revert()
+                            value.restore()
                         } label: {
                             Image(systemSymbol: .arrowUturnLeft)
                         }

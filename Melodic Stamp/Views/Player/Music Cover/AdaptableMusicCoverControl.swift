@@ -67,7 +67,7 @@ struct AdaptableMusicCoverControl: View {
             if isHeaderHovering {
                 HStack(spacing: 2) {
                     AliveButton {
-                        attachedPicturesHandler.revert(of: [type], state: state)
+                        attachedPicturesHandler.restore(of: [type], state: state)
                     } label: {
                         Image(systemSymbol: .arrowUturnLeft)
                     }

@@ -106,9 +106,9 @@ import UniformTypeIdentifiers
         }
     }
 
-    private func revert(of types: [APType]? = nil, value: Value) {
+    private func restore(of types: [APType]? = nil, value: Value) {
         guard let types else {
-            value.revert()
+            value.restore()
             return
         }
 
@@ -123,13 +123,13 @@ import UniformTypeIdentifiers
         }
     }
 
-    func revert(of types: [APType]? = nil, state: State) {
+    func restore(of types: [APType]? = nil, state: State) {
         guard let types else {
             switch state {
             case .undefined:
                 break
             case let .fine(value):
-                value.revert()
+                value.restore()
             case let .varied(values):
                 values.revertAll()
             }
@@ -140,9 +140,9 @@ import UniformTypeIdentifiers
         case .undefined:
             break
         case let .fine(value):
-            revert(of: types, value: value)
+            restore(of: types, value: value)
         case let .varied(values):
-            values.values.forEach { revert(of: types, value: $0) }
+            values.values.forEach { restore(of: types, value: $0) }
         }
     }
 }
