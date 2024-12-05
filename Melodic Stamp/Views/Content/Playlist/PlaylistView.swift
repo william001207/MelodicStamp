@@ -60,53 +60,7 @@ struct PlaylistView: View {
                     }
                 } actions: {
                     LuminareSection(hasPadding: false) {
-                        HStack(spacing: 2) {
-                            Button {
-                                metadataEditor.items = []
-                            } label: {
-                                Image(systemSymbol: .xmark)
-                                    .padding()
-                            }
-                            .buttonStyle(LuminareButtonStyle())
-                            .aspectRatio(1, contentMode: .fit)
-                            .disabled(metadataEditor.items.isEmpty)
-
-                            Button {
-                                let hasShift = NSEvent.modifierFlags.contains(.shift)
-                                player.playbackMode = player.playbackMode.cycle(
-                                    negate: hasShift)
-                            } label: {
-                                HStack {
-                                    player.playbackMode.image
-
-                                    switch player.playbackMode {
-                                    case .single:
-                                        Text("Single Loop")
-                                    case .sequential:
-                                        Text("Sequential")
-                                    case .loop:
-                                        Text("Sequential Loop")
-                                    case .shuffle:
-                                        Text("Shuffle")
-                                    }
-                                }
-                                .padding()
-                            }
-                            .fixedSize(horizontal: true, vertical: false)
-
-                            Button {
-                                player.removeFromPlaylist(items: .init(metadataEditor.items))
-                            } label: {
-                                HStack {
-                                    Image(systemSymbol: .trashFill)
-                                    Text("Remove from Playlist")
-                                }
-                                .padding()
-                            }
-                            .buttonStyle(LuminareDestructiveButtonStyle())
-                            .fixedSize(horizontal: true, vertical: false)
-                            .disabled(metadataEditor.items.isEmpty)
-                        }
+                        actions()
                     }
                     .luminareSectionMasked(true)
                     .luminareSectionMaxWidth(nil)
@@ -115,7 +69,9 @@ struct PlaylistView: View {
                 }
                 .luminareBordered(false)
                 .luminareSectionMasked(true)
-                .luminareListItemCornerRadius(8)
+                .luminareListItemHeight(64)
+                .luminareListItemCornerRadius(12)
+                .luminareListItemHighlightOnHover(false)
                 .luminareListActionsMaterial(.ultraThin)
                 .luminareListActionsHeight(minHeight)
                 .luminareListActionsStyle(.borderless)
@@ -130,6 +86,56 @@ struct PlaylistView: View {
         } else {
             PlaylistExcerpt()
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
+        }
+    }
+    
+    @ViewBuilder private func actions() -> some View {
+        HStack(spacing: 2) {
+            Button {
+                metadataEditor.items = []
+            } label: {
+                Image(systemSymbol: .xmark)
+                    .padding()
+            }
+            .buttonStyle(LuminareButtonStyle())
+            .aspectRatio(1, contentMode: .fit)
+            .disabled(metadataEditor.items.isEmpty)
+            
+            Button {
+                let hasShift = NSEvent.modifierFlags.contains(.shift)
+                player.playbackMode = player.playbackMode.cycle(
+                    negate: hasShift)
+            } label: {
+                HStack {
+                    player.playbackMode.image
+                    
+                    switch player.playbackMode {
+                    case .single:
+                        Text("Single Loop")
+                    case .sequential:
+                        Text("Sequential")
+                    case .loop:
+                        Text("Sequential Loop")
+                    case .shuffle:
+                        Text("Shuffle")
+                    }
+                }
+                .padding()
+            }
+            .fixedSize(horizontal: true, vertical: false)
+            
+            Button {
+                player.removeFromPlaylist(items: .init(metadataEditor.items))
+            } label: {
+                HStack {
+                    Image(systemSymbol: .trashFill)
+                    Text("Remove from Playlist")
+                }
+                .padding()
+            }
+            .buttonStyle(LuminareDestructiveButtonStyle())
+            .fixedSize(horizontal: true, vertical: false)
+            .disabled(metadataEditor.items.isEmpty)
         }
     }
 }

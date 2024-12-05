@@ -134,8 +134,9 @@ extension EditableMetadata: Hashable {
 @Observable final class BatchEditableMetadataValue<V: Equatable>: Identifiable {
     let keyPath: WritableKeyPath<Metadata, V>
     let editableMetadatas: Set<EditableMetadata>
-
-    private var task: Task<(), Never>?
+    
+    private var temporary: V?
+    private var updateDispatch: DispatchWorkItem?
 
     init(keyPath: WritableKeyPath<Metadata, V>, editableMetadatas: Set<EditableMetadata>) {
         self.keyPath = keyPath
@@ -144,19 +145,30 @@ extension EditableMetadata: Hashable {
 
     var current: V {
         get {
-            editableMetadatas.first!.current[keyPath: keyPath]
+            if let temporary {
+                print("Batch editing temporary value \(temporary)")
+                return temporary
+            } else {
+                let temporary = get()
+                self.temporary = temporary
+                print("Initializing batch editable temporary value \(temporary)")
+                return temporary
+            }
         }
 
         set {
-            task?.cancel()
-            task = Task.detached {
-                for editableMetadata in self.editableMetadatas {
-                    Task { @MainActor in
-                        editableMetadata.current[keyPath: self.keyPath] = newValue
-                        print(1)
-                    }
-                }
+            temporary = newValue
+            let updateDispatch = DispatchWorkItem { [weak self] in
+                guard let self else { return }
+                self.set(newValue)
+                self.temporary = nil
+                print("Batch edited value to \(newValue)")
             }
+            
+            // debounce after 0.5s
+            self.updateDispatch?.cancel()
+            self.updateDispatch = updateDispatch
+            DispatchQueue.global(qos: .userInteractive).asyncAfter(deadline: .now() + 0.5, execute: updateDispatch)
         }
     }
 
@@ -188,6 +200,14 @@ extension EditableMetadata: Hashable {
 
     func apply() {
         initial = current
+    }
+    
+    private func get() -> V {
+        editableMetadatas.first!.current[keyPath: keyPath]
+    }
+    
+    private func set(_ value: V) {
+        editableMetadatas.forEach { $0.current[keyPath: self.keyPath] = value }
     }
 
     subscript(isModified keyPath: KeyPath<V, some Equatable>) -> Bool {
