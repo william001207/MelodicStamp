@@ -17,7 +17,7 @@ struct AliveButton<Label>: View where Label: View {
     var enabledStyle: AnyShapeStyle = .init(.primary)
     var hoveringStyle: AnyShapeStyle?
     var disabledStyle: AnyShapeStyle = .init(.quinary)
-    var action: () -> Void
+    var action: () -> ()
     @ViewBuilder var label: () -> Label
 
     @State private var isHovering: Bool = false

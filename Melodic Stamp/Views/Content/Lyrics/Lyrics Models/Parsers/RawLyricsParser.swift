@@ -21,7 +21,7 @@ struct RawLyricLine: LyricLine {
     var lines: [RawLyricLine]
 
     required init(string: String) throws {
-        lines = string
+        self.lines = string
             .split(separator: .newlineSequence)
             .map(String.init(_:))
             .map { .init(content: $0) }

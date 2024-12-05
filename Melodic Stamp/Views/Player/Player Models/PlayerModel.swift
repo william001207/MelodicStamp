@@ -268,8 +268,7 @@ enum PlaybackMode: String, CaseIterable, Identifiable {
             outputDevices = try AudioDevice.devices.filter { try $0.supportsOutput }
             if let uid = UserDefaults.standard.string(forKey: "deviceUID"),
                let deviceID = try? AudioSystemObject.instance.deviceID(forUID: uid),
-               let device = outputDevices.first(where: { $0.objectID == deviceID })
-            {
+               let device = outputDevices.first(where: { $0.objectID == deviceID }) {
                 selectedDevice = device
                 try? player.setOutputDeviceID(deviceID)
             } else {
@@ -371,8 +370,7 @@ extension PlayerModel: AudioPlayer.Delegate {
         DispatchQueue.main.async {
             if let nowPlayingDecoder = audioPlayer.nowPlaying,
                let audioDecoder = nowPlayingDecoder as? AudioDecoder,
-               let url = audioDecoder.inputSource.url
-            {
+               let url = audioDecoder.inputSource.url {
                 self.current = self.playlist.first(where: { $0.url == url })
             } else {
                 self.current = nil

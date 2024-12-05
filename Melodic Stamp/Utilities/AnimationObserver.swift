@@ -10,8 +10,8 @@ import SwiftUI
 
 public struct AnimationObserverModifier<Value: VectorArithmetic> {
     private let observedValue: Value
-    private let onChange: ((Value) -> Void)?
-    private let onComplete: (() -> Void)?
+    private let onChange: ((Value) -> ())?
+    private let onComplete: (() -> ())?
 
     public var animatableData: Value {
         didSet {
@@ -19,11 +19,11 @@ public struct AnimationObserverModifier<Value: VectorArithmetic> {
         }
     }
 
-    public init(for observedValue: Value, onChange: ((Value) -> Void)? = nil, onComplete: (() -> Void)? = nil) {
+    public init(for observedValue: Value, onChange: ((Value) -> ())? = nil, onComplete: (() -> ())? = nil) {
         self.observedValue = observedValue
         self.onChange = onChange
         self.onComplete = onComplete
-        animatableData = observedValue
+        self.animatableData = observedValue
     }
 }
 

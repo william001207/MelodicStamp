@@ -19,7 +19,7 @@ struct PlaylistItem: Identifiable {
         self.url = url
 
         guard let metadata = EditableMetadata(url: url) else { return nil }
-        editableMetadata = metadata
+        self.editableMetadata = metadata
     }
 
     func decoder(enableDoP: Bool = false) throws -> PCMDecoding? {

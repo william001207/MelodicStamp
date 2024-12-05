@@ -44,9 +44,9 @@ import SwiftUI
 
     init?(url: URL) {
         self.url = url
-        current = .init()
-        initial = .init()
-        properties = .init()
+        self.current = .init()
+        self.initial = .init()
+        self.properties = .init()
 
         Task.detached {
             try await self.update()
@@ -135,7 +135,7 @@ extension EditableMetadata: Hashable {
     let keyPath: WritableKeyPath<Metadata, V>
     let editableMetadatas: Set<EditableMetadata>
 
-    private var task: Task<Void, Never>?
+    private var task: Task<(), Never>?
 
     init(keyPath: WritableKeyPath<Metadata, V>, editableMetadatas: Set<EditableMetadata>) {
         self.keyPath = keyPath

@@ -43,8 +43,8 @@ struct ProgressBar: View {
     var overshoot: CGFloat = 16
     var externalOvershootSign: FloatingPointSign?
 
-    var onPercentageChange: (CGFloat, CGFloat) -> Void = { _, _ in }
-    var onOvershootOffsetChange: (CGFloat, CGFloat) -> Void = { _, _ in }
+    var onPercentageChange: (CGFloat, CGFloat) -> () = { _, _ in }
+    var onOvershootOffsetChange: (CGFloat, CGFloat) -> () = { _, _ in }
 
     @State private var interactionState: InteractionState = .receiving
     @State private var percentage: CGFloat = .zero

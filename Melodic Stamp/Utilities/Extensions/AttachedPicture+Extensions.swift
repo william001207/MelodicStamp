@@ -40,7 +40,7 @@ extension AttachedPicture {
             .colouredFish,
             .illustration,
             .bandLogo,
-            .publisherLogo,
+            .publisherLogo
         ]
     }
 }

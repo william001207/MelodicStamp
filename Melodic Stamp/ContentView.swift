@@ -110,7 +110,7 @@ struct ContentView: View {
                 floatingWindows: floatingWindows,
                 sections: [
                     .init(tabs: [.inspector, .metadata]),
-                    .init(title: .init(localized: "Lyrics"), tabs: [.lyrics]),
+                    .init(title: .init(localized: "Lyrics"), tabs: [.lyrics])
                 ],
                 isInspectorPresented: $isInspectorPresented,
                 selectedTab: $selectedTab

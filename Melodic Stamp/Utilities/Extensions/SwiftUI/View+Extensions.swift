@@ -8,7 +8,7 @@
 import SwiftUI
 
 extension View {
-    func observeAnimation<Value: VectorArithmetic>(for observedValue: Value, onChange: ((Value) -> Void)? = nil, onComplete: (() -> Void)? = nil) -> some View {
+    func observeAnimation<Value: VectorArithmetic>(for observedValue: Value, onChange: ((Value) -> ())? = nil, onComplete: (() -> ())? = nil) -> some View {
         modifier(AnimationObserverModifier(for: observedValue, onChange: onChange, onComplete: onComplete))
     }
 

@@ -80,7 +80,7 @@ struct Metadata {
         replayGainReferenceLoudness: Double? = nil,
         additional: AdditionalMetadata? = nil
     ) {
-        attachedPictures = coverImages
+        self.attachedPictures = coverImages
         self.title = title
         self.titleSortOrder = titleSortOrder
         self.artist = artist

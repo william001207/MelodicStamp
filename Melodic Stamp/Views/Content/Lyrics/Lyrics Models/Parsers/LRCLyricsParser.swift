@@ -99,7 +99,7 @@ struct LRCLyricLine: LyricLine {
     var lines: [LRCLyricLine]
 
     required init(string: String) throws {
-        lines = []
+        self.lines = []
 
         let contents = string
             .split(separator: .newlineSequence)

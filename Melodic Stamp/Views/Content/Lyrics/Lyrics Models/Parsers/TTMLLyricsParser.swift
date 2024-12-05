@@ -159,8 +159,7 @@ public class TTMLLyricsParser: NSObject, LyricsParser {
         var indices = IndexSet()
         for (index, line) in lines.enumerated() {
             if let startTime = line.beginTime as TimeInterval?,
-               let endTime = line.endTime as TimeInterval?
-            {
+               let endTime = line.endTime as TimeInterval? {
                 if time >= startTime, time <= endTime {
                     indices.insert(index)
                 }
