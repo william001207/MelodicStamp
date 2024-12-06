@@ -18,7 +18,7 @@ struct PlaylistView: View {
 
     var body: some View {
         if !player.isPlaylistEmpty {
-            AutoScrollView(.vertical) {
+            ZStack(alignment: .topLeading) {
                 LuminareList(
                     items: $player.playlist,
                     selection: $metadataEditor.items,
@@ -58,31 +58,30 @@ struct PlaylistView: View {
                             }
                         }
                     }
-                } actions: {
-                    LuminareSection(hasPadding: false) {
-                        actions()
-                    }
-                    .luminareSectionMasked(true)
-                    .luminareSectionMaxWidth(nil)
-
-                    Spacer()
                 }
-                .luminareBordered(false)
-                .luminareSectionMasked(true)
+                .luminareHasDividers(false)
+                .luminareListContentMargins(top: 64 + minHeight, bottom: 94)
                 .luminareListItemHeight(64)
                 .luminareListItemCornerRadius(12)
                 .luminareListItemHighlightOnHover(false)
-                .luminareListActionsMaterial(.ultraThin)
-                .luminareListActionsHeight(minHeight)
-                .luminareListActionsStyle(.borderless)
-                .padding(.horizontal)
-                .shadow(color: .black.opacity(0.5), radius: 32) // apply unclipped shadow to actions
-
-                Spacer()
-                    .frame(height: 150)
+                
+                HStack(spacing: 0) {
+                    LuminareSection(hasPadding: false) {
+                        actions()
+                            .luminareMinHeight(minHeight)
+                            .frame(height: minHeight)
+                    }
+                    .luminareBordered(false)
+                    .luminareButtonMaterial(.ultraThin)
+                    .luminareSectionMasked(true)
+                    .luminareSectionMaxWidth(nil)
+                    .shadow(color: .black.opacity(0.5), radius: 32)
+                    
+                    Spacer()
+                }
+                .padding(.top, 64)
             }
-            .contentMargins(.top, 64)
-            .contentMargins(.bottom, 94)
+            .padding(.horizontal)
         } else {
             PlaylistExcerpt()
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -97,7 +96,6 @@ struct PlaylistView: View {
                 Image(systemSymbol: .xmark)
                     .padding()
             }
-            .buttonStyle(LuminareButtonStyle())
             .aspectRatio(1, contentMode: .fit)
             .disabled(metadataEditor.items.isEmpty)
 
@@ -137,5 +135,6 @@ struct PlaylistView: View {
             .fixedSize(horizontal: true, vertical: false)
             .disabled(metadataEditor.items.isEmpty)
         }
+        .buttonStyle(LuminareButtonStyle())
     }
 }

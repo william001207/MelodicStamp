@@ -60,7 +60,7 @@ struct InspectorView: View {
 
                     Spacer()
                 }
-                .padding(.horizontal, 16)
+                .padding(.horizontal)
                 .safeAreaPadding(.top, 64)
                 .safeAreaPadding(.bottom, 94)
 
