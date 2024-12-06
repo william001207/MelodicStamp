@@ -60,41 +60,41 @@ struct PlaylistItemView: View {
 
             Spacer()
 
-//            AliveButton {
-//                player.play(item: item)
-//            } label: {
-//                ZStack {
-//                    if isMetadataLoaded {
-//                        let attachedPictures = item.metadata[extracting: \.attachedPictures]
-//                        if let cover = getCover(from: attachedPictures.current), let image = cover.image {
-//                            Group {
-//                                MusicCover(cornerRadius: 0, images: [image], hasPlaceholder: false, maxResolution: 32)
-//                                    .overlay {
-//                                        if isHovering {
-//                                            Rectangle()
-//                                                .foregroundStyle(.placeholder)
-//                                                .opacity(0.25)
-//                                                .blendMode(.darken)
-//                                        }
-//                                    }
-//                            }
-//                            .clipShape(.rect(cornerRadius: 6))
-//                        }
-//                    }
-//
-//                    if isHovering {
-//                        Image(systemSymbol: isMetadataLoaded ? .playFill : .playSlashFill)
-//                            .font(.title3)
-//                            .foregroundStyle(.white)
-//                            .contentTransition(.symbolEffect(.replace))
-//                    }
-//                }
-//                .frame(width: 40, height: 40)
-//            }
+            AliveButton {
+                player.play(item: item)
+            } label: {
+                ZStack {
+                    if isMetadataLoaded {
+                        let attachedPictures = item.metadata[extracting: \.attachedPictures]
+                        if let cover = getCover(from: attachedPictures.current), let image = cover.image {
+                            Group {
+                                MusicCover(cornerRadius: 0, images: [image], hasPlaceholder: false, maxResolution: 32)
+                                    .overlay {
+                                        if isHovering {
+                                            Rectangle()
+                                                .foregroundStyle(.black)
+                                                .opacity(0.25)
+                                                .blendMode(.darken)
+                                        }
+                                    }
+                            }
+                            .clipShape(.rect(cornerRadius: 8))
+                        }
+                    }
+
+                    if isHovering {
+                        Image(systemSymbol: isMetadataLoaded ? .playFill : .playSlashFill)
+                            .font(.title3)
+                            .foregroundStyle(.white)
+                            .contentTransition(.symbolEffect(.replace))
+                    }
+                }
+                .frame(width: 50, height: 50)
+            }
         }
         .padding(.vertical, 10)
         .padding(.leading, 12)
-        .padding(.trailing, 6)
+        .padding(.trailing, 8)
         .onHover { hover in
             withAnimation(.default.speed(5)) {
                 isHovering = hover

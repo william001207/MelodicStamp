@@ -20,7 +20,6 @@ struct FileToolbar: View {
                 Image(systemSymbol: .textLineLastAndArrowtriangleForward)
                 Text("In Current Playlist")
             }
-            .keyboardShortcut("o", modifiers: .command)
 
             Button {
                 fileManager.emitOpen(style: .replacingCurrentPlaylistOrSelection)
@@ -28,7 +27,6 @@ struct FileToolbar: View {
                 Image(systemSymbol: .textInsert)
                 Text("Replacing Current Playlist")
             }
-            .keyboardShortcut("o", modifiers: [.command, .shift])
 
             Divider()
 
@@ -38,7 +36,6 @@ struct FileToolbar: View {
                 Image(systemSymbol: .textBadgePlus)
                 Text("Forming New Playlist")
             }
-            .keyboardShortcut("o", modifiers: [.command, .shift, .option])
         } label: {
             ToolbarLabel {
                 Image(systemSymbol: .playFill)
@@ -52,7 +49,6 @@ struct FileToolbar: View {
                 Image(systemSymbol: .textLineLastAndArrowtriangleForward)
                 Text("To Current Playlist")
             }
-            .keyboardShortcut("p", modifiers: .command)
 
             Button {
                 fileManager.emitAdd(style: .replacingCurrentPlaylistOrSelection)
@@ -60,7 +56,6 @@ struct FileToolbar: View {
                 Image(systemSymbol: .textInsert)
                 Text("Replacing Current Playlist")
             }
-            .keyboardShortcut("p", modifiers: [.command, .shift])
 
             Divider()
 
@@ -70,7 +65,6 @@ struct FileToolbar: View {
                 Image(systemSymbol: .textBadgePlus)
                 Text("Forming New Playlist")
             }
-            .keyboardShortcut("p", modifiers: [.command, .shift, .option])
         } label: {
             ToolbarLabel {
                 Image(systemSymbol: .plus)
