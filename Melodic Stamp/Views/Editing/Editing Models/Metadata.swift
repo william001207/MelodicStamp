@@ -274,7 +274,7 @@ extension Metadata {
     func update() async throws {
         try await withCheckedThrowingContinuation { [weak self] continuation in
             guard let self else { return continuation.resume() }
-            guard url.startAccessingSecurityScopedResource() else { return }
+            guard url.startAccessingSecurityScopedResource() else { return continuation.resume() }
             defer { url.stopAccessingSecurityScopedResource() }
 
             do {
@@ -300,7 +300,7 @@ extension Metadata {
     func write() async throws {
         try await withCheckedThrowingContinuation { [weak self] continuation in
             guard let self, state.isEditable, isModified else { return continuation.resume() }
-            guard url.startAccessingSecurityScopedResource() else { return }
+            guard url.startAccessingSecurityScopedResource() else { return continuation.resume() }
             defer { self.url.stopAccessingSecurityScopedResource() }
 
             do {
