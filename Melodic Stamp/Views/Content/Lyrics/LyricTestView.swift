@@ -11,7 +11,7 @@ import SwiftSoup
 
 class TestLyricViewModel: ObservableObject {
     @Published var lyrics: [TestTtmlLyric] = []
-    @Published var rawText: String = ""  // 用于绑定 TextEditor 输入
+    @Published var rawText: String = ""
     
     func parseLyrics() async {
         // 解析粘贴的歌词文本
