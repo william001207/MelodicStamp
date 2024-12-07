@@ -102,6 +102,7 @@ struct LabeledTextField<F, Label>: View where F: ParseableFormatStyle, F.FormatO
             placeholder,
             value: entry.projectedValue, format: format
         )
+        .luminareCompactButtonAspectRatio(contentMode: .fill)
         .overlay {
             Group {
                 if entry.isModified {

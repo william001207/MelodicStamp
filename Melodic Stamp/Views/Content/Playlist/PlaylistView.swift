@@ -37,26 +37,63 @@ struct PlaylistView: View {
                             Image(systemSymbol: .play)
                         }
                         .tint(.accentColor)
-
-                        Button {
+                        
+                        Button(role: .destructive) {
                             player.removeFromPlaylist(items: [item.wrappedValue])
                         } label: {
                             Image(systemSymbol: .trash)
                         }
                         .tint(.red)
                     }
+                    .swipeActions(edge: .leading) {
+                        if item.wrappedValue.metadata.isModified {
+                            Button {
+                                Task {
+                                    try await item.wrappedValue.metadata.write()
+                                }
+                            } label: {
+                                Image(systemSymbol: .trayAndArrowDown)
+                                Text("Save Metadata")
+                            }
+                            .tint(.green)
+                        }
+                        
+                        if item.wrappedValue.metadata.isModified {
+                            Button {
+                                item.wrappedValue.metadata.restore()
+                            } label: {
+                                Image(systemSymbol: .arrowUturnLeft)
+                                Text("Restore Metadata")
+                            }
+                            .tint(.gray)
+                        }
+                    }
                     .contextMenu {
                         Button("Play") {
                             player.play(item: item.wrappedValue)
                         }
-
-                        Button("Remove") {
+                        
+                        Button("Remove from Playlist") {
                             if metadataEditor.items.isEmpty {
                                 player.removeFromPlaylist(items: [item.wrappedValue])
                             } else {
                                 player.removeFromPlaylist(items: .init(metadataEditor.items))
                             }
                         }
+                        
+                        Divider()
+                        
+                        Button("Save Metadata") {
+                            Task {
+                                try await item.wrappedValue.metadata.write()
+                            }
+                        }
+                        .disabled(!item.wrappedValue.metadata.isModified)
+                        
+                        Button("Restore Metadata") {
+                            item.wrappedValue.metadata.restore()
+                        }
+                        .disabled(!item.wrappedValue.metadata.isModified)
                     }
                 }
                 .luminareHasDividers(false)
