@@ -317,242 +317,188 @@ extension Element {
     }
 }
 
-/*
- import Foundation
- import SwiftSoup
+// MARK: - Tets TTML Parser
 
- public struct TtmlLyric : Identifiable, Equatable {
+ public struct TestTtmlLyric : Identifiable, Equatable {
      public var id = UUID()
      public var indexNum     : Int
-     public var position     : TtmlLyricPositionType
+     public var position     : TestTtmlLyricPositionType
      public var beginTime    : TimeInterval
      public var endTime      : TimeInterval
 
-     public var mainLyric    : [SubTtmlLyric]?
-     public var bgLyric      : BgTtmlLyric?
+     public var mainLyric    : [TestSubTtmlLyric]?
+     public var bgLyric      : TestBgTtmlLyric?
      public var translation  : String?
      public var roman        : String?
 
-     public static func == (lhs: TtmlLyric, rhs: TtmlLyric) -> Bool {
+     public static func == (lhs: TestTtmlLyric, rhs: TestTtmlLyric) -> Bool {
          lhs.id == rhs.id
      }
  }
 
- public struct SubTtmlLyric {
+ public struct TestSubTtmlLyric {
      public var beginTime : TimeInterval
      public var endTime   : TimeInterval
      public var text      : String
  }
 
- public struct BgTtmlLyric {
-     public var subLyric     : [SubTtmlLyric]?
+ public struct TestBgTtmlLyric {
+     public var subLyric     : [TestSubTtmlLyric]?
      public var translation  : String?
      public var roman        : String?
  }
 
- public enum TtmlLyricPositionType {
+ public enum TestTtmlLyricPositionType {
      case main
      case sub
  }
 
- public class TTMLParser: NSObject {
+ public class TestTTMLParser: NSObject {
      private var currentIndexNum: Int = 0
-     private var ttmlLyrics: [TtmlLyric] = []
-     private var currentTtmlLyric: TtmlLyric?
-     private var currentSubTtmlLyrics: [SubTtmlLyric] = []
+     private var ttmlLyrics: [TestTtmlLyric] = []
+     private var currentTtmlLyric: TestTtmlLyric?
+     private var currentSubTtmlLyrics: [TestSubTtmlLyric] = []
      private var currentTranslation: String?
      private var currentRoman: String?
-     private var currentBgLyric: BgTtmlLyric?
+     private var currentBgLyric: TestBgTtmlLyric?
      private var currentElement: String?
  }
 
- extension TTMLParser {
-     public func decodeTtml(data: Data, coderType: String.Encoding) async throws -> [TtmlLyric] {
-         guard let htmlString = String(data: data, encoding: coderType) else { throw NSError() }
-         return try await decodeTtml(htmlString: htmlString)
-     }
+extension TestTTMLParser {
+    public func decodeTtml(data: Data, coderType: String.Encoding) async throws -> [TestTtmlLyric] {
+        guard let htmlString = String(data: data, encoding: coderType) else { throw NSError() }
+        return try await decodeTtml(htmlString: htmlString)
+    }
+}
 
-     public func decodeTtml(htmlString: String) async throws -> [TtmlLyric] {
-         guard let doc = try? SwiftSoup.parse(htmlString) else { throw NSError() }
-         guard let body = doc.body() else { throw NSError() }
+extension TestTTMLParser {
+    public func decodeTtml(htmlString: String) async throws -> [TestTtmlLyric] {
+        guard let doc = try? SwiftSoup.parse(htmlString) else { throw NSError() }
+        guard let body = doc.body() else { throw NSError() }
 
-         var ttmlLyrics: [TtmlLyric] = []
+        var ttmlLyrics: [TestTtmlLyric] = []
 
-         do {
-             let pElements = try body.getElementsByTag("p")
-             for (index, pElement) in pElements.enumerated() {
-                 let beginTime = try pElement.attr("begin")
-                 let endTime = try pElement.attr("end")
-                 let ttmAgent = try pElement.attr("ttm:agent")
-                 let itunesKey = try pElement.attr("itunes:key")
+        do {
+            let pElements = try body.getElementsByTag("p")
+            for (index, pElement) in pElements.enumerated() {
+                let beginTime = try pElement.attr("begin")
+                let endTime = try pElement.attr("end")
+                let ttmAgent = try pElement.attr("ttm:agent")
+                let itunesKey = try pElement.attr("itunes:key")
 
-                 if !ttmAgent.isEmpty || !itunesKey.isEmpty {
-                     var currentTtmlLyric = TtmlLyric(
-                         indexNum: index,
-                         position: getPositionFromAgent(ttmAgent),
-                         beginTime: beginTime.toTimeInterval(),
-                         endTime: endTime.toTimeInterval(),
-                         mainLyric: [],
-                         bgLyric: nil,
-                         translation: nil,
-                         roman: nil
-                     )
+                if !ttmAgent.isEmpty || !itunesKey.isEmpty {
+                    var currentTtmlLyric = TestTtmlLyric(
+                        indexNum: index,
+                        position: getPositionFromAgent(ttmAgent),
+                        beginTime: beginTime.toTimeInterval(),
+                        endTime: endTime.toTimeInterval(),
+                        mainLyric: [],
+                        bgLyric: nil,
+                        translation: nil,
+                        roman: nil
+                    )
 
-                     var currentSubTtmlLyrics: [SubTtmlLyric] = []
-                     var currentTranslation: String?
-                     var currentRoman: String?
-                     var currentBgLyric: BgTtmlLyric?
-                     var bgSubLyricsElements: [Element] = []
-                     var bgSubTtmlLyricList: [SubTtmlLyric] = []
+                    var currentSubTtmlLyrics: [TestSubTtmlLyric] = []
+                    var currentTranslation: String?
+                    var currentRoman: String?
+                    var currentBgLyric: TestBgTtmlLyric?
+                    var bgSubTtmlLyricList: [TestSubTtmlLyric] = []
 
-                     let childNodes = try pElement.getChildNodes()
-                     for node in childNodes {
-                         if let textNode = node as? TextNode {
-                             let text = textNode.text()
-                             if let lastLyric = currentSubTtmlLyrics.last {
-                                 currentSubTtmlLyrics[currentSubTtmlLyrics.count - 1].text += text
-                             } else {
-                                 let spaceLyric = SubTtmlLyric(beginTime: 0, endTime: 0, text: text)
-                                 currentSubTtmlLyrics.append(spaceLyric)
-                             }
-                         } else if let spanElement = node as? Element, spanElement.tagName() == "span" {
-                             let role = try spanElement.attr("ttm:role")
-                             var text: String
+                    let childNodes = try pElement.getChildNodes()
+                    for node in childNodes {
+                        if let textNode = node as? TextNode {
+                            let text = textNode.text()
+                            if let lastLyric = currentSubTtmlLyrics.last {
+                                currentSubTtmlLyrics[currentSubTtmlLyrics.count - 1].text += text
+                            } else {
+                                let spaceLyric = TestSubTtmlLyric(beginTime: 0, endTime: 0, text: text)
+                                currentSubTtmlLyrics.append(spaceLyric)
+                            }
+                        } else if let spanElement = node as? Element, spanElement.tagName() == "span" {
+                            let role = try spanElement.attr("ttm:role")
+                            var text: String
 
-                             if role == "x-translation" {
-                                 text = try spanElement.getPreservedText().normalizeSpaces()
-                                 currentTranslation = text
-                             } else if role == "x-roman" {
-                                 text = try spanElement.getPreservedText().normalizeSpaces()
-                                 currentRoman = text
-                             } else if role == "x-bg" {
-                                 currentBgLyric = BgTtmlLyric(subLyric: [], translation: nil, roman: nil)
-                                 let bgSpanElements = try spanElement.getElementsByTag("span")
-                                 for bgSpanElement in bgSpanElements {
-                                     let bgBeginTime = try bgSpanElement.attr("begin")
-                                     let bgEndTime = try bgSpanElement.attr("end")
-                                     let bgSpanElementRole = try bgSpanElement.attr("ttm:role")
-                                     var bgSpanElementText = try bgSpanElement.getPreservedText().normalizeSpaces()
+                            if role == "x-translation" {
+                                text = try spanElement.getPreservedText().normalizeSpaces()
+                                currentTranslation = text
+                            } else if role == "x-roman" {
+                                text = try spanElement.getPreservedText().normalizeSpaces()
+                                currentRoman = text
+                            } else if role == "x-bg" {
+                                // 处理背景歌词
+                                if currentBgLyric == nil {
+                                    currentBgLyric = TestBgTtmlLyric(subLyric: [], translation: nil, roman: nil)
+                                }
+                                
+                                let bgSpanElements = spanElement.children()
+                                for bgSpanElement in bgSpanElements {
+                                    let bgRole = try bgSpanElement.attr("ttm:role")
+                                    var bgSpanText = try bgSpanElement.getPreservedText()
+                                    bgSpanText = bgSpanText.replacingOccurrences(of: "[()]", with: "", options: .regularExpression)
+                                    
+                                    if bgRole == "x-translation" {
+                                        currentBgLyric?.translation = bgSpanText
+                                    } else if bgRole == "x-roman" {
+                                        currentBgLyric?.roman = bgSpanText
+                                    } else if bgSpanElement.hasAttr("begin") {
+                                        let bgBeginTime = try bgSpanElement.attr("begin").toTimeInterval()
+                                        let bgEndTime = try bgSpanElement.attr("end").toTimeInterval()
+                                        let bgSubTtmlLyric = TestSubTtmlLyric(
+                                            beginTime: bgBeginTime,
+                                            endTime: bgEndTime,
+                                            text: bgSpanText.normalizeSpaces()
+                                        )
+                                        bgSubTtmlLyricList.append(bgSubTtmlLyric)
+                                    }
+                                }
+                                currentBgLyric?.subLyric = bgSubTtmlLyricList.isEmpty ? nil : bgSubTtmlLyricList
+                                // 跳过x-bg标签的子内容，避免重复处理
+                                continue
+                            } else {
+                                // 处理主歌词的子歌词
+                                let subLyricBeginTime = try spanElement.attr("begin")
+                                let subLyricEndTime = try spanElement.attr("end")
+                                let subTtmlLyric = TestSubTtmlLyric(
+                                    beginTime: subLyricBeginTime.toTimeInterval(),
+                                    endTime: subLyricEndTime.toTimeInterval(),
+                                    text: try spanElement.getPreservedText().normalizeSpaces()
+                                )
+                                currentSubTtmlLyrics.append(subTtmlLyric)
+                            }
+                        }
+                    }
+                    
+                    currentTtmlLyric.mainLyric = currentSubTtmlLyrics
+                    currentTtmlLyric.bgLyric = currentBgLyric
+                    currentTtmlLyric.translation = currentTranslation
+                    currentTtmlLyric.roman = currentRoman
+                    
+                    // 避免翻译重复，如果 bgLyric.translation 和 mainLyric.translation 相同，则将 mainLyric.translation 设为 nil
+                    if let bgTranslation = currentTtmlLyric.bgLyric?.translation,
+                       let mainTranslation = currentTtmlLyric.translation,
+                       bgTranslation == mainTranslation {
+                        currentTtmlLyric.translation = nil
+                    }
+                    
+                    ttmlLyrics.append(currentTtmlLyric)
+                }
+            }
+        } catch {
+            throw error
+        }
 
-                                     bgSpanElementText = bgSpanElementText.replacingOccurrences(of: "[()]", with: "", options: .regularExpression)
+        if ttmlLyrics.isEmpty { throw NSError() }
+        return ttmlLyrics
+    }
+}
 
-                                     if bgSpanElementRole == "x-translation" {
-                                         currentBgLyric?.translation = bgSpanElementText
-                                     } else if bgSpanElementRole == "x-roman" {
-                                         currentBgLyric?.roman = bgSpanElementText
-                                     } else if bgSpanElement.hasAttr("begin") {
-                                         let bgSubTtmlLyric = SubTtmlLyric(
-                                             beginTime: bgBeginTime.toTimeInterval(),
-                                             endTime: bgEndTime.toTimeInterval(),
-                                             text: bgSpanElementText
-                                         )
-                                         bgSubTtmlLyricList.append(bgSubTtmlLyric)
-                                     }
-                                     bgSubLyricsElements.append(bgSpanElement)
-                                 }
-                                 currentBgLyric?.subLyric = bgSubTtmlLyricList.isEmpty ? nil : bgSubTtmlLyricList
-                             } else {
-                                 if bgSubLyricsElements.contains(spanElement) { continue }
-                                 let subLyricBeginTime = try spanElement.attr("begin")
-                                 let subLyricEndTime = try spanElement.attr("end")
-                                 let subTtmlLyric = SubTtmlLyric(
-                                     beginTime: subLyricBeginTime.toTimeInterval(),
-                                     endTime: subLyricEndTime.toTimeInterval(),
-                                     text: try spanElement.getPreservedText().normalizeSpaces()
-                                 )
-                                 currentSubTtmlLyrics.append(subTtmlLyric)
-                             }
-                         }
-                     }
 
-                     currentTtmlLyric.mainLyric = currentSubTtmlLyrics
-                     currentTtmlLyric.bgLyric = currentBgLyric
-                     currentTtmlLyric.translation = currentTranslation
-                     currentTtmlLyric.roman = currentRoman
 
-                     ttmlLyrics.append(currentTtmlLyric)
-                 }
-             }
-         } catch {
-             throw error
-         }
-
-         if ttmlLyrics.isEmpty { throw NSError() }
-         return ttmlLyrics
-     }
- }
-
- extension Element {
-     func getPreservedText() throws -> String {
-         var result = ""
-         for node in self.getChildNodes() {
-             if let textNode = node as? TextNode {
-                 result += textNode.text()
-                 if textNode.text().hasSuffix(" ") {
-                     result += " "
-                 }
-             } else if let element = node as? Element {
-                 result += try element.getPreservedText()
-             }
-         }
-         return result
-     }
- }
-
- extension TTMLParser {
-     private func getPositionFromAgent(_ agent: String) -> TtmlLyricPositionType {
+ extension TestTTMLParser {
+     private func getPositionFromAgent(_ agent: String) -> TestTtmlLyricPositionType {
          if agent == "v1" { return .main }
          return .sub
      }
- }
-
- // MARK: Extension
- extension String {
-     func toTimeInterval() -> TimeInterval {
-         let pattern = #"(\d+):(\d+)\.(\d+)"#
-         let regex = try! NSRegularExpression(pattern: pattern)
-         let matches = regex.matches(in: self, range: NSRange(self.startIndex..., in: self))
-
-         guard let match = matches.first,
-               match.numberOfRanges == 4,
-               let minutesRange = Range(match.range(at: 1), in: self),
-               let secondsRange = Range(match.range(at: 2), in: self),
-               let millisecondsRange = Range(match.range(at: 3), in: self),
-               let minutes = Double(self[minutesRange]),
-               let seconds = Double(self[secondsRange]),
-               let milliseconds = Double(self[millisecondsRange]) else {
-             return TimeInterval(0)
-         }
-
-         let totalMilliseconds = (minutes * 60 + seconds) * 1000 + milliseconds
-         let timeInterval = totalMilliseconds / 1000
-
-         return timeInterval
-     }
- }
-
- extension String {
-     func normalizeSpaces() -> String {
-         return self.replacingOccurrences(of: "\u{00A0}", with: " ")
-                    .replacingOccurrences(of: "\u{2000}", with: " ")
-                    .replacingOccurrences(of: "\u{2001}", with: " ")
-                    .replacingOccurrences(of: "\u{2002}", with: " ")
-                    .replacingOccurrences(of: "\u{2003}", with: " ")
-                    .replacingOccurrences(of: "\u{2004}", with: " ")
-                    .replacingOccurrences(of: "\u{2005}", with: " ")
-                    .replacingOccurrences(of: "\u{2006}", with: " ")
-                    .replacingOccurrences(of: "\u{2007}", with: " ")
-                    .replacingOccurrences(of: "\u{2008}", with: " ")
-                    .replacingOccurrences(of: "\u{2009}", with: " ")
-                    .replacingOccurrences(of: "\u{200A}", with: " ")
-     }
- }
-
- extension String.Encoding {
-     public static let gbk: String.Encoding = {
-         let gbkEncoding = CFStringConvertEncodingToNSStringEncoding(CFStringEncoding(CFStringEncodings.GB_18030_2000.rawValue))
-         return String.Encoding(rawValue: gbkEncoding)
-     }()
  }
 
  func loadGBKFile(fileURL: URL) -> String? {
@@ -568,4 +514,3 @@ extension Element {
      return nil
  }
 
- */
