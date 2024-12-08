@@ -56,7 +56,7 @@ struct ContentView: View {
                 MiniPlayer(player: player, playerKeyboardControl: playerKeyboardControl, namespace: namespace)
                     .padding(8)
                     .background {
-                        VisualEffectView(material: .headerView, blendingMode: .behindWindow)
+                        VisualEffectView(material: .hudWindow, blendingMode: .behindWindow)
                     }
                     .padding(.bottom, -32)
                     .ignoresSafeArea()
