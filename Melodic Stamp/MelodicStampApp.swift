@@ -37,6 +37,8 @@ struct MelodicStampApp: App {
             FileCommands()
 
             EditingCommands()
+            
+            PlayerCommands()
         }
 
         Window("About \(Bundle.main.displayName)", id: "about") {

@@ -12,12 +12,13 @@ struct FloatingPlayerView: View {
 
     @Bindable var floatingWindows: FloatingWindowsModel
     @Bindable var player: PlayerModel
+    @Bindable var playerKeyboardControl: PlayerKeyboardControlModel
 
     var body: some View {
         ZStack {
             VisualEffectView(material: .popover, blendingMode: .behindWindow)
 
-            Player(player: player, namespace: namespace)
+            Player(player: player, playerKeyboardControl: playerKeyboardControl, namespace: namespace)
         }
         .frame(width: 800, height: 100)
         .clipShape(.rect(cornerRadius: 25))

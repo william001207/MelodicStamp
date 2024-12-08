@@ -12,20 +12,15 @@ struct Player: View {
     @Environment(\.changeMelodicStampWindowStyle) private var changeWindowStyle
 
     @Bindable var player: PlayerModel
+    @Bindable var playerKeyboardControl: PlayerKeyboardControlModel
 
     var namespace: Namespace.ID
 
     @State private var isProgressBarActive: Bool = false
     @State private var isVolumeBarActive: Bool = false
-    @State private var isPressingSpace: Bool = false
 
     @State private var adjustmentPercentage: CGFloat = .zero
     @State private var shouldUseRemainingDuration: Bool = false
-    @State private var progressBarExternalOvershootSign: FloatingPointSign?
-
-    @State private var previousSongButtonBounceAnimation: Bool = false
-    @State private var nextSongButtonBounceAnimation: Bool = false
-    @State private var speakerButtonBounceAnimation: Bool = false
 
     var body: some View {
         VStack(alignment: .center, spacing: 12) {
@@ -56,91 +51,24 @@ struct Player: View {
         .padding(.horizontal, 32)
         .padding(.vertical, 24)
         .frame(maxWidth: .infinity)
-        .focusable()
-        .focusEffectDisabled()
-        // handle space down/up -> toggle play pause
-        .onKeyPress(keys: [.space], phases: .all) { key in
-            guard player.hasCurrentTrack else { return .ignored }
-
-            switch key.phase {
-            case .down:
-                guard !isPressingSpace else { return .ignored }
-
-                player.togglePlayPause()
-                isPressingSpace = true
-                return .handled
-            case .up:
-                isPressingSpace = false
-                return .handled
-            default:
-                return .ignored
-            }
-        }
-
-        // handle left arrow/right arrow down/repeat/up -> adjust progress and navigate track
-        .onKeyPress(keys: [.leftArrow, .rightArrow], phases: .all) { key in
-            switch key.phase {
-            case .down, .repeat:
-                guard player.hasCurrentTrack else { return .ignored }
-
-                let sign: FloatingPointSign = key.key == .leftArrow ? .minus : .plus
-                let modifiers = key.modifiers
-
-                if modifiers.contains(.command) {
-                    switch sign {
-                    case .plus:
-                        player.nextTrack()
-                        nextSongButtonBounceAnimation.toggle()
-                    case .minus:
-                        player.previousTrack()
-                        previousSongButtonBounceAnimation.toggle()
-                    }
-
-                    return .handled
-                }
-
-                let hasShift = modifiers.contains(.shift)
-                let hasOption = modifiers.contains(.option)
-                let multiplier: CGFloat = if hasShift, !hasOption {
-                    5
-                } else if hasOption, !hasShift {
-                    0.1
-                } else { 1 }
-
-                let inRange = player.adjustTime(multiplier: multiplier, sign: sign)
-
-                if !inRange {
-                    progressBarExternalOvershootSign = sign
-                }
-
-                return .handled
-            case .up:
-                progressBarExternalOvershootSign = nil
-                return .ignored
-            default:
-                return .ignored
-            }
-        }
-
-        // handle m -> toggle mute
-        .onKeyPress(keys: ["m"], phases: .down) { _ in
-            player.isMuted.toggle()
-            return .handled
-        }
     }
 
     @ViewBuilder private func header() -> some View {
         HStack(alignment: .center, spacing: 12) {
-            AliveButton(enabledStyle: .init(.tertiary), hoveringStyle: .init(.secondary)) {
+            AliveButton(
+                enabledStyle: .init(.tertiary), hoveringStyle: .init(.secondary)
+            ) {
                 let hasShift = NSEvent.modifierFlags.contains(.shift)
-                player.playbackMode = player.playbackMode.cycle(negate: hasShift)
+                player.playbackMode = player.playbackMode.cycle(
+                    negate: hasShift)
             } label: {
                 player.playbackMode.image
                     .font(.headline)
                     .contentTransition(.symbolEffect(.replace))
                     .frame(width: 20)
             }
-            .matchedGeometryEffect(id: PlayerNamespace.playbackModeButton, in: namespace)
+            .matchedGeometryEffect(
+                id: PlayerNamespace.playbackModeButton, in: namespace)
 
             Spacer()
 
@@ -153,14 +81,17 @@ struct Player: View {
 
             Spacer()
 
-            AliveButton(enabledStyle: .init(.tertiary), hoveringStyle: .init(.secondary)) {
+            AliveButton(
+                enabledStyle: .init(.tertiary), hoveringStyle: .init(.secondary)
+            ) {
                 changeWindowStyle(.miniPlayer)
             } label: {
                 Image(systemSymbol: .arrowDownRightAndArrowUpLeft)
                     .font(.headline)
                     .frame(width: 20)
             }
-            .matchedGeometryEffect(id: PlayerNamespace.expandShrinkButton, in: namespace)
+            .matchedGeometryEffect(
+                id: PlayerNamespace.expandShrinkButton, in: namespace)
         }
     }
 
@@ -168,51 +99,70 @@ struct Player: View {
         Group {
             AliveButton(enabledStyle: .init(.secondary)) {
                 player.previousTrack()
-                previousSongButtonBounceAnimation.toggle()
+                playerKeyboardControl.previousSongButtonBounceAnimation.toggle()
             } label: {
                 Image(systemSymbol: .backwardFill)
                     .font(.headline)
             }
             .disabled(!player.hasPreviousTrack)
-            .symbolEffect(.bounce, value: previousSongButtonBounceAnimation)
-            .matchedGeometryEffect(id: PlayerNamespace.previousSongButton, in: namespace)
+            .symbolEffect(
+                .bounce,
+                value: playerKeyboardControl.previousSongButtonBounceAnimation
+            )
+            .matchedGeometryEffect(
+                id: PlayerNamespace.previousSongButton, in: namespace)
 
             AliveButton {
                 player.togglePlayPause()
-                isPressingSpace = false
+                playerKeyboardControl.isPressingSpace = false
             } label: {
                 player.playPauseImage
                     .font(.title)
                     .contentTransition(.symbolEffect(.replace.upUp))
                     .frame(width: 20)
             }
-            .scaleEffect(isPressingSpace ? 0.75 : 1, anchor: .center)
-            .animation(.bouncy, value: isPressingSpace)
-            .matchedGeometryEffect(id: PlayerNamespace.playPauseButton, in: namespace)
+            .scaleEffect(
+                playerKeyboardControl.isPressingSpace ? 0.75 : 1,
+                anchor: .center
+            )
+            .animation(.bouncy, value: playerKeyboardControl.isPressingSpace)
+            .matchedGeometryEffect(
+                id: PlayerNamespace.playPauseButton, in: namespace)
 
             AliveButton(enabledStyle: .init(.secondary)) {
                 player.nextTrack()
-                nextSongButtonBounceAnimation.toggle()
+                playerKeyboardControl.nextSongButtonBounceAnimation.toggle()
             } label: {
                 Image(systemSymbol: .forwardFill)
                     .font(.headline)
             }
             .disabled(!player.hasNextTrack)
-            .symbolEffect(.bounce, value: nextSongButtonBounceAnimation)
-            .matchedGeometryEffect(id: PlayerNamespace.nextSongButton, in: namespace)
+            .symbolEffect(
+                .bounce,
+                value: playerKeyboardControl.nextSongButtonBounceAnimation
+            )
+            .matchedGeometryEffect(
+                id: PlayerNamespace.nextSongButton, in: namespace)
         }
         .disabled(!player.hasCurrentTrack)
     }
 
     @ViewBuilder private func trailingControls() -> some View {
-        ProgressBar(value: $player.volume, isActive: $isVolumeBarActive, isDelegated: true) { _, newValue in
+        ProgressBar(
+            value: $player.volume,
+            isActive: $isVolumeBarActive,
+            isDelegated: true
+        ) { _, newValue in
             adjustmentPercentage = newValue
         } onOvershootOffsetChange: { oldValue, newValue in
             if oldValue <= 0, newValue > 0 {
-                speakerButtonBounceAnimation.toggle()
+                playerKeyboardControl.speakerButtonBounceAnimation.toggle()
             }
         }
-        .foregroundStyle(isVolumeBarActive ? .primary : player.isMuted ? .quaternary : .secondary)
+        .foregroundStyle(
+            isVolumeBarActive
+                ? .primary : player.isMuted ? .quaternary : .secondary
+        )
         .backgroundStyle(.quinary)
         .frame(width: 72, height: 12)
         .animation(.default.speed(2), value: player.isMuted)
@@ -226,26 +176,30 @@ struct Player: View {
                 .contentTransition(.symbolEffect(.replace))
                 .frame(width: 16)
         }
-        .symbolEffect(.bounce, value: speakerButtonBounceAnimation)
+        .symbolEffect(
+            .bounce, value: playerKeyboardControl.speakerButtonBounceAnimation
+        )
         .matchedGeometryEffect(id: PlayerNamespace.volumeButton, in: namespace)
     }
 
     @ViewBuilder private func progressBar() -> some View {
-        let time: TimeInterval = if isProgressBarActive {
-            // use adjustment time
-            if shouldUseRemainingDuration {
-                player.duration.toTimeInterval() * (1 - adjustmentPercentage)
+        let time: TimeInterval =
+            if isProgressBarActive {
+                // use adjustment time
+                if shouldUseRemainingDuration {
+                    player.duration.toTimeInterval()
+                        * (1 - adjustmentPercentage)
+                } else {
+                    player.duration.toTimeInterval() * adjustmentPercentage
+                }
             } else {
-                player.duration.toTimeInterval() * adjustmentPercentage
+                // use track time
+                if shouldUseRemainingDuration {
+                    player.timeRemaining
+                } else {
+                    player.timeElapsed
+                }
             }
-        } else {
-            // use track time
-            if shouldUseRemainingDuration {
-                player.timeRemaining
-            } else {
-                player.timeElapsed
-            }
-        }
 
         DurationText(
             duration: .seconds(time),
@@ -258,16 +212,22 @@ struct Player: View {
         }
         .matchedGeometryEffect(id: PlayerNamespace.timeText, in: namespace)
 
-        ProgressBar(value: $player.progress, isActive: $isProgressBarActive, externalOvershootSign: progressBarExternalOvershootSign)
-            .foregroundStyle(isProgressBarActive ? .primary : .secondary)
-            .backgroundStyle(.quinary)
-            .frame(height: 12)
-            .matchedGeometryEffect(id: PlayerNamespace.progressBar, in: namespace)
-            .padding(.horizontal, isProgressBarActive ? 0 : 12)
+        ProgressBar(
+            value: $player.progress,
+            isActive: $isProgressBarActive,
+            externalOvershootSign: playerKeyboardControl
+                .progressBarExternalOvershootSign
+        )
+        .foregroundStyle(isProgressBarActive ? .primary : .secondary)
+        .backgroundStyle(.quinary)
+        .frame(height: 12)
+        .matchedGeometryEffect(id: PlayerNamespace.progressBar, in: namespace)
+        .padding(.horizontal, isProgressBarActive ? 0 : 12)
 
         DurationText(duration: player.duration)
             .frame(width: 40)
             .foregroundStyle(.secondary)
-            .matchedGeometryEffect(id: PlayerNamespace.durationText, in: namespace)
+            .matchedGeometryEffect(
+                id: PlayerNamespace.durationText, in: namespace)
     }
 }

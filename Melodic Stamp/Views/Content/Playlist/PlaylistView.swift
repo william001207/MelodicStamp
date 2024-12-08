@@ -141,21 +141,8 @@ struct PlaylistView: View {
                 player.playbackMode = player.playbackMode.cycle(
                     negate: hasShift)
             } label: {
-                HStack {
-                    player.playbackMode.image
-
-                    switch player.playbackMode {
-                    case .single:
-                        Text("Single Loop")
-                    case .sequential:
-                        Text("Sequential")
-                    case .loop:
-                        Text("Sequential Loop")
-                    case .shuffle:
-                        Text("Shuffle")
-                    }
-                }
-                .padding()
+                PlaybackModeView(mode: player.playbackMode)
+                    .padding()
             }
             .fixedSize(horizontal: true, vertical: false)
 

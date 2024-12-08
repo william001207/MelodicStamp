@@ -28,6 +28,7 @@ struct ContentView: View {
     @State private var floatingWindows: FloatingWindowsModel = .init()
     @State private var fileManager: FileManagerModel = .init()
     @State private var player: PlayerModel = .init()
+    @State private var playerKeyboardControl: PlayerKeyboardControlModel = .init()
 
     @State private var windowStyle: MelodicStampWindowStyle = .main
     @State private var widthRestriction: CGFloat?
@@ -46,7 +47,7 @@ struct ContentView: View {
                     .frame(minHeight: 600)
                     .ignoresSafeArea()
             case .miniPlayer:
-                MiniPlayer(player: player, namespace: namespace)
+                MiniPlayer(player: player, playerKeyboardControl: playerKeyboardControl, namespace: namespace)
                     .padding(8)
                     .background {
                         VisualEffectView(material: .popover, blendingMode: .behindWindow)
@@ -102,6 +103,8 @@ struct ContentView: View {
         .focusable()
         .focusEffectDisabled()
         .focusedValue(\.fileManager, fileManager)
+        .focusedValue(\.player, player)
+        .focusedValue(\.playerKeyboardControl, playerKeyboardControl)
     }
 
     private func initializeFloatingWindows() {
@@ -119,7 +122,8 @@ struct ContentView: View {
         floatingWindows.addPlayer {
             FloatingPlayerView(
                 floatingWindows: floatingWindows,
-                player: player
+                player: player,
+                playerKeyboardControl: playerKeyboardControl
             )
             .environment(\.melodicStampWindowStyle, windowStyle)
             .environment(\.changeMelodicStampWindowStyle) { newValue in
