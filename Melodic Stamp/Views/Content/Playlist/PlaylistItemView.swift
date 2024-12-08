@@ -79,17 +79,22 @@ struct PlaylistItemView: View {
                                     }
                             }
                             .clipShape(.rect(cornerRadius: 8))
+                            
+                            if isHovering {
+                                Image(systemSymbol: isMetadataLoaded ? .playFill : .playSlashFill)
+                                    .foregroundStyle(.white)
+                            }
+                        } else {
+                            if isHovering {
+                                Image(systemSymbol: isMetadataLoaded ? .playFill : .playSlashFill)
+                                    .foregroundStyle(.primary)
+                            }
                         }
-                    }
-
-                    if isHovering {
-                        Image(systemSymbol: isMetadataLoaded ? .playFill : .playSlashFill)
-                            .font(.title3)
-                            .foregroundStyle(.white)
-                            .contentTransition(.symbolEffect(.replace))
                     }
                 }
                 .frame(width: 50, height: 50)
+                .font(.title3)
+                .contentTransition(.symbolEffect(.replace))
             }
         }
         .padding(.vertical, 10)

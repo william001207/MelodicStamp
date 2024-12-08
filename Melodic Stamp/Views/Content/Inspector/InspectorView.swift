@@ -89,7 +89,7 @@ struct InspectorView: View {
                     let availableTypes = Set(AttachedPicture.allTypes)
                         .subtracting(types)
 
-                    Button {
+                    Button(role: .destructive) {
                         attachedPicturesHandler.remove(state: state)
                     } label: {
                         HStack {
@@ -98,7 +98,7 @@ struct InspectorView: View {
                         }
                         .padding()
                     }
-                    .buttonStyle(LuminareDestructiveButtonStyle())
+                    .buttonStyle(.luminareProminent)
                     .fixedSize(horizontal: true, vertical: false)
                     .disabled(types.isEmpty)
 
@@ -127,7 +127,6 @@ struct InspectorView: View {
                         Image(systemSymbol: .plus)
                             .padding()
                     }
-                    .buttonStyle(LuminareProminentButtonStyle())
                     .aspectRatio(1, contentMode: .fit)
                     .disabled(availableTypes.isEmpty)
                     .fileImporter(
@@ -154,6 +153,7 @@ struct InspectorView: View {
                         }
                     }
                 }
+                .buttonStyle(.luminare)
                 .luminareMinHeight(minHeight)
                 .frame(height: minHeight)
             }
@@ -161,7 +161,7 @@ struct InspectorView: View {
             .luminareButtonMaterial(.ultraThin)
             .luminareSectionMasked(true)
             .luminareSectionMaxWidth(nil)
-            .shadow(color: .black.opacity(0.5), radius: 32)
+            .shadow(color: .black.opacity(0.25), radius: 32)
         }
     }
 
