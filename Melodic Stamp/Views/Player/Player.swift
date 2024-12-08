@@ -9,8 +9,7 @@ import SFSafeSymbols
 import SwiftUI
 
 struct Player: View {
-    @Environment(\.changeMelodicStampWindowStyle) private var changeWindowStyle
-
+    @Bindable var windowManager: WindowManagerModel
     @Bindable var player: PlayerModel
     @Bindable var playerKeyboardControl: PlayerKeyboardControlModel
 
@@ -84,7 +83,7 @@ struct Player: View {
             AliveButton(
                 enabledStyle: .init(.tertiary), hoveringStyle: .init(.secondary)
             ) {
-                changeWindowStyle(.miniPlayer)
+                windowManager.style = .miniPlayer
             } label: {
                 Image(systemSymbol: .arrowDownRightAndArrowUpLeft)
                     .font(.headline)

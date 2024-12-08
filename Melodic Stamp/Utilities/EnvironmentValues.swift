@@ -8,6 +8,4 @@
 import SwiftUI
 
 extension EnvironmentValues {
-    @Entry var melodicStampWindowStyle: MelodicStampWindowStyle = .main
-    @Entry var changeMelodicStampWindowStyle: (MelodicStampWindowStyle) -> () = { _ in }
 }

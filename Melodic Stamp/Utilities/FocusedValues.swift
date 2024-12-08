@@ -8,6 +8,7 @@
 import SwiftUI
 
 extension FocusedValues {
+    @Entry var windowManager: WindowManagerModel?
     @Entry var fileManager: FileManagerModel?
     @Entry var player: PlayerModel?
     @Entry var playerKeyboardControl: PlayerKeyboardControlModel?

@@ -26,8 +26,7 @@ struct MiniPlayer: View {
         case lyrics
     }
 
-    @Environment(\.changeMelodicStampWindowStyle) private var changeWindowStyle
-
+    @Bindable var windowManager: WindowManagerModel
     @Bindable var player: PlayerModel
     @Bindable var playerKeyboardControl: PlayerKeyboardControlModel
 
@@ -177,7 +176,7 @@ struct MiniPlayer: View {
             AliveButton(
                 enabledStyle: .init(.tertiary), hoveringStyle: .init(.secondary)
             ) {
-                changeWindowStyle(.main)
+                windowManager.style = .main
             } label: {
                 Image(systemSymbol: .arrowUpLeftAndArrowDownRight)
             }
@@ -400,6 +399,5 @@ struct MiniPlayer: View {
 #Preview {
     @Previewable @Namespace var namespace
 
-    MiniPlayer(
-        player: .init(), playerKeyboardControl: .init(), namespace: namespace)
+    MiniPlayer(windowManager: .init(), player: .init(), playerKeyboardControl: .init(), namespace: namespace)
 }
