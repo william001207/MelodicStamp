@@ -108,7 +108,6 @@ struct MainView: View {
             }
         }
         .ignoresSafeArea()
-        
         .morphed()
         .ignoresSafeArea()
     }

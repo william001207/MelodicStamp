@@ -282,7 +282,7 @@ extension Metadata {
                 properties = file.properties
                 load(from: file.metadata)
                 state = .fine
-                
+
                 switch state {
                 case .loading:
                     print("Loaded metadata from \(url)")

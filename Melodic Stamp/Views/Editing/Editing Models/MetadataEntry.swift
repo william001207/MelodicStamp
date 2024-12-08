@@ -106,7 +106,8 @@ final class MetadataBatchEditingEntry<V: Hashable & Equatable>: Identifiable {
             },
             set: { newValue in
                 self.current = newValue
-            })
+            }
+        )
     }
 
     var isModified: Bool {

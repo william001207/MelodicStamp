@@ -11,8 +11,7 @@ import SwiftSoup
 
 public struct TTMLLyricTag: Hashable, Identifiable, Equatable {
     public enum LyricTagType: String, Hashable, Identifiable, Equatable,
-        CaseIterable
-    {
+        CaseIterable {
         case begin
         case end
         case agent = "ttm:agent"
@@ -164,8 +163,7 @@ public class TTMLLyricsParser: NSObject, LyricsParser {
         var indices = IndexSet()
         for (index, line) in lines.enumerated() {
             if let startTime = line.beginTime as TimeInterval?,
-                let endTime = line.endTime as TimeInterval?
-            {
+               let endTime = line.endTime as TimeInterval? {
                 if time >= startTime, time <= endTime {
                     indices.insert(index)
                 }
@@ -206,15 +204,14 @@ public class TTMLLyricsParser: NSObject, LyricsParser {
 
             let possibleAttributes = [
                 "begin", "end", "ttm:agent", "itunes:key", "ttm:translation",
-                "ttm:roman",
+                "ttm:roman"
             ]
 
             for attribute in possibleAttributes {
                 if pElement.hasAttr(attribute) {
                     let value = try pElement.attr(attribute)
                     if let tagType = TTMLLyricTag.LyricTagType(
-                        rawValue: attribute)
-                    {
+                        rawValue: attribute) {
                         let tag = TTMLLyricTag(type: tagType, content: value)
                         tags.append(tag)
                     }
@@ -230,12 +227,12 @@ public class TTMLLyricsParser: NSObject, LyricsParser {
                         in: .whitespacesAndNewlines)
                     if !text.isEmpty {
                         let subLyric = TTMLSubLyric(
-                            beginTime: beginTime, endTime: endTime, text: text)
+                            beginTime: beginTime, endTime: endTime, text: text
+                        )
                         lyricLine.mainLyric?.append(subLyric)
                     }
                 } else if let spanElement = node as? Element,
-                    spanElement.tagName() == "span"
-                {
+                          spanElement.tagName() == "span" {
                     let role = try spanElement.attr("ttm:role")
                     let text = try spanElement.getPreservedText()
                         .normalizeSpaces()
@@ -244,22 +241,21 @@ public class TTMLLyricsParser: NSObject, LyricsParser {
                     case "x-translation":
                         lyricLine.translation = text
                         if let tagType = TTMLLyricTag.LyricTagType(
-                            rawValue: "ttm:translation")
-                        {
+                            rawValue: "ttm:translation") {
                             let tag = TTMLLyricTag(type: tagType, content: text)
                             lyricLine.tags.append(tag)
                         }
                     case "x-roman":
                         lyricLine.roman = text
                         if let tagType = TTMLLyricTag.LyricTagType(
-                            rawValue: "ttm:roman")
-                        {
+                            rawValue: "ttm:roman") {
                             let tag = TTMLLyricTag(type: tagType, content: text)
                             lyricLine.tags.append(tag)
                         }
                     case "x-bg":
                         var bgLyric = TTMLBgLyric(
-                            subLyric: [], translation: nil, roman: nil)
+                            subLyric: [], translation: nil, roman: nil
+                        )
                         let bgSpanElements = try spanElement.getElementsByTag(
                             "span")
                         var bgSubTtmlLyricList: [TTMLSubLyric] = []
@@ -272,7 +268,8 @@ public class TTMLLyricsParser: NSObject, LyricsParser {
                             let bgText = try bgSpanElement.getPreservedText()
                                 .normalizeSpaces().replacingOccurrences(
                                     of: "[()]", with: "",
-                                    options: .regularExpression)
+                                    options: .regularExpression
+                                )
 
                             let bgSubLyric = TTMLSubLyric(
                                 beginTime: bgBeginTime,
@@ -284,7 +281,7 @@ public class TTMLLyricsParser: NSObject, LyricsParser {
 
                         bgLyric.subLyric =
                             bgSubTtmlLyricList.isEmpty
-                            ? nil : bgSubTtmlLyricList
+                                ? nil : bgSubTtmlLyricList
                         lyricLine.bgLyric = bgLyric
                     default:
                         break
@@ -300,8 +297,7 @@ public class TTMLLyricsParser: NSObject, LyricsParser {
         }
     }
 
-    private func getPositionFromAgent(_ agent: String) -> TtmlLyricPositionType
-    {
+    private func getPositionFromAgent(_ agent: String) -> TtmlLyricPositionType {
         if agent == "v1" { return .main }
         return .sub
     }
@@ -394,10 +390,9 @@ public class TestTTMLParser: NSObject {
     private var currentElement: String?
 }
 
-extension TestTTMLParser {
-    public func decodeTtml(data: Data, coderType: String.Encoding) async throws
-        -> [TestTtmlLyric]
-    {
+public extension TestTTMLParser {
+    func decodeTtml(data: Data, coderType: String.Encoding) async throws
+        -> [TestTtmlLyric] {
         guard let htmlString = String(data: data, encoding: coderType) else {
             throw NSError()
         }
@@ -405,8 +400,8 @@ extension TestTTMLParser {
     }
 }
 
-extension TestTTMLParser {
-    public func decodeTtml(htmlString: String) async throws -> [TestTtmlLyric] {
+public extension TestTTMLParser {
+    func decodeTtml(htmlString: String) async throws -> [TestTtmlLyric] {
         guard let doc = try? SwiftSoup.parse(htmlString) else {
             throw NSError()
         }
@@ -450,12 +445,12 @@ extension TestTTMLParser {
                                 ].text += text
                             } else {
                                 let spaceLyric = TestSubTtmlLyric(
-                                    beginTime: 0, endTime: 0, text: text)
+                                    beginTime: 0, endTime: 0, text: text
+                                )
                                 currentSubTtmlLyrics.append(spaceLyric)
                             }
                         } else if let spanElement = node as? Element,
-                            spanElement.tagName() == "span"
-                        {
+                                  spanElement.tagName() == "span" {
                             let role = try spanElement.attr("ttm:role")
                             var text: String
 
@@ -472,7 +467,8 @@ extension TestTTMLParser {
                                 if currentBgLyric == nil {
                                     currentBgLyric = TestBgTtmlLyric(
                                         subLyrics: [], translation: nil,
-                                        roman: nil)
+                                        roman: nil
+                                    )
                                 }
 
                                 let bgSpanElements = spanElement.children()
@@ -484,7 +480,8 @@ extension TestTTMLParser {
                                     bgSpanText =
                                         bgSpanText.replacingOccurrences(
                                             of: "[()]", with: "",
-                                            options: .regularExpression)
+                                            options: .regularExpression
+                                        )
 
                                     if bgRole == "x-translation" {
                                         currentBgLyric?.translation = bgSpanText
@@ -493,7 +490,7 @@ extension TestTTMLParser {
                                     } else if bgSpanElement.hasAttr("begin") {
                                         let bgBeginTime =
                                             try bgSpanElement.attr("begin")
-                                            .toTimeInterval()
+                                                .toTimeInterval()
                                         let bgEndTime = try bgSpanElement.attr(
                                             "end"
                                         ).toTimeInterval()
@@ -508,7 +505,7 @@ extension TestTTMLParser {
                                 }
                                 currentBgLyric?.subLyrics =
                                     bgSubTtmlLyricList.isEmpty
-                                    ? nil : bgSubTtmlLyricList
+                                        ? nil : bgSubTtmlLyricList
                                 // 跳过x-bg标签的子内容，避免重复处理
                                 continue
                             } else {
@@ -517,11 +514,11 @@ extension TestTTMLParser {
                                     "begin")
                                 let subLyricEndTime = try spanElement.attr(
                                     "end")
-                                let subTtmlLyric = TestSubTtmlLyric(
+                                let subTtmlLyric = try TestSubTtmlLyric(
                                     beginTime:
-                                        subLyricBeginTime.toTimeInterval(),
+                                    subLyricBeginTime.toTimeInterval(),
                                     endTime: subLyricEndTime.toTimeInterval(),
-                                    text: try spanElement.getPreservedText()
+                                    text: spanElement.getPreservedText()
                                         .normalizeSpaces()
                                 )
                                 currentSubTtmlLyrics.append(subTtmlLyric)
@@ -538,8 +535,7 @@ extension TestTTMLParser {
                     if let bgTranslation = currentTtmlLyric.bgLyric?
                         .translation,
                         let mainTranslation = currentTtmlLyric.translation,
-                        bgTranslation == mainTranslation
-                    {
+                        bgTranslation == mainTranslation {
                         currentTtmlLyric.translation = nil
                     }
 
@@ -557,8 +553,7 @@ extension TestTTMLParser {
 
 extension TestTTMLParser {
     private func getPositionFromAgent(_ agent: String)
-        -> TestTtmlLyricPositionType
-    {
+        -> TestTtmlLyricPositionType {
         if agent == "v1" { return .main }
         return .sub
     }

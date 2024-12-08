@@ -37,7 +37,7 @@ struct PlaylistView: View {
                             Image(systemSymbol: .play)
                         }
                         .tint(.accentColor)
-                        
+
                         Button(role: .destructive) {
                             player.removeFromPlaylist(items: [item.wrappedValue])
                         } label: {
@@ -57,7 +57,7 @@ struct PlaylistView: View {
                             }
                             .tint(.green)
                         }
-                        
+
                         if item.wrappedValue.metadata.isModified {
                             Button {
                                 item.wrappedValue.metadata.restore()
@@ -72,7 +72,7 @@ struct PlaylistView: View {
                         Button("Play") {
                             player.play(item: item.wrappedValue)
                         }
-                        
+
                         Button("Remove from Playlist") {
                             if metadataEditor.items.isEmpty {
                                 player.removeFromPlaylist(items: [item.wrappedValue])
@@ -80,16 +80,16 @@ struct PlaylistView: View {
                                 player.removeFromPlaylist(items: .init(metadataEditor.items))
                             }
                         }
-                        
+
                         Divider()
-                        
+
                         Button("Save Metadata") {
                             Task {
                                 try await item.wrappedValue.metadata.write()
                             }
                         }
                         .disabled(!item.wrappedValue.metadata.isModified)
-                        
+
                         Button("Restore Metadata") {
                             item.wrappedValue.metadata.restore()
                         }
@@ -101,7 +101,7 @@ struct PlaylistView: View {
                 .luminareListItemHeight(64)
                 .luminareListItemCornerRadius(12)
                 .luminareListItemHighlightOnHover(false)
-                
+
                 HStack(spacing: 0) {
                     LuminareSection(hasPadding: false) {
                         actions()
@@ -113,7 +113,7 @@ struct PlaylistView: View {
                     .luminareSectionMasked(true)
                     .luminareSectionMaxWidth(nil)
                     .shadow(color: .black.opacity(0.5), radius: 32)
-                    
+
                     Spacer()
                 }
                 .padding(.top, 64)

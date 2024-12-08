@@ -97,7 +97,7 @@ struct LabeledTextField<F, Label>: View where F: ParseableFormatStyle, F.FormatO
         }
     }
 
-    @ViewBuilder private func fine(entry : MetadataBatchEditingEntry<F.FormatInput?>) -> some View {
+    @ViewBuilder private func fine(entry: MetadataBatchEditingEntry<F.FormatInput?>) -> some View {
         LuminareTextField(
             placeholder,
             value: entry.projectedValue, format: format
