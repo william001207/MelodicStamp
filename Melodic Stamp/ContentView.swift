@@ -46,11 +46,17 @@ struct ContentView: View {
                     }
                     .frame(minHeight: 600)
                     .ignoresSafeArea()
+                    .onChange(of: isActive, initial: true) { _, _ in
+                        DispatchQueue.main.async {
+                            NSApp.mainWindow?.titlebarAppearsTransparent = true
+                            NSApp.mainWindow?.titleVisibility = .visible
+                        }
+                    }
             case .miniPlayer:
                 MiniPlayer(player: player, playerKeyboardControl: playerKeyboardControl, namespace: namespace)
                     .padding(8)
                     .background {
-                        VisualEffectView(material: .popover, blendingMode: .behindWindow)
+                        VisualEffectView(material: .headerView, blendingMode: .behindWindow)
                     }
                     .padding(.bottom, -32)
                     .ignoresSafeArea()
@@ -59,6 +65,12 @@ struct ContentView: View {
                     .environment(\.melodicStampWindowStyle, windowStyle)
                     .environment(\.changeMelodicStampWindowStyle) { windowStyle in
                         self.windowStyle = windowStyle
+                    }
+                    .onChange(of: isActive, initial: true) { _, _ in
+                        DispatchQueue.main.async {
+                            NSApp.mainWindow?.titlebarAppearsTransparent = true
+                            NSApp.mainWindow?.titleVisibility = .hidden
+                        }
                     }
             }
         }
@@ -70,8 +82,6 @@ struct ContentView: View {
             floatingWindows.observeFullScreen()
         }
         .onChange(of: isActive, initial: true) { _, _ in
-            NSApp.mainWindow?.titlebarAppearsTransparent = true
-
             switch windowStyle {
             case .main:
                 if isActive {

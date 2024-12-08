@@ -53,22 +53,22 @@ struct MiniPlayer: View {
                     }
                 }
 
-            HStack(alignment: .center, spacing: 12) {
-                leadingControls()
-                    .transition(.blurReplace)
+            TimelineView(.animation) { _ in
+                HStack(alignment: .center, spacing: 12) {
+                    leadingControls()
+                        .transition(.blurReplace)
 
-                TimelineView(.animation) { _ in
                     progressBar()
-                }
 
-                trailingControls()
-                    .transition(.blurReplace)
+                    trailingControls()
+                        .transition(.blurReplace)
+                }
+                .frame(height: 16)
+                .animation(.default, value: isProgressBarHovering)
+                .animation(.default, value: isProgressBarActive)
+                .animation(.default, value: activeControl)
+                .animation(.default, value: headerControl)
             }
-            .frame(height: 16)
-            .animation(.default, value: isProgressBarHovering)
-            .animation(.default, value: isProgressBarActive)
-            .animation(.default, value: activeControl)
-            .animation(.default, value: headerControl)
         }
         .padding(12)
         .background(Color.clear)
@@ -342,8 +342,10 @@ struct MiniPlayer: View {
                     value: value,
                     isActive: $isProgressBarActive,
                     isDelegated: activeControl == .progress,
-                    externalOvershootSign: playerKeyboardControl
-                        .progressBarExternalOvershootSign
+                    externalOvershootSign: activeControl == .progress
+                        ? playerKeyboardControl
+                            .progressBarExternalOvershootSign
+                        : playerKeyboardControl.volumeBarExternalOvershootSign
                 ) { _, newValue in
                     adjustmentPercentage = newValue
                 } onOvershootOffsetChange: { oldValue, newValue in

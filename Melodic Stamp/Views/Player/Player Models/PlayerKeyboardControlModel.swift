@@ -14,6 +14,7 @@ import SwiftUI
     
     var isPressingSpace: Bool = false
     var progressBarExternalOvershootSign: FloatingPointSign?
+    var volumeBarExternalOvershootSign: FloatingPointSign?
     
     @discardableResult func handlePlayPause(in player: PlayerModel, phase: KeyPress.Phases, modifiers: EventModifiers = []) -> KeyPress.Result {
         guard player.hasCurrentTrack else { return .ignored }
@@ -90,7 +91,7 @@ import SwiftUI
             let inRange = player.adjustVolume(multiplier: multiplier, sign: sign)
             
             if !inRange {
-                progressBarExternalOvershootSign = sign
+                volumeBarExternalOvershootSign = sign
                 
                 if sign == .plus {
                     speakerButtonBounceAnimation.toggle()

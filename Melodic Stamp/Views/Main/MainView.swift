@@ -70,7 +70,7 @@ struct MainView: View {
             .ignoresSafeArea()
             .morphed()
             .background {
-                VisualEffectView(material: .titlebar, blendingMode: .behindWindow)
+                VisualEffectView(material: .sidebar, blendingMode: .behindWindow)
             }
             .ignoresSafeArea()
     }
@@ -81,18 +81,16 @@ struct MainView: View {
             case .inspector:
                 InspectorView(player: player, metadataEditor: metadataEditor)
                     .toolbar {
-                        EditorToolbar(metadataEditor: metadataEditor)
-                            .opacity(isInspectorPresented ? 1 : 0)
-                            .allowsHitTesting(isInspectorPresented)
-                            .animation(.default, value: isInspectorPresented)
+                        if isInspectorPresented {
+                            EditorToolbar(metadataEditor: metadataEditor)
+                        }
                     }
             case .metadata:
                 MetadataView(metadataEditor: metadataEditor)
                     .toolbar {
-                        EditorToolbar(metadataEditor: metadataEditor)
-                            .opacity(isInspectorPresented ? 1 : 0)
-                            .allowsHitTesting(isInspectorPresented)
-                            .animation(.default, value: isInspectorPresented)
+                        if isInspectorPresented {
+                            EditorToolbar(metadataEditor: metadataEditor)
+                        }
                     }
             case .lyrics:
                 LyricsView(
@@ -100,10 +98,9 @@ struct MainView: View {
                     lyrics: lyrics
                 )
                 .toolbar {
-                    LyricsToolbar(lyricsType: $lyrics.type)
-                        .opacity(isInspectorPresented ? 1 : 0)
-                        .allowsHitTesting(isInspectorPresented)
-                        .animation(.default, value: isInspectorPresented)
+                    if isInspectorPresented {
+                        LyricsToolbar(lyricsType: $lyrics.type)
+                    }
                 }
             }
         }

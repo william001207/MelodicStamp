@@ -26,27 +26,27 @@ struct Player: View {
         VStack(alignment: .center, spacing: 12) {
             header()
 
-            HStack(alignment: .center, spacing: 24) {
-                HStack(alignment: .center, spacing: 12) {
-                    leadingControls()
-                }
+            TimelineView(.animation) { _ in
+                HStack(alignment: .center, spacing: 24) {
+                    HStack(alignment: .center, spacing: 12) {
+                        leadingControls()
+                    }
 
-                Divider()
+                    Divider()
 
-                TimelineView(.animation) { _ in
                     HStack(alignment: .center, spacing: 12) {
                         progressBar()
                     }
-                }
 
-                Divider()
+                    Divider()
 
-                HStack(alignment: .center, spacing: 24) {
-                    trailingControls()
+                    HStack(alignment: .center, spacing: 24) {
+                        trailingControls()
+                    }
                 }
+                .frame(height: 32)
+                .animation(.default, value: isProgressBarActive)
             }
-            .frame(height: 32)
-            .animation(.default, value: isProgressBarActive)
         }
         .padding(.horizontal, 32)
         .padding(.vertical, 24)
@@ -216,7 +216,7 @@ struct Player: View {
             value: $player.progress,
             isActive: $isProgressBarActive,
             externalOvershootSign: playerKeyboardControl
-                .progressBarExternalOvershootSign
+                .volumeBarExternalOvershootSign
         )
         .foregroundStyle(isProgressBarActive ? .primary : .secondary)
         .backgroundStyle(.quinary)
