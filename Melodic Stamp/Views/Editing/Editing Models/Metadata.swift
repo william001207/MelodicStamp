@@ -103,22 +103,24 @@ import SwiftUI
         guard state.isLoaded else { return [] }
         return [
             attachedPictures,
-            title, titleSortOrder, artist, artistSortOrder, composer, composerSortOrder, genre, genreSortOrder, bpm,
+            title, titleSortOrder, artist, artistSortOrder, composer,
+            composerSortOrder, genre, genreSortOrder, bpm,
             albumTitle, albumTitleSortOrder, albumArtist, albumArtistSortOrder,
             trackNumber, trackTotal, discNumber, discTotal,
             comment, grouping, isCompilation,
             isrc, lyrics, mcn,
             musicBrainzRecordingID, musicBrainzReleaseID,
             rating, releaseDate,
-            replayGainAlbumGain, replayGainAlbumPeak, replayGainTrackGain, replayGainTrackPeak, replayGainReferenceLoudness
+            replayGainAlbumGain, replayGainAlbumPeak, replayGainTrackGain,
+            replayGainTrackPeak, replayGainReferenceLoudness,
         ]
     }
 }
 
 // MARK: Loading Functions
 
-private extension Metadata {
-    func load(
+extension Metadata {
+    fileprivate func load(
         coverImages: Set<AttachedPicture> = [],
         title: String? = nil, titleSortOrder: String? = nil,
         artist: String? = nil, artistSortOrder: String? = nil,
@@ -135,7 +137,8 @@ private extension Metadata {
         isrc: String? = nil,
         lyrics: String? = nil,
         mcn: String? = nil,
-        musicBrainzRecordingID: String? = nil, musicBrainzReleaseID: String? = nil,
+        musicBrainzRecordingID: String? = nil,
+        musicBrainzReleaseID: String? = nil,
         rating: Int? = nil,
         releaseDate: String? = nil,
         replayGainAlbumGain: Double? = nil, replayGainAlbumPeak: Double? = nil,
@@ -179,17 +182,22 @@ private extension Metadata {
         self.additional = .init(additional)
     }
 
-    func load(from metadata: AudioMetadata?) {
+    fileprivate func load(from metadata: AudioMetadata?) {
         load(
             coverImages: metadata?.attachedPictures ?? [],
             title: metadata?.title, titleSortOrder: metadata?.titleSortOrder,
-            artist: metadata?.artist, artistSortOrder: metadata?.artistSortOrder,
-            composer: metadata?.composer, composerSortOrder: metadata?.composerSortOrder,
+            artist: metadata?.artist,
+            artistSortOrder: metadata?.artistSortOrder,
+            composer: metadata?.composer,
+            composerSortOrder: metadata?.composerSortOrder,
             genre: metadata?.genre, genreSortOrder: metadata?.genreSortOrder,
             bpm: metadata?.bpm,
-            albumTitle: metadata?.albumTitle, albumTitleSortOrder: metadata?.albumTitleSortOrder,
-            albumArtist: metadata?.albumArtist, albumArtistSortOrder: metadata?.albumArtistSortOrder,
-            trackNumber: metadata?.trackNumber, trackTotal: metadata?.trackTotal,
+            albumTitle: metadata?.albumTitle,
+            albumTitleSortOrder: metadata?.albumTitleSortOrder,
+            albumArtist: metadata?.albumArtist,
+            albumArtistSortOrder: metadata?.albumArtistSortOrder,
+            trackNumber: metadata?.trackNumber,
+            trackTotal: metadata?.trackTotal,
             discNumber: metadata?.discNumber, discTotal: metadata?.discTotal,
             comment: metadata?.comment,
             grouping: metadata?.grouping,
@@ -197,16 +205,20 @@ private extension Metadata {
             isrc: metadata?.isrc,
             lyrics: metadata?.lyrics,
             mcn: metadata?.mcn,
-            musicBrainzRecordingID: metadata?.musicBrainzRecordingID, musicBrainzReleaseID: metadata?.musicBrainzReleaseID,
+            musicBrainzRecordingID: metadata?.musicBrainzRecordingID,
+            musicBrainzReleaseID: metadata?.musicBrainzReleaseID,
             rating: metadata?.rating, releaseDate: metadata?.releaseDate,
-            replayGainAlbumGain: metadata?.replayGainAlbumGain, replayGainAlbumPeak: metadata?.replayGainAlbumPeak,
-            replayGainTrackGain: metadata?.replayGainTrackGain, replayGainTrackPeak: metadata?.replayGainTrackPeak,
+            replayGainAlbumGain: metadata?.replayGainAlbumGain,
+            replayGainAlbumPeak: metadata?.replayGainAlbumPeak,
+            replayGainTrackGain: metadata?.replayGainTrackGain,
+            replayGainTrackPeak: metadata?.replayGainTrackPeak,
             replayGainReferenceLoudness: metadata?.replayGainReferenceLoudness,
-            additional: metadata?.additionalMetadata.map(AdditionalMetadata.init(_:))
+            additional: metadata?.additionalMetadata.map(
+                AdditionalMetadata.init(_:))
         )
     }
 
-    func pack() -> AudioMetadata {
+    fileprivate func pack() -> AudioMetadata {
         let metadata = AudioMetadata()
 
         metadata.title = title.current
@@ -238,7 +250,8 @@ private extension Metadata {
         metadata.replayGainAlbumPeak = replayGainAlbumPeak.current
         metadata.replayGainTrackGain = replayGainTrackGain.current
         metadata.replayGainTrackPeak = replayGainTrackPeak.current
-        metadata.replayGainReferenceLoudness = replayGainReferenceLoudness.current
+        metadata.replayGainReferenceLoudness =
+            replayGainReferenceLoudness.current
         metadata.additionalMetadata = additional.current
 
         attachedPictures.current.forEach(metadata.attachPicture(_:))
@@ -274,7 +287,9 @@ extension Metadata {
     func update() async throws {
         try await withCheckedThrowingContinuation { [weak self] continuation in
             guard let self else { return continuation.resume() }
-            guard url.startAccessingSecurityScopedResource() else { return continuation.resume() }
+            guard url.startAccessingSecurityScopedResource() else {
+                return continuation.resume()
+            }
             defer { url.stopAccessingSecurityScopedResource() }
 
             do {
@@ -299,8 +314,12 @@ extension Metadata {
 
     func write() async throws {
         try await withCheckedThrowingContinuation { [weak self] continuation in
-            guard let self, state.isEditable, isModified else { return continuation.resume() }
-            guard url.startAccessingSecurityScopedResource() else { return continuation.resume() }
+            guard let self, state.isEditable, isModified else {
+                return continuation.resume()
+            }
+            guard url.startAccessingSecurityScopedResource() else {
+                return continuation.resume()
+            }
             defer { self.url.stopAccessingSecurityScopedResource() }
 
             do {
@@ -310,7 +329,16 @@ extension Metadata {
 
                 let file = try AudioFile(url: url)
                 file.metadata = pack()
-                try file.writeMetadata()
+
+                if file.metadata.comment != nil {
+                    try file.writeMetadata()
+                } else {
+                    // this is crucial for `.flac` file types
+                    // in these files, if all fields except `attachedPictures` field are `nil`, audio decoding will encounter great issues after writing metadata
+                    // so hereby always providing an empty `comment` if it is `nil`
+                    file.metadata.comment = ""
+                    try file.writeMetadata()
+                }
 
                 state = .fine
                 print("Successfully written metadata to \(url)")
@@ -322,7 +350,9 @@ extension Metadata {
         }
     }
 
-    subscript<V>(extracting keyPath: WritableKeyPath<Metadata, Entry<V>>) -> MetadataBatchEditingEntry<V> {
+    subscript<V>(extracting keyPath: WritableKeyPath<Metadata, Entry<V>>)
+        -> MetadataBatchEditingEntry<V>
+    {
         .init(keyPath: keyPath, metadatas: [self])
     }
 }
