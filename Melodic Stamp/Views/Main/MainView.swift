@@ -62,6 +62,12 @@ struct MainView: View {
                 ToolbarItemGroup(placement: .navigation) {
                     FileToolbar(player: player, fileManager: fileManager)
                 }
+                
+#if DEBUG
+                ToolbarItemGroup(placement: .cancellationAction) {
+                    DebugToolbar()
+                }
+#endif
             }
     }
 

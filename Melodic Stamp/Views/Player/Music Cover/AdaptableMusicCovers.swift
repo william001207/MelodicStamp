@@ -53,7 +53,7 @@ struct AdaptableMusicCovers: View {
                         attachedPicturesHandler: attachedPicturesHandler,
                         state: state,
                         type: type,
-                        maxResolution: max(1, round(contentSize.width / 64) * 64)
+                        maxResolution: contentHeight
                     )
                     .containerRelativeFrame(
                         .horizontal, alignment: .center

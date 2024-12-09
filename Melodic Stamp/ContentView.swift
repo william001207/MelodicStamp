@@ -78,7 +78,7 @@ struct ContentView: View {
             FileImporters(fileManager: fileManager, player: player)
                 .allowsHitTesting(false)
         }
-        .navigationTitle(title)
+//        .navigationTitle(title)
         .onAppear {
             floatingWindows.observeFullScreen()
         }
@@ -125,18 +125,18 @@ struct ContentView: View {
         .focusedValue(\.playerKeyboardControl, playerKeyboardControl)
     }
     
-    private var title: Text {
-        if let current = player.current {
-            let values = current.metadata[extracting: \.title]
-            if let title = values.initial, !title.isEmpty {
-                return Text(title)
-            } else {
-                return Text(current.url.lastPathComponent.dropLast(current.url.pathExtension.count + 1))
-            }
-        } else {
-            return Text("\(Bundle.main.displayName)")
-        }
-    }
+//    private var title: Text {
+//        if let current = player.current {
+//            let values = current.metadata[extracting: \.title]
+//            if let title = values.initial, !title.isEmpty {
+//                return Text(title)
+//            } else {
+//                return Text(current.url.lastPathComponent.dropLast(current.url.pathExtension.count + 1))
+//            }
+//        } else {
+//            return Text("\(Bundle.main.displayName)")
+//        }
+//    }
 
     private func initializeFloatingWindows() {
         floatingWindows.addTabBar {

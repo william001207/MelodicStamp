@@ -211,19 +211,25 @@ enum PlaybackMode: String, CaseIterable, Identifiable {
     }
 
     func play(item: PlaylistItem) {
-        do {
-            if let decoder = try item.decoder() {
-                try player.play(decoder)
-                current = item
-            }
-        } catch {}
+        addToPlaylist(urls: [item.url])
+        
+        DispatchQueue.main.async {
+            do {
+                if let decoder = try item.decoder() {
+                    self.current = item
+                    try self.player.play(decoder)
+                }
+            } catch {}
+        }
     }
 
     func play(url: URL) {
         addToPlaylist(urls: [url])
-
-        if let item = playlist.first(where: { $0.url == url }) {
-            play(item: item)
+        
+        DispatchQueue.main.async {
+            if let item = self.playlist.first(where: { $0.url == url }) {
+                self.play(item: item)
+            }
         }
     }
 
@@ -249,6 +255,7 @@ enum PlaybackMode: String, CaseIterable, Identifiable {
             if let index = playlist.firstIndex(where: { $0.url == url }) {
                 if current?.url == url {
                     player.stop()
+                    current = nil
                 }
                 playlist.remove(at: index)
             }
