@@ -34,9 +34,13 @@ struct ResizableImageView: View {
                     }
             }
         }
-        .onChange(of: image) { _, _ in
-            // reload image
-            resizedImage = nil
+        .onChange(of: image) { oldValue, newValue in
+            let oldPath = path(of: oldValue), newPath = path(of: newValue)
+            Task {
+                guard newPath != oldPath else { return }
+                // reload image
+                resizedImage = nil
+            }
         }
     }
     
@@ -49,21 +53,21 @@ struct ResizableImageView: View {
         scaling.map { CGFloat($0) * Self.gradation }
     }
     
-    private var path: String? {
+    private var hasData: Bool {
+        path(of: image).map(CacheDirectory.imageCache.hasData(at:)) ?? false
+    }
+    
+    private func path(of image: NSImage) -> String? {
         guard let scaling, let data = image.tiffRepresentation else { return nil }
         let digest = SHA256.hash(data: data)
         let hex = String(UInt(bitPattern: digest.hashValue), radix: 16)
         return "\(hex)@\(scaling)x"
     }
     
-    private var hasData: Bool {
-        path.map(CacheDirectory.imageCache.hasData(at:)) ?? false
-    }
-    
     private func readOrCache() async throws {
         guard !hasData else {
             // cached
-            if let path, let data = try await CacheDirectory.imageCache.read(from: path) {
+            if let path = path(of: image), let data = try await CacheDirectory.imageCache.read(from: path) {
                 print("Loading image cache \(path)...")
                 resizedImage = NSImage(data: data)
                 print("Loaded image cache \(path)")
@@ -71,7 +75,7 @@ struct ResizableImageView: View {
             return
         }
         
-        guard let path, let resolution else { return }
+        guard let path = path(of: image), let resolution else { return }
         
         // resize and cache
         print("Resizing image \(path) to resolution \(resolution)...")
