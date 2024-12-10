@@ -7,14 +7,13 @@
 
 import CoreImage
 import CoreImage.CIFilterBuiltins
-import SwiftUI
 import SmartCache
+import SwiftUI
 
 struct ResizableImageView: View {
     static let gradation: CGFloat = 32
-    static var cache: SmartCache<URL, Data> = .init(
-        maximumCachedValues: 256,
-        cacheDirectory: .cachesDirectory.appending(path: "ImageCache", directoryHint: .isDirectory)
+    static var cache: MemoryCache<URL, Data> = .init(
+        maximumCachedValues: 256
     )
 
     var image: NSImage
@@ -39,76 +38,83 @@ struct ResizableImageView: View {
             }
         }
         .onChange(of: image) { oldImage, newImage in
-            Task {
-                let oldPath = await path(of: oldImage), newPath = await path(of: newImage)
-                guard newPath != oldPath else { return }
+            guard newImage.tiffRepresentation != oldImage.tiffRepresentation else { return }
+            Task(priority: .background) {
                 await getOrGenerateThumbnail()
             }
         }
     }
-    
+
     private var scaling: Int? {
         guard let maxResolution else { return nil }
         return Int(floor(maxResolution / Self.gradation))
     }
-    
+
     private var resolution: CGFloat? {
         scaling.map { CGFloat($0) * Self.gradation }
     }
-    
-    private func isCached() async throws -> Bool {
-        await !(try path(of: image).flatMap(Self.cache.value(forKey:))?.isEmpty ?? true)
-    }
-    
+
     private func path(of image: NSImage) async -> URL? {
-        return await withCheckedContinuation { continuation in
-            guard let scaling, let data = image.tiffRepresentation else { return continuation.resume(returning: nil) }
-            let hex = String(UInt(bitPattern: data.hashValue), radix: 16)
-            continuation.resume(returning: URL(string: "\(hex)@\(scaling)x"))
+        guard let scaling, let data = image.tiffRepresentation else {
+            return nil
         }
+        
+        let hex = String(UInt(bitPattern: data.hashValue), radix: 16)
+        return URL(string: "\(hex)@\(scaling)x")
     }
 
-    private func getOrGenerateThumbnail() async throws {
+    private func getOrGenerateThumbnail() async {
         guard let resolution else { return }
 
-        if let path = await path(of: image) {
+        if let path = await path(of: image),
+            let cachedImageData = Self.cache.value(forKey: path),
+            let cachedImage = NSImage(data: cachedImageData)
+        {
             // load from cache
-        }
-        if let resized = await resize(image: image, resolution: resolution) {
-            resizedImage = resized
+            resizedImage = cachedImage
+            print("Loaded thumbnail from cache for \(path)")
+        } else if let resizedImage = await resize(
+            image: image, resolution: resolution)
+        {
+            // resize and save to cache
+            self.resizedImage = resizedImage
+            if let path = await path(of: image),
+                let resizedImageData = resizedImage.tiffRepresentation
+            {
+                Self.cache.insert(resizedImageData, forKey: path)
+                print("Resized and cached image thumbnail for \(path)")
+            }
+        } else {
+            print("Failed to find a valid thumbnail!")
         }
     }
 
     private func resize(image: NSImage, resolution: CGFloat) async -> NSImage? {
-        return await withCheckedContinuation { continuation in
-            DispatchQueue.global(qos: .background).async {
-                guard
-                    let tiffData = image.tiffRepresentation,
-                    let ciImage = CIImage(data: tiffData)
-                else {
-                    return continuation.resume(returning: nil)
-                }
-
-                let scale = min(
-                    resolution / ciImage.extent.width,
-                    resolution / ciImage.extent.height, 1)
-                let scaledSize = CGSize(
-                    width: ciImage.extent.width * scale,
-                    height: ciImage.extent.height * scale)
-
-                let scaledCIImage = ciImage.transformed(
-                    by: CGAffineTransform(scaleX: scale, y: scale))
-
-                guard
-                    let cgImage = self.context.createCGImage(
-                        scaledCIImage, from: scaledCIImage.extent)
-                else {
-                    return continuation.resume(returning: nil)
-                }
-
-                let resizedNSImage = NSImage(cgImage: cgImage, size: scaledSize)
-                continuation.resume(returning: resizedNSImage)
-            }
+        guard
+            let tiffData = image.tiffRepresentation,
+            let ciImage = CIImage(data: tiffData)
+        else {
+            return nil
         }
+        
+        let scale = min(
+            resolution / ciImage.extent.width,
+            resolution / ciImage.extent.height, 1)
+        let scaledSize = CGSize(
+            width: ciImage.extent.width * scale,
+            height: ciImage.extent.height * scale)
+        
+        let scaledCIImage = ciImage.transformed(
+            by: CGAffineTransform(scaleX: scale, y: scale))
+        
+        guard
+            let cgImage = self.context.createCGImage(
+                scaledCIImage, from: scaledCIImage.extent)
+        else {
+            return nil
+        }
+        
+        let resizedNSImage = NSImage(cgImage: cgImage, size: scaledSize)
+        return resizedNSImage
     }
 }
