@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		2810E2452CFB169E006FF94A /* Morphed in Frameworks */ = {isa = PBXBuildFile; productRef = 2810E2442CFB169E006FF94A /* Morphed */; };
+		2845A9F72D08745900CD7517 /* SmartCache in Frameworks */ = {isa = PBXBuildFile; productRef = 2845A9F62D08745900CD7517 /* SmartCache */; };
 		287F978D2CF3160700C60307 /* Luminare in Frameworks */ = {isa = PBXBuildFile; productRef = 287F978C2CF3160700C60307 /* Luminare */; };
 		65DFF89D2CFC2A6F00285040 /* SwiftSoup in Frameworks */ = {isa = PBXBuildFile; productRef = 65DFF89C2CFC2A6F00285040 /* SwiftSoup */; };
 		65F1DA7D2CED77F100389E37 /* SFBAudioEngine in Frameworks */ = {isa = PBXBuildFile; productRef = 65F1DA7C2CED77F100389E37 /* SFBAudioEngine */; };
@@ -49,6 +50,7 @@
 			files = (
 				2810E2452CFB169E006FF94A /* Morphed in Frameworks */,
 				65F1DAB32CEDBED700389E37 /* SFSafeSymbols in Frameworks */,
+				2845A9F72D08745900CD7517 /* SmartCache in Frameworks */,
 				287F978D2CF3160700C60307 /* Luminare in Frameworks */,
 				65F1DA9D2CEDBD8700389E37 /* Defaults in Frameworks */,
 				65F1DA8D2CED83F800389E37 /* FullDiskAccess in Frameworks */,
@@ -105,6 +107,7 @@
 				287F978C2CF3160700C60307 /* Luminare */,
 				2810E2442CFB169E006FF94A /* Morphed */,
 				65DFF89C2CFC2A6F00285040 /* SwiftSoup */,
+				2845A9F62D08745900CD7517 /* SmartCache */,
 			);
 			productName = MelodicStamp;
 			productReference = 65F1DA012CECCEE900389E37 /* Melodic Stamp.app */;
@@ -144,6 +147,7 @@
 				287F978B2CF3160600C60307 /* XCRemoteSwiftPackageReference "Luminare" */,
 				2810E2432CFB169E006FF94A /* XCRemoteSwiftPackageReference "Morphed" */,
 				65DFF89B2CFC2A6F00285040 /* XCRemoteSwiftPackageReference "SwiftSoup" */,
+				2845A9F52D08745900CD7517 /* XCRemoteSwiftPackageReference "smart-cache" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 65F1DA022CECCEE900389E37 /* Products */;
@@ -388,6 +392,14 @@
 				kind = branch;
 			};
 		};
+		2845A9F52D08745900CD7517 /* XCRemoteSwiftPackageReference "smart-cache" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/nightwill/smart-cache";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.0;
+			};
+		};
 		287F978B2CF3160600C60307 /* XCRemoteSwiftPackageReference "Luminare" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/Cement-Labs/Luminare";
@@ -451,6 +463,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 2810E2432CFB169E006FF94A /* XCRemoteSwiftPackageReference "Morphed" */;
 			productName = Morphed;
+		};
+		2845A9F62D08745900CD7517 /* SmartCache */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 2845A9F52D08745900CD7517 /* XCRemoteSwiftPackageReference "smart-cache" */;
+			productName = SmartCache;
 		};
 		287F978C2CF3160700C60307 /* Luminare */ = {
 			isa = XCSwiftPackageProductDependency;

@@ -101,6 +101,8 @@ struct PlaylistView: View {
                 .luminareListItemHeight(64)
                 .luminareListItemCornerRadius(12)
                 .luminareListItemHighlightOnHover(false)
+                .contentMargins(.top, 64, for: .scrollIndicators)
+                .contentMargins(.bottom, 94, for: .scrollIndicators)
 
                 HStack(spacing: 0) {
                     LuminareSection(hasPadding: false) {

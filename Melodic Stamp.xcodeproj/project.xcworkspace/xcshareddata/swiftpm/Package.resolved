@@ -1,5 +1,5 @@
 {
-  "originHash" : "1c846a32a7bc5219e40ceaf03ad4827988e331823cf47d6cef35831723a344f0",
+  "originHash" : "52cf5e73359c8f4b19ece3aae7fbc247a72318870f9177222901a43c78093aaf",
   "pins" : [
     {
       "identity" : "avfaudioextensions",
@@ -188,6 +188,15 @@
       "state" : {
         "revision" : "e2e28f4e56e1769c2ec3c61c9355fc64eb7a535a",
         "version" : "5.3.0"
+      }
+    },
+    {
+      "identity" : "smart-cache",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/nightwill/smart-cache",
+      "state" : {
+        "revision" : "fbc659413903249af78ee52701f4ef015c163257",
+        "version" : "1.0.0"
       }
     },
     {

@@ -8,9 +8,14 @@
 import CoreImage
 import CoreImage.CIFilterBuiltins
 import SwiftUI
+import SmartCache
 
 struct ResizableImageView: View {
     static let gradation: CGFloat = 32
+    static var cache: SmartCache<URL, Data> = .init(
+        maximumCachedValues: 256,
+        cacheDirectory: .cachesDirectory.appending(path: "ImageCache", directoryHint: .isDirectory)
+    )
 
     var image: NSImage
     var maxResolution: CGFloat? = 128
@@ -28,31 +33,47 @@ struct ResizableImageView: View {
                     .aspectRatio(contentMode: .fit)
             } else {
                 Color.clear
-                    .task {
-                        await generateThumbnail()
+                    .task(priority: .background) {
+                        await getOrGenerateThumbnail()
                     }
             }
         }
         .onChange(of: image) { oldImage, newImage in
-            guard
-                newImage.tiffRepresentation.hashValue
-                    != oldImage.tiffRepresentation.hashValue
-            else { return }
-
             Task {
-                await generateThumbnail()
+                let oldPath = await path(of: oldImage), newPath = await path(of: newImage)
+                guard newPath != oldPath else { return }
+                await getOrGenerateThumbnail()
             }
         }
     }
-
-    private var resolution: CGFloat? {
+    
+    private var scaling: Int? {
         guard let maxResolution else { return nil }
-        return floor(maxResolution / Self.gradation) * Self.gradation
+        return Int(floor(maxResolution / Self.gradation))
+    }
+    
+    private var resolution: CGFloat? {
+        scaling.map { CGFloat($0) * Self.gradation }
+    }
+    
+    private func isCached() async throws -> Bool {
+        await !(try path(of: image).flatMap(Self.cache.value(forKey:))?.isEmpty ?? true)
+    }
+    
+    private func path(of image: NSImage) async -> URL? {
+        return await withCheckedContinuation { continuation in
+            guard let scaling, let data = image.tiffRepresentation else { return continuation.resume(returning: nil) }
+            let hex = String(UInt(bitPattern: data.hashValue), radix: 16)
+            continuation.resume(returning: URL(string: "\(hex)@\(scaling)x"))
+        }
     }
 
-    private func generateThumbnail() async {
+    private func getOrGenerateThumbnail() async throws {
         guard let resolution else { return }
 
+        if let path = await path(of: image) {
+            // load from cache
+        }
         if let resized = await resize(image: image, resolution: resolution) {
             resizedImage = resized
         }
