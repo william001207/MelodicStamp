@@ -4,7 +4,7 @@
 //
 //  Created by KrLite on 2024/12/9.
 //
-
+/*
 import SwiftUI
 import CryptoKit
 
@@ -111,5 +111,101 @@ struct ResizableImageView: View {
         resizedImage.unlockFocus()
         
         return resizedImage
+    }
+}
+*/
+import SwiftUI
+import CoreImage
+import CoreImage.CIFilterBuiltins
+
+struct ResizableImageView: View {
+    static let gradation: CGFloat = 32
+    
+    var image: NSImage
+    var maxResolution: CGFloat? = 128
+    
+    @State private var resizedImage: NSImage?
+    @State private var isLoading: Bool = false
+    @State private var previousImage: NSImage?
+    
+    private let context = CIContext()
+    
+    var body: some View {
+        Group {
+            if let resizedImage {
+                Image(nsImage: resizedImage)
+                    .resizable()
+                    .interpolation(.high)
+                    .aspectRatio(contentMode: .fit)
+            } else {
+                ZStack {
+                    Image(systemName: "photo")
+                        .resizable()
+                        .scaledToFit()
+                        .foregroundColor(.gray)
+                    
+                    if isLoading {
+                        ProgressView()
+                            .progressViewStyle(CircularProgressViewStyle())
+                            .scaleEffect(1.5)
+                    }
+                }
+                .onAppear {
+                    Task {
+                        await generateThumbnail()
+                    }
+                }
+            }
+        }
+        .onChange(of: image) { oldImage, newImage in
+            if newImage.tiffRepresentation == oldImage.tiffRepresentation {
+                return
+            }
+            Task {
+                await generateThumbnail()
+            }
+        }
+    }
+    
+    private var resolution: CGFloat? {
+        guard let maxResolution else { return nil }
+        return floor(maxResolution / Self.gradation) * Self.gradation
+    }
+    
+    private func generateThumbnail() async {
+        guard let resolution else { return }
+        
+        isLoading = true
+        print("Generating thumbnail")
+        if let resized = await resizeWithCoreImage(image: image, resolution: resolution) {
+            print("Thumbnail generated")
+            resizedImage = resized
+        }
+        isLoading = false
+    }
+    
+    private func resizeWithCoreImage(image: NSImage, resolution: CGFloat) async -> NSImage? {
+        return await withCheckedContinuation { continuation in
+            DispatchQueue.global(qos: .background).async {
+                guard let tiffData = image.tiffRepresentation,
+                      let ciImage = CIImage(data: tiffData) else {
+                    continuation.resume(returning: nil)
+                    return
+                }
+                
+                let scale = min(resolution / ciImage.extent.width, resolution / ciImage.extent.height, 1)
+                let scaledSize = CGSize(width: ciImage.extent.width * scale, height: ciImage.extent.height * scale)
+                
+                let scaledCIImage = ciImage.transformed(by: CGAffineTransform(scaleX: scale, y: scale))
+                
+                guard let cgImage = self.context.createCGImage(scaledCIImage, from: scaledCIImage.extent) else {
+                    continuation.resume(returning: nil)
+                    return
+                }
+                
+                let resizedNSImage = NSImage(cgImage: cgImage, size: scaledSize)
+                continuation.resume(returning: resizedNSImage)
+            }
+        }
     }
 }
