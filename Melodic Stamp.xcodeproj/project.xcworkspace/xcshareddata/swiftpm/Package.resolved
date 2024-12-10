@@ -1,5 +1,5 @@
 {
-  "originHash" : "52cf5e73359c8f4b19ece3aae7fbc247a72318870f9177222901a43c78093aaf",
+  "originHash" : "6d6f56a920bbd6c6c8a8a5e522d833758b3ef8041195a3f1cc3937e2a47f688a",
   "pins" : [
     {
       "identity" : "avfaudioextensions",
@@ -124,7 +124,7 @@
       "location" : "https://github.com/Cement-Labs/Luminare",
       "state" : {
         "branch" : "environments",
-        "revision" : "9e3fe298ea7a7129b7506e01ad8a5d81e9cf4140"
+        "revision" : "ff74ff20a75074d8cc3c004d8062853bbdae1b4e"
       }
     },
     {
@@ -224,6 +224,15 @@
       "state" : {
         "revision" : "0837db354faf9c9deb710dc597046edaadf5360f",
         "version" : "2.7.6"
+      }
+    },
+    {
+      "identity" : "swiftui-variadic-views",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/lorenzofiamingo/swiftui-variadic-views",
+      "state" : {
+        "revision" : "af67d0e85bd2b499fbfb4cda834117e7c52b12b0",
+        "version" : "1.0.0"
       }
     },
     {
