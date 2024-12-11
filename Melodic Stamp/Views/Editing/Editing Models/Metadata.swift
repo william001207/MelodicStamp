@@ -44,6 +44,7 @@ import SwiftUI
 
     private(set) var properties: AudioProperties!
     private(set) var state: State
+    private(set) var hasThumbnail: Bool
 
     var attachedPictures: Entry<Set<AttachedPicture>>!
 
@@ -92,6 +93,7 @@ import SwiftUI
     init?(url: URL) {
         self.state = .loading
         self.url = url
+        self.hasThumbnail = false
 
         Task.detached {
             try await self.update()
@@ -121,7 +123,7 @@ import SwiftUI
 
 extension Metadata {
     fileprivate func load(
-        coverImages: Set<AttachedPicture> = [],
+        attachedPictures: Set<AttachedPicture> = [],
         title: String? = nil, titleSortOrder: String? = nil,
         artist: String? = nil, artistSortOrder: String? = nil,
         composer: String? = nil, composerSortOrder: String? = nil,
@@ -146,7 +148,7 @@ extension Metadata {
         replayGainReferenceLoudness: Double? = nil,
         additional: AdditionalMetadata? = nil
     ) {
-        attachedPictures = .init(coverImages)
+        self.attachedPictures = .init(attachedPictures)
         self.title = .init(title)
         self.titleSortOrder = .init(titleSortOrder)
         self.artist = .init(artist)
@@ -184,7 +186,7 @@ extension Metadata {
 
     fileprivate func load(from metadata: AudioMetadata?) {
         load(
-            coverImages: metadata?.attachedPictures ?? [],
+            attachedPictures: metadata?.attachedPictures ?? [],
             title: metadata?.title, titleSortOrder: metadata?.titleSortOrder,
             artist: metadata?.artist,
             artistSortOrder: metadata?.artistSortOrder,
@@ -296,7 +298,10 @@ extension Metadata {
                 let file = try AudioFile(readingPropertiesAndMetadataFrom: url)
                 properties = file.properties
                 load(from: file.metadata)
-                state = .fine
+                
+                Task {
+                    await self.cacheThumbnail()
+                }
 
                 switch state {
                 case .loading:
@@ -304,6 +309,7 @@ extension Metadata {
                 default:
                     print("Updated metadata from \(url)")
                 }
+                state = .fine
 
                 continuation.resume()
             } catch {
@@ -348,6 +354,19 @@ extension Metadata {
                 continuation.resume(throwing: error)
             }
         }
+    }
+    
+    func cacheThumbnail() async {
+        guard state.isLoaded else { return }
+        if let image = ThumbnailCacheModel.shared.getCoverImage(from: attachedPictures.current)?.image {
+            await ThumbnailCacheModel.shared.cache(forKey: url, from: image)
+            hasThumbnail = true
+        }
+    }
+    
+    func removeThumbnail() {
+        hasThumbnail = false
+        ThumbnailCacheModel.shared.remove(forKey: url)
     }
 
     subscript<V>(extracting keyPath: WritableKeyPath<Metadata, Entry<V>>) -> MetadataBatchEditingEntry<V> {

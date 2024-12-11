@@ -52,7 +52,7 @@ enum PlaybackMode: String, CaseIterable, Identifiable {
 // MARK: - Player Model
 
 @Observable class PlayerModel: NSObject {
-    private let player = AudioPlayer()
+    private let player: AudioPlayer = .init()
 
     private var outputDevices: [AudioDevice] = []
     private var selectedDevice: AudioDevice?
@@ -213,20 +213,18 @@ enum PlaybackMode: String, CaseIterable, Identifiable {
     func play(item: PlaylistItem) {
         addToPlaylist(urls: [item.url])
         
-        DispatchQueue.main.async {
-            do {
-                if let decoder = try item.decoder() {
-                    self.current = item
-                    try self.player.play(decoder)
-                }
-            } catch {}
+        Task {
+            if let decoder = try item.decoder() {
+                self.current = item
+                try self.player.play(decoder)
+            }
         }
     }
 
     func play(url: URL) {
         addToPlaylist(urls: [url])
         
-        DispatchQueue.main.async {
+        Task {
             if let item = self.playlist.first(where: { $0.url == url }) {
                 self.play(item: item)
             }
@@ -258,6 +256,10 @@ enum PlaybackMode: String, CaseIterable, Identifiable {
                     current = nil
                 }
                 playlist.remove(at: index)
+            }
+            
+            if let item = playlist.first(where: { $0.url == url }) {
+                item.metadata.removeThumbnail()
             }
         }
     }

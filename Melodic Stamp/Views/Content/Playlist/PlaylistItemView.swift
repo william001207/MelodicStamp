@@ -110,13 +110,8 @@ struct PlaylistItemView: View {
             } else {
                 Color.clear
                     .task(priority: .background) {
-                        if let cover = await getCover(
-                            from: item.metadata[
-                                extracting: \.attachedPictures
-                            ].current)
-                        {
-                            image = cover.image
-                        }
+                        image = await ThumbnailCacheModel.shared.get(
+                            forKey: item.url)
                     }
 
                 if isHovering {
@@ -131,34 +126,12 @@ struct PlaylistItemView: View {
         .frame(width: 50, height: 50)
         .font(.title3)
         .contentTransition(.symbolEffect(.replace))
-        .onChange(of: item.metadata) {
-            oldValue, newValue in
+        .onChange(of: item.metadata) { _, newValue in
             Task {
-                let oldAttachedPictures = oldValue[
-                    extracting: \.attachedPictures
-                ].current
-                let newAttachedPictures = newValue[
-                    extracting: \.attachedPictures
-                ].current
-                guard newAttachedPictures != oldAttachedPictures
-                else { return }
+                guard newValue.hasThumbnail else { return }
 
-                if let cover = await getCover(from: newAttachedPictures) {
-                    image = cover.image
-                }
+                image = await ThumbnailCacheModel.shared.get(forKey: item.url)
             }
         }
-    }
-
-    private func getCover(from attachedPictures: Set<AttachedPicture>) async
-        -> AttachedPicture?
-    {
-        guard !attachedPictures.isEmpty else { return nil }
-        let frontCover = attachedPictures.first { $0.type == .frontCover }
-        let backCover = attachedPictures.first { $0.type == .backCover }
-        let illustration = attachedPictures.first { $0.type == .illustration }
-        let fileIcon = attachedPictures.first { $0.type == .fileIcon }
-        return frontCover ?? backCover ?? illustration ?? fileIcon
-            ?? attachedPictures.first
     }
 }

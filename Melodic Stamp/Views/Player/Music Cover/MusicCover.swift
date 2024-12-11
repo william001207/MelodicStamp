@@ -18,7 +18,7 @@ struct MusicCover: View {
         Group {
             if !images.isEmpty {
                 // TODO: handle multiple images
-                ResizableImageView(image: images.first!, maxResolution: maxResolution)
+                Image(nsImage: images.first!)
             } else {
                 Group {
                     if hasPlaceholder {
