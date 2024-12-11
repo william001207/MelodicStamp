@@ -257,10 +257,6 @@ enum PlaybackMode: String, CaseIterable, Identifiable {
                 }
                 playlist.remove(at: index)
             }
-            
-            if let item = playlist.first(where: { $0.url == url }) {
-                item.metadata.removeThumbnail()
-            }
         }
     }
 

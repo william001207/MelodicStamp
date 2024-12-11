@@ -21,38 +21,40 @@ struct AdaptableMusicCoverControl: View {
     @State private var isHeaderHovering: Bool = false
 
     var body: some View {
-        let attachedPictures: [AttachedPicture] = switch state {
-        case .undefined:
-            []
-        case let .fine(entry):
-            .init(entry.current)
-        case let .varied(entries):
-            entries.flatMap(\.current)
-        }
+        let attachedPictures: [AttachedPicture] =
+            switch state {
+            case .undefined:
+                []
+            case let .fine(entry):
+                .init(entry.current)
+            case let .varied(entries):
+                entries.flatMap(\.current)
+            }
 
-        let images = attachedPictures
+        let images =
+            attachedPictures
             .filter { $0.type == type }
             .compactMap(\.image)
 
         AliveButton {
             isImagePickerPresented = true
         } label: {
-            MusicCover(
-                images: images,
-                maxResolution: maxResolution
-            )
-            .padding(.horizontal, 16)
+            MusicCover(images: images)
+                .padding(.horizontal, 16)
         }
         .fileImporter(
             isPresented: $isImagePickerPresented,
-            allowedContentTypes: AttachedPicturesHandlerModel.allowedContentTypes
+            allowedContentTypes: AttachedPicturesHandlerModel
+                .allowedContentTypes
         ) { result in
             switch result {
             case let .success(url):
                 guard url.startAccessingSecurityScopedResource() else { break }
                 defer { url.stopAccessingSecurityScopedResource() }
 
-                guard let image = NSImage(contentsOf: url), let attachedPicture = image.attachedPicture(of: type) else { break }
+                guard let image = NSImage(contentsOf: url),
+                    let attachedPicture = image.attachedPicture(of: type)
+                else { break }
                 attachedPicturesHandler.replace([attachedPicture], state: state)
             case .failure:
                 break
@@ -67,11 +69,14 @@ struct AdaptableMusicCoverControl: View {
             if isHeaderHovering {
                 HStack(spacing: 2) {
                     AliveButton {
-                        attachedPicturesHandler.restore(of: [type], state: state)
+                        attachedPicturesHandler.restore(
+                            of: [type], state: state)
                     } label: {
                         Image(systemSymbol: .arrowUturnLeft)
                     }
-                    .disabled(!attachedPicturesHandler.isModified(of: [type], state: state))
+                    .disabled(
+                        !attachedPicturesHandler.isModified(
+                            of: [type], state: state))
 
                     AliveButton {
                         attachedPicturesHandler.remove(of: [type], state: state)
@@ -87,7 +92,8 @@ struct AdaptableMusicCoverControl: View {
                     Rectangle()
                         .fill(.ultraThickMaterial)
                         .clipShape(.capsule)
-                        .matchedGeometryEffect(id: "headerBackground", in: namespace)
+                        .matchedGeometryEffect(
+                            id: "headerBackground", in: namespace)
                 }
             } else {
                 AttachedPictureTypeView(type: type)
@@ -100,7 +106,8 @@ struct AdaptableMusicCoverControl: View {
                         Rectangle()
                             .fill(.ultraThinMaterial)
                             .clipShape(.capsule)
-                            .matchedGeometryEffect(id: "headerBackground", in: namespace)
+                            .matchedGeometryEffect(
+                                id: "headerBackground", in: namespace)
                     }
             }
         }

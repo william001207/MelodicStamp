@@ -44,7 +44,7 @@ import SwiftUI
 
     private(set) var properties: AudioProperties!
     private(set) var state: State
-    private(set) var hasThumbnail: Bool
+    private(set) var thumbnail: NSImage?
 
     var attachedPictures: Entry<Set<AttachedPicture>>!
 
@@ -93,7 +93,6 @@ import SwiftUI
     init?(url: URL) {
         self.state = .loading
         self.url = url
-        self.hasThumbnail = false
 
         Task.detached {
             try await self.update()
@@ -277,12 +276,31 @@ extension Metadata {
         for var restorable in self.restorables {
             restorable.restore()
         }
+        
+        Task {
+            generateThumbnail()
+        }
     }
 
     func apply() {
         guard state.isLoaded else { return }
         for var restorable in self.restorables {
             restorable.apply()
+        }
+        
+        Task {
+            generateThumbnail()
+        }
+    }
+    
+    func generateThumbnail() {
+        guard state.isLoaded else {
+            thumbnail = nil
+            return
+        }
+        
+        if let image = ThumbnailMaker.getCoverImage(from: attachedPictures.current)?.image {
+            thumbnail = ThumbnailMaker.make(image)
         }
     }
 
@@ -298,10 +316,6 @@ extension Metadata {
                 let file = try AudioFile(readingPropertiesAndMetadataFrom: url)
                 properties = file.properties
                 load(from: file.metadata)
-                
-                Task {
-                    await self.cacheThumbnail()
-                }
 
                 switch state {
                 case .loading:
@@ -310,6 +324,10 @@ extension Metadata {
                     print("Updated metadata from \(url)")
                 }
                 state = .fine
+                
+                Task {
+                    self.generateThumbnail()
+                }
 
                 continuation.resume()
             } catch {
@@ -354,19 +372,6 @@ extension Metadata {
                 continuation.resume(throwing: error)
             }
         }
-    }
-    
-    func cacheThumbnail() async {
-        guard state.isLoaded else { return }
-        if let image = ThumbnailCacheModel.shared.getCoverImage(from: attachedPictures.current)?.image {
-            await ThumbnailCacheModel.shared.cache(forKey: url, from: image)
-            hasThumbnail = true
-        }
-    }
-    
-    func removeThumbnail() {
-        hasThumbnail = false
-        ThumbnailCacheModel.shared.remove(forKey: url)
     }
 
     subscript<V>(extracting keyPath: WritableKeyPath<Metadata, Entry<V>>) -> MetadataBatchEditingEntry<V> {

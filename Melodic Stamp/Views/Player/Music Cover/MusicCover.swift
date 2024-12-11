@@ -12,13 +12,12 @@ struct MusicCover: View {
     var images: [NSImage] = []
     var hasPlaceholder: Bool = true
     var cornerRadius: CGFloat = 8
-    var maxResolution: CGFloat? = 128
 
     var body: some View {
         Group {
             if !images.isEmpty {
                 // TODO: handle multiple images
-                Image(nsImage: images.first!)
+                image(images.first!)
             } else {
                 Group {
                     if hasPlaceholder {
@@ -38,5 +37,12 @@ struct MusicCover: View {
             }
         }
         .clipShape(.rect(cornerRadius: cornerRadius))
+    }
+    
+    @ViewBuilder private func image(_ image: NSImage) -> some View {
+        Image(nsImage: image)
+            .resizable()
+            .interpolation(.high)
+            .aspectRatio(contentMode: .fit)
     }
 }

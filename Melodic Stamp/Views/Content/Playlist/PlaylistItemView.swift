@@ -15,7 +15,6 @@ struct PlaylistItemView: View {
     var isSelected: Bool
 
     @State private var isHovering: Bool = false
-    @State private var image: NSImage?
 
     var body: some View {
         HStack(alignment: .center) {
@@ -83,11 +82,10 @@ struct PlaylistItemView: View {
 
     @ViewBuilder private func cover(isMetadataLoaded: Bool) -> some View {
         ZStack {
-            if let image {
+            if isMetadataLoaded, let image = item.metadata.thumbnail {
                 Group {
                     MusicCover(
-                        images: [image], hasPlaceholder: false, cornerRadius: 0,
-                        maxResolution: 32
+                        images: [image], hasPlaceholder: false, cornerRadius: 0
                     )
                     .overlay {
                         if isHovering {
@@ -108,12 +106,6 @@ struct PlaylistItemView: View {
                     .foregroundStyle(.white)
                 }
             } else {
-                Color.clear
-                    .task(priority: .background) {
-                        image = await ThumbnailCacheModel.shared.get(
-                            forKey: item.url)
-                    }
-
                 if isHovering {
                     Image(
                         systemSymbol: isMetadataLoaded
@@ -126,12 +118,5 @@ struct PlaylistItemView: View {
         .frame(width: 50, height: 50)
         .font(.title3)
         .contentTransition(.symbolEffect(.replace))
-        .onChange(of: item.metadata) { _, newValue in
-            Task {
-                guard newValue.hasThumbnail else { return }
-
-                image = await ThumbnailCacheModel.shared.get(forKey: item.url)
-            }
-        }
     }
 }
