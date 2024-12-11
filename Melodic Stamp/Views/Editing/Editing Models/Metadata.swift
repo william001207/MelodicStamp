@@ -350,9 +350,7 @@ extension Metadata {
         }
     }
 
-    subscript<V>(extracting keyPath: WritableKeyPath<Metadata, Entry<V>>)
-        -> MetadataBatchEditingEntry<V>
-    {
+    subscript<V>(extracting keyPath: WritableKeyPath<Metadata, Entry<V>>) -> MetadataBatchEditingEntry<V> {
         .init(keyPath: keyPath, metadatas: [self])
     }
 }

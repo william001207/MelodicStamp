@@ -9,12 +9,10 @@ import CSFBAudioEngine
 import SwiftUI
 
 struct MusicCover: View {
-    var cornerRadius: CGFloat = 8
     var images: [NSImage] = []
     var hasPlaceholder: Bool = true
+    var cornerRadius: CGFloat = 8
     var maxResolution: CGFloat? = 128
-    
-    @State private var resizedImages: [NSImage] = []
 
     var body: some View {
         Group {

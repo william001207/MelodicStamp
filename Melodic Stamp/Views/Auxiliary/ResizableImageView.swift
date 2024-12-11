@@ -31,6 +31,7 @@ struct ResizableImageView: View {
                     .interpolation(.high)
                     .aspectRatio(contentMode: .fit)
             } else {
+                // placeholder for displaying this view, otherwise will never get updates
                 Color.clear
                     .task(priority: .background) {
                         await getOrGenerateThumbnail()

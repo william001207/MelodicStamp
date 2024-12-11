@@ -15,6 +15,7 @@ struct PlaylistItemView: View {
     var isSelected: Bool
 
     @State private var isHovering: Bool = false
+    @State private var image: NSImage?
 
     var body: some View {
         HStack(alignment: .center) {
@@ -63,38 +64,7 @@ struct PlaylistItemView: View {
             AliveButton {
                 player.play(item: item)
             } label: {
-                ZStack {
-                    if isMetadataLoaded {
-                        let attachedPictures = item.metadata[extracting: \.attachedPictures]
-                        if let cover = getCover(from: attachedPictures.current), let image = cover.image {
-                            Group {
-                                MusicCover(cornerRadius: 0, images: [image], hasPlaceholder: false, maxResolution: 32)
-                                    .overlay {
-                                        if isHovering {
-                                            Rectangle()
-                                                .foregroundStyle(.black)
-                                                .opacity(0.25)
-                                                .blendMode(.darken)
-                                        }
-                                    }
-                            }
-                            .clipShape(.rect(cornerRadius: 8))
-                            
-                            if isHovering {
-                                Image(systemSymbol: isMetadataLoaded ? .playFill : .playSlashFill)
-                                    .foregroundStyle(.white)
-                            }
-                        } else {
-                            if isHovering {
-                                Image(systemSymbol: isMetadataLoaded ? .playFill : .playSlashFill)
-                                    .foregroundStyle(.primary)
-                            }
-                        }
-                    }
-                }
-                .frame(width: 50, height: 50)
-                .font(.title3)
-                .contentTransition(.symbolEffect(.replace))
+                cover(isMetadataLoaded: isMetadataLoaded)
             }
         }
         .padding(.vertical, 10)
@@ -111,12 +81,84 @@ struct PlaylistItemView: View {
         player.current == item
     }
 
-    private func getCover(from attachedPictures: Set<AttachedPicture>) -> AttachedPicture? {
+    @ViewBuilder private func cover(isMetadataLoaded: Bool) -> some View {
+        ZStack {
+            if let image {
+                Group {
+                    MusicCover(
+                        images: [image], hasPlaceholder: false, cornerRadius: 0,
+                        maxResolution: 32
+                    )
+                    .overlay {
+                        if isHovering {
+                            Rectangle()
+                                .foregroundStyle(.black)
+                                .opacity(0.25)
+                                .blendMode(.darken)
+                        }
+                    }
+                }
+                .clipShape(.rect(cornerRadius: 8))
+
+                if isHovering {
+                    Image(
+                        systemSymbol: isMetadataLoaded
+                            ? .playFill : .playSlashFill
+                    )
+                    .foregroundStyle(.white)
+                }
+            } else {
+                Color.clear
+                    .task(priority: .background) {
+                        if let cover = await getCover(
+                            from: item.metadata[
+                                extracting: \.attachedPictures
+                            ].current)
+                        {
+                            image = cover.image
+                        }
+                    }
+
+                if isHovering {
+                    Image(
+                        systemSymbol: isMetadataLoaded
+                            ? .playFill : .playSlashFill
+                    )
+                    .foregroundStyle(.primary)
+                }
+            }
+        }
+        .frame(width: 50, height: 50)
+        .font(.title3)
+        .contentTransition(.symbolEffect(.replace))
+        .onChange(of: item.metadata) {
+            oldValue, newValue in
+            Task {
+                let oldAttachedPictures = oldValue[
+                    extracting: \.attachedPictures
+                ].current
+                let newAttachedPictures = newValue[
+                    extracting: \.attachedPictures
+                ].current
+                guard newAttachedPictures != oldAttachedPictures
+                else { return }
+
+                if let cover = await getCover(from: newAttachedPictures) {
+                    image = cover.image
+                }
+            }
+        }
+    }
+
+    private func getCover(from attachedPictures: Set<AttachedPicture>) async
+        -> AttachedPicture?
+    {
         guard !attachedPictures.isEmpty else { return nil }
         let frontCover = attachedPictures.first { $0.type == .frontCover }
         let backCover = attachedPictures.first { $0.type == .backCover }
         let illustration = attachedPictures.first { $0.type == .illustration }
         let fileIcon = attachedPictures.first { $0.type == .fileIcon }
-        return frontCover ?? backCover ?? illustration ?? fileIcon ?? attachedPictures.first
+        return frontCover ?? backCover ?? illustration ?? fileIcon
+            ?? attachedPictures.first
     }
 }
