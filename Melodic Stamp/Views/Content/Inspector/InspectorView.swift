@@ -12,7 +12,6 @@ import SwiftUI
 struct InspectorView: View {
     @Environment(\.luminareMinHeight) private var minHeight
 
-    @Bindable var player: PlayerModel
     @Bindable var metadataEditor: MetadataEditorModel
 
     @State private var attachedPicturesHandler: AttachedPicturesHandlerModel =
@@ -63,10 +62,9 @@ struct InspectorView: View {
                     } label: {
                         Text("Track and Disc")
                     }
-
-                    Spacer()
                 }
                 .padding(.horizontal)
+                // don't use `contentMargins()` for content as it breaks progressive blurs
                 .safeAreaPadding(.top, 64)
                 .safeAreaPadding(.bottom, 94)
 
@@ -179,6 +177,8 @@ struct InspectorView: View {
         LabeledTextField(
             "Composer", text: metadataEditor[extracting: \.composer]
         )
+        
+        LabeledTextField("Genre", text: metadataEditor[extracting: \.genre])
     }
 
     @ViewBuilder private func albumEditor() -> some View {

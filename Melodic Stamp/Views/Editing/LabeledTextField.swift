@@ -10,6 +10,7 @@ import SwiftUI
 
 struct LabeledTextField<F, Label>: View where F: ParseableFormatStyle, F.FormatOutput == String, F.FormatInput: Equatable & Hashable, Label: View {
     @Environment(\.luminareAnimation) private var animation
+    @Environment(\.luminareAnimationFast) private var animationFast
     @Environment(\.luminareMinHeight) private var minHeight
     @Environment(\.luminareCompactButtonCornerRadius) private var buttonCornerRadius
 
@@ -148,7 +149,7 @@ struct LabeledTextField<F, Label>: View where F: ParseableFormatStyle, F.FormatO
             .frame(height: minHeight)
             .fixedSize()
             .onHover { hover in
-                withAnimation {
+                withAnimation(animationFast) {
                     isLabelHovering = hover
                 }
             }

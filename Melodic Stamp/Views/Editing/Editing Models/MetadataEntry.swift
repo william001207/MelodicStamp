@@ -109,6 +109,18 @@ final class MetadataBatchEditingEntry<V: Hashable & Equatable>: Identifiable {
             }
         )
     }
+    
+    func projectedUnwrappedValue<Clean>() -> Binding<Clean>? where V == Optional<Clean> {
+        if current == nil {
+            nil
+        } else {
+            Binding(get: {
+                self.current!
+            }, set: { newValue in
+                self.current = newValue
+            })
+        }
+    }
 
     var isModified: Bool {
         current != initial

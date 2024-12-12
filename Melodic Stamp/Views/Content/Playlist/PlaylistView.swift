@@ -39,7 +39,7 @@ struct PlaylistView: View {
                     } label: {
                         Image(systemSymbol: .play)
                     }
-                    .tint(.accentColor)
+                    .tint(.accent)
 
                     // remove from playlist
                     Button(role: .destructive) {

@@ -88,7 +88,7 @@ struct MainView: View {
         Group {
             switch selectedTab {
             case .inspector:
-                InspectorView(player: player, metadataEditor: metadataEditor)
+                InspectorView(metadataEditor: metadataEditor)
                     .toolbar {
                         if isInspectorPresented {
                             EditorToolbar(metadataEditor: metadataEditor)
