@@ -127,6 +127,19 @@ final class MetadataBatchEditingEntry<V: Hashable & Equatable>: Identifiable {
     }
 }
 
+extension MetadataBatchEditingEntry: Hashable {
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(keyPath)
+        hasher.combine(metadatas)
+    }
+}
+
+extension MetadataBatchEditingEntry: Equatable {
+    static func == (lhs: MetadataBatchEditingEntry<V>, rhs: MetadataBatchEditingEntry<V>) -> Bool {
+        lhs.hashValue == rhs.hashValue
+    }
+}
+
 // MARK: - Metadata Batch Editing Entries
 
 @Observable final class MetadataBatchEditingEntries<V: Hashable & Equatable>: Identifiable {
@@ -161,5 +174,18 @@ final class MetadataBatchEditingEntry<V: Hashable & Equatable>: Identifiable {
 extension MetadataBatchEditingEntries: Sequence {
     func makeIterator() -> Array<MetadataBatchEditingEntry<V>>.Iterator {
         metadatas.map { $0[extracting: keyPath] }.makeIterator()
+    }
+}
+
+extension MetadataBatchEditingEntries: Hashable {
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(keyPath)
+        hasher.combine(metadatas)
+    }
+}
+
+extension MetadataBatchEditingEntries: Equatable {
+    static func == (lhs: MetadataBatchEditingEntries<V>, rhs: MetadataBatchEditingEntries<V>) -> Bool {
+        lhs.hashValue == rhs.hashValue
     }
 }

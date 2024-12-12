@@ -7,10 +7,21 @@
 
 import SwiftUI
 
-enum MetadataValueState<V: Equatable & Hashable> {
+enum MetadataValueState<V: Equatable & Hashable>: Equatable {
     case undefined
     case fine(entry: MetadataBatchEditingEntry<V>)
     case varied(entries: MetadataBatchEditingEntries<V>)
+    
+    var isModified: Bool {
+        switch self {
+        case .undefined:
+            false
+        case .fine(let entry):
+            entry.isModified
+        case .varied(let entries):
+            entries.isModified
+        }
+    }
 }
 
 enum MetadataEditingState: Equatable {

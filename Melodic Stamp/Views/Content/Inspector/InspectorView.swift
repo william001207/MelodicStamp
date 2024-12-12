@@ -35,7 +35,13 @@ struct InspectorView: View {
                             state: metadataEditor[
                                 extracting: \.attachedPictures
                             ]
-                        )
+                        ) {
+                            Spacer()
+                                .frame(height: 8)
+                            
+                            Divider()
+                                .padding(.horizontal, 16)
+                        }
                         .padding(.horizontal, -16)
                         .contentMargins(
                             .horizontal, 16, for: .scrollIndicators

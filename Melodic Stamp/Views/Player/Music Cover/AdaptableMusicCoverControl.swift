@@ -39,7 +39,13 @@ struct AdaptableMusicCoverControl: View {
         AliveButton {
             isImagePickerPresented = true
         } label: {
-            MusicCover(images: images)
+            MusicCover(images: images, cornerRadius: 8)
+                .background {
+                    if state.isModified {
+                        RoundedRectangle(cornerRadius: 8)
+                            .stroke(.tint, lineWidth: 8)
+                    }
+                }
                 .padding(.horizontal, 16)
         }
         .fileImporter(

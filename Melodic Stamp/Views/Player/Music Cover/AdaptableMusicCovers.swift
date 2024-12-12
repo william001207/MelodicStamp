@@ -8,10 +8,10 @@
 import CSFBAudioEngine
 import SwiftUI
 
-struct AdaptableMusicCovers: View {
+struct AdaptableMusicCovers<Content>: View where Content: View {
     enum Layout {
         case flow
-        case grid
+        case list
     }
 
     @Bindable var attachedPicturesHandler: AttachedPicturesHandlerModel
@@ -19,6 +19,7 @@ struct AdaptableMusicCovers: View {
     var layout: Layout = .flow
     var contentWidth: CGFloat = 300, contentHeight: CGFloat = 200
     var state: MetadataValueState<Set<AttachedPicture>>
+    @ViewBuilder var emptyView: () -> Content
 
     @State private var contentSize: CGSize = .zero
 
@@ -30,8 +31,8 @@ struct AdaptableMusicCovers: View {
                 switch layout {
                 case .flow:
                     flowView()
-                case .grid:
-                    gridView()
+                case .list:
+                    listView()
                 }
             }
         }
@@ -42,8 +43,6 @@ struct AdaptableMusicCovers: View {
     private var types: Set<AttachedPicture.`Type`> {
         attachedPicturesHandler.types(state: state)
     }
-
-    @ViewBuilder private func emptyView() -> some View {}
 
     @ViewBuilder private func flowView() -> some View {
         ScrollView(.horizontal) {
@@ -70,7 +69,7 @@ struct AdaptableMusicCovers: View {
                     }
                 }
                 .frame(height: contentHeight)
-                .padding(.bottom, 8)
+                .padding(.vertical, 8)
             }
             .scrollTargetLayout()
             .onGeometryChange(for: CGSize.self) { proxy in
@@ -85,5 +84,5 @@ struct AdaptableMusicCovers: View {
         )
     }
 
-    @ViewBuilder private func gridView() -> some View {}
+    @ViewBuilder private func listView() -> some View {}
 }
