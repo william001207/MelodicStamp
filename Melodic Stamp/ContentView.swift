@@ -33,6 +33,7 @@ struct ContentView: View {
                 MainView(
                     fileManager: fileManager,
                     player: player,
+                    namespace: namespace,
                     isInspectorPresented: $isInspectorPresented,
                     selectedTab: $selectedTab
                 )
@@ -119,6 +120,7 @@ struct ContentView: View {
         .frame(minWidth: minWidth, maxWidth: maxWidth)
         .focusable()
         .focusEffectDisabled()
+        .prefersDefaultFocus(in: namespace)
         .focusedValue(\.windowManager, windowManager)
         .focusedValue(\.fileManager, fileManager)
         .focusedValue(\.player, player)

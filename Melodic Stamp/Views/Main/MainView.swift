@@ -37,6 +37,8 @@ struct MainView: View {
 
     @Bindable var fileManager: FileManagerModel
     @Bindable var player: PlayerModel
+    
+    var namespace: Namespace.ID
 
     @Binding var isInspectorPresented: Bool
     @Binding var selectedTab: SidebarTab
@@ -72,7 +74,7 @@ struct MainView: View {
     }
 
     @ViewBuilder private func playlist() -> some View {
-        PlaylistView(player: player, metadataEditor: metadataEditor)
+        PlaylistView(player: player, metadataEditor: metadataEditor, namespace: namespace)
             .ignoresSafeArea()
             .morphed()
             .background {
