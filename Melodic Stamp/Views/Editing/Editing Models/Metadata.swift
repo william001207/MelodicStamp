@@ -94,9 +94,8 @@ import SwiftUI
         self.state = .loading
         self.url = url
 
-        Task.detached {
+        Task {
             try await self.update()
-            self.state = .fine
         }
     }
 
@@ -323,11 +322,9 @@ extension Metadata {
                 default:
                     print("Updated metadata from \(url)")
                 }
-                state = .fine
                 
-                Task {
-                    self.generateThumbnail()
-                }
+                state = .fine
+                generateThumbnail()
 
                 continuation.resume()
             } catch {
