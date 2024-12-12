@@ -298,7 +298,7 @@ extension Metadata {
             return
         }
         
-        if let image = ThumbnailMaker.getCoverImage(from: attachedPictures.current)?.image {
+        if let image = ThumbnailMaker.getCover(from: attachedPictures.current)?.image {
             thumbnail = ThumbnailMaker.make(image)
         }
     }

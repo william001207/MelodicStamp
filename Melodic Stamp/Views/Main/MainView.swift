@@ -75,6 +75,7 @@ struct MainView: View {
 
     @ViewBuilder private func playlist() -> some View {
         PlaylistView(player: player, metadataEditor: metadataEditor, namespace: namespace)
+            .luminareAnimation(.default.speed(5))
             .ignoresSafeArea()
             .morphed()
             .background {

@@ -16,7 +16,7 @@ struct PlaylistView: View {
 
     @Bindable var player: PlayerModel
     @Bindable var metadataEditor: MetadataEditorModel
-    
+
     var namespace: Namespace.ID
 
     var body: some View {
@@ -33,6 +33,7 @@ struct PlaylistView: View {
                         item.wrappedValue)
                 )
                 .swipeActions {
+                    // play
                     Button {
                         player.play(item: item.wrappedValue)
                     } label: {
@@ -40,6 +41,7 @@ struct PlaylistView: View {
                     }
                     .tint(.accentColor)
 
+                    // remove from playlist
                     Button(role: .destructive) {
                         player.removeFromPlaylist(items: [item.wrappedValue])
                     } label: {
@@ -48,6 +50,7 @@ struct PlaylistView: View {
                     .tint(.red)
                 }
                 .swipeActions(edge: .leading) {
+                    // save metadata
                     if item.wrappedValue.metadata.isModified {
                         Button {
                             Task {
@@ -60,6 +63,7 @@ struct PlaylistView: View {
                         .tint(.green)
                     }
 
+                    // restore metadata
                     if item.wrappedValue.metadata.isModified {
                         Button {
                             item.wrappedValue.metadata.restore()
@@ -71,33 +75,7 @@ struct PlaylistView: View {
                     }
                 }
                 .contextMenu {
-                    Button("Play") {
-                        player.play(item: item.wrappedValue)
-                    }
-
-                    Button("Remove from Playlist") {
-                        if metadataEditor.items.isEmpty {
-                            player.removeFromPlaylist(items: [item.wrappedValue]
-                            )
-                        } else {
-                            player.removeFromPlaylist(
-                                items: .init(metadataEditor.items))
-                        }
-                    }
-
-                    Divider()
-
-                    Button("Save Metadata") {
-                        Task {
-                            try await item.wrappedValue.metadata.write()
-                        }
-                    }
-                    .disabled(!item.wrappedValue.metadata.isModified)
-
-                    Button("Restore Metadata") {
-                        item.wrappedValue.metadata.restore()
-                    }
-                    .disabled(!item.wrappedValue.metadata.isModified)
+                    contextMenu(for: item.wrappedValue)
                 }
             } emptyView: {
                 PlaylistExcerpt()
@@ -110,6 +88,7 @@ struct PlaylistView: View {
             .luminareListItemHighlightOnHover(false)
             .contentMargins(.top, 64, for: .scrollIndicators)
             .contentMargins(.bottom, 94, for: .scrollIndicators)
+            .animation(.default, value: metadataEditor.items)
 
             HStack(spacing: 0) {
                 LuminareSection(hasPadding: false) {
@@ -132,6 +111,7 @@ struct PlaylistView: View {
 
     @ViewBuilder private func actions() -> some View {
         HStack(spacing: 2) {
+            // clear selection
             Button {
                 metadataEditor.items = []
             } label: {
@@ -141,6 +121,7 @@ struct PlaylistView: View {
             .aspectRatio(1, contentMode: .fit)
             .disabled(metadataEditor.items.isEmpty)
 
+            // cycle playback mode
             Button {
                 let hasShift = NSEvent.modifierFlags.contains(.shift)
                 player.playbackMode = player.playbackMode.cycle(
@@ -151,10 +132,11 @@ struct PlaylistView: View {
             }
             .fixedSize(horizontal: true, vertical: false)
 
+            // remove selection from playlist
             Button(role: .destructive) {
                 player.removeFromPlaylist(items: .init(metadataEditor.items))
-                resetFocus(in: namespace)
-                
+                resetFocus(in: namespace)  // must regain focus due to unknown reasons
+
             } label: {
                 HStack {
                     Image(systemSymbol: .trashFill)
@@ -167,5 +149,33 @@ struct PlaylistView: View {
             .disabled(metadataEditor.items.isEmpty)
         }
         .buttonStyle(.luminare)
+    }
+
+    @ViewBuilder private func contextMenu(for item: PlaylistItem) -> some View {
+        Button("Play") {
+            player.play(item: item)
+        }
+
+        Button("Remove from Playlist") {
+            if metadataEditor.items.isEmpty {
+                player.removeFromPlaylist(items: [item])
+            } else {
+                player.removeFromPlaylist(items: .init(metadataEditor.items))
+            }
+        }
+
+        Divider()
+
+        Button("Save Metadata") {
+            Task {
+                try await item.metadata.write()
+            }
+        }
+        .disabled(!item.metadata.isModified)
+
+        Button("Restore Metadata") {
+            item.metadata.restore()
+        }
+        .disabled(!item.metadata.isModified)
     }
 }

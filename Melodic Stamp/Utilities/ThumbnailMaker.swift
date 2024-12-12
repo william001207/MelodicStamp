@@ -38,7 +38,7 @@ struct ThumbnailMaker {
         return resizedNSImage
     }
     
-    static func getCoverImage(from attachedPictures: Set<AttachedPicture>) -> AttachedPicture? {
+    static func getCover(from attachedPictures: Set<AttachedPicture>) -> AttachedPicture? {
         guard !attachedPictures.isEmpty else { return nil }
         let frontCover = attachedPictures.first { $0.type == .frontCover }
         let backCover = attachedPictures.first { $0.type == .backCover }
