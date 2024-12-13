@@ -7,23 +7,6 @@
 
 import SwiftUI
 
-enum MetadataValueState<V: Equatable & Hashable>: Equatable {
-    case undefined
-    case fine(entry: MetadataBatchEditingEntry<V>)
-    case varied(entries: MetadataBatchEditingEntries<V>)
-    
-    var isModified: Bool {
-        switch self {
-        case .undefined:
-            false
-        case .fine(let entry):
-            entry.isModified
-        case .varied(let entries):
-            entries.isModified
-        }
-    }
-}
-
 enum MetadataEditingState: Equatable {
     case fine
     case saving
@@ -83,17 +66,8 @@ enum MetadataEditingState: Equatable {
         }
     }
 
-    subscript<V: Equatable & Hashable>(extracting keyPath: WritableKeyPath<Metadata, MetadataEntry<V>>) -> MetadataValueState<V> {
-        guard isVisible else { return .undefined }
-
-        let values = metadatas.map(\.[extracting: keyPath]).map(\.current)
-        let areIdentical = values.allSatisfy { $0 == values[0] }
-
-        return if areIdentical {
-            .fine(entry: .init(keyPath: keyPath, metadatas: metadatas))
-        } else {
-            .varied(entries: .init(keyPath: keyPath, metadatas: metadatas))
-        }
+    subscript<V: Equatable & Hashable>(extracting keyPath: WritableKeyPath<Metadata, MetadataEntry<V>>) -> MetadataBatchEditingEntries<V> {
+        .init(keyPath: keyPath, metadatas: metadatas)
     }
 }
 

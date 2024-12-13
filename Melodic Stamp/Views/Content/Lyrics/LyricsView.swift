@@ -14,10 +14,10 @@ struct LyricsView: View {
 
     var body: some View {
         Group {
-            switch lyricsState {
-            case .undefined:
-                Color.red
-            case .fine:
+            switch entries.type {
+            case .none, .varied:
+                EmptyView()
+            case .identical:
                 TimelineView(.animation) { _ in
                     ScrollViewReader { _ in
                         ScrollView {
@@ -30,7 +30,7 @@ struct LyricsView: View {
                             .padding(.horizontal)
                             .safeAreaPadding(.top, 64)
                             .safeAreaPadding(.bottom, 94)
-
+                            
                             Spacer()
                                 .frame(height: 150)
                         }
@@ -40,12 +40,10 @@ struct LyricsView: View {
                         .contentMargins(.bottom, 94, for: .scrollIndicators)
                     }
                 }
-            case let .varied(entries):
-                Color.blue
             }
         }
         // TODO: restore this
-//        .onChange(of: lyricsState, initial: true) { _, _ in
+//        .onChange(of: entries, initial: true) { _, _ in
 //            loadLyrics()
 //        }
         .onChange(of: lyrics.type) { _, _ in
@@ -67,7 +65,7 @@ struct LyricsView: View {
         }
     }
 
-    private var lyricsState: MetadataValueState<String?> {
+    private var entries: MetadataBatchEditingEntries<String?> {
         metadataEditor[extracting: \.lyrics]
     }
 
@@ -147,11 +145,7 @@ struct LyricsView: View {
     }
 
     private func loadLyrics() {
-        switch lyricsState {
-        case let .fine(values):
-            lyrics.load(string: values.current)
-        default:
-            break
-        }
+        guard let binding = entries.projectedValue else { return }
+        lyrics.load(string: binding.wrappedValue)
     }
 }

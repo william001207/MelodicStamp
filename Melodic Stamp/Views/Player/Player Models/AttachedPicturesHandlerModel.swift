@@ -12,7 +12,7 @@ import UniformTypeIdentifiers
 @Observable class AttachedPicturesHandlerModel {
     typealias APType = AttachedPicture.`Type`
     typealias Entry = MetadataBatchEditingEntry<Set<AttachedPicture>>
-    typealias State = MetadataValueState<Set<AttachedPicture>>
+    typealias Entries = MetadataBatchEditingEntries<Set<AttachedPicture>>
 
     static var allowedContentTypes: [UTType] {
         [.jpeg, .png, .tiff, .bmp, .gif, .heic, .heif, .rawImage]
@@ -33,28 +33,14 @@ import UniformTypeIdentifiers
             .isEmpty
     }
 
-    func isModified(of types: [APType]? = nil, state: State, countAsEmpty fallback: Bool = true) -> Bool {
-        switch state {
-        case .undefined:
-            false
-        case let .fine(entry):
-            isModified(of: types, entry: entry, countAsEmpty: fallback)
-        case let .varied(entries):
-            !entries
-                .filter { isModified(of: types, entry: $0, countAsEmpty: fallback) }
-                .isEmpty
-        }
+    func isModified(of types: [APType]? = nil, entries: Entries, countAsEmpty fallback: Bool = true) -> Bool {
+        !entries
+            .filter { isModified(of: types, entry: $0, countAsEmpty: fallback) }
+            .isEmpty
     }
 
-    func types(state: State) -> Set<APType> {
-        switch state {
-        case .undefined:
-            []
-        case let .fine(entry):
-            Set(entry.current.map(\.type))
-        case let .varied(entries):
-            Set(entries.flatMap(\.current).map(\.type))
-        }
+    func types(of entries: Entries) -> Set<APType> {
+        Set(entries.flatMap(\.current).map(\.type))
     }
 
     func replacing(
@@ -70,15 +56,8 @@ import UniformTypeIdentifiers
         entry.current = replacing(newAttachedPictures, in: entry.current)
     }
 
-    func replace(_ newAttachedPictures: [AttachedPicture], state: State) {
-        switch state {
-        case .undefined:
-            break
-        case let .fine(entry):
-            replace(newAttachedPictures, entry: entry)
-        case let .varied(entries):
-            entries.forEach { replace(newAttachedPictures, entry: $0) }
-        }
+    func replace(_ newAttachedPictures: [AttachedPicture], entries: Entries) {
+        entries.forEach { replace(newAttachedPictures, entry: $0) }
     }
 
     func removing(
@@ -95,15 +74,8 @@ import UniformTypeIdentifiers
         entry.current = removing(of: types, in: entry.current)
     }
 
-    func remove(of types: [APType]? = nil, state: State) {
-        switch state {
-        case .undefined:
-            break
-        case let .fine(entry):
-            remove(of: types, entry: entry)
-        case let .varied(entries):
-            entries.forEach { remove(of: types, entry: $0) }
-        }
+    func remove(of types: [APType]? = nil, entries: Entries) {
+        entries.forEach { remove(of: types, entry: $0) }
     }
 
     private func restore(of types: [APType]? = nil, entry: Entry) {
@@ -123,26 +95,12 @@ import UniformTypeIdentifiers
         }
     }
 
-    func restore(of types: [APType]? = nil, state: State) {
+    func restore(of types: [APType]? = nil, entries: Entries) {
         guard let types else {
-            switch state {
-            case .undefined:
-                break
-            case let .fine(entry):
-                entry.restore()
-            case let .varied(entries):
-                entries.revertAll()
-            }
+            entries.restoreAll()
             return
         }
 
-        switch state {
-        case .undefined:
-            break
-        case let .fine(entry):
-            restore(of: types, entry: entry)
-        case let .varied(entries):
-            entries.forEach { restore(of: types, entry: $0) }
-        }
+        entries.forEach { restore(of: types, entry: $0) }
     }
 }

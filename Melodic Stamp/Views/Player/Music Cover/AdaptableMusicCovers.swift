@@ -18,7 +18,7 @@ struct AdaptableMusicCovers<Content>: View where Content: View {
 
     var layout: Layout = .flow
     var contentWidth: CGFloat = 300, contentHeight: CGFloat = 200
-    var state: MetadataValueState<Set<AttachedPicture>>
+    var entries: MetadataBatchEditingEntries<Set<AttachedPicture>>
     @ViewBuilder var emptyView: () -> Content
 
     @State private var contentSize: CGSize = .zero
@@ -41,7 +41,7 @@ struct AdaptableMusicCovers<Content>: View where Content: View {
     }
 
     private var types: Set<AttachedPicture.`Type`> {
-        attachedPicturesHandler.types(state: state)
+        attachedPicturesHandler.types(of: entries)
     }
 
     @ViewBuilder private func flowView() -> some View {
@@ -50,7 +50,7 @@ struct AdaptableMusicCovers<Content>: View where Content: View {
                 ForEach(Array(types).sorted(by: <), id: \.self) { type in
                     AdaptableMusicCoverControl(
                         attachedPicturesHandler: attachedPicturesHandler,
-                        state: state,
+                        entries: entries,
                         type: type,
                         maxResolution: contentHeight
                     )

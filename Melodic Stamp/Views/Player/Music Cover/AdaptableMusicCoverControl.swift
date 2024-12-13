@@ -13,7 +13,7 @@ struct AdaptableMusicCoverControl: View {
 
     @Bindable var attachedPicturesHandler: AttachedPicturesHandlerModel
 
-    var state: MetadataValueState<Set<AttachedPicture>>
+    var entries: MetadataBatchEditingEntries<Set<AttachedPicture>>
     var type: AttachedPicture.`Type`
     var maxResolution: CGFloat? = 128
 
@@ -21,49 +21,52 @@ struct AdaptableMusicCoverControl: View {
     @State private var isHeaderHovering: Bool = false
 
     var body: some View {
-        let attachedPictures: [AttachedPicture] =
-            switch state {
-            case .undefined:
-                []
-            case let .fine(entry):
-                .init(entry.current)
-            case let .varied(entries):
-                entries.flatMap(\.current)
-            }
+        Group {
+            if let binding = entries.projectedValue {
+                let attachedPictures: [AttachedPicture] = .init(
+                    binding.wrappedValue)
 
-        let images =
-            attachedPictures
-            .filter { $0.type == type }
-            .compactMap(\.image)
+                let images =
+                    attachedPictures
+                    .filter { $0.type == type }
+                    .compactMap(\.image)
 
-        AliveButton {
-            isImagePickerPresented = true
-        } label: {
-            MusicCover(images: images, cornerRadius: 8)
-                .background {
-                    if state.isModified {
-                        RoundedRectangle(cornerRadius: 8)
-                            .stroke(.tint, lineWidth: 8)
+                AliveButton {
+                    isImagePickerPresented = true
+                } label: {
+                    MusicCover(images: images, cornerRadius: 8)
+                        .background {
+                            if attachedPicturesHandler.isModified(of: [type], entries: entries) {
+                                RoundedRectangle(cornerRadius: 8)
+                                    .stroke(.tint, lineWidth: 8)
+                            }
+                        }
+                        .padding(.horizontal, 16)
+                }
+                .fileImporter(
+                    isPresented: $isImagePickerPresented,
+                    allowedContentTypes: AttachedPicturesHandlerModel
+                        .allowedContentTypes
+                ) { result in
+                    switch result {
+                    case let .success(url):
+                        guard url.startAccessingSecurityScopedResource() else {
+                            break
+                        }
+                        defer { url.stopAccessingSecurityScopedResource() }
+
+                        guard let image = NSImage(contentsOf: url),
+                            let attachedPicture = image.attachedPicture(
+                                of: type)
+                        else { break }
+                        attachedPicturesHandler.replace(
+                            [attachedPicture], entries: entries)
+                    case .failure:
+                        break
                     }
                 }
-                .padding(.horizontal, 16)
-        }
-        .fileImporter(
-            isPresented: $isImagePickerPresented,
-            allowedContentTypes: AttachedPicturesHandlerModel
-                .allowedContentTypes
-        ) { result in
-            switch result {
-            case let .success(url):
-                guard url.startAccessingSecurityScopedResource() else { break }
-                defer { url.stopAccessingSecurityScopedResource() }
-
-                guard let image = NSImage(contentsOf: url),
-                    let attachedPicture = image.attachedPicture(of: type)
-                else { break }
-                attachedPicturesHandler.replace([attachedPicture], state: state)
-            case .failure:
-                break
+            } else {
+                Color.clear
             }
         }
         .padding(.top, 8)
@@ -76,16 +79,22 @@ struct AdaptableMusicCoverControl: View {
                 HStack(spacing: 2) {
                     AliveButton {
                         attachedPicturesHandler.restore(
-                            of: [type], state: state)
+                            of: [type],
+                            entries: entries
+                        )
                     } label: {
                         Image(systemSymbol: .arrowUturnLeft)
                     }
                     .disabled(
                         !attachedPicturesHandler.isModified(
-                            of: [type], state: state))
+                            of: [type],
+                            entries: entries
+                        )
+                    )
 
                     AliveButton {
-                        attachedPicturesHandler.remove(of: [type], state: state)
+                        attachedPicturesHandler.remove(
+                            of: [type], entries: entries)
                     } label: {
                         Image(systemSymbol: .trash)
                     }

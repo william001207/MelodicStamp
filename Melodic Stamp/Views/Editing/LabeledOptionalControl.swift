@@ -13,7 +13,7 @@ where V: Hashable & Equatable, Label: View, Content: View, ContentB: View {
     @Environment(\.luminareAnimationFast) private var animationFast
     @Environment(\.luminareMinHeight) private var minHeight
 
-    var state: MetadataValueState<V?>
+    var entries: MetadataBatchEditingEntries<V?>
     var defaultValue: V
     @ViewBuilder var content: (Binding<V>) -> Content
     @ViewBuilder var emptyView: () -> ContentB
@@ -23,26 +23,26 @@ where V: Hashable & Equatable, Label: View, Content: View, ContentB: View {
 
     var body: some View {
         HStack {
-            switch state {
-            case .undefined:
+            switch entries.type {
+            case .none:
                 emptyView()
-            case .fine(let entry):
+            case .identical:
                 label()
-
+                
                 Spacer()
-
-                if let binding = entry.projectedUnwrappedValue() {
+                
+                if let binding = entries.projectedUnwrappedValue() {
                     if isHovering {
                         HStack(spacing: 2) {
                             AliveButton {
-                                entry.restore()
+                                entries.restoreAll()
                             } label: {
                                 Image(systemSymbol: .arrowUturnLeft)
                             }
-                            .disabled(!entry.isModified)
-
+                            .disabled(!entries.isModified)
+                            
                             AliveButton {
-                                entry.current = nil
+                                entries.setAll(nil)
                             } label: {
                                 Image(systemSymbol: .trash)
                             }
@@ -50,22 +50,22 @@ where V: Hashable & Equatable, Label: View, Content: View, ContentB: View {
                         .foregroundStyle(.red)
                         .bold()
                     }
-
+                    
                     content(binding)
                 } else {
                     Button {
-                        entry.current = defaultValue
+                        entries.setAll(defaultValue)
                     } label: {
                         Text("Grant a Value")
                             .foregroundStyle(.tint)
                     }
                     .buttonStyle(.plain)
                 }
-            case .varied(let entries):
+            case .varied:
                 label()
-
+                
                 Spacer()
-
+                
                 Color.blue
             }
         }

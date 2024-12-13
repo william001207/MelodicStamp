@@ -47,7 +47,7 @@ struct MetadataView: View {
 
     @ViewBuilder private func compilationEditor() -> some View {
         LabeledOptionalControl(
-            state: metadataEditor[extracting: \.isCompilation],
+            entries: metadataEditor[extracting: \.isCompilation],
             defaultValue: false
         ) { binding in
             Toggle("", isOn: binding)

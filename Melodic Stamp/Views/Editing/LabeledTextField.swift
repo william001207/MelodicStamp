@@ -9,12 +9,14 @@ import Luminare
 import SwiftUI
 
 struct LabeledTextField<F, Label>: View where F: ParseableFormatStyle, F.FormatOutput == String, F.FormatInput: Equatable & Hashable, Label: View {
+    typealias Entries = MetadataBatchEditingEntries<F.FormatInput?>
+    
     @Environment(\.luminareAnimation) private var animation
     @Environment(\.luminareAnimationFast) private var animationFast
     @Environment(\.luminareMinHeight) private var minHeight
     @Environment(\.luminareCompactButtonCornerRadius) private var buttonCornerRadius
 
-    private var state: MetadataValueState<F.FormatInput?>
+    private var entries: Entries
     private let format: F
     private let placeholder: LocalizedStringKey
     private let showsLabel: Bool
@@ -24,11 +26,11 @@ struct LabeledTextField<F, Label>: View where F: ParseableFormatStyle, F.FormatO
 
     init(
         _ placeholder: LocalizedStringKey,
-        state: MetadataValueState<F.FormatInput?>, format: F,
+        entries: Entries, format: F,
         showsLabel: Bool = true,
         @ViewBuilder label: @escaping () -> Label
     ) {
-        self.state = state
+        self.entries = entries
         self.format = format
         self.placeholder = placeholder
         self.showsLabel = showsLabel
@@ -37,12 +39,12 @@ struct LabeledTextField<F, Label>: View where F: ParseableFormatStyle, F.FormatO
 
     init(
         _ placeholder: LocalizedStringKey,
-        state: MetadataValueState<F.FormatInput?>, format: F,
+        entries: Entries, format: F,
         showsLabel: Bool = true
     ) where Label == EmptyView {
         self.init(
             placeholder,
-            state: state, format: format,
+            entries: entries, format: format,
             showsLabel: showsLabel
         ) {
             EmptyView()
@@ -51,23 +53,23 @@ struct LabeledTextField<F, Label>: View where F: ParseableFormatStyle, F.FormatO
 
     init(
         _ placeholder: LocalizedStringKey,
-        text: MetadataValueState<String?>,
+        text: MetadataBatchEditingEntries<String?>,
         @ViewBuilder label: @escaping () -> Label
     ) where F == StringFormatStyle {
         self.init(
             placeholder,
-            state: text, format: StringFormatStyle(),
+            entries: text, format: StringFormatStyle(),
             label: label
         )
     }
 
     init(
         _ placeholder: LocalizedStringKey,
-        text: MetadataValueState<String?>
+        text: MetadataBatchEditingEntries<String?>
     ) where F == StringFormatStyle, Label == EmptyView {
         self.init(
             placeholder,
-            state: text, format: StringFormatStyle()
+            entries: text, format: StringFormatStyle()
         ) {
             EmptyView()
         }
@@ -75,38 +77,32 @@ struct LabeledTextField<F, Label>: View where F: ParseableFormatStyle, F.FormatO
 
     var body: some View {
         HStack {
-            switch state {
-            case .undefined:
-                EmptyView()
-            case let .fine(entry):
-                fine(entry: entry)
-            case let .varied(entries):
-                varied(entries: entries)
+            if let binding = entries.projectedValue {
+                identical(binding: binding)
+            } else {
+                varied()
             }
         }
         .animation(animation, value: isActive)
     }
 
     private var isActive: Bool {
-        switch state {
-        case .undefined:
-            false
-        case let .fine(entries):
-            !isEmpty(value: entries.current)
-        case .varied:
+        if let binding = entries.projectedValue {
+            !isEmpty(value: binding.wrappedValue)
+        } else {
             false
         }
     }
 
-    @ViewBuilder private func fine(entry: MetadataBatchEditingEntry<F.FormatInput?>) -> some View {
+    @ViewBuilder private func identical(binding: Binding<F.FormatInput?>) -> some View {
         LuminareTextField(
             placeholder,
-            value: entry.projectedValue, format: format
+            value: binding, format: format
         )
         .luminareCompactButtonAspectRatio(contentMode: .fill)
         .overlay {
             Group {
-                if entry.isModified {
+                if entries.isModified {
                     RoundedRectangle(cornerRadius: buttonCornerRadius)
                         .stroke(.primary)
                         .fill(.quinary.opacity(0.5))
@@ -129,14 +125,14 @@ struct LabeledTextField<F, Label>: View where F: ParseableFormatStyle, F.FormatO
                 if isLabelHovering {
                     HStack(spacing: 2) {
                         AliveButton {
-                            entry.restore()
+                            entries.restoreAll()
                         } label: {
                             Image(systemSymbol: .arrowUturnLeft)
                         }
-                        .disabled(!entry.isModified)
+                        .disabled(!entries.isModified)
 
                         AliveButton {
-                            entry.current = nil
+                            entries.setAll(nil)
                         } label: {
                             Image(systemSymbol: .trash)
                         }
@@ -156,7 +152,7 @@ struct LabeledTextField<F, Label>: View where F: ParseableFormatStyle, F.FormatO
         }
     }
 
-    @ViewBuilder private func varied(entries _: MetadataBatchEditingEntries<F.FormatInput?>) -> some View {
+    @ViewBuilder private func varied() -> some View {
         Color.blue
     }
 

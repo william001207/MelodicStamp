@@ -31,7 +31,7 @@ struct InspectorView: View {
                         AdaptableMusicCovers(
                             attachedPicturesHandler:
                             attachedPicturesHandler,
-                            state: metadataEditor[
+                            entries: metadataEditor[
                                 extracting: \.attachedPictures
                             ]
                         ) {
@@ -88,13 +88,13 @@ struct InspectorView: View {
 
             LuminareSection(hasPadding: false) {
                 HStack(spacing: 2) {
-                    let state = metadataEditor[extracting: \.attachedPictures]
-                    let types = attachedPicturesHandler.types(state: state)
+                    let entries = metadataEditor[extracting: \.attachedPictures]
+                    let types = attachedPicturesHandler.types(of: entries)
                     let availableTypes = Set(AttachedPicture.allTypes)
                         .subtracting(types)
 
                     Button(role: .destructive) {
-                        attachedPicturesHandler.remove(state: state)
+                        attachedPicturesHandler.remove(entries: entries)
                     } label: {
                         HStack {
                             Image(systemSymbol: .trashFill)
@@ -150,7 +150,7 @@ struct InspectorView: View {
                                     of: chosenAttachedPictureType)
                             else { break }
                             attachedPicturesHandler.replace(
-                                [attachedPicture], state: state
+                                [attachedPicture], entries: entries
                             )
                         case .failure:
                             break
@@ -193,33 +193,32 @@ struct InspectorView: View {
 
     @ViewBuilder private func trackAndDiscEditor() -> some View {
         LuminarePopover(arrowEdge: .top) {
-            switch metadataEditor[extracting: \.bpm] {
-            case let .fine(values):
+            if let binding = metadataEditor[extracting: \.bpm].projectedValue {
                 LuminareStepper(
                     value: .init {
-                        CGFloat(values.current ?? .zero)
+                        CGFloat(binding.wrappedValue ?? .zero)
                     } set: { _ in
                         // do nothing
                     },
                     source: .infinite(),
                     indicatorSpacing: 16,
                     onRoundedValueChange: { _, newValue in
-                        values.current = Int(newValue)
+                        binding.wrappedValue = Int(newValue)
                     }
                 )
-            default:
+            } else {
                 EmptyView()
             }
         } badge: {
             LabeledTextField(
-                "BPM", state: metadataEditor[extracting: \.bpm], format: .number
+                "BPM", entries: metadataEditor[extracting: \.bpm], format: .number
             )
         }
         .luminarePopoverTrigger(.forceTouch)
 
         HStack {
             LabeledTextField(
-                "No.", state: metadataEditor[extracting: \.trackNumber],
+                "No.", entries: metadataEditor[extracting: \.trackNumber],
                 format: .number, showsLabel: false
             )
             .frame(maxWidth: 72)
@@ -231,14 +230,14 @@ struct InspectorView: View {
                 .foregroundStyle(.placeholder)
 
             LabeledTextField(
-                "Tracks", state: metadataEditor[extracting: \.trackTotal],
+                "Tracks", entries: metadataEditor[extracting: \.trackTotal],
                 format: .number
             )
         }
 
         HStack {
             LabeledTextField(
-                "No.", state: metadataEditor[extracting: \.discNumber],
+                "No.", entries: metadataEditor[extracting: \.discNumber],
                 format: .number, showsLabel: false
             )
             .frame(maxWidth: 72)
@@ -250,7 +249,7 @@ struct InspectorView: View {
                 .foregroundStyle(.placeholder)
 
             LabeledTextField(
-                "Discs", state: metadataEditor[extracting: \.discTotal],
+                "Discs", entries: metadataEditor[extracting: \.discTotal],
                 format: .number
             )
         }
