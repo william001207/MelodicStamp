@@ -8,34 +8,49 @@
 import SFSafeSymbols
 import SwiftUI
 
-struct SidebarSection: Hashable, Identifiable {
-    var title: String? = nil
-    var tabs: [SidebarTab]
-
-    var id: Int {
-        hashValue
-    }
-
-    static func == (lhs: SidebarSection, rhs: SidebarSection) -> Bool {
-        lhs.hashValue == rhs.hashValue
-    }
+protocol SidebarTab: Hashable, Identifiable, Equatable {
+    var title: String { get }
+    var systemSymbol: SFSymbol { get }
 }
 
-enum SidebarTab: String, Hashable, Identifiable, CaseIterable {
-    case inspector
-    case metadata
-    case lyrics
+enum SidebarContentTab: String, SidebarTab, CaseIterable, Codable {
+    case playlist
+    case leaflet
 
-    var id: String {
-        rawValue
-    }
+    var id: String { rawValue }
 
     var title: String {
         switch self {
-        case .inspector:
-            .init(localized: "Inspector")
-        case .metadata:
-            .init(localized: "Metadata")
+        case .playlist:
+            .init(localized: "Playlist")
+        case .leaflet:
+            .init(localized: "Leaflet")
+        }
+    }
+
+    var systemSymbol: SFSymbol {
+        switch self {
+        case .playlist:
+            .musicNoteList
+        case .leaflet:
+            .viewfinder
+        }
+    }
+}
+
+enum SidebarInspectorTab: String, SidebarTab, CaseIterable, Codable {
+    case commonMetadata
+    case advancedMetadata
+    case lyrics
+
+    var id: String { rawValue }
+
+    var title: String {
+        switch self {
+        case .commonMetadata:
+            .init(localized: "Common")
+        case .advancedMetadata:
+            .init(localized: "Advanced")
         case .lyrics:
             .init(localized: "Lyrics")
         }
@@ -43,9 +58,9 @@ enum SidebarTab: String, Hashable, Identifiable, CaseIterable {
 
     var systemSymbol: SFSymbol {
         switch self {
-        case .inspector:
+        case .commonMetadata:
             .photoOnRectangleAngled
-        case .metadata:
+        case .advancedMetadata:
             .textBadgePlus
         case .lyrics:
             .textQuote

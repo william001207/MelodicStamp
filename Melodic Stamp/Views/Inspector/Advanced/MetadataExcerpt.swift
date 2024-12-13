@@ -1,19 +1,19 @@
 //
-//  LyricsExcerpt.swift
+//  MetadataExcerpt.swift
 //  Melodic Stamp
 //
-//  Created by KrLite on 2024/11/30.
+//  Created by KrLite on 2024/11/25.
 //
 
 import SwiftUI
 
-struct LyricsExcerpt: View {
+struct MetadataExcerpt: View {
     var body: some View {
         VStack {
-            EmptyMusicNoteView(systemSymbol: SidebarTab.lyrics.systemSymbol)
+            EmptyMusicNoteView(systemSymbol: SidebarInspectorTab.advancedMetadata.systemSymbol)
                 .frame(height: 64)
 
-            Text("Lyrics")
+            Text("Metadata")
                 .font(.title3)
                 .foregroundStyle(.quaternary)
         }

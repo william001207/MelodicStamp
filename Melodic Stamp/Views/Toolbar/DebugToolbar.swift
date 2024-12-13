@@ -10,7 +10,11 @@ import SwiftUI
 struct DebugToolbar: View {
     var body: some View {
         Menu("Debug") {
-            
+            if let version = Bundle.main.appVersion {
+                Text("\(Bundle.main.displayName) - \(version)")
+            } else {
+                Text("\(Bundle.main.displayName)")
+            }
         }
     }
 }

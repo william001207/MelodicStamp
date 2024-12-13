@@ -41,7 +41,8 @@ struct MainView: View {
     var namespace: Namespace.ID
 
     @Binding var isInspectorPresented: Bool
-    @Binding var selectedTab: SidebarTab
+    @Binding var selectedContentTab: SidebarContentTab
+    @Binding var selectedInspectorTab: SidebarInspectorTab
 
     @State private var metadataEditor: MetadataEditorModel = .init()
     @State private var lyrics: LyricsModel = .init()
@@ -86,15 +87,15 @@ struct MainView: View {
 
     @ViewBuilder private func inspector() -> some View {
         Group {
-            switch selectedTab {
-            case .inspector:
+            switch selectedInspectorTab {
+            case .commonMetadata:
                 InspectorView(metadataEditor: metadataEditor)
                     .toolbar {
                         if isInspectorPresented {
                             EditorToolbar(metadataEditor: metadataEditor)
                         }
                     }
-            case .metadata:
+            case .advancedMetadata:
                 MetadataView(metadataEditor: metadataEditor)
                     .toolbar {
                         if isInspectorPresented {
@@ -118,11 +119,3 @@ struct MainView: View {
         .ignoresSafeArea()
     }
 }
-
-// #Preview {
-//    @Previewable @State var isInspectorPresented: Bool = false
-//    @Previewable @State var selectedTab: SidebarTab = .inspector
-//
-//    MainView(fileManager: .init(), player: .init(), isInspectorPresented: $isInspectorPresented, selectedTab: $selectedTab)
-//        .frame(minWidth: 1000, minHeight: 600)
-// }

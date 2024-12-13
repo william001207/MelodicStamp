@@ -6,56 +6,37 @@
 //
 
 import SwiftUI
+import Luminare
 
 struct FloatingTabBarView: View {
+    @Environment(\.luminareAnimationFast) private var animationFast
+    
     @Bindable var floatingWindows: FloatingWindowsModel
-
+    
     @State private var isHovering: Bool = true
-    @State private var hoveringTabs: Set<SidebarTab> = []
-
-    var sections: [SidebarSection]
-
+    @State private var hoveringTabs: Set<AnyHashable> = []
+    
     @Binding var isInspectorPresented: Bool
-    @Binding var selectedTab: SidebarTab
-
+    @Binding var selectedContentTab: SidebarContentTab
+    @Binding var selectedInspectorTab: SidebarInspectorTab
+    
     var body: some View {
         ZStack {
             VisualEffectView(material: .popover, blendingMode: .behindWindow)
-
+            
             VStack(alignment: .leading, spacing: 0) {
-                ForEach(sections) { section in
-                    Group {
-                        if let title = section.title {
-                            Group {
-                                if isHovering {
-                                    Text(title)
-                                        .font(.caption)
-                                        .bold()
-                                        .foregroundStyle(.secondary)
-                                } else {
-                                    Divider()
-                                }
-                            }
-                            .frame(height: 8)
-                            .padding(.horizontal, 8)
-                            .transition(.blurReplace)
-                        }
-
-                        ForEach(section.tabs) { tab in
-                            tabView(for: tab)
-                                .onHover { hover in
-                                    withAnimation(.default.speed(2)) {
-                                        if hover {
-                                            hoveringTabs.insert(tab)
-                                        } else {
-                                            hoveringTabs.remove(tab)
-                                        }
-                                    }
-                                }
-                        }
+                Group {
+                    ForEach(SidebarContentTab.allCases) { tab in
+                        contentTab(for: tab)
                     }
-                    .padding(4)
+                    
+                    sectionLabel("Inspector")
+                    
+                    ForEach(SidebarInspectorTab.allCases) { tab in
+                        inspectorTab(for: tab)
+                    }
                 }
+                .padding(4)
             }
         }
         .onAppear {
@@ -73,58 +54,101 @@ struct FloatingTabBarView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .contentShape(.rect(cornerRadius: 24))
     }
-
-    @ViewBuilder private func tabView(for tab: SidebarTab) -> some View {
-        let isTabHovering = hoveringTabs.contains(tab)
-        let isSelected = isInspectorPresented && tab == selectedTab
-
-        AliveButton {
-            if selectedTab == tab {
-                isInspectorPresented.toggle()
+    
+    @ViewBuilder private func sectionLabel(_ key: LocalizedStringKey) -> some View {
+        Group {
+            if isHovering {
+                Text(key)
+                    .font(.caption)
+                    .bold()
+                    .foregroundStyle(.secondary)
             } else {
-                isInspectorPresented = true
-                selectedTab = tab
+                Divider()
             }
+        }
+        .frame(height: 8)
+        .padding(.horizontal, 8)
+        .transition(.blurReplace)
+    }
+    
+    @ViewBuilder private func contentTab(for tab: SidebarContentTab) -> some View {
+        let isSelected = selectedContentTab == tab
+        
+        AliveButton {
+            selectedContentTab = tab
         } label: {
-            HStack(alignment: .center) {
-                Image(systemSymbol: tab.systemSymbol)
-                    .font(.system(size: 18))
-                    .frame(width: 32, height: 32)
-
-                if isHovering {
-                    Text(tab.title)
-                        .font(.headline)
-                        .fixedSize()
-                        .padding(.trailing)
-                }
-            }
-            .frame(height: 32)
-            .padding(4)
-            .frame(maxWidth: .infinity, alignment: isHovering ? .leading : .center)
-            .opacity(isSelected || isTabHovering ? 1 : 0.75)
-            .background {
-                if isSelected {
-                    if isHovering {
-                        RoundedRectangle(cornerRadius: 20)
-                            .stroke(.tint)
-                            .fill(.tint.quaternary)
-                    } else {
-                        RoundedRectangle(cornerRadius: 20)
-                            .stroke(.quaternary)
-                            .fill(.quaternary)
-                    }
-                } else if isTabHovering {
-                    RoundedRectangle(cornerRadius: 20)
-                        .stroke(.quinary)
-                        .fill(.quinary)
+            label(for: tab, isSelected: isSelected)
+        }
+        .onHover { hover in
+            withAnimation(animationFast) {
+                if hover {
+                    hoveringTabs.insert(tab)
+                } else {
+                    hoveringTabs.remove(tab)
                 }
             }
         }
     }
+    
+    @ViewBuilder private func inspectorTab(for tab: SidebarInspectorTab) -> some View {
+        let isSelected = isInspectorPresented && selectedInspectorTab == tab
+        
+        AliveButton {
+            if isSelected {
+                isInspectorPresented.toggle()
+            } else {
+                isInspectorPresented = true
+                selectedInspectorTab = tab
+            }
+        } label: {
+            label(for: tab, isSelected: isSelected)
+        }
+        .onHover { hover in
+            withAnimation(animationFast) {
+                if hover {
+                    hoveringTabs.insert(tab)
+                } else {
+                    hoveringTabs.remove(tab)
+                }
+            }
+        }
+    }
+    
+    @ViewBuilder private func label<Tab: SidebarTab>(for tab: Tab, isSelected: Bool) -> some View {
+        let isTabHovering = hoveringTabs.contains(tab)
+        
+        HStack(alignment: .center) {
+            Image(systemSymbol: tab.systemSymbol)
+                .font(.system(size: 18))
+                .frame(width: 32, height: 32)
+            
+            if isHovering {
+                Text(tab.title)
+                    .font(.headline)
+                    .fixedSize()
+                    .padding(.trailing)
+            }
+        }
+        .frame(height: 32)
+        .padding(4)
+        .frame(maxWidth: .infinity, alignment: isHovering ? .leading : .center)
+        .opacity(isSelected || isTabHovering ? 1 : 0.75)
+        .background {
+            if isSelected {
+                if isHovering {
+                    RoundedRectangle(cornerRadius: 20)
+                        .stroke(.tint)
+                        .fill(.tint.quaternary)
+                } else {
+                    RoundedRectangle(cornerRadius: 20)
+                        .stroke(.quaternary)
+                        .fill(.quaternary)
+                }
+            } else if isTabHovering {
+                RoundedRectangle(cornerRadius: 20)
+                    .stroke(.quinary)
+                    .fill(.quinary)
+            }
+        }
+    }
 }
-
-// #Preview {
-//    @Previewable @State var selectedTab: SidebarTab = .inspector
-//
-//    FloatingTabBarView(floatingWindows: .init(), sections: [.init(tabs: SidebarTab.allCases)], selectedTab: $selectedTab)
-// }

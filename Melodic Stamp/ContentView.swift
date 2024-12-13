@@ -14,7 +14,8 @@ struct ContentView: View {
     @Namespace private var namespace
 
     @State private var isInspectorPresented: Bool = false
-    @State private var selectedTab: SidebarTab = .inspector
+    @State private var selectedContentTab: SidebarContentTab = .playlist
+    @State private var selectedInspectorTab: SidebarInspectorTab = .commonMetadata
 
     @State private var floatingWindows: FloatingWindowsModel = .init()
     @State private var windowManager: WindowManagerModel = .init()
@@ -35,7 +36,8 @@ struct ContentView: View {
                     player: player,
                     namespace: namespace,
                     isInspectorPresented: $isInspectorPresented,
-                    selectedTab: $selectedTab
+                    selectedContentTab: $selectedContentTab,
+                    selectedInspectorTab: $selectedInspectorTab
                 )
                 .onGeometryChange(for: CGRect.self) { proxy in
                     proxy.frame(in: .global)
@@ -144,12 +146,9 @@ struct ContentView: View {
         floatingWindows.addTabBar {
             FloatingTabBarView(
                 floatingWindows: floatingWindows,
-                sections: [
-                    .init(tabs: [.inspector, .metadata]),
-                    .init(title: .init(localized: "Lyrics"), tabs: [.lyrics]),
-                ],
                 isInspectorPresented: $isInspectorPresented,
-                selectedTab: $selectedTab
+                selectedContentTab: $selectedContentTab,
+                selectedInspectorTab: $selectedInspectorTab
             )
         }
         floatingWindows.addPlayer {

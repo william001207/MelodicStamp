@@ -1,19 +1,19 @@
 //
-//  InspectorExcerpt.swift
+//  LyricsExcerpt.swift
 //  Melodic Stamp
 //
-//  Created by KrLite on 2024/11/25.
+//  Created by KrLite on 2024/11/30.
 //
 
 import SwiftUI
 
-struct InspectorExcerpt: View {
+struct LyricsExcerpt: View {
     var body: some View {
         VStack {
-            EmptyMusicNoteView(systemSymbol: SidebarTab.inspector.systemSymbol)
+            EmptyMusicNoteView(systemSymbol: SidebarInspectorTab.lyrics.systemSymbol)
                 .frame(height: 64)
 
-            Text("Inspector")
+            Text("Lyrics")
                 .font(.title3)
                 .foregroundStyle(.quaternary)
         }
@@ -21,5 +21,5 @@ struct InspectorExcerpt: View {
 }
 
 #Preview {
-    InspectorExcerpt()
+    MetadataExcerpt()
 }
