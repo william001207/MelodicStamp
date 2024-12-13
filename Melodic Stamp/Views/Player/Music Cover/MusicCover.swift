@@ -38,7 +38,7 @@ struct MusicCover: View {
         }
         .clipShape(.rect(cornerRadius: cornerRadius))
     }
-    
+
     @ViewBuilder private func image(_ image: NSImage) -> some View {
         Image(nsImage: image)
             .resizable()

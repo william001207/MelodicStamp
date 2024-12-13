@@ -10,7 +10,7 @@ import SwiftUI
 enum MelodicStampWindowStyle: String, Equatable, Hashable, Identifiable {
     case main
     case miniPlayer
-    
+
     var id: Self {
         self
     }

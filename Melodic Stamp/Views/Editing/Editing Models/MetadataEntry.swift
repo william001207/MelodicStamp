@@ -29,11 +29,11 @@ extension Restorable {
     var isModified: Bool {
         current != initial
     }
-    
+
     mutating func restore() {
         current = initial
     }
-    
+
     mutating func apply() {
         initial = current
     }
@@ -101,13 +101,13 @@ final class MetadataBatchEditingEntry<V: Hashable & Equatable>: Identifiable {
 
     var projectedValue: Binding<V> {
         Binding {
-                self.current
+            self.current
         } set: { newValue in
             self.current = newValue
         }
     }
-    
-    func projectedUnwrappedValue<Clean>() -> Binding<Clean>? where V == Optional<Clean> {
+
+    func projectedUnwrappedValue<Clean>() -> Binding<Clean>? where V == Clean? {
         if current == nil {
             nil
         } else {
@@ -158,7 +158,7 @@ extension MetadataBatchEditingEntry: Equatable {
         self.keyPath = keyPath
         self.metadatas = metadatas
     }
-    
+
     var projectedValue: Binding<V>? {
         switch type {
         case .none, .varied:
@@ -171,8 +171,8 @@ extension MetadataBatchEditingEntry: Equatable {
             }
         }
     }
-    
-    func projectedUnwrappedValue<Clean>() -> Binding<Clean>? where V == Optional<Clean> {
+
+    func projectedUnwrappedValue<Clean>() -> Binding<Clean>? where V == Clean? {
         switch type {
         case .none, .varied:
             nil
@@ -188,14 +188,14 @@ extension MetadataBatchEditingEntry: Equatable {
             }
         }
     }
-    
+
     var type: MetadataValueType {
         if metadatas.isEmpty {
             return .none
         } else {
             let values = map(\.current)
             let areIdentical = values.allSatisfy { $0 == values[0] }
-            
+
             return areIdentical ? .identical : .varied
         }
     }
@@ -211,7 +211,7 @@ extension MetadataBatchEditingEntry: Equatable {
     func applyAll() {
         forEach { $0.apply() }
     }
-    
+
     func setAll(_ newValue: V) {
         forEach { $0.current = newValue }
     }
@@ -242,6 +242,6 @@ enum MetadataValueType: String, Identifiable, Hashable, Equatable, CaseIterable,
     case none
     case identical
     case varied
-    
+
     var id: String { rawValue }
 }

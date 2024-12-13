@@ -9,7 +9,7 @@ import Luminare
 import SwiftUI
 
 struct LabeledOptionalControl<V, Label, Content, ContentB>: View
-where V: Hashable & Equatable, Label: View, Content: View, ContentB: View {
+    where V: Hashable & Equatable, Label: View, Content: View, ContentB: View {
     @Environment(\.luminareAnimationFast) private var animationFast
     @Environment(\.luminareMinHeight) private var minHeight
 
@@ -28,9 +28,9 @@ where V: Hashable & Equatable, Label: View, Content: View, ContentB: View {
                 emptyView()
             case .identical:
                 label()
-                
+
                 Spacer()
-                
+
                 if let binding = entries.projectedUnwrappedValue() {
                     if isHovering {
                         HStack(spacing: 2) {
@@ -40,7 +40,7 @@ where V: Hashable & Equatable, Label: View, Content: View, ContentB: View {
                                 Image(systemSymbol: .arrowUturnLeft)
                             }
                             .disabled(!entries.isModified)
-                            
+
                             AliveButton {
                                 entries.setAll(nil)
                             } label: {
@@ -50,7 +50,7 @@ where V: Hashable & Equatable, Label: View, Content: View, ContentB: View {
                         .foregroundStyle(.red)
                         .bold()
                     }
-                    
+
                     content(binding)
                 } else {
                     Button {
@@ -63,9 +63,9 @@ where V: Hashable & Equatable, Label: View, Content: View, ContentB: View {
                 }
             case .varied:
                 label()
-                
+
                 Spacer()
-                
+
                 Color.blue
             }
         }

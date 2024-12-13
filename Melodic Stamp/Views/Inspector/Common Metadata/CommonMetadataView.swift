@@ -37,7 +37,7 @@ struct CommonMetadataView: View {
                         ) {
                             Spacer()
                                 .frame(height: 8)
-                            
+
                             Divider()
                                 .padding(.horizontal, 16)
                         }
@@ -177,7 +177,7 @@ struct CommonMetadataView: View {
         LabeledTextField(
             "Composer", text: metadataEditor[extracting: \.composer]
         )
-        
+
         LabeledTextField("Genre", text: metadataEditor[extracting: \.genre])
     }
 

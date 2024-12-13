@@ -10,7 +10,7 @@ import SwiftUI
 
 struct LabeledTextField<F, Label>: View where F: ParseableFormatStyle, F.FormatOutput == String, F.FormatInput: Equatable & Hashable, Label: View {
     typealias Entries = MetadataBatchEditingEntries<F.FormatInput?>
-    
+
     @Environment(\.luminareAnimation) private var animation
     @Environment(\.luminareAnimationFast) private var animationFast
     @Environment(\.luminareMinHeight) private var minHeight

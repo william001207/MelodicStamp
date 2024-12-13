@@ -7,5 +7,4 @@
 
 import SwiftUI
 
-extension EnvironmentValues {
-}
+extension EnvironmentValues {}

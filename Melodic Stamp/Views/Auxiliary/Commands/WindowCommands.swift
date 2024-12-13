@@ -9,12 +9,12 @@ import SwiftUI
 
 struct WindowCommands: Commands {
     @FocusedValue(\.windowManager) private var windowManager
-    
+
     var body: some Commands {
         CommandGroup(after: .windowSize) {
             if let windowManager {
                 @Bindable var windowManager = windowManager
-                
+
                 switch windowManager.style {
                 case .main:
                     Button("Mini Player") {

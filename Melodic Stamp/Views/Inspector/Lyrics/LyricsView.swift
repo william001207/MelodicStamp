@@ -30,7 +30,7 @@ struct LyricsView: View {
                             .padding(.horizontal)
                             .safeAreaPadding(.top, 64)
                             .safeAreaPadding(.bottom, 94)
-                            
+
                             Spacer()
                                 .frame(height: 150)
                         }

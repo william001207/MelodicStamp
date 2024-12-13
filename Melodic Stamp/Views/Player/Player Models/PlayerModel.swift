@@ -212,7 +212,7 @@ enum PlaybackMode: String, CaseIterable, Identifiable {
 
     func play(item: PlaylistItem) {
         addToPlaylist(urls: [item.url])
-        
+
         Task {
             if let decoder = try item.decoder() {
                 self.current = item
@@ -223,7 +223,7 @@ enum PlaybackMode: String, CaseIterable, Identifiable {
 
     func play(url: URL) {
         addToPlaylist(urls: [url])
-        
+
         Task {
             if let item = self.playlist.first(where: { $0.url == url }) {
                 self.play(item: item)

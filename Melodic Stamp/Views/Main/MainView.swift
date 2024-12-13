@@ -37,7 +37,7 @@ struct MainView: View {
 
     @Bindable var fileManager: FileManagerModel
     @Bindable var player: PlayerModel
-    
+
     var namespace: Namespace.ID
 
     @Binding var isInspectorPresented: Bool
@@ -65,12 +65,12 @@ struct MainView: View {
                 ToolbarItemGroup(placement: .navigation) {
                     FileToolbar(player: player, fileManager: fileManager)
                 }
-                
-#if DEBUG
-                ToolbarItemGroup(placement: .cancellationAction) {
-                    DebugToolbar()
-                }
-#endif
+
+                #if DEBUG
+                    ToolbarItemGroup(placement: .cancellationAction) {
+                        DebugToolbar()
+                    }
+                #endif
             }
     }
 

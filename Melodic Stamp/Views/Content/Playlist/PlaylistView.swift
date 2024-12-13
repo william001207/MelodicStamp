@@ -135,7 +135,7 @@ struct PlaylistView: View {
             // remove selection from playlist
             Button(role: .destructive) {
                 player.removeFromPlaylist(items: .init(metadataEditor.items))
-                resetFocus(in: namespace)  // must regain focus due to unknown reasons
+                resetFocus(in: namespace) // must regain focus due to unknown reasons
 
             } label: {
                 HStack {

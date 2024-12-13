@@ -73,7 +73,6 @@ struct MiniPlayer: View {
         .background(Color.clear)
         .focusable()
         .focusEffectDisabled()
-
         // regain progress control on new track
         .onChange(of: player.currentIndex) { _, newValue in
             guard newValue != nil else { return }
@@ -83,7 +82,8 @@ struct MiniPlayer: View {
         // handle space down/up -> toggle play pause
         .onKeyPress(keys: [.space], phases: .all) { key in
             playerKeyboardControl.handlePlayPause(
-                in: player, phase: key.phase, modifiers: key.modifiers)
+                in: player, phase: key.phase, modifiers: key.modifiers
+            )
         }
 
         // handle left arrow/right arrow down/repeat/up -> adjust progress and navigate track
@@ -94,11 +94,13 @@ struct MiniPlayer: View {
             case .progress:
                 playerKeyboardControl.handleProgressAdjustment(
                     in: player, phase: key.phase, modifiers: key.modifiers,
-                    sign: sign)
+                    sign: sign
+                )
             case .volume:
                 playerKeyboardControl.handleVolumeAdjustment(
                     in: player, phase: key.phase, modifiers: key.modifiers,
-                    sign: sign)
+                    sign: sign
+                )
             }
         }
 
@@ -128,8 +130,7 @@ struct MiniPlayer: View {
         HStack(alignment: .center, spacing: 12) {
             AliveButton(
                 enabledStyle: .init(.tertiary), hoveringStyle: .init(.secondary)
-            ) {
-            } label: {
+            ) {} label: {
                 Image(systemSymbol: .squareAndArrowUp)
             }
             .opacity(isTitleHovering ? 1 : 0)
@@ -146,7 +147,8 @@ struct MiniPlayer: View {
                     .frame(width: 16)
             }
             .matchedGeometryEffect(
-                id: PlayerNamespace.playbackModeButton, in: namespace)
+                id: PlayerNamespace.playbackModeButton, in: namespace
+            )
 
             AliveButton {
                 headerControl =
@@ -205,7 +207,8 @@ struct MiniPlayer: View {
                         .previousSongButtonBounceAnimation
                 )
                 .matchedGeometryEffect(
-                    id: PlayerNamespace.previousSongButton, in: namespace)
+                    id: PlayerNamespace.previousSongButton, in: namespace
+                )
 
                 AliveButton {
                     player.togglePlayPause()
@@ -224,7 +227,8 @@ struct MiniPlayer: View {
                     .bouncy, value: playerKeyboardControl.isPressingSpace
                 )
                 .matchedGeometryEffect(
-                    id: PlayerNamespace.playPauseButton, in: namespace)
+                    id: PlayerNamespace.playPauseButton, in: namespace
+                )
 
                 AliveButton {
                     player.nextTrack()
@@ -239,7 +243,8 @@ struct MiniPlayer: View {
                     value: playerKeyboardControl.nextSongButtonBounceAnimation
                 )
                 .matchedGeometryEffect(
-                    id: PlayerNamespace.nextSongButton, in: namespace)
+                    id: PlayerNamespace.nextSongButton, in: namespace
+                )
             }
             .disabled(!player.hasCurrentTrack)
         }
@@ -281,14 +286,15 @@ struct MiniPlayer: View {
                 value: playerKeyboardControl.speakerButtonBounceAnimation
             )
             .matchedGeometryEffect(
-                id: PlayerNamespace.volumeButton, in: namespace)
+                id: PlayerNamespace.volumeButton, in: namespace
+            )
 
-            AliveButton {
-            } label: {
+            AliveButton {} label: {
                 Image(systemSymbol: .listTriangle)
             }
             .matchedGeometryEffect(
-                id: PlayerNamespace.playlistButton, in: namespace)
+                id: PlayerNamespace.playlistButton, in: namespace
+            )
         }
     }
 
@@ -343,7 +349,7 @@ struct MiniPlayer: View {
                     isDelegated: activeControl == .progress,
                     externalOvershootSign: activeControl == .progress
                         ? playerKeyboardControl
-                            .progressBarExternalOvershootSign
+                        .progressBarExternalOvershootSign
                         : playerKeyboardControl.volumeBarExternalOvershootSign
                 ) { _, newValue in
                     adjustmentPercentage = newValue
@@ -358,7 +364,7 @@ struct MiniPlayer: View {
                     isProgressBarActive
                         ? .primary
                         : activeControl == .volume && player.isMuted
-                            ? .quaternary : .secondary
+                        ? .quaternary : .secondary
                 )
                 .backgroundStyle(.quinary)
             }
@@ -385,7 +391,8 @@ struct MiniPlayer: View {
             }
             .transition(.blurReplace)
             .matchedGeometryEffect(
-                id: PlayerNamespace.durationText, in: namespace)
+                id: PlayerNamespace.durationText, in: namespace
+            )
         }
         .frame(height: 12)
         .onHover { hover in

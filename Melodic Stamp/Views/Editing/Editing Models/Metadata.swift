@@ -112,15 +112,15 @@ import SwiftUI
             musicBrainzRecordingID, musicBrainzReleaseID,
             rating, releaseDate,
             replayGainAlbumGain, replayGainAlbumPeak, replayGainTrackGain,
-            replayGainTrackPeak, replayGainReferenceLoudness,
+            replayGainTrackPeak, replayGainReferenceLoudness
         ]
     }
 }
 
 // MARK: Loading Functions
 
-extension Metadata {
-    fileprivate func load(
+private extension Metadata {
+    func load(
         attachedPictures: Set<AttachedPicture> = [],
         title: String? = nil, titleSortOrder: String? = nil,
         artist: String? = nil, artistSortOrder: String? = nil,
@@ -182,7 +182,7 @@ extension Metadata {
         self.additional = .init(additional)
     }
 
-    fileprivate func load(from metadata: AudioMetadata?) {
+    func load(from metadata: AudioMetadata?) {
         load(
             attachedPictures: metadata?.attachedPictures ?? [],
             title: metadata?.title, titleSortOrder: metadata?.titleSortOrder,
@@ -218,7 +218,7 @@ extension Metadata {
         )
     }
 
-    fileprivate func pack() -> AudioMetadata {
+    func pack() -> AudioMetadata {
         let metadata = AudioMetadata()
 
         metadata.title = title.current
@@ -275,7 +275,7 @@ extension Metadata {
         for var restorable in self.restorables {
             restorable.restore()
         }
-        
+
         Task {
             generateThumbnail()
         }
@@ -286,18 +286,18 @@ extension Metadata {
         for var restorable in self.restorables {
             restorable.apply()
         }
-        
+
         Task {
             generateThumbnail()
         }
     }
-    
+
     func generateThumbnail() {
         guard state.isLoaded else {
             thumbnail = nil
             return
         }
-        
+
         if let image = ThumbnailMaker.getCover(from: attachedPictures.current)?.image {
             thumbnail = ThumbnailMaker.make(image)
         }
@@ -322,7 +322,7 @@ extension Metadata {
                 default:
                     print("Updated metadata from \(url)")
                 }
-                
+
                 state = .fine
                 generateThumbnail()
 

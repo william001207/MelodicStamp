@@ -11,18 +11,18 @@ import SwiftUI
     var previousSongButtonBounceAnimation: Bool = false
     var nextSongButtonBounceAnimation: Bool = false
     var speakerButtonBounceAnimation: Bool = false
-    
+
     var isPressingSpace: Bool = false
     var progressBarExternalOvershootSign: FloatingPointSign?
     var volumeBarExternalOvershootSign: FloatingPointSign?
-    
-    @discardableResult func handlePlayPause(in player: PlayerModel, phase: KeyPress.Phases, modifiers: EventModifiers = []) -> KeyPress.Result {
+
+    @discardableResult func handlePlayPause(in player: PlayerModel, phase: KeyPress.Phases, modifiers _: EventModifiers = []) -> KeyPress.Result {
         guard player.hasCurrentTrack else { return .ignored }
-        
+
         switch phase {
         case .down:
             guard !isPressingSpace else { return .ignored }
-            
+
             player.togglePlayPause()
             isPressingSpace = true
             return .handled
@@ -33,12 +33,12 @@ import SwiftUI
             return .ignored
         }
     }
-    
+
     @discardableResult func handleProgressAdjustment(in player: PlayerModel, phase: KeyPress.Phases, modifiers: EventModifiers = [], sign: FloatingPointSign) -> KeyPress.Result {
         switch phase {
         case .down, .repeat:
             guard player.hasCurrentTrack else { return .ignored }
-            
+
             if modifiers.contains(.command) {
                 switch sign {
                 case .plus:
@@ -48,10 +48,10 @@ import SwiftUI
                     player.previousTrack()
                     previousSongButtonBounceAnimation.toggle()
                 }
-                
+
                 return .handled
             }
-            
+
             let hasShift = modifiers.contains(.shift)
             let hasOption = modifiers.contains(.option)
             let multiplier: CGFloat = if hasShift, !hasOption {
@@ -59,13 +59,13 @@ import SwiftUI
             } else if hasOption, !hasShift {
                 0.1
             } else { 1 }
-            
+
             let inRange = player.adjustTime(multiplier: multiplier, sign: sign)
-            
+
             if !inRange {
                 progressBarExternalOvershootSign = sign
             }
-            
+
             return .handled
         case .up:
             progressBarExternalOvershootSign = nil
@@ -74,12 +74,12 @@ import SwiftUI
             return .ignored
         }
     }
-    
+
     @discardableResult func handleVolumeAdjustment(in player: PlayerModel, phase: KeyPress.Phases, modifiers: EventModifiers = [], sign: FloatingPointSign) -> KeyPress.Result {
         switch phase {
         case .down, .repeat:
             guard player.hasCurrentTrack else { return .ignored }
-            
+
             let hasShift = modifiers.contains(.shift)
             let hasOption = modifiers.contains(.option)
             let multiplier: CGFloat = if hasShift, !hasOption {
@@ -87,17 +87,17 @@ import SwiftUI
             } else if hasOption, !hasShift {
                 0.1
             } else { 1 }
-            
+
             let inRange = player.adjustVolume(multiplier: multiplier, sign: sign)
-            
+
             if !inRange {
                 volumeBarExternalOvershootSign = sign
-                
+
                 if sign == .plus {
                     speakerButtonBounceAnimation.toggle()
                 }
             }
-            
+
             return .handled
         case .up:
             progressBarExternalOvershootSign = nil

@@ -1,5 +1,5 @@
 //
-//  SidebarSection.swift
+//  SidebarTab.swift
 //  MelodicStamp
 //
 //  Created by Xinshao_Air on 2024/11/22.
@@ -61,7 +61,7 @@ enum SidebarInspectorTab: String, SidebarTab, CaseIterable, Codable {
         case .commonMetadata:
             .photoOnRectangleAngled
         case .advancedMetadata:
-            .textBadgePlus
+            .at
         case .lyrics:
             .textQuote
         }

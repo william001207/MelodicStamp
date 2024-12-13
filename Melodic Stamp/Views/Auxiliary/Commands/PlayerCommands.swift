@@ -27,7 +27,8 @@ struct PlayerCommands: Commands {
                     Button("Fast Forward") {
                         guard let player else { return }
                         playerKeyboardControl?.handleProgressAdjustment(
-                            in: player, phase: .down, sign: .plus)
+                            in: player, phase: .down, sign: .plus
+                        )
                     }
                     .keyboardShortcut(.rightArrow, modifiers: .command)
                     .modifierKeyAlternate(.shift) {
@@ -35,7 +36,8 @@ struct PlayerCommands: Commands {
                             guard let player else { return }
                             playerKeyboardControl?.handleProgressAdjustment(
                                 in: player, phase: .down, modifiers: .shift,
-                                sign: .plus)
+                                sign: .plus
+                            )
                         }
                         .badge("×5")
                     }
@@ -44,7 +46,8 @@ struct PlayerCommands: Commands {
                             guard let player else { return }
                             playerKeyboardControl?.handleProgressAdjustment(
                                 in: player, phase: .down, modifiers: .option,
-                                sign: .plus)
+                                sign: .plus
+                            )
                         }
                         .badge("×0.1")
                     }
@@ -52,7 +55,8 @@ struct PlayerCommands: Commands {
                     Button("Rewind") {
                         guard let player else { return }
                         playerKeyboardControl?.handleProgressAdjustment(
-                            in: player, phase: .down, sign: .minus)
+                            in: player, phase: .down, sign: .minus
+                        )
                     }
                     .keyboardShortcut(.leftArrow, modifiers: .command)
                     .modifierKeyAlternate(.shift) {
@@ -60,7 +64,8 @@ struct PlayerCommands: Commands {
                             guard let player else { return }
                             playerKeyboardControl?.handleProgressAdjustment(
                                 in: player, phase: .down, modifiers: .shift,
-                                sign: .minus)
+                                sign: .minus
+                            )
                         }
                         .badge("×5")
                     }
@@ -69,7 +74,8 @@ struct PlayerCommands: Commands {
                             guard let player else { return }
                             playerKeyboardControl?.handleProgressAdjustment(
                                 in: player, phase: .down, modifiers: .option,
-                                sign: .minus)
+                                sign: .minus
+                            )
                         }
                         .badge("×0.1")
                     }
@@ -86,7 +92,8 @@ struct PlayerCommands: Commands {
                 Button("Louder") {
                     guard let player else { return }
                     playerKeyboardControl?.handleVolumeAdjustment(
-                        in: player, phase: .down, sign: .plus)
+                        in: player, phase: .down, sign: .plus
+                    )
                 }
                 .keyboardShortcut(.upArrow, modifiers: .command)
                 .modifierKeyAlternate(.shift) {
@@ -94,7 +101,8 @@ struct PlayerCommands: Commands {
                         guard let player else { return }
                         playerKeyboardControl?.handleVolumeAdjustment(
                             in: player, phase: .down, modifiers: .shift,
-                            sign: .plus)
+                            sign: .plus
+                        )
                     }
                     .badge("×5")
                 }
@@ -103,7 +111,8 @@ struct PlayerCommands: Commands {
                         guard let player else { return }
                         playerKeyboardControl?.handleVolumeAdjustment(
                             in: player, phase: .down, modifiers: .option,
-                            sign: .plus)
+                            sign: .plus
+                        )
                     }
                     .badge("×0.1")
                 }
@@ -111,7 +120,8 @@ struct PlayerCommands: Commands {
                 Button("Quieter") {
                     guard let player else { return }
                     playerKeyboardControl?.handleVolumeAdjustment(
-                        in: player, phase: .down, sign: .minus)
+                        in: player, phase: .down, sign: .minus
+                    )
                 }
                 .keyboardShortcut(.downArrow, modifiers: .command)
                 .modifierKeyAlternate(.shift) {
@@ -119,7 +129,8 @@ struct PlayerCommands: Commands {
                         guard let player else { return }
                         playerKeyboardControl?.handleVolumeAdjustment(
                             in: player, phase: .down, modifiers: .shift,
-                            sign: .minus)
+                            sign: .minus
+                        )
                     }
                     .badge("×5")
                 }
@@ -128,7 +139,8 @@ struct PlayerCommands: Commands {
                         guard let player else { return }
                         playerKeyboardControl?.handleVolumeAdjustment(
                             in: player, phase: .down, modifiers: .option,
-                            sign: .minus)
+                            sign: .minus
+                        )
                     }
                     .badge("×0.1")
                 }

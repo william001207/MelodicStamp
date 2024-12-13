@@ -28,8 +28,8 @@ struct AdaptableMusicCoverControl: View {
 
                 let images =
                     attachedPictures
-                    .filter { $0.type == type }
-                    .compactMap(\.image)
+                        .filter { $0.type == type }
+                        .compactMap(\.image)
 
                 AliveButton {
                     isImagePickerPresented = true
@@ -56,11 +56,12 @@ struct AdaptableMusicCoverControl: View {
                         defer { url.stopAccessingSecurityScopedResource() }
 
                         guard let image = NSImage(contentsOf: url),
-                            let attachedPicture = image.attachedPicture(
-                                of: type)
+                              let attachedPicture = image.attachedPicture(
+                                  of: type)
                         else { break }
                         attachedPicturesHandler.replace(
-                            [attachedPicture], entries: entries)
+                            [attachedPicture], entries: entries
+                        )
                     case .failure:
                         break
                     }
@@ -94,7 +95,8 @@ struct AdaptableMusicCoverControl: View {
 
                     AliveButton {
                         attachedPicturesHandler.remove(
-                            of: [type], entries: entries)
+                            of: [type], entries: entries
+                        )
                     } label: {
                         Image(systemSymbol: .trash)
                     }
@@ -108,7 +110,8 @@ struct AdaptableMusicCoverControl: View {
                         .fill(.ultraThickMaterial)
                         .clipShape(.capsule)
                         .matchedGeometryEffect(
-                            id: "headerBackground", in: namespace)
+                            id: "headerBackground", in: namespace
+                        )
                 }
             } else {
                 AttachedPictureTypeView(type: type)
@@ -122,7 +125,8 @@ struct AdaptableMusicCoverControl: View {
                             .fill(.ultraThinMaterial)
                             .clipShape(.capsule)
                             .matchedGeometryEffect(
-                                id: "headerBackground", in: namespace)
+                                id: "headerBackground", in: namespace
+                            )
                     }
             }
         }

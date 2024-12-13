@@ -5,33 +5,33 @@
 //  Created by Xinshao_Air on 2024/11/22.
 //
 
-import SwiftUI
 import Luminare
+import SwiftUI
 
 struct FloatingTabBarView: View {
     @Environment(\.luminareAnimationFast) private var animationFast
-    
+
     @Bindable var floatingWindows: FloatingWindowsModel
-    
+
     @State private var isHovering: Bool = true
     @State private var hoveringTabs: Set<AnyHashable> = []
-    
+
     @Binding var isInspectorPresented: Bool
     @Binding var selectedContentTab: SidebarContentTab
     @Binding var selectedInspectorTab: SidebarInspectorTab
-    
+
     var body: some View {
         ZStack {
             VisualEffectView(material: .popover, blendingMode: .behindWindow)
-            
+
             VStack(alignment: .leading, spacing: 0) {
                 Group {
                     ForEach(SidebarContentTab.allCases) { tab in
                         contentTab(for: tab)
                     }
-                    
+
                     sectionLabel("Inspector")
-                    
+
                     ForEach(SidebarInspectorTab.allCases) { tab in
                         inspectorTab(for: tab)
                     }
@@ -54,7 +54,7 @@ struct FloatingTabBarView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .contentShape(.rect(cornerRadius: 24))
     }
-    
+
     @ViewBuilder private func sectionLabel(_ key: LocalizedStringKey) -> some View {
         Group {
             if isHovering {
@@ -70,10 +70,10 @@ struct FloatingTabBarView: View {
         .padding(.horizontal, 8)
         .transition(.blurReplace)
     }
-    
+
     @ViewBuilder private func contentTab(for tab: SidebarContentTab) -> some View {
         let isSelected = selectedContentTab == tab
-        
+
         AliveButton {
             selectedContentTab = tab
         } label: {
@@ -89,10 +89,10 @@ struct FloatingTabBarView: View {
             }
         }
     }
-    
+
     @ViewBuilder private func inspectorTab(for tab: SidebarInspectorTab) -> some View {
         let isSelected = isInspectorPresented && selectedInspectorTab == tab
-        
+
         AliveButton {
             if isSelected {
                 isInspectorPresented.toggle()
@@ -113,15 +113,15 @@ struct FloatingTabBarView: View {
             }
         }
     }
-    
-    @ViewBuilder private func label<Tab: SidebarTab>(for tab: Tab, isSelected: Bool) -> some View {
+
+    @ViewBuilder private func label(for tab: some SidebarTab, isSelected: Bool) -> some View {
         let isTabHovering = hoveringTabs.contains(tab)
-        
+
         HStack(alignment: .center) {
             Image(systemSymbol: tab.systemSymbol)
                 .font(.system(size: 18))
                 .frame(width: 32, height: 32)
-            
+
             if isHovering {
                 Text(tab.title)
                     .font(.headline)

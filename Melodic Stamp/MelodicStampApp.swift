@@ -37,9 +37,9 @@ struct MelodicStampApp: App {
             FileCommands()
 
             EditingCommands()
-            
+
             PlayerCommands()
-            
+
             WindowCommands()
         }
 

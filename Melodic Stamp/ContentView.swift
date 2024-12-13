@@ -63,7 +63,8 @@ struct ContentView: View {
                 .padding(8)
                 .background {
                     VisualEffectView(
-                        material: .hudWindow, blendingMode: .behindWindow)
+                        material: .hudWindow, blendingMode: .behindWindow
+                    )
                 }
                 .padding(.bottom, -32)
                 .ignoresSafeArea()
@@ -128,7 +129,7 @@ struct ContentView: View {
         .focusedValue(\.player, player)
         .focusedValue(\.playerKeyboardControl, playerKeyboardControl)
     }
-    
+
 //    private var title: Text {
 //        if let current = player.current {
 //            let values = current.metadata[extracting: \.title]

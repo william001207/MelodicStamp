@@ -67,7 +67,8 @@ struct Player: View {
                     .frame(width: 20)
             }
             .matchedGeometryEffect(
-                id: PlayerNamespace.playbackModeButton, in: namespace)
+                id: PlayerNamespace.playbackModeButton, in: namespace
+            )
 
             Spacer()
 
@@ -90,7 +91,8 @@ struct Player: View {
                     .frame(width: 20)
             }
             .matchedGeometryEffect(
-                id: PlayerNamespace.expandShrinkButton, in: namespace)
+                id: PlayerNamespace.expandShrinkButton, in: namespace
+            )
         }
     }
 
@@ -109,7 +111,8 @@ struct Player: View {
                 value: playerKeyboardControl.previousSongButtonBounceAnimation
             )
             .matchedGeometryEffect(
-                id: PlayerNamespace.previousSongButton, in: namespace)
+                id: PlayerNamespace.previousSongButton, in: namespace
+            )
 
             AliveButton {
                 player.togglePlayPause()
@@ -126,7 +129,8 @@ struct Player: View {
             )
             .animation(.bouncy, value: playerKeyboardControl.isPressingSpace)
             .matchedGeometryEffect(
-                id: PlayerNamespace.playPauseButton, in: namespace)
+                id: PlayerNamespace.playPauseButton, in: namespace
+            )
 
             AliveButton(enabledStyle: .init(.secondary)) {
                 player.nextTrack()
@@ -141,7 +145,8 @@ struct Player: View {
                 value: playerKeyboardControl.nextSongButtonBounceAnimation
             )
             .matchedGeometryEffect(
-                id: PlayerNamespace.nextSongButton, in: namespace)
+                id: PlayerNamespace.nextSongButton, in: namespace
+            )
         }
         .disabled(!player.hasCurrentTrack)
     }
@@ -227,6 +232,7 @@ struct Player: View {
             .frame(width: 40)
             .foregroundStyle(.secondary)
             .matchedGeometryEffect(
-                id: PlayerNamespace.durationText, in: namespace)
+                id: PlayerNamespace.durationText, in: namespace
+            )
     }
 }

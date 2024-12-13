@@ -9,11 +9,11 @@ import SwiftUI
 
 struct PlaybackModeView: View {
     var mode: PlaybackMode
-    
+
     var body: some View {
         HStack {
             mode.image
-            
+
             switch mode {
             case .single:
                 Text("Single Loop")
