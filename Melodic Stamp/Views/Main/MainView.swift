@@ -89,14 +89,14 @@ struct MainView: View {
         Group {
             switch selectedInspectorTab {
             case .commonMetadata:
-                InspectorView(metadataEditor: metadataEditor)
+                CommonMetadataView(metadataEditor: metadataEditor)
                     .toolbar {
                         if isInspectorPresented {
                             EditorToolbar(metadataEditor: metadataEditor)
                         }
                     }
             case .advancedMetadata:
-                MetadataView(metadataEditor: metadataEditor)
+                AdvancedMetadataView(metadataEditor: metadataEditor)
                     .toolbar {
                         if isInspectorPresented {
                             EditorToolbar(metadataEditor: metadataEditor)

@@ -21,5 +21,5 @@ struct LyricsExcerpt: View {
 }
 
 #Preview {
-    MetadataExcerpt()
+    AdvancedMetadataExcerpt()
 }

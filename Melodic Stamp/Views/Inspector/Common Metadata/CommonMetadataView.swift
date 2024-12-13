@@ -1,5 +1,5 @@
 //
-//  InspectorView.swift
+//  CommonMetadataView.swift
 //  MelodicStamp
 //
 //  Created by KrLite on 2024/11/24.
@@ -9,7 +9,7 @@ import CSFBAudioEngine
 import Luminare
 import SwiftUI
 
-struct InspectorView: View {
+struct CommonMetadataView: View {
     @Environment(\.luminareMinHeight) private var minHeight
 
     @Bindable var metadataEditor: MetadataEditorModel
@@ -74,7 +74,7 @@ struct InspectorView: View {
             .contentMargins(.top, 64, for: .scrollIndicators)
             .contentMargins(.bottom, 94, for: .scrollIndicators)
         } else {
-            InspectorExcerpt()
+            CommonMetadataExcerpt()
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
     }

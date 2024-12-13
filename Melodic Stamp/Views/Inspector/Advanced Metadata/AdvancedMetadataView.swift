@@ -1,5 +1,5 @@
 //
-//  MetadataView.swift
+//  AdvancedMetadataView.swift
 //  MelodicStamp
 //
 //  Created by KrLite on 2024/11/24.
@@ -8,7 +8,7 @@
 import Luminare
 import SwiftUI
 
-struct MetadataView: View {
+struct AdvancedMetadataView: View {
     @Bindable var metadataEditor: MetadataEditorModel
 
     var body: some View {
@@ -40,7 +40,7 @@ struct MetadataView: View {
             .contentMargins(.top, 64, for: .scrollIndicators)
             .contentMargins(.bottom, 94, for: .scrollIndicators)
         } else {
-            MetadataExcerpt()
+            AdvancedMetadataExcerpt()
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
     }

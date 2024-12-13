@@ -1,5 +1,5 @@
 //
-//  MetadataExcerpt.swift
+//  AdvancedMetadataExcerpt.swift
 //  Melodic Stamp
 //
 //  Created by KrLite on 2024/11/25.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct MetadataExcerpt: View {
+struct AdvancedMetadataExcerpt: View {
     var body: some View {
         VStack {
             EmptyMusicNoteView(systemSymbol: SidebarInspectorTab.advancedMetadata.systemSymbol)
@@ -21,5 +21,5 @@ struct MetadataExcerpt: View {
 }
 
 #Preview {
-    MetadataExcerpt()
+    AdvancedMetadataExcerpt()
 }
