@@ -71,12 +71,20 @@ struct Player: View {
             )
 
             Spacer()
-
-            ShrinkableMarqueeScrollView {
-                MusicTitle(item: player.current)
+            
+            Group {
+                if let thumbnail = player.current?.metadata.thumbnail {
+                    MusicCover(images: [thumbnail], hasPlaceholder: false, cornerRadius: 2)
+                        .frame(height: 20)
+                }
+                
+                ShrinkableMarqueeScrollView {
+                    MusicTitle(item: player.current)
+                }
+                .contentTransition(.numericText())
+                .animation(.default, value: player.currentIndex)
+                .matchedGeometryEffect(id: PlayerNamespace.title, in: namespace)
             }
-            .contentTransition(.numericText())
-            .animation(.default, value: player.currentIndex)
             .padding(.bottom, 2)
 
             Spacer()

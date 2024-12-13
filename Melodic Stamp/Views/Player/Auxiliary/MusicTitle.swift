@@ -41,8 +41,7 @@ struct MusicTitle: View {
             HStack(spacing: 12) {
                 if mode.hasTitle {
                     Group {
-                        let values = item.metadata[extracting: \.title]
-                        if let title = values.initial, !title.isEmpty {
+                        if let title = item.metadata[extracting: \.title]?.initial, !title.isEmpty {
                             Text(title)
                         } else {
                             Text(item.url.lastPathComponent.dropLast(item.url.pathExtension.count + 1))
@@ -52,9 +51,7 @@ struct MusicTitle: View {
                 }
 
                 if mode.hasArtists {
-                    let values = item.metadata[extracting: \.artist]
-
-                    if let artist = values.initial {
+                    if let artist = item.metadata[extracting: \.artist]?.initial {
                         HStack(spacing: 4) {
                             let artists = PlayerModel.splitArtists(from: artist)
                             ForEach(Array(artists.enumerated()), id: \.offset) { offset, composer in

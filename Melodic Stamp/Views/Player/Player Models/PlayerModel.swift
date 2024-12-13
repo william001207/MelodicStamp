@@ -222,12 +222,8 @@ enum PlaybackMode: String, CaseIterable, Identifiable {
     }
 
     func play(url: URL) {
-        addToPlaylist(urls: [url])
-
-        Task {
-            if let item = self.playlist.first(where: { $0.url == url }) {
-                self.play(item: item)
-            }
+        if let item = PlaylistItem(url: url) {
+            play(item: item)
         }
     }
 

@@ -13,7 +13,7 @@ struct CommonMetadataExcerpt: View {
             EmptyMusicNoteView(systemSymbol: SidebarInspectorTab.commonMetadata.systemSymbol)
                 .frame(height: 64)
 
-            Text("Inspector")
+            Text("Common")
                 .font(.title3)
                 .foregroundStyle(.quaternary)
         }

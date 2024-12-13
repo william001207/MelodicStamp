@@ -13,7 +13,7 @@ struct AdvancedMetadataExcerpt: View {
             EmptyMusicNoteView(systemSymbol: SidebarInspectorTab.advancedMetadata.systemSymbol)
                 .frame(height: 64)
 
-            Text("Metadata")
+            Text("Advanced")
                 .font(.title3)
                 .foregroundStyle(.quaternary)
         }

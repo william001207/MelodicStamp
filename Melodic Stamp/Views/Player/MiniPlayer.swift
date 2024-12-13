@@ -25,6 +25,8 @@ struct MiniPlayer: View {
         case title
         case lyrics
     }
+    
+    @FocusState private var isFocused: Bool
 
     @Bindable var windowManager: WindowManagerModel
     @Bindable var player: PlayerModel
@@ -70,9 +72,13 @@ struct MiniPlayer: View {
             }
         }
         .padding(12)
-        .background(Color.clear)
         .focusable()
         .focusEffectDisabled()
+        .focused($isFocused)
+        .onAppear {
+            isFocused = true
+        }
+        
         // regain progress control on new track
         .onChange(of: player.currentIndex) { _, newValue in
             guard newValue != nil else { return }
@@ -149,6 +155,19 @@ struct MiniPlayer: View {
             .matchedGeometryEffect(
                 id: PlayerNamespace.playbackModeButton, in: namespace
             )
+            
+            Group {
+                switch headerControl {
+                case .title:
+                    if let thumbnail = player.current?.metadata.thumbnail {
+                        MusicCover(images: [thumbnail], hasPlaceholder: false, cornerRadius: 2)
+                            .frame(height: 16)
+                    }
+                default:
+                    EmptyView()
+                }
+            }
+            .padding(.bottom, 2)
 
             AliveButton {
                 headerControl =
@@ -171,8 +190,8 @@ struct MiniPlayer: View {
                 }
                 .contentTransition(.numericText())
                 .animation(.default, value: player.currentIndex)
-                .padding(.bottom, 2)
                 .matchedGeometryEffect(id: PlayerNamespace.title, in: namespace)
+                .padding(.bottom, 2)
             }
 
             AliveButton(
@@ -198,7 +217,6 @@ struct MiniPlayer: View {
                         .toggle()
                 } label: {
                     Image(systemSymbol: .backwardFill)
-                        .font(.headline)
                 }
                 .disabled(!player.hasPreviousTrack)
                 .symbolEffect(
@@ -215,7 +233,7 @@ struct MiniPlayer: View {
                     playerKeyboardControl.isPressingSpace = false
                 } label: {
                     player.playPauseImage
-                        .font(.title)
+                        .font(.title2)
                         .contentTransition(.symbolEffect(.replace.upUp))
                         .frame(width: 16)
                 }
@@ -235,7 +253,6 @@ struct MiniPlayer: View {
                     playerKeyboardControl.nextSongButtonBounceAnimation.toggle()
                 } label: {
                     Image(systemSymbol: .forwardFill)
-                        .font(.headline)
                 }
                 .disabled(!player.hasNextTrack)
                 .symbolEffect(

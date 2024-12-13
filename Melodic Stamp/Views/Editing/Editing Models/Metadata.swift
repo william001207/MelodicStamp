@@ -371,8 +371,9 @@ extension Metadata {
         }
     }
 
-    subscript<V>(extracting keyPath: WritableKeyPath<Metadata, Entry<V>>) -> MetadataBatchEditingEntry<V> {
-        .init(keyPath: keyPath, metadata: self)
+    subscript<V>(extracting keyPath: WritableKeyPath<Metadata, Entry<V>>) -> MetadataBatchEditingEntry<V>? {
+        guard state.isLoaded else { return nil }
+        return .init(keyPath: keyPath, metadata: self)
     }
 }
 

@@ -10,6 +10,8 @@ import SwiftUI
 
 struct ContentView: View {
     @Environment(\.appearsActive) private var isActive
+    
+    @FocusState private var isFocused
 
     @Namespace private var namespace
 
@@ -85,6 +87,7 @@ struct ContentView: View {
 //        .navigationTitle(title)
         .onAppear {
             floatingWindows.observeFullScreen()
+            isFocused = true
         }
         .onChange(of: isActive, initial: true) { _, newValue in
             switch windowManager.style {
@@ -97,6 +100,7 @@ struct ContentView: View {
             case .miniPlayer:
                 destroyFloatingWindows()
             }
+            isFocused = true
         }
         .onChange(of: windowManager.style, initial: true) { _, newValue in
             switch newValue {
@@ -107,6 +111,7 @@ struct ContentView: View {
                 destroyFloatingWindows()
                 maxWidth = 500
             }
+            isFocused = true
         }
         .onChange(of: minWidth) { _, newValue in
             guard newValue != nil else { return }
@@ -124,6 +129,7 @@ struct ContentView: View {
         .focusable()
         .focusEffectDisabled()
         .prefersDefaultFocus(in: namespace)
+        .focused($isFocused)
         .focusedValue(\.windowManager, windowManager)
         .focusedValue(\.fileManager, fileManager)
         .focusedValue(\.player, player)

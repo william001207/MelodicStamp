@@ -48,12 +48,12 @@ struct MainView: View {
     @State private var lyrics: LyricsModel = .init()
 
     var body: some View {
-        playlist()
-            .frame(minWidth: 500)
+        content()
+            .frame(minWidth: 700)
             .inspector(isPresented: $isInspectorPresented) {
                 inspector()
                     .ignoresSafeArea()
-                    .inspectorColumnWidth(min: 300, ideal: 400, max: 650)
+                    .inspectorColumnWidth(min: 300, ideal: 400, max: 700)
             }
             .ignoresSafeArea()
             .luminareMinHeight(38)
@@ -74,15 +74,22 @@ struct MainView: View {
             }
     }
 
-    @ViewBuilder private func playlist() -> some View {
-        PlaylistView(player: player, metadataEditor: metadataEditor, namespace: namespace)
-            .luminareAnimation(.default.speed(5))
-            .ignoresSafeArea()
-            .morphed()
-            .background {
-                VisualEffectView(material: .sidebar, blendingMode: .behindWindow)
+    @ViewBuilder private func content() -> some View {
+        Group {
+            switch selectedContentTab {
+            case .playlist:
+                PlaylistView(player: player, metadataEditor: metadataEditor, namespace: namespace)
+            case .leaflet:
+                LeafletView(player: player)
             }
-            .ignoresSafeArea()
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .ignoresSafeArea()
+        .morphed()
+        .background {
+            VisualEffectView(material: .sidebar, blendingMode: .behindWindow)
+        }
+        .ignoresSafeArea()
     }
 
     @ViewBuilder private func inspector() -> some View {
@@ -114,6 +121,7 @@ struct MainView: View {
                 }
             }
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .ignoresSafeArea()
         .morphed()
         .ignoresSafeArea()

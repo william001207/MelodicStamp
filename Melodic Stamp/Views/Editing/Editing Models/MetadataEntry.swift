@@ -219,7 +219,7 @@ extension MetadataBatchEditingEntry: Equatable {
 
 extension MetadataBatchEditingEntries: Sequence {
     func makeIterator() -> Array<MetadataBatchEditingEntry<V>>.Iterator {
-        metadatas.map { $0[extracting: keyPath] }.makeIterator()
+        metadatas.compactMap { $0[extracting: keyPath] }.makeIterator()
     }
 }
 
