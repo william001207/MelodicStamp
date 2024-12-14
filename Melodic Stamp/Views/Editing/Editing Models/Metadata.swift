@@ -73,12 +73,12 @@ import MediaPlayer
     var grouping: Entry<String?>!
     var isCompilation: Entry<Bool?>!
 
-    var isrc: Entry<String?>!
+    var isrc: Entry<ISRC?>!
     var lyrics: Entry<String?>!
     var mcn: Entry<String?>!
 
-    var musicBrainzRecordingID: Entry<String?>!
-    var musicBrainzReleaseID: Entry<String?>!
+    var musicBrainzRecordingID: Entry<UUID?>!
+    var musicBrainzReleaseID: Entry<UUID?>!
 
     var rating: Entry<Int?>!
     var releaseDate: Entry<String?>!
@@ -168,11 +168,11 @@ private extension Metadata {
         self.comment = .init(comment)
         self.grouping = .init(grouping)
         self.isCompilation = .init(isCompilation)
-        self.isrc = .init(isrc)
+        self.isrc = .init(isrc.flatMap({ ISRC(parsing: $0) }))
         self.lyrics = .init(lyrics)
         self.mcn = .init(mcn)
-        self.musicBrainzRecordingID = .init(musicBrainzRecordingID)
-        self.musicBrainzReleaseID = .init(musicBrainzReleaseID)
+        self.musicBrainzRecordingID = .init(musicBrainzRecordingID.flatMap(UUID.init(uuidString:)))
+        self.musicBrainzReleaseID = .init(musicBrainzReleaseID.flatMap(UUID.init(uuidString:)))
         self.rating = .init(rating)
         self.releaseDate = .init(releaseDate)
         self.replayGainAlbumGain = .init(replayGainAlbumGain)
@@ -244,11 +244,11 @@ private extension Metadata {
         metadata.comment = comment.current
         metadata.grouping = grouping.current
         metadata.isCompilation = isCompilation.current
-        metadata.isrc = isrc.current
+        metadata.isrc = isrc.current?.formatted()
         metadata.lyrics = lyrics.current
         metadata.mcn = mcn.current
-        metadata.musicBrainzRecordingID = musicBrainzRecordingID.current
-        metadata.musicBrainzReleaseID = musicBrainzReleaseID.current
+        metadata.musicBrainzRecordingID = musicBrainzRecordingID.current?.uuidString
+        metadata.musicBrainzReleaseID = musicBrainzReleaseID.current?.uuidString
         metadata.rating = rating.current
         metadata.releaseDate = releaseDate.current
         metadata.replayGainAlbumGain = replayGainAlbumGain.current
@@ -385,6 +385,12 @@ extension Metadata {
 }
 
 // MARK: Extensions
+
+extension Metadata {
+    static func splitArtists(from artist: String) -> [Substring] {
+        artist.split(separator: /[\/,]\s*/)
+    }
+}
 
 extension Metadata: Equatable {
     static func == (lhs: Metadata, rhs: Metadata) -> Bool {

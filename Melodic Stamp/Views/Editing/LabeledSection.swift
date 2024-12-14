@@ -28,7 +28,7 @@ struct LabeledSection<Content, Label>: View where Content: View, Label: View {
 
     init(
         _ key: LocalizedStringKey,
-        content: @escaping () -> Content
+        @ViewBuilder content: @escaping () -> Content
     ) where Label == Text {
         self.init(content: content) {
             Text(key)
@@ -36,7 +36,7 @@ struct LabeledSection<Content, Label>: View where Content: View, Label: View {
     }
 
     init(
-        content: @escaping () -> Content
+        @ViewBuilder content: @escaping () -> Content
     ) where Label == EmptyView {
         self.init(content: content) {
             EmptyView()

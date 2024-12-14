@@ -53,7 +53,7 @@ struct MusicTitle: View {
                 if mode.hasArtists {
                     if let artist = item.metadata[extracting: \.artist]?.initial {
                         HStack(spacing: 4) {
-                            let artists = PlayerModel.splitArtists(from: artist)
+                            let artists = Metadata.splitArtists(from: artist)
                             ForEach(Array(artists.enumerated()), id: \.offset) { offset, composer in
                                 if offset > 0 {
                                     Text("·")

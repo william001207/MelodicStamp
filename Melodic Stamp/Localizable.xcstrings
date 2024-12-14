@@ -89,6 +89,9 @@
     "BPM" : {
 
     },
+    "Catalog Number" : {
+
+    },
     "Coloured Fish" : {
 
     },
@@ -105,6 +108,9 @@
 
     },
     "Conductor" : {
+
+    },
+    "Copyright" : {
 
     },
     "Creator" : {
@@ -164,6 +170,9 @@
     "Inspector" : {
 
     },
+    "ISRC" : {
+
+    },
     "iTunes Key" : {
 
     },
@@ -210,6 +219,9 @@
 
     },
     "Multiple Values" : {
+
+    },
+    "Music Brainz" : {
 
     },
     "Mute" : {
@@ -269,7 +281,19 @@
     "Quieter" : {
 
     },
+    "Rating" : {
+
+    },
+    "Recording ID" : {
+
+    },
     "Recording Location" : {
+
+    },
+    "Release Date" : {
+
+    },
+    "Release ID" : {
 
     },
     "Remove All" : {
@@ -344,7 +368,7 @@
     "To Current Playlist" : {
 
     },
-    "Track and Disc" : {
+    "Track & Disc" : {
 
     },
     "Tracks" : {

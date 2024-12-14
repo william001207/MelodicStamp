@@ -11,22 +11,37 @@ import SwiftUI
 struct AdvancedMetadataView: View {
     @Bindable var metadataEditor: MetadataEditorModel
 
+    @State private var ratingDecreasedAnimation: Bool = false
+    @State private var ratingIncreasedAnimation: Bool = false
+
     var body: some View {
         if metadataEditor.isVisible {
             AutoScrollView(.vertical) {
                 VStack(spacing: 24) {
-                    compilationEditor()
-
                     LabeledSection {
-                        sortingEditor()
-                    } label: {
-                        Text("Sorting")
+                        compilationEditor()
+                        
+                        ratingEditor()
+                    }
+                    
+                    LabeledSection("Release Date") {
+                        releaseDateEditor()
                     }
 
-                    LabeledSection {
+                    LabeledSection("Sorting") {
+                        sortingEditor()
+                    }
+
+                    LabeledSection("Album Sorting") {
                         albumSortingEditor()
-                    } label: {
-                        Text("Album Sorting")
+                    }
+
+                    LabeledSection("Copyright") {
+                        copyrightEditor()
+                    }
+
+                    LabeledSection("Music Brainz") {
+                        musicBrainzEditor()
                     }
                 }
                 .padding(.horizontal)
@@ -57,7 +72,68 @@ struct AdvancedMetadataView: View {
             EmptyView()
         } label: {
             Text("Compilation")
+                .foregroundStyle(.secondary)
         }
+    }
+
+    @ViewBuilder private func ratingEditor() -> some View {
+        HStack {
+            LabeledTextField(
+                "Rating", entries: metadataEditor[extracting: \.rating],
+                format: .number)
+
+            let binding: Binding<Int> = Binding {
+                metadataEditor[extracting: \.rating].projectedUnwrappedValue()?
+                    .wrappedValue ?? 0
+            } set: { newValue in
+                metadataEditor[extracting: \.rating].setAll(newValue)
+            }
+            let isModified = metadataEditor[extracting: \.rating].isModified
+
+            AliveButton {
+                binding.wrappedValue -= 1
+                ratingDecreasedAnimation.toggle()
+            } label: {
+                Image(systemSymbol: .handThumbsdownFill)
+                    .symbolEffect(.bounce, value: ratingDecreasedAnimation)
+                    .foregroundStyle(.tint)
+                    .tint(isModified ? .accent : .secondary)
+            }
+
+            AliveButton {
+                binding.wrappedValue += 1
+                ratingIncreasedAnimation.toggle()
+            } label: {
+                Image(systemSymbol: .handThumbsupFill)
+                    .symbolEffect(.bounce, value: ratingIncreasedAnimation)
+                    .foregroundStyle(.tint)
+                    .tint(isModified ? .accent : .secondary)
+            }
+        }
+    }
+    
+    @ViewBuilder private func releaseDateEditor() -> some View {
+        LabeledTextField("Release Date", text: metadataEditor[extracting: \.releaseDate])
+        
+        let binding: Binding<Date> = Binding {
+            if let string =  metadataEditor[extracting: \.releaseDate].projectedUnwrappedValue()?.wrappedValue {
+                do {
+                    let date = try Date(string, strategy: .dateTime)
+                    return date
+                } catch {
+                    return .now
+                }
+            } else {
+                return .now
+            }
+        } set: { newValue in
+            metadataEditor[extracting: \.releaseDate].setAll(newValue.formatted())
+        }
+        
+        DatePicker("", selection: binding)
+            .labelsHidden()
+            .datePickerStyle(.field)
+            .textFieldStyle(.roundedBorder)
     }
 
     @ViewBuilder private func sortingEditor() -> some View {
@@ -104,5 +180,25 @@ struct AdvancedMetadataView: View {
         ) {
             Text("Album Artist")
         }
+    }
+
+    @ViewBuilder private func copyrightEditor() -> some View {
+        LabeledTextField(
+            "ISRC", entries: metadataEditor[extracting: \.isrc], format: .isrc)
+
+        LabeledTextField(
+            "Catalog Number", text: metadataEditor[extracting: \.mcn])
+    }
+
+    @ViewBuilder private func musicBrainzEditor() -> some View {
+        LabeledTextField(
+            "Recording ID",
+            entries: metadataEditor[extracting: \.musicBrainzRecordingID],
+            format: .uuid)
+
+        LabeledTextField(
+            "Release ID",
+            entries: metadataEditor[extracting: \.musicBrainzRecordingID],
+            format: .uuid)
     }
 }

@@ -450,12 +450,6 @@ extension PlayerModel {
 }
 
 extension PlayerModel {
-    static func splitArtists(from artist: String) -> [Substring] {
-        artist.split(separator: /[\/,]\s*/)
-    }
-}
-
-extension PlayerModel {
     func updateNowPlayingState() {
         let infoCenter = MPNowPlayingInfoCenter.default()
         

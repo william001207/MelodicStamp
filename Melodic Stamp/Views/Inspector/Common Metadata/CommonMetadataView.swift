@@ -51,16 +51,12 @@ struct CommonMetadataView: View {
                         generalEditor()
                     }
 
-                    LabeledSection {
+                    LabeledSection("Album") {
                         albumEditor()
-                    } label: {
-                        Text("Album")
                     }
 
-                    LabeledSection {
+                    LabeledSection("Track & Disc") {
                         trackAndDiscEditor()
-                    } label: {
-                        Text("Track and Disc")
                     }
                 }
                 .padding(.horizontal)
