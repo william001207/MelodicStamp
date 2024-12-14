@@ -146,6 +146,7 @@ struct LabeledTextField<F, Label>: View where F: ParseableFormatStyle, F.FormatO
                     }
                     .foregroundStyle(.red)
                     .bold()
+                    .animation(.bouncy, value: entries.isModified) // to match the animation in `AliveButton`
                 }
             }
             .foregroundStyle(.secondary)
@@ -171,8 +172,6 @@ struct LabeledTextField<F, Label>: View where F: ParseableFormatStyle, F.FormatO
                     label()
                 } else {
                     Text(placeholder)
-                    
-                    Text("…")
                 }
                 
                 Spacer()

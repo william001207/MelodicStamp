@@ -30,27 +30,28 @@ struct LabeledOptionalControl<V, Label, Content, ContentB>: View
                 label()
 
                 Spacer()
+                
+                if isHovering {
+                    HStack(spacing: 2) {
+                        AliveButton {
+                            entries.restoreAll()
+                        } label: {
+                            Image(systemSymbol: .arrowUturnLeft)
+                        }
+                        .disabled(!entries.isModified)
+                        
+                        AliveButton {
+                            entries.setAll(nil)
+                        } label: {
+                            Image(systemSymbol: .trash)
+                        }
+                    }
+                    .foregroundStyle(.red)
+                    .bold()
+                    .animation(.bouncy, value: entries.isModified) // to match the animation in `AliveButton`
+                }
 
                 if let binding = entries.projectedUnwrappedValue() {
-                    if isHovering {
-                        HStack(spacing: 2) {
-                            AliveButton {
-                                entries.restoreAll()
-                            } label: {
-                                Image(systemSymbol: .arrowUturnLeft)
-                            }
-                            .disabled(!entries.isModified)
-
-                            AliveButton {
-                                entries.setAll(nil)
-                            } label: {
-                                Image(systemSymbol: .trash)
-                            }
-                        }
-                        .foregroundStyle(.red)
-                        .bold()
-                    }
-
                     content(binding)
                 } else {
                     Button {
@@ -63,10 +64,18 @@ struct LabeledOptionalControl<V, Label, Content, ContentB>: View
                 }
             case .varied:
                 label()
+                    .italic()
 
                 Spacer()
 
-                Color.blue
+                Button {
+                    entries.setAll(defaultValue)
+                } label: {
+                    Text("Multiple Values")
+                        .foregroundStyle(.tint)
+                }
+                .buttonStyle(.plain)
+                .italic()
             }
         }
         .frame(minHeight: minHeight)

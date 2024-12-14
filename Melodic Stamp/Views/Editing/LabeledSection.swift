@@ -6,15 +6,22 @@
 //
 
 import SwiftUI
+import Luminare
 
 struct LabeledSection<Content, Label>: View where Content: View, Label: View {
+    @Environment(\.luminareAnimation) private var animation
+    
     @ViewBuilder private var content: () -> Content
     @ViewBuilder private var label: () -> Label
+    
+    @State private var isExpanded: Bool = true
 
     init(
-        content: @escaping () -> Content,
-        label: @escaping () -> Label
+        isExpanded: Bool = true,
+        @ViewBuilder content: @escaping () -> Content,
+        @ViewBuilder label: @escaping () -> Label
     ) {
+        self.isExpanded = isExpanded
         self.content = content
         self.label = label
     }
@@ -40,21 +47,39 @@ struct LabeledSection<Content, Label>: View where Content: View, Label: View {
         VStack(alignment: .leading, spacing: 8) {
             if Label.self != EmptyView.self {
                 HStack(spacing: 0) {
-                    label()
+                    AliveButton {
+                        withAnimation(animation) {
+                            isExpanded.toggle()
+                        }
+                    } label: {
+                        HStack(spacing: 4) {
+                            Image(systemSymbol: .chevronDown)
+                                .aspectRatio(1/1, contentMode: .fit)
+                                .rotationEffect(isExpanded ? .zero : .degrees(-90), anchor: .center)
+                            
+                            label()
+                        }
                         .font(.caption)
                         .foregroundStyle(.secondary)
-
+                    }
+                    
                     Spacer()
                 }
             }
-
-            content()
+            
+            if isExpanded {
+                VStack {
+                    content()
+                }
+                .transition(.blurReplace)
+            }
         }
     }
 }
 
 #Preview {
     LabeledSection {
+        Text("Content")
         Button("Button") {}
     } label: {
         Text("Label")
