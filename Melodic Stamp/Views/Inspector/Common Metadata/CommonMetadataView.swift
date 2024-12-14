@@ -230,7 +230,7 @@ struct CommonMetadataView: View {
                 .foregroundStyle(.placeholder)
 
             LabeledTextField(
-                "Tracks", entries: metadataEditor[extracting: \.trackTotal],
+                "Tracks", entries: metadataEditor[extracting: \.trackCount],
                 format: .number
             )
         }
@@ -249,7 +249,7 @@ struct CommonMetadataView: View {
                 .foregroundStyle(.placeholder)
 
             LabeledTextField(
-                "Discs", entries: metadataEditor[extracting: \.discTotal],
+                "Discs", entries: metadataEditor[extracting: \.discCount],
                 format: .number
             )
         }

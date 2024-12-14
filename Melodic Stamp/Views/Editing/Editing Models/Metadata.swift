@@ -7,6 +7,7 @@
 
 @preconcurrency import CSFBAudioEngine
 import SwiftUI
+import MediaPlayer
 
 // MARK: - Metadata
 
@@ -64,9 +65,9 @@ import SwiftUI
     var albumArtistSortOrder: Entry<String?>!
 
     var trackNumber: Entry<Int?>!
-    var trackTotal: Entry<Int?>!
+    var trackCount: Entry<Int?>!
     var discNumber: Entry<Int?>!
-    var discTotal: Entry<Int?>!
+    var discCount: Entry<Int?>!
 
     var comment: Entry<String?>!
     var grouping: Entry<String?>!
@@ -106,7 +107,7 @@ import SwiftUI
             title, titleSortOrder, artist, artistSortOrder, composer,
             composerSortOrder, genre, genreSortOrder, bpm,
             albumTitle, albumTitleSortOrder, albumArtist, albumArtistSortOrder,
-            trackNumber, trackTotal, discNumber, discTotal,
+            trackNumber, trackCount, discNumber, discCount,
             comment, grouping, isCompilation,
             isrc, lyrics, mcn,
             musicBrainzRecordingID, musicBrainzReleaseID,
@@ -129,8 +130,8 @@ private extension Metadata {
         bpm: Int? = nil,
         albumTitle: String? = nil, albumTitleSortOrder: String? = nil,
         albumArtist: String? = nil, albumArtistSortOrder: String? = nil,
-        trackNumber: Int? = nil, trackTotal: Int? = nil,
-        discNumber: Int? = nil, discTotal: Int? = nil,
+        trackNumber: Int? = nil, trackCount: Int? = nil,
+        discNumber: Int? = nil, discCount: Int? = nil,
         comment: String? = nil,
         grouping: String? = nil,
         isCompilation: Bool? = nil,
@@ -161,9 +162,9 @@ private extension Metadata {
         self.albumArtist = .init(albumArtist)
         self.albumArtistSortOrder = .init(albumArtistSortOrder)
         self.trackNumber = .init(trackNumber)
-        self.trackTotal = .init(trackTotal)
+        self.trackCount = .init(trackCount)
         self.discNumber = .init(discNumber)
-        self.discTotal = .init(discTotal)
+        self.discCount = .init(discCount)
         self.comment = .init(comment)
         self.grouping = .init(grouping)
         self.isCompilation = .init(isCompilation)
@@ -185,20 +186,23 @@ private extension Metadata {
     func load(from metadata: AudioMetadata?) {
         load(
             attachedPictures: metadata?.attachedPictures ?? [],
-            title: metadata?.title, titleSortOrder: metadata?.titleSortOrder,
+            title: metadata?.title,
+            titleSortOrder: metadata?.titleSortOrder,
             artist: metadata?.artist,
             artistSortOrder: metadata?.artistSortOrder,
             composer: metadata?.composer,
             composerSortOrder: metadata?.composerSortOrder,
-            genre: metadata?.genre, genreSortOrder: metadata?.genreSortOrder,
+            genre: metadata?.genre,
+            genreSortOrder: metadata?.genreSortOrder,
             bpm: metadata?.bpm,
             albumTitle: metadata?.albumTitle,
             albumTitleSortOrder: metadata?.albumTitleSortOrder,
             albumArtist: metadata?.albumArtist,
             albumArtistSortOrder: metadata?.albumArtistSortOrder,
             trackNumber: metadata?.trackNumber,
-            trackTotal: metadata?.trackTotal,
-            discNumber: metadata?.discNumber, discTotal: metadata?.discTotal,
+            trackCount: metadata?.trackTotal,
+            discNumber: metadata?.discNumber,
+            discCount: metadata?.discTotal,
             comment: metadata?.comment,
             grouping: metadata?.grouping,
             isCompilation: metadata?.isCompilation,
@@ -207,7 +211,8 @@ private extension Metadata {
             mcn: metadata?.mcn,
             musicBrainzRecordingID: metadata?.musicBrainzRecordingID,
             musicBrainzReleaseID: metadata?.musicBrainzReleaseID,
-            rating: metadata?.rating, releaseDate: metadata?.releaseDate,
+            rating: metadata?.rating,
+            releaseDate: metadata?.releaseDate,
             replayGainAlbumGain: metadata?.replayGainAlbumGain,
             replayGainAlbumPeak: metadata?.replayGainAlbumPeak,
             replayGainTrackGain: metadata?.replayGainTrackGain,
@@ -233,9 +238,9 @@ private extension Metadata {
         metadata.albumTitle = albumTitle.current
         metadata.albumArtist = albumArtist.current
         metadata.trackNumber = trackNumber.current
-        metadata.trackTotal = trackTotal.current
+        metadata.trackTotal = trackCount.current
         metadata.discNumber = discNumber.current
-        metadata.discTotal = discTotal.current
+        metadata.discTotal = discCount.current
         metadata.comment = comment.current
         metadata.grouping = grouping.current
         metadata.isCompilation = isCompilation.current
@@ -289,6 +294,7 @@ extension Metadata {
 
         Task {
             generateThumbnail()
+            updateNowPlayingInfo()
         }
     }
 
@@ -325,6 +331,7 @@ extension Metadata {
 
                 state = .fine
                 generateThumbnail()
+                updateNowPlayingInfo()
 
                 continuation.resume()
             } catch {
@@ -388,5 +395,87 @@ extension Metadata: Equatable {
 extension Metadata: Hashable {
     func hash(into hasher: inout Hasher) {
         hasher.combine(id)
+    }
+}
+
+extension Metadata {
+    func updateNowPlayingInfo() {
+        let infoCenter = MPNowPlayingInfoCenter.default()
+        var info = infoCenter.nowPlayingInfo ?? .init()
+        
+        if state.isLoaded {
+            updateNowPlayingInfo(for: &info)
+        } else {
+            Self.resetNowPlayingInfo(for: &info)
+        }
+        
+        infoCenter.nowPlayingInfo = info
+    }
+    
+    func updateNowPlayingInfo(for dict: inout [String: Any]) {
+        guard state.isLoaded else { return Self.resetNowPlayingInfo(for: &dict) }
+        
+        dict[MPMediaItemPropertyArtwork] = ThumbnailMaker.getCover(from: attachedPictures.initial)
+            .flatMap(\.image)
+            .map(\.mediaItemArtwork)
+        
+        dict[MPMediaItemPropertyTitle] = title.initial
+        dict[MPMediaItemPropertyArtist] = artist.initial
+        dict[MPMediaItemPropertyComposer] = composer.initial
+        dict[MPMediaItemPropertyGenre] = genre.initial
+        dict[MPMediaItemPropertyBeatsPerMinute] = bpm.initial
+        
+        dict[MPMediaItemPropertyAlbumTitle] = albumTitle.initial
+        dict[MPMediaItemPropertyAlbumArtist] = albumArtist.initial
+        
+        dict[MPMediaItemPropertyAlbumTrackNumber] = trackNumber.initial
+        dict[MPMediaItemPropertyAlbumTrackCount] = trackCount.initial
+        dict[MPMediaItemPropertyDiscNumber] = discNumber.initial
+        dict[MPMediaItemPropertyDiscCount] = discCount.initial
+        
+        dict[MPMediaItemPropertyComments] = comment.initial
+        dict[MPMediaItemPropertyUserGrouping] = grouping.initial
+        dict[MPMediaItemPropertyIsCompilation] = isCompilation.initial
+        
+        dict[MPNowPlayingInfoPropertyInternationalStandardRecordingCode] = isrc.initial
+        dict[MPMediaItemPropertyLyrics] = lyrics.initial
+        
+        dict[MPMediaItemPropertyReleaseDate] = releaseDate.initial
+    }
+    
+    static func resetNowPlayingInfo() {
+        let infoCenter = MPNowPlayingInfoCenter.default()
+        var info = infoCenter.nowPlayingInfo ?? .init()
+        
+        Self.resetNowPlayingInfo(for: &info)
+        
+        infoCenter.nowPlayingInfo = info
+    }
+    
+    static func resetNowPlayingInfo(for dict: inout [String: Any]) {
+        dict[MPMediaItemPropertyArtwork] = nil
+        
+        dict[MPMediaItemPropertyTitle] = nil
+        dict[MPMediaItemPropertyArtist] = nil
+        dict[MPMediaItemPropertyComposer] = nil
+        dict[MPMediaItemPropertyGenre] = nil
+        dict[MPMediaItemPropertyBeatsPerMinute] = nil
+        
+        dict[MPMediaItemPropertyAlbumTitle] = nil
+        dict[MPMediaItemPropertyAlbumArtist] = nil
+        
+        dict[MPMediaItemPropertyAlbumTrackNumber] = nil
+        dict[MPMediaItemPropertyAlbumTrackCount] = nil
+        dict[MPMediaItemPropertyDiscNumber] = nil
+        dict[MPMediaItemPropertyDiscCount] = nil
+        
+        dict[MPMediaItemPropertyComments] = nil
+        dict[MPMediaItemPropertyUserGrouping] = nil
+        dict[MPMediaItemPropertyIsCompilation] = nil
+        
+        dict[MPNowPlayingInfoPropertyInternationalStandardRecordingCode] = nil
+        dict[MPMediaItemPropertyLyrics] = nil
+        
+        dict[MPMediaItemPropertyReleaseDate] = nil
     }
 }

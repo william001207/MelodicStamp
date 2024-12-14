@@ -75,7 +75,6 @@ struct Player: View {
             Group {
                 if let thumbnail = player.current?.metadata.thumbnail {
                     MusicCover(images: [thumbnail], hasPlaceholder: false, cornerRadius: 2)
-                        .frame(height: 20)
                 }
                 
                 ShrinkableMarqueeScrollView {
@@ -102,6 +101,7 @@ struct Player: View {
                 id: PlayerNamespace.expandShrinkButton, in: namespace
             )
         }
+        .frame(height: 20)
     }
 
     @ViewBuilder private func leadingControls() -> some View {
@@ -162,8 +162,7 @@ struct Player: View {
     @ViewBuilder private func trailingControls() -> some View {
         ProgressBar(
             value: $player.volume,
-            isActive: $isVolumeBarActive,
-            isDelegated: true
+            isActive: $isVolumeBarActive
         ) { _, newValue in
             adjustmentPercentage = newValue
         } onOvershootOffsetChange: { oldValue, newValue in
@@ -227,6 +226,7 @@ struct Player: View {
         ProgressBar(
             value: $player.progress,
             isActive: $isProgressBarActive,
+            isDelegated: true,
             externalOvershootSign: playerKeyboardControl
                 .volumeBarExternalOvershootSign
         )

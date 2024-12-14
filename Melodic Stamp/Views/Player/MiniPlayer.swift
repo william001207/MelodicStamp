@@ -161,7 +161,6 @@ struct MiniPlayer: View {
                 case .title:
                     if let thumbnail = player.current?.metadata.thumbnail {
                         MusicCover(images: [thumbnail], hasPlaceholder: false, cornerRadius: 2)
-                            .frame(height: 16)
                     }
                 default:
                     EmptyView()
@@ -206,6 +205,7 @@ struct MiniPlayer: View {
             )
             .opacity(isTitleHovering ? 1 : 0)
         }
+        .frame(height: 16)
     }
 
     @ViewBuilder private func leadingControls() -> some View {

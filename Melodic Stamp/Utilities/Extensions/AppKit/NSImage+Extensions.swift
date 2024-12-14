@@ -7,6 +7,7 @@
 
 import AppKit
 import CSFBAudioEngine
+import MediaPlayer
 
 extension NSImage: @retroactive @unchecked Sendable {}
 
@@ -18,5 +19,13 @@ extension NSImage {
     func attachedPicture(of type: AttachedPicture.`Type`) -> AttachedPicture? {
         guard let tiffRepresentation else { return nil }
         return .init(imageData: tiffRepresentation, type: type)
+    }
+}
+
+extension NSImage {
+    var mediaItemArtwork: MPMediaItemArtwork {
+        .init(boundsSize: size) { _ in
+            self
+        }
     }
 }

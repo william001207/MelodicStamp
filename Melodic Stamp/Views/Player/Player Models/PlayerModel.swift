@@ -11,6 +11,7 @@ import os.log
 import SFBAudioEngine
 import SFSafeSymbols
 import SwiftUI
+import MediaPlayer
 
 // MARK: - Playback Mode
 
@@ -80,6 +81,7 @@ enum PlaybackMode: String, CaseIterable, Identifiable {
             guard timeDifference > 9 / 100 else { return }
 
             player.seek(position: max(0, min(1, newValue)))
+            updateNowPlayingInfo()
         }
     }
 
@@ -196,7 +198,8 @@ enum PlaybackMode: String, CaseIterable, Identifiable {
     override init() {
         super.init()
         player.delegate = self
-        updateDeviceMenu()
+        setupRemoteTransportControls()
+        //        updateDeviceMenu()
     }
 
     func randomIndex() -> Int? {
@@ -377,6 +380,18 @@ extension PlayerModel: AudioPlayer.Delegate {
                 self.current = nil
                 self.nextTrack()
             }
+            
+            self.updateNowPlayingState()
+            self.updateNowPlayingInfo()
+            self.updateNowPlayingMetadataInfo()
+        }
+    }
+    
+    func audioPlayerPlaybackStateChanged(_ audioPlayer: AudioPlayer) {
+        DispatchQueue.main.async {
+            self.updateNowPlayingState()
+            self.updateNowPlayingInfo()
+            self.updateNowPlayingMetadataInfo()
         }
     }
 
@@ -437,5 +452,121 @@ extension PlayerModel {
 extension PlayerModel {
     static func splitArtists(from artist: String) -> [Substring] {
         artist.split(separator: /[\/,]\s*/)
+    }
+}
+
+extension PlayerModel {
+    func updateNowPlayingState() {
+        let infoCenter = MPNowPlayingInfoCenter.default()
+        
+        infoCenter.playbackState = if hasCurrentTrack {
+            isPlaying ? .playing : .paused
+        } else {
+            .stopped
+        }
+    }
+    
+    func updateNowPlayingInfo() {
+        let infoCenter = MPNowPlayingInfoCenter.default()
+        var info = infoCenter.nowPlayingInfo ?? .init()
+        
+        if hasCurrentTrack {
+            info[MPMediaItemPropertyPlaybackDuration] = duration.toTimeInterval()
+            info[MPNowPlayingInfoPropertyElapsedPlaybackTime] = timeElapsed
+        } else {
+            info[MPMediaItemPropertyPlaybackDuration] = nil
+            info[MPNowPlayingInfoPropertyElapsedPlaybackTime] = nil
+        }
+        
+        infoCenter.nowPlayingInfo = info
+    }
+    
+    func updateNowPlayingMetadataInfo() {
+        if let current {
+            current.metadata.updateNowPlayingInfo()
+        } else {
+            Metadata.resetNowPlayingInfo()
+        }
+    }
+    
+    func setupRemoteTransportControls() {
+        let commandCenter = MPRemoteCommandCenter.shared()
+        
+        // play
+        commandCenter.playCommand.addTarget { [unowned self] event in
+            guard self.hasCurrentTrack else { return .noActionableNowPlayingItem }
+            
+            if self.isPlaying {
+                return .commandFailed
+            } else {
+                self.play()
+                return .success
+            }
+        }
+        
+        // pause
+        commandCenter.pauseCommand.addTarget { [unowned self] event in
+            guard self.hasCurrentTrack else { return .noActionableNowPlayingItem }
+            
+            if !self.isPlaying {
+                return .commandFailed
+            } else {
+                self.pause()
+                return .success
+            }
+        }
+        
+        // toggle play pause
+        commandCenter.togglePlayPauseCommand.addTarget { [unowned self] event in
+            guard self.hasCurrentTrack else { return .noActionableNowPlayingItem }
+            
+            self.togglePlayPause()
+            return .success
+        }
+        
+        // skip forward
+        commandCenter.skipForwardCommand.preferredIntervals = [1.0, 5.0, 15.0]
+        commandCenter.skipForwardCommand.addTarget { [unowned self] event in
+            guard self.hasCurrentTrack else { return .noActionableNowPlayingItem }
+            guard let event = event as? MPSkipIntervalCommandEvent else { return .commandFailed }
+            
+            self.adjustTime(delta: event.interval, sign: .plus)
+            return .success
+        }
+        
+        // skip backward
+        commandCenter.skipBackwardCommand.preferredIntervals = [1.0, 5.0, 15.0]
+        commandCenter.skipBackwardCommand.addTarget { [unowned self] event in
+            guard self.hasCurrentTrack else { return .noActionableNowPlayingItem }
+            guard let event = event as? MPSkipIntervalCommandEvent else { return .commandFailed }
+            
+            self.adjustTime(delta: event.interval, sign: .minus)
+            return .success
+        }
+        
+        // seek
+        commandCenter.changePlaybackPositionCommand.addTarget { [unowned self] event in
+            guard self.hasCurrentTrack else { return .noActionableNowPlayingItem }
+            guard let event = event as? MPChangePlaybackPositionCommandEvent else { return .commandFailed }
+            
+            self.progress = event.positionTime / duration.toTimeInterval()
+            return .success
+        }
+        
+        // next track
+        commandCenter.nextTrackCommand.addTarget { [unowned self] event in
+            guard self.hasNextTrack else { return .noSuchContent }
+            
+            self.nextTrack()
+            return .success
+        }
+        
+        // previous track
+        commandCenter.previousTrackCommand.addTarget { [unowned self] event in
+            guard self.hasPreviousTrack else { return .noSuchContent }
+            
+            self.previousTrack()
+            return .success
+        }
     }
 }
