@@ -153,6 +153,8 @@ extension MetadataBatchEditingEntry: Equatable {
 
     let keyPath: EntryKeyPath
     let metadatas: Set<Metadata>
+    
+    private var isRestoring: Bool = false
 
     init(keyPath: EntryKeyPath, metadatas: Set<Metadata>) {
         self.keyPath = keyPath
@@ -190,7 +192,7 @@ extension MetadataBatchEditingEntry: Equatable {
     }
 
     var type: MetadataValueType {
-        if metadatas.isEmpty {
+        if metadatas.isEmpty || isRestoring {
             return .none
         } else {
             let values = map(\.current)
@@ -205,7 +207,9 @@ extension MetadataBatchEditingEntry: Equatable {
     }
 
     func restoreAll() {
+        isRestoring = true
         forEach { $0.restore() }
+        isRestoring = false
     }
 
     func applyAll() {

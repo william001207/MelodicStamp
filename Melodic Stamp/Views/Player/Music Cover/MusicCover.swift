@@ -22,10 +22,9 @@ struct MusicCover: View {
                 Group {
                     if hasPlaceholder {
                         Rectangle()
-                            .fill(.regularMaterial)
-                            .background(.placeholder.opacity(0.25))
+                            .foregroundStyle(.placeholder.quinary)
                             .overlay {
-                                Image(systemSymbol: .photo)
+                                Image(systemSymbol: .photoOnRectangleAngled)
                                     .imageScale(.large)
                                     .foregroundStyle(.placeholder)
                             }

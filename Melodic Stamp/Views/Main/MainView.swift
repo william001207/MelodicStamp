@@ -49,11 +49,12 @@ struct MainView: View {
 
     var body: some View {
         content()
-            .frame(minWidth: 700)
+            .frame(minWidth: 600)
             .inspector(isPresented: $isInspectorPresented) {
                 inspector()
                     .ignoresSafeArea()
                     .inspectorColumnWidth(min: 300, ideal: 400, max: 700)
+                    .animation(nil, value: metadataEditor.items) // remove strange transitions when selection changes
             }
             .ignoresSafeArea()
             .luminareMinHeight(38)

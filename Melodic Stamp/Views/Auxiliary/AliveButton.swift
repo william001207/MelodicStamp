@@ -29,12 +29,10 @@ struct AliveButton<Label>: View where Label: View {
             .gesture(DragGesture(minimumDistance: 0)
                 .onChanged { _ in
                     guard isEnabled else { return }
-
                     isActive = true
                 }
                 .onEnded { gesture in
                     guard isEnabled else { return }
-
                     isActive = false
 
                     // only triggers action when location is valid (inside this view)
@@ -51,12 +49,28 @@ struct AliveButton<Label>: View where Label: View {
                 isHovering = hover
             }
 
-            .foregroundStyle(isEnabled ? isHovering ? hoveringStyle ?? enabledStyle : enabledStyle : disabledStyle)
+            .foregroundStyle(style)
             .scaleEffect(isActive ? scaleFactor : 1, anchor: .center)
             .shadow(radius: isActive ? shadowRadius : 0)
-            .animation(.default, value: isHovering)
+            .animation(hasHoveringStyle ? .default : nil, value: isHovering) // avoid unnecessary transitions on hover
             .animation(.bouncy, value: isActive)
             .animation(.default, value: isEnabled)
+    }
+    
+    private var hasHoveringStyle: Bool {
+        hoveringStyle != nil
+    }
+    
+    private var style: AnyShapeStyle {
+        if isEnabled {
+            if isHovering, let hoveringStyle {
+                hoveringStyle
+            } else {
+                enabledStyle
+            }
+        } else {
+            disabledStyle
+        }
     }
 }
 

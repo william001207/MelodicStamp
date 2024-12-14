@@ -22,52 +22,34 @@ struct AdaptableMusicCoverControl: View {
 
     var body: some View {
         Group {
-            if let binding = entries.projectedValue {
-                let attachedPictures: [AttachedPicture] = .init(
-                    binding.wrappedValue)
-
-                let images =
-                    attachedPictures
-                        .filter { $0.type == type }
-                        .compactMap(\.image)
-
-                AliveButton {
-                    isImagePickerPresented = true
-                } label: {
-                    MusicCover(images: images, cornerRadius: 8)
-                        .background {
-                            if attachedPicturesHandler.isModified(of: [type], entries: entries) {
-                                RoundedRectangle(cornerRadius: 8)
-                                    .stroke(.tint, lineWidth: 8)
-                            }
-                        }
-                        .padding(.horizontal, 16)
-                }
-                .fileImporter(
-                    isPresented: $isImagePickerPresented,
-                    allowedContentTypes: AttachedPicturesHandlerModel
-                        .allowedContentTypes
-                ) { result in
-                    switch result {
-                    case let .success(url):
-                        guard url.startAccessingSecurityScopedResource() else {
-                            break
-                        }
-                        defer { url.stopAccessingSecurityScopedResource() }
-
-                        guard let image = NSImage(contentsOf: url),
-                              let attachedPicture = image.attachedPicture(
-                                  of: type)
-                        else { break }
-                        attachedPicturesHandler.replace(
-                            [attachedPicture], entries: entries
-                        )
-                    case .failure:
+            AliveButton {
+                isImagePickerPresented = true
+            } label: {
+                image()
+                    .padding(.horizontal, 16)
+            }
+            .fileImporter(
+                isPresented: $isImagePickerPresented,
+                allowedContentTypes: AttachedPicturesHandlerModel
+                    .allowedContentTypes
+            ) { result in
+                switch result {
+                case let .success(url):
+                    guard url.startAccessingSecurityScopedResource() else {
                         break
                     }
+                    defer { url.stopAccessingSecurityScopedResource() }
+
+                    guard let image = NSImage(contentsOf: url),
+                        let attachedPicture = image.attachedPicture(
+                            of: type)
+                    else { break }
+                    attachedPicturesHandler.replace(
+                        [attachedPicture], entries: entries
+                    )
+                case .failure:
+                    break
                 }
-            } else {
-                Color.clear
             }
         }
         .padding(.top, 8)
@@ -134,5 +116,29 @@ struct AdaptableMusicCoverControl: View {
             isHeaderHovering = hover
         }
         .animation(.smooth(duration: 0.25), value: isHeaderHovering)
+    }
+    
+    @ViewBuilder private func image() -> some View {
+        if let binding = entries.projectedValue {
+            let attachedPictures: [AttachedPicture] = .init(
+                binding.wrappedValue)
+            
+            let images =
+            attachedPictures
+                .filter { $0.type == type }
+                .compactMap(\.image)
+            
+            MusicCover(images: images, cornerRadius: 8)
+                .background {
+                    if attachedPicturesHandler.isModified(
+                        of: [type], entries: entries)
+                    {
+                        RoundedRectangle(cornerRadius: 8)
+                            .stroke(.tint, lineWidth: 8)
+                    }
+                }
+        } else {
+            MusicCover(images: [], cornerRadius: 8)
+        }
     }
 }

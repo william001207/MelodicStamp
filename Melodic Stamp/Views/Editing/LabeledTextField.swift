@@ -10,6 +10,8 @@ import SwiftUI
 
 struct LabeledTextField<F, Label>: View where F: ParseableFormatStyle, F.FormatOutput == String, F.FormatInput: Equatable & Hashable, Label: View {
     typealias Entries = MetadataBatchEditingEntries<F.FormatInput?>
+    
+    @FocusState private var isFocused: Bool
 
     @Environment(\.luminareAnimation) private var animation
     @Environment(\.luminareAnimationFast) private var animationFast
@@ -84,6 +86,7 @@ struct LabeledTextField<F, Label>: View where F: ParseableFormatStyle, F.FormatO
             }
         }
         .animation(animation, value: isActive)
+        .animation(animation, value: entries.isModified)
     }
 
     private var isActive: Bool {
@@ -100,6 +103,10 @@ struct LabeledTextField<F, Label>: View where F: ParseableFormatStyle, F.FormatO
             value: binding, format: format
         )
         .luminareCompactButtonAspectRatio(contentMode: .fill)
+        .focused($isFocused)
+        .onSubmit {
+            isFocused = false
+        }
         .overlay {
             Group {
                 if entries.isModified {
@@ -153,7 +160,28 @@ struct LabeledTextField<F, Label>: View where F: ParseableFormatStyle, F.FormatO
     }
 
     @ViewBuilder private func varied() -> some View {
-        Color.blue
+        Button {
+            entries.setAll(nil)
+            DispatchQueue.main.async {
+                isFocused = true
+            }
+        } label: {
+            HStack(spacing: 0) {
+                if Label.self != EmptyView.self {
+                    label()
+                } else {
+                    Text(placeholder)
+                    
+                    Text("…")
+                }
+                
+                Spacer()
+            }
+        }
+        .italic()
+        .foregroundStyle(.secondary)
+        .buttonStyle(.luminareCompact)
+        .luminareCompactButtonAspectRatio(contentMode: .fill)
     }
 
     private func isEmpty(value: F.FormatInput?) -> Bool {
