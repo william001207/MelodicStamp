@@ -140,7 +140,7 @@ struct LyricsView: View {
     }
 
     @ViewBuilder private func ttmlLyricLine(index _: Int, line: TTMLLine) -> some View {
-        Text(line.content)
+//        Text(line.content)
     }
 
     private func loadLyrics() {

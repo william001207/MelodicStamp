@@ -86,6 +86,7 @@ import SwiftSoup
         isRecursive: Bool = false
     ) throws {
         try readTimestamp(from: element, into: &lyrics)
+        var text = try element.text()
         
         for node in element.getChildNodes() {
             if let textNode = node as? TextNode {
@@ -99,17 +100,17 @@ import SwiftSoup
             {
                 let beginTime = try TTMLData(type: .begin, element: spanElement)?.content.toTimeInterval()
                 let endTime = try TTMLData(type: .end, element: spanElement)?.content.toTimeInterval()
-                let text = try spanElement
-                    .getPreservedText()
+                let spanText = try spanElement
+                    .text()
                     .normalizeSpaces()
                 
                 if let roleAttribute = try TTMLData(type: .role, element: spanElement)?.content,
                    let role = TTMLRole(rawValue: roleAttribute) {
                     switch role {
                     case .translation:
-                        lyrics.translation = text
+                        lyrics.translation = spanText
                     case .roman:
-                        lyrics.roman = text
+                        lyrics.roman = spanText
                     case .background:
                         if isRecursive {
                             var dummy: TTMLLyrics = .init()
@@ -121,29 +122,17 @@ import SwiftSoup
                             )
                         }
                     }
+                    
+                    text.replace(spanText, with: "", maxReplacements: 1)
                 } else {
                     lyrics.append(.init(
-                        beginTime: beginTime, endTime: endTime, text: text
+                        beginTime: beginTime, endTime: endTime, text: spanText
                     ))
                 }
             }
         }
-    }
-}
-
-extension Element {
-    func getPreservedText() throws -> String {
-        var result = ""
-        for node in getChildNodes() {
-            if let textNode = node as? TextNode {
-                result += textNode.text()
-                if textNode.text().hasSuffix(" ") {
-                    result += " "
-                }
-            } else if let element = node as? Element {
-                result += try element.getPreservedText()
-            }
-        }
-        return result
+        
+        // Preservs spaces between span elements
+        lyrics.insertSpaces(from: text)
     }
 }

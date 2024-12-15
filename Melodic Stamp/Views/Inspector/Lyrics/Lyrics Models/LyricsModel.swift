@@ -13,7 +13,6 @@ import RegexBuilder
 protocol LyricLine: Equatable, Hashable, Identifiable {
     var beginTime: TimeInterval? { get }
     var endTime: TimeInterval? { get }
-    var content: String { get }
 
     var isValid: Bool { get }
 }

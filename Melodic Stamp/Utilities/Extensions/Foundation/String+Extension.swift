@@ -52,6 +52,43 @@ extension String {
     func normalizeSpaces() -> String {
         replacing(/\\u{(00A0|20[0-9A])}/, with: "")
     }
+    
+    func countConsecutiveSpacesBetweenNumbers(terminator: Character) -> [Int: Int] {
+        var result: [Int: Int] = [:]
+        var currentNumber: Int? = nil
+        var spaceCount = 0
+        var buffer = ""
+        
+        for character in self {
+            if character.isWholeNumber {
+                // Builds multi-digit numbers
+                buffer.append(character)
+            } else if character == terminator {
+                // Handles the end of a number
+                if let number = Int(buffer) {
+                    if let previousNumber = currentNumber {
+                        // Store the previous number and its space count
+                        result[previousNumber] = spaceCount
+                    }
+                    // Updates current number
+                    currentNumber = number
+                    spaceCount = 0
+                }
+                buffer = ""
+            } else if character.isWhitespace {
+                // Counts consecutive spaces
+                spaceCount += 1
+            }
+        }
+        
+        // Adds the last number to the result (if it exists)
+        if let number = Int(buffer), let previousNumber = currentNumber {
+            result[previousNumber] = spaceCount
+            result[number] = 0
+        }
+        
+        return result
+    }
 }
 
 public extension String.Encoding {

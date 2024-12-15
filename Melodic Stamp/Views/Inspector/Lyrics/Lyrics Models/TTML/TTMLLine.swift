@@ -17,15 +17,7 @@ struct TTMLLine: LyricLine {
     var lyrics: TTMLLyrics = .init()
     var backgroundLyrics: TTMLLyrics = .init()
 
-    let id: UUID = .init()
-
-    var content: String {
-        lyrics.map(\.text).joined(separator: " ")
-    }
-
-    var isValid: Bool {
-        beginTime != nil || endTime != nil
-    }
+    let id = UUID()
 }
 
 extension TTMLLine: Equatable {
@@ -46,6 +38,8 @@ struct TTMLLyric: Equatable, Hashable, Codable {
     var beginTime: TimeInterval?
     var endTime: TimeInterval?
     var text: String
+    
+    var trailingSpaceCount: Int = 0
 }
 
 // MARK: - Lyrics
@@ -65,7 +59,7 @@ extension TTMLLyrics: Sequence {
     }
 }
 
-extension TTMLLyrics: Collection {
+extension TTMLLyrics: MutableCollection {
     var startIndex: Int { children.startIndex }
     var endIndex: Int { children.endIndex }
     var count: Int { children.count }
@@ -75,7 +69,13 @@ extension TTMLLyrics: Collection {
     }
     
     subscript(index: Int) -> TTMLLyric {
-        children[index]
+        get {
+            children[index]
+        }
+        
+        set {
+            children[index] = newValue
+        }
     }
 }
 
@@ -85,6 +85,28 @@ extension TTMLLyrics: RangeReplaceableCollection {
         with newElements: C
     ) where C.Element == TTMLLyric {
         children.replaceSubrange(subrange, with: newElements)
+    }
+}
+
+extension TTMLLyrics {
+    mutating func insertSpaces(from template: String) {
+        let terminator: Character = ";"
+        var indexedTemplate = template
+        enumerated().forEach {
+            indexedTemplate.replace(
+                $1.text,
+                with: "\($0)\(terminator)",
+                maxReplacements: 1
+            )
+        }
+        
+        let consecutiveSpaces = indexedTemplate
+            .countConsecutiveSpacesBetweenNumbers(terminator: terminator)
+        
+        for (index, spaceCount) in consecutiveSpaces {
+            guard indices.contains(index) else { continue }
+            self[index].trailingSpaceCount = spaceCount
+        }
     }
 }
 

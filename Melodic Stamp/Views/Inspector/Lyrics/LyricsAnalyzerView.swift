@@ -132,12 +132,18 @@ private struct LyricsAnalyzerView: View {
                 ScrollView(.horizontal) {
                     HStack(spacing: 0) {
                         ForEach(lyrics.children, id: \.beginTime) { lyric in
-                            Text(lyric.text)
-                                .bold()
-                                .modifier(LuminareHoverable())
-                                .luminareBordered(false)
-                                .luminareHorizontalPadding(0)
-                                .luminareMinHeight(24)
+                            Group {
+                                Text(lyric.text)
+                                    .modifier(LuminareHoverable())
+                                    .luminareBordered(false)
+                                    .luminareHorizontalPadding(0)
+                                    .luminareMinHeight(24)
+                                
+                                ForEach(0..<lyric.trailingSpaceCount, id: \.self) { _ in
+                                    Text(" ")
+                                }
+                            }
+                            .bold()
                         }
                     }
                     .padding(.horizontal, 4)
