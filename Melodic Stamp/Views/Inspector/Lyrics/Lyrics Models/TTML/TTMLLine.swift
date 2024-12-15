@@ -40,6 +40,20 @@ struct TTMLLyric: Equatable, Hashable, Codable {
     var text: String
     
     var trailingSpaceCount: Int = 0
+    
+    init(
+        beginTime: TimeInterval? = nil,
+        endTime: TimeInterval? = nil,
+        text: String,
+        trailingSpaceCount: Int = 0
+    ) {
+        self.beginTime = beginTime
+        self.endTime = endTime
+        self.trailingSpaceCount = trailingSpaceCount
+        
+        // Remove parentheses
+        self.text = text.replacing(/[\[\]\()【】（）]/, with: "")
+    }
 }
 
 // MARK: - Lyrics

@@ -74,8 +74,8 @@ import SwiftSoup
     }
     
     static func readTimestamp(from element: Element, into lyrics: inout TTMLLyrics) throws {
-        let beginTime = try TTMLData(type: .begin, element: element)?.content.toTimeInterval()
-        let endTime = try TTMLData(type: .end, element: element)?.content.toTimeInterval()
+        let beginTime = try TTMLData(type: .begin, element: element)?.content.toTTMLTimeInterval()
+        let endTime = try TTMLData(type: .end, element: element)?.content.toTTMLTimeInterval()
         
         lyrics.beginTime = beginTime
         lyrics.endTime = endTime
@@ -100,8 +100,8 @@ import SwiftSoup
                 let spanElement = node as? Element,
                 spanElement.tagName() == "span"
             {
-                let beginTime = try TTMLData(type: .begin, element: spanElement)?.content.toTimeInterval()
-                let endTime = try TTMLData(type: .end, element: spanElement)?.content.toTimeInterval()
+                let beginTime = try TTMLData(type: .begin, element: spanElement)?.content.toTTMLTimeInterval()
+                let endTime = try TTMLData(type: .end, element: spanElement)?.content.toTTMLTimeInterval()
                 let spanText = try spanElement
                     .text()
                     .normalizeSpaces()
@@ -121,15 +121,6 @@ import SwiftSoup
                                 into: &backgroundLyrics,
                                 intoBackground: &dummy,
                                 isRecursive: false
-                            )
-                            backgroundLyrics = TTMLLyrics(
-                                backgroundLyrics.map { lyric in
-                                    var newLyric = lyric
-                                    newLyric.text = lyric.text
-                                        .replacingOccurrences(of: "(", with: "")
-                                        .replacingOccurrences(of: ")", with: "")
-                                    return newLyric
-                                }
                             )
                         }
                     }

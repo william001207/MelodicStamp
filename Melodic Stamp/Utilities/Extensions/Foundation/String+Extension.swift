@@ -24,27 +24,27 @@ extension String {
 }
 
 extension String {
-    func toTimeInterval() -> TimeInterval {
-        let pattern = #"(\d+):(\d+)\.(\d+)"#
-        let regex = try! NSRegularExpression(pattern: pattern)
-        let matches = regex.matches(in: self, range: NSRange(startIndex..., in: self))
-
-        guard let match = matches.first,
-              match.numberOfRanges == 4,
-              let minutesRange = Range(match.range(at: 1), in: self),
-              let secondsRange = Range(match.range(at: 2), in: self),
-              let millisecondsRange = Range(match.range(at: 3), in: self),
-              let minutes = Double(self[minutesRange]),
-              let seconds = Double(self[secondsRange]),
-              let milliseconds = Double(self[millisecondsRange])
-        else {
-            return TimeInterval(0)
+    func toTTMLTimeInterval() -> TimeInterval? {
+        let regex = /(\d+):(\d+)\.(\d+)/
+        
+        do {
+            if let match = try regex.wholeMatch(in: self) {
+                guard
+                    let minutes = Double(match.output.1),
+                    let seconds = Double(match.output.2),
+                    let milliseconds = Double(match.output.3)
+                else { return nil }
+                
+                let totalSeconds = minutes * 60 + seconds
+                let totalMilliseconds = totalSeconds * 1000 + milliseconds
+                
+                return totalMilliseconds
+            } else {
+                return nil
+            }
+        } catch {
+            return nil
         }
-
-        let totalMilliseconds = (minutes * 60 + seconds) * 1000 + milliseconds
-        let timeInterval = totalMilliseconds / 1000
-
-        return timeInterval
     }
 }
 
