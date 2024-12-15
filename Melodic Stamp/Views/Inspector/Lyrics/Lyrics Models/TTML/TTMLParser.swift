@@ -120,6 +120,15 @@ import SwiftSoup
                                 intoBackground: &dummy,
                                 isRecursive: false
                             )
+                            backgroundLyrics = TTMLLyrics(
+                                backgroundLyrics.map { lyric in
+                                    var newLyric = lyric
+                                    newLyric.text = lyric.text
+                                        .replacingOccurrences(of: "(", with: "")
+                                        .replacingOccurrences(of: ")", with: "")
+                                    return newLyric
+                                }
+                            )
                         }
                     }
                     
