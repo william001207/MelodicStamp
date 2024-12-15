@@ -11,8 +11,8 @@ import RegexBuilder
 struct TTMLLine: LyricLine {
     var index: Int
     var position: TTMLPosition
-    var beginTime: TimeInterval?
-    var endTime: TimeInterval?
+    var beginTime: TimeInterval? { lyrics.beginTime }
+    var endTime: TimeInterval? { lyrics.endTime }
     
     var lyrics: TTMLLyrics = .init()
     var backgroundLyrics: TTMLLyrics = .init()
@@ -51,6 +51,9 @@ struct TTMLLyric: Equatable, Hashable, Codable {
 // MARK: - Lyrics
 
 struct TTMLLyrics: Equatable, Hashable, Codable {
+    var beginTime: TimeInterval?
+    var endTime: TimeInterval?
+    
     var children: [TTMLLyric] = []
     var translation: String?
     var roman: String?

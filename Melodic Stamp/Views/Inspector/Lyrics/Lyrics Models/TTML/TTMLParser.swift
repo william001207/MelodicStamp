@@ -32,23 +32,19 @@ import SwiftSoup
         }
 
         for (index, pElement) in try body.getElementsByTag("p").enumerated() {
-            let beginTime = try TTMLData(type: .begin, element: pElement)?.content.toTimeInterval()
-            let endTime = try  TTMLData(type: .end, element: pElement)?.content.toTimeInterval()
             let agent = try  TTMLData(type: .agent, element: pElement)
 
             var line = TTMLLine(
                 index: index,
-                position: Self.getPosition(fromAgent: agent?.content),
-                beginTime: beginTime,
-                endTime: endTime
+                position: Self.getPosition(fromAgent: agent?.content)
             )
 
-            var backgroundLyrics: TTMLLyrics? = .init()
-            try Self.readNodes(from: pElement.getChildNodes(), into: &line.lyrics, recursive: &backgroundLyrics)
-            
-            if let backgroundLyrics {
-                line.backgroundLyrics = backgroundLyrics
-            }
+            try Self.readNodes(
+                from: pElement,
+                into: &line.lyrics,
+                intoBackground: &line.backgroundLyrics,
+                isRecursive: true
+            )
             
             lines.append(line)
         }
@@ -75,8 +71,23 @@ import SwiftSoup
         }
     }
     
-    static func readNodes(from nodes: [Node], into lyrics: inout TTMLLyrics, recursive: inout TTMLLyrics?) throws {
-        for node in nodes {
+    static func readTimestamp(from element: Element, into lyrics: inout TTMLLyrics) throws {
+        let beginTime = try TTMLData(type: .begin, element: element)?.content.toTimeInterval()
+        let endTime = try TTMLData(type: .end, element: element)?.content.toTimeInterval()
+        
+        lyrics.beginTime = beginTime
+        lyrics.endTime = endTime
+    }
+    
+    static func readNodes(
+        from element: Element,
+        into lyrics: inout TTMLLyrics,
+        intoBackground backgroundLyrics: inout TTMLLyrics,
+        isRecursive: Bool = false
+    ) throws {
+        try readTimestamp(from: element, into: &lyrics)
+        
+        for node in element.getChildNodes() {
             if let textNode = node as? TextNode {
                 let text = textNode.text().trimmingCharacters(in: .whitespacesAndNewlines)
                 guard !text.isEmpty else { continue }
@@ -92,10 +103,6 @@ import SwiftSoup
                     .getPreservedText()
                     .normalizeSpaces()
                 
-                lyrics.append(.init(
-                    beginTime: beginTime, endTime: endTime, text: text
-                ))
-                
                 if let roleAttribute = try TTMLData(type: .role, element: spanElement)?.content,
                    let role = TTMLRole(rawValue: roleAttribute) {
                     switch role {
@@ -104,11 +111,20 @@ import SwiftSoup
                     case .roman:
                         lyrics.roman = text
                     case .background:
-                        if var recursive {
-                            var dummy: TTMLLyrics? = nil
-                            try readNodes(from: spanElement.getChildNodes(), into: &recursive, recursive: &dummy)
+                        if isRecursive {
+                            var dummy: TTMLLyrics = .init()
+                            try readNodes(
+                                from: spanElement,
+                                into: &backgroundLyrics,
+                                intoBackground: &dummy,
+                                isRecursive: false
+                            )
                         }
                     }
+                } else {
+                    lyrics.append(.init(
+                        beginTime: beginTime, endTime: endTime, text: text
+                    ))
                 }
             }
         }

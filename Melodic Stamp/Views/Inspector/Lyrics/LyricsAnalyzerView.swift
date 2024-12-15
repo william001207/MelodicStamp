@@ -76,64 +76,7 @@ private struct LyricsAnalyzerView: View {
                                     .monospaced()
                                     .foregroundColor(.secondary)
 
-                                    VStack(alignment: .leading, spacing: 8) {
-                                        Group {
-                                            ScrollView(.horizontal) {
-                                                HStack(spacing: 0) {
-                                                    ForEach(
-                                                        line.lyrics,
-                                                        id: \.beginTime
-                                                    ) {
-                                                        lyric in
-                                                        Text(lyric.text)
-                                                            .font(.title2)
-                                                            .bold()
-                                                            .modifier(
-                                                                LuminareHoverable()
-                                                            )
-                                                            .luminareBordered(
-                                                                false
-                                                            )
-                                                            .luminareHorizontalPadding(
-                                                                0)
-                                                    }
-                                                }
-                                                .padding(.horizontal, 4)
-                                            }
-                                        }
-                                        .frame(maxWidth: .infinity)
-                                        .background(.quinary)
-                                        .clipShape(.rect(cornerRadius: 8))
-
-                                        if let translation = line.translation {
-                                            HStack {
-                                                Image(systemSymbol: .translate)
-                                                    .padding(2)
-                                                    .frame(
-                                                        width: 16, height: 16)
-
-                                                Text("\(translation)")
-                                            }
-                                            .font(.subheadline)
-                                            .foregroundStyle(.tint)
-                                        }
-
-                                        if let roman = line.roman {
-                                            HStack {
-                                                Image(
-                                                    systemSymbol:
-                                                        .characterPhonetic
-                                                )
-                                                .padding(2)
-                                                .frame(width: 16, height: 16)
-
-                                                Text("\(roman)")
-                                            }
-                                            .font(.subheadline)
-                                            .foregroundStyle(.purple)
-                                        }
-                                    }
-                                    .frame(maxWidth: .infinity)
+                                    lyrics(line.lyrics)
 
                                     if !line.backgroundLyrics.isEmpty {
                                         HStack {
@@ -146,91 +89,23 @@ private struct LyricsAnalyzerView: View {
                                         .monospaced()
                                         .foregroundStyle(.secondary)
 
-                                        VStack(alignment: .leading, spacing: 8)
-                                        {
-                                            Group {
-                                                ScrollView(.horizontal) {
-                                                    HStack(spacing: 0) {
-                                                        ForEach(
-                                                            line
-                                                                .backgroundLyrics,
-                                                            id: \.beginTime
-                                                        ) {
-                                                            lyric in
-                                                            Text(lyric.text)
-                                                                .bold()
-                                                                .modifier(
-                                                                    LuminareHoverable()
-                                                                )
-                                                                .luminareBordered(
-                                                                    false
-                                                                )
-                                                                .luminareHorizontalPadding(
-                                                                    0
-                                                                )
-                                                                .luminareMinHeight(
-                                                                    24)
-                                                        }
-                                                    }
-                                                    .padding(.horizontal, 4)
-                                                    .foregroundStyle(.secondary)
-                                                }
-                                            }
-                                            .frame(maxWidth: .infinity)
-                                            .background(.quinary)
-                                            .clipShape(.rect(cornerRadius: 8))
-
-                                            if let translation = line
-                                                .backgroundLyrics.translation
-                                                .translation
-                                            {
-                                                HStack {
-                                                    Image(
-                                                        systemSymbol: .translate
-                                                    )
-                                                    .padding(2)
-                                                    .frame(
-                                                        width: 16, height: 16)
-
-                                                    Text("\(translation)")
-                                                }
-                                                .font(.subheadline)
-                                                .foregroundStyle(.secondary)
-                                                .foregroundStyle(.tint)
-                                            }
-
-                                            if let roman = line.backgroundLyrics
-                                                .roman
-                                            {
-                                                HStack {
-                                                    Image(
-                                                        systemSymbol:
-                                                            .characterPhonetic
-                                                    )
-                                                    .padding(2)
-                                                    .frame(
-                                                        width: 16, height: 16)
-
-                                                    Text("\(roman)")
-                                                }
-                                                .font(.subheadline)
-                                                .foregroundStyle(.secondary)
-                                                .foregroundStyle(.purple)
-                                            }
-                                        }
-                                        .frame(maxWidth: .infinity)
+                                        lyrics(line.backgroundLyrics)
                                     }
 
                                     HStack {
-                                        Text("from")
-
-                                        Text(line.beginTime.formatted())
-
+                                        if let beginTime = line.beginTime {
+                                            Text("from")
+                                            
+                                            Text(beginTime.formatted())
+                                        }
+                                        
                                         Spacer()
-
-                                        Text("to")
-
-                                        Text(line.endTime.formatted())
+                                        
+                                        if let endTime = line.endTime {
+                                            Text("to")
+                                            
+                                            Text(endTime.formatted())
+                                        }
                                     }
                                     .font(.caption)
                                     .monospaced()
@@ -249,6 +124,58 @@ private struct LyricsAnalyzerView: View {
             }
             .frame(minHeight: 300)
         }
+    }
+    
+    @ViewBuilder private func lyrics(_ lyrics: TTMLLyrics) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Group {
+                ScrollView(.horizontal) {
+                    HStack(spacing: 0) {
+                        ForEach(lyrics.children, id: \.beginTime) { lyric in
+                            Text(lyric.text)
+                                .bold()
+                                .modifier(LuminareHoverable())
+                                .luminareBordered(false)
+                                .luminareHorizontalPadding(0)
+                                .luminareMinHeight(24)
+                        }
+                    }
+                    .padding(.horizontal, 4)
+                    .foregroundStyle(.secondary)
+                }
+            }
+            .frame(maxWidth: .infinity)
+            .background(.quinary)
+            .clipShape(.rect(cornerRadius: 8))
+            
+            if let translation = lyrics.translation {
+                HStack {
+                    Image(systemSymbol: .translate)
+                    .padding(2)
+                    .frame(
+                        width: 16, height: 16)
+                    
+                    Text("\(translation)")
+                }
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+                .foregroundStyle(.tint)
+            }
+            
+            if let roman = lyrics.roman {
+                HStack {
+                    Image(systemSymbol: .characterPhonetic)
+                    .padding(2)
+                    .frame(width: 16, height: 16)
+                    
+                    Text("\(roman)")
+                }
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+                .foregroundStyle(.purple)
+            }
+        }
+        .frame(maxWidth: .infinity)
     }
 }
 
