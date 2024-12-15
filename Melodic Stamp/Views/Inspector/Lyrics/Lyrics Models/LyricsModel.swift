@@ -7,6 +7,7 @@
 
 import Foundation
 import RegexBuilder
+import SwiftSoup
 
 // MARK: - Lyric Line (Protocol)
 
@@ -79,7 +80,7 @@ enum LyricsStorage {
 @Observable class LyricsModel {
     private(set) var storage: LyricsStorage?
     private(set) var url: URL?
-    var type: LyricsType = .raw
+    var type: LyricsType?
 
     private var cache: String?
 
@@ -87,7 +88,19 @@ enum LyricsStorage {
         self.url = url
     }
 
-    func load(string: String?) {
+    func load(string: String?, autoRecognizes: Bool = true) {
+        if autoRecognizes {
+            if let string {
+                do {
+                    type = try recognize(string: string) ?? .raw
+                } catch {
+                    type = .raw
+                }
+            } else {
+                type = nil
+            }
+        }
+        
         // Debounce
         guard type != storage?.type || string != cache || url != url else { return }
 
@@ -98,22 +111,43 @@ enum LyricsStorage {
             return
         }
 
-        do {
-            storage = switch type {
-            case .raw:
-                try .raw(parser: .init(string: string))
-            case .lrc:
-                try .lrc(parser: .init(string: string))
-            case .ttml:
-                try .ttml(parser: .init(string: string))
+        if let type {
+            do {
+                storage = switch type {
+                case .raw:
+                    try .raw(parser: .init(string: string))
+                case .lrc:
+                    try .lrc(parser: .init(string: string))
+                case .ttml:
+                    try .ttml(parser: .init(string: string))
+                }
+            } catch {
+                storage = nil
             }
-        } catch {
-            storage = nil
         }
     }
 
     func find(at time: TimeInterval, in url: URL?) -> IndexSet {
         guard let storage, let url, url == self.url else { return [] }
         return storage.find(at: time)
+    }
+}
+
+extension LyricsModel {
+    func recognize(string: String?) throws -> LyricsType? {
+        guard let string else { return nil }
+        return if string
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .starts(with: /\[.+].*/)
+        {
+            .lrc
+        } else if
+            let body = try SwiftSoup.parse(string).body(),
+            body.tagName() == "tt"
+        {
+            .ttml
+        } else {
+            .raw
+        }
     }
 }

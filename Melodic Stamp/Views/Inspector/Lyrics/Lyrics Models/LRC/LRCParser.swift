@@ -58,7 +58,7 @@ import RegexBuilder
                 tags.append(String(match.output.1).trimmingCharacters(in: .whitespacesAndNewlines))
             }
             
-            print("Extracting lyric line: \(tags), \"\(content)\"")
+//            print("Extracting LRC lyric line: \(tags), \"\(content)\"")
             
             var line: LRCLine = .init(content: content)
             
@@ -97,16 +97,16 @@ import RegexBuilder
     }
 
     func find(at time: TimeInterval) -> IndexSet {
-        var nearestStartTime: TimeInterval = .zero
+        var nearestBeginTime: TimeInterval = .zero
         var indices: IndexSet = []
 
         for beginTime in lines.compactMap(\.beginTime) {
-            guard beginTime <= time, beginTime >= nearestStartTime else { continue }
-            nearestStartTime = beginTime
+            guard beginTime <= time, beginTime >= nearestBeginTime else { continue }
+            nearestBeginTime = beginTime
         }
 
         for (index, line) in lines.enumerated() {
-            guard let beginTime = line.beginTime, beginTime <= time, beginTime >= nearestStartTime else { continue }
+            guard let beginTime = line.beginTime, beginTime <= time, beginTime >= nearestBeginTime else { continue }
 
             if let endTime = line.endTime {
                 guard endTime > time else { continue }

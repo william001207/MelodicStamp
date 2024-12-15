@@ -71,12 +71,14 @@ struct Player: View {
             )
 
             Spacer()
-            
+
             Group {
                 if let thumbnail = player.current?.metadata.thumbnail {
-                    MusicCover(images: [thumbnail], hasPlaceholder: false, cornerRadius: 2)
+                    MusicCover(
+                        images: [thumbnail], hasPlaceholder: false,
+                        cornerRadius: 2)
                 }
-                
+
                 ShrinkableMarqueeScrollView {
                     MusicTitle(item: player.current)
                 }
@@ -162,14 +164,14 @@ struct Player: View {
     @ViewBuilder private func trailingControls() -> some View {
         ProgressBar(
             value: $player.volume,
-            isActive: $isVolumeBarActive
-        ) { _, newValue in
-            adjustmentPercentage = newValue
-        } onOvershootOffsetChange: { oldValue, newValue in
-            if oldValue <= 0, newValue > 0 {
-                playerKeyboardControl.speakerButtonBounceAnimation.toggle()
+            isActive: $isVolumeBarActive,
+            externalOvershootSign: playerKeyboardControl.volumeBarExternalOvershootSign,
+            onOvershootOffsetChange: { oldValue, newValue in
+                if oldValue <= 0, newValue > 0 {
+                    playerKeyboardControl.speakerButtonBounceAnimation.toggle()
+                }
             }
-        }
+        )
         .foregroundStyle(
             isVolumeBarActive
                 ? .primary : player.isMuted ? .quaternary : .secondary
@@ -228,7 +230,10 @@ struct Player: View {
             isActive: $isProgressBarActive,
             isDelegated: true,
             externalOvershootSign: playerKeyboardControl
-                .volumeBarExternalOvershootSign
+                .progressBarExternalOvershootSign,
+            onPercentageChange: { _, newValue in
+                adjustmentPercentage = newValue
+            }
         )
         .foregroundStyle(isProgressBarActive ? .primary : .secondary)
         .backgroundStyle(.quinary)

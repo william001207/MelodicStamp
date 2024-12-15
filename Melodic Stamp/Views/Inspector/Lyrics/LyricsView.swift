@@ -18,33 +18,30 @@ struct LyricsView: View {
             case .none, .varied:
                 EmptyView()
             case .identical:
-                TimelineView(.animation) { _ in
-                    ScrollViewReader { _ in
-                        ScrollView {
-                            // Don't apply `.contentMargins()`, otherwise causing `LazyVStack` related glitches
-                            LazyVStack(alignment: alignment, spacing: 10) {
-                                lyricLines()
-                                    .textSelection(.enabled)
-                            }
-                            .padding(.horizontal)
-                            .safeAreaPadding(.top, 64)
-                            .safeAreaPadding(.bottom, 94)
-
-                            Spacer()
-                                .frame(height: 150)
+                ScrollViewReader { _ in
+                    ScrollView {
+                        // Don't apply `.contentMargins()`, otherwise causing `LazyVStack` related glitches
+                        LazyVStack(alignment: alignment, spacing: 10) {
+                            lyricLines()
+                                .textSelection(.enabled)
                         }
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
-                        .scrollContentBackground(.hidden)
-                        .contentMargins(.top, 64, for: .scrollIndicators)
-                        .contentMargins(.bottom, 94, for: .scrollIndicators)
+                        .padding(.horizontal)
+                        .safeAreaPadding(.top, 64)
+                        .safeAreaPadding(.bottom, 94)
+
+                        Spacer()
+                            .frame(height: 150)
                     }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .scrollContentBackground(.hidden)
+                    .contentMargins(.top, 64, for: .scrollIndicators)
+                    .contentMargins(.bottom, 94, for: .scrollIndicators)
                 }
             }
         }
-        // TODO: Restore this
-//        .onChange(of: entries, initial: true) { _, _ in
-//            loadLyrics()
-//        }
+        .onChange(of: entries, initial: true) { _, _ in
+            loadLyrics()
+        }
         .onChange(of: lyrics.type) { _, _ in
             loadLyrics()
         }
@@ -54,12 +51,16 @@ struct LyricsView: View {
     }
 
     private var alignment: HorizontalAlignment {
-        switch lyrics.type {
-        case .raw:
-            .leading
-        case .lrc:
-            .center
-        case .ttml:
+        if let type = lyrics.type {
+            switch type {
+            case .raw:
+                .leading
+            case .lrc:
+                .center
+            case .ttml:
+                .leading
+            }
+        } else {
             .leading
         }
     }
@@ -75,15 +76,18 @@ struct LyricsView: View {
     @ViewBuilder private func lyricLines() -> some View {
         switch lyrics.storage {
         case let .raw(parser):
-            ForEach(Array(parser.lines.enumerated()), id: \.element) { index, line in
+            ForEach(Array(parser.lines.enumerated()), id: \.element) {
+                index, line in
                 rawLyricLine(index: index, line: line)
             }
         case let .lrc(parser):
-            ForEach(Array(parser.lines.enumerated()), id: \.element) { index, line in
+            ForEach(Array(parser.lines.enumerated()), id: \.element) {
+                index, line in
                 lrcLyricLine(index: index, line: line)
             }
         case let .ttml(parser):
-            ForEach(Array(parser.lines.enumerated()), id: \.element) { index, line in
+            ForEach(Array(parser.lines.enumerated()), id: \.element) {
+                index, line in
                 ttmlLyricLine(index: index, line: line)
             }
         case .none:
@@ -91,11 +95,15 @@ struct LyricsView: View {
         }
     }
 
-    @ViewBuilder private func rawLyricLine(index _: Int, line: RawLyricLine) -> some View {
+    @ViewBuilder private func rawLyricLine(index _: Int, line: RawLyricLine)
+        -> some View
+    {
         Text(line.content)
     }
 
-    @ViewBuilder private func lrcLyricLine(index: Int, line: LRCLine) -> some View {
+    @ViewBuilder private func lrcLyricLine(index: Int, line: LRCLine)
+        -> some View
+    {
         let isHighlighted = highlightedIndices.contains(index)
 
         HStack {
@@ -136,11 +144,64 @@ struct LyricsView: View {
                 }
             }
         }
-        .foregroundStyle(isHighlighted ? AnyShapeStyle(.tint) : AnyShapeStyle(.primary))
+        .foregroundStyle(
+            isHighlighted ? AnyShapeStyle(.tint) : AnyShapeStyle(.primary))
     }
 
-    @ViewBuilder private func ttmlLyricLine(index _: Int, line: TTMLLine) -> some View {
-//        Text(line.content)
+    @ViewBuilder private func ttmlLyricLine(index: Int, line: TTMLLine)
+        -> some View
+    {
+        VStack(alignment: .leading, spacing: 16) {
+            HStack {
+                Text("#\(line.index)")
+                    .foregroundStyle(.orange)
+
+                Spacer()
+
+                Text("at")
+
+                Text("\(line.position)")
+                    .foregroundStyle(.orange)
+            }
+            .font(.caption)
+            .monospaced()
+            .foregroundColor(.secondary)
+
+            TTMLLyricsView(lyrics: line.lyrics)
+
+            if !line.backgroundLyrics.isEmpty {
+                HStack {
+                    Text("background")
+                        .foregroundStyle(.orange)
+
+                    Spacer()
+                }
+                .font(.caption)
+                .monospaced()
+                .foregroundStyle(.secondary)
+
+                TTMLLyricsView(lyrics: line.backgroundLyrics)
+            }
+
+            HStack {
+                if let beginTime = line.beginTime {
+                    Text("from")
+
+                    Text(beginTime.formatted())
+                }
+
+                Spacer()
+
+                if let endTime = line.endTime {
+                    Text("to")
+
+                    Text(endTime.formatted())
+                }
+            }
+            .font(.caption)
+            .monospaced()
+            .foregroundColor(.secondary)
+        }
     }
 
     private func loadLyrics() {

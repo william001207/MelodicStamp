@@ -116,9 +116,9 @@ struct MainView: View {
                     lyrics: lyrics
                 )
                 .toolbar {
-                    if isInspectorPresented {
-                        LyricsToolbar(lyricsType: $lyrics.type)
-                    }
+//                    if isInspectorPresented {
+//                        LyricsToolbar(lyricsType: $lyrics.type)
+//                    }
                 }
             }
         }

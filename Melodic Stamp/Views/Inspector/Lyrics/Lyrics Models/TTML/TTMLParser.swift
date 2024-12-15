@@ -51,7 +51,8 @@ import SwiftSoup
     }
     
     func find(at time: TimeInterval) -> IndexSet {
-        var indices = IndexSet()
+        var indices: IndexSet = []
+        
         for (index, line) in lines.enumerated() {
             if let beginTime = line.beginTime as TimeInterval?,
                let endTime = line.endTime as TimeInterval? {
@@ -60,6 +61,7 @@ import SwiftSoup
                 }
             }
         }
+        
         return indices
     }
     
