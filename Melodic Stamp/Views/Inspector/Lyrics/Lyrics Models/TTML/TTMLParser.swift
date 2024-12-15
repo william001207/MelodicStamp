@@ -43,66 +43,13 @@ import SwiftSoup
                 endTime: endTime
             )
 
-            for node in pElement.getChildNodes() {
-                if let textNode = node as? TextNode {
-                    let text = textNode.text().trimmingCharacters(in: .whitespacesAndNewlines)
-                    guard !text.isEmpty else { continue }
-                    
-                    line.lyrics.append(TTMLLyric(
-                        beginTime: beginTime, endTime: endTime, text: text
-                    ))
-                } else if
-                    let spanElement = node as? Element,
-                        spanElement.tagName() == "span",
-                    let role = try TTMLData(type: .role, element: spanElement),
-                    let roleAttribute = TTMLRole(rawValue: role.content)
-                {
-                    let text = try spanElement.getPreservedText()
-                        .normalizeSpaces()
-
-                    switch roleAttribute {
-                    case .translation:
-                        line.lyrics.translation = text
-                    case .roman:
-                        line.lyrics.roman = text
-                    case .background:
-                        
-                    }
-                    
-//                    case "x-bg":
-//                        var bgLyric = TTMLBackgroundLyric(
-//                            subLyric: [], translation: nil, roman: nil
-//                        )
-//                        let bgSpanElements = try spanElement.getElementsByTag(
-//                            "span")
-//                        var bgSubTtmlLyricList: [TTMLSubLyric] = []
-//
-//                        for bgSpanElement in bgSpanElements {
-//                            let bgBeginTime = try bgSpanElement.attr("begin")
-//                                .toTimeInterval()
-//                            let bgEndTime = try bgSpanElement.attr("end")
-//                                .toTimeInterval()
-//                            let bgText = try bgSpanElement.getPreservedText()
-//                                .normalizeSpaces().replacingOccurrences(
-//                                    of: "[()]", with: "",
-//                                    options: .regularExpression
-//                                )
-//
-//                            let bgSubLyric = TTMLSubLyric(
-//                                beginTime: bgBeginTime,
-//                                endTime: bgEndTime,
-//                                text: bgText
-//                            )
-//                            bgSubTtmlLyricList.append(bgSubLyric)
-//                        }
-//
-//                        bgLyric.children =
-//                            bgSubTtmlLyricList.isEmpty
-//                                ? nil : bgSubTtmlLyricList
-//                        lyricLine.bgLyric = bgLyric
-                }
+            var backgroundLyrics: TTMLLyrics? = .init()
+            try Self.readNodes(from: pElement.getChildNodes(), into: &line.lyrics, recursive: &backgroundLyrics)
+            
+            if let backgroundLyrics {
+                line.backgroundLyrics = backgroundLyrics
             }
-
+            
             lines.append(line)
         }
     }
@@ -125,6 +72,45 @@ import SwiftSoup
         return switch agent {
         case "v1": .main
         default: .sub
+        }
+    }
+    
+    static func readNodes(from nodes: [Node], into lyrics: inout TTMLLyrics, recursive: inout TTMLLyrics?) throws {
+        for node in nodes {
+            if let textNode = node as? TextNode {
+                let text = textNode.text().trimmingCharacters(in: .whitespacesAndNewlines)
+                guard !text.isEmpty else { continue }
+                
+                lyrics.append(.init(text: text))
+            } else if
+                let spanElement = node as? Element,
+                spanElement.tagName() == "span"
+            {
+                let beginTime = try TTMLData(type: .begin, element: spanElement)?.content.toTimeInterval()
+                let endTime = try TTMLData(type: .end, element: spanElement)?.content.toTimeInterval()
+                let text = try spanElement
+                    .getPreservedText()
+                    .normalizeSpaces()
+                
+                lyrics.append(.init(
+                    beginTime: beginTime, endTime: endTime, text: text
+                ))
+                
+                if let roleAttribute = try TTMLData(type: .role, element: spanElement)?.content,
+                   let role = TTMLRole(rawValue: roleAttribute) {
+                    switch role {
+                    case .translation:
+                        lyrics.translation = text
+                    case .roman:
+                        lyrics.roman = text
+                    case .background:
+                        if var recursive {
+                            var dummy: TTMLLyrics? = nil
+                            try readNodes(from: spanElement.getChildNodes(), into: &recursive, recursive: &dummy)
+                        }
+                    }
+                }
+            }
         }
     }
 }
