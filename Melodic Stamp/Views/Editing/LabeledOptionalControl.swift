@@ -48,7 +48,7 @@ struct LabeledOptionalControl<V, Label, Content, ContentB>: View
                     }
                     .foregroundStyle(.red)
                     .bold()
-                    .animation(.bouncy, value: entries.isModified) // to match the animation in `AliveButton`
+                    .animation(.bouncy, value: entries.isModified) // To match the animation in `AliveButton`
                 }
 
                 if let binding = entries.projectedUnwrappedValue() {

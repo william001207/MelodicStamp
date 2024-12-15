@@ -35,7 +35,7 @@ struct AliveButton<Label>: View where Label: View {
                     guard isEnabled else { return }
                     isActive = false
 
-                    // only triggers action when location is valid (inside this view)
+                    // Only triggers action when location is valid (inside this view)
                     if frame.contains(gesture.location) {
                         action()
                     }
@@ -52,7 +52,7 @@ struct AliveButton<Label>: View where Label: View {
             .foregroundStyle(style)
             .scaleEffect(isActive ? scaleFactor : 1, anchor: .center)
             .shadow(radius: isActive ? shadowRadius : 0)
-            .animation(hasHoveringStyle ? .default : nil, value: isHovering) // avoid unnecessary transitions on hover
+            .animation(hasHoveringStyle ? .default : nil, value: isHovering) // Avoid unnecessary transitions on hover
             .animation(.bouncy, value: isActive)
             .animation(.default, value: isEnabled)
     }

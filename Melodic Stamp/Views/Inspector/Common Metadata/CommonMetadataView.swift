@@ -60,7 +60,7 @@ struct CommonMetadataView: View {
                     }
                 }
                 .padding(.horizontal)
-                // don't use `contentMargins()` for content as it breaks progressive blurs
+                // Don't use `contentMargins()` for content as it breaks progressive blurs
                 .safeAreaPadding(.top, 64)
                 .safeAreaPadding(.bottom, 94)
 

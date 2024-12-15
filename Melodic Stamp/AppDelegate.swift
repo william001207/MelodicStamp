@@ -10,7 +10,6 @@ import SwiftUI
 
 class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_: Notification) {
-//        playerViewModel.setupRemoteCommandCenter()
     }
 
     func applicationShouldTerminateAfterLastWindowClosed(_: NSApplication) -> Bool {
@@ -18,9 +17,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func application(_: NSApplication, open urls: [URL]) {
-        if let url = urls.first {
-//            model?.play(url)
-        }
     }
 
     func applicationWillTerminate(_: Notification) {}

@@ -53,7 +53,7 @@ struct MelodicStampApp: App {
     }
 }
 
-// TODO: improve this
+// TODO: Improve this
 let allowedContentTypes: [UTType] = {
     var types = [UTType]()
     types.append(contentsOf: AudioDecoder.supportedMIMETypes.compactMap { UTType(mimeType: $0) })

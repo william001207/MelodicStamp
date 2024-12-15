@@ -75,7 +75,7 @@ enum PlaybackMode: String, CaseIterable, Identifiable {
         }
 
         set {
-            // debounce and cancel if adjustment is smaller than 0.09s
+            // Debounce and cancel if adjustment is smaller than 0.09s
             let difference = abs(newValue - progress)
             let timeDifference = duration.toTimeInterval() * difference
             guard timeDifference > 9 / 100 else { return }
@@ -323,14 +323,14 @@ enum PlaybackMode: String, CaseIterable, Identifiable {
             os_log("Album gain %.2f dB, peak %.8f; Tracks: [%{public}@]", log: OSLog.default, type: .info, rg.0.gain, rg.0.peak, rg.1.map { url, replayGain in
                 String(format: "\"%@\" gain %.2f dB, peak %.8f", FileManager.default.displayName(atPath: url.lastPathComponent), replayGain.gain, replayGain.peak)
             }.joined(separator: ", "))
-            // TODO: notice user we're done
+            // TODO: Notice user we're done
         } catch {}
     }
 
 //    func exportWAVEFile(url: URL) {
 //        let destURL = url.deletingPathExtension().appendingPathExtension("wav")
 //        if FileManager.default.fileExists(atPath: destURL.path) {
-//            // TODO: handle this
+//            // TODO: Handle this
 //            return
 //        }
 //
@@ -349,7 +349,7 @@ extension PlayerModel: AudioPlayer.Delegate {
         if let audioDecoder = decoder as? AudioDecoder {
             switch playbackMode {
             case .single:
-                // play again
+                // Play again
                 guard let currentIndex else { break }
                 do {
                     if let decoder = try playlist[currentIndex].decoder() {
@@ -357,7 +357,7 @@ extension PlayerModel: AudioPlayer.Delegate {
                     }
                 } catch {}
             default:
-                // jump to next track
+                // Jump to next track
                 guard let nextIndex else { break }
                 do {
                     if let decoder = try playlist[nextIndex].decoder() {
@@ -486,7 +486,7 @@ extension PlayerModel {
     func setupRemoteTransportControls() {
         let commandCenter = MPRemoteCommandCenter.shared()
         
-        // play
+        // Play
         commandCenter.playCommand.addTarget { [unowned self] event in
             guard self.hasCurrentTrack else { return .noActionableNowPlayingItem }
             
@@ -498,7 +498,7 @@ extension PlayerModel {
             }
         }
         
-        // pause
+        // Pause
         commandCenter.pauseCommand.addTarget { [unowned self] event in
             guard self.hasCurrentTrack else { return .noActionableNowPlayingItem }
             
@@ -510,7 +510,7 @@ extension PlayerModel {
             }
         }
         
-        // toggle play pause
+        // Toggle play pause
         commandCenter.togglePlayPauseCommand.addTarget { [unowned self] event in
             guard self.hasCurrentTrack else { return .noActionableNowPlayingItem }
             
@@ -518,7 +518,7 @@ extension PlayerModel {
             return .success
         }
         
-        // skip forward
+        // Skip forward
         commandCenter.skipForwardCommand.preferredIntervals = [1.0, 5.0, 15.0]
         commandCenter.skipForwardCommand.addTarget { [unowned self] event in
             guard self.hasCurrentTrack else { return .noActionableNowPlayingItem }
@@ -528,7 +528,7 @@ extension PlayerModel {
             return .success
         }
         
-        // skip backward
+        // Skip backward
         commandCenter.skipBackwardCommand.preferredIntervals = [1.0, 5.0, 15.0]
         commandCenter.skipBackwardCommand.addTarget { [unowned self] event in
             guard self.hasCurrentTrack else { return .noActionableNowPlayingItem }
@@ -538,7 +538,7 @@ extension PlayerModel {
             return .success
         }
         
-        // seek
+        // Seek
         commandCenter.changePlaybackPositionCommand.addTarget { [unowned self] event in
             guard self.hasCurrentTrack else { return .noActionableNowPlayingItem }
             guard let event = event as? MPChangePlaybackPositionCommandEvent else { return .commandFailed }
@@ -547,7 +547,7 @@ extension PlayerModel {
             return .success
         }
         
-        // next track
+        // Next track
         commandCenter.nextTrackCommand.addTarget { [unowned self] event in
             guard self.hasNextTrack else { return .noSuchContent }
             
@@ -555,7 +555,7 @@ extension PlayerModel {
             return .success
         }
         
-        // previous track
+        // Previous track
         commandCenter.previousTrackCommand.addTarget { [unowned self] event in
             guard self.hasPreviousTrack else { return .noSuchContent }
             

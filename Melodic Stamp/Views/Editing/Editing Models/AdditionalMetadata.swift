@@ -33,7 +33,7 @@ extension AdditionalMetadata {
 //        self.reduce(into: [AnyHashable: Any]()) { result, pair in
 //            let (key, value) = pair
 //            if let wrapper = value as? NonHashableWrapper {
-//                result[key] = wrapper.description // TODO: replace this with recovery logic if needed
+//                result[key] = wrapper.description // TODO: Replace this with recovery logic if needed
 //            } else {
 //                result[key] = value
 //            }

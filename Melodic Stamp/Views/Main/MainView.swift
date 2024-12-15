@@ -54,12 +54,12 @@ struct MainView: View {
                 inspector()
                     .ignoresSafeArea()
                     .inspectorColumnWidth(min: 300, ideal: 400, max: 700)
-                    .animation(nil, value: metadataEditor.items) // remove strange transitions when selection changes
+                    .animation(nil, value: metadataEditor.items) // Remove strange transitions when selection changes
             }
             .ignoresSafeArea()
             .luminareMinHeight(38)
             .toolbar {
-                // at least to preserve the titlebar style
+                // At least to preserve the titlebar style
                 Color.clear
             }
             .toolbar {

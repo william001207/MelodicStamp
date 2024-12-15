@@ -33,7 +33,7 @@ struct PlaylistView: View {
                         item.wrappedValue)
                 )
                 .swipeActions {
-                    // play
+                    // Play
                     Button {
                         player.play(item: item.wrappedValue)
                     } label: {
@@ -41,7 +41,7 @@ struct PlaylistView: View {
                     }
                     .tint(.accent)
 
-                    // remove from playlist
+                    // Remove from playlist
                     Button(role: .destructive) {
                         player.removeFromPlaylist(items: [item.wrappedValue])
                     } label: {
@@ -50,7 +50,7 @@ struct PlaylistView: View {
                     .tint(.red)
                 }
                 .swipeActions(edge: .leading) {
-                    // save metadata
+                    // Save metadata
                     if item.wrappedValue.metadata.isModified {
                         Button {
                             Task {
@@ -63,7 +63,7 @@ struct PlaylistView: View {
                         .tint(.green)
                     }
 
-                    // restore metadata
+                    // Restore metadata
                     if item.wrappedValue.metadata.isModified {
                         Button {
                             item.wrappedValue.metadata.restore()
@@ -111,7 +111,7 @@ struct PlaylistView: View {
 
     @ViewBuilder private func actions() -> some View {
         HStack(spacing: 2) {
-            // clear selection
+            // Clear selection
             Button {
                 metadataEditor.items = []
             } label: {
@@ -121,7 +121,7 @@ struct PlaylistView: View {
             .aspectRatio(1, contentMode: .fit)
             .disabled(metadataEditor.items.isEmpty)
 
-            // cycle playback mode
+            // Cycle playback mode
             Button {
                 let hasShift = NSEvent.modifierFlags.contains(.shift)
                 player.playbackMode = player.playbackMode.cycle(
@@ -132,10 +132,10 @@ struct PlaylistView: View {
             }
             .fixedSize(horizontal: true, vertical: false)
 
-            // remove selection from playlist
+            // Remove selection from playlist
             Button(role: .destructive) {
                 player.removeFromPlaylist(items: .init(metadataEditor.items))
-                resetFocus(in: namespace) // must regain focus due to unknown reasons
+                resetFocus(in: namespace) // Must regain focus due to unknown reasons
 
             } label: {
                 HStack {

@@ -16,7 +16,7 @@ struct MusicCover: View {
     var body: some View {
         Group {
             if !images.isEmpty {
-                // TODO: handle multiple images
+                // TODO: Handle multiple images
                 image(images.first!)
             } else {
                 Group {

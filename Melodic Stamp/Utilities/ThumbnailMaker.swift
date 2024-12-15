@@ -19,7 +19,7 @@ enum ThumbnailMaker {
             return nil
         }
 
-        // calculate and create the scaled image
+        // Calculate and create the scaled image
         let scale = min(
             resolution / ciImage.extent.width,
             resolution / ciImage.extent.height, 1
@@ -31,7 +31,7 @@ enum ThumbnailMaker {
         let scaledCIImage = ciImage.transformed(
             by: CGAffineTransform(scaleX: scale, y: scale))
         
-        // create the context
+        // Create the context
         let options: [CIContextOption: Any] = [
             .useSoftwareRenderer: false,
             .outputColorSpace: CGColorSpaceCreateDeviceRGB(),
@@ -39,13 +39,13 @@ enum ThumbnailMaker {
         ]
         let ciContext = CIContext(options: options)
         
-        // apply filters
+        // Apply filters
         let sharpnessFilter = CIFilter.sharpenLuminance()
         sharpnessFilter.inputImage = scaledCIImage
         sharpnessFilter.sharpness = 1
         let sharpenedImage = sharpnessFilter.outputImage
 
-        // find the result
+        // Find the result
         let resultImage = sharpenedImage ?? scaledCIImage
         guard
             let cgImage = ciContext.createCGImage(

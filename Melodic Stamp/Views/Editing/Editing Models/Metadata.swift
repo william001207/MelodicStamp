@@ -361,8 +361,8 @@ extension Metadata {
                 if file.metadata.comment != nil {
                     try file.writeMetadata()
                 } else {
-                    // this is crucial for `.flac` file types
-                    // in these files, if all fields except `attachedPictures` field are `nil`, audio decoding will encounter great issues after writing metadata
+                    // This is crucial for `.flac` file types
+                    // In these files, if all fields except `attachedPictures` field are `nil`, audio decoding will encounter great issues after writing metadata
                     // so hereby always providing an empty `comment` if it is `nil`
                     file.metadata.comment = ""
                     try file.writeMetadata()

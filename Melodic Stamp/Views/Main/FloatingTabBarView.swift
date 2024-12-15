@@ -40,7 +40,7 @@ struct FloatingTabBarView: View {
             }
         }
         .onAppear {
-            // avoid glitches on first hover
+            // Avoid glitches on first hover
             isHovering = false
         }
         .onHover(perform: { hover in

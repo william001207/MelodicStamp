@@ -39,9 +39,9 @@ protocol LyricsParser {
 // MARK: Lyrics Type
 
 enum LyricsType: String, Hashable, Identifiable, CaseIterable {
-    case raw // raw splitted string, unparsed
-    case lrc // sentence based
-    case ttml // word based
+    case raw // Raw splitted string, unparsed
+    case lrc // Line based
+    case ttml // Word based
 
     var id: String {
         rawValue
@@ -89,7 +89,7 @@ enum LyricsStorage {
     }
 
     func load(string: String?) {
-        // debounce
+        // Debounce
         guard type != storage?.type || string != cache || url != url else { return }
 
         cache = string

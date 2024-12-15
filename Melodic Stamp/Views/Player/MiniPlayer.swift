@@ -79,20 +79,20 @@ struct MiniPlayer: View {
             isFocused = true
         }
         
-        // regain progress control on new track
+        // Regain progress control on new track
         .onChange(of: player.currentIndex) { _, newValue in
             guard newValue != nil else { return }
             activeControl = .progress
         }
 
-        // handle space down/up -> toggle play pause
+        // Handle space down/up -> toggle play pause
         .onKeyPress(keys: [.space], phases: .all) { key in
             playerKeyboardControl.handlePlayPause(
                 in: player, phase: key.phase, modifiers: key.modifiers
             )
         }
 
-        // handle left arrow/right arrow down/repeat/up -> adjust progress and navigate track
+        // Handle left arrow/right arrow down/repeat/up -> adjust progress and navigate track
         .onKeyPress(keys: [.leftArrow, .rightArrow], phases: .all) { key in
             let sign: FloatingPointSign = key.key == .leftArrow ? .minus : .plus
 
@@ -110,7 +110,7 @@ struct MiniPlayer: View {
             }
         }
 
-        // handle escape -> regain progress control
+        // Handle escape -> regain progress control
         .onKeyPress(.escape) {
             guard activeControl == .volume else { return .ignored }
 
@@ -118,7 +118,7 @@ struct MiniPlayer: View {
             return .handled
         }
 
-        // handle m -> toggle mute
+        // Handle m -> toggle mute
         .onKeyPress(keys: ["m"], phases: .down) { _ in
             player.isMuted.toggle()
             return .handled
@@ -182,7 +182,7 @@ struct MiniPlayer: View {
                     case .title:
                         MusicTitle(item: player.current)
                     case .lyrics:
-                        // TODO: add lyrics control
+                        // TODO: Add lyrics control
                         Text("Lyrics")
                             .bold()
                     }
@@ -271,7 +271,7 @@ struct MiniPlayer: View {
         if activeControl == .volume {
             Group {
                 if isProgressBarExpanded {
-                    // preserves spacing
+                    // Preserves spacing
                     Spacer()
                         .frame(width: 0)
                 } else {
@@ -321,7 +321,7 @@ struct MiniPlayer: View {
                 if activeControl == .progress {
                     let time: TimeInterval =
                         if isProgressBarActive {
-                            // use adjustment time
+                            // Use adjustment time
                             if shouldUseRemainingDuration {
                                 player.duration.toTimeInterval()
                                     * (1 - adjustmentPercentage)
@@ -330,7 +330,7 @@ struct MiniPlayer: View {
                                     * adjustmentPercentage
                             }
                         } else {
-                            // use track time
+                            // Use track time
                             if shouldUseRemainingDuration {
                                 player.timeRemaining
                             } else {

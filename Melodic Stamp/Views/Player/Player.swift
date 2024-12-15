@@ -196,7 +196,7 @@ struct Player: View {
     @ViewBuilder private func progressBar() -> some View {
         let time: TimeInterval =
             if isProgressBarActive {
-                // use adjustment time
+                // Use adjustment time
                 if shouldUseRemainingDuration {
                     player.duration.toTimeInterval()
                         * (1 - adjustmentPercentage)
@@ -204,7 +204,7 @@ struct Player: View {
                     player.duration.toTimeInterval() * adjustmentPercentage
                 }
             } else {
-                // use track time
+                // Use track time
                 if shouldUseRemainingDuration {
                     player.timeRemaining
                 } else {

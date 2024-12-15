@@ -1,8 +1,8 @@
 //
 //  Bundle+Extensions.swift
-//  Loop
+//  MelodicStamp
 //
-//  Created by Kai Azim on 2023-06-14.
+//  Created by KrLite on 2024/11/10.
 //
 
 import Foundation

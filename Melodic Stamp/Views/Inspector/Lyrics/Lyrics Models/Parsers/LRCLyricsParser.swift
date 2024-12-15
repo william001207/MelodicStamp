@@ -128,7 +128,7 @@ struct LRCLyricLine: LyricLine {
                 let match = try lineRegex.wholeMatch(
                     in: $0.trimmingCharacters(in: .whitespacesAndNewlines))
             else { return }
-            // output: (original, tagString, _, content)
+            // Output: (original, tagString, _, content)
 
             let tagString = String(match.output.1).trimmingCharacters(in: .whitespacesAndNewlines)
             let content = String(match.output.3).trimmingCharacters(in: .whitespacesAndNewlines)
@@ -144,16 +144,16 @@ struct LRCLyricLine: LyricLine {
 
             for tag in tags {
                 if let time = try TimeInterval(lyricTimestamp: tag) {
-                    // parse timestamp
+                    // Parse timestamp
                     if line.startTime == nil {
-                        // save as start time
+                        // Save as start time
                         line.startTime = time
                     } else if line.endTime == nil {
-                        // save as end time
+                        // Save as end time
                         line.endTime = time
                     }
                 } else {
-                    // parse tag
+                    // Parse tag
                     do {
                         if let tag = try Self.parseTag(string: tag) {
                             if tag.type.isMetadata {
@@ -161,7 +161,7 @@ struct LRCLyricLine: LyricLine {
                                 case .translation:
                                     line.type = .translation(locale: tag.content)
                                 default:
-                                    // TODO: handle more metadatas
+                                    // TODO: Handle more metadatas
                                     break
                                 }
                             } else {

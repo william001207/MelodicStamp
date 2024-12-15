@@ -21,8 +21,7 @@ struct LyricsView: View {
                 TimelineView(.animation) { _ in
                     ScrollViewReader { _ in
                         ScrollView {
-                            // do not apply `.contentMargins()`
-                            // otherwise causing `LazyVStack` related glitches
+                            // Don't apply `.contentMargins()`, otherwise causing `LazyVStack` related glitches
                             LazyVStack(alignment: alignment, spacing: 10) {
                                 lyricLines()
                                     .textSelection(.enabled)
@@ -42,7 +41,7 @@ struct LyricsView: View {
                 }
             }
         }
-        // TODO: restore this
+        // TODO: Restore this
 //        .onChange(of: entries, initial: true) { _, _ in
 //            loadLyrics()
 //        }

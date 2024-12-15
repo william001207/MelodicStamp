@@ -16,7 +16,7 @@ struct LabeledTextField<F, Label>: View where F: ParseableFormatStyle, F.FormatO
     @Environment(\.luminareAnimation) private var animation
     @Environment(\.luminareAnimationFast) private var animationFast
     @Environment(\.luminareMinHeight) private var minHeight
-    @Environment(\.luminareCompactButtonCornerRadius) private var buttonCornerRadius
+    @Environment(\.luminareCompactButtonCornerRadii) private var cornerRadii
 
     private var entries: Entries
     private let format: F
@@ -110,7 +110,7 @@ struct LabeledTextField<F, Label>: View where F: ParseableFormatStyle, F.FormatO
         .overlay {
             Group {
                 if entries.isModified {
-                    RoundedRectangle(cornerRadius: buttonCornerRadius)
+                    UnevenRoundedRectangle(cornerRadii: cornerRadii)
                         .stroke(.primary)
                         .fill(.quinary.opacity(0.5))
                         .foregroundStyle(.tint)
@@ -146,7 +146,7 @@ struct LabeledTextField<F, Label>: View where F: ParseableFormatStyle, F.FormatO
                     }
                     .foregroundStyle(.red)
                     .bold()
-                    .animation(.bouncy, value: entries.isModified) // to match the animation in `AliveButton`
+                    .animation(.bouncy, value: entries.isModified) // To match the animation in `AliveButton`
                 }
             }
             .foregroundStyle(.secondary)
@@ -186,7 +186,7 @@ struct LabeledTextField<F, Label>: View where F: ParseableFormatStyle, F.FormatO
     private func isEmpty(value: F.FormatInput?) -> Bool {
         guard let value else { return true }
         return if let value = value as? String {
-            // empty strings are empty too, as placeholders will display
+            // Empty strings are empty too, as placeholders will display
             value.isEmpty
         } else {
             false
