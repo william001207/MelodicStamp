@@ -1,110 +1,30 @@
 //
-//  LRCLyricsParser.swift
+//  LRCParser.swift
 //  Melodic Stamp
 //
-//  Created by Xinshao_Air on 2024/12/1.
+//  Created by KrLite on 2024/12/1.
 //
 
 import Foundation
 import RegexBuilder
 
-struct LRCLyricTag: Hashable, Identifiable, Equatable {
-    enum LyricTagType: String, Hashable, Identifiable, Equatable, CaseIterable {
-        case artist = "ar"
-        case album = "al"
-        case title = "ti"
-        case author = "au"
-        case length
-        case creator = "by"
-        case offset
-        case editor = "re"
-        case version = "ve"
-        case translation = "tr"
+@Observable class LRCParser: LyricsParser {
+    typealias Tag = LRCTag
+    typealias Line = LRCLine
 
-        var id: String {
-            rawValue
-        }
-
-        var isMetadata: Bool {
-            switch self {
-            case .length, .offset, .translation: true
-            default: false
-            }
-        }
-
-        var name: String {
-            switch self {
-            case .length: .init(localized: "Length")
-            case .offset: .init(localized: "Offset")
-            case .translation: .init(localized: "Translation")
-            case .artist: .init(localized: "Artist")
-            case .album: .init(localized: "Album")
-            case .title: .init(localized: "Title")
-            case .author: .init(localized: "Author")
-            case .creator: .init(localized: "Creator")
-            case .editor: .init(localized: "Editor")
-            case .version: .init(localized: "Version")
-            }
-        }
-
-        static var regex: Regex<Substring> {
-            Regex {
-                ChoiceOf {
-                    length.rawValue
-                    offset.rawValue
-                    translation.rawValue
-
-                    artist.rawValue
-                    album.rawValue
-                    title.rawValue
-                    author.rawValue
-                    creator.rawValue
-                    editor.rawValue
-                    version.rawValue
-                }
-            }
-        }
-    }
-
-    var id: LyricTagType {
-        type
-    }
-
-    var type: LyricTagType
-    var content: String
-}
-
-struct LRCLyricLine: LyricLine {
-    typealias Tag = LRCLyricTag
-
-    enum LRCLyricType: Hashable, Equatable {
-        case main
-        case translation(locale: String)
-    }
-
-    let id: UUID = .init()
-
-    var type: LRCLyricType = .main
-    var startTime: TimeInterval?
-    var endTime: TimeInterval?
-
-    var tags: [LRCLyricTag] = []
-    var content: String
-}
-
-@Observable class LRCLyricsParser: LyricsParser {
-    typealias Tag = LRCLyricTag
-    typealias Line = LRCLyricLine
-
-    var lines: [LRCLyricLine]
+    var lines: [LRCLine] = []
 
     required init(string: String) throws {
+        try parse(from: string)
+    }
+    
+    private func parse(from string: String) throws {
         self.lines = []
-
+        
         let contents = string
             .split(separator: .newlineSequence)
             .map(String.init(_:))
-
+        
         try contents.forEach {
             let tagRegex = Regex {
                 "["
@@ -123,25 +43,25 @@ struct LRCLyricLine: LyricLine {
                     ZeroOrMore(.anyNonNewline)
                 }
             }
-
+            
             guard
                 let match = try lineRegex.wholeMatch(
                     in: $0.trimmingCharacters(in: .whitespacesAndNewlines))
             else { return }
             // Output: (original, tagString, _, content)
-
+            
             let tagString = String(match.output.1).trimmingCharacters(in: .whitespacesAndNewlines)
             let content = String(match.output.3).trimmingCharacters(in: .whitespacesAndNewlines)
-
+            
             var tags: [String] = []
             for match in tagString.matches(of: tagRegex) {
                 tags.append(String(match.output.1).trimmingCharacters(in: .whitespacesAndNewlines))
             }
-
+            
             print("Extracting lyric line: \(tags), \"\(content)\"")
-
-            var line: LRCLyricLine = .init(content: content)
-
+            
+            var line: LRCLine = .init(content: content)
+            
             for tag in tags {
                 if let time = try TimeInterval(lyricTimestamp: tag) {
                     // Parse timestamp
@@ -171,7 +91,7 @@ struct LRCLyricLine: LyricLine {
                     } catch {}
                 }
             }
-
+            
             lines.append(line)
         }
     }
@@ -202,7 +122,7 @@ struct LRCLyricLine: LyricLine {
     static func parseTag(string: String) throws -> Tag? {
         let regex = Regex {
             Capture {
-                Tag.LyricTagType.regex
+                Tag.TagType.regex
             }
             ":"
             Capture {
@@ -216,7 +136,7 @@ struct LRCLyricLine: LyricLine {
         let key = String(match.output.1)
         let value = String(match.output.2)
 
-        guard let type = Tag.LyricTagType(rawValue: key) else {
+        guard let type = Tag.TagType(rawValue: key) else {
             return nil
         }
         return .init(type: type, content: value)

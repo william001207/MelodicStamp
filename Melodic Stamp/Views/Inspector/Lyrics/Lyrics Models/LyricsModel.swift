@@ -11,9 +11,9 @@ import RegexBuilder
 // MARK: - Lyric Line (Protocol)
 
 protocol LyricLine: Equatable, Hashable, Identifiable {
-    var startTime: TimeInterval? { get set }
-    var endTime: TimeInterval? { get set }
-    var content: String { get set }
+    var startTime: TimeInterval? { get }
+    var endTime: TimeInterval? { get }
+    var content: String { get }
 
     var isValid: Bool { get }
 }
@@ -52,8 +52,8 @@ enum LyricsType: String, Hashable, Identifiable, CaseIterable {
 
 enum LyricsStorage {
     case raw(parser: RawLyricsParser)
-    case lrc(parser: LRCLyricsParser)
-    case ttml(parser: TTMLLyricsParser)
+    case lrc(parser: LRCParser)
+    case ttml(parser: TTMLParser)
 
     var type: LyricsType {
         switch self {

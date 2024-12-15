@@ -7,14 +7,6 @@
 
 import Foundation
 
-struct RawLyricLine: LyricLine {
-    var startTime: TimeInterval?
-    var endTime: TimeInterval?
-    var content: String
-
-    let id: UUID = .init()
-}
-
 @Observable class RawLyricsParser: LyricsParser {
     typealias Line = RawLyricLine
 

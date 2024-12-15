@@ -1,5 +1,5 @@
 //
-//  TTMLLyricsParser.swift
+//  TTMLParser.swift
 //  Melodic Stamp
 //
 //  Created by KrLite on 2024/12/1.
@@ -9,167 +9,14 @@ import Foundation
 import RegexBuilder
 import SwiftSoup
 
-public struct TTMLLyricTag: Hashable, Identifiable, Equatable {
-    public enum LyricTagType: String, Hashable, Identifiable, Equatable,
-        CaseIterable {
-        case begin
-        case end
-        case agent = "ttm:agent"
-        case itunesKey = "itunes:key"
-        case translation = "ttm:translation"
-        case roman = "ttm:roman"
+@Observable final class TTMLParser: LyricsParser {
+    typealias Tag = TTMLTag
+    typealias Line = TTMLLine
 
-        public var id: String {
-            rawValue
-        }
-
-        public var name: String {
-            switch self {
-            case .begin:
-                NSLocalizedString("Begin", comment: "")
-            case .end:
-                NSLocalizedString("End", comment: "")
-            case .agent:
-                NSLocalizedString("Agent", comment: "")
-            case .itunesKey:
-                NSLocalizedString("iTunes Key", comment: "")
-            case .translation:
-                NSLocalizedString("Translation", comment: "")
-            case .roman:
-                NSLocalizedString("Roman", comment: "")
-            }
-        }
-
-        public static var regex: Regex<Substring> {
-            Regex {
-                ChoiceOf {
-                    "begin"
-                    "end"
-                    "ttm:agent"
-                    "itunes:key"
-                    "ttm:translation"
-                    "ttm:roman"
-                }
-            }
-        }
-    }
-
-    public var id: LyricTagType {
-        type
-    }
-
-    public var type: LyricTagType
-    public var content: String
-
-    public init(type: LyricTagType, content: String) {
-        self.type = type
-        self.content = content
-    }
-}
-
-struct TTMLLyricLine: LyricLine {
-    typealias Tag = TTMLLyricTag
-
-    var indexNum: Int
-    var position: TtmlLyricPositionType
-    var beginTime: TimeInterval
-    var endTime: TimeInterval?
-    var tags: [TTMLLyricTag] = []
-    var mainLyric: [TTMLSubLyric]?
-    var bgLyric: TTMLBgLyric?
-    var translation: String?
-    var roman: String?
-
-    let id: UUID = .init()
-
-    var startTime: TimeInterval? {
-        get { beginTime }
-        set { if let newValue { beginTime = newValue } }
-    }
-
-    var content: String {
-        get {
-            mainLyric?.map(\.text).joined(separator: " ") ?? ""
-        }
-        set {}
-    }
-
-    var isValid: Bool {
-        startTime != nil || endTime != nil
-    }
-}
-
-extension TTMLLyricLine: Equatable {
-    static func == (lhs: TTMLLyricLine, rhs: TTMLLyricLine) -> Bool {
-        lhs.id == rhs.id
-    }
-}
-
-extension TTMLLyricLine: Hashable {
-    func hash(into hasher: inout Hasher) {
-        hasher.combine(id)
-    }
-}
-
-public struct TTMLSubLyric {
-    public var beginTime: TimeInterval
-    public var endTime: TimeInterval
-    public var text: String
-
-    public init(beginTime: TimeInterval, endTime: TimeInterval, text: String) {
-        self.beginTime = beginTime
-        self.endTime = endTime
-        self.text = text
-    }
-}
-
-public struct TTMLBgLyric {
-    public var subLyric: [TTMLSubLyric]?
-    public var translation: String?
-    public var roman: String?
-
-    public init(
-        subLyric: [TTMLSubLyric]? = nil, translation: String? = nil,
-        roman: String? = nil
-    ) {
-        self.subLyric = subLyric
-        self.translation = translation
-        self.roman = roman
-    }
-}
-
-public enum TtmlLyricPositionType {
-    case main
-    case sub
-}
-
-@Observable
-public class TTMLLyricsParser: NSObject, LyricsParser {
-    typealias Tag = TTMLLyricTag
-    typealias Line = TTMLLyricLine
-
-    var lines: [TTMLLyricLine] = []
+    var lines: [TTMLLine] = []
 
     required init(string: String) throws {
-        super.init()
         try parseLyrics(from: string)
-    }
-
-    override required init() {
-        super.init()
-    }
-
-    func find(at time: TimeInterval) -> IndexSet {
-        var indices = IndexSet()
-        for (index, line) in lines.enumerated() {
-            if let startTime = line.beginTime as TimeInterval?,
-               let endTime = line.endTime as TimeInterval? {
-                if time >= startTime, time <= endTime {
-                    indices.insert(index)
-                }
-            }
-        }
-        return indices
     }
 
     private func parseLyrics(from string: String) throws {
@@ -189,8 +36,8 @@ public class TTMLLyricsParser: NSObject, LyricsParser {
             let beginTime = beginTimeStr.toTimeInterval()
             let endTime = endTimeStr.toTimeInterval()
 
-            var lyricLine = TTMLLyricLine(
-                indexNum: index,
+            var lyricLine = TTMLLine(
+                index: index,
                 position: getPositionFromAgent(ttmAgent),
                 beginTime: beginTime,
                 endTime: endTime,
@@ -200,7 +47,7 @@ public class TTMLLyricsParser: NSObject, LyricsParser {
                 roman: nil
             )
 
-            var tags: [TTMLLyricTag] = []
+            var tags: [TTMLTag] = []
 
             let possibleAttributes = [
                 "begin", "end", "ttm:agent", "itunes:key", "ttm:translation",
@@ -210,9 +57,9 @@ public class TTMLLyricsParser: NSObject, LyricsParser {
             for attribute in possibleAttributes {
                 if pElement.hasAttr(attribute) {
                     let value = try pElement.attr(attribute)
-                    if let tagType = TTMLLyricTag.LyricTagType(
+                    if let tagType = TTMLTag.TagType(
                         rawValue: attribute) {
-                        let tag = TTMLLyricTag(type: tagType, content: value)
+                        let tag = TTMLTag(type: tagType, content: value)
                         tags.append(tag)
                     }
                 }
@@ -240,20 +87,20 @@ public class TTMLLyricsParser: NSObject, LyricsParser {
                     switch role {
                     case "x-translation":
                         lyricLine.translation = text
-                        if let tagType = TTMLLyricTag.LyricTagType(
+                        if let tagType = TTMLTag.TagType(
                             rawValue: "ttm:translation") {
-                            let tag = TTMLLyricTag(type: tagType, content: text)
+                            let tag = TTMLTag(type: tagType, content: text)
                             lyricLine.tags.append(tag)
                         }
                     case "x-roman":
                         lyricLine.roman = text
-                        if let tagType = TTMLLyricTag.LyricTagType(
+                        if let tagType = TTMLTag.TagType(
                             rawValue: "ttm:roman") {
-                            let tag = TTMLLyricTag(type: tagType, content: text)
+                            let tag = TTMLTag(type: tagType, content: text)
                             lyricLine.tags.append(tag)
                         }
                     case "x-bg":
-                        var bgLyric = TTMLBgLyric(
+                        var bgLyric = TTMLBackgroundLyric(
                             subLyric: [], translation: nil, roman: nil
                         )
                         let bgSpanElements = try spanElement.getElementsByTag(
@@ -279,7 +126,7 @@ public class TTMLLyricsParser: NSObject, LyricsParser {
                             bgSubTtmlLyricList.append(bgSubLyric)
                         }
 
-                        bgLyric.subLyric =
+                        bgLyric.children =
                             bgSubTtmlLyricList.isEmpty
                                 ? nil : bgSubTtmlLyricList
                         lyricLine.bgLyric = bgLyric
@@ -296,16 +143,24 @@ public class TTMLLyricsParser: NSObject, LyricsParser {
             throw NSError(domain: "EmptyLyrics", code: -1, userInfo: nil)
         }
     }
-
-    private func getPositionFromAgent(_ agent: String) -> TtmlLyricPositionType {
-        if agent == "v1" { return .main }
-        return .sub
+    
+    func find(at time: TimeInterval) -> IndexSet {
+        var indices = IndexSet()
+        for (index, line) in lines.enumerated() {
+            if let startTime = line.startTime as TimeInterval?,
+               let endTime = line.endTime as TimeInterval? {
+                if time >= startTime, time <= endTime {
+                    indices.insert(index)
+                }
+            }
+        }
+        return indices
     }
 
-    public static func parseTag(string: String) throws -> TTMLLyricTag? {
+    static func parseTag(string: String) throws -> TTMLTag? {
         let regex = Regex {
             Capture {
-                Tag.LyricTagType.regex
+                Tag.TagType.regex
             }
             "="
             Capture {
@@ -319,10 +174,17 @@ public class TTMLLyricsParser: NSObject, LyricsParser {
         let key = String(match.output.1)
         let value = String(match.output.2)
 
-        guard let type = Tag.LyricTagType(rawValue: key) else {
+        guard let type = Tag.TagType(rawValue: key) else {
             return nil
         }
-        return TTMLLyricTag(type: type, content: value)
+        return TTMLTag(type: type, content: value)
+    }
+    
+    static func getPositionFromAgent(_ agent: String) -> TTMLPosition {
+        switch agent {
+        case "v1": .main
+        default: .sub
+        }
     }
 }
 
@@ -345,41 +207,41 @@ extension Element {
 
 // MARK: - Tets TTML Parser
 
-public struct TestTtmlLyric: Identifiable, Equatable {
-    public var id = UUID()
-    public var indexNum: Int
-    public var position: TestTtmlLyricPositionType
-    public var beginTime: TimeInterval
-    public var endTime: TimeInterval
+struct TestTtmlLyric: Identifiable, Equatable {
+    var id = UUID()
+    var indexNum: Int
+    var position: TestTtmlLyricPositionType
+    var beginTime: TimeInterval
+    var endTime: TimeInterval
 
-    public var mainLyric: [TestSubTtmlLyric]?
-    public var bgLyric: TestBgTtmlLyric?
-    public var translation: String?
-    public var roman: String?
+    var mainLyric: [TestSubTtmlLyric]?
+    var bgLyric: TestBgTtmlLyric?
+    var translation: String?
+    var roman: String?
 
-    public static func == (lhs: TestTtmlLyric, rhs: TestTtmlLyric) -> Bool {
+    static func == (lhs: TestTtmlLyric, rhs: TestTtmlLyric) -> Bool {
         lhs.id == rhs.id
     }
 }
 
-public struct TestSubTtmlLyric {
-    public var beginTime: TimeInterval
-    public var endTime: TimeInterval
-    public var text: String
+struct TestSubTtmlLyric {
+    var beginTime: TimeInterval
+    var endTime: TimeInterval
+    var text: String
 }
 
-public struct TestBgTtmlLyric {
-    public var subLyrics: [TestSubTtmlLyric]?
-    public var translation: String?
-    public var roman: String?
+struct TestBgTtmlLyric {
+    var subLyrics: [TestSubTtmlLyric]?
+    var translation: String?
+    var roman: String?
 }
 
-public enum TestTtmlLyricPositionType {
+enum TestTtmlLyricPositionType {
     case main
     case sub
 }
 
-public class TestTTMLParser: NSObject {
+class TestTTMLParser: NSObject {
     private var currentIndexNum: Int = 0
     private var ttmlLyrics: [TestTtmlLyric] = []
     private var currentTtmlLyric: TestTtmlLyric?
@@ -390,7 +252,7 @@ public class TestTTMLParser: NSObject {
     private var currentElement: String?
 }
 
-public extension TestTTMLParser {
+extension TestTTMLParser {
     func decodeTtml(data: Data, coderType: String.Encoding) async throws
         -> [TestTtmlLyric] {
         guard let htmlString = String(data: data, encoding: coderType) else {
@@ -400,7 +262,7 @@ public extension TestTTMLParser {
     }
 }
 
-public extension TestTTMLParser {
+extension TestTTMLParser {
     func decodeTtml(htmlString: String) async throws -> [TestTtmlLyric] {
         guard let doc = try? SwiftSoup.parse(htmlString) else {
             throw NSError()
