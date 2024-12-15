@@ -20,6 +20,8 @@ struct Player: View {
 
     @State private var adjustmentPercentage: CGFloat = .zero
     @State private var shouldUseRemainingDuration: Bool = false
+    
+    @State private var id: UUID = .init()
 
     var body: some View {
         VStack(alignment: .center, spacing: 12) {

@@ -52,8 +52,8 @@ enum PlaybackMode: String, CaseIterable, Identifiable {
 
 // MARK: - Player Model
 
-@Observable class PlayerModel: NSObject {
-    private let player: AudioPlayer = .init()
+@Observable final class PlayerModel: NSObject {
+    private var player: AudioPlayer = .init()
 
     private var outputDevices: [AudioDevice] = []
     private var selectedDevice: AudioDevice?

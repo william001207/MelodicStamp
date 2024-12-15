@@ -143,7 +143,7 @@ extension LyricsModel {
             .lrc
         } else if
             let body = try SwiftSoup.parse(string).body(),
-            body.tagName() == "tt"
+            try body.getElementsByTag("tt").count > 0
         {
             .ttml
         } else {
