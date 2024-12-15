@@ -9,16 +9,13 @@ import Foundation
 import RegexBuilder
 
 struct TTMLLine: LyricLine {
-    typealias Tag = TTMLTag
-
     var index: Int
     var position: TTMLPosition
-    var startTime: TimeInterval?
+    var beginTime: TimeInterval?
     var endTime: TimeInterval?
-    var tags: [TTMLTag] = []
     
-    var lyrics: TTMLLyrics
-    var backgroundLyrics: TTMLLyrics
+    var lyrics: TTMLLyrics = .init()
+    var backgroundLyrics: TTMLLyrics = .init()
 
     let id: UUID = .init()
 
@@ -27,7 +24,7 @@ struct TTMLLine: LyricLine {
     }
 
     var isValid: Bool {
-        startTime != nil || endTime != nil
+        beginTime != nil || endTime != nil
     }
 }
 
@@ -46,8 +43,8 @@ extension TTMLLine: Hashable {
 // MARK: - Lyric
 
 struct TTMLLyric: Equatable, Hashable, Codable {
-    var startTime: TimeInterval
-    var endTime: TimeInterval
+    var beginTime: TimeInterval?
+    var endTime: TimeInterval?
     var text: String
 }
 
@@ -62,6 +59,29 @@ struct TTMLLyrics: Equatable, Hashable, Codable {
 extension TTMLLyrics: Sequence {
     func makeIterator() -> Array<TTMLLyric>.Iterator {
         children.makeIterator()
+    }
+}
+
+extension TTMLLyrics: Collection {
+    var startIndex: Int { children.startIndex }
+    var endIndex: Int { children.endIndex }
+    var count: Int { children.count }
+    
+    func index(after i: Int) -> Int {
+        children.index(after: i)
+    }
+    
+    subscript(index: Int) -> TTMLLyric {
+        children[index]
+    }
+}
+
+extension TTMLLyrics: RangeReplaceableCollection {
+    mutating func replaceSubrange<C: Collection>(
+        _ subrange: Range<Int>,
+        with newElements: C
+    ) where C.Element == TTMLLyric {
+        children.replaceSubrange(subrange, with: newElements)
     }
 }
 

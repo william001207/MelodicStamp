@@ -50,18 +50,7 @@ extension String {
 
 extension String {
     func normalizeSpaces() -> String {
-        replacingOccurrences(of: "\u{00A0}", with: " ")
-            .replacingOccurrences(of: "\u{2000}", with: " ")
-            .replacingOccurrences(of: "\u{2001}", with: " ")
-            .replacingOccurrences(of: "\u{2002}", with: " ")
-            .replacingOccurrences(of: "\u{2003}", with: " ")
-            .replacingOccurrences(of: "\u{2004}", with: " ")
-            .replacingOccurrences(of: "\u{2005}", with: " ")
-            .replacingOccurrences(of: "\u{2006}", with: " ")
-            .replacingOccurrences(of: "\u{2007}", with: " ")
-            .replacingOccurrences(of: "\u{2008}", with: " ")
-            .replacingOccurrences(of: "\u{2009}", with: " ")
-            .replacingOccurrences(of: "\u{200A}", with: " ")
+        replacing(/\\u{(00A0|20[0-9A])}/, with: "")
     }
 }
 

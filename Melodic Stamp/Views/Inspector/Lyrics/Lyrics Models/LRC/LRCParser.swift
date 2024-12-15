@@ -15,10 +15,10 @@ import RegexBuilder
     var lines: [LRCLine] = []
 
     required init(string: String) throws {
-        try parse(from: string)
+        try parse(string: string)
     }
     
-    private func parse(from string: String) throws {
+    private func parse(string: String) throws {
         self.lines = []
         
         let contents = string
@@ -65,9 +65,9 @@ import RegexBuilder
             for tag in tags {
                 if let time = try TimeInterval(lyricTimestamp: tag) {
                     // Parse timestamp
-                    if line.startTime == nil {
+                    if line.beginTime == nil {
                         // Save as start time
-                        line.startTime = time
+                        line.beginTime = time
                     } else if line.endTime == nil {
                         // Save as end time
                         line.endTime = time
@@ -100,13 +100,13 @@ import RegexBuilder
         var nearestStartTime: TimeInterval = .zero
         var indices: IndexSet = []
 
-        for startTime in lines.compactMap(\.startTime) {
-            guard startTime <= time, startTime >= nearestStartTime else { continue }
-            nearestStartTime = startTime
+        for beginTime in lines.compactMap(\.beginTime) {
+            guard beginTime <= time, beginTime >= nearestStartTime else { continue }
+            nearestStartTime = beginTime
         }
 
         for (index, line) in lines.enumerated() {
-            guard let startTime = line.startTime, startTime <= time, startTime >= nearestStartTime else { continue }
+            guard let beginTime = line.beginTime, beginTime <= time, beginTime >= nearestStartTime else { continue }
 
             if let endTime = line.endTime {
                 guard endTime > time else { continue }

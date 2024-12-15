@@ -19,7 +19,7 @@ struct LRCLine: LyricLine {
     let id: UUID = .init()
 
     var type: LRCLyricType = .main
-    var startTime: TimeInterval?
+    var beginTime: TimeInterval?
     var endTime: TimeInterval?
 
     var tags: [LRCTag] = []

@@ -8,7 +8,7 @@
 import Foundation
 
 struct RawLyricLine: LyricLine {
-    var startTime: TimeInterval?
+    var beginTime: TimeInterval?
     var endTime: TimeInterval?
     var content: String
 

@@ -11,7 +11,7 @@ import RegexBuilder
 // MARK: - Lyric Line (Protocol)
 
 protocol LyricLine: Equatable, Hashable, Identifiable {
-    var startTime: TimeInterval? { get }
+    var beginTime: TimeInterval? { get }
     var endTime: TimeInterval? { get }
     var content: String { get }
 
@@ -20,7 +20,7 @@ protocol LyricLine: Equatable, Hashable, Identifiable {
 
 extension LyricLine {
     var isValid: Bool {
-        startTime != nil || endTime != nil
+        beginTime != nil || endTime != nil
     }
 }
 
