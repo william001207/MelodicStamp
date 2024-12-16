@@ -51,6 +51,18 @@ import SwiftUI
             name: NSWindow.didExitFullScreenNotification,
             object: NSApp.mainWindow
         )
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(windowDidMove(_:)),
+            name: NSWindow.didMoveNotification,
+            object: NSApp.mainWindow
+        )
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(windowDidResize(_:)),
+            name: NSWindow.didResizeNotification,
+            object: NSApp.mainWindow
+        )
     }
 
     func hide() {
@@ -135,7 +147,7 @@ import SwiftUI
 
         tabBarWindow.setFrame(
             .init(
-                x: isInFullScreen ? max(8, leadingX) : leadingX,
+                x: max(8, leadingX),
                 y: bottomY,
                 width: tabBarFrame.width,
                 height: tabBarFrame.height
@@ -159,7 +171,7 @@ import SwiftUI
         playerWindow.setFrame(
             .init(
                 x: centerX,
-                y: isInFullScreen ? max(8, bottomY) : bottomY,
+                y: max(8, bottomY),
                 width: playerFrame.width,
                 height: playerFrame.height
             ),
@@ -185,5 +197,15 @@ extension FloatingWindowsModel {
 
     @objc func windowDidExitFullScreen(_: Notification) {
         show()
+    }
+    
+    @objc func windowDidMove(_: Notification) {
+        updateTabBarPosition()
+        updatePlayerPosition()
+    }
+    
+    @objc func windowDidResize(_: Notification) {
+        updateTabBarPosition()
+        updatePlayerPosition()
     }
 }
