@@ -21,74 +21,85 @@ struct PlaylistView: View {
 
     var body: some View {
         ZStack(alignment: .topLeading) {
-            LuminareList(
-                items: $player.playlist,
-                selection: $metadataEditor.items,
-                id: \.id
-            ) { item in
-                PlaylistItemView(
-                    player: player,
-                    item: item.wrappedValue,
-                    isSelected: metadataEditor.items.contains(
-                        item.wrappedValue)
-                )
-                .swipeActions {
-                    // Play
-                    Button {
-                        player.play(item: item.wrappedValue)
-                    } label: {
-                        Image(systemSymbol: .play)
-                    }
-                    .tint(.accent)
-
-                    // Remove from playlist
-                    Button(role: .destructive) {
-                        player.removeFromPlaylist(items: [item.wrappedValue])
-                    } label: {
-                        Image(systemSymbol: .trash)
-                    }
-                    .tint(.red)
-                }
-                .swipeActions(edge: .leading) {
-                    // Save metadata
-                    if item.wrappedValue.metadata.isModified {
-                        Button {
-                            Task {
-                                try await item.wrappedValue.metadata.write()
-                            }
-                        } label: {
-                            Image(systemSymbol: .trayAndArrowDown)
-                            Text("Save Metadata")
-                        }
-                        .tint(.green)
-                    }
-
-                    // Restore metadata
-                    if item.wrappedValue.metadata.isModified {
-                        Button {
-                            item.wrappedValue.metadata.restore()
-                        } label: {
-                            Image(systemSymbol: .arrowUturnLeft)
-                            Text("Restore Metadata")
-                        }
-                        .tint(.gray)
-                    }
-                }
-                .contextMenu {
-                    contextMenu(for: item.wrappedValue)
-                }
-            } emptyView: {
+            if player.isPlaylistEmpty {
                 PlaylistExcerpt()
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
+            } else {
+                List(selection: $metadataEditor.items) {
+                    Spacer()
+                        .frame(height: 64 + minHeight)
+                        .listRowSeparator(.hidden)
+                    
+                    ForEach(player.playlist, id: \.self) { item in
+                        PlaylistItemView(
+                            player: player,
+                            item: item,
+                            isSelected: metadataEditor.items.contains(item)
+                        )
+                        .swipeActions {
+                            // Play
+                            Button {
+                                player.play(item: item)
+                            } label: {
+                                Image(systemSymbol: .play)
+                            }
+                            .tint(.accent)
+                            
+                            // Remove from playlist
+                            Button(role: .destructive) {
+                                player.removeFromPlaylist(items: [item])
+                            } label: {
+                                Image(systemSymbol: .trash)
+                            }
+                            .tint(.red)
+                        }
+                        .swipeActions(edge: .leading) {
+                            // Save metadata
+                            if item.metadata.isModified {
+                                Button {
+                                    Task {
+                                        try await item.metadata.write()
+                                    }
+                                } label: {
+                                    Image(systemSymbol: .trayAndArrowDown)
+                                    Text("Save Metadata")
+                                }
+                                .tint(.green)
+                            }
+                            
+                            // Restore metadata
+                            if item.metadata.isModified {
+                                Button {
+                                    item.metadata.restore()
+                                } label: {
+                                    Image(systemSymbol: .arrowUturnLeft)
+                                    Text("Restore Metadata")
+                                }
+                                .tint(.gray)
+                            }
+                        }
+                        .contextMenu {
+                            contextMenu(for: item)
+                        }
+                    }
+                    
+                    Spacer()
+                        .frame(height: 94)
+                        .listRowSeparator(.hidden)
+                }
+                .scrollContentBackground(.hidden)
+                //            } emptyView: {
+                //                PlaylistExcerpt()
+                //                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                //            }
+                //            .luminareHasDividers(false)
+                //            .luminareListContentMargins(top: 64 + minHeight, bottom: 94)
+                //            .luminareListItemHeight(64)
+                //            .luminareListItemCornerRadius(12)
+                //            .luminareListItemHighlightOnHover(false)
+                .contentMargins(.top, 64, for: .scrollIndicators)
+                .contentMargins(.bottom, 94, for: .scrollIndicators)
             }
-            .luminareHasDividers(false)
-            .luminareListContentMargins(top: 64 + minHeight, bottom: 94)
-            .luminareListItemHeight(64)
-            .luminareListItemCornerRadius(12)
-            .luminareListItemHighlightOnHover(false)
-            .contentMargins(.top, 64, for: .scrollIndicators)
-            .contentMargins(.bottom, 94, for: .scrollIndicators)
-            .animation(.default, value: metadataEditor.items)
 
             HStack(spacing: 0) {
                 LuminareSection(hasPadding: false) {
@@ -105,8 +116,8 @@ struct PlaylistView: View {
                 Spacer()
             }
             .padding(.top, 64)
+            .padding(.horizontal)
         }
-        .padding(.horizontal)
     }
 
     @ViewBuilder private func actions() -> some View {
