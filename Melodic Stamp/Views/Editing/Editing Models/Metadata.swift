@@ -13,7 +13,7 @@ import MediaPlayer
 
 // MARK: Definition
 
-@Observable final class Metadata: Identifiable, Sendable {
+@Observable final class Metadata: Identifiable {
     typealias Entry = MetadataEntry
 
     enum State {
