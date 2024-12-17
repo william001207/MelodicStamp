@@ -91,9 +91,7 @@ struct CommonMetadataView: View {
                         .subtracting(types)
 
                     Button(role: .destructive) {
-                        let fallback = entries.projectedValue?.wrappedValue ?? []
                         attachedPicturesHandler.remove(entries: entries)
-                        registerUndo(fallback, for: entries)
                     } label: {
                         HStack {
                             Image(systemSymbol: .trashFill)
@@ -149,11 +147,9 @@ struct CommonMetadataView: View {
                                     of: chosenAttachedPictureType)
                             else { break }
                             
-                            let fallback = entries.projectedValue?.wrappedValue ?? []
                             attachedPicturesHandler.replace(
                                 [attachedPicture], entries: entries
                             )
-                            registerUndo(fallback, for: entries)
                         case .failure:
                             break
                         }
@@ -255,18 +251,5 @@ struct CommonMetadataView: View {
                 format: .number
             )
         }
-    }
-    
-    private func registerUndo(
-        _ oldValue: Set<AttachedPicture>,
-        for entries: MetadataBatchEditingEntries<Set<AttachedPicture>>
-    ) {
-        guard oldValue != entries.projectedValue?.wrappedValue ?? [] else { return }
-//        undoManager?.registerUndo(withTarget: entries) { entries in
-//            let fallback = entries.projectedValue?.wrappedValue ?? []
-//            entries.setAll(oldValue)
-            
-//            self.registerUndo(fallback, for: entries)
-//        }
     }
 }
