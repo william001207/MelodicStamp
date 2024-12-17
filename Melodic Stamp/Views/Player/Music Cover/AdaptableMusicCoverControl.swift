@@ -9,11 +9,15 @@ import CSFBAudioEngine
 import SwiftUI
 
 struct AdaptableMusicCoverControl: View {
+    typealias Entries = MetadataBatchEditingEntries<Set<AttachedPicture>>
+    
+    @Environment(\.undoManager) private var undoManager
+    
     @Namespace private var namespace
 
     @Bindable var attachedPicturesHandler: AttachedPicturesHandlerModel
 
-    var entries: MetadataBatchEditingEntries<Set<AttachedPicture>>
+    var entries: Entries
     var type: AttachedPicture.`Type`
     var maxResolution: CGFloat? = 128
 
@@ -44,9 +48,12 @@ struct AdaptableMusicCoverControl: View {
                         let attachedPicture = image.attachedPicture(
                             of: type)
                     else { break }
+                    
+                    let fallback = entries.projectedValue?.wrappedValue ?? []
                     attachedPicturesHandler.replace(
                         [attachedPicture], entries: entries
                     )
+                    registerUndo(fallback, for: entries)
                 case .failure:
                     break
                 }
@@ -61,10 +68,12 @@ struct AdaptableMusicCoverControl: View {
             if isHeaderHovering {
                 HStack(spacing: 2) {
                     AliveButton {
+                        let fallback = entries.projectedValue?.wrappedValue ?? []
                         attachedPicturesHandler.restore(
                             of: [type],
                             entries: entries
                         )
+                        registerUndo(fallback, for: entries)
                     } label: {
                         Image(systemSymbol: .arrowUturnLeft)
                     }
@@ -76,9 +85,11 @@ struct AdaptableMusicCoverControl: View {
                     )
 
                     AliveButton {
+                        let fallback = entries.projectedValue?.wrappedValue ?? []
                         attachedPicturesHandler.remove(
                             of: [type], entries: entries
                         )
+                        registerUndo(fallback, for: entries)
                     } label: {
                         Image(systemSymbol: .trash)
                     }
@@ -139,6 +150,16 @@ struct AdaptableMusicCoverControl: View {
                 }
         } else {
             MusicCover(images: [], cornerRadius: 8)
+        }
+    }
+    
+    private func registerUndo(_ oldValue: Set<AttachedPicture>, for entries: Entries) {
+        guard oldValue != entries.projectedValue?.wrappedValue ?? [] else { return }
+        undoManager?.registerUndo(withTarget: entries) { entries in
+            let fallback = entries.projectedValue?.wrappedValue ?? []
+            entries.setAll(oldValue)
+            
+            self.registerUndo(fallback, for: entries)
         }
     }
 }

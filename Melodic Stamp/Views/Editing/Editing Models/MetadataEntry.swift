@@ -18,11 +18,8 @@ protocol Modifiable {
 protocol Restorable: Equatable, Modifiable {
     associatedtype V: Equatable
 
-    var current: V { get }
-    var initial: V { get }
-
-    mutating func setCurrent(_ value: V)
-    mutating func setInitial(_ value: V)
+    var current: V { get set }
+    var initial: V { get set }
     
     mutating func restore()
     mutating func apply()
@@ -34,41 +31,23 @@ extension Restorable {
     }
 
     mutating func restore() {
-        setCurrent(initial)
+        current = initial
     }
 
     mutating func apply() {
-        setInitial(current)
+        initial = current
     }
 }
 
 // MARK: - Metadata Entry
 
 @Observable final class MetadataEntry<V: Hashable & Equatable>: Restorable {
-    private(set) var current: V
-    private(set) var initial: V
-    private let undoManager: UndoManager?
+    var current: V
+    var initial: V
 
-    init(_ value: V, undoManager: UndoManager? = nil) {
+    init(_ value: V) {
         self.current = value
         self.initial = value
-        self.undoManager = undoManager
-    }
-    
-    func setCurrent(_ value: V) {
-        let fallback = current
-        current = value
-        undoManager?.registerUndo(withTarget: self) { entry in
-            entry.current = fallback
-        }
-    }
-    
-    func setInitial(_ value: V) {
-        let fallback = initial
-        initial = value
-        undoManager?.registerUndo(withTarget: self) { entry in
-            entry.initial = fallback
-        }
     }
 }
 
@@ -106,7 +85,7 @@ final class MetadataBatchEditingEntry<V: Hashable & Equatable>: Identifiable {
         }
 
         set {
-            metadata[keyPath: keyPath].setCurrent(newValue)
+            metadata[keyPath: keyPath].current = newValue
         }
     }
 
@@ -116,7 +95,7 @@ final class MetadataBatchEditingEntry<V: Hashable & Equatable>: Identifiable {
         }
 
         set {
-            metadata[keyPath: keyPath].setInitial(newValue)
+            metadata[keyPath: keyPath].initial = newValue
         }
     }
 

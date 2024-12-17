@@ -9,6 +9,8 @@ import CSFBAudioEngine
 import SwiftUI
 
 struct AdaptableMusicCovers<Content>: View where Content: View {
+    typealias Entries = MetadataBatchEditingEntries<Set<AttachedPicture>>
+    
     enum Layout {
         case flow
         case list
@@ -18,7 +20,7 @@ struct AdaptableMusicCovers<Content>: View where Content: View {
 
     var layout: Layout = .flow
     var contentWidth: CGFloat = 300, contentHeight: CGFloat = 200
-    var entries: MetadataBatchEditingEntries<Set<AttachedPicture>>
+    var entries: Entries
     @ViewBuilder var emptyView: () -> Content
 
     @State private var contentSize: CGSize = .zero

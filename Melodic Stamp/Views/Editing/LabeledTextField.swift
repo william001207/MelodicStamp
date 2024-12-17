@@ -11,6 +11,8 @@ import SwiftUI
 struct LabeledTextField<F, Label>: View where F: ParseableFormatStyle, F.FormatOutput == String, F.FormatInput: Equatable & Hashable, Label: View {
     typealias Entries = MetadataBatchEditingEntries<F.FormatInput?>
     
+    @Environment(\.undoManager) private var undoManager
+    
     @FocusState private var isFocused: Bool
 
     @Environment(\.luminareAnimation) private var animation
@@ -25,6 +27,7 @@ struct LabeledTextField<F, Label>: View where F: ParseableFormatStyle, F.FormatO
     @ViewBuilder private let label: () -> Label
 
     @State private var isLabelHovering: Bool = false
+    @State private var fallback: F.FormatInput?
 
     init(
         _ placeholder: LocalizedStringKey,
@@ -106,6 +109,13 @@ struct LabeledTextField<F, Label>: View where F: ParseableFormatStyle, F.FormatO
         .focused($isFocused)
         .onSubmit {
             isFocused = false
+        }
+        .onChange(of: isFocused, initial: true) { oldValue, newValue in
+            if newValue {
+                fallback = entries.projectedUnwrappedValue()?.wrappedValue
+            } else {
+                registerUndo(fallback, for: entries)
+            }
         }
         .overlay {
             Group {
@@ -190,6 +200,16 @@ struct LabeledTextField<F, Label>: View where F: ParseableFormatStyle, F.FormatO
             value.isEmpty
         } else {
             false
+        }
+    }
+    
+    private func registerUndo(_ oldValue: F.FormatInput?, for entries: Entries) {
+        guard oldValue != entries.projectedUnwrappedValue()?.wrappedValue else { return }
+        undoManager?.registerUndo(withTarget: entries) { entries in
+            let fallback = entries.projectedUnwrappedValue()?.wrappedValue
+            entries.setAll(oldValue)
+            
+            self.registerUndo(fallback, for: entries)
         }
     }
 }

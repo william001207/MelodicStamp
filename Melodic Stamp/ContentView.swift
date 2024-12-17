@@ -10,6 +10,7 @@ import SwiftUI
 
 struct ContentView: View {
     @Environment(\.appearsActive) private var isActive
+    @Environment(\.undoManager) private var undoManager
     
     @FocusState private var isFocused
 
@@ -23,8 +24,8 @@ struct ContentView: View {
     @State private var windowManager: WindowManagerModel = .init()
     @State private var fileManager: FileManagerModel = .init()
     @State private var player: PlayerModel = .init()
-    @State private var playerKeyboardControl: PlayerKeyboardControlModel =
-        .init()
+    @State private var playerKeyboardControl: PlayerKeyboardControlModel = .init()
+    @State private var metadataEditor: MetadataEditorModel = .init()
 
     @State private var minWidth: CGFloat?
     @State private var maxWidth: CGFloat?
@@ -36,6 +37,7 @@ struct ContentView: View {
                 MainView(
                     fileManager: fileManager,
                     player: player,
+                    metadataEditor: metadataEditor,
                     namespace: namespace,
                     isInspectorPresented: $isInspectorPresented,
                     selectedContentTab: $selectedContentTab,
@@ -87,6 +89,7 @@ struct ContentView: View {
 //        .navigationTitle(title)
         .onAppear {
             floatingWindows.observeFullScreen()
+            player.undoManager = { undoManager }
             isFocused = true
         }
         .onChange(of: isActive, initial: true) { _, newValue in
@@ -134,6 +137,7 @@ struct ContentView: View {
         .focusedValue(\.fileManager, fileManager)
         .focusedValue(\.player, player)
         .focusedValue(\.playerKeyboardControl, playerKeyboardControl)
+        .focusedValue(\.metadataEditor, metadataEditor)
     }
 
 //    private var title: Text {

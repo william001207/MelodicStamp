@@ -37,14 +37,14 @@ struct MainView: View {
 
     @Bindable var fileManager: FileManagerModel
     @Bindable var player: PlayerModel
+    @Bindable var metadataEditor: MetadataEditorModel
 
     var namespace: Namespace.ID
 
     @Binding var isInspectorPresented: Bool
     @Binding var selectedContentTab: SidebarContentTab
     @Binding var selectedInspectorTab: SidebarInspectorTab
-
-    @State private var metadataEditor: MetadataEditorModel = .init()
+    
     @State private var lyrics: LyricsModel = .init()
 
     var body: some View {

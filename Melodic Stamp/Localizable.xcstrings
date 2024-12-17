@@ -89,6 +89,9 @@
     "Catalog Number" : {
 
     },
+    "Clear Selection" : {
+
+    },
     "Coloured Fish" : {
 
     },
@@ -252,6 +255,12 @@
 
     },
     "Play" : {
+
+    },
+    "Play %@" : {
+
+    },
+    "Play Selected" : {
 
     },
     "Playback" : {

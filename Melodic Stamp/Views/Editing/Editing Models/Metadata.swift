@@ -42,7 +42,7 @@ import SwiftUI
 
     var id: URL { url }
     let url: URL
-    let undoManager: UndoManager = .init()
+    var undoManager: () -> UndoManager?
 
     private(set) var properties: AudioProperties!
     private(set) var state: State
@@ -95,6 +95,7 @@ import SwiftUI
     init?(url: URL) {
         self.state = .loading
         self.url = url
+        self.undoManager = { nil }
 
         Task {
             try await self.update()
@@ -149,149 +150,115 @@ extension Metadata {
         additional: AdditionalMetadata? = nil
     ) {
         self.attachedPictures = .init(
-            attachedPictures,
-            undoManager: undoManager
+            attachedPictures
         )
         
         self.title = .init(
-            title,
-            undoManager: undoManager
+            title
         )
         self.titleSortOrder = .init(
-            titleSortOrder,
-            undoManager: undoManager
+            titleSortOrder
         )
         self.artist = .init(
-            artist,
-            undoManager: undoManager
+            artist
         )
         self.artistSortOrder = .init(
-            artistSortOrder,
-            undoManager: undoManager
+            artistSortOrder
         )
         self.composer = .init(
-            composer,
-            undoManager: undoManager
+            composer
         )
         self.composerSortOrder = .init(
-            composerSortOrder,
-            undoManager: undoManager
+            composerSortOrder
         )
         self.genre = .init(
-            genre,
-            undoManager: undoManager
+            genre
         )
         self.genreSortOrder = .init(
-            genreSortOrder,
-            undoManager: undoManager
+            genreSortOrder
         )
         self.bpm = .init(
-            bpm,
-            undoManager: undoManager
+            bpm
         )
         
         self.albumTitle = .init(
-            albumTitle,
-            undoManager: undoManager
+            albumTitle
         )
         self.albumTitleSortOrder = .init(
-            albumTitleSortOrder,
-            undoManager: undoManager
+            albumTitleSortOrder
         )
         self.albumArtist = .init(
-            albumArtist,
-            undoManager: undoManager
+            albumArtist
         )
         self.albumArtistSortOrder = .init(
-            albumArtistSortOrder,
-            undoManager: undoManager
+            albumArtistSortOrder
         )
         
         self.trackNumber = .init(
-            trackNumber,
-            undoManager: undoManager
+            trackNumber
         )
         self.trackCount = .init(
-            trackCount,
-            undoManager: undoManager
+            trackCount
         )
         self.discNumber = .init(
-            discNumber,
-            undoManager: undoManager
+            discNumber
         )
         self.discCount = .init(
-            discCount,
-            undoManager: undoManager
+            discCount
         )
         
         self.comment = .init(
-            comment,
-            undoManager: undoManager
+            comment
         )
         self.grouping = .init(
-            grouping,
-            undoManager: undoManager
+            grouping
         )
         self.isCompilation = .init(
-            isCompilation,
-            undoManager: undoManager
+            isCompilation
         )
         
         self.isrc = .init(
-            isrc.flatMap({ ISRC(parsing: $0) }),
-            undoManager: undoManager
+            isrc.flatMap({ ISRC(parsing: $0) })
         )
         self.lyrics = .init(
-            lyrics,
-            undoManager: undoManager
+            lyrics
         )
         self.mcn = .init(
-            mcn,
-            undoManager: undoManager
+            mcn
         )
         
         self.musicBrainzRecordingID = .init(
-            musicBrainzRecordingID.flatMap(UUID.init(uuidString:)),
-            undoManager: undoManager
+            musicBrainzRecordingID.flatMap(UUID.init(uuidString:))
         )
         self.musicBrainzReleaseID = .init(
-            musicBrainzReleaseID.flatMap(UUID.init(uuidString:)),
-            undoManager: undoManager
+            musicBrainzReleaseID.flatMap(UUID.init(uuidString:))
         )
         
         self.rating = .init(
-            rating,
-            undoManager: undoManager
+            rating
         )
         self.releaseDate = .init(
-            releaseDate,
-            undoManager: undoManager
+            releaseDate
         )
         
         self.replayGainAlbumGain = .init(
-            replayGainAlbumGain,
-            undoManager: undoManager
+            replayGainAlbumGain
         )
         self.replayGainAlbumPeak = .init(
-            replayGainAlbumPeak,
-            undoManager: undoManager
+            replayGainAlbumPeak
         )
         self.replayGainTrackGain = .init(
-            replayGainTrackGain,
-            undoManager: undoManager
+            replayGainTrackGain
         )
         self.replayGainTrackPeak = .init(
-            replayGainTrackPeak,
-            undoManager: undoManager
+            replayGainTrackPeak
         )
         self.replayGainReferenceLoudness = .init(
-            replayGainReferenceLoudness,
-            undoManager: undoManager
+            replayGainReferenceLoudness
         )
         
         self.additional = .init(
-            additional,
-            undoManager: undoManager
+            additional
         )
     }
 
@@ -522,6 +489,10 @@ extension Metadata: Hashable {
 }
 
 extension Metadata {
+    static func fallbackTitle(url: URL) -> String {
+        String(url.lastPathComponent.dropLast(url.pathExtension.count + 1))
+    }
+    
     func updateNowPlayingInfo() {
         let infoCenter = MPNowPlayingInfoCenter.default()
         var info = infoCenter.nowPlayingInfo ?? .init()
@@ -546,7 +517,7 @@ extension Metadata {
         .flatMap(\.image)
         .map(\.mediaItemArtwork)
 
-        dict[MPMediaItemPropertyTitle] = title.initial
+        dict[MPMediaItemPropertyTitle] = title.initial ?? Self.fallbackTitle(url: url)
         dict[MPMediaItemPropertyArtist] = artist.initial
         dict[MPMediaItemPropertyComposer] = composer.initial
         dict[MPMediaItemPropertyGenre] = genre.initial
