@@ -88,15 +88,6 @@ struct PlaylistView: View {
                         .listRowSeparator(.hidden)
                 }
                 .scrollContentBackground(.hidden)
-                //            } emptyView: {
-                //                PlaylistExcerpt()
-                //                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                //            }
-                //            .luminareHasDividers(false)
-                //            .luminareListContentMargins(top: 64 + minHeight, bottom: 94)
-                //            .luminareListItemHeight(64)
-                //            .luminareListItemCornerRadius(12)
-                //            .luminareListItemHighlightOnHover(false)
                 .contentMargins(.top, 64, for: .scrollIndicators)
                 .contentMargins(.bottom, 94, for: .scrollIndicators)
             }
