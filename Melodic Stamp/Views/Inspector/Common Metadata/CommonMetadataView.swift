@@ -91,7 +91,7 @@ struct CommonMetadataView: View {
                         .subtracting(types)
 
                     Button(role: .destructive) {
-                        attachedPicturesHandler.remove(entries: entries)
+                        attachedPicturesHandler.remove(entries: entries, undoManager: undoManager)
                     } label: {
                         HStack {
                             Image(systemSymbol: .trashFill)
@@ -149,7 +149,8 @@ struct CommonMetadataView: View {
                             else { break }
                             
                             attachedPicturesHandler.replace(
-                                [attachedPicture], entries: entries
+                                [attachedPicture], entries: entries,
+                                undoManager: undoManager
                             )
                         case .failure:
                             break

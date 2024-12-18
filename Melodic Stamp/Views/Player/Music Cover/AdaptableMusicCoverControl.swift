@@ -50,7 +50,8 @@ struct AdaptableMusicCoverControl: View {
                     else { break }
                     
                     attachedPicturesHandler.replace(
-                        [attachedPicture], entries: entries
+                        [attachedPicture], entries: entries,
+                        undoManager: undoManager
                     )
                 case .failure:
                     break
@@ -67,7 +68,8 @@ struct AdaptableMusicCoverControl: View {
                 HStack(spacing: 2) {
                     AliveButton {
                         attachedPicturesHandler.restore(
-                            of: [type], entries: entries
+                            of: [type], entries: entries,
+                            undoManager: undoManager
                         )
                     } label: {
                         Image(systemSymbol: .arrowUturnLeft)
@@ -81,7 +83,8 @@ struct AdaptableMusicCoverControl: View {
 
                     AliveButton {
                         attachedPicturesHandler.remove(
-                            of: [type], entries: entries
+                            of: [type], entries: entries,
+                            undoManager: undoManager
                         )
                     } label: {
                         Image(systemSymbol: .trash)

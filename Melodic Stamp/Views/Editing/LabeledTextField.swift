@@ -11,6 +11,15 @@ import SwiftUI
 struct LabeledTextField<F, Label>: View where F: ParseableFormatStyle, F.FormatOutput == String, F.FormatInput: Equatable & Hashable, Label: View {
     typealias Entries = MetadataBatchEditingEntries<F.FormatInput?>
     
+    enum Fallback<V> {
+        case invalid
+        case valid(value: V)
+        
+        mutating func set(_ newValue: V) {
+            self = .valid(value: newValue)
+        }
+    }
+    
     @Environment(\.undoManager) private var undoManager
     
     @FocusState private var isFocused: Bool
@@ -27,7 +36,7 @@ struct LabeledTextField<F, Label>: View where F: ParseableFormatStyle, F.FormatO
     @ViewBuilder private let label: () -> Label
 
     @State private var isLabelHovering: Bool = false
-    @State private var fallback: F.FormatInput?
+    @State private var fallback: Fallback<F.FormatInput?> = .invalid
 
     init(
         _ placeholder: LocalizedStringKey,
@@ -112,9 +121,14 @@ struct LabeledTextField<F, Label>: View where F: ParseableFormatStyle, F.FormatO
         }
         .onChange(of: isFocused, initial: true) { oldValue, newValue in
             if newValue {
-                fallback = entries.projectedUnwrappedValue()?.wrappedValue
+                fallback.set(entries.projectedUnwrappedValue()?.wrappedValue)
             } else {
-                registerUndo(fallback, for: entries)
+                switch fallback {
+                case .invalid:
+                    break
+                case .valid(let value):
+                    registerUndo(value, for: entries)
+                }
             }
         }
         .overlay {
@@ -204,7 +218,10 @@ struct LabeledTextField<F, Label>: View where F: ParseableFormatStyle, F.FormatO
     }
     
     private func registerUndo(_ oldValue: F.FormatInput?, for entries: Entries) {
-        guard oldValue != entries.projectedUnwrappedValue()?.wrappedValue else { return }
+        let value = entries.projectedUnwrappedValue()?.wrappedValue
+        let areIdentical = oldValue == value || (isEmpty(value: oldValue) && isEmpty(value: value))
+        
+        guard !areIdentical else { return }
         undoManager?.registerUndo(withTarget: entries) { entries in
             let fallback = entries.projectedUnwrappedValue()?.wrappedValue
             entries.setAll(oldValue)
