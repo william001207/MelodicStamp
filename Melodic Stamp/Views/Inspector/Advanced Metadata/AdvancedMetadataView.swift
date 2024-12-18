@@ -78,10 +78,6 @@ struct AdvancedMetadataView: View {
 
     @ViewBuilder private func ratingEditor() -> some View {
         HStack {
-            LabeledTextField(
-                "Rating", entries: metadataEditor[extracting: \.rating],
-                format: .number)
-
             let binding: Binding<Int> = Binding {
                 metadataEditor[extracting: \.rating].projectedUnwrappedValue()?
                     .wrappedValue ?? 0
@@ -89,6 +85,10 @@ struct AdvancedMetadataView: View {
                 metadataEditor[extracting: \.rating].setAll(newValue)
             }
             let isModified = metadataEditor[extracting: \.rating].isModified
+            
+            LabeledTextField(
+                "Rating", entries: metadataEditor[extracting: \.rating],
+                format: .number)
 
             AliveButton {
                 binding.wrappedValue -= 1
@@ -113,27 +113,19 @@ struct AdvancedMetadataView: View {
     }
     
     @ViewBuilder private func releaseDateEditor() -> some View {
-        LabeledTextField("Release Date", text: metadataEditor[extracting: \.releaseDate])
-        
-        let binding: Binding<Date> = Binding {
-            if let string =  metadataEditor[extracting: \.releaseDate].projectedUnwrappedValue()?.wrappedValue {
-                do {
-                    let date = try Date(string, strategy: .dateTime)
-                    return date
-                } catch {
-                    return .now
-                }
-            } else {
-                return .now
+        HStack {
+            let isModified = metadataEditor[extracting: \.releaseDate].isModified
+            
+            LabeledTextField("Release Date", text: metadataEditor[extracting: \.releaseDate])
+            
+            AliveButton {
+                metadataEditor[extracting: \.releaseDate].setAll(Date.now.formatted(date: .complete, time: .shortened))
+            } label: {
+                Image(systemSymbol: .dotScope)
+                    .foregroundStyle(.tint)
+                    .tint(isModified ? .accent : .secondary)
             }
-        } set: { newValue in
-            metadataEditor[extracting: \.releaseDate].setAll(newValue.formatted())
         }
-        
-        DatePicker("", selection: binding)
-            .labelsHidden()
-            .datePickerStyle(.field)
-            .textFieldStyle(.roundedBorder)
     }
 
     @ViewBuilder private func sortingEditor() -> some View {

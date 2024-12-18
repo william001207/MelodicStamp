@@ -11,7 +11,7 @@ import SwiftUI
 struct LabeledTextField<F, Label>: View where F: ParseableFormatStyle, F.FormatOutput == String, F.FormatInput: Equatable & Hashable, Label: View {
     typealias Entries = MetadataBatchEditingEntries<F.FormatInput?>
     
-    enum Fallback<V> {
+    enum Checkpoint<V> {
         case invalid
         case valid(value: V)
         
@@ -36,7 +36,8 @@ struct LabeledTextField<F, Label>: View where F: ParseableFormatStyle, F.FormatO
     @ViewBuilder private let label: () -> Label
 
     @State private var isLabelHovering: Bool = false
-    @State private var fallback: Fallback<F.FormatInput?> = .invalid
+    @State private var checkpoint: Checkpoint<F.FormatInput?> = .invalid
+    @State private var undoTargetCheckpoint: Checkpoint<F.FormatInput?> = .invalid
 
     init(
         _ placeholder: LocalizedStringKey,
@@ -116,20 +117,23 @@ struct LabeledTextField<F, Label>: View where F: ParseableFormatStyle, F.FormatO
         )
         .luminareCompactButtonAspectRatio(contentMode: .fill)
         .focused($isFocused)
+        .onAppear {
+            isFocused = false
+            updateCheckpoint()
+        }
         .onSubmit {
             isFocused = false
         }
-        .onChange(of: isFocused, initial: true) { oldValue, newValue in
+        .onChange(of: isFocused, initial: true) { _, newValue in
             if newValue {
-                fallback.set(entries.projectedUnwrappedValue()?.wrappedValue)
+                updateCheckpoint()
             } else {
-                switch fallback {
-                case .invalid:
-                    break
-                case .valid(let value):
-                    registerUndo(value, for: entries)
-                }
+                registerUndoFromCheckpoint()
             }
+        }
+        .onChange(of: entries.projectedValue?.wrappedValue) { oldValue, _ in
+            guard !isFocused else { return }
+            registerUndo(oldValue, for: entries)
         }
         .overlay {
             Group {
@@ -217,11 +221,36 @@ struct LabeledTextField<F, Label>: View where F: ParseableFormatStyle, F.FormatO
         }
     }
     
+    private func areIdentical(_ oldValue: F.FormatInput?, _ newValue: F.FormatInput?) -> Bool {
+        oldValue == newValue || (isEmpty(value: oldValue) && isEmpty(value: newValue))
+    }
+    
+    private func updateCheckpoint() {
+        checkpoint.set(entries.projectedUnwrappedValue()?.wrappedValue)
+    }
+    
+    private func registerUndoFromCheckpoint() {
+        switch checkpoint {
+        case .invalid:
+            break
+        case .valid(let value):
+            registerUndo(value, for: entries)
+        }
+    }
+    
     private func registerUndo(_ oldValue: F.FormatInput?, for entries: Entries) {
         let value = entries.projectedUnwrappedValue()?.wrappedValue
-        let areIdentical = oldValue == value || (isEmpty(value: oldValue) && isEmpty(value: value))
         
-        guard !areIdentical else { return }
+        guard !areIdentical(oldValue, value) else { return }
+        
+        switch undoTargetCheckpoint {
+        case .invalid:
+            break
+        case .valid(let value):
+            guard !areIdentical(oldValue, value) else { return }
+        }
+        undoTargetCheckpoint.set(oldValue)
+        
         undoManager?.registerUndo(withTarget: entries) { entries in
             let fallback = entries.projectedUnwrappedValue()?.wrappedValue
             entries.setAll(oldValue)
