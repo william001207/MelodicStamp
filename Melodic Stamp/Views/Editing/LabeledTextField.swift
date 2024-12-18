@@ -10,18 +10,18 @@ import SwiftUI
 
 struct LabeledTextField<F, Label>: View where F: ParseableFormatStyle, F.FormatOutput == String, F.FormatInput: Equatable & Hashable, Label: View {
     typealias Entries = MetadataBatchEditingEntries<F.FormatInput?>
-    
+
     enum Checkpoint<V> {
         case invalid
         case valid(value: V)
-        
+
         mutating func set(_ newValue: V) {
             self = .valid(value: newValue)
         }
     }
-    
+
     @Environment(\.undoManager) private var undoManager
-    
+
     @FocusState private var isFocused: Bool
 
     @Environment(\.luminareAnimation) private var animation
@@ -201,7 +201,7 @@ struct LabeledTextField<F, Label>: View where F: ParseableFormatStyle, F.FormatO
                 } else {
                     Text(placeholder)
                 }
-                
+
                 Spacer()
             }
         }
@@ -220,42 +220,42 @@ struct LabeledTextField<F, Label>: View where F: ParseableFormatStyle, F.FormatO
             false
         }
     }
-    
+
     private func areIdentical(_ oldValue: F.FormatInput?, _ newValue: F.FormatInput?) -> Bool {
         oldValue == newValue || (isEmpty(value: oldValue) && isEmpty(value: newValue))
     }
-    
+
     private func updateCheckpoint() {
         checkpoint.set(entries.projectedUnwrappedValue()?.wrappedValue)
     }
-    
+
     private func registerUndoFromCheckpoint() {
         switch checkpoint {
         case .invalid:
             break
-        case .valid(let value):
+        case let .valid(value):
             registerUndo(value, for: entries)
         }
     }
-    
+
     private func registerUndo(_ oldValue: F.FormatInput?, for entries: Entries) {
         let value = entries.projectedUnwrappedValue()?.wrappedValue
-        
+
         guard !areIdentical(oldValue, value) else { return }
-        
+
         switch undoTargetCheckpoint {
         case .invalid:
             break
-        case .valid(let value):
+        case let .valid(value):
             guard !areIdentical(oldValue, value) else { return }
         }
         undoTargetCheckpoint.set(oldValue)
-        
+
         undoManager?.registerUndo(withTarget: entries) { entries in
             let fallback = entries.projectedUnwrappedValue()?.wrappedValue
             entries.setAll(oldValue)
-            
-            self.registerUndo(fallback, for: entries)
+
+            registerUndo(fallback, for: entries)
         }
     }
 }

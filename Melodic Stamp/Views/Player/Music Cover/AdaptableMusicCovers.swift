@@ -10,7 +10,7 @@ import SwiftUI
 
 struct AdaptableMusicCovers<Content>: View where Content: View {
     typealias Entries = MetadataBatchEditingEntries<Set<AttachedPicture>>
-    
+
     enum Layout {
         case flow
         case list

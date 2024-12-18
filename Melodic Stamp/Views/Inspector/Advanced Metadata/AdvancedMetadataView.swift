@@ -20,10 +20,10 @@ struct AdvancedMetadataView: View {
                 VStack(spacing: 24) {
                     LabeledSection {
                         compilationEditor()
-                        
+
                         ratingEditor()
                     }
-                    
+
                     LabeledSection("Release Date") {
                         releaseDateEditor()
                     }
@@ -85,10 +85,11 @@ struct AdvancedMetadataView: View {
                 metadataEditor[extracting: \.rating].setAll(newValue)
             }
             let isModified = metadataEditor[extracting: \.rating].isModified
-            
+
             LabeledTextField(
                 "Rating", entries: metadataEditor[extracting: \.rating],
-                format: .number)
+                format: .number
+            )
 
             AliveButton {
                 binding.wrappedValue -= 1
@@ -111,13 +112,13 @@ struct AdvancedMetadataView: View {
             }
         }
     }
-    
+
     @ViewBuilder private func releaseDateEditor() -> some View {
         HStack {
             let isModified = metadataEditor[extracting: \.releaseDate].isModified
-            
+
             LabeledTextField("Release Date", text: metadataEditor[extracting: \.releaseDate])
-            
+
             AliveButton {
                 metadataEditor[extracting: \.releaseDate].setAll(Date.now.formatted(date: .complete, time: .shortened))
             } label: {
@@ -176,21 +177,25 @@ struct AdvancedMetadataView: View {
 
     @ViewBuilder private func copyrightEditor() -> some View {
         LabeledTextField(
-            "ISRC", entries: metadataEditor[extracting: \.isrc], format: .isrc)
+            "ISRC", entries: metadataEditor[extracting: \.isrc], format: .isrc
+        )
 
         LabeledTextField(
-            "Catalog Number", text: metadataEditor[extracting: \.mcn])
+            "Catalog Number", text: metadataEditor[extracting: \.mcn]
+        )
     }
 
     @ViewBuilder private func musicBrainzEditor() -> some View {
         LabeledTextField(
             "Recording ID",
             entries: metadataEditor[extracting: \.musicBrainzRecordingID],
-            format: .uuid)
+            format: .uuid
+        )
 
         LabeledTextField(
             "Release ID",
             entries: metadataEditor[extracting: \.musicBrainzRecordingID],
-            format: .uuid)
+            format: .uuid
+        )
     }
 }

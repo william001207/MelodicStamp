@@ -13,7 +13,7 @@ struct TTMLLine: LyricLine {
     var position: TTMLPosition
     var beginTime: TimeInterval? { lyrics.beginTime }
     var endTime: TimeInterval? { lyrics.endTime }
-    
+
     var lyrics: TTMLLyrics = .init()
     var backgroundLyrics: TTMLLyrics = .init()
 
@@ -38,9 +38,9 @@ struct TTMLLyric: Equatable, Hashable, Codable {
     var beginTime: TimeInterval?
     var endTime: TimeInterval?
     var text: String
-    
+
     var trailingSpaceCount: Int = 0
-    
+
     init(
         beginTime: TimeInterval? = nil,
         endTime: TimeInterval? = nil,
@@ -50,7 +50,7 @@ struct TTMLLyric: Equatable, Hashable, Codable {
         self.beginTime = beginTime
         self.endTime = endTime
         self.trailingSpaceCount = trailingSpaceCount
-        
+
         // Remove parentheses
         self.text = text.replacing(/[\[\]\()【】（）]/, with: "")
     }
@@ -61,7 +61,7 @@ struct TTMLLyric: Equatable, Hashable, Codable {
 struct TTMLLyrics: Equatable, Hashable, Codable {
     var beginTime: TimeInterval?
     var endTime: TimeInterval?
-    
+
     var children: [TTMLLyric] = []
     var translation: String?
     var roman: String?
@@ -77,16 +77,16 @@ extension TTMLLyrics: MutableCollection {
     var startIndex: Int { children.startIndex }
     var endIndex: Int { children.endIndex }
     var count: Int { children.count }
-    
+
     func index(after i: Int) -> Int {
         children.index(after: i)
     }
-    
+
     subscript(index: Int) -> TTMLLyric {
         get {
             children[index]
         }
-        
+
         set {
             children[index] = newValue
         }
@@ -94,10 +94,10 @@ extension TTMLLyrics: MutableCollection {
 }
 
 extension TTMLLyrics: RangeReplaceableCollection {
-    mutating func replaceSubrange<C: Collection>(
+    mutating func replaceSubrange(
         _ subrange: Range<Int>,
-        with newElements: C
-    ) where C.Element == TTMLLyric {
+        with newElements: some Collection<TTMLLyric>
+    ) {
         children.replaceSubrange(subrange, with: newElements)
     }
 }
@@ -113,10 +113,10 @@ extension TTMLLyrics {
                 maxReplacements: 1
             )
         }
-        
+
         let consecutiveSpaces = indexedTemplate
             .countConsecutiveSpacesBetweenNumbers(terminator: terminator)
-        
+
         for (index, spaceCount) in consecutiveSpaces {
             guard indices.contains(index) else { continue }
             self[index].trailingSpaceCount = spaceCount
@@ -129,6 +129,6 @@ extension TTMLLyrics {
 enum TTMLPosition: String, Equatable, Hashable, Identifiable, CaseIterable, Codable {
     case main
     case sub
-    
+
     var id: String { rawValue }
 }

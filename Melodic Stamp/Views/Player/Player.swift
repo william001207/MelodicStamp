@@ -20,7 +20,7 @@ struct Player: View {
 
     @State private var adjustmentPercentage: CGFloat = .zero
     @State private var shouldUseRemainingDuration: Bool = false
-    
+
     @State private var id: UUID = .init()
 
     var body: some View {
@@ -78,7 +78,8 @@ struct Player: View {
                 if let thumbnail = player.current?.metadata.thumbnail {
                     MusicCover(
                         images: [thumbnail], hasPlaceholder: false,
-                        cornerRadius: 2)
+                        cornerRadius: 2
+                    )
                 }
 
                 ShrinkableMarqueeScrollView {

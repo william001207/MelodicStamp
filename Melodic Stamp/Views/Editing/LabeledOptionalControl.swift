@@ -30,7 +30,7 @@ struct LabeledOptionalControl<V, Label, Content, ContentB>: View
                 label()
 
                 Spacer()
-                
+
                 if isHovering {
                     HStack(spacing: 2) {
                         AliveButton {
@@ -39,7 +39,7 @@ struct LabeledOptionalControl<V, Label, Content, ContentB>: View
                             Image(systemSymbol: .arrowUturnLeft)
                         }
                         .disabled(!entries.isModified)
-                        
+
                         AliveButton {
                             entries.setAll(nil)
                         } label: {

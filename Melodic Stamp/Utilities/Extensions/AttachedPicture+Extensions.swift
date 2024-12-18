@@ -43,13 +43,13 @@ extension AttachedPicture {
             .publisherLogo
         ]
     }
-    
+
     var data: Data {
         Data(imageData)
     }
-    
-    open override func copy() -> Any {
-        return AttachedPicture(imageData: data, type: type)
+
+    override open func copy() -> Any {
+        AttachedPicture(imageData: data, type: type)
     }
 }
 

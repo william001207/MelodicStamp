@@ -5,12 +5,12 @@
 //  Created by KrLite on 2024/12/15.
 //
 
-import SwiftUI
 import Luminare
+import SwiftUI
 
 struct TTMLLyricsView: View {
     var lyrics: TTMLLyrics
-    
+
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             Group {
@@ -23,8 +23,8 @@ struct TTMLLyricsView: View {
                                     .luminareBordered(false)
                                     .luminareHorizontalPadding(0)
                                     .luminareMinHeight(24)
-                                
-                                ForEach(0..<lyric.trailingSpaceCount, id: \.self) { _ in
+
+                                ForEach(0 ..< lyric.trailingSpaceCount, id: \.self) { _ in
                                     Text(" ")
                                 }
                             }
@@ -38,27 +38,28 @@ struct TTMLLyricsView: View {
             .frame(maxWidth: .infinity)
             .background(.quinary)
             .clipShape(.rect(cornerRadius: 8))
-            
+
             if let translation = lyrics.translation {
                 HStack {
                     Image(systemSymbol: .translate)
                         .padding(2)
                         .frame(
-                            width: 16, height: 16)
-                    
+                            width: 16, height: 16
+                        )
+
                     Text("\(translation)")
                 }
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
                 .foregroundStyle(.tint)
             }
-            
+
             if let roman = lyrics.roman {
                 HStack {
                     Image(systemSymbol: .characterPhonetic)
                         .padding(2)
                         .frame(width: 16, height: 16)
-                    
+
                     Text("\(roman)")
                 }
                 .font(.subheadline)

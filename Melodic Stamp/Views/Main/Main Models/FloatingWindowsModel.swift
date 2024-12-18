@@ -198,12 +198,12 @@ extension FloatingWindowsModel {
     @objc func windowDidExitFullScreen(_: Notification) {
         show()
     }
-    
+
     @objc func windowDidMove(_: Notification) {
         updateTabBarPosition()
         updatePlayerPosition()
     }
-    
+
     @objc func windowDidResize(_: Notification) {
         updateTabBarPosition()
         updatePlayerPosition()

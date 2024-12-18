@@ -5,10 +5,10 @@
 //  Created by KrLite on 2024/12/11.
 //
 
-import CSFBAudioEngine
 import AppKit
 import CoreImage
 import CoreImage.CIFilterBuiltins
+import CSFBAudioEngine
 
 enum ThumbnailMaker {
     static func make(_ image: NSImage, resolution: CGFloat = 128) -> NSImage? {
@@ -30,7 +30,7 @@ enum ThumbnailMaker {
         )
         let scaledCIImage = ciImage.transformed(
             by: CGAffineTransform(scaleX: scale, y: scale))
-        
+
         // Create the context
         let options: [CIContextOption: Any] = [
             .useSoftwareRenderer: false,
@@ -38,7 +38,7 @@ enum ThumbnailMaker {
             .workingColorSpace: CGColorSpaceCreateDeviceRGB()
         ]
         let ciContext = CIContext(options: options)
-        
+
         // Apply filters
         let sharpnessFilter = CIFilter.sharpenLuminance()
         sharpnessFilter.inputImage = scaledCIImage
@@ -60,19 +60,18 @@ enum ThumbnailMaker {
     }
 
     static func getCover(from attachedPictures: Set<AttachedPicture>)
-        -> AttachedPicture?
-    {
+        -> AttachedPicture? {
         guard !attachedPictures.isEmpty else { return nil }
 
         let preferredTypes: [AttachedPicture.`Type`] = [
             .frontCover, .backCover,
             .illustration, .fileIcon, .otherFileIcon,
-            .leafletPage, .media,
+            .leafletPage, .media
         ]
         let preferredAttachedPicture =
             preferredTypes
-            .compactMap { getCover(of: $0, from: attachedPictures) }
-            .first
+                .compactMap { getCover(of: $0, from: attachedPictures) }
+                .first
         return preferredAttachedPicture ?? attachedPictures.first
     }
 

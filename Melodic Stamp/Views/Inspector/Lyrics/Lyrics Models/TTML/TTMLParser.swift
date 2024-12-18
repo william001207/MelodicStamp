@@ -14,7 +14,7 @@ import SwiftSoup
         case documentNotFound
         case bodyNotFound
     }
-    
+
     typealias Line = TTMLLine
 
     var lines: [TTMLLine] = []
@@ -32,7 +32,7 @@ import SwiftSoup
         }
 
         for (index, pElement) in try body.getElementsByTag("p").enumerated() {
-            let agent = try  TTMLData(type: .agent, element: pElement)
+            let agent = try TTMLData(type: .agent, element: pElement)
 
             var line = TTMLLine(
                 index: index,
@@ -45,14 +45,14 @@ import SwiftSoup
                 intoBackground: &line.backgroundLyrics,
                 isRecursive: true
             )
-            
+
             lines.append(line)
         }
     }
-    
+
     func find(at time: TimeInterval) -> IndexSet {
         var indices: IndexSet = []
-        
+
         for (index, line) in lines.enumerated() {
             if let beginTime = line.beginTime as TimeInterval?,
                let endTime = line.endTime as TimeInterval? {
@@ -61,10 +61,10 @@ import SwiftSoup
                 }
             }
         }
-        
+
         return indices
     }
-    
+
     static func getPosition(fromAgent agent: String?) -> TTMLPosition {
         guard let agent else { return .main }
         return switch agent {
@@ -72,15 +72,15 @@ import SwiftSoup
         default: .sub
         }
     }
-    
+
     static func readTimestamp(from element: Element, into lyrics: inout TTMLLyrics) throws {
         let beginTime = try TTMLData(type: .begin, element: element)?.content.toTTMLTimeInterval()
         let endTime = try TTMLData(type: .end, element: element)?.content.toTTMLTimeInterval()
-        
+
         lyrics.beginTime = beginTime
         lyrics.endTime = endTime
     }
-    
+
     static func readNodes(
         from element: Element,
         into lyrics: inout TTMLLyrics,
@@ -89,23 +89,22 @@ import SwiftSoup
     ) throws {
         try readTimestamp(from: element, into: &lyrics)
         var text = try element.text()
-        
+
         for node in element.getChildNodes() {
             if let textNode = node as? TextNode {
                 let text = textNode.text().trimmingCharacters(in: .whitespacesAndNewlines)
                 guard !text.isEmpty else { continue }
-                
+
                 lyrics.append(.init(text: text))
             } else if
                 let spanElement = node as? Element,
-                spanElement.tagName() == "span"
-            {
+                spanElement.tagName() == "span" {
                 let beginTime = try TTMLData(type: .begin, element: spanElement)?.content.toTTMLTimeInterval()
                 let endTime = try TTMLData(type: .end, element: spanElement)?.content.toTTMLTimeInterval()
                 let spanText = try spanElement
                     .text()
                     .normalizeSpaces()
-                
+
                 if let roleAttribute = try TTMLData(type: .role, element: spanElement)?.content,
                    let role = TTMLRole(rawValue: roleAttribute) {
                     switch role {
@@ -124,7 +123,7 @@ import SwiftSoup
                             )
                         }
                     }
-                    
+
                     text.replace(spanText, with: "", maxReplacements: 1)
                 } else {
                     lyrics.append(.init(
@@ -133,7 +132,7 @@ import SwiftSoup
                 }
             }
         }
-        
+
         // Preservs spaces between span elements
         lyrics.insertSpaces(from: text)
     }

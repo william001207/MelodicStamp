@@ -10,7 +10,7 @@ import SwiftUI
 struct PlaylistCommands: Commands {
     @FocusedValue(\.player) private var player
     @FocusedValue(\.metadataEditor) private var metadataEditor
-    
+
     var body: some Commands {
         CommandMenu("Playlist") {
             Group {
@@ -20,13 +20,11 @@ struct PlaylistCommands: Commands {
                     }
                     .disabled(metadataEditor.items.isEmpty)
                 } else {
-                    Button("Clear Selection") {
-                        
-                    }
-                    .disabled(true)
+                    Button("Clear Selection") {}
+                        .disabled(true)
                 }
             }
-            
+
             Group {
                 if let player, let metadataEditor {
                     if metadataEditor.items.isEmpty {
@@ -42,20 +40,17 @@ struct PlaylistCommands: Commands {
                         }
                     }
                 } else {
-                    Button("Remove All") {
-                        
-                    }
-                    .disabled(true)
+                    Button("Remove All") {}
+                        .disabled(true)
                 }
             }
             .keyboardShortcut(.deleteForward, modifiers: [])
-            
+
             Group {
                 if
                     let player, let metadataEditor,
                     metadataEditor.items.count == 1,
-                    let item = metadataEditor.items.first
-                {
+                    let item = metadataEditor.items.first {
                     let title = MusicTitle.stringifiedTitle(mode: .title, for: item)
                     Button {
                         player.play(item: item)
@@ -67,10 +62,8 @@ struct PlaylistCommands: Commands {
                         }
                     }
                 } else {
-                    Button("Play Selected") {
-                        
-                    }
-                    .disabled(true)
+                    Button("Play Selected") {}
+                        .disabled(true)
                 }
             }
             .keyboardShortcut(.return, modifiers: [])

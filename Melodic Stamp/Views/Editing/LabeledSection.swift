@@ -5,15 +5,15 @@
 //  Created by KrLite on 2024/11/24.
 //
 
-import SwiftUI
 import Luminare
+import SwiftUI
 
 struct LabeledSection<Content, Label>: View where Content: View, Label: View {
     @Environment(\.luminareAnimation) private var animation
-    
+
     @ViewBuilder private var content: () -> Content
     @ViewBuilder private var label: () -> Label
-    
+
     @State private var isExpanded: Bool = true
 
     init(
@@ -54,19 +54,19 @@ struct LabeledSection<Content, Label>: View where Content: View, Label: View {
                     } label: {
                         HStack(spacing: 4) {
                             Image(systemSymbol: .chevronDown)
-                                .aspectRatio(1/1, contentMode: .fit)
+                                .aspectRatio(1 / 1, contentMode: .fit)
                                 .rotationEffect(isExpanded ? .zero : .degrees(-90), anchor: .center)
-                            
+
                             label()
                         }
                         .font(.caption)
                         .foregroundStyle(.secondary)
                     }
-                    
+
                     Spacer()
                 }
             }
-            
+
             if isExpanded {
                 VStack {
                     content()

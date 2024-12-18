@@ -13,7 +13,7 @@ struct MusicTitle: View {
         case extensive
         case plain
     }
-    
+
     enum DisplayMode {
         case comprehensive
         case title
@@ -57,7 +57,7 @@ struct MusicTitle: View {
                         }
                         .bold()
                     }
-                    
+
                     if mode.hasArtists {
                         if let artist = item.metadata[extracting: \.artist]?.initial {
                             HStack(spacing: 4) {
@@ -67,7 +67,7 @@ struct MusicTitle: View {
                                         Text("·")
                                             .foregroundStyle(.placeholder)
                                     }
-                                    
+
                                     Text(composer)
                                         .foregroundStyle(.secondary)
                                 }
@@ -89,11 +89,11 @@ struct MusicTitle: View {
             }
         }
     }
-    
+
     static func fallbackTitle(for item: PlaylistItem) -> String {
         Metadata.fallbackTitle(url: item.url)
     }
-    
+
     static func stringifiedTitle(mode: DisplayMode, for item: PlaylistItem, separator: String = " ") -> String {
         var components: [String] = []
         if mode.hasTitle {
@@ -103,7 +103,7 @@ struct MusicTitle: View {
                 components.append(fallbackTitle(for: item))
             }
         }
-        
+
         if mode.hasArtists {
             if let artist = item.metadata[extracting: \.artist]?.initial {
                 components.append(artist)

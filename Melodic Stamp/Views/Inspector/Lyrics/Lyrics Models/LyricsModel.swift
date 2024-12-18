@@ -100,7 +100,7 @@ enum LyricsStorage {
                 type = nil
             }
         }
-        
+
         // Debounce
         guard type != storage?.type || string != cache || url != url else { return }
 
@@ -138,13 +138,11 @@ extension LyricsModel {
         guard let string else { return nil }
         return if string
             .trimmingCharacters(in: .whitespacesAndNewlines)
-            .starts(with: /\[.+].*/)
-        {
+            .starts(with: /\[.+].*/) {
             .lrc
         } else if
             let body = try SwiftSoup.parse(string).body(),
-            try body.getElementsByTag("tt").count > 0
-        {
+            try !body.getElementsByTag("tt").isEmpty {
             .ttml
         } else {
             .raw

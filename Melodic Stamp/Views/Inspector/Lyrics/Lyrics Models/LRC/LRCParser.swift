@@ -17,14 +17,14 @@ import RegexBuilder
     required init(string: String) throws {
         try parse(string: string)
     }
-    
+
     private func parse(string: String) throws {
-        self.lines = []
-        
+        lines = []
+
         let contents = string
             .split(separator: .newlineSequence)
             .map(String.init(_:))
-        
+
         try contents.forEach {
             let tagRegex = Regex {
                 "["
@@ -43,25 +43,25 @@ import RegexBuilder
                     ZeroOrMore(.anyNonNewline)
                 }
             }
-            
+
             guard
                 let match = try lineRegex.wholeMatch(
                     in: $0.trimmingCharacters(in: .whitespacesAndNewlines))
             else { return }
             // Output: (original, tagString, _, content)
-            
+
             let tagString = String(match.output.1).trimmingCharacters(in: .whitespacesAndNewlines)
             let content = String(match.output.3).trimmingCharacters(in: .whitespacesAndNewlines)
-            
+
             var tags: [String] = []
             for match in tagString.matches(of: tagRegex) {
                 tags.append(String(match.output.1).trimmingCharacters(in: .whitespacesAndNewlines))
             }
-            
+
 //            print("Extracting LRC lyric line: \(tags), \"\(content)\"")
-            
+
             var line: LRCLine = .init(content: content)
-            
+
             for tag in tags {
                 if let time = try TimeInterval(lyricTimestamp: tag) {
                     // Parse timestamp
@@ -91,7 +91,7 @@ import RegexBuilder
                     } catch {}
                 }
             }
-            
+
             lines.append(line)
         }
     }

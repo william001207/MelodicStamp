@@ -24,14 +24,14 @@ struct TTMLData: Equatable, Hashable, Identifiable {
 
     var type: DataType
     var content: String
-    
+
     init(type: DataType, content: String) {
         self.type = type
         self.content = content
     }
-    
+
     init?(type: DataType, element: Element) throws {
-        self.init(type: type, content: try element.attr(type.rawValue))
+        try self.init(type: type, content: element.attr(type.rawValue))
     }
 }
 
@@ -39,6 +39,6 @@ enum TTMLRole: String, Equatable, Hashable, Identifiable, CaseIterable, Codable 
     case translation = "x-translation"
     case roman = "x-roman"
     case background = "x-bg"
-        
+
     var id: String { rawValue }
 }

@@ -29,7 +29,7 @@ struct PlaylistView: View {
                     Spacer()
                         .frame(height: 64 + minHeight)
                         .listRowSeparator(.hidden)
-                    
+
                     ForEach(player.playlist, id: \.self) { item in
                         switch item.metadata.state {
                         case .loading:
@@ -48,7 +48,7 @@ struct PlaylistView: View {
                         }
                     }
                     .transition(.slide)
-                    
+
                     Spacer()
                         .frame(height: 94)
                         .listRowSeparator(.hidden)
@@ -100,15 +100,15 @@ struct PlaylistView: View {
             .padding(.horizontal)
         }
     }
-    
+
     private var canEscape: Bool {
         !metadataEditor.items.isEmpty
     }
-    
+
     private var canRemove: Bool {
         !player.playlist.isEmpty
     }
-    
+
     @ViewBuilder private func actions() -> some View {
         HStack(spacing: 2) {
             // Clear selection
@@ -120,7 +120,7 @@ struct PlaylistView: View {
             }
             .aspectRatio(1, contentMode: .fit)
             .disabled(!canEscape)
-            
+
             // Cycle playback mode
             Button {
                 let hasShift = NSEvent.modifierFlags.contains(.shift)
@@ -131,7 +131,7 @@ struct PlaylistView: View {
                     .padding()
             }
             .fixedSize(horizontal: true, vertical: false)
-            
+
             // Remove selection from playlist / remove all
             Button(role: .destructive) {
                 if metadataEditor.items.isEmpty {
@@ -139,12 +139,12 @@ struct PlaylistView: View {
                 } else {
                     handleRemove(items: .init(metadataEditor.items))
                 }
-                
+
                 resetFocus(in: namespace) // Must regain focus due to unknown reasons
             } label: {
                 HStack {
                     Image(systemSymbol: .trashFill)
-                    
+
                     if !canRemove || metadataEditor.items.isEmpty {
                         Text("Remove All")
                     } else {
@@ -159,7 +159,7 @@ struct PlaylistView: View {
         }
         .buttonStyle(.luminare)
     }
-    
+
     @ViewBuilder private func itemView(for item: PlaylistItem) -> some View {
         PlaylistItemView(
             player: player,
@@ -174,7 +174,7 @@ struct PlaylistView: View {
                 Image(systemSymbol: .play)
             }
             .tint(.accent)
-            
+
             // Remove from playlist
             Button(role: .destructive) {
                 handleRemove(items: [item])
@@ -196,7 +196,7 @@ struct PlaylistView: View {
                 }
                 .tint(.green)
             }
-            
+
             // Restore metadata
             if item.metadata.isModified {
                 Button {
@@ -248,13 +248,13 @@ struct PlaylistView: View {
         .disabled(!item.metadata.isModified)
         .keyboardShortcut("r", modifiers: .command)
     }
-    
+
     @discardableResult private func handleEscape() -> Bool {
         guard canEscape else { return false }
         metadataEditor.items.removeAll()
         return true
     }
-    
+
     @discardableResult private func handleRemove(items: [PlaylistItem]) -> Bool {
         guard canRemove else { return false }
         player.removeFromPlaylist(items: items)

@@ -56,11 +56,11 @@ struct AliveButton<Label>: View where Label: View {
             .animation(.bouncy, value: isActive)
             .animation(.default, value: isEnabled)
     }
-    
+
     private var hasHoveringStyle: Bool {
         hoveringStyle != nil
     }
-    
+
     private var style: AnyShapeStyle {
         if isEnabled {
             if isHovering, let hoveringStyle {

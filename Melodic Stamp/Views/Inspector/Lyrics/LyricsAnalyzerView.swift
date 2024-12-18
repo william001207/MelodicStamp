@@ -95,15 +95,15 @@ private struct LyricsAnalyzerView: View {
                                     HStack {
                                         if let beginTime = line.beginTime {
                                             Text("from")
-                                            
+
                                             Text(beginTime.formatted())
                                         }
-                                        
+
                                         Spacer()
-                                        
+
                                         if let endTime = line.endTime {
                                             Text("to")
-                                            
+
                                             Text(endTime.formatted())
                                         }
                                     }

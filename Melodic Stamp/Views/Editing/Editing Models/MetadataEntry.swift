@@ -20,7 +20,7 @@ protocol Restorable: Equatable, Modifiable {
 
     var current: V { get set }
     var initial: V { get set }
-    
+
     mutating func restore()
     mutating func apply()
 }
@@ -153,7 +153,7 @@ extension MetadataBatchEditingEntry: Equatable {
 
     let keyPath: EntryKeyPath
     let metadatas: Set<Metadata>
-    
+
     private var isRestoring: Bool = false
 
     init(keyPath: EntryKeyPath, metadatas: Set<Metadata>) {

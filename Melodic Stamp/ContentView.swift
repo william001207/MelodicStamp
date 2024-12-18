@@ -10,7 +10,7 @@ import SwiftUI
 
 struct ContentView: View {
     @Environment(\.appearsActive) private var isActive
-    
+
     @FocusState private var isFocused
 
     @Namespace private var namespace

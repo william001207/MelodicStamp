@@ -147,7 +147,7 @@ struct CommonMetadataView: View {
                                     of: chosenAttachedPictureType
                                 )
                             else { break }
-                            
+
                             attachedPicturesHandler.replace(
                                 [attachedPicture], entries: entries,
                                 undoManager: undoManager

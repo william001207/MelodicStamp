@@ -26,7 +26,7 @@ extension String {
 extension String {
     func toTTMLTimeInterval() -> TimeInterval? {
         let regex = /(\d+):(\d+)\.(\d+)/
-        
+
         do {
             if let match = try regex.wholeMatch(in: self) {
                 guard
@@ -34,10 +34,10 @@ extension String {
                     let seconds = Double(match.output.2),
                     let milliseconds = Double(match.output.3)
                 else { return nil }
-                
+
                 let totalSeconds = minutes * 60 + seconds
                 let totalMilliseconds = totalSeconds * 1000 + milliseconds
-                
+
                 return totalMilliseconds
             } else {
                 return nil
@@ -52,13 +52,13 @@ extension String {
     func normalizeSpaces() -> String {
         replacing(/\\u{(00A0|20[0-9A])}/, with: "")
     }
-    
+
     func countConsecutiveSpacesBetweenNumbers(terminator: Character) -> [Int: Int] {
         var result: [Int: Int] = [:]
-        var currentNumber: Int? = nil
+        var currentNumber: Int?
         var spaceCount = 0
         var buffer = ""
-        
+
         for character in self {
             if character.isWholeNumber {
                 // Builds multi-digit numbers
@@ -80,13 +80,13 @@ extension String {
                 spaceCount += 1
             }
         }
-        
+
         // Adds the last number to the result (if it exists)
         if let number = Int(buffer), let previousNumber = currentNumber {
             result[previousNumber] = spaceCount
             result[number] = 0
         }
-        
+
         return result
     }
 }

@@ -96,14 +96,12 @@ struct LyricsView: View {
     }
 
     @ViewBuilder private func rawLyricLine(index _: Int, line: RawLyricLine)
-        -> some View
-    {
+        -> some View {
         Text(line.content)
     }
 
     @ViewBuilder private func lrcLyricLine(index: Int, line: LRCLine)
-        -> some View
-    {
+        -> some View {
         let isHighlighted = highlightedIndices.contains(index)
 
         HStack {
@@ -148,9 +146,8 @@ struct LyricsView: View {
             isHighlighted ? AnyShapeStyle(.tint) : AnyShapeStyle(.primary))
     }
 
-    @ViewBuilder private func ttmlLyricLine(index: Int, line: TTMLLine)
-        -> some View
-    {
+    @ViewBuilder private func ttmlLyricLine(index _: Int, line: TTMLLine)
+        -> some View {
         VStack(alignment: .leading, spacing: 16) {
             HStack {
                 Text("#\(line.index)")

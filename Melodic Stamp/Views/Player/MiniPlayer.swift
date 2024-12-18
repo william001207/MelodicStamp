@@ -25,7 +25,7 @@ struct MiniPlayer: View {
         case title
         case lyrics
     }
-    
+
     @FocusState private var isFocused: Bool
 
     @Bindable var windowManager: WindowManagerModel
@@ -78,7 +78,7 @@ struct MiniPlayer: View {
         .onAppear {
             isFocused = true
         }
-        
+
         // Regain progress control on new track
         .onChange(of: player.currentIndex) { _, newValue in
             guard newValue != nil else { return }
@@ -155,7 +155,7 @@ struct MiniPlayer: View {
             .matchedGeometryEffect(
                 id: PlayerNamespace.playbackModeButton, in: namespace
             )
-            
+
             Group {
                 switch headerControl {
                 case .title:

@@ -9,7 +9,7 @@ import SwiftUI
 
 struct LeafletView: View {
     @Bindable var player: PlayerModel
-    
+
     var body: some View {
         if let current = player.current {
             Color.blue

@@ -8,10 +8,10 @@
 import Foundation
 
 struct ISRC: Hashable, Equatable, Codable {
-    var countryCode: String  // 2 digits
-    var registrantCode: String  // 3 digits
-    var year: String  // 2 digits
-    var designationCode: String  // 5 digits
+    var countryCode: String // 2 digits
+    var registrantCode: String // 3 digits
+    var year: String // 2 digits
+    var designationCode: String // 5 digits
 
     var components: [String] {
         [countryCode, registrantCode, year, designationCode]
@@ -40,11 +40,11 @@ extension ISRC {
     struct FormatStyle: Hashable, Equatable, Codable, ParseableFormatStyle {
         typealias FormatInput = ISRC
         typealias FormatOutput = String
-        
+
         struct Strategy: ParseStrategy {
             typealias ParseInput = String
             typealias ParseOutput = ISRC
-            
+
             func parse(_ value: String) throws -> ISRC {
                 let components = value.uppercased().split(separator: "-")
                 guard components.count == 4,
@@ -58,7 +58,7 @@ extension ISRC {
                 else {
                     throw FormatError.invalidFormat
                 }
-                
+
                 return .init(
                     countryCode: String(components[0]),
                     registrantCode: String(components[1]),
@@ -67,11 +67,11 @@ extension ISRC {
                 )
             }
         }
-        
+
         enum FormatError: Error {
             case invalidFormat
         }
-        
+
         var parseStrategy: Strategy = .init()
 
         func format(_ value: ISRC) -> String {
@@ -86,7 +86,7 @@ extension ISRC {
     }
 
     func formatted<F: Foundation.FormatStyle>(_ style: F) -> F.FormatOutput
-    where F.FormatInput == ISRC {
+        where F.FormatInput == ISRC {
         style.format(self)
     }
 }
@@ -95,7 +95,7 @@ extension FormatStyle where Self == ISRC.FormatStyle {
     static var isrc: Self {
         isrc()
     }
-    
+
     static func isrc(parseStrategy: Self.Strategy = .init()) -> Self {
         .init(parseStrategy: parseStrategy)
     }

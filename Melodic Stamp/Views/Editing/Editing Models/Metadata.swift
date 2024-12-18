@@ -113,15 +113,15 @@ import SwiftUI
             musicBrainzRecordingID, musicBrainzReleaseID,
             rating, releaseDate,
             replayGainAlbumGain, replayGainAlbumPeak, replayGainTrackGain,
-            replayGainTrackPeak, replayGainReferenceLoudness,
+            replayGainTrackPeak, replayGainReferenceLoudness
         ]
     }
 }
 
 // MARK: Loading Functions
 
-extension Metadata {
-    fileprivate func load(
+private extension Metadata {
+    func load(
         attachedPictures: Set<AttachedPicture> = [],
         title: String? = nil, titleSortOrder: String? = nil,
         artist: String? = nil, artistSortOrder: String? = nil,
@@ -150,7 +150,7 @@ extension Metadata {
         self.attachedPictures = .init(
             attachedPictures
         )
-        
+
         self.title = .init(
             title
         )
@@ -178,7 +178,7 @@ extension Metadata {
         self.bpm = .init(
             bpm
         )
-        
+
         self.albumTitle = .init(
             albumTitle
         )
@@ -191,7 +191,7 @@ extension Metadata {
         self.albumArtistSortOrder = .init(
             albumArtistSortOrder
         )
-        
+
         self.trackNumber = .init(
             trackNumber
         )
@@ -204,7 +204,7 @@ extension Metadata {
         self.discCount = .init(
             discCount
         )
-        
+
         self.comment = .init(
             comment
         )
@@ -214,9 +214,9 @@ extension Metadata {
         self.isCompilation = .init(
             isCompilation
         )
-        
+
         self.isrc = .init(
-            isrc.flatMap({ ISRC(parsing: $0) })
+            isrc.flatMap { ISRC(parsing: $0) }
         )
         self.lyrics = .init(
             lyrics
@@ -224,21 +224,21 @@ extension Metadata {
         self.mcn = .init(
             mcn
         )
-        
+
         self.musicBrainzRecordingID = .init(
             musicBrainzRecordingID.flatMap(UUID.init(uuidString:))
         )
         self.musicBrainzReleaseID = .init(
             musicBrainzReleaseID.flatMap(UUID.init(uuidString:))
         )
-        
+
         self.rating = .init(
             rating
         )
         self.releaseDate = .init(
             releaseDate
         )
-        
+
         self.replayGainAlbumGain = .init(
             replayGainAlbumGain
         )
@@ -254,13 +254,13 @@ extension Metadata {
         self.replayGainReferenceLoudness = .init(
             replayGainReferenceLoudness
         )
-        
+
         self.additional = .init(
             additional
         )
     }
 
-    fileprivate func load(from metadata: AudioMetadata?) {
+    func load(from metadata: AudioMetadata?) {
         load(
             attachedPictures: metadata?.attachedPictures ?? [],
             title: metadata?.title,
@@ -300,7 +300,7 @@ extension Metadata {
         )
     }
 
-    fileprivate func pack() -> AudioMetadata {
+    func pack() -> AudioMetadata {
         let metadata = AudioMetadata()
 
         metadata.title = title.current
@@ -383,8 +383,7 @@ extension Metadata {
         }
 
         if let image = ThumbnailMaker.getCover(from: attachedPictures.current)?
-            .image
-        {
+            .image {
             thumbnail = ThumbnailMaker.make(image)
         }
     }
@@ -459,8 +458,7 @@ extension Metadata {
     }
 
     subscript<V>(extracting keyPath: WritableKeyPath<Metadata, Entry<V>>)
-        -> MetadataBatchEditingEntry<V>?
-    {
+        -> MetadataBatchEditingEntry<V>? {
         guard state.isLoaded else { return nil }
         return .init(keyPath: keyPath, metadata: self)
     }
@@ -490,7 +488,7 @@ extension Metadata {
     static func fallbackTitle(url: URL) -> String {
         String(url.lastPathComponent.dropLast(url.pathExtension.count + 1))
     }
-    
+
     func updateNowPlayingInfo() {
         let infoCenter = MPNowPlayingInfoCenter.default()
         var info = infoCenter.nowPlayingInfo ?? .init()

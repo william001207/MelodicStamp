@@ -10,9 +10,9 @@ import SwiftUI
 
 struct AdaptableMusicCoverControl: View {
     typealias Entries = MetadataBatchEditingEntries<Set<AttachedPicture>>
-    
+
     @Environment(\.undoManager) private var undoManager
-    
+
     @Namespace private var namespace
 
     @Bindable var attachedPicturesHandler: AttachedPicturesHandlerModel
@@ -48,7 +48,7 @@ struct AdaptableMusicCoverControl: View {
                         let image = NSImage(contentsOf: url),
                         let attachedPicture = image.attachedPicture(of: type)
                     else { break }
-                    
+
                     attachedPicturesHandler.replace(
                         [attachedPicture], entries: entries,
                         undoManager: undoManager
@@ -124,17 +124,17 @@ struct AdaptableMusicCoverControl: View {
         }
         .animation(.smooth(duration: 0.25), value: isHeaderHovering)
     }
-    
+
     @ViewBuilder private func image() -> some View {
         if let binding = entries.projectedValue {
             let attachedPictures: [AttachedPicture] = .init(
                 binding.wrappedValue)
-            
+
             let images =
-            attachedPictures
-                .filter { $0.type == type }
-                .compactMap(\.image)
-            
+                attachedPictures
+                    .filter { $0.type == type }
+                    .compactMap(\.image)
+
             MusicCover(images: images, cornerRadius: 8)
                 .background {
                     if attachedPicturesHandler.isModified(
@@ -148,14 +148,14 @@ struct AdaptableMusicCoverControl: View {
             MusicCover(images: [], cornerRadius: 8)
         }
     }
-    
+
 //    private func registerUndo(_ oldValue: Set<AttachedPicture>, for entries: Entries) {
 //        guard oldValue != entries.projectedValue?.wrappedValue ?? [] else { return }
 //        undoManager?.registerUndo(withTarget: self.attachedPicturesHandler) { _ in
 //            let entries = self.entries
 //            let fallback = self.attachedPicturesHandler.copy(contents: entries)
 //            entries.setAll(oldValue)
-//            
+//
 //            self.registerUndo(fallback, for: entries)
 //        }
 //    }
