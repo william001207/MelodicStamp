@@ -43,6 +43,10 @@ struct AdvancedMetadataView: View {
                     LabeledSection("Music Brainz") {
                         musicBrainzEditor()
                     }
+                    
+                    LabeledSection("Miscellaneous") {
+                        commentEditor()
+                    }
                 }
                 .padding(.horizontal)
                 // Don't use `contentMargins()` for content as it breaks progressive blurs
@@ -196,6 +200,13 @@ struct AdvancedMetadataView: View {
             "Release ID",
             entries: metadataEditor[extracting: \.musicBrainzRecordingID],
             format: .uuid
+        )
+    }
+    
+    @ViewBuilder private func commentEditor() -> some View {
+        LabeledTextEditor(
+            "Comment",
+            entries: metadataEditor[extracting: \.comment]
         )
     }
 }

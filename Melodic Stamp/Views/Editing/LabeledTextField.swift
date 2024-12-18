@@ -12,19 +12,18 @@ struct LabeledTextField<F, Label>: View where F: ParseableFormatStyle, F.FormatO
     typealias Entries = MetadataBatchEditingEntries<F.FormatInput?>
 
     @Environment(\.undoManager) private var undoManager
-
-    @FocusState private var isFocused: Bool
-
     @Environment(\.luminareAnimation) private var animation
     @Environment(\.luminareAnimationFast) private var animationFast
     @Environment(\.luminareMinHeight) private var minHeight
     @Environment(\.luminareCompactButtonCornerRadii) private var cornerRadii
+    
+    @FocusState private var isFocused: Bool
 
     private var entries: Entries
     private let format: F
     private let placeholder: LocalizedStringKey
     private let showsLabel: Bool
-    @ViewBuilder private let label: () -> Label
+    @ViewBuilder private var label: () -> Label
 
     @State private var isLabelHovering: Bool = false
     @State private var checkpoint: Checkpoint<F.FormatInput?> = .invalid
