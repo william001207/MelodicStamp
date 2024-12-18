@@ -68,7 +68,7 @@ struct LabeledSection<Content, Label>: View where Content: View, Label: View {
             }
 
             if isExpanded {
-                VStack {
+                Group {
                     content()
                 }
                 .transition(.blurReplace)

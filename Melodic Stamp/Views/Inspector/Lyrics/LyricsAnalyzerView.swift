@@ -40,7 +40,7 @@ private struct LyricsAnalyzerView: View {
                     } label: {
                         Image(systemSymbol: .trash)
                     }
-                    .luminareCompactButtonAspectRatio(1 / 1, contentMode: .fit)
+                    .luminareAspectRatio(1 / 1, contentMode: .fit)
                     .disabled(lyricsAnalyzer.raw.isEmpty)
                     .foregroundStyle(.red)
 
@@ -49,7 +49,7 @@ private struct LyricsAnalyzerView: View {
                             try await lyricsAnalyzer.parseLyrics()
                         }
                     }
-                    .luminareCompactButtonAspectRatio(contentMode: .fill)
+                    .luminareAspectRatio(contentMode: .fill)
                     .disabled(lyricsAnalyzer.raw.isEmpty)
                 }
                 .buttonStyle(.luminareCompact)

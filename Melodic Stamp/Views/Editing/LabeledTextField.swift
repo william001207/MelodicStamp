@@ -11,15 +11,6 @@ import SwiftUI
 struct LabeledTextField<F, Label>: View where F: ParseableFormatStyle, F.FormatOutput == String, F.FormatInput: Equatable & Hashable, Label: View {
     typealias Entries = MetadataBatchEditingEntries<F.FormatInput?>
 
-    enum Checkpoint<V> {
-        case invalid
-        case valid(value: V)
-
-        mutating func set(_ newValue: V) {
-            self = .valid(value: newValue)
-        }
-    }
-
     @Environment(\.undoManager) private var undoManager
 
     @FocusState private var isFocused: Bool
@@ -115,7 +106,7 @@ struct LabeledTextField<F, Label>: View where F: ParseableFormatStyle, F.FormatO
             placeholder,
             value: binding, format: format
         )
-        .luminareCompactButtonAspectRatio(contentMode: .fill)
+        .luminareAspectRatio(contentMode: .fill)
         .focused($isFocused)
         .onAppear {
             isFocused = false
@@ -208,7 +199,7 @@ struct LabeledTextField<F, Label>: View where F: ParseableFormatStyle, F.FormatO
         .italic()
         .foregroundStyle(.secondary)
         .buttonStyle(.luminareCompact)
-        .luminareCompactButtonAspectRatio(contentMode: .fill)
+        .luminareAspectRatio(contentMode: .fill)
     }
 
     private func isEmpty(value: F.FormatInput?) -> Bool {
@@ -240,7 +231,6 @@ struct LabeledTextField<F, Label>: View where F: ParseableFormatStyle, F.FormatO
 
     private func registerUndo(_ oldValue: F.FormatInput?, for entries: Entries) {
         let value = entries.projectedUnwrappedValue()?.wrappedValue
-
         guard !areIdentical(oldValue, value) else { return }
 
         switch undoTargetCheckpoint {
