@@ -10,7 +10,7 @@ import CSFBAudioEngine
 
 extension AttachedPicture {
     var image: NSImage? {
-        .init(data: imageData)
+        .init(data: data)
     }
 
     var category: AttachedPictureCategory {
@@ -42,6 +42,14 @@ extension AttachedPicture {
             .bandLogo,
             .publisherLogo
         ]
+    }
+    
+    var data: Data {
+        Data(imageData)
+    }
+    
+    open override func copy() -> Any {
+        return AttachedPicture(imageData: data, type: type)
     }
 }
 

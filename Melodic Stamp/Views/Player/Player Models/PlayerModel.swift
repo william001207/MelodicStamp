@@ -57,8 +57,6 @@ enum PlaybackMode: String, CaseIterable, Identifiable {
 
     private var outputDevices: [AudioDevice] = []
     private var selectedDevice: AudioDevice?
-
-    var undoManager: () -> UndoManager? = { nil }
     
     private(set) var current: PlaylistItem?
     var playlist: [PlaylistItem] = []
@@ -237,7 +235,6 @@ enum PlaybackMode: String, CaseIterable, Identifiable {
             guard !playlist.contains(where: { $0.url == url }) else { continue }
 
             if let item = PlaylistItem(url: url) {
-                item.metadata.undoManager = undoManager
                 addToPlaylist(items: [item])
             }
         }

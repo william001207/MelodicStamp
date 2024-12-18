@@ -144,7 +144,8 @@ struct CommonMetadataView: View {
                             guard
                                 let image = NSImage(contentsOf: url),
                                 let attachedPicture = image.attachedPicture(
-                                    of: chosenAttachedPictureType)
+                                    of: chosenAttachedPictureType
+                                )
                             else { break }
                             
                             attachedPicturesHandler.replace(
@@ -156,7 +157,6 @@ struct CommonMetadataView: View {
                     }
                 }
                 .buttonStyle(.luminare)
-                .luminareMinHeight(minHeight)
                 .frame(height: minHeight)
             }
             .luminareBordered(false)

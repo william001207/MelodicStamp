@@ -10,7 +10,6 @@ import SwiftUI
 
 struct ContentView: View {
     @Environment(\.appearsActive) private var isActive
-    @Environment(\.undoManager) private var undoManager
     
     @FocusState private var isFocused
 
@@ -89,7 +88,6 @@ struct ContentView: View {
 //        .navigationTitle(title)
         .onAppear {
             floatingWindows.observeFullScreen()
-            player.undoManager = { undoManager }
             isFocused = true
         }
         .onChange(of: isActive, initial: true) { _, newValue in

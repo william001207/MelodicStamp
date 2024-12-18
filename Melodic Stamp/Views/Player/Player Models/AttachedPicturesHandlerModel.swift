@@ -103,4 +103,21 @@ import UniformTypeIdentifiers
 
         entries.forEach { restore(of: types, entry: $0) }
     }
+    
+    func copy(contents entries: Entries) -> Set<AttachedPicture> {
+        let oldValue = entries.projectedValue?.wrappedValue ?? []
+        var newValue: Set<AttachedPicture> = []
+        oldValue.forEach { newValue.insert($0.copy() as! AttachedPicture) }
+        return newValue
+    }
+    
+//    func registerUndo(_ oldValue: Set<AttachedPicture>, for entries: Entries, in undoManager: UndoManager?) {
+//        guard oldValue != entries.projectedValue?.wrappedValue ?? [] else { return }
+//        undoManager?.registerUndo(withTarget: self) { _ in
+//            let fallback = self.copy(contents: entries)
+//            entries.setAll(oldValue)
+//            
+//            self.registerUndo(fallback, for: entries, in: undoManager)
+//        }
+//    }
 }

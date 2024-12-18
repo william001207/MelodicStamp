@@ -42,7 +42,6 @@ import SwiftUI
 
     var id: URL { url }
     let url: URL
-    var undoManager: () -> UndoManager?
 
     private(set) var properties: AudioProperties!
     private(set) var state: State
@@ -95,7 +94,6 @@ import SwiftUI
     init?(url: URL) {
         self.state = .loading
         self.url = url
-        self.undoManager = { nil }
 
         Task {
             try await self.update()

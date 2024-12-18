@@ -44,16 +44,14 @@ struct AdaptableMusicCoverControl: View {
                     }
                     defer { url.stopAccessingSecurityScopedResource() }
 
-                    guard let image = NSImage(contentsOf: url),
-                        let attachedPicture = image.attachedPicture(
-                            of: type)
+                    guard
+                        let image = NSImage(contentsOf: url),
+                        let attachedPicture = image.attachedPicture(of: type)
                     else { break }
                     
-                    let fallback = entries.projectedValue?.wrappedValue ?? []
                     attachedPicturesHandler.replace(
                         [attachedPicture], entries: entries
                     )
-                    registerUndo(fallback, for: entries)
                 case .failure:
                     break
                 }
@@ -68,12 +66,9 @@ struct AdaptableMusicCoverControl: View {
             if isHeaderHovering {
                 HStack(spacing: 2) {
                     AliveButton {
-                        let fallback = entries.projectedValue?.wrappedValue ?? []
                         attachedPicturesHandler.restore(
-                            of: [type],
-                            entries: entries
+                            of: [type], entries: entries
                         )
-                        registerUndo(fallback, for: entries)
                     } label: {
                         Image(systemSymbol: .arrowUturnLeft)
                     }
@@ -85,11 +80,9 @@ struct AdaptableMusicCoverControl: View {
                     )
 
                     AliveButton {
-                        let fallback = entries.projectedValue?.wrappedValue ?? []
                         attachedPicturesHandler.remove(
                             of: [type], entries: entries
                         )
-                        registerUndo(fallback, for: entries)
                     } label: {
                         Image(systemSymbol: .trash)
                     }
@@ -142,8 +135,8 @@ struct AdaptableMusicCoverControl: View {
             MusicCover(images: images, cornerRadius: 8)
                 .background {
                     if attachedPicturesHandler.isModified(
-                        of: [type], entries: entries)
-                    {
+                        of: [type], entries: entries
+                    ) {
                         RoundedRectangle(cornerRadius: 8)
                             .stroke(.tint, lineWidth: 8)
                     }
@@ -153,13 +146,14 @@ struct AdaptableMusicCoverControl: View {
         }
     }
     
-    private func registerUndo(_ oldValue: Set<AttachedPicture>, for entries: Entries) {
-        guard oldValue != entries.projectedValue?.wrappedValue ?? [] else { return }
-        undoManager?.registerUndo(withTarget: entries) { entries in
-            let fallback = entries.projectedValue?.wrappedValue ?? []
-            entries.setAll(oldValue)
-            
-            self.registerUndo(fallback, for: entries)
-        }
-    }
+//    private func registerUndo(_ oldValue: Set<AttachedPicture>, for entries: Entries) {
+//        guard oldValue != entries.projectedValue?.wrappedValue ?? [] else { return }
+//        undoManager?.registerUndo(withTarget: self.attachedPicturesHandler) { _ in
+//            let entries = self.entries
+//            let fallback = self.attachedPicturesHandler.copy(contents: entries)
+//            entries.setAll(oldValue)
+//            
+//            self.registerUndo(fallback, for: entries)
+//        }
+//    }
 }
