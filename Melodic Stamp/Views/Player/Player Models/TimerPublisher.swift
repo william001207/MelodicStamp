@@ -2,15 +2,13 @@
 //  TimerPublisher.swift
 //  Melodic Stamp
 //
-//  Created by 屈志健 on 2024/12/19.
+//  Created by Xinshao_Air on 2024/12/19.
 //
-
 
 import Combine
 import SwiftUI
 import SFBAudioEngine
 
-/// 替代 `CADisplayLink` 的定时器 Publisher
 struct TimerPublisher: Publisher {
     let interval: TimeInterval
     let queue: DispatchQueue
