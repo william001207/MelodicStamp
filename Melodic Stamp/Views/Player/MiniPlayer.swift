@@ -43,6 +43,11 @@ struct MiniPlayer: View {
 
     @State private var adjustmentPercentage: CGFloat = .zero
     @State private var shouldUseRemainingDuration: Bool = true
+    
+    @State var progress: CGFloat = .zero
+    @State var duration: Duration = .zero
+    @State var timeElapsed: TimeInterval = .zero
+    @State var timeRemaining: TimeInterval = .zero
 
     var body: some View {
         VStack(spacing: 12) {
@@ -54,7 +59,7 @@ struct MiniPlayer: View {
                     }
                 }
 
-            TimelineView(.animation) { _ in
+//            TimelineView(.animation) { _ in
                 HStack(alignment: .center, spacing: 12) {
                     leadingControls()
                         .transition(.blurReplace)
@@ -69,7 +74,7 @@ struct MiniPlayer: View {
                 .animation(.default, value: isProgressBarActive)
                 .animation(.default, value: activeControl)
                 .animation(.default, value: headerControl)
-            }
+//            }
         }
         .padding(12)
         .focusable()
@@ -77,6 +82,25 @@ struct MiniPlayer: View {
         .focused($isFocused)
         .onAppear {
             isFocused = true
+        }
+        
+        .onReceive(player.playbackTime) { playbackTime in
+            
+            if let progress = playbackTime.progress {
+                self.progress = progress
+            }
+            
+            if let current = playbackTime.current {
+                self.timeElapsed = current
+            }
+            
+            if let remaining = playbackTime.remaining {
+                self.timeRemaining = -remaining
+            }
+            
+            if let current = playbackTime.current, let remaining = playbackTime.remaining {
+                duration =  {playbackTime.total.map { .seconds($0) } ?? .zero }()
+            }
         }
 
         // Regain progress control on new track
@@ -187,8 +211,8 @@ struct MiniPlayer: View {
                             .bold()
                     }
                 }
-                .contentTransition(.numericText())
-                .animation(.default, value: player.currentIndex)
+//                .contentTransition(.numericText())
+//                .animation(.default, value: player.currentIndex)
                 .matchedGeometryEffect(id: PlayerNamespace.title, in: namespace)
                 .padding(.bottom, 2)
             }
@@ -334,9 +358,9 @@ struct MiniPlayer: View {
                         } else {
                             // Use track time
                             if shouldUseRemainingDuration {
-                                player.timeRemaining
+                                timeRemaining
                             } else {
-                                player.timeElapsed
+                                timeElapsed
                             }
                         }
 
@@ -358,7 +382,11 @@ struct MiniPlayer: View {
                 let value: Binding<CGFloat> =
                     switch activeControl {
                     case .progress:
-                        player.hasCurrentTrack ? $player.progress : .constant(0)
+                        player.hasCurrentTrack ? Binding(
+                            get: { player.progress },
+                            set: { newValue in
+                                player.seek(position: max(0, min(1, newValue)))
+                            }) : .constant(0)
                     case .volume:
                         $player.volume
                     }
@@ -404,7 +432,7 @@ struct MiniPlayer: View {
 
             Group {
                 if activeControl == .progress {
-                    DurationText(duration: player.duration)
+                    DurationText(duration: duration)
                         .frame(width: 40)
                         .foregroundStyle(.secondary)
                 }

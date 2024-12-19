@@ -20,6 +20,11 @@ struct Player: View {
 
     @State private var adjustmentPercentage: CGFloat = .zero
     @State private var shouldUseRemainingDuration: Bool = false
+    
+    @State var progress: CGFloat = .zero
+    @State var duration: Duration = .zero
+    @State var timeElapsed: TimeInterval = .zero
+    @State var timeRemaining: TimeInterval = .zero
 
     @State private var id: UUID = .init()
 
@@ -27,7 +32,7 @@ struct Player: View {
         VStack(alignment: .center, spacing: 12) {
             header()
 
-            TimelineView(.animation) { _ in
+//            TimelineView(.animation) { _ in
                 HStack(alignment: .center, spacing: 24) {
                     HStack(alignment: .center, spacing: 12) {
                         leadingControls()
@@ -47,11 +52,29 @@ struct Player: View {
                 }
                 .frame(height: 32)
                 .animation(.default, value: isProgressBarActive)
-            }
+//            }
         }
         .padding(.horizontal, 32)
         .padding(.vertical, 24)
         .frame(maxWidth: .infinity)
+        .onReceive(player.playbackTime) { playbackTime in
+            
+            if let progress = playbackTime.progress {
+                self.progress = progress
+            }
+            
+            if let current = playbackTime.current {
+                self.timeElapsed = current
+            }
+            
+            if let remaining = playbackTime.remaining {
+                self.timeRemaining = -remaining
+            }
+            
+            if let current = playbackTime.current, let remaining = playbackTime.remaining {
+                duration =  {playbackTime.total.map { .seconds($0) } ?? .zero }()
+            }
+        }
     }
 
     @ViewBuilder private func header() -> some View {
@@ -85,8 +108,8 @@ struct Player: View {
                 ShrinkableMarqueeScrollView {
                     MusicTitle(item: player.current)
                 }
-                .contentTransition(.numericText())
-                .animation(.default, value: player.currentIndex)
+//                .contentTransition(.numericText())
+//                .animation(.default, value: player.currentIndex)
                 .matchedGeometryEffect(id: PlayerNamespace.title, in: namespace)
             }
             .padding(.bottom, 2)
@@ -207,7 +230,7 @@ struct Player: View {
             if isProgressBarActive {
                 // Use adjustment time
                 if shouldUseRemainingDuration {
-                    player.duration.toTimeInterval()
+                    duration.toTimeInterval()
                         * (1 - adjustmentPercentage)
                 } else {
                     player.duration.toTimeInterval() * adjustmentPercentage
@@ -215,9 +238,9 @@ struct Player: View {
             } else {
                 // Use track time
                 if shouldUseRemainingDuration {
-                    player.timeRemaining
+                    timeRemaining
                 } else {
-                    player.timeElapsed
+                    timeElapsed
                 }
             }
 
@@ -233,7 +256,13 @@ struct Player: View {
         .matchedGeometryEffect(id: PlayerNamespace.timeText, in: namespace)
 
         ProgressBar(
-            value: $player.progress,
+            value:  Binding(
+                get: { self.progress }, // Get the current progress
+                set: { newValue in
+                    // Use seek to update the progress within valid bounds
+                    player.seek(position: max(0, min(1, newValue)))
+                }
+            ),
             isActive: $isProgressBarActive,
             isDelegated: true,
             externalOvershootSign: playerKeyboardControl
@@ -247,6 +276,28 @@ struct Player: View {
         .frame(height: 12)
         .matchedGeometryEffect(id: PlayerNamespace.progressBar, in: namespace)
         .padding(.horizontal, isProgressBarActive ? 0 : 12)
+        
+//        Slider(
+//            value: Binding(
+//                get: { self.progress }, // Get the current progress
+//                set: { newValue in
+//                    // Use seek to update the progress within valid bounds
+//                    player.seek(position: max(0, min(1, newValue)))
+//                }
+//            ),
+//            in: 0...1, // Adjust the range based on your progress scale
+//            onEditingChanged: { isEditing in
+//                isProgressBarActive = isEditing
+//            }
+//        )
+//        .foregroundColor(isProgressBarActive ? .primary : .secondary)
+//        .background(Color.gray) // Replace with your preferred background color
+//        .frame(height: 12)
+//        .matchedGeometryEffect(id: PlayerNamespace.progressBar, in: namespace)
+//        .padding(.horizontal, isProgressBarActive ? 0 : 12)
+//        .onChange(of: player.progress) { _, newValue in
+//            adjustmentPercentage = newValue
+//        }
 
         DurationText(duration: player.duration)
             .frame(width: 40)

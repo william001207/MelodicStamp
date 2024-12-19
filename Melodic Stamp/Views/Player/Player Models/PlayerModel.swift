@@ -58,6 +58,15 @@ enum PlaybackMode: String, CaseIterable, Identifiable {
     private var outputDevices: [AudioDevice] = []
     private var selectedDevice: AudioDevice?
 
+    private var cancellables = Set<AnyCancellable>()
+    private let timerPublisher = TimerPublisher(interval: 1.0)
+    private var playbackTimeSubject = PassthroughSubject<AudioPlayer.PlaybackTime, Never>()
+
+    var playbackTime: AnyPublisher<AudioPlayer.PlaybackTime, Never> {
+        playbackTimeSubject
+            .eraseToAnyPublisher()
+    }
+
     private(set) var current: PlaylistItem?
     var playlist: [PlaylistItem] = []
     var playbackMode: PlaybackMode = .sequential
@@ -73,16 +82,16 @@ enum PlaybackMode: String, CaseIterable, Identifiable {
         get {
             player.time?.progress ?? .zero
         }
-
-        set {
-            // Debounce and cancel if adjustment is smaller than 0.09s
-            let difference = abs(newValue - progress)
-            let timeDifference = duration.toTimeInterval() * difference
-            guard timeDifference > 9 / 100 else { return }
-
-            player.seek(position: max(0, min(1, newValue)))
-            updateNowPlayingInfo()
-        }
+//
+//        set {
+//            // Debounce and cancel if adjustment is smaller than 0.09s
+//            let difference = abs(newValue - progress)
+//            let timeDifference = duration.toTimeInterval() * difference
+//            guard timeDifference > 9 / 100 else { return }
+//
+//            player.seek(position: max(0, min(1, newValue)))
+//            updateNowPlayingInfo()
+//        }
     }
 
     private var mutedVolume: CGFloat = .zero
@@ -199,6 +208,14 @@ enum PlaybackMode: String, CaseIterable, Identifiable {
         super.init()
         player.delegate = self
         setupRemoteTransportControls()
+        timerPublisher
+            .receive(on: DispatchQueue.main)
+            .sink { _ in
+                if let time = self.player.time {
+                    self.playbackTimeSubject.send(time)
+                }
+            }
+            .store(in: &cancellables)
         //        updateDeviceMenu()
     }
 
@@ -258,6 +275,11 @@ enum PlaybackMode: String, CaseIterable, Identifiable {
             }
         }
     }
+
+    func seek(position: Double) {
+        player.seek(position: position)
+    }
+    
 
     func removeFromPlaylist(items: [PlaylistItem]) {
         removeFromPlaylist(urls: items.map(\.url))
@@ -425,7 +447,7 @@ extension PlayerModel {
             -multiplier
         }
         let progress = progress + delta * adjustedMultiplier
-        self.progress = progress
+//        self.progress = progress
 
         return progress >= 0 && progress <= 1
     }
@@ -539,13 +561,13 @@ extension PlayerModel {
         }
 
         // Seek
-        commandCenter.changePlaybackPositionCommand.addTarget { [unowned self] event in
-            guard hasCurrentTrack else { return .noActionableNowPlayingItem }
-            guard let event = event as? MPChangePlaybackPositionCommandEvent else { return .commandFailed }
-
-            progress = event.positionTime / duration.toTimeInterval()
-            return .success
-        }
+//        commandCenter.changePlaybackPositionCommand.addTarget { [unowned self] event in
+//            guard hasCurrentTrack else { return .noActionableNowPlayingItem }
+//            guard let event = event as? MPChangePlaybackPositionCommandEvent else { return .commandFailed }
+//
+//            progress = event.positionTime / duration.toTimeInterval()
+//            return .success
+//        }
 
         // Next track
         commandCenter.nextTrackCommand.addTarget { [unowned self] _ in

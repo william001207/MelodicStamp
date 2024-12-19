@@ -85,9 +85,9 @@ struct MainView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .ignoresSafeArea()
         .morphed()
-//        .background {
-//            VisualEffectView(material: .sidebar, blendingMode: .behindWindow)
-//        }
+        .background {
+            VisualEffectView(material: .headerView, blendingMode: .behindWindow)
+        }
         .ignoresSafeArea()
     }
 
