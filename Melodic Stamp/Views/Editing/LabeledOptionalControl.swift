@@ -11,7 +11,7 @@ import SwiftUI
 struct LabeledOptionalControl<V, Label, Content, ContentB>: View
     where V: Hashable & Equatable, Label: View, Content: View, ContentB: View {
     typealias Entries = MetadataBatchEditingEntries<V?>
-    
+
     @Environment(\.undoManager) private var undoManager
     @Environment(\.luminareAnimationFast) private var animationFast
     @Environment(\.luminareMinHeight) private var minHeight
@@ -94,15 +94,15 @@ struct LabeledOptionalControl<V, Label, Content, ContentB>: View
             registerUndo(oldValue, for: entries)
         }
     }
-    
+
     private var hasValue: Bool {
         entries.projectedUnwrappedValue() != nil
     }
-    
+
     private func registerUndo(_ oldValue: V?, for entries: Entries) {
         let value = entries.projectedUnwrappedValue()?.wrappedValue
         guard oldValue != value else { return }
-        
+
         switch undoTargetCheckpoint {
         case .invalid:
             break
@@ -110,16 +110,16 @@ struct LabeledOptionalControl<V, Label, Content, ContentB>: View
             guard oldValue != value else { return }
         }
         undoTargetCheckpoint.set(oldValue)
-        
+
         undoManager?.registerUndo(withTarget: entries) { entries in
             let fallback = entries.projectedUnwrappedValue()?.wrappedValue
             entries.setAll(oldValue)
-            
+
             registerUndo(fallback, for: entries)
         }
     }
-    
-    private func withUndo(for entries: Entries, _ body: @escaping () -> Void) {
+
+    private func withUndo(for entries: Entries, _ body: @escaping () -> ()) {
         let fallback = entries.projectedUnwrappedValue()?.wrappedValue
         body()
         registerUndo(fallback, for: entries)

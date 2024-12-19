@@ -11,11 +11,11 @@ import SwiftUI
 struct AdaptableMusicCoverControl: View {
     typealias Entries = MetadataBatchEditingEntries<Set<AttachedPicture>>
 
+    @Environment(AttachedPicturesHandlerModel.self) var attachedPicturesHandler
+
     @Environment(\.undoManager) private var undoManager
 
     @Namespace private var namespace
-
-    @Bindable var attachedPicturesHandler: AttachedPicturesHandlerModel
 
     var entries: Entries
     var type: AttachedPicture.`Type`

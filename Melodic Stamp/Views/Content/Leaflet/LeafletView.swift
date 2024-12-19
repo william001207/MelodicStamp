@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct LeafletView: View {
-    @Bindable var player: PlayerModel
+    @Environment(PlayerModel.self) var player
 
     var body: some View {
         if let current = player.current {

@@ -5,21 +5,21 @@
 //  Created by KrLite on 2024/12/18.
 //
 
-import SwiftUI
 import Luminare
+import SwiftUI
 import SwiftUIIntrospect
 
 struct LabeledTextEditor<Label>: View where Label: View {
     typealias Entries = MetadataBatchEditingEntries<String?>
-    
+
     @Environment(\.luminareAnimationFast) private var animationFast
-    
+
     private var entries: Entries
     @ViewBuilder private var label: () -> Label
-    
+
     @State private var isEditorHovering: Bool = false
     @State private var isPresented: Bool = false
-    
+
     init(
         entries: Entries,
         @ViewBuilder label: @escaping () -> Label
@@ -27,7 +27,7 @@ struct LabeledTextEditor<Label>: View where Label: View {
         self.entries = entries
         self.label = label
     }
-    
+
     init(
         _ key: LocalizedStringKey,
         entries: Entries
@@ -36,7 +36,7 @@ struct LabeledTextEditor<Label>: View where Label: View {
             Text(key)
         }
     }
-    
+
     var body: some View {
         HStack {
             let isModified = entries.isModified
@@ -45,16 +45,16 @@ struct LabeledTextEditor<Label>: View where Label: View {
             } set: { newValue in
                 entries.setAll(newValue)
             }
-            
+
             label()
-            
+
             Spacer()
-            
+
             if !isEmpty {
                 Text("\(binding.wrappedValue.count) words")
                     .foregroundStyle(.placeholder)
             }
-            
+
             AliveButton {
                 isPresented.toggle()
             } label: {
@@ -69,7 +69,7 @@ struct LabeledTextEditor<Label>: View where Label: View {
                         .frame(width: 300, height: 450)
                         .luminareBordered(false)
                         .luminareHasBackground(false)
-                    
+
                     if isEditorHovering {
                         HStack(spacing: 2) {
                             AliveButton {
@@ -78,7 +78,7 @@ struct LabeledTextEditor<Label>: View where Label: View {
                                 Image(systemSymbol: .arrowUturnLeft)
                             }
                             .disabled(!entries.isModified)
-                            
+
                             AliveButton {
                                 entries.setAll("")
                             } label: {
@@ -108,7 +108,7 @@ struct LabeledTextEditor<Label>: View where Label: View {
         .modifier(LuminareHoverable())
         .luminareAspectRatio(contentMode: .fill)
     }
-    
+
     private var isEmpty: Bool {
         if let value = entries.projectedUnwrappedValue()?.wrappedValue {
             value.isEmpty

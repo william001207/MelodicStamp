@@ -33,19 +33,17 @@ private extension View {
 }
 
 struct MainView: View {
-    @Environment(\.appearsActive) private var isActive
+    @Environment(FileManagerModel.self) var fileManager
+    @Environment(PlayerModel.self) var player
+    @Environment(MetadataEditorModel.self) var metadataEditor
 
-    @Bindable var fileManager: FileManagerModel
-    @Bindable var player: PlayerModel
-    @Bindable var metadataEditor: MetadataEditorModel
+    @Environment(\.appearsActive) private var isActive
 
     var namespace: Namespace.ID
 
     @Binding var isInspectorPresented: Bool
     @Binding var selectedContentTab: SidebarContentTab
     @Binding var selectedInspectorTab: SidebarInspectorTab
-
-    @State private var lyrics: LyricsModel = .init()
 
     var body: some View {
         content()
@@ -64,7 +62,7 @@ struct MainView: View {
             }
             .toolbar {
                 ToolbarItemGroup(placement: .navigation) {
-                    FileToolbar(player: player, fileManager: fileManager)
+                    FileToolbar()
                 }
 
                 #if DEBUG
@@ -79,9 +77,9 @@ struct MainView: View {
         Group {
             switch selectedContentTab {
             case .playlist:
-                PlaylistView(player: player, metadataEditor: metadataEditor, namespace: namespace)
+                PlaylistView(namespace: namespace)
             case .leaflet:
-                LeafletView(player: player)
+                LeafletView()
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -97,29 +95,26 @@ struct MainView: View {
         Group {
             switch selectedInspectorTab {
             case .commonMetadata:
-                CommonMetadataView(metadataEditor: metadataEditor)
+                CommonMetadataView()
                     .toolbar {
                         if isInspectorPresented {
-                            EditorToolbar(metadataEditor: metadataEditor)
+                            EditorToolbar()
                         }
                     }
             case .advancedMetadata:
-                AdvancedMetadataView(metadataEditor: metadataEditor)
+                AdvancedMetadataView()
                     .toolbar {
                         if isInspectorPresented {
-                            EditorToolbar(metadataEditor: metadataEditor)
+                            EditorToolbar()
                         }
                     }
             case .lyrics:
-                LyricsView(
-                    player: player, metadataEditor: metadataEditor,
-                    lyrics: lyrics
-                )
-                .toolbar {
+                LyricsView()
+                    .toolbar {
 //                    if isInspectorPresented {
 //                        LyricsToolbar(lyricsType: $lyrics.type)
 //                    }
-                }
+                    }
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)

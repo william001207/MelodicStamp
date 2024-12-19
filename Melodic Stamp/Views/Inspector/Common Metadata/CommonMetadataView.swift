@@ -10,17 +10,15 @@ import Luminare
 import SwiftUI
 
 struct CommonMetadataView: View {
+    @Environment(MetadataEditorModel.self) var metadataEditor
+
     @Environment(\.undoManager) private var undoManager
     @Environment(\.luminareMinHeight) private var minHeight
 
-    @Bindable var metadataEditor: MetadataEditorModel
-
-    @State private var attachedPicturesHandler: AttachedPicturesHandlerModel =
-        .init()
+    @State private var attachedPicturesHandler: AttachedPicturesHandlerModel = .init()
 
     @State private var isCoverPickerPresented: Bool = false
-    @State private var chosenAttachedPictureType: AttachedPicture.`Type` =
-        .frontCover
+    @State private var chosenAttachedPictureType: AttachedPicture.`Type` = .frontCover
 
     var body: some View {
         if metadataEditor.isVisible {
@@ -30,8 +28,6 @@ struct CommonMetadataView: View {
                         attachedPicturesEditor()
 
                         AdaptableMusicCovers(
-                            attachedPicturesHandler:
-                            attachedPicturesHandler,
                             entries: metadataEditor[
                                 extracting: \.attachedPictures
                             ]
@@ -42,6 +38,7 @@ struct CommonMetadataView: View {
                             Divider()
                                 .padding(.horizontal, 16)
                         }
+                        .environment(attachedPicturesHandler)
                         .padding(.horizontal, -16)
                         .contentMargins(
                             .horizontal, 16, for: .scrollIndicators

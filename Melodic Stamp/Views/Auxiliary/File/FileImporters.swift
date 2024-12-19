@@ -8,10 +8,12 @@
 import SwiftUI
 
 struct FileImporters: View {
-    @Bindable var fileManager: FileManagerModel
-    @Bindable var player: PlayerModel
+    @Environment(FileManagerModel.self) var fileManager
+    @Environment(PlayerModel.self) var player
 
     var body: some View {
+        @Bindable var fileManager = fileManager
+
         Color.clear
             .fileImporter(
                 isPresented: $fileManager.isFileOpenerPresented,

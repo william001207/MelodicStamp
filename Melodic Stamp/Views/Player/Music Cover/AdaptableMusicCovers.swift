@@ -16,7 +16,7 @@ struct AdaptableMusicCovers<Content>: View where Content: View {
         case list
     }
 
-    @Bindable var attachedPicturesHandler: AttachedPicturesHandlerModel
+    @Environment(AttachedPicturesHandlerModel.self) var attachedPicturesHandler
 
     var layout: Layout = .flow
     var contentWidth: CGFloat = 300, contentHeight: CGFloat = 200
@@ -51,7 +51,6 @@ struct AdaptableMusicCovers<Content>: View where Content: View {
             LazyHStack(alignment: .center, spacing: 0) {
                 ForEach(Array(types).sorted(by: <), id: \.self) { type in
                     AdaptableMusicCoverControl(
-                        attachedPicturesHandler: attachedPicturesHandler,
                         entries: entries,
                         type: type,
                         maxResolution: contentHeight

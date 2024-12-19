@@ -15,16 +15,17 @@ struct ContentView: View {
 
     @Namespace private var namespace
 
-    @State private var isInspectorPresented: Bool = false
-    @State private var selectedContentTab: SidebarContentTab = .playlist
-    @State private var selectedInspectorTab: SidebarInspectorTab = .commonMetadata
-
     @State private var floatingWindows: FloatingWindowsModel = .init()
     @State private var windowManager: WindowManagerModel = .init()
     @State private var fileManager: FileManagerModel = .init()
     @State private var player: PlayerModel = .init()
     @State private var playerKeyboardControl: PlayerKeyboardControlModel = .init()
     @State private var metadataEditor: MetadataEditorModel = .init()
+    @State private var lyrics: LyricsModel = .init()
+
+    @State private var isInspectorPresented: Bool = false
+    @State private var selectedContentTab: SidebarContentTab = .playlist
+    @State private var selectedInspectorTab: SidebarInspectorTab = .commonMetadata
 
     @State private var minWidth: CGFloat?
     @State private var maxWidth: CGFloat?
@@ -34,9 +35,6 @@ struct ContentView: View {
             switch windowManager.style {
             case .main:
                 MainView(
-                    fileManager: fileManager,
-                    player: player,
-                    metadataEditor: metadataEditor,
                     namespace: namespace,
                     isInspectorPresented: $isInspectorPresented,
                     selectedContentTab: $selectedContentTab,
@@ -57,32 +55,27 @@ struct ContentView: View {
                     }
                 }
             case .miniPlayer:
-                MiniPlayer(
-                    windowManager: windowManager,
-                    player: player,
-                    playerKeyboardControl: playerKeyboardControl,
-                    namespace: namespace
-                )
-                .padding(8)
-                .background {
-                    VisualEffectView(
-                        material: .hudWindow, blendingMode: .behindWindow
-                    )
-                }
-                .padding(.bottom, -32)
-                .ignoresSafeArea()
-                .frame(minWidth: 500, idealWidth: 500)
-                .fixedSize(horizontal: false, vertical: true)
-                .onChange(of: isActive, initial: true) { _, _ in
-                    DispatchQueue.main.async {
-                        NSApp.mainWindow?.titlebarAppearsTransparent = true
-                        NSApp.mainWindow?.titleVisibility = .hidden
+                MiniPlayer(namespace: namespace)
+                    .padding(8)
+                    .background {
+                        VisualEffectView(
+                            material: .hudWindow, blendingMode: .behindWindow
+                        )
                     }
-                }
+                    .padding(.bottom, -32)
+                    .ignoresSafeArea()
+                    .frame(minWidth: 500, idealWidth: 500)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .onChange(of: isActive, initial: true) { _, _ in
+                        DispatchQueue.main.async {
+                            NSApp.mainWindow?.titlebarAppearsTransparent = true
+                            NSApp.mainWindow?.titleVisibility = .hidden
+                        }
+                    }
             }
         }
         .background {
-            FileImporters(fileManager: fileManager, player: player)
+            FileImporters()
                 .allowsHitTesting(false)
         }
 //        .navigationTitle(title)
@@ -127,15 +120,26 @@ struct ContentView: View {
             }
         }
         .frame(minWidth: minWidth, maxWidth: maxWidth)
+        // Environments
+        .environment(floatingWindows)
+        .environment(windowManager)
+        .environment(fileManager)
+        .environment(player)
+        .environment(playerKeyboardControl)
+        .environment(metadataEditor)
+        .environment(lyrics)
+        // Focus management
         .focusable()
         .focusEffectDisabled()
         .prefersDefaultFocus(in: namespace)
         .focused($isFocused)
+        // Focused values
         .focusedValue(\.windowManager, windowManager)
         .focusedValue(\.fileManager, fileManager)
         .focusedValue(\.player, player)
         .focusedValue(\.playerKeyboardControl, playerKeyboardControl)
         .focusedValue(\.metadataEditor, metadataEditor)
+        // Environments
     }
 
 //    private var title: Text {
@@ -154,19 +158,18 @@ struct ContentView: View {
     private func initializeFloatingWindows() {
         floatingWindows.addTabBar {
             FloatingTabBarView(
-                floatingWindows: floatingWindows,
                 isInspectorPresented: $isInspectorPresented,
                 selectedContentTab: $selectedContentTab,
                 selectedInspectorTab: $selectedInspectorTab
             )
+            .environment(floatingWindows)
         }
         floatingWindows.addPlayer {
-            FloatingPlayerView(
-                floatingWindows: floatingWindows,
-                windowManager: windowManager,
-                player: player,
-                playerKeyboardControl: playerKeyboardControl
-            )
+            FloatingPlayerView()
+                .environment(floatingWindows)
+                .environment(windowManager)
+                .environment(player)
+                .environment(playerKeyboardControl)
         }
     }
 

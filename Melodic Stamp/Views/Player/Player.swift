@@ -9,9 +9,9 @@ import SFSafeSymbols
 import SwiftUI
 
 struct Player: View {
-    @Bindable var windowManager: WindowManagerModel
-    @Bindable var player: PlayerModel
-    @Bindable var playerKeyboardControl: PlayerKeyboardControlModel
+    @Environment(WindowManagerModel.self) var windowManager
+    @Environment(PlayerModel.self) var player
+    @Environment(PlayerKeyboardControlModel.self) var playerKeyboardControl
 
     var namespace: Namespace.ID
 
@@ -165,6 +165,8 @@ struct Player: View {
     }
 
     @ViewBuilder private func trailingControls() -> some View {
+        @Bindable var player = player
+
         ProgressBar(
             value: $player.volume,
             isActive: $isVolumeBarActive,
@@ -199,6 +201,8 @@ struct Player: View {
     }
 
     @ViewBuilder private func progressBar() -> some View {
+        @Bindable var player = player
+
         let time: TimeInterval =
             if isProgressBarActive {
                 // Use adjustment time

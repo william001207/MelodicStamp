@@ -9,7 +9,7 @@ import Luminare
 import SwiftUI
 
 struct AdvancedMetadataView: View {
-    @Bindable var metadataEditor: MetadataEditorModel
+    @Environment(MetadataEditorModel.self) var metadataEditor
 
     @State private var ratingDecreasedAnimation: Bool = false
     @State private var ratingIncreasedAnimation: Bool = false
@@ -43,7 +43,7 @@ struct AdvancedMetadataView: View {
                     LabeledSection("Music Brainz") {
                         musicBrainzEditor()
                     }
-                    
+
                     LabeledSection("Miscellaneous") {
                         commentEditor()
                     }
@@ -202,7 +202,7 @@ struct AdvancedMetadataView: View {
             format: .uuid
         )
     }
-    
+
     @ViewBuilder private func commentEditor() -> some View {
         LabeledTextEditor(
             "Comment",

@@ -11,15 +11,17 @@ import SFSafeSymbols
 import SwiftUI
 
 struct PlaylistView: View {
+    @Environment(PlayerModel.self) var player
+    @Environment(MetadataEditorModel.self) var metadataEditor
+
     @Environment(\.resetFocus) private var resetFocus
     @Environment(\.luminareMinHeight) private var minHeight
-
-    @Bindable var player: PlayerModel
-    @Bindable var metadataEditor: MetadataEditorModel
 
     var namespace: Namespace.ID
 
     var body: some View {
+        @Bindable var metadataEditor = metadataEditor
+
         ZStack(alignment: .topLeading) {
             if player.isPlaylistEmpty {
                 PlaylistExcerpt()
@@ -162,7 +164,6 @@ struct PlaylistView: View {
 
     @ViewBuilder private func itemView(for item: PlaylistItem) -> some View {
         PlaylistItemView(
-            player: player,
             item: item,
             isSelected: metadataEditor.items.contains(item)
         )

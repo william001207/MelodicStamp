@@ -9,7 +9,7 @@ import SFSafeSymbols
 import SwiftUI
 
 struct EditorToolbar: View {
-    @Bindable var metadataEditor: MetadataEditorModel
+    @Environment(MetadataEditorModel.self) var metadataEditor
 
     var body: some View {
         Button {

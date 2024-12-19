@@ -9,9 +9,9 @@ import Luminare
 import SwiftUI
 
 struct FloatingTabBarView: View {
-    @Environment(\.luminareAnimationFast) private var animationFast
+    @Environment(FloatingWindowsModel.self) var floatingWindows
 
-    @Bindable var floatingWindows: FloatingWindowsModel
+    @Environment(\.luminareAnimationFast) private var animationFast
 
     @State private var isHovering: Bool = true
     @State private var hoveringTabs: Set<AnyHashable> = []

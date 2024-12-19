@@ -8,18 +8,18 @@
 import SwiftUI
 
 struct FloatingPlayerView: View {
-    @Namespace private var namespace
+    @Environment(FloatingWindowsModel.self) var floatingWindows
+    @Environment(WindowManagerModel.self) var windowManager
+    @Environment(PlayerModel.self) var player
+    @Environment(PlayerKeyboardControlModel.self) var playerKeyboardControl
 
-    @Bindable var floatingWindows: FloatingWindowsModel
-    @Bindable var windowManager: WindowManagerModel
-    @Bindable var player: PlayerModel
-    @Bindable var playerKeyboardControl: PlayerKeyboardControlModel
+    @Namespace private var namespace
 
     var body: some View {
         ZStack {
             VisualEffectView(material: .popover, blendingMode: .behindWindow)
 
-            Player(windowManager: windowManager, player: player, playerKeyboardControl: playerKeyboardControl, namespace: namespace)
+            Player(namespace: namespace)
         }
         .frame(width: 800, height: 100)
         .clipShape(.rect(cornerRadius: 25))

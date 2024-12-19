@@ -16,7 +16,7 @@ struct LabeledTextField<F, Label>: View where F: ParseableFormatStyle, F.FormatO
     @Environment(\.luminareAnimationFast) private var animationFast
     @Environment(\.luminareMinHeight) private var minHeight
     @Environment(\.luminareCompactButtonCornerRadii) private var cornerRadii
-    
+
     @FocusState private var isFocused: Bool
 
     private var entries: Entries

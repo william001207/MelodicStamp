@@ -8,9 +8,9 @@
 import SwiftUI
 
 struct LyricsView: View {
-    @Bindable var player: PlayerModel
-    @Bindable var metadataEditor: MetadataEditorModel
-    @Bindable var lyrics: LyricsModel
+    @Environment(PlayerModel.self) var player
+    @Environment(MetadataEditorModel.self) var metadataEditor
+    @Environment(LyricsModel.self) var lyrics
 
     var body: some View {
         Group {

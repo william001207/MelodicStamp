@@ -28,9 +28,9 @@ struct MiniPlayer: View {
 
     @FocusState private var isFocused: Bool
 
-    @Bindable var windowManager: WindowManagerModel
-    @Bindable var player: PlayerModel
-    @Bindable var playerKeyboardControl: PlayerKeyboardControlModel
+    @Environment(WindowManagerModel.self) var windowManager
+    @Environment(PlayerModel.self) var player
+    @Environment(PlayerKeyboardControlModel.self) var playerKeyboardControl
 
     var namespace: Namespace.ID
 
@@ -316,6 +316,8 @@ struct MiniPlayer: View {
     }
 
     @ViewBuilder private func progressBar() -> some View {
+        @Bindable var player = player
+
         HStack(alignment: .center, spacing: 8) {
             Group {
                 if activeControl == .progress {
@@ -357,7 +359,8 @@ struct MiniPlayer: View {
                     switch activeControl {
                     case .progress:
                         player.hasCurrentTrack ? $player.progress : .constant(0)
-                    case .volume: $player.volume
+                    case .volume:
+                        $player.volume
                     }
 
                 ProgressBar(
@@ -423,5 +426,5 @@ struct MiniPlayer: View {
 #Preview {
     @Previewable @Namespace var namespace
 
-    MiniPlayer(windowManager: .init(), player: .init(), playerKeyboardControl: .init(), namespace: namespace)
+    MiniPlayer(namespace: namespace)
 }
