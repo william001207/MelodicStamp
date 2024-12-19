@@ -285,7 +285,7 @@ struct MiniPlayer: View {
         }
 
         if activeControl == .volume || !isProgressBarExpanded {
-            AliveButton {
+            AliveButton(enabledStyle: .init(.secondary)) {
                 switch activeControl {
                 case .progress:
                     activeControl = .volume
@@ -306,7 +306,7 @@ struct MiniPlayer: View {
                 id: PlayerNamespace.volumeButton, in: namespace
             )
 
-            AliveButton {} label: {
+            AliveButton(enabledStyle: .init(.secondary)) {} label: {
                 Image(systemSymbol: .listTriangle)
             }
             .matchedGeometryEffect(

@@ -111,7 +111,7 @@ struct Player: View {
 
     @ViewBuilder private func leadingControls() -> some View {
         Group {
-            AliveButton(enabledStyle: .init(.secondary)) {
+            AliveButton {
                 player.previousTrack()
                 playerKeyboardControl.previousSongButtonBounceAnimation.toggle()
             } label: {
@@ -145,7 +145,7 @@ struct Player: View {
                 id: PlayerNamespace.playPauseButton, in: namespace
             )
 
-            AliveButton(enabledStyle: .init(.secondary)) {
+            AliveButton {
                 player.nextTrack()
                 playerKeyboardControl.nextSongButtonBounceAnimation.toggle()
             } label: {
@@ -186,7 +186,7 @@ struct Player: View {
         .animation(.default.speed(2), value: player.isMuted)
         .matchedGeometryEffect(id: PlayerNamespace.volumeBar, in: namespace)
 
-        AliveButton {
+        AliveButton(enabledStyle: .init(.secondary)) {
             player.isMuted.toggle()
         } label: {
             player.speakerImage
