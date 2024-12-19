@@ -44,10 +44,10 @@ struct MiniPlayer: View {
     @State private var adjustmentPercentage: CGFloat = .zero
     @State private var shouldUseRemainingDuration: Bool = true
     
-    @State var progress: CGFloat = .zero
-    @State var duration: Duration = .zero
-    @State var timeElapsed: TimeInterval = .zero
-    @State var timeRemaining: TimeInterval = .zero
+    @State var progress: Double?
+    @State var duration: Duration?
+    @State var timeElapsed: TimeInterval?
+    @State var timeRemaining: TimeInterval?
 
     var body: some View {
         VStack(spacing: 12) {
@@ -84,10 +84,17 @@ struct MiniPlayer: View {
         
         // Receive playback time update
         .onReceive(player.playbackTime) { playbackTime in
-            progress = playbackTime.progress ?? .zero
-            timeElapsed = playbackTime.current ?? .zero
-            timeRemaining = playbackTime.remaining ?? .zero
-            duration = playbackTime.total.map { .seconds($0) } ?? .zero
+            progress = playbackTime.progress
+            timeElapsed = playbackTime.current
+            timeRemaining = playbackTime.remaining
+            duration = playbackTime.total.map { .seconds($0) }
+        }
+        .onChange(of: player.currentIndex, initial: true) { _, newValue in
+            guard newValue == nil else { return }
+            progress = nil
+            timeElapsed = nil
+            timeRemaining = nil
+            duration = nil
         }
 
         // Regain progress control on new track
@@ -330,27 +337,28 @@ struct MiniPlayer: View {
         HStack(alignment: .center, spacing: 8) {
             Group {
                 if activeControl == .progress {
-                    let time: TimeInterval =
-                        if isProgressBarActive {
-                            // Use adjustment time
-                            if shouldUseRemainingDuration {
-                                duration.toTimeInterval()
-                                    * (1 - adjustmentPercentage)
-                            } else {
-                                duration.toTimeInterval()
-                                    * adjustmentPercentage
+                    let time: TimeInterval? = if isProgressBarActive {
+                        // Use adjustment time
+                        if shouldUseRemainingDuration {
+                            duration.map {
+                                $0.toTimeInterval() * (1 - adjustmentPercentage)
                             }
                         } else {
-                            // Use track time
-                            if shouldUseRemainingDuration {
-                                timeRemaining
-                            } else {
-                                timeElapsed
+                            duration.map {
+                                $0.toTimeInterval() * adjustmentPercentage
                             }
                         }
+                    } else {
+                        // Use track time
+                        if shouldUseRemainingDuration {
+                            timeRemaining
+                        } else {
+                            timeElapsed
+                        }
+                    }
 
                     DurationText(
-                        duration: .seconds(time),
+                        duration: time.map(Duration.seconds(_:)),
                         sign: shouldUseRemainingDuration ? .minus : .plus
                     )
                     .frame(width: 40)
@@ -433,7 +441,7 @@ struct MiniPlayer: View {
     
     private var progressBinding: Binding<CGFloat> {
         Binding {
-            progress
+            progress ?? .zero
         } set: { newValue in
             player.progress = newValue
         }

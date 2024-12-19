@@ -14,7 +14,7 @@ struct DurationText: View {
     var body: some View {
         Text(formattedSign + (formattedDuration ?? "--:--"))
 //            .contentTransition(.numericText())
-//            .animation(.bouncy, value: duration)
+            .animation(.bouncy, value: duration)
     }
 
     private var formattedSign: String {
