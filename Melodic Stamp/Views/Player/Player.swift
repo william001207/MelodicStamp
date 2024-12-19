@@ -31,49 +31,37 @@ struct Player: View {
     var body: some View {
         VStack(alignment: .center, spacing: 12) {
             header()
-
-//            TimelineView(.animation) { _ in
-                HStack(alignment: .center, spacing: 24) {
-                    HStack(alignment: .center, spacing: 12) {
-                        leadingControls()
-                    }
-
-                    Divider()
-
-                    HStack(alignment: .center, spacing: 12) {
-                        progressBar()
-                    }
-
-                    Divider()
-
-                    HStack(alignment: .center, spacing: 24) {
-                        trailingControls()
-                    }
+            
+            HStack(alignment: .center, spacing: 24) {
+                HStack(alignment: .center, spacing: 12) {
+                    leadingControls()
                 }
-                .frame(height: 32)
-                .animation(.default, value: isProgressBarActive)
-//            }
+                
+                Divider()
+                
+                HStack(alignment: .center, spacing: 12) {
+                    progressBar()
+                }
+                
+                Divider()
+                
+                HStack(alignment: .center, spacing: 24) {
+                    trailingControls()
+                }
+            }
+            .frame(height: 32)
+            .animation(.default, value: isProgressBarActive)
         }
         .padding(.horizontal, 32)
         .padding(.vertical, 24)
         .frame(maxWidth: .infinity)
+        
+        // Receive playback time update
         .onReceive(player.playbackTime) { playbackTime in
-            
-            if let progress = playbackTime.progress {
-                self.progress = progress
-            }
-            
-            if let current = playbackTime.current {
-                self.timeElapsed = current
-            }
-            
-            if let remaining = playbackTime.remaining {
-                self.timeRemaining = -remaining
-            }
-            
-            if let current = playbackTime.current, let remaining = playbackTime.remaining {
-                duration =  {playbackTime.total.map { .seconds($0) } ?? .zero }()
-            }
+            progress = playbackTime.progress ?? .zero
+            timeElapsed = playbackTime.current ?? .zero
+            timeRemaining = playbackTime.remaining ?? .zero
+            duration = playbackTime.total.map { .seconds($0) } ?? .zero
         }
     }
 
@@ -109,7 +97,7 @@ struct Player: View {
                     MusicTitle(item: player.current)
                 }
 //                .contentTransition(.numericText())
-//                .animation(.default, value: player.currentIndex)
+                .animation(.default, value: player.currentIndex)
                 .matchedGeometryEffect(id: PlayerNamespace.title, in: namespace)
             }
             .padding(.bottom, 2)
@@ -188,10 +176,8 @@ struct Player: View {
     }
 
     @ViewBuilder private func trailingControls() -> some View {
-        @Bindable var player = player
-
         ProgressBar(
-            value: $player.volume,
+            value: volumeBinding,
             isActive: $isVolumeBarActive,
             externalOvershootSign: playerKeyboardControl.volumeBarExternalOvershootSign,
             onOvershootOffsetChange: { oldValue, newValue in
@@ -224,8 +210,6 @@ struct Player: View {
     }
 
     @ViewBuilder private func progressBar() -> some View {
-        @Bindable var player = player
-
         let time: TimeInterval =
             if isProgressBarActive {
                 // Use adjustment time
@@ -233,7 +217,7 @@ struct Player: View {
                     duration.toTimeInterval()
                         * (1 - adjustmentPercentage)
                 } else {
-                    player.duration.toTimeInterval() * adjustmentPercentage
+                    duration.toTimeInterval() * adjustmentPercentage
                 }
             } else {
                 // Use track time
@@ -256,13 +240,7 @@ struct Player: View {
         .matchedGeometryEffect(id: PlayerNamespace.timeText, in: namespace)
 
         ProgressBar(
-            value:  Binding(
-                get: { self.progress }, // Get the current progress
-                set: { newValue in
-                    // Use seek to update the progress within valid bounds
-                    player.seek(position: max(0, min(1, newValue)))
-                }
-            ),
+            value: progressBinding,
             isActive: $isProgressBarActive,
             isDelegated: true,
             externalOvershootSign: playerKeyboardControl
@@ -276,34 +254,28 @@ struct Player: View {
         .frame(height: 12)
         .matchedGeometryEffect(id: PlayerNamespace.progressBar, in: namespace)
         .padding(.horizontal, isProgressBarActive ? 0 : 12)
-        
-//        Slider(
-//            value: Binding(
-//                get: { self.progress }, // Get the current progress
-//                set: { newValue in
-//                    // Use seek to update the progress within valid bounds
-//                    player.seek(position: max(0, min(1, newValue)))
-//                }
-//            ),
-//            in: 0...1, // Adjust the range based on your progress scale
-//            onEditingChanged: { isEditing in
-//                isProgressBarActive = isEditing
-//            }
-//        )
-//        .foregroundColor(isProgressBarActive ? .primary : .secondary)
-//        .background(Color.gray) // Replace with your preferred background color
-//        .frame(height: 12)
-//        .matchedGeometryEffect(id: PlayerNamespace.progressBar, in: namespace)
-//        .padding(.horizontal, isProgressBarActive ? 0 : 12)
-//        .onChange(of: player.progress) { _, newValue in
-//            adjustmentPercentage = newValue
-//        }
 
-        DurationText(duration: player.duration)
+        DurationText(duration: duration)
             .frame(width: 40)
             .foregroundStyle(.secondary)
             .matchedGeometryEffect(
                 id: PlayerNamespace.durationText, in: namespace
             )
+    }
+    
+    private var progressBinding: Binding<CGFloat> {
+        Binding {
+            progress
+        } set: { newValue in
+            player.progress = newValue
+        }
+    }
+    
+    private var volumeBinding: Binding<CGFloat> {
+        Binding {
+            player.volume
+        } set: { newValue in
+            player.volume = newValue
+        }
     }
 }

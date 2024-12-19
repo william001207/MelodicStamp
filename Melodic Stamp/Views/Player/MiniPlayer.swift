@@ -58,23 +58,21 @@ struct MiniPlayer: View {
                         isTitleHovering = hover
                     }
                 }
-
-//            TimelineView(.animation) { _ in
-                HStack(alignment: .center, spacing: 12) {
-                    leadingControls()
-                        .transition(.blurReplace)
-
-                    progressBar()
-
-                    trailingControls()
-                        .transition(.blurReplace)
-                }
-                .frame(height: 16)
-                .animation(.default, value: isProgressBarHovering)
-                .animation(.default, value: isProgressBarActive)
-                .animation(.default, value: activeControl)
-                .animation(.default, value: headerControl)
-//            }
+            
+            HStack(alignment: .center, spacing: 12) {
+                leadingControls()
+                    .transition(.blurReplace)
+                
+                progressBar()
+                
+                trailingControls()
+                    .transition(.blurReplace)
+            }
+            .frame(height: 16)
+            .animation(.default, value: isProgressBarHovering)
+            .animation(.default, value: isProgressBarActive)
+            .animation(.default, value: activeControl)
+            .animation(.default, value: headerControl)
         }
         .padding(12)
         .focusable()
@@ -84,23 +82,12 @@ struct MiniPlayer: View {
             isFocused = true
         }
         
+        // Receive playback time update
         .onReceive(player.playbackTime) { playbackTime in
-            
-            if let progress = playbackTime.progress {
-                self.progress = progress
-            }
-            
-            if let current = playbackTime.current {
-                self.timeElapsed = current
-            }
-            
-            if let remaining = playbackTime.remaining {
-                self.timeRemaining = -remaining
-            }
-            
-            if let current = playbackTime.current, let remaining = playbackTime.remaining {
-                duration =  {playbackTime.total.map { .seconds($0) } ?? .zero }()
-            }
+            progress = playbackTime.progress ?? .zero
+            timeElapsed = playbackTime.current ?? .zero
+            timeRemaining = playbackTime.remaining ?? .zero
+            duration = playbackTime.total.map { .seconds($0) } ?? .zero
         }
 
         // Regain progress control on new track
@@ -212,7 +199,7 @@ struct MiniPlayer: View {
                     }
                 }
 //                .contentTransition(.numericText())
-//                .animation(.default, value: player.currentIndex)
+                .animation(.default, value: player.currentIndex)
                 .matchedGeometryEffect(id: PlayerNamespace.title, in: namespace)
                 .padding(.bottom, 2)
             }
@@ -340,8 +327,6 @@ struct MiniPlayer: View {
     }
 
     @ViewBuilder private func progressBar() -> some View {
-        @Bindable var player = player
-
         HStack(alignment: .center, spacing: 8) {
             Group {
                 if activeControl == .progress {
@@ -349,10 +334,10 @@ struct MiniPlayer: View {
                         if isProgressBarActive {
                             // Use adjustment time
                             if shouldUseRemainingDuration {
-                                player.duration.toTimeInterval()
+                                duration.toTimeInterval()
                                     * (1 - adjustmentPercentage)
                             } else {
-                                player.duration.toTimeInterval()
+                                duration.toTimeInterval()
                                     * adjustmentPercentage
                             }
                         } else {
@@ -382,13 +367,9 @@ struct MiniPlayer: View {
                 let value: Binding<CGFloat> =
                     switch activeControl {
                     case .progress:
-                        player.hasCurrentTrack ? Binding(
-                            get: { player.progress },
-                            set: { newValue in
-                                player.seek(position: max(0, min(1, newValue)))
-                            }) : .constant(0)
+                        player.hasCurrentTrack ? progressBinding : .constant(0)
                     case .volume:
-                        $player.volume
+                        volumeBinding
                     }
 
                 ProgressBar(
@@ -447,6 +428,22 @@ struct MiniPlayer: View {
             guard !hover else { return }
 
             isProgressBarHovering = false
+        }
+    }
+    
+    private var progressBinding: Binding<CGFloat> {
+        Binding {
+            progress
+        } set: { newValue in
+            player.progress = newValue
+        }
+    }
+    
+    private var volumeBinding: Binding<CGFloat> {
+        Binding {
+            player.volume
+        } set: { newValue in
+            player.volume = newValue
         }
     }
 }

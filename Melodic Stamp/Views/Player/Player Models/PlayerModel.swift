@@ -59,7 +59,7 @@ enum PlaybackMode: String, CaseIterable, Identifiable {
     private var selectedDevice: AudioDevice?
 
     private var cancellables = Set<AnyCancellable>()
-    private let timerPublisher = TimerPublisher(interval: 1.0)
+    private let publisher = TimerPublisher(interval: 0.25)
     private var playbackTimeSubject = PassthroughSubject<AudioPlayer.PlaybackTime, Never>()
 
     var playbackTime: AnyPublisher<AudioPlayer.PlaybackTime, Never> {
@@ -82,16 +82,16 @@ enum PlaybackMode: String, CaseIterable, Identifiable {
         get {
             player.time?.progress ?? .zero
         }
-//
-//        set {
-//            // Debounce and cancel if adjustment is smaller than 0.09s
-//            let difference = abs(newValue - progress)
-//            let timeDifference = duration.toTimeInterval() * difference
-//            guard timeDifference > 9 / 100 else { return }
-//
-//            player.seek(position: max(0, min(1, newValue)))
-//            updateNowPlayingInfo()
-//        }
+
+        set {
+            // Debounce and cancel if adjustment is smaller than 0.09s
+            let difference = abs(newValue - progress)
+            let timeDifference = duration.toTimeInterval() * difference
+            guard timeDifference > 9 / 100 else { return }
+
+            player.seek(position: max(0, min(1, newValue)))
+            updateNowPlayingInfo()
+        }
     }
 
     private var mutedVolume: CGFloat = .zero
@@ -208,7 +208,7 @@ enum PlaybackMode: String, CaseIterable, Identifiable {
         super.init()
         player.delegate = self
         setupRemoteTransportControls()
-        timerPublisher
+        publisher
             .receive(on: DispatchQueue.main)
             .sink { _ in
                 if let time = self.player.time {

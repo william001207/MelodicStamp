@@ -15,10 +15,14 @@ struct CommonMetadataView: View {
     @Environment(\.undoManager) private var undoManager
     @Environment(\.luminareMinHeight) private var minHeight
 
-    @State private var attachedPicturesHandler: AttachedPicturesHandlerModel = .init()
+    @State private var attachedPicturesHandler: AttachedPicturesHandlerModel =
+        .init()
 
     @State private var isCoverPickerPresented: Bool = false
-    @State private var chosenAttachedPictureType: AttachedPicture.`Type` = .frontCover
+    @State private var chosenAttachedPictureType: AttachedPicture.`Type` =
+        .frontCover
+
+    @State private var isBPMStepperPresented: Bool = false
 
     var body: some View {
         if metadataEditor.isVisible {
@@ -88,7 +92,8 @@ struct CommonMetadataView: View {
                         .subtracting(types)
 
                     Button(role: .destructive) {
-                        attachedPicturesHandler.remove(entries: entries, undoManager: undoManager)
+                        attachedPicturesHandler.remove(
+                            entries: entries, undoManager: undoManager)
                     } label: {
                         HStack {
                             Image(systemSymbol: .trashFill)
@@ -188,29 +193,39 @@ struct CommonMetadataView: View {
     }
 
     @ViewBuilder private func trackAndDiscEditor() -> some View {
-        LuminarePopover(arrowEdge: .top) {
-            if let binding = metadataEditor[extracting: \.bpm].projectedValue {
-                LuminareStepper(
-                    value: .init {
-                        CGFloat(binding.wrappedValue ?? .zero)
-                    } set: { _ in
-                        // do nothing
-                    },
-                    source: .infinite(),
-                    indicatorSpacing: 16,
-                    onRoundedValueChange: { _, newValue in
-                        binding.wrappedValue = Int(newValue)
-                    }
-                )
-            } else {
-                EmptyView()
-            }
-        } badge: {
+        HStack {
+            let isModified = metadataEditor[extracting: \.bpm].isModified
+
             LabeledTextField(
-                "BPM", entries: metadataEditor[extracting: \.bpm], format: .number
+                "BPM", entries: metadataEditor[extracting: \.bpm],
+                format: .number
             )
+
+            if let binding = metadataEditor[extracting: \.bpm].projectedValue {
+                AliveButton {
+                    isBPMStepperPresented.toggle()
+                } label: {
+                    Image(systemSymbol: .sliderHorizontal3)
+                        .foregroundStyle(.tint)
+                        .tint(isModified ? .accent : .secondary)
+                }
+                .popover(isPresented: $isBPMStepperPresented, arrowEdge: .top) {
+                    LuminareStepper(
+                        value: .init {
+                            CGFloat(binding.wrappedValue ?? .zero)
+                        } set: { _ in
+                            // do nothing
+                        },
+                        source: .infinite(),
+                        indicatorSpacing: 16,
+                        onRoundedValueChange: { _, newValue in
+                            binding.wrappedValue = Int(newValue)
+                        }
+                    )
+                    .frame(width: 225, height: 35)
+                }
+            }
         }
-        .luminarePopoverTrigger(.forceTouch)
 
         HStack {
             LabeledTextField(
