@@ -9,20 +9,17 @@ import AppKit
 import SwiftUI
 
 @Observable class FloatingWindowsModel {
-    private(set) var isTabBarAdded: Bool = false
-    private(set) var isPlayerAdded: Bool = false
-
-    private let tabBarIdentifier: UUID = .init()
-    private let playerIdentifier: UUID = .init()
-
     private var isInFullScreen: Bool = false
 
-    var tabBarWindow: NSWindow? {
-        NSApp.windows.first(where: { $0.title == tabBarIdentifier.uuidString })
+    var tabBarWindow: NSWindow?
+    var playerWindow: NSWindow?
+
+    var isTabBarAdded: Bool {
+        tabBarWindow != nil
     }
 
-    var playerWindow: NSWindow? {
-        NSApp.windows.first(where: { $0.title == playerIdentifier.uuidString })
+    var isPlayerAdded: Bool {
+        playerWindow != nil
     }
 
     func observeFullScreen() {
@@ -84,13 +81,12 @@ import SwiftUI
         floatingWindow.backgroundColor = .clear
         floatingWindow.level = .floating
         floatingWindow.collectionBehavior = [.fullScreenNone]
-        floatingWindow.title = tabBarIdentifier.uuidString
 
         floatingWindow.alphaValue = 0
         applicationWindow.addChildWindow(floatingWindow, ordered: .above)
 
         DispatchQueue.main.async {
-            self.isTabBarAdded = true
+            self.tabBarWindow = floatingWindow
             self.updateTabBarPosition(window: floatingWindow, in: applicationWindow)
             floatingWindow.animator().alphaValue = 1
         }
@@ -105,13 +101,12 @@ import SwiftUI
         floatingWindow.backgroundColor = .clear
         floatingWindow.level = .floating
         floatingWindow.collectionBehavior = [.fullScreenNone]
-        floatingWindow.title = playerIdentifier.uuidString
 
         floatingWindow.alphaValue = 0
         applicationWindow.addChildWindow(floatingWindow, ordered: .above)
 
         DispatchQueue.main.async {
-            self.isPlayerAdded = true
+            self.playerWindow = floatingWindow
             self.updatePlayerPosition(window: floatingWindow, in: applicationWindow)
             floatingWindow.animator().alphaValue = 1
         }
@@ -122,7 +117,7 @@ import SwiftUI
 
         applicationWindow.removeChildWindow(tabBarWindow)
         tabBarWindow.orderOut(nil)
-        isTabBarAdded = false
+        self.tabBarWindow = nil
     }
 
     func removePlayer() {
@@ -130,7 +125,7 @@ import SwiftUI
 
         applicationWindow.removeChildWindow(playerWindow)
         playerWindow.orderOut(nil)
-        isPlayerAdded = false
+        self.playerWindow = nil
     }
 
     func updateTabBarPosition(window: NSWindow? = nil, in mainWindow: NSWindow? = nil) {

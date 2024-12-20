@@ -195,11 +195,4 @@ struct ContentView: View {
         floatingWindows.removeTabBar()
         floatingWindows.removePlayer()
     }
-
-    private func updateTitle() {
-        DispatchQueue.main.async {
-            NSApp.mainWindow?.subtitle = subtitle
-            NSApp.mainWindow?.title = title
-        }
-    }
 }
