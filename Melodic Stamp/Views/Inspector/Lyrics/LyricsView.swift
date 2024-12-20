@@ -12,6 +12,8 @@ struct LyricsView: View {
     @Environment(MetadataEditorModel.self) var metadataEditor
     @Environment(LyricsModel.self) var lyrics
 
+    @State var timeElapsed: TimeInterval?
+
     var body: some View {
         Group {
             switch entries.type {
@@ -48,6 +50,14 @@ struct LyricsView: View {
         .onChange(of: player.current) { _, newValue in
             lyrics.identify(url: newValue?.url)
         }
+        // Receive playback time update
+        .onReceive(player.playbackTime) { playbackTime in
+            timeElapsed = playbackTime.current
+        }
+        .onChange(of: player.currentIndex, initial: true) { _, newValue in
+            guard newValue == nil else { return }
+            timeElapsed = nil
+        }
     }
 
     private var alignment: HorizontalAlignment {
@@ -70,7 +80,11 @@ struct LyricsView: View {
     }
 
     private var highlightedIndices: IndexSet {
-        lyrics.find(at: player.timeElapsed, in: player.current?.url)
+        if let timeElapsed {
+            lyrics.find(at: timeElapsed, in: player.current?.url)
+        } else {
+            []
+        }
     }
 
     @ViewBuilder private func lyricLines() -> some View {

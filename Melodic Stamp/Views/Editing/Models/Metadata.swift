@@ -419,7 +419,6 @@ extension Metadata {
 
                 state = .fine
                 generateThumbnail()
-                updateNowPlayingInfo()
 
                 continuation.resume()
             } catch {
