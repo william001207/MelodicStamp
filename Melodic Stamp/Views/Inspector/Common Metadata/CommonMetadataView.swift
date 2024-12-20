@@ -93,7 +93,8 @@ struct CommonMetadataView: View {
 
                     Button(role: .destructive) {
                         attachedPicturesHandler.remove(
-                            entries: entries, undoManager: undoManager)
+                            entries: entries, undoManager: undoManager
+                        )
                     } label: {
                         HStack {
                             Image(systemSymbol: .trashFill)

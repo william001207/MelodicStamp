@@ -88,9 +88,9 @@ struct ContentView: View {
             case .main:
                 if newValue {
                     initializeFloatingWindows()
-                } /*else {
+                } /* else {
                     destroyFloatingWindows()
-                }*/
+                } */
             case .miniPlayer:
                 destroyFloatingWindows()
             }

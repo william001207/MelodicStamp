@@ -43,7 +43,7 @@ struct MiniPlayer: View {
 
     @State private var adjustmentPercentage: CGFloat = .zero
     @State private var shouldUseRemainingDuration: Bool = true
-    
+
     @State var progress: Double?
     @State var duration: Duration?
     @State var timeElapsed: TimeInterval?
@@ -58,13 +58,13 @@ struct MiniPlayer: View {
                         isTitleHovering = hover
                     }
                 }
-            
+
             HStack(alignment: .center, spacing: 12) {
                 leadingControls()
                     .transition(.blurReplace)
-                
+
                 progressBar()
-                
+
                 trailingControls()
                     .transition(.blurReplace)
             }
@@ -81,7 +81,7 @@ struct MiniPlayer: View {
         .onAppear {
             isFocused = true
         }
-        
+
         // Receive playback time update
         .onReceive(player.playbackTime) { playbackTime in
             progress = playbackTime.progress
@@ -438,7 +438,7 @@ struct MiniPlayer: View {
             isProgressBarHovering = false
         }
     }
-    
+
     private var progressBinding: Binding<CGFloat> {
         Binding {
             progress ?? .zero
@@ -446,7 +446,7 @@ struct MiniPlayer: View {
             player.progress = newValue
         }
     }
-    
+
     private var volumeBinding: Binding<CGFloat> {
         Binding {
             player.volume

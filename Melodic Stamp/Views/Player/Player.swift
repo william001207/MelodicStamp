@@ -20,7 +20,7 @@ struct Player: View {
 
     @State private var adjustmentPercentage: CGFloat = .zero
     @State private var shouldUseRemainingDuration: Bool = false
-    
+
     @State var progress: Double?
     @State var duration: Duration?
     @State var timeElapsed: TimeInterval?
@@ -31,20 +31,20 @@ struct Player: View {
     var body: some View {
         VStack(alignment: .center, spacing: 12) {
             header()
-            
+
             HStack(alignment: .center, spacing: 24) {
                 HStack(alignment: .center, spacing: 12) {
                     leadingControls()
                 }
-                
+
                 Divider()
-                
+
                 HStack(alignment: .center, spacing: 12) {
                     progressBar()
                 }
-                
+
                 Divider()
-                
+
                 HStack(alignment: .center, spacing: 24) {
                     trailingControls()
                 }
@@ -55,7 +55,6 @@ struct Player: View {
         .padding(.horizontal, 32)
         .padding(.vertical, 24)
         .frame(maxWidth: .infinity)
-        
         // Receive playback time update
         .onReceive(player.playbackTime) { playbackTime in
             progress = playbackTime.progress
@@ -271,7 +270,7 @@ struct Player: View {
                 id: PlayerNamespace.durationText, in: namespace
             )
     }
-    
+
     private var progressBinding: Binding<CGFloat> {
         Binding {
             progress ?? .zero
@@ -279,7 +278,7 @@ struct Player: View {
             player.progress = newValue
         }
     }
-    
+
     private var volumeBinding: Binding<CGFloat> {
         Binding {
             player.volume

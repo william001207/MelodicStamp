@@ -279,7 +279,6 @@ enum PlaybackMode: String, CaseIterable, Identifiable {
     func seek(position: Double) {
         player.seek(position: position)
     }
-    
 
     func removeFromPlaylist(items: [PlaylistItem]) {
         removeFromPlaylist(urls: items.map(\.url))
