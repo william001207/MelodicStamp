@@ -33,16 +33,11 @@ struct PlaylistView: View {
                         .listRowSeparator(.hidden)
 
                     ForEach(player.playlist, id: \.self) { item in
-                        switch item.metadata.state {
-                        case .loading:
-                            itemView(for: item)
-                                .redacted(reason: .placeholder)
-                        default:
-                            itemView(for: item)
-                                .contextMenu {
-                                    contextMenu(for: item)
-                                }
-                        }
+                        itemView(for: item)
+                            .contextMenu {
+                                contextMenu(for: item)
+                            }
+                            .redacted(reason: item.metadata.state.redactionReasons)
                     }
                     .onMove { indices, destination in
                         withAnimation {

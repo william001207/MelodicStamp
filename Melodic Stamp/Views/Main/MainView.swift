@@ -65,11 +65,11 @@ struct MainView: View {
                     FileToolbar()
                 }
 
-                #if DEBUG
-                    ToolbarItemGroup(placement: .cancellationAction) {
-                        DebugToolbar()
-                    }
-                #endif
+//                #if DEBUG
+//                    ToolbarItemGroup(placement: .cancellationAction) {
+//                        DebugToolbar()
+//                    }
+//                #endif
             }
     }
 

@@ -10,6 +10,7 @@ import SwiftUI
 
 struct ContentView: View {
     @Environment(\.appearsActive) private var isActive
+    @Environment(\.resetFocus) private var resetFocus
 
     @FocusState private var isFocused
 
@@ -34,67 +35,33 @@ struct ContentView: View {
         Group {
             switch windowManager.style {
             case .main:
-                MainView(
-                    namespace: namespace,
-                    isInspectorPresented: $isInspectorPresented,
-                    selectedContentTab: $selectedContentTab,
-                    selectedInspectorTab: $selectedInspectorTab
-                )
-                .onGeometryChange(for: CGRect.self) { proxy in
-                    proxy.frame(in: .global)
-                } action: { _ in
-                    floatingWindows.updateTabBarPosition()
-                    floatingWindows.updatePlayerPosition()
-                }
-                .frame(minHeight: 600)
-                .ignoresSafeArea()
-                .onChange(of: isActive, initial: true) { _, _ in
-                    DispatchQueue.main.async {
-                        NSApp.mainWindow?.titlebarAppearsTransparent = true
-                        NSApp.mainWindow?.titleVisibility = .visible
-                    }
-                }
+                mainView()
             case .miniPlayer:
-                MiniPlayer(namespace: namespace)
-                    .padding(8)
-                    .background {
-                        VisualEffectView(
-                            material: .hudWindow, blendingMode: .behindWindow
-                        )
-                    }
-                    .padding(.bottom, -32)
-                    .ignoresSafeArea()
-                    .frame(minWidth: 500, idealWidth: 500)
-                    .fixedSize(horizontal: false, vertical: true)
-                    .onChange(of: isActive, initial: true) { _, _ in
-                        DispatchQueue.main.async {
-                            NSApp.mainWindow?.titlebarAppearsTransparent = true
-                            NSApp.mainWindow?.titleVisibility = .hidden
-                        }
-                    }
+                miniPlayer()
             }
         }
         .background {
             FileImporters()
                 .allowsHitTesting(false)
         }
-//        .navigationTitle(title)
         .onAppear {
             floatingWindows.observeFullScreen()
             isFocused = true
+            resetFocus(in: namespace)
         }
         .onChange(of: isActive, initial: true) { _, newValue in
             switch windowManager.style {
             case .main:
                 if newValue {
                     initializeFloatingWindows()
-                } /* else {
+                } else {
                     destroyFloatingWindows()
-                } */
+                }
             case .miniPlayer:
                 destroyFloatingWindows()
             }
             isFocused = true
+            resetFocus(in: namespace)
         }
         .onChange(of: windowManager.style, initial: true) { _, newValue in
             switch newValue {
@@ -106,6 +73,7 @@ struct ContentView: View {
                 maxWidth = 500
             }
             isFocused = true
+            resetFocus(in: namespace)
         }
         .onChange(of: minWidth) { _, newValue in
             guard newValue != nil else { return }
@@ -139,21 +107,71 @@ struct ContentView: View {
         .focusedValue(\.player, player)
         .focusedValue(\.playerKeyboardControl, playerKeyboardControl)
         .focusedValue(\.metadataEditor, metadataEditor)
-        // Environments
+        // Navigation
+        .navigationTitle(title)
+        .navigationSubtitle(subtitle)
     }
 
-//    private var title: Text {
-//        if let current = player.current {
-//            let values = current.metadata[extracting: \.title]
-//            if let title = values.initial, !title.isEmpty {
-//                return Text(title)
-//            } else {
-//                return Text(current.url.lastPathComponent.dropLast(current.url.pathExtension.count + 1))
-//            }
-//        } else {
-//            return Text("\(Bundle.main.displayName)")
-//        }
-//    }
+    private var title: String {
+        if let current = player.current {
+            MusicTitle.stringifiedTitle(mode: .title, for: current)
+        } else {
+            Bundle.main.displayName
+        }
+    }
+
+    private var subtitle: String {
+        if let current = player.current {
+            MusicTitle.stringifiedTitle(mode: .artists, for: current)
+        } else if !player.isPlaylistEmpty {
+            .init(localized: "\(player.playlist.count) Songs")
+        } else {
+            .init()
+        }
+    }
+
+    @ViewBuilder private func mainView() -> some View {
+        MainView(
+            namespace: namespace,
+            isInspectorPresented: $isInspectorPresented,
+            selectedContentTab: $selectedContentTab,
+            selectedInspectorTab: $selectedInspectorTab
+        )
+        .onGeometryChange(for: CGRect.self) { proxy in
+            proxy.frame(in: .global)
+        } action: { _ in
+            floatingWindows.updateTabBarPosition()
+            floatingWindows.updatePlayerPosition()
+        }
+        .frame(minHeight: 600)
+        .ignoresSafeArea()
+        .onChange(of: isActive, initial: true) { _, _ in
+            DispatchQueue.main.async {
+                NSApp.mainWindow?.titlebarAppearsTransparent = true
+                NSApp.mainWindow?.titleVisibility = .visible
+            }
+        }
+    }
+
+    @ViewBuilder private func miniPlayer() -> some View {
+        MiniPlayer(namespace: namespace)
+            .padding(8)
+            .background {
+                VisualEffectView(
+                    material: .hudWindow, blendingMode: .behindWindow
+                )
+            }
+            .padding(.bottom, -32)
+            .ignoresSafeArea()
+            .frame(minWidth: 500, idealWidth: 500)
+            .fixedSize(horizontal: false, vertical: true)
+            .onChange(of: isActive, initial: true) { _, _ in
+                DispatchQueue.main.async {
+                    NSApp.mainWindow?.titlebarAppearsTransparent = true
+                    NSApp.mainWindow?.titleVisibility = .hidden
+                }
+            }
+    }
 
     private func initializeFloatingWindows() {
         floatingWindows.addTabBar {
@@ -176,5 +194,12 @@ struct ContentView: View {
     private func destroyFloatingWindows() {
         floatingWindows.removeTabBar()
         floatingWindows.removePlayer()
+    }
+
+    private func updateTitle() {
+        DispatchQueue.main.async {
+            NSApp.mainWindow?.subtitle = subtitle
+            NSApp.mainWindow?.title = title
+        }
     }
 }

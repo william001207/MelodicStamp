@@ -9,11 +9,6 @@ import CSFBAudioEngine
 import SwiftUI
 
 struct MusicTitle: View {
-    enum Layout {
-        case extensive
-        case plain
-    }
-
     enum DisplayMode {
         case comprehensive
         case title
@@ -38,55 +33,46 @@ struct MusicTitle: View {
         }
     }
 
-    var layout: Layout = .extensive
     var mode: DisplayMode = .comprehensive
     var item: PlaylistItem?
 
     var body: some View {
-        switch layout {
-        case .extensive:
-            if let item {
-                HStack(spacing: 12) {
-                    if mode.hasTitle {
-                        Group {
-                            if let title = item.metadata[extracting: \.title]?.initial, !title.isEmpty {
-                                Text(title)
-                            } else {
-                                Text(Self.fallbackTitle(for: item))
-                            }
-                        }
-                        .bold()
-                    }
-
-                    if mode.hasArtists {
-                        if let artist = item.metadata[extracting: \.artist]?.initial {
-                            HStack(spacing: 4) {
-                                let artists = Metadata.splitArtists(from: artist)
-                                ForEach(Array(artists.enumerated()), id: \.offset) { offset, composer in
-                                    if offset > 0 {
-                                        Text("·")
-                                            .foregroundStyle(.placeholder)
-                                    }
-
-                                    Text(composer)
-                                        .foregroundStyle(.secondary)
-                                }
-                            }
+        if let item {
+            HStack(spacing: 12) {
+                if mode.hasTitle {
+                    Group {
+                        if let title = item.metadata[extracting: \.title]?
+                            .initial, !title.isEmpty {
+                            Text(title)
+                        } else {
+                            Text(Self.fallbackTitle(for: item))
                         }
                     }
-                }
-            } else {
-                Text("Nothing to Play")
                     .bold()
-                    .foregroundStyle(.placeholder)
-            }
-        case .plain:
-            if let item {
-                let title = Self.stringifiedTitle(mode: mode, for: item)
-                if !title.isEmpty {
-                    Text(title)
+                }
+
+                if mode.hasArtists {
+                    if let artist = item.metadata[extracting: \.artist]?.initial {
+                        HStack(spacing: 4) {
+                            let artists = Metadata.splitArtists(from: artist)
+                            ForEach(Array(artists.enumerated()), id: \.offset) {
+                                offset, composer in
+                                if offset > 0 {
+                                    Text("·")
+                                        .foregroundStyle(.placeholder)
+                                }
+
+                                Text(composer)
+                                    .foregroundStyle(.secondary)
+                            }
+                        }
+                    }
                 }
             }
+        } else {
+            Text("Nothing to Play")
+                .bold()
+                .foregroundStyle(.placeholder)
         }
     }
 
@@ -94,7 +80,9 @@ struct MusicTitle: View {
         Metadata.fallbackTitle(url: item.url)
     }
 
-    static func stringifiedTitle(mode: DisplayMode, for item: PlaylistItem, separator: String = " ") -> String {
+    static func stringifiedTitle(
+        mode: DisplayMode = .comprehensive, for item: PlaylistItem, separator: String = " "
+    ) -> String {
         var components: [String] = []
         if mode.hasTitle {
             if let title = item.metadata[extracting: \.title]?.initial {
