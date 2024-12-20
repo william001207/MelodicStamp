@@ -83,7 +83,6 @@ struct PlaylistItemView: View {
     @ViewBuilder private func cover(isMetadataLoaded: Bool) -> some View {
         ZStack {
             if isMetadataLoaded, let image = item.metadata.thumbnail {
-                Group {
                     MusicCover(
                         images: [image], hasPlaceholder: false, cornerRadius: 0
                     )
@@ -95,8 +94,6 @@ struct PlaylistItemView: View {
                                 .blendMode(.darken)
                         }
                     }
-                }
-                .clipShape(.rect(cornerRadius: 8))
 
                 if isHovering {
                     Image(
@@ -106,6 +103,9 @@ struct PlaylistItemView: View {
                     .foregroundStyle(.white)
                 }
             } else {
+                Rectangle()
+                    .foregroundStyle(.placeholder.quinary)
+                
                 if isHovering {
                     Image(
                         systemSymbol: isMetadataLoaded
@@ -115,6 +115,7 @@ struct PlaylistItemView: View {
                 }
             }
         }
+        .clipShape(.rect(cornerRadius: 8))
         .frame(width: 50, height: 50)
         .font(.title3)
         .contentTransition(.symbolEffect(.replace))
