@@ -10,9 +10,9 @@ import RegexBuilder
 
 @Observable class LRCParser: LyricsParser {
     typealias Tag = LRCTag
-    typealias Line = LRCLine
+    typealias Line = LRCLyricLine
 
-    var lines: [LRCLine] = []
+    var lines: [LRCLyricLine] = []
 
     required init(string: String) throws {
         try parse(string: string)
@@ -60,7 +60,7 @@ import RegexBuilder
 
 //            print("Extracting LRC lyric line: \(tags), \"\(content)\"")
 
-            var line: LRCLine = .init(content: content)
+            var line: LRCLyricLine = .init(content: content)
 
             for tag in tags {
                 if let time = try TimeInterval(lyricTimestamp: tag) {
@@ -124,7 +124,7 @@ import RegexBuilder
         }
 
         guard let lowerBound, let upperBound else { return 0..<0 }
-        return lowerBound..<upperBound
+        return lowerBound..<(upperBound + 1)
     }
 
     static func parseTag(string: String) throws -> Tag? {

@@ -10,6 +10,7 @@ import SwiftUI
 struct DurationText: View {
     var duration: Duration?
     var sign: FloatingPointSign = .plus
+    var pattern: Duration.TimeFormatStyle.Pattern = .minuteSecond
 
     var body: some View {
         Text(formattedSign + (formattedDuration ?? "--:--"))
@@ -28,7 +29,7 @@ struct DurationText: View {
 
     private var formattedDuration: String? {
         duration.map {
-            $0.formatted(.time(pattern: .minuteSecond))
+            $0.formatted(.time(pattern: pattern))
         }
     }
 }

@@ -1,5 +1,5 @@
 //
-//  TTMLLine.swift
+//  TTMLLyricLine.swift
 //  Melodic Stamp
 //
 //  Created by KrLite on 2024/12/15.
@@ -7,8 +7,9 @@
 
 import Foundation
 import RegexBuilder
+import SFSafeSymbols
 
-struct TTMLLine: LyricLine {
+struct TTMLLyricLine: LyricLine {
     var index: Int
     var position: TTMLPosition
     var beginTime: TimeInterval? { lyrics.beginTime }
@@ -20,13 +21,13 @@ struct TTMLLine: LyricLine {
     let id = UUID()
 }
 
-extension TTMLLine: Equatable {
-    static func == (lhs: TTMLLine, rhs: TTMLLine) -> Bool {
+extension TTMLLyricLine: Equatable {
+    static func == (lhs: TTMLLyricLine, rhs: TTMLLyricLine) -> Bool {
         lhs.id == rhs.id
     }
 }
 
-extension TTMLLine: Hashable {
+extension TTMLLyricLine: Hashable {
     func hash(into hasher: inout Hasher) {
         hasher.combine(id)
     }
@@ -56,6 +57,29 @@ struct TTMLLyric: Equatable, Hashable, Codable {
     }
 }
 
+// MARK: - Translation
+
+typealias TTMLLocale = Locale
+
+extension TTMLLocale {
+    var main: String? {
+        identifier.split(separator: /[-_]/).first.map(String.init(_:))
+    }
+    
+    var symbolLocalization: Localization? {
+        main.flatMap(Localization.init(rawValue:))
+    }
+    
+    func localize(systemSymbol symbol: SFSymbol) -> SFSymbol? {
+        symbolLocalization.flatMap(symbol.localized(to:))
+    }
+}
+
+struct TTMLTranslation: Equatable, Hashable, Codable {
+    var locale: TTMLLocale
+    var text: String
+}
+
 // MARK: - Lyrics
 
 struct TTMLLyrics: Equatable, Hashable, Codable {
@@ -63,7 +87,7 @@ struct TTMLLyrics: Equatable, Hashable, Codable {
     var endTime: TimeInterval?
 
     var children: [TTMLLyric] = []
-    var translation: String?
+    var translations: [TTMLTranslation] = []
     var roman: String?
 }
 

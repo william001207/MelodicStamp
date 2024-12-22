@@ -71,7 +71,7 @@ enum PlaybackMode: String, CaseIterable, Identifiable {
     var playlist: [PlaylistItem] = []
     var playbackMode: PlaybackMode = .sequential
 
-    var lyricLines: [LRCLine] = []
+    var lyricLines: [LRCLyricLine] = []
     var currentLyricIndex: Int = 0
 
     var duration: Duration { player.time?.total.map { .seconds($0) } ?? .zero }

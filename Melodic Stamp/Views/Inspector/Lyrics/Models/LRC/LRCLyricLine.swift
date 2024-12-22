@@ -1,5 +1,5 @@
 //
-//  LRCLine.swift
+//  LRCLyricLine.swift
 //  Melodic Stamp
 //
 //  Created by KrLite on 2024/12/15.
@@ -8,7 +8,7 @@
 import Foundation
 import RegexBuilder
 
-struct LRCLine: LyricLine {
+struct LRCLyricLine: LyricLine {
     typealias Tag = LRCTag
 
     enum LRCLyricType: Hashable, Equatable {

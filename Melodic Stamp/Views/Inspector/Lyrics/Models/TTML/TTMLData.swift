@@ -16,6 +16,7 @@ struct TTMLData: Equatable, Hashable, Identifiable {
         case agent = "ttm:agent"
         case role = "ttm:role"
         case itunesKey = "itunes:key"
+        case language = "xml:lang"
 
         var id: String { rawValue }
     }

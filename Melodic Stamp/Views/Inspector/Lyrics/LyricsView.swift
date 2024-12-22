@@ -109,13 +109,11 @@ struct LyricsView: View {
         }
     }
 
-    @ViewBuilder private func rawLyricLine(index _: Int, line: RawLyricLine)
-        -> some View {
+    @ViewBuilder private func rawLyricLine(index: Int, line: RawLyricLine) -> some View {
         Text(line.content)
     }
 
-    @ViewBuilder private func lrcLyricLine(index: Int, line: LRCLine)
-        -> some View {
+    @ViewBuilder private func lrcLyricLine(index: Int, line: LRCLyricLine) -> some View {
         let isHighlighted = highlightedRange.contains(index)
 
         HStack {
@@ -141,7 +139,7 @@ struct LyricsView: View {
                     }
                 }
             }
-            .foregroundStyle(.secondary)
+            .foregroundStyle(.quinary)
 
             if line.isValid, !line.content.isEmpty {
                 switch line.type {
@@ -156,63 +154,18 @@ struct LyricsView: View {
                 }
             }
         }
-        .foregroundStyle(
-            isHighlighted ? AnyShapeStyle(.tint) : AnyShapeStyle(.primary))
+        .foregroundStyle(.tint)
+        .tint(isHighlighted ? .accent: .secondary)
+        .scaleEffect(isHighlighted ? 1.1 : 1)
+        .animation(.bouncy, value: isHighlighted)
+        .padding(.vertical, 4)
     }
 
-    @ViewBuilder private func ttmlLyricLine(index _: Int, line: TTMLLine)
+    @ViewBuilder private func ttmlLyricLine(index: Int, line: TTMLLyricLine)
         -> some View {
-        VStack(alignment: .leading, spacing: 16) {
-            HStack {
-                Text("#\(line.index)")
-                    .foregroundStyle(.orange)
-
-                Spacer()
-
-                Text("at")
-
-                Text("\(line.position)")
-                    .foregroundStyle(.orange)
-            }
-            .font(.caption)
-            .monospaced()
-            .foregroundColor(.secondary)
-
-            TTMLLyricsView(lyrics: line.lyrics)
-
-            if !line.backgroundLyrics.isEmpty {
-                HStack {
-                    Text("background")
-                        .foregroundStyle(.orange)
-
-                    Spacer()
-                }
-                .font(.caption)
-                .monospaced()
-                .foregroundStyle(.secondary)
-
-                TTMLLyricsView(lyrics: line.backgroundLyrics)
-            }
-
-            HStack {
-                if let beginTime = line.beginTime {
-                    Text("from")
-
-                    Text(beginTime.formatted())
-                }
-
-                Spacer()
-
-                if let endTime = line.endTime {
-                    Text("to")
-
-                    Text(endTime.formatted())
-                }
-            }
-            .font(.caption)
-            .monospaced()
-            .foregroundColor(.secondary)
-        }
+            let isHighlighted = highlightedRange.contains(index)
+            
+            TTMLLyricLineView(isHighlighted: isHighlighted, line: line)
     }
 
     private func loadLyrics() {

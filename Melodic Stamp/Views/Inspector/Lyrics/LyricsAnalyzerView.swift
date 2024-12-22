@@ -60,59 +60,9 @@ private struct LyricsAnalyzerView: View {
                     ScrollView {
                         DividedVStack {
                             ForEach(parser.lines) { line in
-                                VStack(alignment: .leading, spacing: 16) {
-                                    HStack {
-                                        Text("#\(line.index)")
-                                            .foregroundStyle(.orange)
-
-                                        Spacer()
-
-                                        Text("at")
-
-                                        Text("\(line.position)")
-                                            .foregroundStyle(.orange)
-                                    }
-                                    .font(.caption)
-                                    .monospaced()
-                                    .foregroundColor(.secondary)
-
-                                    TTMLLyricsView(lyrics: line.lyrics)
-
-                                    if !line.backgroundLyrics.isEmpty {
-                                        HStack {
-                                            Text("background")
-                                                .foregroundStyle(.orange)
-
-                                            Spacer()
-                                        }
-                                        .font(.caption)
-                                        .monospaced()
-                                        .foregroundStyle(.secondary)
-
-                                        TTMLLyricsView(lyrics: line.backgroundLyrics)
-                                    }
-
-                                    HStack {
-                                        if let beginTime = line.beginTime {
-                                            Text("from")
-
-                                            Text(beginTime.formatted())
-                                        }
-
-                                        Spacer()
-
-                                        if let endTime = line.endTime {
-                                            Text("to")
-
-                                            Text(endTime.formatted())
-                                        }
-                                    }
-                                    .font(.caption)
-                                    .monospaced()
-                                    .foregroundColor(.secondary)
-                                }
+                                TTMLLyricLineView(line: line)
                             }
-                            .padding(8)
+                            .padding(.horizontal, 8)
                         }
                     }
                 } else {

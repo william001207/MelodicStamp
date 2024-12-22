@@ -15,9 +15,9 @@ import SwiftSoup
         case bodyNotFound
     }
 
-    typealias Line = TTMLLine
+    typealias Line = TTMLLyricLine
 
-    var lines: [TTMLLine] = []
+    var lines: [TTMLLyricLine] = []
 
     required init(string: String) throws {
         try parseLyrics(string: string)
@@ -34,7 +34,7 @@ import SwiftSoup
         for (index, pElement) in try body.getElementsByTag("p").enumerated() {
             let agent = try TTMLData(type: .agent, element: pElement)
 
-            var line = TTMLLine(
+            var line = TTMLLyricLine(
                 index: index,
                 position: Self.getPosition(fromAgent: agent?.content)
             )
@@ -70,7 +70,7 @@ import SwiftSoup
         }
 
         guard let lowerBound, let upperBound else { return 0..<0 }
-        return lowerBound..<upperBound
+        return lowerBound..<(upperBound + 1)
     }
 
     static func getPosition(fromAgent agent: String?) -> TTMLPosition {
@@ -113,23 +113,27 @@ import SwiftSoup
                     .text()
                     .normalizeSpaces()
 
-                if let roleAttribute = try TTMLData(type: .role, element: spanElement)?.content,
-                   let role = TTMLRole(rawValue: roleAttribute) {
+                if
+                    let roleData = try TTMLData(type: .role, element: spanElement),
+                    let role = TTMLRole(rawValue: roleData.content)
+                {
                     switch role {
                     case .translation:
-                        lyrics.translation = spanText
+                        guard let language = try TTMLData(type: .language, element: spanElement) else { break }
+                        
+                        let locale = Locale(identifier: language.content)
+                        lyrics.translations.append(.init(locale: locale, text: spanText))
                     case .roman:
                         lyrics.roman = spanText
                     case .background:
-                        if isRecursive {
-                            var dummy: TTMLLyrics = .init()
-                            try readNodes(
-                                from: spanElement,
-                                into: &backgroundLyrics,
-                                intoBackground: &dummy,
-                                isRecursive: false
-                            )
-                        }
+                        guard isRecursive else { break }
+                        var dummy: TTMLLyrics = .init()
+                        try readNodes(
+                            from: spanElement,
+                            into: &backgroundLyrics,
+                            intoBackground: &dummy,
+                            isRecursive: false
+                        )
                     }
 
                     text.replace(spanText, with: "", maxReplacements: 1)
