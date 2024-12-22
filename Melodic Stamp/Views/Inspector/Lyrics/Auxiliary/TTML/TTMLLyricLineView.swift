@@ -75,7 +75,9 @@ struct TTMLLyricLineView: View {
                                 Rectangle()
                                     .foregroundStyle(.accent)
                             }
-                            .clipShape(.rect(cornerRadius: 6))
+                            .clipShape(.rect(cornerRadii: .init(
+                                topLeading: 6, bottomLeading: 6, bottomTrailing: 0, topTrailing: 6
+                            )))
                         
                         Spacer()
                         
@@ -93,7 +95,9 @@ struct TTMLLyricLineView: View {
                                 Rectangle()
                                     .foregroundStyle(.accent)
                             }
-                            .clipShape(.rect(cornerRadius: 6))
+                            .clipShape(.rect(cornerRadii: .init(
+                                topLeading: 6, bottomLeading: 6, bottomTrailing: 6, topTrailing: 0
+                            )))
                     }
                 }
                 .font(.footnote)

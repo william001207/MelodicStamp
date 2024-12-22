@@ -18,7 +18,7 @@ struct TTMLInformationView<Content>: View where Content: View {
     @State private var isHovering: Bool = false
     
     var body: some View {
-        HStack {
+        HStack(alignment: .top) {
             Image(systemSymbol: systemSymbol)
                 .padding(2)
                 .frame(width: 16, height: 16)
