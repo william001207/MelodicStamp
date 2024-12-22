@@ -19,7 +19,7 @@ import Foundation
             .map { .init(content: $0) }
     }
 
-    func find(at _: TimeInterval) -> IndexSet {
-        []
+    func find(at _: TimeInterval) -> Range<Int> {
+        0..<0
     }
 }

@@ -33,7 +33,7 @@ protocol LyricsParser {
 
     init(string: String) throws
 
-    func find(at time: TimeInterval) -> IndexSet
+    func find(at time: TimeInterval) -> Range<Int>
 }
 
 // MARK: Lyrics Type
@@ -63,7 +63,7 @@ enum LyricsStorage {
         }
     }
 
-    func find(at time: TimeInterval) -> IndexSet {
+    func find(at time: TimeInterval) -> Range<Int> {
         switch self {
         case let .raw(parser):
             parser.find(at: time)
@@ -127,8 +127,8 @@ enum LyricsStorage {
         }
     }
 
-    func find(at time: TimeInterval, in url: URL?) -> IndexSet {
-        guard let storage, let url, url == self.url else { return [] }
+    func find(at time: TimeInterval, in url: URL?) -> Range<Int> {
+        guard let storage, let url, url == self.url else { return 0..<0 }
         return storage.find(at: time)
     }
 }

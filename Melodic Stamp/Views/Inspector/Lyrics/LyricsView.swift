@@ -79,11 +79,11 @@ struct LyricsView: View {
         metadataEditor[extracting: \.lyrics]
     }
 
-    private var highlightedIndices: IndexSet {
+    private var highlightedRange: Range<Int> {
         if let timeElapsed {
             lyrics.find(at: timeElapsed, in: player.current?.url)
         } else {
-            []
+            0..<0
         }
     }
 
@@ -116,7 +116,7 @@ struct LyricsView: View {
 
     @ViewBuilder private func lrcLyricLine(index: Int, line: LRCLine)
         -> some View {
-        let isHighlighted = highlightedIndices.contains(index)
+        let isHighlighted = highlightedRange.contains(index)
 
         HStack {
             ForEach(line.tags) { tag in

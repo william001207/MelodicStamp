@@ -50,19 +50,27 @@ import SwiftSoup
         }
     }
 
-    func find(at time: TimeInterval) -> IndexSet {
-        var indices: IndexSet = []
+    func find(at time: TimeInterval) -> Range<Int> {
+        var lowerBound: Int?, upperBound: Int?
+        
+        func insert(_ index: Int) {
+            if lowerBound == nil {
+                lowerBound = index
+            }
+            upperBound = index
+        }
 
         for (index, line) in lines.enumerated() {
             if let beginTime = line.beginTime as TimeInterval?,
                let endTime = line.endTime as TimeInterval? {
                 if time >= beginTime, time <= endTime {
-                    indices.insert(index)
+                    insert(index)
                 }
             }
         }
 
-        return indices
+        guard let lowerBound, let upperBound else { return 0..<0 }
+        return lowerBound..<upperBound
     }
 
     static func getPosition(fromAgent agent: String?) -> TTMLPosition {

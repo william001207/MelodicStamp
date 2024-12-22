@@ -96,9 +96,16 @@ import RegexBuilder
         }
     }
 
-    func find(at time: TimeInterval) -> IndexSet {
+    func find(at time: TimeInterval) -> Range<Int> {
         var nearestBeginTime: TimeInterval = .zero
-        var indices: IndexSet = []
+        var lowerBound: Int?, upperBound: Int?
+        
+        func insert(_ index: Int) {
+            if lowerBound == nil {
+                lowerBound = index
+            }
+            upperBound = index
+        }
 
         for beginTime in lines.compactMap(\.beginTime) {
             guard beginTime <= time, beginTime >= nearestBeginTime else { continue }
@@ -110,13 +117,14 @@ import RegexBuilder
 
             if let endTime = line.endTime {
                 guard endTime > time else { continue }
-                indices.insert(index)
+                insert(index)
             } else {
-                indices.insert(index)
+                insert(index)
             }
         }
 
-        return indices
+        guard let lowerBound, let upperBound else { return 0..<0 }
+        return lowerBound..<upperBound
     }
 
     static func parseTag(string: String) throws -> Tag? {
