@@ -131,18 +131,20 @@ import SwiftUI
     func updateTabBarPosition(window: NSWindow? = nil, in mainWindow: NSWindow? = nil) {
         guard
             let tabBarWindow = window ?? tabBarWindow,
-            let applicationWindow = mainWindow ?? NSApp.mainWindow
+            let applicationWindow = mainWindow ?? NSApp.mainWindow,
+            let screen = NSScreen.main
         else { return }
 
         let tabBarFrame = tabBarWindow.frame
         let windowFrame = applicationWindow.frame
+        let screenFrame = screen.frame
 
         let leadingX = windowFrame.origin.x - 16 - 48
         let bottomY = windowFrame.origin.y + (windowFrame.height - tabBarFrame.height) / 2
 
         tabBarWindow.setFrame(
             .init(
-                x: max(8, leadingX),
+                x: max(screenFrame.minX + 8, leadingX),
                 y: bottomY,
                 width: tabBarFrame.width,
                 height: tabBarFrame.height
@@ -154,11 +156,13 @@ import SwiftUI
     func updatePlayerPosition(window: NSWindow? = nil, in mainWindow: NSWindow? = nil) {
         guard
             let playerWindow = window ?? playerWindow,
-            let applicationWindow = mainWindow ?? NSApp.mainWindow
+            let applicationWindow = mainWindow ?? NSApp.mainWindow,
+            let screen = NSScreen.main
         else { return }
 
         let playerFrame = playerWindow.frame
         let windowFrame = applicationWindow.frame
+        let screenFrame = screen.frame
 
         let centerX = windowFrame.origin.x + (windowFrame.width - playerFrame.width) / 2
         let bottomY = windowFrame.origin.y - 32
@@ -166,7 +170,7 @@ import SwiftUI
         playerWindow.setFrame(
             .init(
                 x: centerX,
-                y: max(8, bottomY),
+                y: max(screenFrame.minY + 8, bottomY),
                 width: playerFrame.width,
                 height: playerFrame.height
             ),
