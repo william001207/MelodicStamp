@@ -8,11 +8,12 @@
 import SwiftUI
 
 struct LeafletView: View {
+    
     @Environment(PlayerModel.self) var player
 
     var body: some View {
         if let current = player.current {
-            Color.blue
+            NowPlayingView()
         } else {
             LeafletExcerpt()
         }
