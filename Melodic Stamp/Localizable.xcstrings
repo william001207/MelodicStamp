@@ -29,6 +29,9 @@
         }
       }
     },
+    "%lld" : {
+
+    },
     "%lld Songs" : {
 
     },
@@ -197,6 +200,9 @@
     "Louder" : {
 
     },
+    "Lower bound: %lld" : {
+
+    },
     "Lyricist" : {
 
     },
@@ -234,6 +240,9 @@
 
     },
     "Next Song" : {
+
+    },
+    "No lyrics available" : {
 
     },
     "No." : {
@@ -384,6 +393,9 @@
 
     },
     "Unprocessed" : {
+
+    },
+    "Upper bound: %lld" : {
 
     },
     "Version" : {
