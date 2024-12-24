@@ -14,6 +14,8 @@ struct MelodicStampApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
 
     @Environment(\.openWindow) private var openWindow
+    
+    @FocusedValue(\.windowManager) private var windowManager
 
     var body: some Scene {
         WindowGroup {

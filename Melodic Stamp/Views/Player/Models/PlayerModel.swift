@@ -15,18 +15,15 @@ import SwiftUI
 
 // MARK: - Playback Mode
 
-enum PlaybackMode: String, CaseIterable, Identifiable {
+enum PlaybackMode: String, Hashable, Equatable, CaseIterable, Identifiable {
     var id: String { rawValue }
 
-    case single
     case sequential
     case loop
     case shuffle
 
     var image: Image {
         switch self {
-        case .single:
-            .init(systemSymbol: .repeat1)
         case .sequential:
             .init(systemSymbol: .musicNoteList)
         case .loop:
@@ -38,62 +35,74 @@ enum PlaybackMode: String, CaseIterable, Identifiable {
 
     func cycle(negate: Bool = false) -> Self {
         switch self {
-        case .single:
-            negate ? .shuffle : .sequential
         case .sequential:
-            negate ? .single : .loop
+            negate ? .shuffle : .loop
         case .loop:
             negate ? .sequential : .shuffle
         case .shuffle:
-            negate ? .loop : .single
+            negate ? .loop : .sequential
         }
     }
 }
 
-// MARK: - Player Model
+struct PlaybackTime: Hashable {
+    fileprivate(set) var duration: Duration
+    fileprivate(set) var elapsed: TimeInterval
+    
+    var remaining: TimeInterval { duration.timeInterval - elapsed }
+    var progress: CGFloat { elapsed / duration.timeInterval }
+}
+
+// MARK: - Player Model - Fields
 
 @Observable final class PlayerModel: NSObject {
+    // MARK: Player
+    
     private var player: AudioPlayer = .init()
-
+    
     private var outputDevices: [AudioDevice] = []
     private var selectedDevice: AudioDevice?
-
+    
+    // MARK: Publishers
+    
     private var cancellables = Set<AnyCancellable>()
-    private let publisher = TimerPublisher(interval: 0.25)
-    private var playbackTimeSubject = PassthroughSubject<AudioPlayer.PlaybackTime, Never>()
-
-    var playbackTime: AnyPublisher<AudioPlayer.PlaybackTime, Never> {
-        playbackTimeSubject
-            .eraseToAnyPublisher()
+    private let timer = TimerPublisher(interval: 0.25)
+    
+    private var playbackTimeSubject = PassthroughSubject<PlaybackTime?, Never>()
+    var playbackTimePublisher: AnyPublisher<PlaybackTime?, Never> {
+        playbackTimeSubject.eraseToAnyPublisher()
     }
-
+    
+    // MARK: Playlist & Playback
+    
     private(set) var current: PlaylistItem?
-    var playlist: [PlaylistItem] = []
+    private(set) var playlist: [PlaylistItem] = []
+    
     var playbackMode: PlaybackMode = .sequential
-
-    var lyricLines: [LRCLyricLine] = []
-    var currentLyricIndex: Int = 0
-
+    var playbackLooping: Bool = false
+    
     var duration: Duration { player.time?.total.map { .seconds($0) } ?? .zero }
     var timeElapsed: TimeInterval { player.time?.current ?? .zero }
     var timeRemaining: TimeInterval { player.time?.remaining ?? .zero }
-
+    
+    // MARK: Functional
+    
     var progress: CGFloat {
         get {
             player.time?.progress ?? .zero
         }
-
+        
         set {
             // Debounce and cancel if adjustment is smaller than 0.09s
             let difference = abs(newValue - progress)
-            let timeDifference = duration.toTimeInterval() * difference
+            let timeDifference = duration.timeInterval * difference
             guard timeDifference > 9 / 100 else { return }
-
+            
             player.seek(position: max(0, min(1, newValue)))
             updateNowPlayingInfo()
         }
     }
-
+    
     private var mutedVolume: CGFloat = .zero
     var volume: CGFloat {
         get {
@@ -103,7 +112,7 @@ enum PlaybackMode: String, CaseIterable, Identifiable {
                 CGFloat(player.volume)
             }
         }
-
+        
         set {
             isMuted = false
             do {
@@ -111,11 +120,11 @@ enum PlaybackMode: String, CaseIterable, Identifiable {
             } catch {}
         }
     }
-
+    
     var isPlaying: Bool {
         player.isPlaying
     }
-
+    
     var isMuted: Bool = false {
         didSet {
             do {
@@ -128,21 +137,19 @@ enum PlaybackMode: String, CaseIterable, Identifiable {
             } catch {}
         }
     }
-
+    
     var isPlaylistEmpty: Bool {
         playlist.isEmpty
     }
-
+    
     var hasCurrentTrack: Bool {
         current != nil
     }
-
+    
     var hasNextTrack: Bool {
         guard current != nil else { return false }
-
+        
         switch playbackMode {
-        case .single:
-            return true
         case .sequential:
             guard let currentIndex else { return false }
             return currentIndex < playlist.count - 1
@@ -150,13 +157,11 @@ enum PlaybackMode: String, CaseIterable, Identifiable {
             return !playlist.isEmpty
         }
     }
-
+    
     var hasPreviousTrack: Bool {
         guard current != nil else { return false }
-
+        
         switch playbackMode {
-        case .single:
-            return true
         case .sequential:
             guard let currentIndex else { return false }
             return currentIndex > 0
@@ -164,18 +169,16 @@ enum PlaybackMode: String, CaseIterable, Identifiable {
             return !playlist.isEmpty
         }
     }
-
+    
     var currentIndex: Int? {
         guard let current else { return nil }
         return playlist.firstIndex(of: current)
     }
-
+    
     var nextIndex: Int? {
         guard hasNextTrack else { return nil }
-
+        
         switch playbackMode {
-        case .single:
-            return currentIndex
         case .sequential:
             guard let currentIndex else { return nil }
             return currentIndex + 1
@@ -186,13 +189,11 @@ enum PlaybackMode: String, CaseIterable, Identifiable {
             return randomIndex()
         }
     }
-
+    
     var previousIndex: Int? {
         guard hasPreviousTrack else { return nil }
-
+        
         switch playbackMode {
-        case .single:
-            return currentIndex
         case .sequential:
             guard let currentIndex else { return nil }
             return currentIndex - 1
@@ -203,22 +204,32 @@ enum PlaybackMode: String, CaseIterable, Identifiable {
             return randomIndex()
         }
     }
-
+    
     override init() {
         super.init()
         player.delegate = self
         setupRemoteTransportControls()
-        publisher
+        timer
             .receive(on: DispatchQueue.main)
             .sink { _ in
                 if let time = self.player.time {
-                    self.playbackTimeSubject.send(time)
+                    guard
+                        let total = time.total,
+                        let current = time.current
+                    else { return }
+                    self.playbackTimeSubject.send(.init(
+                        duration: total.duration, elapsed: current
+                    ))
                 }
             }
             .store(in: &cancellables)
         //        updateDeviceMenu()
     }
+}
 
+// MARK: - Player Model - Functions
+
+extension PlayerModel {
     func randomIndex() -> Int? {
         guard !playlist.isEmpty else { return nil }
 
@@ -274,6 +285,10 @@ enum PlaybackMode: String, CaseIterable, Identifiable {
                 playlist.remove(at: index)
             }
         }
+    }
+    
+    func movePlaylist(fromOffsets indices: IndexSet, toOffset destination: Int) {
+        playlist.move(fromOffsets: indices, toOffset: destination)
     }
 
     func seek(position: Double) {
@@ -368,24 +383,20 @@ enum PlaybackMode: String, CaseIterable, Identifiable {
 extension PlayerModel: AudioPlayer.Delegate {
     func audioPlayer(_: AudioPlayer, decodingComplete decoder: PCMDecoding) {
         if let audioDecoder = decoder as? AudioDecoder {
-            switch playbackMode {
-            case .single:
+            let index = if playbackLooping {
                 // Play again
-                guard let currentIndex else { break }
-                do {
-                    if let decoder = try playlist[currentIndex].decoder() {
-                        try player.enqueue(decoder)
-                    }
-                } catch {}
-            default:
+                currentIndex
+            } else {
                 // Jump to next track
-                guard let nextIndex else { break }
-                do {
-                    if let decoder = try playlist[nextIndex].decoder() {
-                        try player.enqueue(decoder)
-                    }
-                } catch {}
+                nextIndex
             }
+            guard let index else { return }
+            
+            do {
+                if let decoder = try playlist[index].decoder() {
+                    try player.enqueue(decoder)
+                }
+            } catch {}
         } else {
             os_log("Failed to cast decoder to AudioDecoder or retrieve URL", log: OSLog.default, type: .error)
         }
@@ -453,7 +464,7 @@ extension PlayerModel {
 
     @discardableResult func adjustTime(delta: TimeInterval = 1, multiplier: CGFloat = 1, sign: FloatingPointSign = .plus) -> Bool {
         guard duration > .zero else { return false }
-        return adjustProgress(delta: delta / duration.toTimeInterval(), multiplier: multiplier, sign: sign)
+        return adjustProgress(delta: delta / duration.timeInterval, multiplier: multiplier, sign: sign)
     }
 
     @discardableResult func adjustVolume(delta: CGFloat = 0.01, multiplier: CGFloat = 1, sign: FloatingPointSign = .plus) -> Bool {
@@ -486,7 +497,7 @@ extension PlayerModel {
         var info = infoCenter.nowPlayingInfo ?? .init()
 
         if hasCurrentTrack {
-            info[MPMediaItemPropertyPlaybackDuration] = duration.toTimeInterval()
+            info[MPMediaItemPropertyPlaybackDuration] = duration.timeInterval
             info[MPNowPlayingInfoPropertyElapsedPlaybackTime] = timeElapsed
         } else {
             info[MPMediaItemPropertyPlaybackDuration] = nil
@@ -564,7 +575,7 @@ extension PlayerModel {
 //            guard hasCurrentTrack else { return .noActionableNowPlayingItem }
 //            guard let event = event as? MPChangePlaybackPositionCommandEvent else { return .commandFailed }
 //
-//            progress = event.positionTime / duration.toTimeInterval()
+//            progress = event.positionTime / duration.timeInterval
 //            return .success
 //        }
 

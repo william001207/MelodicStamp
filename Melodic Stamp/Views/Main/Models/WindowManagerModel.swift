@@ -14,6 +14,13 @@ enum MelodicStampWindowStyle: String, Equatable, Hashable, Identifiable {
     var id: Self {
         self
     }
+    
+    var hasTitleBar: Bool {
+        switch self {
+        case .main: true
+        case .miniPlayer: false
+        }
+    }
 }
 
 @Observable final class WindowManagerModel {

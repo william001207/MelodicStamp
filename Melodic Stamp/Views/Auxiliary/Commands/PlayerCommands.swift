@@ -161,21 +161,27 @@ struct PlayerCommands: Commands {
 
                 if let player {
                     @Bindable var player = player
-                    let playbackName: String =
-                        switch player.playbackMode {
-                        case .single:
-                            .init(localized: "Single Loop")
-                        case .sequential:
-                            .init(localized: "Sequential")
-                        case .loop:
-                            .init(localized: "Sequential Loop")
-                        case .shuffle:
-                            .init(localized: "Shuffle")
-                        }
+                    let playbackName = PlaybackModeView.name(of: player.playbackMode)
 
-                    Picker("Playback", selection: $player.playbackMode) {
+                    Menu("Playback") {
                         ForEach(PlaybackMode.allCases) { mode in
-                            PlaybackModeView(mode: mode)
+                            let binding: Binding<Bool> = Binding {
+                                player.playbackMode == mode
+                            } set: { newValue in
+                                guard newValue else { return }
+                                player.playbackMode = mode
+                            }
+                            Toggle(isOn: binding) {
+                                PlaybackModeView(mode: mode)
+                            }
+                        }
+                        
+                        Divider()
+                        
+                        Toggle(isOn: $player.playbackLooping) {
+                            Image(systemSymbol: .repeat1)
+                            
+                            Text("Infinite Loop")
                         }
                     }
                     .badge(playbackName)

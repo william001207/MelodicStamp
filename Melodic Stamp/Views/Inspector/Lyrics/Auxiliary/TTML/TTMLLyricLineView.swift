@@ -62,7 +62,7 @@ struct TTMLLyricLineView: View {
                     
                     VStack {
                         DurationText(
-                            duration: line.beginTime.map(Duration.milliseconds(_:)),
+                            duration: line.beginTime?.duration,
                             pattern: .minuteSecond(
                                 padMinuteToLength: 0,
                                 fractionalSecondsLength: 3
@@ -82,7 +82,7 @@ struct TTMLLyricLineView: View {
                         Spacer()
                         
                         DurationText(
-                            duration: line.endTime.map(Duration.milliseconds(_:)),
+                            duration: line.endTime?.duration,
                             pattern: .minuteSecond(
                                 padMinuteToLength: 0,
                                 fractionalSecondsLength: 3

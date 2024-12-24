@@ -21,12 +21,7 @@ struct Player: View {
     @State private var adjustmentPercentage: CGFloat = .zero
     @State private var shouldUseRemainingDuration: Bool = false
 
-    @State var progress: Double?
-    @State var duration: Duration?
-    @State var timeElapsed: TimeInterval?
-    @State var timeRemaining: TimeInterval?
-
-    @State private var id: UUID = .init()
+    @State private var playbackTime: PlaybackTime?
 
     var body: some View {
         VStack(alignment: .center, spacing: 12) {
@@ -39,7 +34,7 @@ struct Player: View {
 
                 Divider()
 
-                HStack(alignment: .center, spacing: 12) {
+                HStack(alignment: .center, spacing: 8) {
                     progressBar()
                 }
 
@@ -56,18 +51,12 @@ struct Player: View {
         .padding(.vertical, 24)
         .frame(maxWidth: .infinity)
         // Receive playback time update
-        .onReceive(player.playbackTime) { playbackTime in
-            progress = playbackTime.progress
-            timeElapsed = playbackTime.current
-            timeRemaining = playbackTime.remaining
-            duration = playbackTime.total.map { .seconds($0) }
+        .onReceive(player.playbackTimePublisher) { playbackTime in
+            self.playbackTime = playbackTime
         }
         .onChange(of: player.currentIndex, initial: true) { _, newValue in
             guard newValue == nil else { return }
-            progress = nil
-            timeElapsed = nil
-            timeRemaining = nil
-            duration = nil
+            playbackTime = nil
         }
     }
 
@@ -88,23 +77,36 @@ struct Player: View {
             .matchedGeometryEffect(
                 id: PlayerNamespace.playbackModeButton, in: namespace
             )
+            
+            AliveButton(
+                enabledStyle: .init(.tertiary), hoveringStyle: .init(.secondary)
+            ) {
+                player.playbackLooping.toggle()
+            } label: {
+                PlaybackLoopingView(isEnabled: player.playbackLooping)
+                    .font(.headline)
+                    .frame(width: 20)
+            }
+            .matchedGeometryEffect(
+                id: PlayerNamespace.playbackLoopingButton, in: namespace
+            )
 
             Spacer()
 
             Group {
-                if let thumbnail = player.current?.metadata.thumbnail {
-                    MusicCover(
-                        images: [thumbnail], hasPlaceholder: false,
-                        cornerRadius: 2
-                    )
-                }
-
                 ShrinkableMarqueeScrollView {
                     MusicTitle(item: player.current)
                 }
 //                .contentTransition(.numericText())
                 .animation(.default, value: player.currentIndex)
                 .matchedGeometryEffect(id: PlayerNamespace.title, in: namespace)
+                
+                if let thumbnail = player.current?.metadata.thumbnail {
+                    MusicCover(
+                        images: [thumbnail], hasPlaceholder: false,
+                        cornerRadius: 2
+                    )
+                }
             }
             .padding(.bottom, 2)
 
@@ -219,29 +221,30 @@ struct Player: View {
         let time: TimeInterval? = if isProgressBarActive {
             // Use adjustment time
             if shouldUseRemainingDuration {
-                duration.map {
-                    $0.toTimeInterval() * (1 - adjustmentPercentage)
+                (playbackTime?.duration).map {
+                    $0.timeInterval * (1 - adjustmentPercentage)
                 }
             } else {
-                duration.map {
-                    $0.toTimeInterval() * adjustmentPercentage
+                (playbackTime?.duration).map {
+                    $0.timeInterval * adjustmentPercentage
                 }
             }
         } else {
             // Use track time
             if shouldUseRemainingDuration {
-                timeRemaining
+                playbackTime?.remaining
             } else {
-                timeElapsed
+                playbackTime?.elapsed
             }
         }
 
         DurationText(
-            duration: time.map(Duration.seconds(_:)),
+            duration: time?.duration,
             sign: shouldUseRemainingDuration ? .minus : .plus
         )
         .frame(width: 40)
         .foregroundStyle(.secondary)
+        .padding(.bottom, 1)
         .onTapGesture {
             shouldUseRemainingDuration.toggle()
         }
@@ -257,15 +260,17 @@ struct Player: View {
                 adjustmentPercentage = newValue
             }
         )
+        .disabled(!player.hasCurrentTrack)
         .foregroundStyle(isProgressBarActive ? .primary : .secondary)
         .backgroundStyle(.quinary)
         .frame(height: 12)
         .matchedGeometryEffect(id: PlayerNamespace.progressBar, in: namespace)
         .padding(.horizontal, isProgressBarActive ? 0 : 12)
 
-        DurationText(duration: duration)
+        DurationText(duration: playbackTime?.duration)
             .frame(width: 40)
             .foregroundStyle(.secondary)
+            .padding(.bottom, 1)
             .matchedGeometryEffect(
                 id: PlayerNamespace.durationText, in: namespace
             )
@@ -273,7 +278,7 @@ struct Player: View {
 
     private var progressBinding: Binding<CGFloat> {
         Binding {
-            progress ?? .zero
+            playbackTime?.progress ?? .zero
         } set: { newValue in
             player.progress = newValue
         }

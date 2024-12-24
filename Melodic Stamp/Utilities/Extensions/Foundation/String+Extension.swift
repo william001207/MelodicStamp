@@ -24,7 +24,7 @@ extension String {
 }
 
 extension String {
-    func toTTMLTimeInterval() -> TimeInterval? {
+    func toTTMLTimestamp() -> TimeInterval? {
         let regex = /(\d+):(\d+)\.(\d+)/
 
         do {
@@ -35,10 +35,7 @@ extension String {
                     let milliseconds = Double(match.output.3)
                 else { return nil }
 
-                let totalSeconds = minutes * 60 + seconds
-                let totalMilliseconds = totalSeconds * 1000 + milliseconds
-
-                return totalMilliseconds
+                return minutes * 60 + seconds + milliseconds / 1000
             } else {
                 return nil
             }

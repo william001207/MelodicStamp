@@ -44,10 +44,7 @@ struct MiniPlayer: View {
     @State private var adjustmentPercentage: CGFloat = .zero
     @State private var shouldUseRemainingDuration: Bool = true
 
-    @State var progress: Double?
-    @State var duration: Duration?
-    @State var timeElapsed: TimeInterval?
-    @State var timeRemaining: TimeInterval?
+    @State private var playbackTime: PlaybackTime?
 
     var body: some View {
         VStack(spacing: 12) {
@@ -83,18 +80,12 @@ struct MiniPlayer: View {
         }
 
         // Receive playback time update
-        .onReceive(player.playbackTime) { playbackTime in
-            progress = playbackTime.progress
-            timeElapsed = playbackTime.current
-            timeRemaining = playbackTime.remaining
-            duration = playbackTime.total.map { .seconds($0) }
+        .onReceive(player.playbackTimePublisher) { playbackTime in
+            self.playbackTime = playbackTime
         }
         .onChange(of: player.currentIndex, initial: true) { _, newValue in
             guard newValue == nil else { return }
-            progress = nil
-            timeElapsed = nil
-            timeRemaining = nil
-            duration = nil
+            playbackTime = nil
         }
 
         // Regain progress control on new track
@@ -173,18 +164,19 @@ struct MiniPlayer: View {
             .matchedGeometryEffect(
                 id: PlayerNamespace.playbackModeButton, in: namespace
             )
-
-            Group {
-                switch headerControl {
-                case .title:
-                    if let thumbnail = player.current?.metadata.thumbnail {
-                        MusicCover(images: [thumbnail], hasPlaceholder: false, cornerRadius: 2)
-                    }
-                default:
-                    EmptyView()
-                }
+            
+            AliveButton(
+                enabledStyle: .init(.tertiary), hoveringStyle: .init(.secondary)
+            ) {
+                player.playbackLooping.toggle()
+            } label: {
+                PlaybackLoopingView(isEnabled: player.playbackLooping)
+                    .font(.headline)
+                    .frame(width: 16)
             }
-            .padding(.bottom, 2)
+            .matchedGeometryEffect(
+                id: PlayerNamespace.playbackLoopingButton, in: namespace
+            )
 
             AliveButton {
                 headerControl =
@@ -210,6 +202,18 @@ struct MiniPlayer: View {
                 .matchedGeometryEffect(id: PlayerNamespace.title, in: namespace)
                 .padding(.bottom, 2)
             }
+            
+            Group {
+                switch headerControl {
+                case .title:
+                    if let thumbnail = player.current?.metadata.thumbnail {
+                        MusicCover(images: [thumbnail], hasPlaceholder: false, cornerRadius: 2)
+                    }
+                default:
+                    EmptyView()
+                }
+            }
+            .padding(.bottom, 2)
 
             AliveButton(
                 enabledStyle: .init(.tertiary), hoveringStyle: .init(.secondary)
@@ -340,29 +344,30 @@ struct MiniPlayer: View {
                     let time: TimeInterval? = if isProgressBarActive {
                         // Use adjustment time
                         if shouldUseRemainingDuration {
-                            duration.map {
-                                $0.toTimeInterval() * (1 - adjustmentPercentage)
+                            (playbackTime?.duration).map {
+                                $0.timeInterval * (1 - adjustmentPercentage)
                             }
                         } else {
-                            duration.map {
-                                $0.toTimeInterval() * adjustmentPercentage
+                            (playbackTime?.duration).map {
+                                $0.timeInterval * adjustmentPercentage
                             }
                         }
                     } else {
                         // Use track time
                         if shouldUseRemainingDuration {
-                            timeRemaining
+                            playbackTime?.remaining
                         } else {
-                            timeElapsed
+                            playbackTime?.elapsed
                         }
                     }
 
                     DurationText(
-                        duration: time.map(Duration.seconds(_:)),
+                        duration: time?.duration,
                         sign: shouldUseRemainingDuration ? .minus : .plus
                     )
                     .frame(width: 40)
                     .foregroundStyle(.secondary)
+                    .padding(.bottom, 1)
                     .onTapGesture {
                         shouldUseRemainingDuration.toggle()
                     }
@@ -421,9 +426,10 @@ struct MiniPlayer: View {
 
             Group {
                 if activeControl == .progress {
-                    DurationText(duration: duration)
+                    DurationText(duration: playbackTime?.duration)
                         .frame(width: 40)
                         .foregroundStyle(.secondary)
+                        .padding(.bottom, 1)
                 }
             }
             .transition(.blurReplace)
@@ -441,7 +447,7 @@ struct MiniPlayer: View {
 
     private var progressBinding: Binding<CGFloat> {
         Binding {
-            progress ?? .zero
+            playbackTime?.progress ?? .zero
         } set: { newValue in
             player.progress = newValue
         }

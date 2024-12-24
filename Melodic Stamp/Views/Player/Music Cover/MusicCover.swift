@@ -32,7 +32,7 @@ struct MusicCover: View {
                         Color.clear
                     }
                 }
-                .aspectRatio(1, contentMode: .fit)
+                .aspectRatio(1/1, contentMode: .fit)
             }
         }
         .clipShape(.rect(cornerRadius: cornerRadius))

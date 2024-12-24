@@ -7,6 +7,9 @@
     " " : {
 
     },
+    "--:--" : {
+
+    },
     "·" : {
 
     },
@@ -165,6 +168,9 @@
 
     },
     "In Current Playlist" : {
+
+    },
+    "Infinite Loop" : {
 
     },
     "Inspector" : {
@@ -345,9 +351,6 @@
 
     },
     "Shuffle" : {
-
-    },
-    "Single Loop" : {
 
     },
     "Sorting" : {

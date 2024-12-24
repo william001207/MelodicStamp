@@ -12,7 +12,7 @@ struct LyricsView: View {
     @Environment(MetadataEditorModel.self) var metadataEditor
     @Environment(LyricsModel.self) var lyrics
 
-    @State var timeElapsed: TimeInterval?
+    @State private var playbackTime: PlaybackTime?
 
     var body: some View {
         Group {
@@ -51,12 +51,12 @@ struct LyricsView: View {
             lyrics.identify(url: newValue?.url)
         }
         // Receive playback time update
-        .onReceive(player.playbackTime) { playbackTime in
-            timeElapsed = playbackTime.current
+        .onReceive(player.playbackTimePublisher) { playbackTime in
+            self.playbackTime = playbackTime
         }
         .onChange(of: player.currentIndex, initial: true) { _, newValue in
             guard newValue == nil else { return }
-            timeElapsed = nil
+            playbackTime = nil
         }
     }
 
@@ -80,7 +80,7 @@ struct LyricsView: View {
     }
 
     private var highlightedRange: Range<Int> {
-        if let timeElapsed {
+        if let timeElapsed = playbackTime?.elapsed {
             lyrics.find(at: timeElapsed, in: player.current?.url)
         } else {
             0..<0

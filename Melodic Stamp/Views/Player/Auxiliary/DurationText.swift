@@ -13,9 +13,22 @@ struct DurationText: View {
     var pattern: Duration.TimeFormatStyle.Pattern = .minuteSecond
 
     var body: some View {
-        Text(formattedSign + (formattedDuration ?? "--:--"))
-//            .contentTransition(.numericText())
-            .animation(.bouncy, value: duration)
+        HStack(spacing: 0) {
+            if let formattedDuration {
+                Text(formattedSign)
+                
+                Text(formattedDuration)
+            } else {
+                Group {
+                    Text(formattedSign)
+                    
+                    Text("--:--")
+                }
+                .foregroundStyle(.placeholder)
+            }
+        }
+//        .contentTransition(.numericText())
+        .animation(.bouncy, value: duration)
     }
 
     private var formattedSign: String {

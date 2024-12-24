@@ -81,12 +81,11 @@ import SwiftSoup
         }
     }
 
-    static func readTimestamp(from element: Element, into lyrics: inout TTMLLyrics) throws {
-        let beginTime = try TTMLData(type: .begin, element: element)?.content.toTTMLTimeInterval()
-        let endTime = try TTMLData(type: .end, element: element)?.content.toTTMLTimeInterval()
+    static func readTimestamp(from element: Element) throws -> (beginTime: TimeInterval?, endTime: TimeInterval?) {
+        let beginTime = try TTMLData(type: .begin, element: element)?.content.toTTMLTimestamp()
+        let endTime = try TTMLData(type: .end, element: element)?.content.toTTMLTimestamp()
 
-        lyrics.beginTime = beginTime
-        lyrics.endTime = endTime
+        return (beginTime, endTime)
     }
 
     static func readNodes(
@@ -95,7 +94,10 @@ import SwiftSoup
         intoBackground backgroundLyrics: inout TTMLLyrics,
         isRecursive: Bool = false
     ) throws {
-        try readTimestamp(from: element, into: &lyrics)
+        let (beginTime, endTime) = try readTimestamp(from: element)
+        lyrics.beginTime = beginTime
+        lyrics.endTime = endTime
+        
         var text = try element.text()
 
         for node in element.getChildNodes() {
@@ -107,8 +109,7 @@ import SwiftSoup
             } else if
                 let spanElement = node as? Element,
                 spanElement.tagName() == "span" {
-                let beginTime = try TTMLData(type: .begin, element: spanElement)?.content.toTTMLTimeInterval()
-                let endTime = try TTMLData(type: .end, element: spanElement)?.content.toTTMLTimeInterval()
+                let (beginTime, endTime) = try readTimestamp(from: spanElement)
                 let spanText = try spanElement
                     .text()
                     .normalizeSpaces()

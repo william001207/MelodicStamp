@@ -14,18 +14,20 @@ struct PlaybackModeView: View {
         HStack {
             mode.image
 
-            switch mode {
-            case .single:
-                Text("Single Loop")
-            case .sequential:
-                Text("Sequential")
-            case .loop:
-                Text("Sequential Loop")
-            case .shuffle:
-                Text("Shuffle")
-            }
+            Text(Self.name(of: mode))
         }
         .tag(mode)
+    }
+    
+    static func name(of mode: PlaybackMode) -> String {
+        switch mode {
+        case .sequential:
+                .init(localized: "Sequential")
+        case .loop:
+                .init(localized: "Sequential Loop")
+        case .shuffle:
+                .init(localized: "Shuffle")
+        }
     }
 }
 

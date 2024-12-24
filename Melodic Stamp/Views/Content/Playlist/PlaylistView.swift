@@ -16,6 +16,7 @@ struct PlaylistView: View {
 
     @Environment(\.resetFocus) private var resetFocus
     @Environment(\.luminareMinHeight) private var minHeight
+    @Environment(\.luminareAnimation) private var animation
 
     var namespace: Namespace.ID
 
@@ -41,7 +42,7 @@ struct PlaylistView: View {
                     }
                     .onMove { indices, destination in
                         withAnimation {
-                            player.playlist.move(fromOffsets: indices, toOffset: destination)
+                            player.movePlaylist(fromOffsets: indices, toOffset: destination)
                         }
                     }
                     .transition(.slide)
@@ -80,18 +81,24 @@ struct PlaylistView: View {
             }
 
             HStack(spacing: 0) {
-                LuminareSection(hasPadding: false) {
-                    actions()
-                        .luminareMinHeight(minHeight)
-                        .frame(height: minHeight)
+                Group {
+                    LuminareSection(hasPadding: false) {
+                        leadingActions()
+                            .frame(height: minHeight)
+                    }
+                    
+                    Spacer()
+                    
+                    LuminareSection(hasPadding: false) {
+                        trailingActions()
+                            .frame(height: minHeight)
+                    }
                 }
                 .luminareBordered(false)
                 .luminareButtonMaterial(.thin)
                 .luminareSectionMasked(true)
                 .luminareSectionMaxWidth(nil)
                 .shadow(color: .black.opacity(0.25), radius: 32)
-
-                Spacer()
             }
             .padding(.top, 64)
             .padding(.horizontal)
@@ -106,7 +113,7 @@ struct PlaylistView: View {
         !player.playlist.isEmpty
     }
 
-    @ViewBuilder private func actions() -> some View {
+    @ViewBuilder private func leadingActions() -> some View {
         HStack(spacing: 2) {
             // Clear selection
             Button {
@@ -115,19 +122,8 @@ struct PlaylistView: View {
                 Image(systemSymbol: .xmark)
                     .padding()
             }
-            .aspectRatio(1, contentMode: .fit)
+            .aspectRatio(1/1, contentMode: .fit)
             .disabled(!canEscape)
-
-            // Cycle playback mode
-            Button {
-                let hasShift = NSEvent.modifierFlags.contains(.shift)
-                player.playbackMode = player.playbackMode.cycle(
-                    negate: hasShift)
-            } label: {
-                PlaybackModeView(mode: player.playbackMode)
-                    .padding()
-            }
-            .fixedSize(horizontal: true, vertical: false)
 
             // Remove selection from playlist / remove all
             Button(role: .destructive) {
@@ -153,6 +149,31 @@ struct PlaylistView: View {
             .buttonStyle(.luminareProminent)
             .fixedSize(horizontal: true, vertical: false)
             .disabled(!canRemove)
+        }
+        .buttonStyle(.luminare)
+    }
+    
+    @ViewBuilder private func trailingActions() -> some View {
+        HStack(spacing: 2) {
+            // Cycle playback mode
+            Button {
+                let hasShift = NSEvent.modifierFlags.contains(.shift)
+                player.playbackMode = player.playbackMode.cycle(
+                    negate: hasShift)
+            } label: {
+                PlaybackModeView(mode: player.playbackMode)
+                    .padding()
+            }
+            .fixedSize(horizontal: true, vertical: false)
+            
+            // Toggle infinite loop
+            Button {
+                player.playbackLooping.toggle()
+            } label: {
+                PlaybackLoopingView(isEnabled: player.playbackLooping)
+                    .padding()
+            }
+            .aspectRatio(1/1, contentMode: .fit)
         }
         .buttonStyle(.luminare)
     }
