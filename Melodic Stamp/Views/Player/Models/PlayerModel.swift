@@ -69,8 +69,13 @@ struct PlaybackTime: Hashable {
     private let timer = TimerPublisher(interval: 0.25)
     
     private var playbackTimeSubject = PassthroughSubject<PlaybackTime?, Never>()
+    private var isPlayingSubject = PassthroughSubject<Bool, Never>()
+    
     var playbackTimePublisher: AnyPublisher<PlaybackTime?, Never> {
         playbackTimeSubject.eraseToAnyPublisher()
+    }
+    var isPlayingPublisher: AnyPublisher<Bool, Never> {
+        isPlayingSubject.eraseToAnyPublisher()
     }
     
     // MARK: Playlist & Playback
@@ -212,14 +217,22 @@ struct PlaybackTime: Hashable {
         timer
             .receive(on: DispatchQueue.main)
             .sink { _ in
-                if let time = self.player.time {
-                    guard
-                        let total = time.total,
-                        let current = time.current
-                    else { return }
-                    self.playbackTimeSubject.send(.init(
-                        duration: total.duration, elapsed: current
-                    ))
+                playbackTime: do {
+                    if let time = self.player.time {
+                        guard
+                            let total = time.total,
+                            let current = time.current
+                        else { break playbackTime }
+                        self.playbackTimeSubject.send(.init(
+                            duration: total.duration, elapsed: current
+                        ))
+                    } else {
+                        self.playbackTimeSubject.send(nil)
+                    }
+                }
+                
+                isPlaying: do {
+                    self.isPlayingSubject.send(self.isPlaying)
                 }
             }
             .store(in: &cancellables)
