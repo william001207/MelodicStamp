@@ -115,6 +115,8 @@ struct MainView: View {
 //                        LyricsToolbar(lyricsType: $lyrics.type)
 //                    }
                     }
+            case .analysis:
+                AnalysisView()
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)

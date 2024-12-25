@@ -36,12 +36,22 @@ enum SidebarContentTab: String, SidebarTab, CaseIterable, Codable {
             .viewfinder
         }
     }
+    
+    var inspectors: [SidebarInspectorTab] {
+        switch self {
+        case .playlist:
+            [.commonMetadata, .advancedMetadata, .lyrics, .analysis]
+        case .leaflet:
+            [.analysis]
+        }
+    }
 }
 
 enum SidebarInspectorTab: String, SidebarTab, CaseIterable, Codable {
     case commonMetadata
     case advancedMetadata
     case lyrics
+    case analysis
 
     var id: String { rawValue }
 
@@ -53,6 +63,8 @@ enum SidebarInspectorTab: String, SidebarTab, CaseIterable, Codable {
             .init(localized: "Advanced")
         case .lyrics:
             .init(localized: "Lyrics")
+        case .analysis:
+            .init(localized: "Analysis")
         }
     }
 
@@ -64,6 +76,8 @@ enum SidebarInspectorTab: String, SidebarTab, CaseIterable, Codable {
             .at
         case .lyrics:
             .textQuote
+        case .analysis:
+            .checkmarkSealFill
         }
     }
 }

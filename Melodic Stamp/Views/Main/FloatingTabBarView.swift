@@ -11,14 +11,16 @@ import SwiftUI
 struct FloatingTabBarView: View {
     @Environment(FloatingWindowsModel.self) var floatingWindows
 
+    @Environment(\.luminareAnimation) private var animation
     @Environment(\.luminareAnimationFast) private var animationFast
-
-    @State private var isHovering: Bool = true
-    @State private var hoveringTabs: Set<AnyHashable> = []
 
     @Binding var isInspectorPresented: Bool
     @Binding var selectedContentTab: SidebarContentTab
     @Binding var selectedInspectorTab: SidebarInspectorTab
+    
+    @State private var isHovering: Bool = true // Crucial!
+    @State private var isDragging: Bool = false
+    @State private var hoveringTabs: Set<AnyHashable> = []
 
     var body: some View {
         ZStack {
@@ -32,32 +34,45 @@ struct FloatingTabBarView: View {
 
                     sectionLabel("Inspector")
 
-                    ForEach(SidebarInspectorTab.allCases) { tab in
+                    ForEach(selectedContentTab.inspectors) { tab in
                         inspectorTab(for: tab)
                     }
                 }
                 .padding(4)
+                .transition(.blurReplace)
             }
+            .animation(animation, value: selectedContentTab)
         }
         .onAppear {
             // Avoid glitches on first hover
             isHovering = false
         }
-        .onHover(perform: { hover in
-            withAnimation(.default.speed(2)) {
-                isHovering = hover
+        .onHover { hover in
+            isHovering = hover
+        }
+        .onChange(of: selectedContentTab) { _, newValue in
+            guard isInspectorPresented else { return }
+            if !newValue.inspectors.contains(selectedInspectorTab) {
+                // Tell the inspector to close
+                isInspectorPresented = false
             }
-        })
+        }
         .background(.clear)
-        .frame(width: isHovering ? nil : 48)
+        .frame(width: isExpanded ? nil : 48)
         .clipShape(.rect(cornerRadius: 24))
         .frame(maxWidth: .infinity, alignment: .leading)
         .contentShape(.rect(cornerRadius: 24))
+        .animation(animation, value: isExpanded)
+        .fixedSize(horizontal: false, vertical: true) // Resize window
+    }
+    
+    private var isExpanded: Bool {
+        isHovering || isDragging
     }
 
     @ViewBuilder private func sectionLabel(_ key: LocalizedStringKey) -> some View {
         Group {
-            if isHovering {
+            if isExpanded {
                 Text(key)
                     .font(.caption)
                     .bold()
@@ -78,6 +93,10 @@ struct FloatingTabBarView: View {
             selectedContentTab = tab
         } label: {
             label(for: tab, isSelected: isSelected)
+        } onGestureChanged: { _ in
+            isDragging = true
+        } onGestureEnded: { _ in
+            isDragging = false
         }
         .onHover { hover in
             withAnimation(animationFast) {
@@ -102,6 +121,10 @@ struct FloatingTabBarView: View {
             }
         } label: {
             label(for: tab, isSelected: isSelected)
+        } onGestureChanged: { _ in
+            isDragging = true
+        } onGestureEnded: { _ in
+            isDragging = false
         }
         .onHover { hover in
             withAnimation(animationFast) {
@@ -122,7 +145,7 @@ struct FloatingTabBarView: View {
                 .font(.system(size: 18))
                 .frame(width: 32, height: 32)
 
-            if isHovering {
+            if isExpanded {
                 Text(tab.title)
                     .font(.headline)
                     .fixedSize()
@@ -131,11 +154,11 @@ struct FloatingTabBarView: View {
         }
         .frame(height: 32)
         .padding(4)
-        .frame(maxWidth: .infinity, alignment: isHovering ? .leading : .center)
+        .frame(maxWidth: .infinity, alignment: isExpanded ? .leading : .center)
         .opacity(isSelected || isTabHovering ? 1 : 0.75)
         .background {
             if isSelected {
-                if isHovering {
+                if isExpanded {
                     RoundedRectangle(cornerRadius: 20)
                         .stroke(.tint)
                         .fill(.tint.quaternary)

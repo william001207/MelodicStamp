@@ -144,14 +144,14 @@ struct MiniPlayer: View {
     @ViewBuilder private func header() -> some View {
         HStack(alignment: .center, spacing: 12) {
             AliveButton(
-                enabledStyle: .init(.tertiary), hoveringStyle: .init(.secondary)
+                enabledStyle: .tertiary, hoveringStyle: .secondary
             ) {} label: {
                 Image(systemSymbol: .squareAndArrowUp)
             }
             .opacity(isTitleHovering ? 1 : 0)
 
             AliveButton(
-                enabledStyle: .init(.tertiary), hoveringStyle: .init(.secondary)
+                enabledStyle: .tertiary, hoveringStyle: .secondary
             ) {
                 let hasShift = NSEvent.modifierFlags.contains(.shift)
                 player.playbackMode = player.playbackMode.cycle(
@@ -166,7 +166,7 @@ struct MiniPlayer: View {
             )
             
             AliveButton(
-                enabledStyle: .init(.tertiary), hoveringStyle: .init(.secondary)
+                enabledStyle: .tertiary, hoveringStyle: .secondary
             ) {
                 player.playbackLooping.toggle()
             } label: {
@@ -216,7 +216,7 @@ struct MiniPlayer: View {
             .padding(.bottom, 2)
 
             AliveButton(
-                enabledStyle: .init(.tertiary), hoveringStyle: .init(.secondary)
+                enabledStyle: .tertiary, hoveringStyle: .secondary
             ) {
                 windowManager.style = .main
             } label: {
@@ -307,7 +307,7 @@ struct MiniPlayer: View {
         }
 
         if activeControl == .volume || !isProgressBarExpanded {
-            AliveButton(enabledStyle: .init(.secondary)) {
+            AliveButton(enabledStyle: .secondary) {
                 switch activeControl {
                 case .progress:
                     activeControl = .volume
@@ -328,7 +328,7 @@ struct MiniPlayer: View {
                 id: PlayerNamespace.volumeButton, in: namespace
             )
 
-            AliveButton(enabledStyle: .init(.secondary)) {} label: {
+            AliveButton(enabledStyle: .secondary) {} label: {
                 Image(systemSymbol: .listTriangle)
             }
             .matchedGeometryEffect(

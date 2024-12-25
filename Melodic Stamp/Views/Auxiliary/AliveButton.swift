@@ -11,25 +11,71 @@ import SwiftUI
 struct AliveButton<Label>: View where Label: View {
     @Environment(\.isEnabled) private var isEnabled
 
-    var scaleFactor: CGFloat = 0.85
-    var shadowRadius: CGFloat = 4
-    var duration: TimeInterval = 0.45
-    var enabledStyle: AnyShapeStyle = .init(.primary)
+    var scaleFactor: CGFloat
+    var shadowRadius: CGFloat
+    var duration: TimeInterval
+    
+    var enabledStyle: AnyShapeStyle
     var hoveringStyle: AnyShapeStyle?
-    var disabledStyle: AnyShapeStyle = .init(.quinary)
-    var action: () -> ()
+    var disabledStyle: AnyShapeStyle
+    
+    var onGestureChanged: (DragGesture.Value) -> Void
+    var onGestureEnded: (DragGesture.Value) -> Void
+    var action: () -> Void
     @ViewBuilder var label: () -> Label
 
     @State private var isHovering: Bool = false
     @State private var isActive: Bool = false
     @State private var frame: CGRect = .zero
+    
+    init(
+        scaleFactor: CGFloat = 0.85, shadowRadius: CGFloat = 4, duration: TimeInterval = 0.45,
+        enabledStyle: some ShapeStyle = .primary, hoveringStyle: some ShapeStyle, disabledStyle: some ShapeStyle = .quinary,
+        action: @escaping () -> Void,
+        @ViewBuilder label: @escaping () -> Label,
+        onGestureChanged: @escaping (DragGesture.Value) -> Void = { _ in },
+        onGestureEnded: @escaping (DragGesture.Value) -> Void = { _ in }
+    ) {
+        self.scaleFactor = scaleFactor
+        self.shadowRadius = shadowRadius
+        self.duration = duration
+        self.enabledStyle = .init(enabledStyle)
+        self.hoveringStyle = .init(hoveringStyle)
+        self.disabledStyle = .init(disabledStyle)
+        self.onGestureChanged = onGestureChanged
+        self.onGestureEnded = onGestureEnded
+        self.action = action
+        self.label = label
+    }
+    
+    init(
+        scaleFactor: CGFloat = 0.85, shadowRadius: CGFloat = 4, duration: TimeInterval = 0.45,
+        enabledStyle: some ShapeStyle = .primary, disabledStyle: some ShapeStyle = .quinary,
+        action: @escaping () -> Void,
+        @ViewBuilder label: @escaping () -> Label,
+        onGestureChanged: @escaping (DragGesture.Value) -> Void = { _ in },
+        onGestureEnded: @escaping (DragGesture.Value) -> Void = { _ in }
+    ) {
+        self.scaleFactor = scaleFactor
+        self.shadowRadius = shadowRadius
+        self.duration = duration
+        self.enabledStyle = .init(enabledStyle)
+        self.hoveringStyle = nil
+        self.disabledStyle = .init(disabledStyle)
+        self.onGestureChanged = onGestureChanged
+        self.onGestureEnded = onGestureEnded
+        self.action = action
+        self.label = label
+    }
 
     var body: some View {
         label()
             .gesture(DragGesture(minimumDistance: 0)
-                .onChanged { _ in
+                .onChanged { gesture in
                     guard isEnabled else { return }
                     isActive = true
+                    
+                    onGestureChanged(gesture)
                 }
                 .onEnded { gesture in
                     guard isEnabled else { return }
@@ -39,6 +85,8 @@ struct AliveButton<Label>: View where Label: View {
                     if frame.contains(gesture.location) {
                         action()
                     }
+                    
+                    onGestureEnded(gesture)
                 })
             .onGeometryChange(for: CGRect.self) { proxy in
                 proxy.frame(in: .local)
