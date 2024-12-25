@@ -15,6 +15,7 @@ struct NowPlayingView: View {
 
     @State private var playbackTime: PlaybackTime?
     @State private var isPlaying: Bool = false
+    @State private var showLyrics: Bool = true
 
     var body: some View {
         HStack(spacing: 50) {
@@ -31,16 +32,24 @@ struct NowPlayingView: View {
             }
             .frame(width: 350, height: 350, alignment: .center)
             
-            NowPlayingLyricsView()
-                .transition(.blurReplace(.downUp))
+            if showLyrics {
+                NowPlayingLyricsView()
+                    .transition(.blurReplace(.downUp))
+            }
         }
         .padding(.horizontal, 100)
-        .background(Color.accentColor.opacity(0.5))
+        .background(Color.black.opacity(0.5))
+        // Test Only
+        .overlay(alignment: .top) {
+            Button("Lyrics Toggle"){
+                withAnimation(.smooth(duration: 0.45)) {
+                    showLyrics.toggle()
+                }
+            }
+            .padding(.top, 100)
+        }
         .onReceive(player.isPlayingPublisher) { isPlaying in
             self.isPlaying = isPlaying
-        }
-        .onReceive(player.playbackTimePublisher) { playbackTime in
-            self.playbackTime = playbackTime
         }
     }
 }

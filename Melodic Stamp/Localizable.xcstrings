@@ -29,9 +29,6 @@
         }
       }
     },
-    "%lld" : {
-
-    },
     "%lld Songs" : {
 
     },
@@ -200,9 +197,6 @@
     "Louder" : {
 
     },
-    "Lower bound: %lld" : {
-
-    },
     "Lyricist" : {
 
     },
@@ -210,6 +204,9 @@
 
     },
     "Lyrics (.lrc)" : {
+
+    },
+    "Lyrics Toggle" : {
 
     },
     "Main Window" : {
@@ -393,9 +390,6 @@
 
     },
     "Unprocessed" : {
-
-    },
-    "Upper bound: %lld" : {
 
     },
     "Version" : {

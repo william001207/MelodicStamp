@@ -128,9 +128,13 @@ enum LyricsStorage {
     }
 
     func find(at time: TimeInterval, in url: URL?) -> Range<Int> {
-        guard let storage, let url, url == self.url else { return 0..<0 }
+        guard let storage, let url, url == self.url else {
+            print("URL mismatch or lyrics not loaded. Player URL: \(url?.absoluteString ?? "nil"), Lyrics URL: \(self.url?.absoluteString ?? "nil")")
+            return 0..<0
+        }
         return storage.find(at: time)
     }
+
 }
 
 extension LyricsModel {

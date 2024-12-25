@@ -10,161 +10,16 @@ import SwiftUI
 struct NowPlayingLyricsView: View {
 
     @Environment(PlayerModel.self) var player
-    @Environment(MetadataEditorModel.self) var metadataEditor
     @Environment(LyricsModel.self) var lyrics
 
     @State private var playbackTime: PlaybackTime?
-    
-    @State private var highlightedRange: Range<Int> = 0..<1 // DEBUG
-
-    var body: some View {
-        VStack {
-            Group {
-                switch entries.type {
-                case .none, .varied:
-                    EmptyView()
-                case .identical:
-                    if let lines = lyricsLines {
-                        DynamicScrollView(
-                            range: 0..<lines.count,
-                            highlightedRange: highlightedRange,
-                            alignment: .center
-                        ) { index, isHighlighted in
-                            lyricLineView(line: lines[index], isHighlighted: isHighlighted)
-                        } indicators: {
-                            EmptyView()
-                        }
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    } else {
-                        Text("No lyrics available")
-                            .frame(maxWidth: .infinity, maxHeight: .infinity)
-                            .foregroundStyle(.secondary)
-                    }
-                }
-            }
-            .overlay(alignment: .bottom) {
-                VStack {
-                    if let lines = lyricsLines {
-                        HStack {
-                            let upperBound = highlightedRange.upperBound
-                            
-                            Text("Lower bound: \(highlightedRange.lowerBound)")
-                                .fixedSize()
-                                .frame(width: 100, alignment: .leading)
-                            
-                            if upperBound > 0 {
-                                Slider(
-                                    value: Binding {
-                                        Double(highlightedRange.lowerBound)
-                                    } set: { newValue in
-                                        let newBound = min(Int(newValue), upperBound)
-                                        highlightedRange = max(0, newBound)..<upperBound
-                                    },
-                                    in: 0...Double(upperBound),
-                                    step: 1
-                                ) {
-                                    EmptyView()
-                                } minimumValueLabel: {
-                                    Text("\(0)")
-                                } maximumValueLabel: {
-                                    Text("\(upperBound)")
-                                }
-                                .monospaced()
-                            } else {
-                                Slider(
-                                    value: .constant(0),
-                                    in: 0...1,
-                                    step: 1
-                                ) {
-                                    EmptyView()
-                                } minimumValueLabel: {
-                                    Text("\(0)")
-                                } maximumValueLabel: {
-                                    Text("\(0)")
-                                }
-                                .disabled(true)
-                                .monospaced()
-                            }
-                        }
-                        .padding()
-                        HStack {
-                            let lowerBound = highlightedRange.lowerBound
-                            
-                            Text("Upper bound: \(highlightedRange.upperBound)")
-                                .fixedSize()
-                                .frame(width: 100, alignment: .leading)
-                            
-                            if lowerBound < lines.count {
-                                Slider(
-                                    value: Binding {
-                                        Double(highlightedRange.upperBound)
-                                    } set: { newValue in
-                                        let newBound = max(Int(newValue), lowerBound)
-                                        highlightedRange = lowerBound..<min(lines.count, newBound)
-                                    },
-                                    in: Double(lowerBound)...Double(lines.count),
-                                    step: 1
-                                ) {
-                                    EmptyView()
-                                } minimumValueLabel: {
-                                    Text("\(lowerBound)")
-                                } maximumValueLabel: {
-                                    Text("\(lines.count)")
-                                }
-                                .monospaced()
-                            } else {
-                                Slider(
-                                    value: .constant(1),
-                                    in: 0...1,
-                                    step: 1
-                                ) {
-                                    EmptyView()
-                                } minimumValueLabel: {
-                                    Text("\(lines.count)")
-                                } maximumValueLabel: {
-                                    Text("\(lines.count)")
-                                }
-                                .disabled(true)
-                                .monospaced()
-                            }
-                        }
-                        .padding()
-                    }
-                }
-            }
-        }
-        .padding(.bottom, 94)
-        .onChange(of: entries, initial: true) { _, _ in
-            loadLyrics()
-        }
-        .onChange(of: lyrics.type) { _, _ in
-            loadLyrics()
-        }
-        .onChange(of: player.current) { _, newValue in
-            lyrics.identify(url: newValue?.url)
-        }
-        .onReceive(player.playbackTimePublisher) { playbackTime in
-            self.playbackTime = playbackTime
-        }
-        .onChange(of: player.currentIndex, initial: true) { _, newValue in
-            guard newValue == nil else { return }
-            playbackTime = nil
-        }
-    }
-
-    private var entries: MetadataBatchEditingEntries<String?> {
-        metadataEditor[extracting: \.lyrics]
-    }
-
-    /*
-    private var highlightedRange: Range<Int> {
-        if let timeElapsed = playbackTime?.elapsed {
-            return lyrics.find(at: timeElapsed, in: player.current?.url)
-        } else {
-            return 0..<0
-        }
-    }
-    */
+    @State private var highlightedRange: Range<Int> = 0..<0
+    @State private var eachTextHeights: [CGFloat] = []
+    @State private var scrollViewOffset: CGFloat = 50
+    @State private var isPlaying: Bool = false
+    @State private var isOnHover: Bool = false
+    @State private var timer: Timer?
+    @State private var fineGrainedElapsedTime: TimeInterval = 0.0
 
     private var lyricsLines: [any LyricLine]? {
         switch lyrics.storage {
@@ -179,8 +34,61 @@ struct NowPlayingLyricsView: View {
         }
     }
 
+    var body: some View {
+        VStack {
+            if let lines = lyricsLines {
+                DynamicScrollView(
+                    offset: scrollViewOffset,
+                    range: 0..<lines.count,
+                    highlightedRange: highlightedRange,
+                    alignment: .center
+                ) { index, isHighlighted in
+                    lyricLineView(line: lines[index], isHighlighted: isHighlighted, index: index)
+                } indicators: {
+                    Spacer()
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+            } else {
+                Text("No lyrics available")
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
+                    .foregroundStyle(.secondary)
+            }
+        }
+        .onHover{ isOnHover in
+            withAnimation(.smooth(duration: 0.25)) {
+                self.isOnHover = isOnHover
+            }
+        }
+        .onAppear {
+            loadLyrics()
+        }
+        .onChange(of: player.current) { _, newValue in
+            loadLyrics()
+        }
+        .onReceive(player.playbackTimePublisher) { playbackTime in
+            self.playbackTime = playbackTime
+
+            if let timeElapsed = playbackTime?.elapsed {
+                let newRange = lyrics.find(at: timeElapsed, in: player.current?.url)
+                if newRange != 0..<0 {
+                    highlightedRange = newRange
+                }
+                fineGrainedElapsedTime = timeElapsed
+            }
+        }
+        .onReceive(player.isPlayingPublisher) { isPlaying in
+            self.isPlaying = isPlaying
+            toggleTimer(isPlaying: isPlaying)
+        }
+        .onChange(of: player.currentIndex, initial: true) { _, newValue in
+            guard newValue == nil else { return }
+            playbackTime = nil
+            stopTimer()
+        }
+    }
+
     @ViewBuilder
-    private func lyricLineView(line: any LyricLine, isHighlighted: Bool) -> some View {
+    private func lyricLineView(line: any LyricLine, isHighlighted: Bool, index: Int) -> some View {
         Group {
             if let rawLine = line as? RawLyricLine {
                 rawLyricLineView(line: rawLine, isHighlighted: isHighlighted)
@@ -193,12 +101,33 @@ struct NowPlayingLyricsView: View {
             }
         }
         .padding(.bottom, 32)
+        .blur(radius: isHighlighted ? 0 : isOnHover ? 0 : blur(for: index))
+        .opacity(isHighlighted ? 1 : isOnHover ? 1 : opacity(for: index))
+        .background {
+            GeometryReader { geometry in
+                Color.clear
+                    .onAppear {
+                        let height = geometry.size.height
+                        if index < eachTextHeights.count {
+                            eachTextHeights[index] = height
+                        } else {
+                            eachTextHeights.append(contentsOf: Array(repeating: 0, count: index - eachTextHeights.count + 1))
+                            eachTextHeights[index] = height
+                        }
+                    }
+            }
+        }
+        .onChange(of: isHighlighted) { oldValue, newValue in
+            if isHighlighted {
+                scrollViewOffset = eachTextHeights[index]
+            }
+        }
     }
 
     @ViewBuilder
     private func rawLyricLineView(line: RawLyricLine, isHighlighted: Bool) -> some View {
         Text(line.content)
-            .foregroundStyle(isHighlighted ? .primary : .secondary)
+            .font(.system(size: 36).weight(.bold))
     }
 
     @ViewBuilder
@@ -212,24 +141,68 @@ struct NowPlayingLyricsView: View {
 
         HStack {
             tagsView
-
             if line.isValid, !line.content.isEmpty {
                 Text(line.content)
-                    .foregroundStyle(.primary)
+                    .font(.system(size: 36).weight(.bold))
             }
         }
-        .padding(.vertical, 4)
         .background(isHighlighted ? Color.accentColor.opacity(0.1) : Color.clear)
-        .animation(.bouncy, value: isHighlighted)
     }
 
     @ViewBuilder
     private func ttmlLyricLineView(line: TTMLLyricLine, isHighlighted: Bool) -> some View {
-        PlayingTTMLLyricsLine(isHighlighted: isHighlighted, line: line)
+        PlayingTTMLLyricsLine(isHighlighted: isHighlighted, line: line, elapsedTime: fineGrainedElapsedTime)
     }
 
     private func loadLyrics() {
-        guard let binding = entries.projectedValue else { return }
-        lyrics.load(string: binding.wrappedValue)
+        guard let currentTrack = player.current else {
+            print("No current track")
+            return
+        }
+        
+        guard let lyricsEntry = currentTrack.metadata.lyrics else {
+            print("No lyrics found in player metadata for URL: \(currentTrack.url.absoluteString)")
+            return
+        }
+        
+        let lyricsString = lyricsEntry.current
+        lyrics.identify(url: currentTrack.url)
+        lyrics.load(string: lyricsString)
+    }
+
+    private func toggleTimer(isPlaying: Bool) {
+        if isPlaying {
+            startTimer()
+        } else {
+            stopTimer()
+        }
+    }
+
+    private func startTimer() {
+        stopTimer()
+        timer = Timer.scheduledTimer(withTimeInterval: 0.01, repeats: true) { _ in
+            fineGrainedElapsedTime += 0.01
+        }
+    }
+
+    private func stopTimer() {
+        timer?.invalidate()
+        timer = nil
+    }
+    
+    private func opacity(for index: Int) -> Double {
+        let distance = abs(index - (highlightedRange.lowerBound))
+        let maxOpacity: Double = 0.55
+        let minOpacity: Double = 0.125
+        let factor = maxOpacity - (Double(distance) * 0.05)
+        return max(minOpacity, min(factor, maxOpacity))
+    }
+
+    private func blur(for index: Int) -> CGFloat {
+        let distance = abs(index - (highlightedRange.lowerBound))
+        let maxBlur: CGFloat = 5.0
+        let minBlur: CGFloat = 0.0
+        let factor = CGFloat(distance) * 1.0
+        return max(minBlur, min(factor, maxBlur))
     }
 }
