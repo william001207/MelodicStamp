@@ -39,13 +39,15 @@ struct NowPlayingLyricsView: View {
             if let lines = lyricsLines {
                 DynamicScrollView(
                     offset: scrollViewOffset,
+                    delayBeforePush: 0.2,
+                    canPushAnimation: true,
                     range: 0..<lines.count,
                     highlightedRange: highlightedRange,
                     alignment: .center
                 ) { index, isHighlighted in
                     lyricLineView(line: lines[index], isHighlighted: isHighlighted, index: index)
-                } indicators: {
-                    Spacer()
+                } indicators: { index, isHighlighted in
+                    
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {
@@ -55,7 +57,7 @@ struct NowPlayingLyricsView: View {
             }
         }
         .onHover{ isOnHover in
-            withAnimation(.smooth(duration: 0.25)) {
+            withAnimation(.smooth(duration: 0.45)) {
                 self.isOnHover = isOnHover
             }
         }

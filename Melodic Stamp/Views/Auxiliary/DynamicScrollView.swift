@@ -30,7 +30,7 @@ struct DynamicScrollView<Content: View, Indicators: View>: View {
     var alignment: ScrollAlignment = .top
     
     @ViewBuilder var content: (_ index: Int, _ isHighlighted: Bool) -> Content
-    @ViewBuilder var indicators: () -> Indicators
+    @ViewBuilder var indicators: (_ index: Int, _ isHighlighted: Bool) -> Indicators
     
     @State private var animationState: DynamicAnimationState = .intermediate
     @State private var scrollPosition: ScrollPosition = .init()
@@ -61,10 +61,10 @@ struct DynamicScrollView<Content: View, Indicators: View>: View {
                         content(index, isHighlighted)
                             .offset(y: proportion * offset)
                             .animation(.bouncy.delay(delay), value: animationState)
-                            .animation(.bouncy, value: highlightedRange)
+                            .animation(.smooth, value: highlightedRange)
                             .overlay {
                                 if index == highlightedRange.lowerBound {
-                                    indicators()
+                                    indicators(index, isHighlighted)
                                         .opacity(proportion)
                                         .animation(.default, value: proportion)
                                 }
@@ -293,7 +293,7 @@ struct DynamicScrollView<Content: View, Indicators: View>: View {
                     brightness: 1
                 ))
                 .opacity(isHighlighted ? 1 : 0.5)
-        } indicators: {
+        } indicators: { index, isHighlighted in
             EmptyView()
         }
         .border(.foreground)

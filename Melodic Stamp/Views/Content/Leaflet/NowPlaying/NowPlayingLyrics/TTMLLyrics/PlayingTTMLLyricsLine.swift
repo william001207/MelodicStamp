@@ -8,6 +8,10 @@
 import SwiftUI
 
 struct PlayingTTMLLyricsLine: View {
+    
+    @State var Highlighted: Bool = false
+    
+    @State var animationHighlighted: Bool = false
 
     var isHighlighted: Bool = false
     var line: TTMLLyricLine
@@ -16,7 +20,7 @@ struct PlayingTTMLLyricsLine: View {
     var body: some View {
         VStack(alignment: .center, spacing: 5) {
             Group {
-                if isHighlighted {
+                if Highlighted {
                     Text(
                         line.lyrics.children.map { $0.text + String(repeating: " ", count: $0.trailingSpaceCount) }
                             .joined()
@@ -34,6 +38,8 @@ struct PlayingTTMLLyricsLine: View {
                             .joined()
                     )
                     .font(.system(size: 36).weight(.bold))
+                    .foregroundStyle(animationHighlighted ? Color.white : Color.white.opacity(0.1))
+                    .brightness(animationHighlighted ? 1.5 : 1.0)
                 }
                 
                 if !line.lyrics.translations.isEmpty {
@@ -84,6 +90,14 @@ struct PlayingTTMLLyricsLine: View {
             .foregroundStyle(isHighlighted ? .white : .white.opacity(0.5))
             .multilineTextAlignment(line.position == .main ? .leading : .trailing)
             .frame(maxWidth: .infinity, alignment: line.position == .main ? .leading : .trailing)
+        }
+        .onChange(of: isHighlighted) { oldValue, newValue in
+            Highlighted = newValue
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
+                withAnimation(.smooth(duration: 0.45)) {
+                    animationHighlighted = newValue
+                }
+            }
         }
     }
 }
