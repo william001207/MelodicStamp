@@ -63,7 +63,7 @@ struct Player: View {
     @ViewBuilder private func header() -> some View {
         HStack(alignment: .center, spacing: 12) {
             AliveButton(
-                enabledStyle: .init(.tertiary), hoveringStyle: .init(.secondary)
+                enabledStyle: .tertiary, hoveringStyle: .secondary
             ) {
                 let hasShift = NSEvent.modifierFlags.contains(.shift)
                 player.playbackMode = player.playbackMode.cycle(
@@ -79,7 +79,7 @@ struct Player: View {
             )
             
             AliveButton(
-                enabledStyle: .init(.tertiary), hoveringStyle: .init(.secondary)
+                enabledStyle: .tertiary, hoveringStyle: .secondary
             ) {
                 player.playbackLooping.toggle()
             } label: {
@@ -113,7 +113,7 @@ struct Player: View {
             Spacer()
 
             AliveButton(
-                enabledStyle: .init(.tertiary), hoveringStyle: .init(.secondary)
+                enabledStyle: .tertiary, hoveringStyle: .secondary
             ) {
                 windowManager.style = .miniPlayer
             } label: {
@@ -203,7 +203,7 @@ struct Player: View {
         .animation(.default.speed(2), value: player.isMuted)
         .matchedGeometryEffect(id: PlayerNamespace.volumeBar, in: namespace)
 
-        AliveButton(enabledStyle: .init(.secondary)) {
+        AliveButton(enabledStyle: .secondary) {
             player.isMuted.toggle()
         } label: {
             player.speakerImage
