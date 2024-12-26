@@ -54,12 +54,16 @@ struct NowPlayingView: View {
         // Test Only
         
         .overlay(alignment: .top) {
-            Button("Lyrics Toggle"){
-                withAnimation(.smooth(duration: 0.45)) {
-                    showLyrics.toggle()
+            HStack {
+                Button("Lyrics Toggle"){
+                    withAnimation(.smooth(duration: 0.45)) {
+                        showLyrics.toggle()
+                    }
                 }
+                .padding(.top, 100)
+                AudioVisualizationView()
+                    .frame(width: 20, height: 20)
             }
-            .padding(.top, 100)
         }
         
         .onReceive(player.isPlayingPublisher) { isPlaying in
@@ -69,7 +73,7 @@ struct NowPlayingView: View {
     
     func extractDominantColors(from image: NSImage) {
         do {
-            let colors = try DominantColors.dominantColors(nsImage: image, quality: .low, maxCount: 3, options: [.excludeBlack], sorting: .frequency)
+            let colors = try DominantColors.dominantColors(nsImage: image, quality: .low,algorithm: .CIE94, maxCount: 3, options: [.excludeBlack], sorting: .lightness)
             
             let processedColors = colors.map { nsColor in
                 Color(

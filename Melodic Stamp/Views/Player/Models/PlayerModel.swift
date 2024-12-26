@@ -12,6 +12,7 @@ import os.log
 import SFBAudioEngine
 import SFSafeSymbols
 import SwiftUI
+import Accelerate
 
 // MARK: - Playback Mode
 
@@ -70,12 +71,16 @@ struct PlaybackTime: Hashable {
     
     private var playbackTimeSubject = PassthroughSubject<PlaybackTime?, Never>()
     private var isPlayingSubject = PassthroughSubject<Bool, Never>()
+    private var visualizationDataSubject = PassthroughSubject<[Float], Never>()
     
     var playbackTimePublisher: AnyPublisher<PlaybackTime?, Never> {
         playbackTimeSubject.eraseToAnyPublisher()
     }
     var isPlayingPublisher: AnyPublisher<Bool, Never> {
         isPlayingSubject.eraseToAnyPublisher()
+    }
+    var visualizationDataPublisher: AnyPublisher<[Float], Never> {
+        visualizationDataSubject.eraseToAnyPublisher()
     }
     
     // MARK: Playlist & Playback
@@ -89,6 +94,9 @@ struct PlaybackTime: Hashable {
     var duration: Duration { player.time?.total.map { .seconds($0) } ?? .zero }
     var timeElapsed: TimeInterval { player.time?.current ?? .zero }
     var timeRemaining: TimeInterval { player.time?.remaining ?? .zero }
+    
+    // MARK: FFT
+    private var audioDataBuffer: [Float] = []
     
     // MARK: Functional
     
@@ -214,6 +222,7 @@ struct PlaybackTime: Hashable {
         super.init()
         player.delegate = self
         setupRemoteTransportControls()
+        setupAudioVisualization()
         timer
             .receive(on: DispatchQueue.main)
             .sink { _ in
@@ -245,7 +254,7 @@ struct PlaybackTime: Hashable {
 extension PlayerModel {
     func randomIndex() -> Int? {
         guard !playlist.isEmpty else { return nil }
-
+        
         if let current, let index = playlist.firstIndex(of: current) {
             let indices = Array(playlist.indices).filter { $0 != index }
             return indices.randomElement()
@@ -253,10 +262,10 @@ extension PlayerModel {
             return playlist.indices.randomElement()
         }
     }
-
+    
     func play(item: PlaylistItem) {
         addToPlaylist(urls: [item.url])
-
+        
         Task {
             if let decoder = try item.decoder() {
                 self.current = item
@@ -264,30 +273,30 @@ extension PlayerModel {
             }
         }
     }
-
+    
     func play(url: URL) {
         if let item = PlaylistItem(url: url) {
             play(item: item)
         }
     }
-
+    
     func addToPlaylist(urls: [URL]) {
         for url in urls {
             guard !playlist.contains(where: { $0.url == url }) else { continue }
-
+            
             if let item = PlaylistItem(url: url) {
                 addToPlaylist(items: [item])
             }
         }
     }
-
+    
     func addToPlaylist(items: [PlaylistItem]) {
         for item in items {
             guard !playlist.contains(item) else { continue }
             playlist.append(item)
         }
     }
-
+    
     func removeFromPlaylist(urls: [URL]) {
         for url in urls {
             if let index = playlist.firstIndex(where: { $0.url == url }) {
@@ -303,19 +312,19 @@ extension PlayerModel {
     func movePlaylist(fromOffsets indices: IndexSet, toOffset destination: Int) {
         playlist.move(fromOffsets: indices, toOffset: destination)
     }
-
+    
     func seek(position: Double) {
         player.seek(position: position)
     }
-
+    
     func removeFromPlaylist(items: [PlaylistItem]) {
         removeFromPlaylist(urls: items.map(\.url))
     }
-
+    
     func removeAll() {
         removeFromPlaylist(items: playlist)
     }
-
+    
     func updateDeviceMenu() {
         do {
             outputDevices = try AudioDevice.devices.filter { try $0.supportsOutput }
@@ -332,40 +341,40 @@ extension PlayerModel {
             }
         } catch {}
     }
-
+    
     func setOutputDevice(_ device: AudioDevice) {
         do {
             try player.setOutputDeviceID(device.objectID)
             selectedDevice = device
         } catch {}
     }
-
+    
     func play() {
         do {
             try player.play()
         } catch {}
     }
-
+    
     func pause() {
         player.pause()
     }
-
+    
     func togglePlayPause() {
         do {
             try player.togglePlayPause()
         } catch {}
     }
-
+    
     func nextTrack() {
         guard let nextIndex else { return }
         play(item: playlist[nextIndex])
     }
-
+    
     func previousTrack() {
         guard let previousIndex else { return }
         play(item: playlist[previousIndex])
     }
-
+    
     func analyzeFiles(urls: [URL]) {
         do {
             let rg = try ReplayGainAnalyzer.analyzeAlbum(urls)
@@ -375,22 +384,71 @@ extension PlayerModel {
             // TODO: Notice user we're done
         } catch {}
     }
-
-//    func exportWAVEFile(url: URL) {
-//        let destURL = url.deletingPathExtension().appendingPathExtension("wav")
-//        if FileManager.default.fileExists(atPath: destURL.path) {
-//            // TODO: Handle this
-//            return
-//        }
-//
-//        do {
-//            try AudioConverter.convert(url, to: destURL)
-//            try? AudioFile.copyMetadata(from: url, to: destURL)
-//        } catch {
-//            try? FileManager.default.trashItem(at: destURL, resultingItemURL: nil)
-//
-//        }
-//    }
+    
+    //    func exportWAVEFile(url: URL) {
+    //        let destURL = url.deletingPathExtension().appendingPathExtension("wav")
+    //        if FileManager.default.fileExists(atPath: destURL.path) {
+    //            // TODO: Handle this
+    //            return
+    //        }
+    //
+    //        do {
+    //            try AudioConverter.convert(url, to: destURL)
+    //            try? AudioFile.copyMetadata(from: url, to: destURL)
+    //        } catch {
+    //            try? FileManager.default.trashItem(at: destURL, resultingItemURL: nil)
+    //
+    //        }
+    //    }
+    
+    private func setupAudioVisualization() {
+        
+        player.withEngine { [weak self] engine in
+            guard let self = self else { return }
+            
+            let inputNode = engine.mainMixerNode
+            let bus = 0
+            
+            inputNode.installTap(onBus: bus, bufferSize: 1024, format: inputNode.outputFormat(forBus: bus)) { buffer, _ in
+                self.processAudioBuffer(buffer)
+            }
+        }
+    }
+    
+    private func processAudioBuffer(_ buffer: AVAudioPCMBuffer) {
+        guard let channelData = buffer.floatChannelData else { return }
+        
+        let channelDataPointer = channelData[0]
+        let frameLength = Int(buffer.frameLength)
+        
+        audioDataBuffer = Array(UnsafeBufferPointer(start: channelDataPointer, count: frameLength))
+        
+        let fftMagnitudes = performFFT(audioDataBuffer)
+        
+        DispatchQueue.main.async {
+            self.visualizationDataSubject.send(fftMagnitudes)
+        }
+    }
+    
+    private func performFFT(_ audioData: [Float]) -> [Float] {
+        let log2n = vDSP_Length(log2(Float(audioData.count)))
+        let fftSetup = vDSP_create_fftsetup(log2n, Int32(kFFTRadix2))!
+        
+        var real = [Float](audioData)
+        var imaginary = [Float](repeating: 0.0, count: audioData.count)
+        var complexBuffer = DSPSplitComplex(realp: &real, imagp: &imaginary)
+        
+        vDSP_fft_zip(fftSetup, &complexBuffer, 1, log2n, FFTDirection(FFT_FORWARD))
+        
+        var magnitudes = [Float](repeating: 0.0, count: audioData.count / 2)
+        vDSP_zvmags(&complexBuffer, 1, &magnitudes, 1, vDSP_Length(magnitudes.count))
+        
+        var normalizedMagnitudes = [Float](repeating: 0.0, count: magnitudes.count)
+        vDSP_vdbcon(magnitudes, 1, [1.0], &normalizedMagnitudes, 1, vDSP_Length(magnitudes.count), 1)
+        
+        vDSP_destroy_fftsetup(fftSetup)
+        return normalizedMagnitudes
+    }
 }
 
 extension PlayerModel: AudioPlayer.Delegate {
