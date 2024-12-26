@@ -74,21 +74,22 @@ struct MainView: View {
     }
 
     @ViewBuilder private func content() -> some View {
-        Group {
-            switch selectedContentTab {
-            case .playlist:
-                PlaylistView(namespace: namespace)
-            case .leaflet:
-                LeafletView()
-            }
+        switch selectedContentTab {
+        case .playlist:
+            PlaylistView(namespace: namespace)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .ignoresSafeArea()
+                .morphed()
+                .background {
+                    VisualEffectView(material: .headerView, blendingMode: .behindWindow)
+                }
+                .ignoresSafeArea()
+        case .leaflet:
+            LeafletView()
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .ignoresSafeArea()
+                .ignoresSafeArea()
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .ignoresSafeArea()
-        .morphed()
-        .background {
-            VisualEffectView(material: .headerView, blendingMode: .behindWindow)
-        }
-        .ignoresSafeArea()
     }
 
     @ViewBuilder private func inspector() -> some View {

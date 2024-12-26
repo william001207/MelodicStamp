@@ -1,5 +1,5 @@
 {
-  "originHash" : "3eb57b568db6014929aba22191d33eb0ad31f876504e6b3bf643dbc7136ed5bd",
+  "originHash" : "8b013765cbfbb5460c00c2ba7649225e84d7cc3e0a8a62c218bc50d16415afcb",
   "pins" : [
     {
       "identity" : "avfaudioextensions",
@@ -83,6 +83,15 @@
       }
     },
     {
+      "identity" : "dominantcolors?tab=readme-ov-file#features",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/DenDmitriev/DominantColors?tab=readme-ov-file#features",
+      "state" : {
+        "revision" : "c2b8ad9768fd984729624eaa8203aa9a23b06909",
+        "version" : "1.2.1"
+      }
+    },
+    {
       "identity" : "flac-binary-xcframework",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/sbooth/flac-binary-xcframework",
@@ -125,6 +134,15 @@
       "state" : {
         "branch" : "main",
         "revision" : "77797215c35b03b1661cc10a12916db02980d4ef"
+      }
+    },
+    {
+      "identity" : "meshgradient",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/Xinshao-air/MeshGradient.git",
+      "state" : {
+        "branch" : "main",
+        "revision" : "879c06685d207d0d29ef6a241a980c79cee6393d"
       }
     },
     {

@@ -60,7 +60,7 @@ struct DynamicScrollView<Content: View, Indicators: View>: View {
                         
                         content(index, isHighlighted)
                             .offset(y: proportion * offset)
-                            .animation(.bouncy.delay(delay), value: animationState)
+                            .animation(.spring(bounce: 0.20).delay(delay), value: animationState)
                             .animation(.smooth, value: highlightedRange)
                             .overlay {
                                 if index == highlightedRange.lowerBound {
@@ -173,9 +173,12 @@ struct DynamicScrollView<Content: View, Indicators: View>: View {
     
     VStack {
         Picker("Alignment", selection: $alignment) {
-            Text("Top").tag(ScrollAlignment.top)
-            Text("Center").tag(ScrollAlignment.center)
-            Text("Bottom").tag(ScrollAlignment.bottom)
+            Text("Top")
+                .tag(ScrollAlignment.top)
+            Text("Center")
+                .tag(ScrollAlignment.center)
+            Text("Bottom")
+                .tag(ScrollAlignment.bottom)
         }
         .pickerStyle(SegmentedPickerStyle())
         .padding()

@@ -11,6 +11,8 @@ struct NowPlayingLyricsView: View {
 
     @Environment(PlayerModel.self) var player
     @Environment(LyricsModel.self) var lyrics
+    
+    @Binding var showLyrics: Bool
 
     @State private var playbackTime: PlaybackTime?
     @State private var highlightedRange: Range<Int> = 0..<0
@@ -67,6 +69,15 @@ struct NowPlayingLyricsView: View {
         .onChange(of: player.current) { _, newValue in
             loadLyrics()
         }
+        .onChange(of: player.currentIndex, initial: true) { _, newValue in
+            guard newValue == nil else { return }
+            playbackTime = nil
+            stopTimer()
+        }
+        .onReceive(player.isPlayingPublisher) { isPlaying in
+            self.isPlaying = isPlaying
+            toggleTimer(isPlaying: isPlaying)
+        }
         .onReceive(player.playbackTimePublisher) { playbackTime in
             self.playbackTime = playbackTime
 
@@ -77,15 +88,6 @@ struct NowPlayingLyricsView: View {
                 }
                 fineGrainedElapsedTime = timeElapsed
             }
-        }
-        .onReceive(player.isPlayingPublisher) { isPlaying in
-            self.isPlaying = isPlaying
-            toggleTimer(isPlaying: isPlaying)
-        }
-        .onChange(of: player.currentIndex, initial: true) { _, newValue in
-            guard newValue == nil else { return }
-            playbackTime = nil
-            stopTimer()
         }
     }
 
@@ -121,7 +123,9 @@ struct NowPlayingLyricsView: View {
         }
         .onChange(of: isHighlighted) { oldValue, newValue in
             if isHighlighted {
-                scrollViewOffset = eachTextHeights[index]
+                guard index + 1 < eachTextHeights.count else { return }
+                let nextTextHeights = eachTextHeights[index + 1]
+                scrollViewOffset = nextTextHeights
             }
         }
     }
@@ -158,18 +162,17 @@ struct NowPlayingLyricsView: View {
 
     private func loadLyrics() {
         guard let currentTrack = player.current else {
-            print("No current track")
             return
         }
         
         guard let lyricsEntry = currentTrack.metadata.lyrics else {
-            print("No lyrics found in player metadata for URL: \(currentTrack.url.absoluteString)")
             return
         }
         
         let lyricsString = lyricsEntry.current
         lyrics.identify(url: currentTrack.url)
         lyrics.load(string: lyricsString)
+        showLyrics = true
     }
 
     private func toggleTimer(isPlaying: Bool) {

@@ -36,6 +36,7 @@ struct FloatingTabBarView: View {
 
                     ForEach(selectedContentTab.inspectors) { tab in
                         inspectorTab(for: tab)
+                            .transition(.blurReplace)
                     }
                 }
                 .padding(4)

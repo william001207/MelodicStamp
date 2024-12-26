@@ -223,7 +223,7 @@ struct CommonMetadataView: View {
                             binding.wrappedValue = Int(newValue)
                         }
                     )
-                    .frame(width: 225, height: 35)
+                    .frame(width: 125, height: 30)
                 }
             }
         }

@@ -12,6 +12,9 @@
 		28797B9A2D10724C00FB4395 /* SwiftUIIntrospect in Frameworks */ = {isa = PBXBuildFile; productRef = 28797B992D10724C00FB4395 /* SwiftUIIntrospect */; };
 		287F978D2CF3160700C60307 /* Luminare in Frameworks */ = {isa = PBXBuildFile; productRef = 287F978C2CF3160700C60307 /* Luminare */; };
 		65DFF89D2CFC2A6F00285040 /* SwiftSoup in Frameworks */ = {isa = PBXBuildFile; productRef = 65DFF89C2CFC2A6F00285040 /* SwiftSoup */; };
+		65EE5C962D1CEBBD0026B8F1 /* MeshGradient in Frameworks */ = {isa = PBXBuildFile; productRef = 65EE5C952D1CEBBD0026B8F1 /* MeshGradient */; };
+		65EE5C982D1CEBBD0026B8F1 /* MeshGradientCHeaders in Frameworks */ = {isa = PBXBuildFile; productRef = 65EE5C972D1CEBBD0026B8F1 /* MeshGradientCHeaders */; };
+		65EE5C9B2D1CEBD30026B8F1 /* DominantColors in Frameworks */ = {isa = PBXBuildFile; productRef = 65EE5C9A2D1CEBD30026B8F1 /* DominantColors */; };
 		65F1DA7D2CED77F100389E37 /* SFBAudioEngine in Frameworks */ = {isa = PBXBuildFile; productRef = 65F1DA7C2CED77F100389E37 /* SFBAudioEngine */; };
 		65F1DA842CED788D00389E37 /* CAAudioHardware in Frameworks */ = {isa = PBXBuildFile; productRef = 65F1DA832CED788D00389E37 /* CAAudioHardware */; };
 		65F1DA8D2CED83F800389E37 /* FullDiskAccess in Frameworks */ = {isa = PBXBuildFile; productRef = 65F1DA8C2CED83F800389E37 /* FullDiskAccess */; };
@@ -57,8 +60,11 @@
 				65F1DA9D2CEDBD8700389E37 /* Defaults in Frameworks */,
 				65F1DA8D2CED83F800389E37 /* FullDiskAccess in Frameworks */,
 				65DFF89D2CFC2A6F00285040 /* SwiftSoup in Frameworks */,
+				65EE5C9B2D1CEBD30026B8F1 /* DominantColors in Frameworks */,
 				65F1DA7D2CED77F100389E37 /* SFBAudioEngine in Frameworks */,
 				65F1DA842CED788D00389E37 /* CAAudioHardware in Frameworks */,
+				65EE5C982D1CEBBD0026B8F1 /* MeshGradientCHeaders in Frameworks */,
+				65EE5C962D1CEBBD0026B8F1 /* MeshGradient in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -111,6 +117,9 @@
 				65DFF89C2CFC2A6F00285040 /* SwiftSoup */,
 				2845A9F62D08745900CD7517 /* SmartCache */,
 				28797B992D10724C00FB4395 /* SwiftUIIntrospect */,
+				65EE5C952D1CEBBD0026B8F1 /* MeshGradient */,
+				65EE5C972D1CEBBD0026B8F1 /* MeshGradientCHeaders */,
+				65EE5C9A2D1CEBD30026B8F1 /* DominantColors */,
 			);
 			productName = MelodicStamp;
 			productReference = 65F1DA012CECCEE900389E37 /* Melodic Stamp.app */;
@@ -152,6 +161,8 @@
 				65DFF89B2CFC2A6F00285040 /* XCRemoteSwiftPackageReference "SwiftSoup" */,
 				2845A9F52D08745900CD7517 /* XCRemoteSwiftPackageReference "smart-cache" */,
 				28797B982D10724C00FB4395 /* XCRemoteSwiftPackageReference "swiftui-introspect" */,
+				65EE5C942D1CEBBD0026B8F1 /* XCRemoteSwiftPackageReference "MeshGradient" */,
+				65EE5C992D1CEBD30026B8F1 /* XCRemoteSwiftPackageReference "DominantColors" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 65F1DA022CECCEE900389E37 /* Products */;
@@ -323,6 +334,7 @@
 				DEVELOPMENT_TEAM = "";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Melodic-Stamp-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "Melodic Stamp";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.music";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
@@ -349,9 +361,10 @@
 				CURRENT_PROJECT_VERSION = 20241120MA;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"Melodic Stamp/Preview Content\"";
-				DEVELOPMENT_TEAM = 7XRF3J9RS4;
+				DEVELOPMENT_TEAM = "";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Melodic-Stamp-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "Melodic Stamp";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.music";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
@@ -431,6 +444,22 @@
 				minimumVersion = 2.7.6;
 			};
 		};
+		65EE5C942D1CEBBD0026B8F1 /* XCRemoteSwiftPackageReference "MeshGradient" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Xinshao-air/MeshGradient.git";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
+		65EE5C992D1CEBD30026B8F1 /* XCRemoteSwiftPackageReference "DominantColors" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/DenDmitriev/DominantColors?tab=readme-ov-file#features";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.2.1;
+			};
+		};
 		65F1DA7B2CED77F100389E37 /* XCRemoteSwiftPackageReference "SFBAudioEngine" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/sbooth/SFBAudioEngine";
@@ -498,6 +527,21 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 65DFF89B2CFC2A6F00285040 /* XCRemoteSwiftPackageReference "SwiftSoup" */;
 			productName = SwiftSoup;
+		};
+		65EE5C952D1CEBBD0026B8F1 /* MeshGradient */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 65EE5C942D1CEBBD0026B8F1 /* XCRemoteSwiftPackageReference "MeshGradient" */;
+			productName = MeshGradient;
+		};
+		65EE5C972D1CEBBD0026B8F1 /* MeshGradientCHeaders */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 65EE5C942D1CEBBD0026B8F1 /* XCRemoteSwiftPackageReference "MeshGradient" */;
+			productName = MeshGradientCHeaders;
+		};
+		65EE5C9A2D1CEBD30026B8F1 /* DominantColors */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 65EE5C992D1CEBD30026B8F1 /* XCRemoteSwiftPackageReference "DominantColors" */;
+			productName = DominantColors;
 		};
 		65F1DA7C2CED77F100389E37 /* SFBAudioEngine */ = {
 			isa = XCSwiftPackageProductDependency;

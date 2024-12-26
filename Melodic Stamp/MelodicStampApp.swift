@@ -61,5 +61,6 @@ let allowedContentTypes: [UTType] = {
     var types = [UTType]()
     types.append(contentsOf: AudioDecoder.supportedMIMETypes.compactMap { UTType(mimeType: $0) })
     types.append(contentsOf: DSDDecoder.supportedMIMETypes.compactMap { UTType(mimeType: $0) })
+    types.append(UTType.ogg)
     return types
 }()
