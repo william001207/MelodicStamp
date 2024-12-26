@@ -1,5 +1,5 @@
 //
-//  AnalysisView.swift
+//  AnalyticsView.swift
 //  Melodic Stamp
 //
 //  Created by Xinshao_Air on 2024/12/1.
@@ -7,8 +7,8 @@
 
 import SwiftUI
 
-struct AnalysisView: View {
+struct AnalyticsView: View {
     var body: some View {
-        AnalysisExcerpt()
+        ExcerptView(tab: SidebarInspectorTab.analytics)
     }
 }

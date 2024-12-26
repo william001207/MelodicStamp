@@ -88,6 +88,7 @@ struct MainView: View {
             LeafletView()
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .ignoresSafeArea()
+                .morphed()
                 .ignoresSafeArea()
         }
     }
@@ -116,8 +117,8 @@ struct MainView: View {
 //                        LyricsToolbar(lyricsType: $lyrics.type)
 //                    }
                     }
-            case .analysis:
-                AnalysisView()
+            case .analytics:
+                AnalyticsView()
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)

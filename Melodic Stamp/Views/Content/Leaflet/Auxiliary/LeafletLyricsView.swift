@@ -1,5 +1,5 @@
 //
-//  NowPlayingLyricsView.swift
+//  LeafletLyricsView.swift
 //  Melodic Stamp
 //
 //  Created by Xinshao_Air on 2024/12/24.
@@ -7,12 +7,9 @@
 
 import SwiftUI
 
-struct NowPlayingLyricsView: View {
-
+struct LeafletLyricsView: View {
     @Environment(PlayerModel.self) var player
     @Environment(LyricsModel.self) var lyrics
-    
-    @Binding var showLyrics: Bool
 
     @State private var playbackTime: PlaybackTime?
     @State private var highlightedRange: Range<Int> = 0..<0
@@ -22,19 +19,6 @@ struct NowPlayingLyricsView: View {
     @State private var isOnHover: Bool = false
     @State private var timer: Timer?
     @State private var fineGrainedElapsedTime: TimeInterval = 0.0
-
-    private var lyricsLines: [any LyricLine]? {
-        switch lyrics.storage {
-        case let .raw(parser):
-            return parser.lines
-        case let .lrc(parser):
-            return parser.lines
-        case let .ttml(parser):
-            return parser.lines
-        case .none:
-            return nil
-        }
-    }
 
     var body: some View {
         VStack {
@@ -88,6 +72,19 @@ struct NowPlayingLyricsView: View {
                 }
                 fineGrainedElapsedTime = timeElapsed
             }
+        }
+    }
+    
+    private var lyricsLines: [any LyricLine]? {
+        switch lyrics.storage {
+        case let .raw(parser):
+            return parser.lines
+        case let .lrc(parser):
+            return parser.lines
+        case let .ttml(parser):
+            return parser.lines
+        case .none:
+            return nil
         }
     }
 
@@ -172,7 +169,6 @@ struct NowPlayingLyricsView: View {
         let lyricsString = lyricsEntry.current
         lyrics.identify(url: currentTrack.url)
         lyrics.load(string: lyricsString)
-        showLyrics = true
     }
 
     private func toggleTimer(isPlaying: Bool) {

@@ -25,8 +25,7 @@ struct PlaylistView: View {
 
         ZStack(alignment: .topLeading) {
             if player.isPlaylistEmpty {
-                PlaylistExcerpt()
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                ExcerptView(tab: SidebarContentTab.playlist)
             } else {
                 List(selection: $metadataEditor.items) {
                     Spacer()

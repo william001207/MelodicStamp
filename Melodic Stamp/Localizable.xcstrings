@@ -68,7 +68,7 @@
     "Album Title Sort Order" : {
 
     },
-    "Analysis" : {
+    "Analytics" : {
 
     },
     "Artist" : {
@@ -207,9 +207,6 @@
 
     },
     "Lyrics (.lrc)" : {
-
-    },
-    "Lyrics Toggle" : {
 
     },
     "Main Window" : {
@@ -378,6 +375,9 @@
 
     },
     "To Current Playlist" : {
+
+    },
+    "Toggle Lyrics" : {
 
     },
     "Track & Disc" : {

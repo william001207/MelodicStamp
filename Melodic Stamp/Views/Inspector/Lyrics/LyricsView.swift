@@ -18,7 +18,7 @@ struct LyricsView: View {
         Group {
             switch entries.type {
             case .none, .varied:
-                EmptyView()
+                ExcerptView(tab: SidebarInspectorTab.lyrics)
             case .identical:
                 ScrollViewReader { _ in
                     ScrollView {

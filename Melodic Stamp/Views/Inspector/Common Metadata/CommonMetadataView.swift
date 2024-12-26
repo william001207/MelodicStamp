@@ -25,7 +25,9 @@ struct CommonMetadataView: View {
     @State private var isBPMStepperPresented: Bool = false
 
     var body: some View {
-        if metadataEditor.isVisible {
+        if !metadataEditor.isVisible {
+            ExcerptView(tab: SidebarInspectorTab.commonMetadata)
+        } else {
             AutoScrollView(.vertical) {
                 VStack(spacing: 24) {
                     VStack(spacing: 8) {
@@ -71,9 +73,6 @@ struct CommonMetadataView: View {
             }
             .contentMargins(.top, 64, for: .scrollIndicators)
             .contentMargins(.bottom, 94, for: .scrollIndicators)
-        } else {
-            CommonMetadataExcerpt()
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
     }
 

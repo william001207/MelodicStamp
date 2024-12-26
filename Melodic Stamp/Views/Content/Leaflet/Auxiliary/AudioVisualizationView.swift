@@ -11,8 +11,9 @@ import Combine
 struct AudioVisualizationView: View {
     @Environment(PlayerModel.self) var player
 
-    @State var frequencyData: [Float] = Array(repeating: 0, count: 5)
     let maxMagnitude: Float = 10.0
+    
+    @State private var frequencyData: [Float] = Array(repeating: 0, count: 5)
 
     var body: some View {
         GeometryReader { geometry in

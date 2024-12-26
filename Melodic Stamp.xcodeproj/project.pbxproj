@@ -454,7 +454,7 @@
 		};
 		65EE5C992D1CEBD30026B8F1 /* XCRemoteSwiftPackageReference "DominantColors" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/DenDmitriev/DominantColors?tab=readme-ov-file#features";
+			repositoryURL = "https://github.com/DenDmitriev/DominantColors";
 			requirement = {
 				kind = upToNextMajorVersion;
 				minimumVersion = 1.2.1;

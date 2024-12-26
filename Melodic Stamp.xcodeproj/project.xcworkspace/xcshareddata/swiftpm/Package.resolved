@@ -1,5 +1,5 @@
 {
-  "originHash" : "8b013765cbfbb5460c00c2ba7649225e84d7cc3e0a8a62c218bc50d16415afcb",
+  "originHash" : "4514d8c92410fcfc774b458dffb34494e8fb2175ee96501b6f61195093c93412",
   "pins" : [
     {
       "identity" : "avfaudioextensions",
@@ -83,9 +83,9 @@
       }
     },
     {
-      "identity" : "dominantcolors?tab=readme-ov-file#features",
+      "identity" : "dominantcolors",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/DenDmitriev/DominantColors?tab=readme-ov-file#features",
+      "location" : "https://github.com/DenDmitriev/DominantColors",
       "state" : {
         "revision" : "c2b8ad9768fd984729624eaa8203aa9a23b06909",
         "version" : "1.2.1"
