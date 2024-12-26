@@ -37,7 +37,7 @@ struct LeafletView: View {
                         .animation(.spring(duration: 0.65, bounce: 0.45, blendDuration: 0.75), value: isPlaying)
                         .onChange(of: player.currentIndex, initial: true) { _, _ in
                             Task {
-                                dominantColors = await extractDominantColors(from: cover)
+                                dominantColors = try await extractDominantColors(from: cover)
                             }
                         }
                     }
@@ -74,16 +74,12 @@ struct LeafletView: View {
         }
     }
     
-    func extractDominantColors(from image: NSImage) async -> [Color] {
-        do {
-            let colors = try DominantColors.dominantColors(
-                nsImage: image, quality: .low,
-                algorithm: .CIE94, maxCount: 3, options: [.excludeBlack], sorting: .lightness
-            )
-            
-            return colors.map(Color.init(nsColor:))
-        } catch {
-            print("Failed to extract dominant colors: \(error)")
-        }
+    func extractDominantColors(from image: NSImage) async throws -> [Color] {
+        let colors = try DominantColors.dominantColors(
+            nsImage: image, quality: .low,
+            algorithm: .CIE94, maxCount: 3, options: [.excludeBlack], sorting: .lightness
+        )
+        
+        return colors.map(Color.init(nsColor:))
     }
 }

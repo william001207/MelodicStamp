@@ -1,5 +1,5 @@
 //
-//  ScrollAlignment.swift
+//  BouncyScrollView.swift
 //  Melodic Stamp
 //
 //  Created by Xinshao_Air on 2024/12/24.
@@ -7,18 +7,18 @@
 
 import SwiftUI
 
-enum DynamicAnimationState {
+enum BouncyScrollViewAnimationState {
     case intermediate
     case pushed
 }
 
-enum ScrollAlignment {
+enum BouncyScrollViewAlignment {
     case top
     case center
     case bottom
 }
 
-struct DynamicScrollView<Content: View, Indicators: View>: View {
+struct BouncyScrollView<Content: View, Indicators: View>: View {
     
     var offset: CGFloat = 50
     var delay: TimeInterval = 0.08
@@ -27,12 +27,12 @@ struct DynamicScrollView<Content: View, Indicators: View>: View {
     
     var range: Range<Int>
     var highlightedRange: Range<Int>
-    var alignment: ScrollAlignment = .top
+    var alignment: BouncyScrollViewAlignment = .top
     
     @ViewBuilder var content: (_ index: Int, _ isHighlighted: Bool) -> Content
     @ViewBuilder var indicators: (_ index: Int, _ isHighlighted: Bool) -> Indicators
     
-    @State private var animationState: DynamicAnimationState = .intermediate
+    @State private var animationState: BouncyScrollViewAnimationState = .intermediate
     @State private var scrollPosition: ScrollPosition = .init()
     @State private var scrollOffset: CGFloat = .zero
     
@@ -168,17 +168,17 @@ struct DynamicScrollView<Content: View, Indicators: View>: View {
 #Preview {
     @Previewable @State var canPushAnimation: Bool = true
     @Previewable @State var highlightedRange: Range<Int> = 0..<1
-    @Previewable @State var alignment: ScrollAlignment = .top
+    @Previewable @State var alignment: BouncyScrollViewAlignment = .top
     let count = 20
     
     VStack {
         Picker("Alignment", selection: $alignment) {
             Text("Top")
-                .tag(ScrollAlignment.top)
+                .tag(BouncyScrollViewAlignment.top)
             Text("Center")
-                .tag(ScrollAlignment.center)
+                .tag(BouncyScrollViewAlignment.center)
             Text("Bottom")
-                .tag(ScrollAlignment.bottom)
+                .tag(BouncyScrollViewAlignment.bottom)
         }
         .pickerStyle(SegmentedPickerStyle())
         .padding()
@@ -279,7 +279,7 @@ struct DynamicScrollView<Content: View, Indicators: View>: View {
             }
         }
         
-        DynamicScrollView(
+        BouncyScrollView(
             canPushAnimation: canPushAnimation,
             range: 0..<count,
             highlightedRange: highlightedRange,
