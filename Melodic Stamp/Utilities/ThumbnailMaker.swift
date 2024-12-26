@@ -11,7 +11,7 @@ import CoreImage.CIFilterBuiltins
 import CSFBAudioEngine
 
 enum ThumbnailMaker {
-    static func make(_ image: NSImage, resolution: CGFloat = 128) -> NSImage? {
+    static func make(_ image: NSImage, resolution: CGFloat = 128) async -> NSImage? {
         guard
             let tiffData = image.tiffRepresentation,
             let ciImage = CIImage(data: tiffData)

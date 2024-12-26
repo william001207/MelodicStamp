@@ -9,8 +9,8 @@ import SwiftUI
 import Luminare
 
 struct LeafletLyricsView: View {
-    @Environment(PlayerModel.self) var player
-    @Environment(LyricsModel.self) var lyrics
+    @Environment(PlayerModel.self) private var player
+    @Environment(LyricsModel.self) private var lyrics
     
     @Environment(\.luminareAnimation) private var animation
 

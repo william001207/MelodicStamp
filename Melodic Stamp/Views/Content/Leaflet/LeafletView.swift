@@ -52,7 +52,7 @@ struct LeafletView: View {
             .padding(.horizontal, 100)
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
             .background {
-                AnimatedGrid(CoverColors: dominantColors)
+                AnimatedGrid(colors: dominantColors)
             }
             .onReceive(player.isPlayingPublisher) { isPlaying in
                 self.isPlaying = isPlaying
@@ -74,12 +74,11 @@ struct LeafletView: View {
         }
     }
     
-    func extractDominantColors(from image: NSImage) async throws -> [Color] {
+    private func extractDominantColors(from image: NSImage) async throws -> [Color] {
         let colors = try DominantColors.dominantColors(
             nsImage: image, quality: .low,
             algorithm: .CIE94, maxCount: 3, options: [.excludeBlack], sorting: .lightness
         )
-        
-        return colors.map(Color.init(nsColor:))
+        return colors.map(Color.init(_:))
     }
 }

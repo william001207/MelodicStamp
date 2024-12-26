@@ -71,7 +71,7 @@ struct PlaybackTime: Hashable {
     
     private var playbackTimeSubject = PassthroughSubject<PlaybackTime?, Never>()
     private var isPlayingSubject = PassthroughSubject<Bool, Never>()
-    private var visualizationDataSubject = PassthroughSubject<[Float], Never>()
+    private var visualizationDataSubject = PassthroughSubject<[CGFloat], Never>()
     
     var playbackTimePublisher: AnyPublisher<PlaybackTime?, Never> {
         playbackTimeSubject.eraseToAnyPublisher()
@@ -79,7 +79,7 @@ struct PlaybackTime: Hashable {
     var isPlayingPublisher: AnyPublisher<Bool, Never> {
         isPlayingSubject.eraseToAnyPublisher()
     }
-    var visualizationDataPublisher: AnyPublisher<[Float], Never> {
+    var visualizationDataPublisher: AnyPublisher<[CGFloat], Never> {
         visualizationDataSubject.eraseToAnyPublisher()
     }
     
@@ -96,7 +96,8 @@ struct PlaybackTime: Hashable {
     var timeRemaining: TimeInterval { player.time?.remaining ?? .zero }
     
     // MARK: FFT
-    private var audioDataBuffer: [Float] = []
+    
+    private var audioDataBuffer: [CGFloat] = []
     
     // MARK: Functional
     
@@ -402,7 +403,6 @@ extension PlayerModel {
     //    }
     
     private func setupAudioVisualization() {
-        
         player.withEngine { [weak self] engine in
             guard let self = self else { return }
             
@@ -421,33 +421,12 @@ extension PlayerModel {
         let channelDataPointer = channelData[0]
         let frameLength = Int(buffer.frameLength)
         
-        audioDataBuffer = Array(UnsafeBufferPointer(start: channelDataPointer, count: frameLength))
+        audioDataBuffer = Array(UnsafeBufferPointer(start: channelDataPointer, count: frameLength)).map(CGFloat.init(_:))
         
-        let fftMagnitudes = performFFT(audioDataBuffer)
-        
-        DispatchQueue.main.async {
-            self.visualizationDataSubject.send(fftMagnitudes)
+        Task { @MainActor in
+            let fftMagnitudes = await FFTHelper.perform(audioDataBuffer.map(Float.init(_:)))
+            self.visualizationDataSubject.send(fftMagnitudes.map(CGFloat.init(_:)))
         }
-    }
-    
-    private func performFFT(_ audioData: [Float]) -> [Float] {
-        let log2n = vDSP_Length(log2(Float(audioData.count)))
-        let fftSetup = vDSP_create_fftsetup(log2n, Int32(kFFTRadix2))!
-        
-        var real = [Float](audioData)
-        var imaginary = [Float](repeating: 0.0, count: audioData.count)
-        var complexBuffer = DSPSplitComplex(realp: &real, imagp: &imaginary)
-        
-        vDSP_fft_zip(fftSetup, &complexBuffer, 1, log2n, FFTDirection(FFT_FORWARD))
-        
-        var magnitudes = [Float](repeating: 0.0, count: audioData.count / 2)
-        vDSP_zvmags(&complexBuffer, 1, &magnitudes, 1, vDSP_Length(magnitudes.count))
-        
-        var normalizedMagnitudes = [Float](repeating: 0.0, count: magnitudes.count)
-        vDSP_vdbcon(magnitudes, 1, [1.0], &normalizedMagnitudes, 1, vDSP_Length(magnitudes.count), 1)
-        
-        vDSP_destroy_fftsetup(fftSetup)
-        return normalizedMagnitudes
     }
 }
 

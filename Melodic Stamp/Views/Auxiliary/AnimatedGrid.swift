@@ -11,47 +11,38 @@ import MeshGradient
 import MeshGradientCHeaders
 
 struct AnimatedGrid: View {
-    
     typealias MeshColor = SIMD3<Float>
     
-    var CoverColors: [Color]
+    var colors: [Color]
+    var randomizer = MeshRandomizer(colorRandomizer: MeshRandomizer.arrayBasedColorRandomizer(availableColors: meshColors))
     
-    var GridColors: [simd_float3] {
-        return CoverColors.map { $0.toSimdFloat3() }
+    var simdColors: [simd_float3] {
+        colors.map { $0.toSimdFloat3() }
     }
-         
-    var meshRandomizer = MeshRandomizer(colorRandomizer: MeshRandomizer.arrayBasedColorRandomizer(availableColors: meshColors))
     
     var body: some View {
-        
         MeshGradient(
             initialGrid: generatePlainGrid(),
             animatorConfiguration: .init(
                 animationSpeedRange: 4 ... 5,
-                meshRandomizer:
-                    MeshRandomizer(
-                        colorRandomizer:
-                            MeshRandomizer.arrayBasedColorRandomizer(
-                                availableColors: GridColors
-                            )
-                    )
+                meshRandomizer: randomizer
             )
         )
     }
     
     func generatePlainGrid(size: Int = 4) -> MeshGradientGrid<ControlPoint> {
-        
         let preparationGrid = MeshGradientGrid<MeshColor>(repeating: .zero, width: size, height: size)
         var result = MeshGenerator.generate(colorDistribution: preparationGrid)
         
         for x in stride(from: 0, to: result.width, by: 1) {
             for y in stride(from: 0, to: result.height, by: 1) {
-                meshRandomizer.locationRandomizer(&result[x, y].location, x, y, result.width, result.height)
-                meshRandomizer.turbulencyRandomizer(&result[x, y].uTangent, x, y, result.width, result.height)
-                meshRandomizer.turbulencyRandomizer(&result[x, y].vTangent, x, y, result.width, result.height)
-                meshRandomizer.colorRandomizer(&result[x, y].color, result[x, y].color, x, y, result.width, result.height)
+                randomizer.locationRandomizer(&result[x, y].location, x, y, result.width, result.height)
+                randomizer.turbulencyRandomizer(&result[x, y].uTangent, x, y, result.width, result.height)
+                randomizer.turbulencyRandomizer(&result[x, y].vTangent, x, y, result.width, result.height)
+                randomizer.colorRandomizer(&result[x, y].color, result[x, y].color, x, y, result.width, result.height)
             }
         }
+        
         return result
     }
 }

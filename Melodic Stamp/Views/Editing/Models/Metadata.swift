@@ -369,7 +369,7 @@ extension Metadata {
         }
 
         Task {
-            generateThumbnail()
+            await generateThumbnail()
         }
     }
 
@@ -380,89 +380,65 @@ extension Metadata {
         }
 
         Task {
-            generateThumbnail()
+            await generateThumbnail()
             updateNowPlayingInfo()
         }
     }
 
-    func generateThumbnail() {
+    func generateThumbnail() async {
         guard state.isLoaded else {
             thumbnail = nil
             return
         }
 
-        if let image = ThumbnailMaker.getCover(from: attachedPictures.current)?
-            .image {
-            thumbnail = ThumbnailMaker.make(image)
+        if let image = ThumbnailMaker.getCover(from: attachedPictures.current)?.image {
+            thumbnail = await ThumbnailMaker.make(image)
         }
     }
 
     func update() async throws {
-        try await withCheckedThrowingContinuation { [weak self] continuation in
-            guard let self else { return continuation.resume() }
-            guard url.startAccessingSecurityScopedResource() else {
-                return continuation.resume()
-            }
-            defer { url.stopAccessingSecurityScopedResource() }
-
-            do {
-                let file = try AudioFile(readingPropertiesAndMetadataFrom: url)
-                properties = file.properties
-                load(from: file.metadata)
-
-                switch state {
-                case .loading:
-                    print("Loaded metadata from \(url)")
-                default:
-                    print("Updated metadata from \(url)")
-                }
-
-                state = .fine
-                generateThumbnail()
-
-                continuation.resume()
-            } catch {
-                continuation.resume(throwing: error)
-            }
+        guard url.startAccessingSecurityScopedResource() else { return }
+        defer { url.stopAccessingSecurityScopedResource() }
+        
+        let file = try AudioFile(readingPropertiesAndMetadataFrom: url)
+        properties = file.properties
+        load(from: file.metadata)
+        
+        switch state {
+        case .loading:
+            print("Loaded metadata from \(url)")
+        default:
+            print("Updated metadata from \(url)")
         }
+        
+        state = .fine
+        await generateThumbnail()
     }
 
     func write() async throws {
-        try await withCheckedThrowingContinuation { [weak self] continuation in
-            guard let self, state.isEditable, isModified else {
-                return continuation.resume()
-            }
-            guard url.startAccessingSecurityScopedResource() else {
-                return continuation.resume()
-            }
-            defer { self.url.stopAccessingSecurityScopedResource() }
-
-            do {
-                state = .saving
-                apply()
-                print("Started writing metadata to \(url)")
-
-                let file = try AudioFile(url: url)
-                file.metadata = pack()
-
-                if file.metadata.comment != nil {
-                    try file.writeMetadata()
-                } else {
-                    // This is crucial for `.flac` file types
-                    // In these files, if all fields except `attachedPictures` field are `nil`, audio decoding will encounter great issues after writing metadata
-                    // so hereby always providing an empty `comment` if it is `nil`
-                    file.metadata.comment = ""
-                    try file.writeMetadata()
-                }
-
-                state = .fine
-                print("Successfully written metadata to \(url)")
-
-                continuation.resume()
-            } catch {
-                continuation.resume(throwing: error)
-            }
+        guard state.isEditable, isModified else { return }
+        guard url.startAccessingSecurityScopedResource() else { return }
+        defer { self.url.stopAccessingSecurityScopedResource() }
+        
+        state = .saving
+        apply()
+        print("Started writing metadata to \(url)")
+        
+        let file = try AudioFile(url: url)
+        file.metadata = pack()
+        
+        if file.metadata.comment != nil {
+            try file.writeMetadata()
+        } else {
+            // This is crucial for `.flac` file types
+            // In these files, if all fields except `attachedPictures` field are `nil`, audio decoding will encounter great issues after writing metadata
+            // so hereby always providing an empty `comment` if it is `nil`
+            file.metadata.comment = ""
+            try file.writeMetadata()
         }
+        
+        state = .fine
+        print("Successfully written metadata to \(url)")
     }
 
     subscript<V>(extracting keyPath: WritableKeyPath<Metadata, Entry<V>>)
