@@ -80,6 +80,6 @@ struct TTMLDisplayLyricLine: View {
     }
     
     private func stringContent(of lyrics: TTMLLyrics) -> String {
-        lyrics.map(\.content).joined(separator: " ")
+        lyrics.map(\.content).joined()
     }
 }
