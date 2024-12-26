@@ -1,5 +1,5 @@
 //
-//  TTMLTextRenderer.swift
+//  DisplayLyricsRenderer.swift
 //  Melodic Stamp
 //
 //  Created by Xinshao_Air on 2024/12/25.
@@ -7,14 +7,14 @@
 
 import SwiftUI
 
-struct TTMLTextRenderer: TextRenderer {
+struct DisplayLyricsRenderer<Animated>: TextRenderer where Animated: AnimatedString {
     var animatableData: TimeInterval {
         get { elapsedTime }
         set { elapsedTime = newValue }
     }
 
     var elapsedTime: TimeInterval
-    var ttmlLyrics: [TTMLLyric]
+    var strings: [Animated]
     
     var inactiveOpacity: CGFloat = 0.25
     var blendRadius: CGFloat = 20
@@ -25,19 +25,19 @@ struct TTMLTextRenderer: TextRenderer {
     var lift: CGFloat = 2.5
     var softness: CGFloat = 0.75
     
-    func group(layout: Text.Layout) -> [TTMLLyric: [Text.Layout.RunSlice]] {
+    func group(layout: Text.Layout) -> [Animated: [Text.Layout.RunSlice]] {
         let slices = Array(layout.flattenedRunSlices)
-        var result: [TTMLLyric: [Text.Layout.RunSlice]] = [:]
+        var result: [Animated: [Text.Layout.RunSlice]] = [:]
         var index = 0
         
-        for animatedLyric in ttmlLyrics {
-            let count = animatedLyric.text.count
-            let endIndex = index + count + animatedLyric.trailingSpaceCount
+        for string in strings {
+            let count = string.content.count
+            let endIndex = index + count
             guard endIndex <= slices.endIndex else { break }
             
             result.updateValue(
                 Array(slices[index..<endIndex]),
-                forKey: animatedLyric
+                forKey: string
             )
             index = endIndex
         }

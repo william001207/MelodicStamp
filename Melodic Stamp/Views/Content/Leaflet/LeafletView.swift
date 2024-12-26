@@ -46,7 +46,7 @@ struct LeafletView: View {
                 
                 if hasLyrics {
                     LeafletLyricsView()
-                        .transition(.blurReplace(.downUp))
+                        .transition(.blurReplace)
                 }
             }
             .padding(.horizontal, 100)

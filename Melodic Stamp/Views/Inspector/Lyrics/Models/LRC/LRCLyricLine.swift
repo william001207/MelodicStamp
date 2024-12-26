@@ -8,7 +8,7 @@
 import Foundation
 import RegexBuilder
 
-struct LRCLyricLine: LyricLine {
+struct LRCLyricLine: LyricLine, AnimatedString {
     typealias Tag = LRCTag
 
     enum LRCLyricType: Hashable, Equatable {

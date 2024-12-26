@@ -35,13 +35,15 @@ extension TTMLLyricLine: Hashable {
 
 // MARK: - Lyric
 
-struct TTMLLyric: Equatable, Hashable, Codable {
+struct TTMLLyric: Equatable, Hashable, Identifiable, AnimatedString {
     var beginTime: TimeInterval?
     var endTime: TimeInterval?
     var text: String
-
+    
     var trailingSpaceCount: Int = 0
-
+    
+    let id = UUID()
+    
     init(
         beginTime: TimeInterval? = nil,
         endTime: TimeInterval? = nil,
@@ -51,9 +53,13 @@ struct TTMLLyric: Equatable, Hashable, Codable {
         self.beginTime = beginTime
         self.endTime = endTime
         self.trailingSpaceCount = trailingSpaceCount
-
+        
         // Remove parentheses
         self.text = text.replacing(/[\[\]\()【】（）]/, with: "")
+    }
+    
+    var content: String {
+        text + .init(repeating: " ", count: trailingSpaceCount)
     }
 }
 
@@ -75,14 +81,16 @@ extension TTMLLocale {
     }
 }
 
-struct TTMLTranslation: Equatable, Hashable, Codable {
+struct TTMLTranslation: Equatable, Hashable, Identifiable {
     var locale: TTMLLocale
     var text: String
+    
+    let id = UUID()
 }
 
 // MARK: - Lyrics
 
-struct TTMLLyrics: Equatable, Hashable, Codable {
+struct TTMLLyrics: Equatable, Hashable {
     var beginTime: TimeInterval?
     var endTime: TimeInterval?
 

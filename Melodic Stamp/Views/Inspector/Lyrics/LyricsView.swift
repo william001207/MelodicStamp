@@ -92,28 +92,28 @@ struct LyricsView: View {
         case let .raw(parser):
             ForEach(Array(parser.lines.enumerated()), id: \.element) {
                 index, line in
-                rawLyricLine(index: index, line: line)
+                rawLyricLine(line: line, index: index)
             }
         case let .lrc(parser):
             ForEach(Array(parser.lines.enumerated()), id: \.element) {
                 index, line in
-                lrcLyricLine(index: index, line: line)
+                lrcLyricLine(line: line, index: index)
             }
         case let .ttml(parser):
             ForEach(Array(parser.lines.enumerated()), id: \.element) {
                 index, line in
-                ttmlLyricLine(index: index, line: line)
+                ttmlLyricLine(line: line, index: index)
             }
         case .none:
             EmptyView()
         }
     }
 
-    @ViewBuilder private func rawLyricLine(index: Int, line: RawLyricLine) -> some View {
+    @ViewBuilder private func rawLyricLine(line: RawLyricLine, index: Int) -> some View {
         Text(line.content)
     }
 
-    @ViewBuilder private func lrcLyricLine(index: Int, line: LRCLyricLine) -> some View {
+    @ViewBuilder private func lrcLyricLine(line: LRCLyricLine, index: Int) -> some View {
         let isHighlighted = highlightedRange.contains(index)
 
         HStack {
@@ -161,7 +161,7 @@ struct LyricsView: View {
         .padding(.vertical, 4)
     }
 
-    @ViewBuilder private func ttmlLyricLine(index: Int, line: TTMLLyricLine)
+    @ViewBuilder private func ttmlLyricLine(line: TTMLLyricLine, index: Int)
         -> some View {
             let isHighlighted = highlightedRange.contains(index)
             

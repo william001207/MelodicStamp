@@ -26,25 +26,19 @@ struct LeafletLyricsView: View {
     @State private var timer = Timer.publish(every: 0.01, on: .main, in: .default).autoconnect()
 
     var body: some View {
-        Group {
-            if let lines = lyricsLines {
-                VStack {
-                    BouncyScrollView(
-                        offset: offset,
-                        delayBeforePush: 0.2,
-                        canPushAnimation: true,
-                        range: 0..<lines.count,
-                        highlightedRange: highlightedRange,
-                        alignment: .center
-                    ) { index, isHighlighted in
-                        lyricLineView(line: lines[index], isHighlighted: isHighlighted, index: index)
-                    } indicators: { index, isHighlighted in
-
-                    }
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                }
-            }
+        BouncyScrollView(
+            offset: offset,
+            delayBeforePush: 0.2,
+            canPushAnimation: true,
+            range: 0..<lyricLines.count,
+            highlightedRange: highlightedRange,
+            alignment: .center
+        ) { index, isHighlighted in
+            lyricLine(line: lyricLines[index], index: index, isHighlighted: isHighlighted)
+        } indicators: { index, isHighlighted in
+            
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .onHover { hover in
             withAnimation(.smooth(duration: 0.45)) {
                 isHovering = hover
@@ -82,31 +76,28 @@ struct LeafletLyricsView: View {
             fineGrainedElapsedTime += 0.01
         }
     }
-
-    private var lyricsLines: [any LyricLine]? {
+    
+    private var lyricLines: [any LyricLine] {
         switch lyrics.storage {
-        case let .raw(parser):
-            return parser.lines
-        case let .lrc(parser):
-            return parser.lines
-        case let .ttml(parser):
-            return parser.lines
-        case .none:
-            return nil
+        case .raw(let parser as any LyricsParser), .lrc(let parser as any LyricsParser), .ttml(let parser as any LyricsParser):
+            parser.lines
+        default:
+            []
         }
     }
 
-    @ViewBuilder private func lyricLineView(
-        line: any LyricLine, isHighlighted: Bool, index: Int
+    @ViewBuilder private func lyricLine(
+        line: any LyricLine, index: Int, isHighlighted: Bool
     ) -> some View {
         Group {
-            if let rawLine = line as? RawLyricLine {
-                rawLyricLineView(line: rawLine, isHighlighted: isHighlighted)
-            } else if let lrcLine = line as? LRCLyricLine {
-                lrcLyricLineView(line: lrcLine, isHighlighted: isHighlighted)
-            } else if let ttmlLine = line as? TTMLLyricLine {
-                ttmlLyricLineView(line: ttmlLine, isHighlighted: isHighlighted)
-            } else {
+            switch line {
+            case let line as RawLyricLine:
+                rawLyricLine(line: line, isHighlighted: isHighlighted)
+            case let line as LRCLyricLine:
+                lrcLyricLine(line: line, isHighlighted: isHighlighted)
+            case let line as TTMLLyricLine:
+                ttmlLyricLine(line: line, isHighlighted: isHighlighted)
+            default:
                 EmptyView()
             }
         }
@@ -139,40 +130,39 @@ struct LeafletLyricsView: View {
         }
     }
 
-    @ViewBuilder private func rawLyricLineView(line: RawLyricLine, isHighlighted: Bool)
+    @ViewBuilder private func rawLyricLine(line: RawLyricLine, isHighlighted: Bool)
         -> some View
     {
         Text(line.content)
             .font(.system(size: 36).weight(.bold))
     }
 
-    @ViewBuilder private func lrcLyricLineView(line: LRCLyricLine, isHighlighted: Bool)
+    @ViewBuilder private func lrcLyricLine(line: LRCLyricLine, isHighlighted: Bool)
         -> some View
     {
-        let tagsView = ForEach(line.tags) { tag in
-            if !tag.type.isMetadata {
-                Text(tag.content)
-                    .foregroundStyle(.quinary)
-            }
-        }
-
-        HStack {
-            tagsView
-            if line.isValid, !line.content.isEmpty {
+        if line.isValid {
+            HStack {
+                ForEach(line.tags) { tag in
+                    if !tag.type.isMetadata {
+                        Text(tag.content)
+                            .foregroundStyle(.quinary)
+                    }
+                }
+                
                 Text(line.content)
-                    .font(.system(size: 36).weight(.bold))
+                    .font(.system(size: 36))
+                    .bold()
             }
         }
-        .background(
-            isHighlighted ? Color.accentColor.opacity(0.1) : Color.clear)
     }
 
-    @ViewBuilder private func ttmlLyricLineView(line: TTMLLyricLine, isHighlighted: Bool)
+    @ViewBuilder private func ttmlLyricLine(line: TTMLLyricLine, isHighlighted: Bool)
         -> some View
     {
-        PlayingTTMLLyricsLine(
-            isHighlighted: isHighlighted, line: line,
-            elapsedTime: fineGrainedElapsedTime)
+        TTMLDisplayLyricLine(
+            line: line, elapsedTime: fineGrainedElapsedTime,
+            isHighlighted: isHighlighted
+        )
     }
 
     private func loadLyrics() {
