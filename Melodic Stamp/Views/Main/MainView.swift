@@ -95,28 +95,28 @@ struct MainView: View {
         Group {
             switch selectedInspectorTab {
             case .commonMetadata:
-                CommonMetadataView()
+                InspectorCommonMetadataView()
                     .toolbar {
                         if isInspectorPresented {
                             EditorToolbar()
                         }
                     }
             case .advancedMetadata:
-                AdvancedMetadataView()
+                InspectorAdvancedMetadataView()
                     .toolbar {
                         if isInspectorPresented {
                             EditorToolbar()
                         }
                     }
             case .lyrics:
-                LyricsView()
+                InspectorLyricsView()
                     .toolbar {
 //                    if isInspectorPresented {
 //                        LyricsToolbar(lyricsType: $lyrics.type)
 //                    }
                     }
             case .analytics:
-                AnalyticsView()
+                InspectorAnalyticsView()
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)

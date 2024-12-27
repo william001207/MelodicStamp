@@ -1,5 +1,5 @@
 //
-//  TTMLDisplayLyricLine.swift
+//  TTMLDisplayLyricLineView.swift
 //  Melodic Stamp
 //
 //  Created by Xinshao_Air on 2024/12/24.
@@ -8,7 +8,7 @@
 import SwiftUI
 import Luminare
 
-struct TTMLDisplayLyricLine: View {
+struct TTMLDisplayLyricLineView: View {
     @Environment(\.luminareAnimation) private var animation
     
     var line: TTMLLyricLine
@@ -20,21 +20,25 @@ struct TTMLDisplayLyricLine: View {
     var body: some View {
         VStack(alignment: .center, spacing: 5) {
             Group {
-                if isHighlighted {
-                    Text(stringContent(of: line.lyrics))
-                        .font(.system(size: 36))
-                        .bold()
-                        .textRenderer(DisplayLyricsRenderer(
-                            elapsedTime: elapsedTime,
-                            strings: line.lyrics.children
-                        ))
-                } else {
-                    Text(stringContent(of: line.lyrics))
-                        .font(.system(size: 36))
-                        .bold()
-                        .foregroundStyle(.white.opacity(isAnimationHighlighted ? 1 : 0.1))
-                        .brightness(isAnimationHighlighted ? 1.5 : 1.0)
+                VStack {
+                    if isHighlighted {
+                        Text(stringContent(of: line.lyrics))
+                            .font(.system(size: 36))
+                            .bold()
+                            .textRenderer(DisplayLyricsRenderer(
+                                elapsedTime: elapsedTime,
+                                strings: line.lyrics.children
+                            ))
+                    } else {
+                        Text(stringContent(of: line.lyrics))
+                            .font(.system(size: 36))
+                            .bold()
+                            .foregroundStyle(.white.opacity(isAnimationHighlighted ? 1 : 0.1))
+                            .brightness(isAnimationHighlighted ? 1.5 : 1.0)
+                    }
                 }
+                // Isolating switching animation between renderers
+                .animation(nil, value: isHighlighted)
                 
                 auxiliaryViews(for: line.lyrics)
                     .font(.system(size: 22))
@@ -60,7 +64,6 @@ struct TTMLDisplayLyricLine: View {
             .foregroundStyle(.white.opacity(isHighlighted ? 1 : 0.5))
             .multilineTextAlignment(line.position == .main ? .leading : .trailing)
             .frame(maxWidth: .infinity, alignment: line.position == .main ? .leading : .trailing)
-            .animation(nil, value: isHighlighted)
         }
         .onChange(of: isHighlighted) { _, newValue in
             withAnimation(.smooth(duration: 0.45).delay(0.25)) {

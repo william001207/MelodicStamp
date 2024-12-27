@@ -1,5 +1,5 @@
 //
-//  TTMLLyricsView.swift
+//  TTMLInspectorLyricsView.swift
 //  Melodic Stamp
 //
 //  Created by KrLite on 2024/12/15.
@@ -9,7 +9,7 @@ import Luminare
 import SwiftUI
 import SFSafeSymbols
 
-struct TTMLLyricsView: View {
+struct TTMLInspectorLyricsView: View {
     var isHighlighted: Bool = false
     var lyrics: TTMLLyrics
 
@@ -43,7 +43,7 @@ struct TTMLLyricsView: View {
         
         VStack(alignment: .leading, spacing: 2) {
             ForEach(lyrics.translations, id: \.locale) { translation in
-                TTMLInformationView(systemSymbol: .translate) {
+                TTMLInspectorInformationView(systemSymbol: .translate) {
                     HStack(spacing: 2) {
                         if let symbol = translation.locale.localize(systemSymbol: .character) {
                             Image(systemSymbol: symbol)
@@ -59,7 +59,7 @@ struct TTMLLyricsView: View {
             }
             
             if let roman = lyrics.roman {
-                TTMLInformationView(systemSymbol: .characterPhonetic) {
+                TTMLInspectorInformationView(systemSymbol: .characterPhonetic) {
                     Text("\(roman)")
                 }
                 .foregroundStyle(.purple)
@@ -69,7 +69,7 @@ struct TTMLLyricsView: View {
 }
 
 #Preview {
-    TTMLLyricsView(isHighlighted: false, lyrics: .init(
+    TTMLInspectorLyricsView(isHighlighted: false, lyrics: .init(
         beginTime: 0, endTime: 1000,
         children: [
             .init(text: "A", trailingSpaceCount: 1),

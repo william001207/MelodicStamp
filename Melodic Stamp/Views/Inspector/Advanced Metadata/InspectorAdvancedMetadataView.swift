@@ -1,5 +1,5 @@
 //
-//  AdvancedMetadataView.swift
+//  InspectorAdvancedMetadataView.swift
 //  MelodicStamp
 //
 //  Created by KrLite on 2024/11/24.
@@ -8,7 +8,7 @@
 import Luminare
 import SwiftUI
 
-struct AdvancedMetadataView: View {
+struct InspectorAdvancedMetadataView: View {
     @Environment(MetadataEditorModel.self) var metadataEditor
 
     @State private var ratingDecreasedAnimation: Bool = false

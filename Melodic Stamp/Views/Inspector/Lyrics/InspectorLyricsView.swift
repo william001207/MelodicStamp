@@ -1,5 +1,5 @@
 //
-//  LyricsView.swift
+//  InspectorLyricsView.swift
 //  Melodic Stamp
 //
 //  Created by Xinshao_Air on 2024/12/1.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct LyricsView: View {
+struct InspectorLyricsView: View {
     @Environment(PlayerModel.self) var player
     @Environment(MetadataEditorModel.self) var metadataEditor
     @Environment(LyricsModel.self) var lyrics
@@ -165,7 +165,7 @@ struct LyricsView: View {
         -> some View {
             let isHighlighted = highlightedRange.contains(index)
             
-            TTMLLyricLineView(isHighlighted: isHighlighted, line: line)
+            TTMLInspectorLyricLineView(isHighlighted: isHighlighted, line: line)
     }
 
     private func loadLyrics() {

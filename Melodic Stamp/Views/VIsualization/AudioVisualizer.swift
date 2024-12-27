@@ -1,5 +1,5 @@
 //
-//  AudioVisualizationView.swift
+//  AudioVisualizer.swift
 //  Melodic Stamp
 //
 //  Created by Xinshao_Air on 2024/12/26.
@@ -8,7 +8,7 @@
 import SwiftUI
 import Combine
 
-struct AudioVisualizationView: View {
+struct AudioVisualizer: View {
     @Environment(PlayerModel.self) private var player
 
     let maxMagnitude: CGFloat = 10

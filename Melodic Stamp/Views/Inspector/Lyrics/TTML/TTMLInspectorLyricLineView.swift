@@ -1,5 +1,5 @@
 //
-//  TTMLLyricLineView.swift
+//  TTMLInspectorLyricLineView.swift
 //  Melodic Stamp
 //
 //  Created by KrLite on 2024/12/22.
@@ -8,7 +8,7 @@
 import SwiftUI
 import Luminare
 
-struct TTMLLyricLineView: View {
+struct TTMLInspectorLyricLineView: View {
     @Environment(\.luminareAnimationFast) private var animationFast
     
     var isHighlighted: Bool = false
@@ -28,7 +28,7 @@ struct TTMLLyricLineView: View {
             .monospaced()
             .foregroundColor(.secondary)
             
-            TTMLLyricsView(isHighlighted: isHighlighted, lyrics: line.lyrics)
+            TTMLInspectorLyricsView(isHighlighted: isHighlighted, lyrics: line.lyrics)
             
             if !line.backgroundLyrics.isEmpty {
                 HStack {
@@ -43,7 +43,7 @@ struct TTMLLyricLineView: View {
                 .monospaced()
                 .foregroundStyle(.secondary)
                 
-                TTMLLyricsView(isHighlighted: isHighlighted, lyrics: line.backgroundLyrics)
+                TTMLInspectorLyricsView(isHighlighted: isHighlighted, lyrics: line.backgroundLyrics)
             }
         }
         .padding(.vertical, 16)
@@ -109,7 +109,7 @@ struct TTMLLyricLineView: View {
 }
 
 #Preview {
-    TTMLLyricLineView(isHighlighted: false, line: .init(
+    TTMLInspectorLyricLineView(isHighlighted: false, line: .init(
         index: 0, position: .main,
         lyrics: .init(
             beginTime: 0, endTime: 1000,

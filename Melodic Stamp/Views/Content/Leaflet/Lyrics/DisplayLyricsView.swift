@@ -1,5 +1,5 @@
 //
-//  LeafletLyricsView.swift
+//  DisplayLyricsView.swift
 //  Melodic Stamp
 //
 //  Created by Xinshao_Air on 2024/12/24.
@@ -8,7 +8,7 @@
 import SwiftUI
 import Luminare
 
-struct LeafletLyricsView: View {
+struct DisplayLyricsView: View {
     @Environment(PlayerModel.self) private var player
     @Environment(LyricsModel.self) private var lyrics
     
@@ -167,7 +167,7 @@ struct LeafletLyricsView: View {
     @ViewBuilder private func ttmlLyricLine(line: TTMLLyricLine, isHighlighted: Bool)
         -> some View
     {
-        TTMLDisplayLyricLine(
+        TTMLDisplayLyricLineView(
             line: line, elapsedTime: fineGrainedElapsedTime,
             isHighlighted: isHighlighted
         )

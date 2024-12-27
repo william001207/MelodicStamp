@@ -60,7 +60,7 @@ private struct LyricsAnalyzerView: View {
                     ScrollView {
                         DividedVStack {
                             ForEach(parser.lines) { line in
-                                TTMLLyricLineView(line: line)
+                                TTMLInspectorLyricLineView(line: line)
                             }
                             .padding(.horizontal, 8)
                         }

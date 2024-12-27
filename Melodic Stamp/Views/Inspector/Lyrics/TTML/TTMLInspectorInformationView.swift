@@ -1,5 +1,5 @@
 //
-//  TTMLInformationView.swift
+//  TTMLInspectorInformationView.swift
 //  Melodic Stamp
 //
 //  Created by KrLite on 2024/12/22.
@@ -9,7 +9,7 @@ import SwiftUI
 import SFSafeSymbols
 import Luminare
 
-struct TTMLInformationView<Content>: View where Content: View {
+struct TTMLInspectorInformationView<Content>: View where Content: View {
     @Environment(\.luminareAnimationFast) private var animationFast
     
     var systemSymbol: SFSymbol
@@ -36,7 +36,7 @@ struct TTMLInformationView<Content>: View where Content: View {
 }
 
 #Preview {
-    TTMLInformationView(systemSymbol: .characterPhonetic) {
+    TTMLInspectorInformationView(systemSymbol: .characterPhonetic) {
         Text("Roman")
     }
 }

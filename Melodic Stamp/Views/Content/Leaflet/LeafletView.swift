@@ -46,7 +46,7 @@ struct LeafletView: View {
                 .frame(width: 350, height: 350, alignment: .center)
                 
                 if hasLyrics {
-                    LeafletLyricsView()
+                    DisplayLyricsView()
                         .transition(.blurReplace)
                 }
             }
@@ -68,7 +68,7 @@ struct LeafletView: View {
                     }
                     .padding(.top, 100)
                     
-                    AudioVisualizationView()
+                    AudioVisualizer()
                         .frame(width: 20, height: 20)
                 }
             }

@@ -1,5 +1,5 @@
 //
-//  CommonMetadataView.swift
+//  InspectorCommonMetadataView.swift
 //  MelodicStamp
 //
 //  Created by KrLite on 2024/11/24.
@@ -9,7 +9,7 @@ import CSFBAudioEngine
 import Luminare
 import SwiftUI
 
-struct CommonMetadataView: View {
+struct InspectorCommonMetadataView: View {
     @Environment(MetadataEditorModel.self) var metadataEditor
 
     @Environment(\.undoManager) private var undoManager
