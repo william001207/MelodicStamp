@@ -22,7 +22,6 @@ struct ContentView: View {
     @State private var player: PlayerModel = .init()
     @State private var playerKeyboardControl: PlayerKeyboardControlModel = .init()
     @State private var metadataEditor: MetadataEditorModel = .init()
-    @State private var lyrics: LyricsModel = .init()
 
     @State private var isInspectorPresented: Bool = false
     @State private var selectedContentTab: SidebarContentTab = .playlist
@@ -97,7 +96,6 @@ struct ContentView: View {
         .environment(player)
         .environment(playerKeyboardControl)
         .environment(metadataEditor)
-        .environment(lyrics)
         // Focus management
         .focusable()
         .focusEffectDisabled()

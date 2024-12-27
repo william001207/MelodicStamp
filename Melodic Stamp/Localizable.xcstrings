@@ -19,16 +19,6 @@
     "%@" : {
 
     },
-    "%@ - %@" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "%1$@ - %2$@"
-          }
-        }
-      }
-    },
     "%lld Songs" : {
 
     },
@@ -128,9 +118,6 @@
     "Creator" : {
 
     },
-    "Debug" : {
-
-    },
     "Discs" : {
 
     },
@@ -204,9 +191,6 @@
 
     },
     "Lyrics" : {
-
-    },
-    "Lyrics (.lrc)" : {
 
     },
     "Main Window" : {
@@ -362,9 +346,6 @@
     "Staff" : {
 
     },
-    "Timed Text (.ttml)" : {
-
-    },
     "Title" : {
 
     },
@@ -387,9 +368,6 @@
 
     },
     "Unmute" : {
-
-    },
-    "Unprocessed" : {
 
     },
     "Version" : {

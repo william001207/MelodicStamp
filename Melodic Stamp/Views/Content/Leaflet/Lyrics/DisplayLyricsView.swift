@@ -51,15 +51,19 @@ struct DisplayLyricsView: View {
                 isHovering = hover
             }
         }
-        .onChange(of: player.currentIndex, initial: true) { _, newValue in
-            if newValue != nil {
+        .onChange(of: player.current, initial: true) { _, newValue in
+            if let newValue {
+                lyrics.identify(url: newValue.url)
                 loadLyrics()
+                connectTimer()
             } else {
                 playbackTime = nil
+                disconnectTimer()
             }
         }
-        .onChange(of: isPlaying) { _, newValue in
+        .onChange(of: isPlaying, initial: true) { _, newValue in
             if newValue {
+                loadLyrics()
                 connectTimer()
             } else {
                 disconnectTimer()
@@ -141,7 +145,6 @@ struct DisplayLyricsView: View {
     @ViewBuilder private func rawLyricLine(line: RawLyricLine, isHighlighted _: Bool)
         -> some View {
         Text(line.content)
-            .font(.system(size: 36).weight(.bold))
     }
 
     @ViewBuilder private func lrcLyricLine(line: LRCLyricLine, isHighlighted _: Bool)
@@ -169,19 +172,13 @@ struct DisplayLyricsView: View {
             isHighlighted: isHighlighted
         )
     }
-
+    
     private func loadLyrics() {
-        guard let currentTrack = player.current else {
-            return
-        }
-
-        guard let lyricsEntry = currentTrack.metadata.lyrics else {
-            return
-        }
-
-        let lyricsString = lyricsEntry.current
-        lyrics.identify(url: currentTrack.url)
-        lyrics.load(string: lyricsString)
+        guard
+            let current = player.current,
+            let string = current.metadata[extracting: \.lyrics]?.current
+        else { return }
+        lyrics.load(string: string)
     }
 
     private func connectTimer() {

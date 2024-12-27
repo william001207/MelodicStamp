@@ -15,64 +15,72 @@ struct TTMLDisplayLyricLineView: View {
     var elapsedTime: TimeInterval
     var isHighlighted: Bool = false
 
-    @State var isAnimationHighlighted: Bool = false
+    @State private var isAnimationHighlighted: Bool = false
 
     var body: some View {
         VStack(alignment: .center, spacing: 5) {
             Group {
-                VStack {
-                    if isHighlighted {
-                        Text(stringContent(of: line.lyrics))
-                            .font(.system(size: 36))
-                            .bold()
-                            .textRenderer(DisplayLyricsRenderer(
-                                elapsedTime: elapsedTime,
-                                strings: line.lyrics.children
-                            ))
-                    } else {
-                        Text(stringContent(of: line.lyrics))
-                            .font(.system(size: 36))
-                            .bold()
-                            .foregroundStyle(.white.opacity(isAnimationHighlighted ? 1 : 0.1))
-                            .brightness(isAnimationHighlighted ? 1.5 : 1.0)
-                    }
-                }
-                // Isolating switching animation between renderers
-                .animation(nil, value: isHighlighted)
-
-                auxiliaryViews(for: line.lyrics)
-                    .font(.system(size: 22))
-
                 if isHighlighted {
-                    if !line.backgroundLyrics.children.isEmpty {
-                        Group {
-                            Text(stringContent(of: line.backgroundLyrics))
-                                .font(.system(size: 28))
-                                .bold()
-                                .textRenderer(DisplayLyricsRenderer(
-                                    elapsedTime: elapsedTime,
-                                    strings: line.backgroundLyrics.children
-                                ))
-
-                            auxiliaryViews(for: line.backgroundLyrics)
-                                .font(.system(size: 22))
-                        }
-                        .transition(.blurReplace(.downUp))
+                    Text(stringContent(of: line.lyrics))
+                        .font(.title)
+                        .bold()
+                        .textRenderer(textRenderer(for: line.lyrics))
+                    
+                    additionalContent(for: line.lyrics)
+                        .font(.title3)
+                } else {
+                    Text(stringContent(of: line.lyrics))
+                        .font(.title)
+                        .bold()
+                        .foregroundStyle(.white.opacity(isAnimationHighlighted ? 1 : 0.1))
+                        .brightness(isAnimationHighlighted ? 1.5 : 1.0)
+                    
+                    additionalContent(for: line.lyrics)
+                        .font(.title3)
+                    Group {
+                        Text(stringContent(of: line.backgroundLyrics))
+                            .font(.title2)
+                            .bold()
+                            .textRenderer(textRenderer(for: line.backgroundLyrics))
+                        
+                        additionalContent(for: line.backgroundLyrics)
+                            .font(.title3)
                     }
+                    .transition(.blurReplace)
                 }
             }
-            .foregroundStyle(.white.opacity(isHighlighted ? 1 : 0.5))
-            .multilineTextAlignment(line.position == .main ? .leading : .trailing)
-            .frame(maxWidth: .infinity, alignment: line.position == .main ? .leading : .trailing)
+            .multilineTextAlignment(textAlignment)
+            .frame(maxWidth: .infinity, alignment: alignment)
         }
+        .foregroundStyle(.white.opacity(isHighlighted ? 1 : 0.5))
         .onChange(of: isHighlighted) { _, newValue in
             withAnimation(.smooth(duration: 0.45).delay(0.25)) {
                 isAnimationHighlighted = newValue
             }
         }
+        // Isolating switching animation between renderers
+        .animation(nil, value: isHighlighted)
+    }
+    
+    private var textAlignment: TextAlignment {
+        switch line.position {
+        case .main:
+                .leading
+        case .sub:
+                .trailing
+        }
+    }
+    
+    private var alignment: Alignment {
+        switch line.position {
+        case .main:
+                .leading
+        case .sub:
+                .trailing
+        }
     }
 
-    @ViewBuilder private func auxiliaryViews(for lyrics: TTMLLyrics) -> some View {
+    @ViewBuilder private func additionalContent(for lyrics: TTMLLyrics) -> some View {
         ForEach(lyrics.translations) { translation in
             Text(translation.text)
         }
@@ -85,5 +93,9 @@ struct TTMLDisplayLyricLineView: View {
 
     private func stringContent(of lyrics: TTMLLyrics) -> String {
         lyrics.map(\.content).joined()
+    }
+    
+    private func textRenderer(for lyrics: TTMLLyrics) -> some TextRenderer {
+        DisplayLyricsRenderer(elapsedTime: elapsedTime, strings: lyrics.children)
     }
 }

@@ -269,7 +269,7 @@ extension PlayerModel {
     func play(item: PlaylistItem) {
         addToPlaylist(urls: [item.url])
 
-        Task {
+        Task { @MainActor in
             if let decoder = try item.decoder() {
                 self.current = item
                 try self.player.play(decoder)
@@ -433,25 +433,21 @@ extension PlayerModel {
 }
 
 extension PlayerModel: AudioPlayer.Delegate {
-    func audioPlayer(_: AudioPlayer, decodingComplete decoder: PCMDecoding) {
-        if let audioDecoder = decoder as? AudioDecoder {
-            let index = if playbackLooping {
-                // Play again
-                currentIndex
-            } else {
-                // Jump to next track
-                nextIndex
-            }
-            guard let index else { return }
-
-            do {
-                if let decoder = try playlist[index].decoder() {
-                    try player.enqueue(decoder)
-                }
-            } catch {}
+    func audioPlayerEndOfAudio(_ audioPlayer: AudioPlayer) {
+        let index = if playbackLooping {
+            // Play again
+            currentIndex
         } else {
-            os_log("Failed to cast decoder to AudioDecoder or retrieve URL", log: OSLog.default, type: .error)
+            // Jump to next track
+            nextIndex
         }
+        guard let index else { return }
+        
+        do {
+            if let decoder = try playlist[index].decoder() {
+                try player.enqueue(decoder)
+            }
+        } catch {}
     }
 
     func audioPlayerNowPlayingChanged(_ audioPlayer: AudioPlayer) {

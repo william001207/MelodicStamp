@@ -44,6 +44,9 @@ struct MainView: View {
     @Binding var isInspectorPresented: Bool
     @Binding var selectedContentTab: SidebarContentTab
     @Binding var selectedInspectorTab: SidebarInspectorTab
+    
+    @State private var inspectorLyrics: LyricsModel = .init()
+    @State private var displayLyrics: LyricsModel = .init()
 
     var body: some View {
         content()
@@ -80,6 +83,7 @@ struct MainView: View {
                 .ignoresSafeArea()
         case .leaflet:
             LeafletView()
+                .environment(displayLyrics)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .ignoresSafeArea()
         }
@@ -108,6 +112,7 @@ struct MainView: View {
                 InspectorAnalyticsView()
             }
         }
+        .environment(inspectorLyrics)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .ignoresSafeArea()
         .morphed()
