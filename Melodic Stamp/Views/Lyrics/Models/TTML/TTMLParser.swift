@@ -53,24 +53,34 @@ import SwiftSoup
     func find(at time: TimeInterval) -> Range<Int> {
         var lowerBound: Int?, upperBound: Int?
 
-        func insert(_ index: Int) {
+        func accumulate(to index: Int) {
             if lowerBound == nil {
                 lowerBound = index
             }
-            upperBound = index
+            upperBound = index + 1
+        }
+        
+        func passthrough(by index: Int) {
+            guard lowerBound == nil else { return }
+            upperBound = index + 1
         }
 
         for (index, line) in lines.enumerated() {
-            if let beginTime = line.beginTime as TimeInterval?,
-               let endTime = line.endTime as TimeInterval? {
-                if time >= beginTime, time <= endTime {
-                    insert(index)
-                }
-            }
+            guard let beginTime = line.beginTime as TimeInterval?, beginTime <= time else { continue }
+            
+            // Isn't valid when end time not parsed, but needed to be recorded
+            passthrough(by: index)
+            
+            guard let endTime = line.endTime as TimeInterval?, endTime >= time else { continue }
+            accumulate(to: index)
         }
 
-        guard let lowerBound, let upperBound else { return 0 ..< 0 }
-        return lowerBound ..< (upperBound + 1)
+        guard let upperBound else { return 0 ..< 0 }
+        return if let lowerBound {
+            lowerBound ..< upperBound
+        } else {
+            upperBound ..< upperBound
+        }
     }
 
     static func getPosition(fromAgent agent: String?) -> TTMLPosition {

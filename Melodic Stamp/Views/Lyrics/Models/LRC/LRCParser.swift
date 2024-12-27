@@ -99,12 +99,17 @@ import RegexBuilder
     func find(at time: TimeInterval) -> Range<Int> {
         var nearestBeginTime: TimeInterval = .zero
         var lowerBound: Int?, upperBound: Int?
-
-        func insert(_ index: Int) {
+        
+        func accumulate(to index: Int) {
             if lowerBound == nil {
                 lowerBound = index
             }
-            upperBound = index
+            upperBound = index + 1
+        }
+        
+        func passthrough(by index: Int) {
+            guard lowerBound == nil else { return }
+            upperBound = index + 1
         }
 
         for beginTime in lines.compactMap(\.beginTime) {
@@ -114,17 +119,24 @@ import RegexBuilder
 
         for (index, line) in lines.enumerated() {
             guard let beginTime = line.beginTime, beginTime <= time, beginTime >= nearestBeginTime else { continue }
+            
+            // Isn't valid when end time not parsed, but needed to be recorded
+            passthrough(by: index)
 
             if let endTime = line.endTime {
                 guard endTime > time else { continue }
-                insert(index)
+                accumulate(to: index)
             } else {
-                insert(index)
+                accumulate(to: index)
             }
         }
-
-        guard let lowerBound, let upperBound else { return 0 ..< 0 }
-        return lowerBound ..< (upperBound + 1)
+        
+        guard let upperBound else { return 0 ..< 0 }
+        return if let lowerBound {
+            lowerBound ..< upperBound
+        } else {
+            upperBound ..< upperBound
+        }
     }
 
     static func parseTag(string: String) throws -> Tag? {

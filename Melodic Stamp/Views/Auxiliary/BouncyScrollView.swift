@@ -18,6 +18,7 @@ enum BouncyScrollViewAlignment {
 }
 
 struct BouncyScrollView<Content: View, Indicators: View>: View {
+    var offset: CGFloat = 50
     var delay: TimeInterval = 0.08
     var delayBeforePush: TimeInterval = 0.5
     var canPushAnimation: Bool = true
@@ -37,6 +38,9 @@ struct BouncyScrollView<Content: View, Indicators: View>: View {
 
     var body: some View {
         ScrollView {
+            Spacer()
+                .frame(height: offset)
+            
             Spacer()
                 .frame(height: compensate)
             

@@ -15,7 +15,6 @@ struct DisplayLyricsView: View {
     @Environment(\.luminareAnimation) private var animation
 
     @State private var playbackTime: PlaybackTime?
-    @State private var highlightedRange: Range<Int> = 0 ..< 0
 
     @State private var isPlaying: Bool = false
     @State private var isHovering: Bool = false
@@ -24,6 +23,7 @@ struct DisplayLyricsView: View {
     @State private var timer = Timer.publish(every: 0.01, on: .main, in: .default).autoconnect()
 
     var body: some View {
+        // Avoid multiple instantializations
         let lines = lyricLines
 
         Group {
@@ -49,8 +49,7 @@ struct DisplayLyricsView: View {
             }
         }
         .onChange(of: player.current, initial: true) { _, newValue in
-            if let newValue {
-                lyrics.identify(url: newValue.url)
+            if newValue != nil {
                 loadLyrics()
                 connectTimer()
             } else {
@@ -68,10 +67,6 @@ struct DisplayLyricsView: View {
         }
         .onChange(of: playbackTime) { _, newValue in
             guard let elapsed = newValue?.elapsed else { return }
-            let newRange = lyrics.find(at: elapsed, in: player.current?.url)
-            if newRange != 0 ..< 0 {
-                highlightedRange = newRange
-            }
             fineGrainedElapsedTime = elapsed
         }
         .onReceive(player.isPlayingPublisher) { isPlaying in
@@ -91,6 +86,14 @@ struct DisplayLyricsView: View {
             parser.lines
         default:
             []
+        }
+    }
+    
+    private var highlightedRange: Range<Int> {
+        if let timeElapsed = playbackTime?.elapsed {
+            lyrics.find(at: timeElapsed)
+        } else {
+            0 ..< 0
         }
     }
 
