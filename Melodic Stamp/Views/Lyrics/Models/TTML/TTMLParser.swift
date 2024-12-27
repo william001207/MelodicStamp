@@ -52,7 +52,7 @@ import SwiftSoup
 
     func find(at time: TimeInterval) -> Range<Int> {
         var lowerBound: Int?, upperBound: Int?
-        
+
         func insert(_ index: Int) {
             if lowerBound == nil {
                 lowerBound = index
@@ -69,8 +69,8 @@ import SwiftSoup
             }
         }
 
-        guard let lowerBound, let upperBound else { return 0..<0 }
-        return lowerBound..<(upperBound + 1)
+        guard let lowerBound, let upperBound else { return 0 ..< 0 }
+        return lowerBound ..< (upperBound + 1)
     }
 
     static func getPosition(fromAgent agent: String?) -> TTMLPosition {
@@ -97,7 +97,7 @@ import SwiftSoup
         let (beginTime, endTime) = try readTimestamp(from: element)
         lyrics.beginTime = beginTime
         lyrics.endTime = endTime
-        
+
         var text = try element.text()
 
         for node in element.getChildNodes() {
@@ -116,12 +116,11 @@ import SwiftSoup
 
                 if
                     let roleData = try TTMLData(type: .role, element: spanElement),
-                    let role = TTMLRole(rawValue: roleData.content)
-                {
+                    let role = TTMLRole(rawValue: roleData.content) {
                     switch role {
                     case .translation:
                         guard let language = try TTMLData(type: .language, element: spanElement) else { break }
-                        
+
                         let locale = Locale(identifier: language.content)
                         lyrics.translations.append(.init(locale: locale, text: spanText))
                     case .roman:

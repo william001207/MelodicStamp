@@ -21,7 +21,7 @@ extension TimeInterval {
         let minutes = Double(components[0]), seconds = Double(components[1]), milliseconds = Double(components[2])
         self.init(floatLiteral: minutes * 60 + seconds + milliseconds / 1000)
     }
-    
+
     var duration: Duration {
         .seconds(self)
     }

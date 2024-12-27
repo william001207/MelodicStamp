@@ -6,8 +6,8 @@
 //
 
 import Luminare
-import SwiftUI
 import SFSafeSymbols
+import SwiftUI
 
 struct TTMLInspectorLyricsView: View {
     var isHighlighted: Bool = false
@@ -24,7 +24,7 @@ struct TTMLInspectorLyricsView: View {
                                 .luminareBordered(false)
                                 .luminareHorizontalPadding(0)
                                 .luminareMinHeight(24)
-                            
+
                             ForEach(0 ..< lyric.trailingSpaceCount, id: \.self) { _ in
                                 Text(" ")
                             }
@@ -40,7 +40,7 @@ struct TTMLInspectorLyricsView: View {
         .background(.tint.quinary)
         .clipShape(.rect(cornerRadius: 8))
         .tint(isHighlighted ? .accent : .primary)
-        
+
         VStack(alignment: .leading, spacing: 2) {
             ForEach(lyrics.translations, id: \.locale) { translation in
                 TTMLInspectorInformationView(systemSymbol: .translate) {
@@ -48,16 +48,16 @@ struct TTMLInspectorLyricsView: View {
                         if let symbol = translation.locale.localize(systemSymbol: .character) {
                             Image(systemSymbol: symbol)
                         }
-                        
+
                         Text("\(translation.locale.identifier)")
                     }
                     .foregroundStyle(.secondary)
-                    
+
                     Text("\(translation.text)")
                 }
                 .foregroundStyle(.tint)
             }
-            
+
             if let roman = lyrics.roman {
                 TTMLInspectorInformationView(systemSymbol: .characterPhonetic) {
                     Text("\(roman)")

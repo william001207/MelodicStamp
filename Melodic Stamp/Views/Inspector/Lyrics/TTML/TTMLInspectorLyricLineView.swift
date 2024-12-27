@@ -5,36 +5,36 @@
 //  Created by KrLite on 2024/12/22.
 //
 
-import SwiftUI
 import Luminare
+import SwiftUI
 
 struct TTMLInspectorLyricLineView: View {
     @Environment(\.luminareAnimationFast) private var animationFast
-    
+
     var isHighlighted: Bool = false
     var line: TTMLLyricLine
-    
+
     @State private var isHovering: Bool = false
-    
+
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
                 Text("\(line.position)")
                     .foregroundStyle(.accent)
-                
+
                 Text("#\(line.index)")
             }
             .font(.caption)
             .monospaced()
             .foregroundColor(.secondary)
-            
+
             TTMLInspectorLyricsView(isHighlighted: isHighlighted, lyrics: line.lyrics)
-            
+
             if !line.backgroundLyrics.isEmpty {
                 HStack {
                     Text("background")
                         .foregroundStyle(.accent)
-                    
+
                     VStack {
                         Divider()
                     }
@@ -42,7 +42,7 @@ struct TTMLInspectorLyricLineView: View {
                 .font(.caption)
                 .monospaced()
                 .foregroundStyle(.secondary)
-                
+
                 TTMLInspectorLyricsView(isHighlighted: isHighlighted, lyrics: line.backgroundLyrics)
             }
         }
@@ -59,7 +59,7 @@ struct TTMLInspectorLyricLineView: View {
                         .frame(width: 4)
                         .foregroundStyle(.accent)
                         .padding(.vertical, 6)
-                    
+
                     VStack {
                         DurationText(
                             duration: line.beginTime?.duration,
@@ -68,19 +68,19 @@ struct TTMLInspectorLyricLineView: View {
                                 fractionalSecondsLength: 3
                             )
                         )
-                            .foregroundStyle(.background)
-                            .padding(.vertical, 2)
-                            .padding(.horizontal, 4)
-                            .background {
-                                Rectangle()
-                                    .foregroundStyle(.accent)
-                            }
-                            .clipShape(.rect(cornerRadii: .init(
-                                topLeading: 6, bottomLeading: 6, bottomTrailing: 0, topTrailing: 6
-                            )))
-                        
+                        .foregroundStyle(.background)
+                        .padding(.vertical, 2)
+                        .padding(.horizontal, 4)
+                        .background {
+                            Rectangle()
+                                .foregroundStyle(.accent)
+                        }
+                        .clipShape(.rect(cornerRadii: .init(
+                            topLeading: 6, bottomLeading: 6, bottomTrailing: 0, topTrailing: 6
+                        )))
+
                         Spacer()
-                        
+
                         DurationText(
                             duration: line.endTime?.duration,
                             pattern: .minuteSecond(
@@ -88,16 +88,16 @@ struct TTMLInspectorLyricLineView: View {
                                 fractionalSecondsLength: 3
                             )
                         )
-                            .foregroundStyle(.background)
-                            .padding(.vertical, 2)
-                            .padding(.horizontal, 4)
-                            .background {
-                                Rectangle()
-                                    .foregroundStyle(.accent)
-                            }
-                            .clipShape(.rect(cornerRadii: .init(
-                                topLeading: 6, bottomLeading: 6, bottomTrailing: 6, topTrailing: 0
-                            )))
+                        .foregroundStyle(.background)
+                        .padding(.vertical, 2)
+                        .padding(.horizontal, 4)
+                        .background {
+                            Rectangle()
+                                .foregroundStyle(.accent)
+                        }
+                        .clipShape(.rect(cornerRadii: .init(
+                            topLeading: 6, bottomLeading: 6, bottomTrailing: 6, topTrailing: 0
+                        )))
                     }
                 }
                 .font(.footnote)

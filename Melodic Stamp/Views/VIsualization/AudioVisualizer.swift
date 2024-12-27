@@ -5,14 +5,14 @@
 //  Created by Xinshao_Air on 2024/12/26.
 //
 
-import SwiftUI
 import Combine
+import SwiftUI
 
 struct AudioVisualizer: View {
     @Environment(PlayerModel.self) private var player
 
     let maxMagnitude: CGFloat = 10
-    
+
     @State private var frequencyData: [CGFloat] = Array(repeating: 0, count: 5)
 
     var body: some View {
@@ -37,11 +37,10 @@ struct AudioVisualizer: View {
 
     private func sampleData(_ data: [CGFloat], count: Int) -> [CGFloat] {
         guard !data.isEmpty else { return .init(repeating: 0, count: count) }
-        
+
         let chunkSize = max(data.count / count, 1)
         return stride(from: 0, to: data.count, by: chunkSize).map {
-            Array(data[$0..<min($0 + chunkSize, data.count)]).reduce(0, +) / CGFloat(chunkSize)
+            Array(data[$0 ..< min($0 + chunkSize, data.count)]).reduce(0, +) / CGFloat(chunkSize)
         }
     }
 }
-

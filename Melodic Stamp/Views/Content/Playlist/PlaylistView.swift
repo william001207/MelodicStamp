@@ -85,9 +85,9 @@ struct PlaylistView: View {
                         leadingActions()
                             .frame(height: minHeight)
                     }
-                    
+
                     Spacer()
-                    
+
                     LuminareSection(hasPadding: false) {
                         trailingActions()
                             .frame(height: minHeight)
@@ -121,7 +121,7 @@ struct PlaylistView: View {
                 Image(systemSymbol: .xmark)
                     .padding()
             }
-            .aspectRatio(1/1, contentMode: .fit)
+            .aspectRatio(1 / 1, contentMode: .fit)
             .disabled(!canEscape)
 
             // Remove selection from playlist / remove all
@@ -151,7 +151,7 @@ struct PlaylistView: View {
         }
         .buttonStyle(.luminare)
     }
-    
+
     @ViewBuilder private func trailingActions() -> some View {
         HStack(spacing: 2) {
             // Cycle playback mode
@@ -164,7 +164,7 @@ struct PlaylistView: View {
                     .padding()
             }
             .fixedSize(horizontal: true, vertical: false)
-            
+
             // Toggle infinite loop
             Button {
                 player.playbackLooping.toggle()
@@ -172,7 +172,7 @@ struct PlaylistView: View {
                 PlaybackLoopingView(isEnabled: player.playbackLooping)
                     .padding()
             }
-            .aspectRatio(1/1, contentMode: .fit)
+            .aspectRatio(1 / 1, contentMode: .fit)
         }
         .buttonStyle(.luminare)
     }

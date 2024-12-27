@@ -99,7 +99,7 @@ import RegexBuilder
     func find(at time: TimeInterval) -> Range<Int> {
         var nearestBeginTime: TimeInterval = .zero
         var lowerBound: Int?, upperBound: Int?
-        
+
         func insert(_ index: Int) {
             if lowerBound == nil {
                 lowerBound = index
@@ -123,8 +123,8 @@ import RegexBuilder
             }
         }
 
-        guard let lowerBound, let upperBound else { return 0..<0 }
-        return lowerBound..<(upperBound + 1)
+        guard let lowerBound, let upperBound else { return 0 ..< 0 }
+        return lowerBound ..< (upperBound + 1)
     }
 
     static func parseTag(string: String) throws -> Tag? {

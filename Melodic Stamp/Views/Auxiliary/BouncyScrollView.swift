@@ -19,30 +19,27 @@ enum BouncyScrollViewAlignment {
 }
 
 struct BouncyScrollView<Content: View, Indicators: View>: View {
-    
     var offset: CGFloat = 50
     var delay: TimeInterval = 0.08
     var delayBeforePush: TimeInterval = 0.5
     var canPushAnimation: Bool = true
-    
+
     var range: Range<Int>
     var highlightedRange: Range<Int>
     var alignment: BouncyScrollViewAlignment = .top
-    
+
     @ViewBuilder var content: (_ index: Int, _ isHighlighted: Bool) -> Content
     @ViewBuilder var indicators: (_ index: Int, _ isHighlighted: Bool) -> Indicators
-    
+
     @State private var animationState: BouncyScrollViewAnimationState = .intermediate
     @State private var scrollPosition: ScrollPosition = .init()
     @State private var scrollOffset: CGFloat = .zero
-    
+
     var body: some View {
         GeometryReader { geometry in
             ScrollView {
                 LazyVStack(spacing: 0) {
-                    
                     switch alignment {
-                        
                     case .top:
                         EmptyView()
                     case .center:
@@ -52,12 +49,12 @@ struct BouncyScrollView<Content: View, Indicators: View>: View {
                         Spacer()
                             .frame(height: geometry.size.height)
                     }
-                    
+
                     ForEach(range, id: \.self) { index in
                         let isHighlighted = highlightedRange.contains(index)
-                        let proportion = self.proportion(at: index)
-                        let delay = self.delay(at: index)
-                        
+                        let proportion = proportion(at: index)
+                        let delay = delay(at: index)
+
                         content(index, isHighlighted)
                             .offset(y: proportion * offset)
                             .animation(.spring(bounce: 0.20).delay(delay), value: animationState)
@@ -70,12 +67,11 @@ struct BouncyScrollView<Content: View, Indicators: View>: View {
                                 }
                             }
                     }
-                    
+
                     Spacer()
                         .frame(height: offset)
-                    
+
                     switch alignment {
-                        
                     case .top:
                         Spacer()
                             .frame(height: geometry.size.height)
@@ -98,7 +94,7 @@ struct BouncyScrollView<Content: View, Indicators: View>: View {
             }
             .onChange(of: highlightedRange) { _, newValue in
                 withAnimation(.bouncy) {
-                    scrollOffset =  CGFloat(newValue.lowerBound) * offset
+                    scrollOffset = CGFloat(newValue.lowerBound) * offset
                 }
             }
 
@@ -108,7 +104,7 @@ struct BouncyScrollView<Content: View, Indicators: View>: View {
             .onChange(of: highlightedRange) { oldValue, newValue in
                 let isLowerBoundChanged = oldValue.lowerBound != newValue.lowerBound
                 let isPauseChanged = oldValue.isEmpty != newValue.isEmpty && canPauseAnimation
-                
+
                 guard isLowerBoundChanged || isPauseChanged else { return }
                 updateAnimationState()
             }
@@ -120,27 +116,27 @@ struct BouncyScrollView<Content: View, Indicators: View>: View {
             }
         }
     }
-    
+
     private var hasIndicators: Bool {
         Indicators.self != EmptyView.self
     }
-    
+
     private var canPauseAnimation: Bool {
         hasIndicators && highlightedRange.isEmpty
     }
-    
+
     private func updateAnimationState() {
         animationState = .intermediate
         DispatchQueue.main.asyncAfter(deadline: .now() + delayBeforePush) {
             tryPushAnimation()
         }
     }
-    
+
     private func tryPushAnimation() {
-        guard canPushAnimation && !canPauseAnimation else { return }
+        guard canPushAnimation, !canPauseAnimation else { return }
         animationState = .pushed
     }
-    
+
     private func proportion(at index: Int) -> CGFloat {
         if index >= highlightedRange.lowerBound {
             switch animationState {
@@ -149,7 +145,7 @@ struct BouncyScrollView<Content: View, Indicators: View>: View {
             }
         } else { 0 }
     }
-    
+
     private func delay(at index: Int) -> CGFloat {
         switch animationState {
         case .intermediate:
@@ -159,18 +155,18 @@ struct BouncyScrollView<Content: View, Indicators: View>: View {
             return CGFloat(index - highlightedRange.upperBound) * delay
         }
     }
-    
-    private func calculateScrollOffset(for index: Int, in scrollViewHeight: CGFloat) -> CGFloat {
-        return CGFloat(index) * offset
+
+    private func calculateScrollOffset(for index: Int, in _: CGFloat) -> CGFloat {
+        CGFloat(index) * offset
     }
 }
 
 #Preview {
-    @Previewable @State var canPushAnimation: Bool = true
-    @Previewable @State var highlightedRange: Range<Int> = 0..<1
+    @Previewable @State var canPushAnimation = true
+    @Previewable @State var highlightedRange: Range<Int> = 0 ..< 1
     @Previewable @State var alignment: BouncyScrollViewAlignment = .top
     let count = 20
-    
+
     VStack {
         Picker("Alignment", selection: $alignment) {
             Text("Top")
@@ -182,21 +178,21 @@ struct BouncyScrollView<Content: View, Indicators: View>: View {
         }
         .pickerStyle(SegmentedPickerStyle())
         .padding()
-        
+
         HStack {
             let upperBound = highlightedRange.upperBound
-            
+
             Text("Lower bound: \(highlightedRange.lowerBound)")
                 .fixedSize()
                 .frame(width: 100, alignment: .leading)
-            
+
             if upperBound > 0 {
                 Slider(
                     value: Binding {
                         Double(highlightedRange.lowerBound)
                     } set: { newValue in
                         let newBound = min(Int(newValue), upperBound)
-                        highlightedRange = max(0, newBound)..<upperBound
+                        highlightedRange = max(0, newBound) ..< upperBound
                     },
                     in: 0...Double(upperBound),
                     step: 1
@@ -225,21 +221,21 @@ struct BouncyScrollView<Content: View, Indicators: View>: View {
             }
         }
         .padding()
-        
+
         HStack {
             let lowerBound = highlightedRange.lowerBound
-            
+
             Text("Upper bound: \(highlightedRange.upperBound)")
                 .fixedSize()
                 .frame(width: 100, alignment: .leading)
-            
+
             if lowerBound < count {
                 Slider(
                     value: Binding {
                         Double(highlightedRange.upperBound)
                     } set: { newValue in
                         let newBound = max(Int(newValue), lowerBound)
-                        highlightedRange = lowerBound..<min(count, newBound)
+                        highlightedRange = lowerBound ..< min(count, newBound)
                     },
                     in: Double(lowerBound)...Double(count),
                     step: 1
@@ -268,7 +264,7 @@ struct BouncyScrollView<Content: View, Indicators: View>: View {
             }
         }
         .padding()
-        
+
         Button {
             canPushAnimation.toggle()
         } label: {
@@ -278,10 +274,10 @@ struct BouncyScrollView<Content: View, Indicators: View>: View {
                 Text("Allow Animation Pushing")
             }
         }
-        
+
         BouncyScrollView(
             canPushAnimation: canPushAnimation,
-            range: 0..<count,
+            range: 0 ..< count,
             highlightedRange: highlightedRange,
             alignment: alignment
         ) { index, isHighlighted in
@@ -296,11 +292,10 @@ struct BouncyScrollView<Content: View, Indicators: View>: View {
                     brightness: 1
                 ))
                 .opacity(isHighlighted ? 1 : 0.5)
-        } indicators: { index, isHighlighted in
+        } indicators: { _, _ in
             EmptyView()
         }
         .border(.foreground)
-        
         .frame(height: 400)
     }
     .frame(width: 400)

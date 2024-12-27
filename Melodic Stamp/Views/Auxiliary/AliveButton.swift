@@ -14,27 +14,27 @@ struct AliveButton<Label>: View where Label: View {
     var scaleFactor: CGFloat
     var shadowRadius: CGFloat
     var duration: TimeInterval
-    
+
     var enabledStyle: AnyShapeStyle
     var hoveringStyle: AnyShapeStyle?
     var disabledStyle: AnyShapeStyle
-    
-    var onGestureChanged: (DragGesture.Value) -> Void
-    var onGestureEnded: (DragGesture.Value) -> Void
-    var action: () -> Void
+
+    var onGestureChanged: (DragGesture.Value) -> ()
+    var onGestureEnded: (DragGesture.Value) -> ()
+    var action: () -> ()
     @ViewBuilder var label: () -> Label
 
     @State private var isHovering: Bool = false
     @State private var isActive: Bool = false
     @State private var frame: CGRect = .zero
-    
+
     init(
         scaleFactor: CGFloat = 0.85, shadowRadius: CGFloat = 4, duration: TimeInterval = 0.45,
         enabledStyle: some ShapeStyle = .primary, hoveringStyle: some ShapeStyle, disabledStyle: some ShapeStyle = .quinary,
-        action: @escaping () -> Void,
+        action: @escaping () -> (),
         @ViewBuilder label: @escaping () -> Label,
-        onGestureChanged: @escaping (DragGesture.Value) -> Void = { _ in },
-        onGestureEnded: @escaping (DragGesture.Value) -> Void = { _ in }
+        onGestureChanged: @escaping (DragGesture.Value) -> () = { _ in },
+        onGestureEnded: @escaping (DragGesture.Value) -> () = { _ in }
     ) {
         self.scaleFactor = scaleFactor
         self.shadowRadius = shadowRadius
@@ -47,14 +47,14 @@ struct AliveButton<Label>: View where Label: View {
         self.action = action
         self.label = label
     }
-    
+
     init(
         scaleFactor: CGFloat = 0.85, shadowRadius: CGFloat = 4, duration: TimeInterval = 0.45,
         enabledStyle: some ShapeStyle = .primary, disabledStyle: some ShapeStyle = .quinary,
-        action: @escaping () -> Void,
+        action: @escaping () -> (),
         @ViewBuilder label: @escaping () -> Label,
-        onGestureChanged: @escaping (DragGesture.Value) -> Void = { _ in },
-        onGestureEnded: @escaping (DragGesture.Value) -> Void = { _ in }
+        onGestureChanged: @escaping (DragGesture.Value) -> () = { _ in },
+        onGestureEnded: @escaping (DragGesture.Value) -> () = { _ in }
     ) {
         self.scaleFactor = scaleFactor
         self.shadowRadius = shadowRadius
@@ -74,7 +74,7 @@ struct AliveButton<Label>: View where Label: View {
                 .onChanged { gesture in
                     guard isEnabled else { return }
                     isActive = true
-                    
+
                     onGestureChanged(gesture)
                 }
                 .onEnded { gesture in
@@ -85,7 +85,7 @@ struct AliveButton<Label>: View where Label: View {
                     if frame.contains(gesture.location) {
                         action()
                     }
-                    
+
                     onGestureEnded(gesture)
                 })
             .onGeometryChange(for: CGRect.self) { proxy in

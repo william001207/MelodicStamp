@@ -77,7 +77,7 @@ struct Player: View {
             .matchedGeometryEffect(
                 id: PlayerNamespace.playbackModeButton, in: namespace
             )
-            
+
             AliveButton(
                 enabledStyle: .tertiary, hoveringStyle: .secondary
             ) {
@@ -100,7 +100,7 @@ struct Player: View {
 //                .contentTransition(.numericText())
                 .animation(.default, value: player.currentIndex)
                 .matchedGeometryEffect(id: PlayerNamespace.title, in: namespace)
-                
+
                 if let thumbnail = player.current?.metadata.thumbnail {
                     MusicCover(
                         images: [thumbnail], hasPlaceholder: false,

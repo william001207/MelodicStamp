@@ -399,18 +399,18 @@ extension Metadata {
     func update() async throws {
         guard url.startAccessingSecurityScopedResource() else { return }
         defer { url.stopAccessingSecurityScopedResource() }
-        
+
         let file = try AudioFile(readingPropertiesAndMetadataFrom: url)
         properties = file.properties
         load(from: file.metadata)
-        
+
         switch state {
         case .loading:
             print("Loaded metadata from \(url)")
         default:
             print("Updated metadata from \(url)")
         }
-        
+
         state = .fine
         await generateThumbnail()
     }
@@ -419,14 +419,14 @@ extension Metadata {
         guard state.isEditable, isModified else { return }
         guard url.startAccessingSecurityScopedResource() else { return }
         defer { self.url.stopAccessingSecurityScopedResource() }
-        
+
         state = .saving
         apply()
         print("Started writing metadata to \(url)")
-        
+
         let file = try AudioFile(url: url)
         file.metadata = pack()
-        
+
         if file.metadata.comment != nil {
             try file.writeMetadata()
         } else {
@@ -436,7 +436,7 @@ extension Metadata {
             file.metadata.comment = ""
             try file.writeMetadata()
         }
-        
+
         state = .fine
         print("Successfully written metadata to \(url)")
     }

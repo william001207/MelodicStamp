@@ -164,7 +164,7 @@ struct MiniPlayer: View {
             .matchedGeometryEffect(
                 id: PlayerNamespace.playbackModeButton, in: namespace
             )
-            
+
             AliveButton(
                 enabledStyle: .tertiary, hoveringStyle: .secondary
             ) {
@@ -202,7 +202,7 @@ struct MiniPlayer: View {
                 .matchedGeometryEffect(id: PlayerNamespace.title, in: namespace)
                 .padding(.bottom, 2)
             }
-            
+
             Group {
                 switch headerControl {
                 case .title:

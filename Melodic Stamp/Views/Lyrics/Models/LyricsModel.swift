@@ -129,7 +129,7 @@ enum LyricsStorage {
 
     func find(at time: TimeInterval, in url: URL?) -> Range<Int> {
         guard let storage, let url, url == self.url else {
-            return 0..<0
+            return 0 ..< 0
         }
         return storage.find(at: time)
     }

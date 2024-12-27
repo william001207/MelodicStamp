@@ -20,6 +20,6 @@ import Foundation
     }
 
     func find(at _: TimeInterval) -> Range<Int> {
-        0..<0
+        0 ..< 0
     }
 }

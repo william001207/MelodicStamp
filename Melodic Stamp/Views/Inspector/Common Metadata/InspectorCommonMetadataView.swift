@@ -130,7 +130,7 @@ struct InspectorCommonMetadataView: View {
                         Image(systemSymbol: .plus)
                             .padding()
                     }
-                    .aspectRatio(1/1, contentMode: .fit)
+                    .aspectRatio(1 / 1, contentMode: .fit)
                     .disabled(availableTypes.isEmpty)
                     .fileImporter(
                         isPresented: $isCoverPickerPresented,

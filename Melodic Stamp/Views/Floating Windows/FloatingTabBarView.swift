@@ -17,7 +17,7 @@ struct FloatingTabBarView: View {
     @Binding var isInspectorPresented: Bool
     @Binding var selectedContentTab: SidebarContentTab
     @Binding var selectedInspectorTab: SidebarInspectorTab
-    
+
     @State private var isHovering: Bool = true // Crucial!
     @State private var isDragging: Bool = false
     @State private var hoveringTabs: Set<AnyHashable> = []
@@ -65,7 +65,7 @@ struct FloatingTabBarView: View {
         .animation(animation, value: isExpanded)
         .fixedSize(horizontal: false, vertical: true) // Resize window
     }
-    
+
     private var isExpanded: Bool {
         isHovering || isDragging
     }

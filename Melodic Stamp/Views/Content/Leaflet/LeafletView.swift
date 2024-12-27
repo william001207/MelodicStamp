@@ -5,14 +5,14 @@
 //  Created by KrLite on 2024/12/13.
 //
 
-import SwiftUI
 import DominantColors
+import SwiftUI
 
 struct LeafletView: View {
     @Environment(PlayerModel.self) var player
     @Environment(MetadataEditorModel.self) var metadataEditor
     @Environment(LyricsModel.self) var lyrics
-    
+
     @State private var dominantColors: [Color] = [.init(hex: 0x929292), .init(hex: 0xFFFFFF), .init(hex: 0x929292)]
     @State private var playbackTime: PlaybackTime?
     @State private var isPlaying: Bool = false
@@ -26,8 +26,7 @@ struct LeafletView: View {
                 Group {
                     if
                         let attachedPictures = player.current?.metadata[extracting: \.attachedPictures]?.current,
-                        let cover = ThumbnailMaker.getCover(from: attachedPictures)?.image
-                    {
+                        let cover = ThumbnailMaker.getCover(from: attachedPictures)?.image {
                         MusicCover(
                             images: [cover], hasPlaceholder: false,
                             cornerRadius: 20
@@ -44,7 +43,7 @@ struct LeafletView: View {
                     }
                 }
                 .frame(width: 350, height: 350, alignment: .center)
-                
+
                 if hasLyrics {
                     DisplayLyricsView()
                         .transition(.blurReplace)
@@ -61,20 +60,20 @@ struct LeafletView: View {
             // For testing
             .overlay(alignment: .top) {
                 HStack {
-                    Button("Toggle Lyrics"){
+                    Button("Toggle Lyrics") {
                         withAnimation(.smooth(duration: 0.45)) {
                             hasLyrics.toggle()
                         }
                     }
                     .padding(.top, 100)
-                    
+
                     AudioVisualizer()
                         .frame(width: 20, height: 20)
                 }
             }
         }
     }
-    
+
     private func extractDominantColors(from image: NSImage) async throws -> [Color] {
         let colors = try DominantColors.dominantColors(
             nsImage: image, quality: .low,

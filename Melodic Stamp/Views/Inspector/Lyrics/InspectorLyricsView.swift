@@ -83,7 +83,7 @@ struct InspectorLyricsView: View {
         if let timeElapsed = playbackTime?.elapsed {
             lyrics.find(at: timeElapsed, in: player.current?.url)
         } else {
-            0..<0
+            0 ..< 0
         }
     }
 
@@ -109,7 +109,7 @@ struct InspectorLyricsView: View {
         }
     }
 
-    @ViewBuilder private func rawLyricLine(line: RawLyricLine, index: Int) -> some View {
+    @ViewBuilder private func rawLyricLine(line: RawLyricLine, index _: Int) -> some View {
         Text(line.content)
     }
 
@@ -155,7 +155,7 @@ struct InspectorLyricsView: View {
             }
         }
         .foregroundStyle(.tint)
-        .tint(isHighlighted ? .accent: .secondary)
+        .tint(isHighlighted ? .accent : .secondary)
         .scaleEffect(isHighlighted ? 1.1 : 1)
         .animation(.bouncy, value: isHighlighted)
         .padding(.vertical, 4)
@@ -163,9 +163,9 @@ struct InspectorLyricsView: View {
 
     @ViewBuilder private func ttmlLyricLine(line: TTMLLyricLine, index: Int)
         -> some View {
-            let isHighlighted = highlightedRange.contains(index)
-            
-            TTMLInspectorLyricLineView(isHighlighted: isHighlighted, line: line)
+        let isHighlighted = highlightedRange.contains(index)
+
+        TTMLInspectorLyricLineView(isHighlighted: isHighlighted, line: line)
     }
 
     private func loadLyrics() {

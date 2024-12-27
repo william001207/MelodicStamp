@@ -25,9 +25,9 @@ struct PlainAnimatedString: AnimatedString {
     var content: String
     var beginTime: TimeInterval?
     var endTime: TimeInterval?
-    
+
     let id = UUID()
-    
+
     init(_ content: String, beginTime: TimeInterval? = nil, endTime: TimeInterval? = nil) {
         self.content = content
         self.beginTime = beginTime

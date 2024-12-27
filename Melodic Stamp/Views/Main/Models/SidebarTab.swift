@@ -36,7 +36,7 @@ enum SidebarContentTab: String, SidebarTab, CaseIterable, Codable {
             .viewfinder
         }
     }
-    
+
     var inspectors: [SidebarInspectorTab] {
         switch self {
         case .playlist:

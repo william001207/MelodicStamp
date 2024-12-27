@@ -39,11 +39,11 @@ struct TTMLLyric: Equatable, Hashable, Identifiable, AnimatedString {
     var beginTime: TimeInterval?
     var endTime: TimeInterval?
     var text: String
-    
+
     var trailingSpaceCount: Int = 0
-    
+
     let id = UUID()
-    
+
     init(
         beginTime: TimeInterval? = nil,
         endTime: TimeInterval? = nil,
@@ -53,11 +53,11 @@ struct TTMLLyric: Equatable, Hashable, Identifiable, AnimatedString {
         self.beginTime = beginTime
         self.endTime = endTime
         self.trailingSpaceCount = trailingSpaceCount
-        
+
         // Remove parentheses
         self.text = text.replacing(/[\[\]\()【】（）]/, with: "")
     }
-    
+
     var content: String {
         text + .init(repeating: " ", count: trailingSpaceCount)
     }
@@ -71,11 +71,11 @@ extension TTMLLocale {
     var main: String? {
         identifier.split(separator: /[-_]/).first.map(String.init(_:))
     }
-    
+
     var symbolLocalization: Localization? {
         main.flatMap(Localization.init(rawValue:))
     }
-    
+
     func localize(systemSymbol symbol: SFSymbol) -> SFSymbol? {
         symbolLocalization.flatMap(symbol.localized(to:))
     }
@@ -84,7 +84,7 @@ extension TTMLLocale {
 struct TTMLTranslation: Equatable, Hashable, Identifiable {
     var locale: TTMLLocale
     var text: String
-    
+
     let id = UUID()
 }
 

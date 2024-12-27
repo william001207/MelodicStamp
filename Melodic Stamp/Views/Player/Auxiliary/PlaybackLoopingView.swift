@@ -5,14 +5,14 @@
 //  Created by KrLite on 2024/12/24.
 //
 
-import SwiftUI
 import Luminare
+import SwiftUI
 
 struct PlaybackLoopingView: View {
     @Environment(\.luminareAnimation) private var animation
-    
+
     var isEnabled: Bool = false
-    
+
     var body: some View {
         Image(systemSymbol: .repeat1)
             .background {
@@ -27,12 +27,12 @@ struct PlaybackLoopingView: View {
 }
 
 #Preview {
-    @Previewable @State var isEnabled: Bool = false
-    
+    @Previewable @State var isEnabled = false
+
     Button("Toggle") {
         isEnabled.toggle()
     }
-    
+
     PlaybackLoopingView(isEnabled: isEnabled)
         .padding()
 }

@@ -5,16 +5,16 @@
 //  Created by Xinshao_Air on 2024/12/24.
 //
 
-import SwiftUI
 import Luminare
+import SwiftUI
 
 struct TTMLDisplayLyricLineView: View {
     @Environment(\.luminareAnimation) private var animation
-    
+
     var line: TTMLLyricLine
     var elapsedTime: TimeInterval
     var isHighlighted: Bool = false
-    
+
     @State var isAnimationHighlighted: Bool = false
 
     var body: some View {
@@ -39,10 +39,10 @@ struct TTMLDisplayLyricLineView: View {
                 }
                 // Isolating switching animation between renderers
                 .animation(nil, value: isHighlighted)
-                
+
                 auxiliaryViews(for: line.lyrics)
                     .font(.system(size: 22))
-                
+
                 if isHighlighted {
                     if !line.backgroundLyrics.children.isEmpty {
                         Group {
@@ -53,7 +53,7 @@ struct TTMLDisplayLyricLineView: View {
                                     elapsedTime: elapsedTime,
                                     strings: line.backgroundLyrics.children
                                 ))
-                            
+
                             auxiliaryViews(for: line.backgroundLyrics)
                                 .font(.system(size: 22))
                         }
@@ -71,18 +71,18 @@ struct TTMLDisplayLyricLineView: View {
             }
         }
     }
-    
+
     @ViewBuilder private func auxiliaryViews(for lyrics: TTMLLyrics) -> some View {
         ForEach(lyrics.translations) { translation in
             Text(translation.text)
         }
-        
+
         if let roman = lyrics.roman {
             Text(roman)
                 .bold()
         }
     }
-    
+
     private func stringContent(of lyrics: TTMLLyrics) -> String {
         lyrics.map(\.content).joined()
     }

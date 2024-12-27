@@ -11,9 +11,8 @@ extension Text.Layout {
     var flattenedRunSlices: some RandomAccessCollection<Text.Layout.RunSlice> {
         flattenedRuns.flatMap(\.self)
     }
-    
+
     var flattenedRuns: some RandomAccessCollection<Text.Layout.Run> {
         flatMap(\.self)
     }
 }
-

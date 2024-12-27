@@ -22,30 +22,30 @@ struct InspectorAdvancedMetadataView: View {
                 VStack(spacing: 24) {
                     LabeledSection {
                         compilationEditor()
-                        
+
                         ratingEditor()
                     }
-                    
+
                     LabeledSection("Release Date") {
                         releaseDateEditor()
                     }
-                    
+
                     LabeledSection("Sorting") {
                         sortingEditor()
                     }
-                    
+
                     LabeledSection("Album Sorting") {
                         albumSortingEditor()
                     }
-                    
+
                     LabeledSection("Copyright") {
                         copyrightEditor()
                     }
-                    
+
                     LabeledSection("Music Brainz") {
                         musicBrainzEditor()
                     }
-                    
+
                     LabeledSection("Miscellaneous") {
                         commentEditor()
                     }
@@ -54,7 +54,7 @@ struct InspectorAdvancedMetadataView: View {
                 // Don't use `contentMargins()` for content as it breaks progressive blurs
                 .safeAreaPadding(.top, 64)
                 .safeAreaPadding(.bottom, 94)
-                
+
                 Spacer()
                     .frame(height: 150)
             }

@@ -5,6 +5,7 @@
 //  Created by KrLite on 2024/11/20.
 //
 
+import Accelerate
 import CAAudioHardware
 import Combine
 import MediaPlayer
@@ -12,7 +13,6 @@ import os.log
 import SFBAudioEngine
 import SFSafeSymbols
 import SwiftUI
-import Accelerate
 
 // MARK: - Playback Mode
 
@@ -49,7 +49,7 @@ enum PlaybackMode: String, Hashable, Equatable, CaseIterable, Identifiable {
 struct PlaybackTime: Hashable {
     fileprivate(set) var duration: Duration
     fileprivate(set) var elapsed: TimeInterval
-    
+
     var remaining: TimeInterval { duration.timeInterval - elapsed }
     var progress: CGFloat { elapsed / duration.timeInterval }
 }
@@ -58,65 +58,67 @@ struct PlaybackTime: Hashable {
 
 @Observable final class PlayerModel: NSObject {
     // MARK: Player
-    
+
     private var player: AudioPlayer = .init()
-    
+
     private var outputDevices: [AudioDevice] = []
     private var selectedDevice: AudioDevice?
-    
+
     // MARK: Publishers
-    
+
     private var cancellables = Set<AnyCancellable>()
     private let timer = TimerPublisher(interval: 0.25)
-    
+
     private var playbackTimeSubject = PassthroughSubject<PlaybackTime?, Never>()
     private var isPlayingSubject = PassthroughSubject<Bool, Never>()
     private var visualizationDataSubject = PassthroughSubject<[CGFloat], Never>()
-    
+
     var playbackTimePublisher: AnyPublisher<PlaybackTime?, Never> {
         playbackTimeSubject.eraseToAnyPublisher()
     }
+
     var isPlayingPublisher: AnyPublisher<Bool, Never> {
         isPlayingSubject.eraseToAnyPublisher()
     }
+
     var visualizationDataPublisher: AnyPublisher<[CGFloat], Never> {
         visualizationDataSubject.eraseToAnyPublisher()
     }
-    
+
     // MARK: Playlist & Playback
-    
+
     private(set) var current: PlaylistItem?
     private(set) var playlist: [PlaylistItem] = []
-    
+
     var playbackMode: PlaybackMode = .sequential
     var playbackLooping: Bool = false
-    
+
     var duration: Duration { player.time?.total.map { .seconds($0) } ?? .zero }
     var timeElapsed: TimeInterval { player.time?.current ?? .zero }
     var timeRemaining: TimeInterval { player.time?.remaining ?? .zero }
-    
+
     // MARK: FFT
-    
+
     private var audioDataBuffer: [CGFloat] = []
-    
+
     // MARK: Functional
-    
+
     var progress: CGFloat {
         get {
             player.time?.progress ?? .zero
         }
-        
+
         set {
             // Debounce and cancel if adjustment is smaller than 0.09s
             let difference = abs(newValue - progress)
             let timeDifference = duration.timeInterval * difference
             guard timeDifference > 9 / 100 else { return }
-            
+
             player.seek(position: max(0, min(1, newValue)))
             updateNowPlayingInfo()
         }
     }
-    
+
     private var mutedVolume: CGFloat = .zero
     var volume: CGFloat {
         get {
@@ -126,7 +128,7 @@ struct PlaybackTime: Hashable {
                 CGFloat(player.volume)
             }
         }
-        
+
         set {
             isMuted = false
             do {
@@ -134,11 +136,11 @@ struct PlaybackTime: Hashable {
             } catch {}
         }
     }
-    
+
     var isPlaying: Bool {
         player.isPlaying
     }
-    
+
     var isMuted: Bool = false {
         didSet {
             do {
@@ -151,18 +153,18 @@ struct PlaybackTime: Hashable {
             } catch {}
         }
     }
-    
+
     var isPlaylistEmpty: Bool {
         playlist.isEmpty
     }
-    
+
     var hasCurrentTrack: Bool {
         current != nil
     }
-    
+
     var hasNextTrack: Bool {
         guard current != nil else { return false }
-        
+
         switch playbackMode {
         case .sequential:
             guard let currentIndex else { return false }
@@ -171,10 +173,10 @@ struct PlaybackTime: Hashable {
             return !playlist.isEmpty
         }
     }
-    
+
     var hasPreviousTrack: Bool {
         guard current != nil else { return false }
-        
+
         switch playbackMode {
         case .sequential:
             guard let currentIndex else { return false }
@@ -183,15 +185,15 @@ struct PlaybackTime: Hashable {
             return !playlist.isEmpty
         }
     }
-    
+
     var currentIndex: Int? {
         guard let current else { return nil }
         return playlist.firstIndex(of: current)
     }
-    
+
     var nextIndex: Int? {
         guard hasNextTrack else { return nil }
-        
+
         switch playbackMode {
         case .sequential:
             guard let currentIndex else { return nil }
@@ -203,10 +205,10 @@ struct PlaybackTime: Hashable {
             return randomIndex()
         }
     }
-    
+
     var previousIndex: Int? {
         guard hasPreviousTrack else { return nil }
-        
+
         switch playbackMode {
         case .sequential:
             guard let currentIndex else { return nil }
@@ -218,7 +220,7 @@ struct PlaybackTime: Hashable {
             return randomIndex()
         }
     }
-    
+
     override init() {
         super.init()
         player.delegate = self
@@ -240,7 +242,7 @@ struct PlaybackTime: Hashable {
                         self.playbackTimeSubject.send(nil)
                     }
                 }
-                
+
                 isPlaying: do {
                     self.isPlayingSubject.send(self.isPlaying)
                 }
@@ -255,7 +257,7 @@ struct PlaybackTime: Hashable {
 extension PlayerModel {
     func randomIndex() -> Int? {
         guard !playlist.isEmpty else { return nil }
-        
+
         if let current, let index = playlist.firstIndex(of: current) {
             let indices = Array(playlist.indices).filter { $0 != index }
             return indices.randomElement()
@@ -263,10 +265,10 @@ extension PlayerModel {
             return playlist.indices.randomElement()
         }
     }
-    
+
     func play(item: PlaylistItem) {
         addToPlaylist(urls: [item.url])
-        
+
         Task {
             if let decoder = try item.decoder() {
                 self.current = item
@@ -274,30 +276,30 @@ extension PlayerModel {
             }
         }
     }
-    
+
     func play(url: URL) {
         if let item = PlaylistItem(url: url) {
             play(item: item)
         }
     }
-    
+
     func addToPlaylist(urls: [URL]) {
         for url in urls {
             guard !playlist.contains(where: { $0.url == url }) else { continue }
-            
+
             if let item = PlaylistItem(url: url) {
                 addToPlaylist(items: [item])
             }
         }
     }
-    
+
     func addToPlaylist(items: [PlaylistItem]) {
         for item in items {
             guard !playlist.contains(item) else { continue }
             playlist.append(item)
         }
     }
-    
+
     func removeFromPlaylist(urls: [URL]) {
         for url in urls {
             if let index = playlist.firstIndex(where: { $0.url == url }) {
@@ -309,23 +311,23 @@ extension PlayerModel {
             }
         }
     }
-    
+
     func movePlaylist(fromOffsets indices: IndexSet, toOffset destination: Int) {
         playlist.move(fromOffsets: indices, toOffset: destination)
     }
-    
+
     func seek(position: Double) {
         player.seek(position: position)
     }
-    
+
     func removeFromPlaylist(items: [PlaylistItem]) {
         removeFromPlaylist(urls: items.map(\.url))
     }
-    
+
     func removeAll() {
         removeFromPlaylist(items: playlist)
     }
-    
+
     func updateDeviceMenu() {
         do {
             outputDevices = try AudioDevice.devices.filter { try $0.supportsOutput }
@@ -342,40 +344,40 @@ extension PlayerModel {
             }
         } catch {}
     }
-    
+
     func setOutputDevice(_ device: AudioDevice) {
         do {
             try player.setOutputDeviceID(device.objectID)
             selectedDevice = device
         } catch {}
     }
-    
+
     func play() {
         do {
             try player.play()
         } catch {}
     }
-    
+
     func pause() {
         player.pause()
     }
-    
+
     func togglePlayPause() {
         do {
             try player.togglePlayPause()
         } catch {}
     }
-    
+
     func nextTrack() {
         guard let nextIndex else { return }
         play(item: playlist[nextIndex])
     }
-    
+
     func previousTrack() {
         guard let previousIndex else { return }
         play(item: playlist[previousIndex])
     }
-    
+
     func analyzeFiles(urls: [URL]) {
         do {
             let rg = try ReplayGainAnalyzer.analyzeAlbum(urls)
@@ -385,7 +387,7 @@ extension PlayerModel {
             // TODO: Notice user we're done
         } catch {}
     }
-    
+
     //    func exportWAVEFile(url: URL) {
     //        let destURL = url.deletingPathExtension().appendingPathExtension("wav")
     //        if FileManager.default.fileExists(atPath: destURL.path) {
@@ -401,28 +403,28 @@ extension PlayerModel {
     //
     //        }
     //    }
-    
+
     private func setupAudioVisualization() {
         player.withEngine { [weak self] engine in
-            guard let self = self else { return }
-            
+            guard let self else { return }
+
             let inputNode = engine.mainMixerNode
             let bus = 0
-            
+
             inputNode.installTap(onBus: bus, bufferSize: 1024, format: inputNode.outputFormat(forBus: bus)) { buffer, _ in
                 self.processAudioBuffer(buffer)
             }
         }
     }
-    
+
     private func processAudioBuffer(_ buffer: AVAudioPCMBuffer) {
         guard let channelData = buffer.floatChannelData else { return }
-        
+
         let channelDataPointer = channelData[0]
         let frameLength = Int(buffer.frameLength)
-        
+
         audioDataBuffer = Array(UnsafeBufferPointer(start: channelDataPointer, count: frameLength)).map(CGFloat.init(_:))
-        
+
         Task { @MainActor in
             let fftMagnitudes = await FFTHelper.perform(audioDataBuffer.map(Float.init(_:)))
             self.visualizationDataSubject.send(fftMagnitudes.map(CGFloat.init(_:)))
@@ -441,7 +443,7 @@ extension PlayerModel: AudioPlayer.Delegate {
                 nextIndex
             }
             guard let index else { return }
-            
+
             do {
                 if let decoder = try playlist[index].decoder() {
                     try player.enqueue(decoder)

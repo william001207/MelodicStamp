@@ -18,15 +18,15 @@ struct PlaybackModeView: View {
         }
         .tag(mode)
     }
-    
+
     static func name(of mode: PlaybackMode) -> String {
         switch mode {
         case .sequential:
-                .init(localized: "Sequential")
+            .init(localized: "Sequential")
         case .loop:
-                .init(localized: "Sequential Loop")
+            .init(localized: "Sequential Loop")
         case .shuffle:
-                .init(localized: "Shuffle")
+            .init(localized: "Shuffle")
         }
     }
 }

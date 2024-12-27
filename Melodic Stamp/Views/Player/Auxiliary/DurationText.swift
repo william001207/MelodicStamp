@@ -16,12 +16,12 @@ struct DurationText: View {
         HStack(spacing: 0) {
             if let formattedDuration {
                 Text(formattedSign)
-                
+
                 Text(formattedDuration)
             } else {
                 Group {
                     Text(formattedSign)
-                    
+
                     Text("--:--")
                 }
                 .foregroundStyle(.placeholder)

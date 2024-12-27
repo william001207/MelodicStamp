@@ -175,12 +175,12 @@ struct PlayerCommands: Commands {
                                 PlaybackModeView(mode: mode)
                             }
                         }
-                        
+
                         Divider()
-                        
+
                         Toggle(isOn: $player.playbackLooping) {
                             Image(systemSymbol: .repeat1)
-                            
+
                             Text("Infinite Loop")
                         }
                     }
