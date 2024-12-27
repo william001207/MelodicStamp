@@ -64,12 +64,6 @@ struct MainView: View {
                 ToolbarItemGroup(placement: .navigation) {
                     FileToolbar()
                 }
-
-//                #if DEBUG
-//                    ToolbarItemGroup(placement: .cancellationAction) {
-//                        DebugToolbar()
-//                    }
-//                #endif
             }
     }
 
@@ -110,11 +104,6 @@ struct MainView: View {
                     }
             case .lyrics:
                 InspectorLyricsView()
-                    .toolbar {
-//                    if isInspectorPresented {
-//                        LyricsToolbar(lyricsType: $lyrics.type)
-//                    }
-                    }
             case .analytics:
                 InspectorAnalyticsView()
             }
