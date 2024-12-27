@@ -26,17 +26,25 @@ struct LeafletLyricsView: View {
     @State private var timer = Timer.publish(every: 0.01, on: .main, in: .default).autoconnect()
 
     var body: some View {
+        let lines = lyricLines
+        
+        Group {
+            if !lines.isEmpty {
         BouncyScrollView(
             offset: offset,
             delayBeforePush: 0.2,
             canPushAnimation: true,
-            range: 0..<lyricLines.count,
+            range: 0..<lines.count,
             highlightedRange: highlightedRange,
             alignment: .center
         ) { index, isHighlighted in
-            lyricLine(line: lyricLines[index], index: index, isHighlighted: isHighlighted)
+            lyricLine(line: lines[index], index: index, isHighlighted: isHighlighted)
         } indicators: { index, isHighlighted in
             
+        }
+            } else {
+                Color.clear
+            }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .onHover { hover in
