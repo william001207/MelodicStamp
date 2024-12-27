@@ -16,8 +16,6 @@ struct DisplayLyricsView: View {
 
     @State private var playbackTime: PlaybackTime?
     @State private var highlightedRange: Range<Int> = 0 ..< 0
-    @State private var heights: [CGFloat] = []
-    @State private var offset: CGFloat = 50
 
     @State private var isPlaying: Bool = false
     @State private var isHovering: Bool = false
@@ -31,7 +29,6 @@ struct DisplayLyricsView: View {
         Group {
             if !lines.isEmpty {
                 BouncyScrollView(
-                    offset: offset,
                     delayBeforePush: 0.2,
                     canPushAnimation: true,
                     range: 0 ..< lines.count,
@@ -115,31 +112,6 @@ struct DisplayLyricsView: View {
         .padding(.bottom, 32)
         .blur(radius: isHighlighted || isHovering ? 0 : blurRadius(for: index))
         .opacity(isHighlighted || isHovering ? 1 : opacity(for: index))
-        .background {
-            GeometryReader { geometry in
-                Color.clear
-                    .onAppear {
-                        let height = geometry.size.height
-                        if index < heights.count {
-                            heights[index] = height
-                        } else {
-                            heights.append(
-                                contentsOf: Array(
-                                    repeating: 0,
-                                    count: index - heights.count + 1
-                                ))
-                            heights[index] = height
-                        }
-                    }
-            }
-        }
-        .onChange(of: isHighlighted) { _, _ in
-            if isHighlighted {
-                guard index + 1 < heights.count else { return }
-                let nextHeight = heights[index + 1]
-                offset = nextHeight
-            }
-        }
     }
 
     @ViewBuilder private func rawLyricLine(line: RawLyricLine, isHighlighted _: Bool)

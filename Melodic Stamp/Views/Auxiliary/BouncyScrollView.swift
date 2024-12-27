@@ -19,7 +19,6 @@ enum BouncyScrollViewAlignment {
 }
 
 struct BouncyScrollView<Content: View, Indicators: View>: View {
-    var offset: CGFloat = 50
     var delay: TimeInterval = 0.08
     var delayBeforePush: TimeInterval = 0.5
     var canPushAnimation: Bool = true
@@ -34,86 +33,74 @@ struct BouncyScrollView<Content: View, Indicators: View>: View {
     @State private var animationState: BouncyScrollViewAnimationState = .intermediate
     @State private var scrollPosition: ScrollPosition = .init()
     @State private var scrollOffset: CGFloat = .zero
+    @State private var contentOffsets: [Int: CGFloat] = [:]
 
     var body: some View {
-        GeometryReader { geometry in
-            ScrollView {
-                LazyVStack(spacing: 0) {
-                    switch alignment {
-                    case .top:
-                        EmptyView()
-                    case .center:
-                        Spacer()
-                            .frame(height: geometry.size.height / 2.25)
-                    case .bottom:
-                        Spacer()
-                            .frame(height: geometry.size.height)
-                    }
-
-                    ForEach(range, id: \.self) { index in
-                        let isHighlighted = highlightedRange.contains(index)
-                        let proportion = proportion(at: index)
-                        let delay = delay(at: index)
-
-                        content(index, isHighlighted)
-                            .offset(y: proportion * offset)
-                            .animation(.spring(bounce: 0.20).delay(delay), value: animationState)
-                            .animation(.smooth, value: highlightedRange)
-                            .overlay {
-                                if index == highlightedRange.lowerBound {
-                                    indicators(index, isHighlighted)
-                                        .opacity(proportion)
-                                        .animation(.default, value: proportion)
+        ScrollView {
+            LazyVStack(spacing: 0) {
+                ForEach(range, id: \.self) { index in
+                    let isHighlighted = highlightedRange.contains(index)
+                    let delay = delay(at: index)
+                    
+                    Group {
+                        if let offset = contentOffsets[index] {
+                            let proportion = proportion(at: index)
+                            
+                            content(index, isHighlighted)
+                                .offset(y: proportion * offset)
+                                .overlay {
+                                    if index == highlightedRange.lowerBound {
+                                        indicators(index, isHighlighted)
+                                            .opacity(proportion)
+                                            .animation(.default, value: proportion)
+                                    }
                                 }
-                            }
+                        } else {
+                            content(index, isHighlighted)
+                            
+                        }
                     }
-
-                    Spacer()
-                        .frame(height: offset)
-
-                    switch alignment {
-                    case .top:
-                        Spacer()
-                            .frame(height: geometry.size.height)
-                    case .center:
-                        Spacer()
-                            .frame(height: geometry.size.height / 2.25)
-                    case .bottom:
-                        Spacer()
-                            .frame(height: geometry.size.height)
+                    .animation(.spring(bounce: 0.20).delay(delay), value: animationState)
+                    .animation(.smooth, value: highlightedRange)
+                    .onGeometryChange(for: CGSize.self) { proxy in
+                        proxy.size
+                    } action: { newValue in
+                        contentOffsets.updateValue(newValue.height, forKey: index)
                     }
                 }
+                
+                Spacer()
+                    .frame(height: 200)
             }
-            .scrollIndicators(.never)
-            .scrollPosition($scrollPosition)
-            .onScrollGeometryChange(for: CGPoint.self) { proxy in
-                proxy.contentOffset
-            } action: { _, newValue in
-                guard scrollPosition.isPositionedByUser else { return }
-                scrollOffset = newValue.y
+        }
+        .scrollIndicators(.never)
+        .scrollPosition($scrollPosition)
+        .onScrollGeometryChange(for: CGPoint.self) { proxy in
+            proxy.contentOffset
+        } action: { _, newValue in
+            guard scrollPosition.isPositionedByUser else { return }
+            scrollOffset = newValue.y
+        }
+        .onAppear {
+            updateAnimationState()
+        }
+        .onChange(of: highlightedRange) { _, newValue in
+            withAnimation(.bouncy) {
+                scrollOffset = fold(until: newValue.lowerBound)
             }
-            .onChange(of: highlightedRange) { _, newValue in
-                withAnimation(.bouncy) {
-                    scrollOffset = CGFloat(newValue.lowerBound) * offset
-                }
-            }
-
-            .onAppear {
-                updateAnimationState()
-            }
-            .onChange(of: highlightedRange) { oldValue, newValue in
-                let isLowerBoundChanged = oldValue.lowerBound != newValue.lowerBound
-                let isPauseChanged = oldValue.isEmpty != newValue.isEmpty && canPauseAnimation
-
-                guard isLowerBoundChanged || isPauseChanged else { return }
-                updateAnimationState()
-            }
-            .onChange(of: canPushAnimation) { _, _ in
-                tryPushAnimation()
-            }
-            .observeAnimation(for: scrollOffset) { value in
-                scrollPosition.scrollTo(y: value)
-            }
+        }
+        .onChange(of: highlightedRange) { oldValue, newValue in
+            let isLowerBoundChanged = oldValue.lowerBound != newValue.lowerBound
+            let isPauseChanged = oldValue.isEmpty != newValue.isEmpty && canPauseAnimation
+            
+            guard isLowerBoundChanged || isPauseChanged else { return }
+            updateAnimationState()
+        }
+        .onChange(of: canPushAnimation) { _, _ in
+            tryPushAnimation()
+        }
+        .observeAnimation(for: scrollOffset) { value in
+            scrollPosition.scrollTo(y: value)
         }
     }
 
@@ -123,6 +110,18 @@ struct BouncyScrollView<Content: View, Indicators: View>: View {
 
     private var canPauseAnimation: Bool {
         hasIndicators && highlightedRange.isEmpty
+    }
+    
+    private func fold(until index: Int) -> CGFloat {
+        let indices = contentOffsets.keys
+        let index = if let maxIndex = indices.max() {
+            min(index, maxIndex)
+        } else { index }
+        
+        return contentOffsets
+            .filter { $0.key < index }
+            .map(\.value)
+            .reduce(0, +)
     }
 
     private func updateAnimationState() {
@@ -154,10 +153,6 @@ struct BouncyScrollView<Content: View, Indicators: View>: View {
             guard index >= highlightedRange.upperBound else { return 0 }
             return CGFloat(index - highlightedRange.upperBound) * delay
         }
-    }
-
-    private func calculateScrollOffset(for index: Int, in _: CGFloat) -> CGFloat {
-        CGFloat(index) * offset
     }
 }
 
