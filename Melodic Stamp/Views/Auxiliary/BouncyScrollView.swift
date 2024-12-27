@@ -15,7 +15,6 @@ enum BouncyScrollViewAnimationState {
 enum BouncyScrollViewAlignment {
     case top
     case center
-    case bottom
 }
 
 struct BouncyScrollView<Content: View, Indicators: View>: View {
@@ -30,6 +29,7 @@ struct BouncyScrollView<Content: View, Indicators: View>: View {
     @ViewBuilder var content: (_ index: Int, _ isHighlighted: Bool) -> Content
     @ViewBuilder var indicators: (_ index: Int, _ isHighlighted: Bool) -> Indicators
 
+    @State private var containerSize: CGSize = .zero
     @State private var animationState: BouncyScrollViewAnimationState = .intermediate
     @State private var scrollPosition: ScrollPosition = .init()
     @State private var scrollOffset: CGFloat = .zero
@@ -37,6 +37,9 @@ struct BouncyScrollView<Content: View, Indicators: View>: View {
 
     var body: some View {
         ScrollView {
+            Spacer()
+                .frame(height: compensate)
+            
             LazyVStack(spacing: 0) {
                 ForEach(range, id: \.self) { index in
                     let isHighlighted = highlightedRange.contains(index)
@@ -68,10 +71,10 @@ struct BouncyScrollView<Content: View, Indicators: View>: View {
                         contentOffsets.updateValue(newValue.height, forKey: index)
                     }
                 }
-                
-                Spacer()
-                    .frame(height: 200)
             }
+            
+            Spacer()
+                .frame(height: containerSize.height)
         }
         .scrollIndicators(.never)
         .scrollPosition($scrollPosition)
@@ -80,6 +83,11 @@ struct BouncyScrollView<Content: View, Indicators: View>: View {
         } action: { _, newValue in
             guard scrollPosition.isPositionedByUser else { return }
             scrollOffset = newValue.y
+        }
+        .onGeometryChange(for: CGSize.self) { proxy in
+            proxy.size
+        } action: { newValue in
+            containerSize = newValue
         }
         .onAppear {
             updateAnimationState()
@@ -110,6 +118,19 @@ struct BouncyScrollView<Content: View, Indicators: View>: View {
 
     private var canPauseAnimation: Bool {
         hasIndicators && highlightedRange.isEmpty
+    }
+    
+    private var compensate: CGFloat {
+        switch alignment {
+        case .top:
+            .zero
+        case .center:
+            if let offset = contentOffsets[highlightedRange.lowerBound] {
+                (containerSize.height - offset) / 2
+            } else {
+                containerSize.height / 2
+            }
+        }
     }
     
     private func fold(until index: Int) -> CGFloat {
@@ -168,8 +189,6 @@ struct BouncyScrollView<Content: View, Indicators: View>: View {
                 .tag(BouncyScrollViewAlignment.top)
             Text("Center")
                 .tag(BouncyScrollViewAlignment.center)
-            Text("Bottom")
-                .tag(BouncyScrollViewAlignment.bottom)
         }
         .pickerStyle(SegmentedPickerStyle())
         .padding()
