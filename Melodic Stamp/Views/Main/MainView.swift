@@ -88,7 +88,6 @@ struct MainView: View {
             LeafletView()
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .ignoresSafeArea()
-                .morphed()
                 .ignoresSafeArea()
         }
     }

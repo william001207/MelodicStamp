@@ -30,18 +30,18 @@ struct LeafletLyricsView: View {
         
         Group {
             if !lines.isEmpty {
-        BouncyScrollView(
-            offset: offset,
-            delayBeforePush: 0.2,
-            canPushAnimation: true,
-            range: 0..<lines.count,
-            highlightedRange: highlightedRange,
-            alignment: .center
-        ) { index, isHighlighted in
-            lyricLine(line: lines[index], index: index, isHighlighted: isHighlighted)
-        } indicators: { index, isHighlighted in
-            
-        }
+                BouncyScrollView(
+                    offset: offset,
+                    delayBeforePush: 0.2,
+                    canPushAnimation: true,
+                    range: 0..<lines.count,
+                    highlightedRange: highlightedRange,
+                    alignment: .center
+                ) { index, isHighlighted in
+                    lyricLine(line: lines[index], index: index, isHighlighted: isHighlighted)
+                } indicators: { index, isHighlighted in
+                    
+                }
             } else {
                 Color.clear
             }

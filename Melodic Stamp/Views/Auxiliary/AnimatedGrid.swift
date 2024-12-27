@@ -25,7 +25,13 @@ struct AnimatedGrid: View {
             initialGrid: generatePlainGrid(),
             animatorConfiguration: .init(
                 animationSpeedRange: 4 ... 5,
-                meshRandomizer: randomizer
+                meshRandomizer:
+                    MeshRandomizer(
+                        colorRandomizer:
+                            MeshRandomizer.arrayBasedColorRandomizer(
+                                availableColors: simdColors
+                            )
+                    )
             )
         )
     }

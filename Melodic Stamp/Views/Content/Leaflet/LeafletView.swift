@@ -32,7 +32,8 @@ struct LeafletView: View {
                             images: [cover], hasPlaceholder: false,
                             cornerRadius: 20
                         )
-                        .frame(width: isPlaying ? 350 : 300, height: isPlaying ? 350 : 300)
+//                        .frame(width: isPlaying ? 350 : 300, height: isPlaying ? 350 : 300)
+                        .scaleEffect(isPlaying ? 1 : 0.85, anchor: .center)
                         .shadow(radius: isPlaying ? 20 : 10)
                         .animation(.spring(duration: 0.65, bounce: 0.45, blendDuration: 0.75), value: isPlaying)
                         .onChange(of: player.currentIndex, initial: true) { _, _ in

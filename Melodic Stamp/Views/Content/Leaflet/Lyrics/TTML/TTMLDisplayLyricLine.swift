@@ -20,41 +20,42 @@ struct TTMLDisplayLyricLine: View {
     var body: some View {
         VStack(alignment: .center, spacing: 5) {
             Group {
-                if isHighlighted {
-                    Text(stringContent(of: line.lyrics))
-                        .font(.system(size: 36))
-                        .bold()
-                        .textRenderer(DisplayLyricsRenderer(
-                            elapsedTime: elapsedTime,
-                            strings: line.lyrics.children
-                        ))
-                } else {
-                    Text(stringContent(of: line.lyrics))
-                        .font(.system(size: 36))
-                        .bold()
-                        .foregroundStyle(.white.opacity(isAnimationHighlighted ? 1 : 0.1))
-                        .brightness(isAnimationHighlighted ? 1.5 : 1.0)
+                VStack {
+                    if isHighlighted {
+                        Text(stringContent(of: line.lyrics))
+                            .font(.system(size: 36))
+                            .bold()
+                            .textRenderer(DisplayLyricsRenderer(
+                                elapsedTime: elapsedTime,
+                                strings: line.lyrics.children
+                            ))
+                    } else {
+                        Text(stringContent(of: line.lyrics))
+                            .font(.system(size: 36))
+                            .bold()
+                            .foregroundStyle(.white.opacity(isAnimationHighlighted ? 1 : 0.1))
+                            .brightness(isAnimationHighlighted ? 1.5 : 1.0)
+                    }
                 }
+                .animation(nil, value: isHighlighted)
                 
                 auxiliaryViews(for: line.lyrics)
                     .font(.system(size: 22))
                 
-                if isHighlighted {
-                    if !line.backgroundLyrics.isEmpty {
-                        Group {
-                            Text(stringContent(of: line.backgroundLyrics))
-                                .font(.system(size: 28))
-                                .bold()
-                                .textRenderer(DisplayLyricsRenderer(
-                                    elapsedTime: elapsedTime,
-                                    strings: line.backgroundLyrics.children
-                                ))
-                            
-                            auxiliaryViews(for: line.backgroundLyrics)
-                                .font(.system(size: 22))
-                        }
-                        .transition(.blurReplace)
+                if !line.backgroundLyrics.children.isEmpty && isHighlighted {
+                    Group {
+                        Text(stringContent(of: line.backgroundLyrics))
+                            .font(.system(size: 28))
+                            .bold()
+                            .textRenderer(DisplayLyricsRenderer(
+                                elapsedTime: elapsedTime,
+                                strings: line.backgroundLyrics.children
+                            ))
+                        
+                        auxiliaryViews(for: line.backgroundLyrics)
+                            .font(.system(size: 22))
                     }
+                    .transition(.blurReplace(.downUp))
                 }
             }
             .foregroundStyle(.white.opacity(isHighlighted ? 1 : 0.5))
@@ -62,7 +63,7 @@ struct TTMLDisplayLyricLine: View {
             .frame(maxWidth: .infinity, alignment: line.position == .main ? .leading : .trailing)
         }
         .onChange(of: isHighlighted) { _, newValue in
-            withAnimation(animation.delay(0.25)) {
+            withAnimation(.smooth(duration: 0.45).delay(0.25)) {
                 isAnimationHighlighted = newValue
             }
         }
