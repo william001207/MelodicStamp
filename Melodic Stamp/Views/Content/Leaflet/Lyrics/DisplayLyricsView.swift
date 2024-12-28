@@ -54,9 +54,13 @@ struct DisplayLyricsView: View {
             }
         }
         .onChange(of: player.current, initial: true) { _, newValue in
-            if newValue != nil {
-                loadLyrics()
+            if let newValue {
                 connectTimer()
+                
+                Task {
+                    let raw = await newValue.metadata.poll(for: \.lyrics).current
+                    await lyrics.read(raw)
+                }
             } else {
                 playbackTime = nil
                 disconnectTimer()
@@ -64,7 +68,6 @@ struct DisplayLyricsView: View {
         }
         .onChange(of: isPlaying, initial: true) { _, newValue in
             if newValue {
-                loadLyrics()
                 connectTimer()
             } else {
                 disconnectTimer()
@@ -140,14 +143,6 @@ struct DisplayLyricsView: View {
             line: line, elapsedTime: fineGrainedElapsedTime,
             isHighlighted: isHighlighted
         )
-    }
-
-    private func loadLyrics() {
-        guard
-            let current = player.current,
-            let string = current.metadata[extracting: \.lyrics]?.current
-        else { return }
-        lyrics.load(string: string)
     }
 
     private func connectTimer() {

@@ -47,13 +47,9 @@ struct InspectorLyricsView: View {
             }
         }
         .onChange(of: entries, initial: true) { _, _ in
-            loadLyrics()
-        }
-        .onChange(of: lyrics.type) { _, _ in
-            loadLyrics()
-        }
-        .onChange(of: player.current) { _, newValue in
-            lyrics.identify(url: newValue?.url)
+            Task {
+                await loadLyrics()
+            }
         }
         // Receive playback time update
         .onReceive(player.playbackTimePublisher) { playbackTime in
@@ -80,7 +76,7 @@ struct InspectorLyricsView: View {
         }
     }
 
-    private var entries: MetadataBatchEditingEntries<String?> {
+    private var entries: MetadataBatchEditingEntries<RawLyrics?> {
         metadataEditor[extracting: \.lyrics]
     }
 
@@ -164,8 +160,8 @@ struct InspectorLyricsView: View {
         TTMLInspectorLyricLineView(isHighlighted: isHighlighted, line: line)
     }
 
-    private func loadLyrics() {
-        guard let binding = entries.projectedValue else { return }
-        lyrics.load(string: binding.wrappedValue)
+    private func loadLyrics() async {
+        let binding = entries.projectedValue
+        await lyrics.read(binding?.wrappedValue)
     }
 }

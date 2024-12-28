@@ -83,7 +83,7 @@ import SwiftUI
     var isCompilation: Entry<Bool?>!
 
     var isrc: Entry<ISRC?>!
-    var lyrics: Entry<String?>!
+    var lyrics: Entry<RawLyrics?>!
     var mcn: Entry<String?>!
 
     var musicBrainzRecordingID: Entry<UUID?>!
@@ -228,7 +228,7 @@ private extension Metadata {
             isrc.flatMap { ISRC(parsing: $0) }
         )
         self.lyrics = .init(
-            lyrics
+            .init(url: url, content: lyrics)
         )
         self.mcn = .init(
             mcn
@@ -331,7 +331,7 @@ private extension Metadata {
         metadata.grouping = grouping.current
         metadata.isCompilation = isCompilation.current
         metadata.isrc = isrc.current?.formatted()
-        metadata.lyrics = lyrics.current
+        metadata.lyrics = lyrics.current?.content
         metadata.mcn = mcn.current
         metadata.musicBrainzRecordingID =
             musicBrainzRecordingID.current?.uuidString
@@ -439,6 +439,19 @@ extension Metadata {
 
         state = .fine
         print("Successfully written metadata to \(url)")
+    }
+    
+    func poll<V>(for keyPath: WritableKeyPath<Metadata, Entry<V>>) async -> MetadataBatchEditingEntry<V> {
+        print("Started polling metadata for \(keyPath)")
+        while !state.isLoaded { try? await Task.sleep(for: .milliseconds(100)) }
+        
+        var entry: MetadataBatchEditingEntry<V>?
+        repeat {
+            entry = self[extracting: keyPath]
+        } while entry == nil
+        
+        print("Succeed polling metadata for \(keyPath)")
+        return entry!
     }
 
     subscript<V>(extracting keyPath: WritableKeyPath<Metadata, Entry<V>>)

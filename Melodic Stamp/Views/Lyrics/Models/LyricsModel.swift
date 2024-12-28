@@ -208,55 +208,61 @@ enum LyricsStorage {
     }
 }
 
+// MARK: Raw Lyrics
+
+struct RawLyrics: Hashable, Equatable, Identifiable {
+    var url: URL
+    var content: String?
+    
+    var id: URL { url }
+}
+
 // MARK: Lyrics Model
 
 @Observable class LyricsModel {
     private(set) var storage: LyricsStorage?
-    private(set) var url: URL?
+    private(set) var raw: RawLyrics?
     var type: LyricsType?
-
-    private var cache: String?
 
     var lines: [any LyricLine] {
         storage?.parser.lines ?? []
     }
 
-    func identify(url: URL?) {
-        self.url = url
-    }
-
-    func load(string: String?, autoRecognizes: Bool = true) {
-        if autoRecognizes {
-            if let string {
-                do {
-                    type = try recognize(string: string) ?? .raw
-                } catch {
-                    type = .raw
-                }
-            } else {
-                type = nil
-            }
-        }
-
-        // Debounce
-        guard type != storage?.type || string != cache || url != url else { return }
-
-        cache = string
-        url = url
-        guard let string else {
+    func read(_ raw: RawLyrics?, autoRecognizes: Bool = true, forced: Bool = false) async {
+        guard forced || raw != self.raw else { return }
+        self.raw = raw
+        
+        guard let raw else {
+            // Explicitly set to nothing
             storage = nil
+            type = nil
             return
+        }
+        
+        guard let content = raw.content else {
+            // Implicitly fails, reading nothing
+            storage = nil
+            type = nil
+            return
+        }
+        
+        if autoRecognizes {
+            do {
+                type = try recognize(string: content) ?? .raw
+            } catch {
+                type = .raw
+            }
         }
 
         if let type {
             do {
                 storage = switch type {
                 case .raw:
-                    try .raw(parser: .init(string: string))
+                    try .raw(parser: .init(string: content))
                 case .lrc:
-                    try .lrc(parser: .init(string: string))
+                    try .lrc(parser: .init(string: content))
                 case .ttml:
-                    try .ttml(parser: .init(string: string))
+                    try .ttml(parser: .init(string: content))
                 }
             } catch {
                 storage = nil
@@ -268,7 +274,7 @@ enum LyricsStorage {
         guard let storage else { return 0 ..< 0 }
         let result = storage.parser.highlight(at: time)
         return if let url {
-            if url == self.url {
+            if url == raw?.url {
                 result
             } else {
                 0 ..< 0
