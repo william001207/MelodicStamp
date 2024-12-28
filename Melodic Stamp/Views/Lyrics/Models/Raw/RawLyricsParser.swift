@@ -18,8 +18,4 @@ import Foundation
             .map(String.init(_:))
             .map { .init(content: $0) }
     }
-
-    func find(at _: TimeInterval) -> Range<Int> {
-        0 ..< 0
-    }
 }

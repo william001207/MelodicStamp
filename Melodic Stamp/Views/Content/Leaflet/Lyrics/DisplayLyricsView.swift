@@ -24,7 +24,7 @@ struct DisplayLyricsView: View {
 
     var body: some View {
         // Avoid multiple instantializations
-        let lines = lyricLines
+        let lines = lyrics.lines
         let range = highlightedRange
 
         Group {
@@ -80,35 +80,24 @@ struct DisplayLyricsView: View {
             fineGrainedElapsedTime += 0.01
         }
     }
-
-    private var lyricLines: [any LyricLine] {
-        switch lyrics.storage {
-        case let .raw(parser as any LyricsParser), .lrc(let parser as any LyricsParser), .ttml(let parser as any LyricsParser):
-            parser.lines
-        default:
-            []
-        }
-    }
     
     private var highlightedRange: Range<Int> {
         if let timeElapsed = playbackTime?.elapsed {
-            lyrics.find(at: timeElapsed)
+            lyrics.highlight(at: timeElapsed)
         } else {
             0 ..< 0
         }
     }
 
-    @ViewBuilder private func lyricLine(
-        line: any LyricLine, index: Int, isHighlighted: Bool
-    ) -> some View {
+    @ViewBuilder private func lyricLine(line: any LyricLine, index: Int, isHighlighted: Bool) -> some View {
         Group {
             switch line {
             case let line as RawLyricLine:
-                rawLyricLine(line: line, isHighlighted: isHighlighted)
+                rawLyricLine(line: line, index: index, isHighlighted: isHighlighted)
             case let line as LRCLyricLine:
-                lrcLyricLine(line: line, isHighlighted: isHighlighted)
+                lrcLyricLine(line: line, index: index, isHighlighted: isHighlighted)
             case let line as TTMLLyricLine:
-                ttmlLyricLine(line: line, isHighlighted: isHighlighted)
+                ttmlLyricLine(line: line, index: index, isHighlighted: isHighlighted)
             default:
                 EmptyView()
             }
@@ -118,12 +107,12 @@ struct DisplayLyricsView: View {
         .opacity(isHighlighted || isHovering ? 1 : opacity(for: index))
     }
 
-    @ViewBuilder private func rawLyricLine(line: RawLyricLine, isHighlighted _: Bool)
+    @ViewBuilder private func rawLyricLine(line: RawLyricLine, index: Int, isHighlighted _: Bool)
         -> some View {
         Text(line.content)
     }
 
-    @ViewBuilder private func lrcLyricLine(line: LRCLyricLine, isHighlighted _: Bool)
+    @ViewBuilder private func lrcLyricLine(line: LRCLyricLine, index: Int, isHighlighted _: Bool)
         -> some View {
         if line.isValid {
             HStack {
@@ -141,7 +130,7 @@ struct DisplayLyricsView: View {
         }
     }
 
-    @ViewBuilder private func ttmlLyricLine(line: TTMLLyricLine, isHighlighted: Bool)
+    @ViewBuilder private func ttmlLyricLine(line: TTMLLyricLine, index: Int, isHighlighted: Bool)
         -> some View {
         TTMLDisplayLyricLineView(
             line: line, elapsedTime: fineGrainedElapsedTime,

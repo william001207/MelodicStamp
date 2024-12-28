@@ -15,6 +15,9 @@ struct InspectorLyricsView: View {
     @State private var playbackTime: PlaybackTime?
 
     var body: some View {
+        // Avoid multiple instantializations
+        let lines = lyrics.lines
+        
         Group {
             switch entries.type {
             case .none, .varied:
@@ -24,8 +27,10 @@ struct InspectorLyricsView: View {
                     ScrollView {
                         // Don't apply `.contentMargins()`, otherwise causing `LazyVStack` related glitches
                         LazyVStack(alignment: alignment, spacing: 10) {
-                            lyricLines()
-                                .textSelection(.enabled)
+                            ForEach(Array(lines.enumerated()), id: \.element) { index, line in
+                                lyricLine(line: line, index: index)
+                            }
+                            .textSelection(.enabled)
                         }
                         .padding(.horizontal)
                         .safeAreaPadding(.top, 64)
@@ -81,30 +86,21 @@ struct InspectorLyricsView: View {
 
     private var highlightedRange: Range<Int> {
         if let timeElapsed = playbackTime?.elapsed {
-            lyrics.find(at: timeElapsed, in: player.current?.url)
+            lyrics.highlight(at: timeElapsed, in: player.current?.url)
         } else {
             0 ..< 0
         }
     }
 
-    @ViewBuilder private func lyricLines() -> some View {
-        switch lyrics.storage {
-        case let .raw(parser):
-            ForEach(Array(parser.lines.enumerated()), id: \.element) {
-                index, line in
-                rawLyricLine(line: line, index: index)
-            }
-        case let .lrc(parser):
-            ForEach(Array(parser.lines.enumerated()), id: \.element) {
-                index, line in
-                lrcLyricLine(line: line, index: index)
-            }
-        case let .ttml(parser):
-            ForEach(Array(parser.lines.enumerated()), id: \.element) {
-                index, line in
-                ttmlLyricLine(line: line, index: index)
-            }
-        case .none:
+    @ViewBuilder private func lyricLine(line: any LyricLine, index: Int) -> some View {
+        switch line {
+        case let line as RawLyricLine:
+            rawLyricLine(line: line, index: index)
+        case let line as LRCLyricLine:
+            lrcLyricLine(line: line, index: index)
+        case let line as TTMLLyricLine:
+            ttmlLyricLine(line: line, index: index)
+        default:
             EmptyView()
         }
     }
