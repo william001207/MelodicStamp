@@ -25,6 +25,7 @@ struct DisplayLyricsView: View {
     var body: some View {
         // Avoid multiple instantializations
         let lines = lyricLines
+        let range = highlightedRange
 
         Group {
             if !lines.isEmpty {
@@ -32,7 +33,7 @@ struct DisplayLyricsView: View {
                     delayBeforePush: 0.2,
                     canPushAnimation: true,
                     range: 0 ..< lines.count,
-                    highlightedRange: highlightedRange,
+                    highlightedRange: range,
                     alignment: .center
                 ) { index, isHighlighted in
                     lyricLine(line: lines[index], index: index, isHighlighted: isHighlighted)
