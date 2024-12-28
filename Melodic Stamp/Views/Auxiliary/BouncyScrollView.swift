@@ -122,17 +122,25 @@ struct BouncyScrollView<Content: View>: View {
         }
         .onChange(of: highlightedRange) { oldValue, newValue in
             let isLowerBoundChanged = oldValue.lowerBound != newValue.lowerBound
+            let isUpperBoundChanged = oldValue.upperBound != newValue.upperBound
 
-            guard isLowerBoundChanged else { return }
-            updateAnimationState()
+            if isLowerBoundChanged {
+                updateAnimationState()
+            } else if isUpperBoundChanged {
+                pushAnimation()
+            }
         }
         .observeAnimation(for: scrollOffset) { value in
             scrollPosition.scrollTo(y: value)
         }
     }
+    
+    private var isIndicatorVisible: Bool {
+        indicator(highlightedRange.lowerBound, true).isVisible
+    }
 
     private var canPauseAnimation: Bool {
-        indicator(highlightedRange.lowerBound, true).isVisible && highlightedRange.isEmpty
+        highlightedRange.isEmpty && isIndicatorVisible
     }
 
     private var compensate: CGFloat {

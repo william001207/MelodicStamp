@@ -36,18 +36,25 @@ struct DisplayLyricsView: View {
                     alignment: .center
                 ) { index, isHighlighted in
                     lyricLine(line: lines[index], index: index, isHighlighted: isHighlighted)
-                } indicator: { _, _ in
-                    .invisible
-//                    let span = lyrics.storage?.parser.duration(before: index)
-//                    let beginTime = span?.begin ?? .zero
-//                    let endTime = span?.end ?? player.duration.timeInterval
-//
-//                    HStack {
-//                        ProgressDotsContainerView(elapsedTime: fineGrainedElapsedTime, beginTime: beginTime, endTime: endTime)
-//
-//                        let progress = (fineGrainedElapsedTime - beginTime) / (endTime - beginTime)
-//                        ProgressView(value: max(0, min(1, progress)))
-//                    }
+                } indicator: { index, _ in
+                    let span = lyrics.storage?.parser.duration(before: index)
+                    let beginTime = span?.begin
+                    let endTime = span?.end
+                    
+                    if let beginTime, let endTime {
+                        let duration = endTime - beginTime
+                        let progress = (fineGrainedElapsedTime - beginTime) / duration
+                        
+                        return if duration >= 1, progress <= 1 {
+                            .visible {
+                                HStack {
+                                    ProgressDotsContainerView(elapsedTime: fineGrainedElapsedTime, beginTime: beginTime, endTime: endTime)
+                                    
+                                    ProgressView(value: max(0, progress))
+                                }
+                            }
+                        } else { .invisible }
+                    } else { return .invisible }
                 }
             } else {
                 Color.clear

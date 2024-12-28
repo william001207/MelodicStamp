@@ -57,6 +57,8 @@ struct TTMLDisplayLyricLineView: View {
                         Text(stringContent(of: line.backgroundLyrics))
                             .font(.title2)
                             .bold()
+                            .foregroundStyle(.white.opacity(isAnimationHighlighted ? 1 : 0.1))
+                            .brightness(isAnimationHighlighted ? 1.5 : 1.0)
 
                         additionalContent(for: line.backgroundLyrics)
                             .font(.title3)
