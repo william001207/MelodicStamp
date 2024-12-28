@@ -41,62 +41,50 @@ protocol LyricsParser {
 }
 
 extension LyricsParser {
+    // Do not use sequences, otherwise causing huge performance issues
     func highlight(at time: TimeInterval) -> Range<Int> {
-        // Lines that begin before (or equal) the target time, sorted by descending beginning times
-        let prefixes = lines.enumerated()
-            .filter {
-                if let beginTime = $0.element.beginTime {
-                    beginTime <= time
-                } else { false }
-            }
-            .sorted {
-                let lhsBeginTime = $0.element.beginTime ?? .nan
-                let rhsBeginTime = $1.element.beginTime ?? .nan
-                return lhsBeginTime > rhsBeginTime
-            }
-
-        // Lines that begin after the target time, sorted by ascending beginning times
-        let suffixes = lines.enumerated()
-            .filter {
-                if let beginTime = $0.element.beginTime {
-                    beginTime > time
-                } else { false }
-            }
-            .sorted {
-                let lhsBeginTime = $0.element.beginTime ?? .nan
-                let rhsBeginTime = $1.element.beginTime ?? .nan
-                return lhsBeginTime < rhsBeginTime
-            }
-
-        let lastPrefix = prefixes.first
-        let firstSuffix = suffixes.first
         let endIndex = lines.endIndex
-
-        if let lastPrefix {
+        
+        let previous = lines.last {
+            if let beginTime = $0.beginTime {
+                beginTime <= time
+            } else { false }
+        }
+        let previousIndex = previous.flatMap(lines.firstIndex)
+        
+        if let previous, let previousIndex {
             // Has a prefixing line
 
-            if let endTime = lastPrefix.element.endTime {
+            if let endTime = previous.endTime {
                 // The prefixing line specifies an ending time
 
                 let reachedEndTime = endTime < time
 
                 if reachedEndTime {
                     // Reached the prefixing line's ending time
+                    
+                    let next = lines.first {
+                        if let beginTime = $0.beginTime {
+                            beginTime > time
+                        } else { false }
+                    }
+                    let nextIndex = next.flatMap(lines.firstIndex)
+                    
 
-                    if let firstSuffix {
+                    if let next, let nextIndex {
                         // Has a suffixing line
 
                         let suspensionThreshold: TimeInterval = 1
-                        let shouldSuspend = if let beginTime = firstSuffix.element.beginTime {
+                        let shouldSuspend = if let beginTime = next.beginTime {
                             beginTime - endTime >= suspensionThreshold
                         } else { false }
 
                         return if shouldSuspend {
                             // Suspend before the suffixing line begins
-                            firstSuffix.offset ..< firstSuffix.offset
+                            nextIndex ..< nextIndex
                         } else {
                             // Hold until the suffixing line begins
-                            lastPrefix.offset ..< firstSuffix.offset
+                            previousIndex ..< nextIndex
                         }
                     } else {
                         // Has no suffixing lines
@@ -106,31 +94,44 @@ extension LyricsParser {
                 } else {
                     // Still in the range of the prefixing line
 
-                    let firstPrefix = prefixes
-                        .prefix {
-                            $0.element.endTime == endTime
-                        }
-                        .first
+                    let furthest = lines.first {
+                        $0.endTime == previous.endTime
+                    }
+                    let furthestIndex = furthest.flatMap(lines.firstIndex)
 
-                    return (firstPrefix?.offset ?? 0) ..< (lastPrefix.offset + 1)
+                    return if let furthestIndex {
+                        furthestIndex ..< (previousIndex + 1)
+                    } else {
+                        0 ..< (previousIndex + 1)
+                    }
                 }
             } else {
                 // The prefixing line specifies no ending times
+                
+                let next = lines.first {
+                    if let beginTime = $0.beginTime {
+                        beginTime > time
+                    } else { false }
+                }
+                let nextIndex = next.flatMap(lines.firstIndex)
 
-                if let firstSuffix {
+                if let nextIndex {
                     // Has a suffixing line
 
-                    return lastPrefix.offset ..< firstSuffix.offset
+                    return previousIndex ..< nextIndex
                 } else {
                     // Has no suffixing lines
 
-                    let firstPrefix = prefixes
-                        .prefix {
-                            $0.element.endTime == nil
-                        }
-                        .first
-
-                    return (firstPrefix?.offset ?? 0) ..< (lastPrefix.offset + 1)
+                    let furthest = lines.first {
+                        $0.endTime == previous.endTime
+                    }
+                    let furthestIndex = furthest.flatMap(lines.firstIndex)
+                    
+                    return if let furthestIndex {
+                        furthestIndex ..< (previousIndex + 1)
+                    } else {
+                        0 ..< (previousIndex + 1)
+                    }
                 }
             }
         } else {
@@ -150,19 +151,13 @@ extension LyricsParser {
         let duration = duration(of: index)
 
         if let time = duration.begin {
-            let prefixes = lines.enumerated()
-                .filter {
-                    if let beginTime = $0.element.beginTime {
-                        beginTime < time
-                    } else { false }
-                }
-                .sorted {
-                    let lhsBeginTime = $0.element.beginTime ?? .nan
-                    let rhsBeginTime = $1.element.beginTime ?? .nan
-                    return lhsBeginTime > rhsBeginTime
-                }
+            let previous = lines.last {
+                if let beginTime = $0.beginTime {
+                    beginTime < time
+                } else { false }
+            }
 
-            return (prefixes.first?.element.endTime, time)
+            return (previous?.endTime, time)
         } else {
             return (nil, nil)
         }

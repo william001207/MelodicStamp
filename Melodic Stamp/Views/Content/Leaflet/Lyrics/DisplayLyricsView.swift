@@ -20,7 +20,7 @@ struct DisplayLyricsView: View {
     @State private var isHovering: Bool = false
 
     @State private var fineGrainedElapsedTime: TimeInterval = 0.0
-    @State private var timer = Timer.publish(every: 0.01, on: .main, in: .default).autoconnect()
+    @State private var timer = Timer.publish(every: 0.1, on: .main, in: .default).autoconnect()
 
     var body: some View {
         // Avoid multiple instantializations
@@ -37,16 +37,17 @@ struct DisplayLyricsView: View {
                 ) { index, isHighlighted in
                     lyricLine(line: lines[index], index: index, isHighlighted: isHighlighted)
                 } indicator: { index, _ in
-                    let span = lyrics.storage?.parser.duration(before: index)
-                    let beginTime = span?.begin ?? .zero
-                    let endTime = span?.end ?? player.duration.timeInterval
-
-                    HStack {
-                        ProgressDotsContainerView(elapsedTime: fineGrainedElapsedTime, beginTime: beginTime, endTime: endTime)
-                        
-                        let progress = (fineGrainedElapsedTime - beginTime) / (endTime - beginTime)
-                        ProgressView(value: max(0, min(1, progress)))
-                    }
+                        .invisible
+//                    let span = lyrics.storage?.parser.duration(before: index)
+//                    let beginTime = span?.begin ?? .zero
+//                    let endTime = span?.end ?? player.duration.timeInterval
+//
+//                    HStack {
+//                        ProgressDotsContainerView(elapsedTime: fineGrainedElapsedTime, beginTime: beginTime, endTime: endTime)
+//                        
+//                        let progress = (fineGrainedElapsedTime - beginTime) / (endTime - beginTime)
+//                        ProgressView(value: max(0, min(1, progress)))
+//                    }
                 }
             } else {
                 Color.clear

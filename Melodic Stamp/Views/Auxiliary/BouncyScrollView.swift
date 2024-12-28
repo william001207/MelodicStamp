@@ -17,7 +17,23 @@ enum BouncyScrollViewAlignment {
     case center
 }
 
-struct BouncyScrollView<Content: View, Indicator: View>: View {
+enum BouncyScrollViewIndicator {
+    case invisible
+    case visible(content: AnyView)
+    
+    static func visible(@ViewBuilder _ content: @escaping () -> some View) -> Self {
+        .visible(content: .init(content()))
+    }
+    
+    var isVisible: Bool {
+        switch self {
+        case .visible: return true
+        case .invisible: return false
+        }
+    }
+}
+
+struct BouncyScrollView<Content: View>: View {
     var offset: CGFloat = 50
     var delay: TimeInterval = 0.08
     var bounceDelay: TimeInterval = 0.5
@@ -27,7 +43,7 @@ struct BouncyScrollView<Content: View, Indicator: View>: View {
     var alignment: BouncyScrollViewAlignment = .top
 
     @ViewBuilder var content: (_ index: Int, _ isHighlighted: Bool) -> Content
-    @ViewBuilder var indicator: (_ index: Int, _ isHighlighted: Bool) -> Indicator
+    var indicator: (_ index: Int, _ isHighlighted: Bool) -> BouncyScrollViewIndicator
 
     @State private var containerSize: CGSize = .zero
     @State private var animationState: BouncyScrollViewAnimationState = .intermediate
@@ -56,9 +72,14 @@ struct BouncyScrollView<Content: View, Indicator: View>: View {
                                 .offset(y: proportion * offset)
                                 .background {
                                     if index == highlightedRange.lowerBound {
-                                        indicator(index, isHighlighted)
-                                            .opacity(proportion)
-                                            .animation(.default, value: proportion)
+                                        switch indicator(index, isHighlighted) {
+                                        case .invisible:
+                                            EmptyView()
+                                        case .visible(let content):
+                                            content
+                                                .opacity(proportion)
+                                                .animation(.default, value: proportion)
+                                        }
                                     }
                                 }
                         } else {
@@ -101,9 +122,8 @@ struct BouncyScrollView<Content: View, Indicator: View>: View {
         }
         .onChange(of: highlightedRange) { oldValue, newValue in
             let isLowerBoundChanged = oldValue.lowerBound != newValue.lowerBound
-            let isPauseChanged = oldValue.isEmpty != newValue.isEmpty
 
-            guard isLowerBoundChanged || isPauseChanged else { return }
+            guard isLowerBoundChanged else { return }
             updateAnimationState()
         }
         .observeAnimation(for: scrollOffset) { value in
@@ -111,12 +131,8 @@ struct BouncyScrollView<Content: View, Indicator: View>: View {
         }
     }
 
-    private var hasIndicators: Bool {
-        Indicator.self != EmptyView.self
-    }
-
     private var canPauseAnimation: Bool {
-        hasIndicators && highlightedRange.isEmpty
+        indicator(highlightedRange.lowerBound, true).isVisible && highlightedRange.isEmpty
     }
 
     private var compensate: CGFloat {
@@ -294,12 +310,14 @@ struct BouncyScrollView<Content: View, Indicator: View>: View {
                 ))
                 .opacity(isHighlighted ? 1 : 0.5)
         } indicator: { _, _ in
-            HStack {
-                Circle()
-                Circle()
-                Circle()
-            }
-            .frame(height: 10)
+                .visible {
+                    HStack {
+                        Circle()
+                        Circle()
+                        Circle()
+                    }
+                    .frame(height: 10)
+                }
         }
         .border(.foreground)
         .frame(height: 400)

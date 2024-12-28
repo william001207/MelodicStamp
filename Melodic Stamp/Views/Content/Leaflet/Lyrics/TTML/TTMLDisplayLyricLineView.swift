@@ -19,13 +19,16 @@ struct TTMLDisplayLyricLineView: View {
 
     var body: some View {
         VStack(alignment: .center, spacing: 5) {
+            let lyricsRenderer = textRenderer(for: line.lyrics)
+            let backgroundLyricsRenderer = textRenderer(for: line.backgroundLyrics)
+            
             // Do not extract any views from inside the if branch, otherwise causing animation loss
             Group {
                 if isHighlighted {
                     Text(stringContent(of: line.lyrics))
                         .font(.title)
                         .bold()
-                        .textRenderer(textRenderer(for: line.lyrics))
+                        .textRenderer(lyricsRenderer)
 
                     additionalContent(for: line.lyrics)
                         .font(.title3)
@@ -34,7 +37,7 @@ struct TTMLDisplayLyricLineView: View {
                         Text(stringContent(of: line.backgroundLyrics))
                             .font(.title2)
                             .bold()
-                            .textRenderer(textRenderer(for: line.backgroundLyrics))
+                            .textRenderer(backgroundLyricsRenderer)
                         
                         additionalContent(for: line.backgroundLyrics)
                             .font(.title3)
@@ -54,7 +57,6 @@ struct TTMLDisplayLyricLineView: View {
                         Text(stringContent(of: line.backgroundLyrics))
                             .font(.title2)
                             .bold()
-                            .textRenderer(textRenderer(for: line.backgroundLyrics))
 
                         additionalContent(for: line.backgroundLyrics)
                             .font(.title3)
