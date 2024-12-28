@@ -293,7 +293,7 @@ struct BouncyScrollView<Content: View, Indicator: View>: View {
                     brightness: 1
                 ))
                 .opacity(isHighlighted ? 1 : 0.5)
-        } indicators: { _, _ in
+        } indicator: { _, _ in
             HStack {
                 Circle()
                 Circle()

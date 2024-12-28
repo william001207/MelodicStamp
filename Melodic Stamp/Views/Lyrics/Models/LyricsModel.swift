@@ -153,7 +153,7 @@ extension LyricsParser {
             let prefixes = lines.enumerated()
                 .filter {
                     if let beginTime = $0.element.beginTime {
-                        beginTime <= time
+                        beginTime < time
                     } else { false }
                 }
                 .sorted {

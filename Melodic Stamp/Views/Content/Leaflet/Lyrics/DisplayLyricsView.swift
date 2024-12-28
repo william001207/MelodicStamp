@@ -41,7 +41,12 @@ struct DisplayLyricsView: View {
                     let beginTime = span?.begin ?? .zero
                     let endTime = span?.end ?? player.duration.timeInterval
 
-                    ProgressDotsContainerView(elapsedTime: fineGrainedElapsedTime, beginTime: beginTime, endTime: endTime)
+                    HStack {
+                        ProgressDotsContainerView(elapsedTime: fineGrainedElapsedTime, beginTime: beginTime, endTime: endTime)
+                        
+                        let progress = (fineGrainedElapsedTime - beginTime) / (endTime - beginTime)
+                        ProgressView(value: max(0, min(1, progress)))
+                    }
                 }
             } else {
                 Color.clear
