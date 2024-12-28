@@ -169,7 +169,7 @@ extension LyricsParser {
     }
 }
 
-// MARK: Lyrics Type
+// MARK: - Lyrics Type
 
 enum LyricsType: String, Hashable, Identifiable, CaseIterable {
     case raw // Raw splitted string, unparsed
@@ -181,7 +181,7 @@ enum LyricsType: String, Hashable, Identifiable, CaseIterable {
     }
 }
 
-// MARK: Lyrics Storage
+// MARK: - Lyrics Storage
 
 enum LyricsStorage {
     case raw(parser: RawLyricsParser)
@@ -208,16 +208,16 @@ enum LyricsStorage {
     }
 }
 
-// MARK: Raw Lyrics
+// MARK: - Raw Lyrics
 
 struct RawLyrics: Hashable, Equatable, Identifiable {
-    var url: URL
+    let url: URL
     var content: String?
 
     var id: URL { url }
 }
 
-// MARK: Lyrics Model
+// MARK: - Lyrics Model
 
 @Observable class LyricsModel {
     private(set) var storage: LyricsStorage?
