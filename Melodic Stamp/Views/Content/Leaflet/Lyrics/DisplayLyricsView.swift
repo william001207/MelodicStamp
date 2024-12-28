@@ -126,14 +126,13 @@ struct DisplayLyricsView: View {
         -> some View {
         if line.isValid {
             HStack {
-                /*
                 ForEach(line.tags) { tag in
                     if !tag.type.isMetadata {
                         Text(tag.content)
                             .foregroundStyle(.quinary)
                     }
                 }
-                */
+
                 Text(line.content)
                     .font(.system(size: 36))
                     .bold()

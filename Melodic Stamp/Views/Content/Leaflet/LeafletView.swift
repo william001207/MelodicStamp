@@ -59,7 +59,7 @@ struct LeafletView: View {
             }
             // For testing
             .overlay(alignment: .top) {
-                VStack {
+                HStack {
                     Button("Toggle Lyrics") {
                         withAnimation(.smooth(duration: 0.45)) {
                             hasLyrics.toggle()
