@@ -16,15 +16,27 @@ struct DisplayLyricsView: View {
 
     @State private var playbackTime: PlaybackTime?
 
+    @State private var highlightedRange: Range<Int> = 0..<0
     @State private var isPlaying: Bool = false
     @State private var isHovering: Bool = false
 
     @State private var fineGrainedElapsedTime: TimeInterval = 0.0
-    @State private var timer = Timer.publish(every: 0.1, on: .main, in: .default).autoconnect()
-
+//    @State private var timer: Timer?
+    @State private var timer = Timer.publish(every: 0.01, on: .main, in: .default).autoconnect()
+    
+//    private var lyricLines: [any LyricLine] {
+//        switch lyrics.storage {
+//        case .raw(let parser as any LyricsParser), .lrc(let parser as any LyricsParser), .ttml(let parser as any LyricsParser):
+//            parser.lines
+//        default:
+//            []
+//        }
+//    }
+    
     var body: some View {
         // Avoid multiple instantializations
         let lines = lyrics.lines
+
         let range = highlightedRange
 
         Group {
@@ -32,11 +44,13 @@ struct DisplayLyricsView: View {
                 BouncyScrollView(
                     bounceDelay: 0.2,
                     range: 0 ..< lines.count,
-                    highlightedRange: range,
+                    highlightedRange: highlightedRange,
                     alignment: .center
                 ) { index, isHighlighted in
                     lyricLine(line: lines[index], index: index, isHighlighted: isHighlighted)
+
                 } indicator: { index, _ in
+                        //.invisible
                     let span = lyrics.storage?.parser.duration(before: index)
                     let beginTime = span?.begin
                     let endTime = span?.end
@@ -45,7 +59,7 @@ struct DisplayLyricsView: View {
                         let duration = endTime - beginTime
                         let progress = (fineGrainedElapsedTime - beginTime) / duration
                         
-                        return if duration >= 1, progress <= 1 {
+                        return if duration >= 4, progress <= 1 {
                             .visible {
                                 HStack {
                                     ProgressDotsContainerView(elapsedTime: fineGrainedElapsedTime, beginTime: beginTime, endTime: endTime)
@@ -56,11 +70,11 @@ struct DisplayLyricsView: View {
                         } else { .invisible }
                     } else { return .invisible }
                 }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {
                 Color.clear
             }
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .onHover { hover in
             withAnimation(.smooth(duration: 0.45)) {
                 isHovering = hover
@@ -89,28 +103,34 @@ struct DisplayLyricsView: View {
         .onChange(of: playbackTime) { _, newValue in
             guard let elapsed = newValue?.elapsed else { return }
             fineGrainedElapsedTime = elapsed
+            if self.range != highlightedRange {
+                highlightedRange = self.range
+            }
         }
         .onReceive(player.isPlayingPublisher) { isPlaying in
             self.isPlaying = isPlaying
         }
         .onReceive(player.playbackTimePublisher) { playbackTime in
             self.playbackTime = playbackTime
+            if let timeElapsed = playbackTime?.elapsed {
+                fineGrainedElapsedTime = timeElapsed
+            }
         }
         .onReceive(timer) { _ in
             fineGrainedElapsedTime += 0.01
         }
     }
 
-    private var highlightedRange: Range<Int> {
+    private var range: Range<Int> {
         if let timeElapsed = playbackTime?.elapsed {
-            lyrics.highlight(at: timeElapsed)
+            return lyrics.highlight(at: timeElapsed)
         } else {
-            0 ..< 0
+            return 0 ..< 0
         }
     }
 
     @ViewBuilder private func lyricLine(line: any LyricLine, index: Int, isHighlighted: Bool) -> some View {
-        Group {
+        VStack(spacing: .zero) {
             switch line {
             case let line as RawLyricLine:
                 rawLyricLine(line: line, index: index, isHighlighted: isHighlighted)
@@ -136,13 +156,6 @@ struct DisplayLyricsView: View {
         -> some View {
         if line.isValid {
             HStack {
-                ForEach(line.tags) { tag in
-                    if !tag.type.isMetadata {
-                        Text(tag.content)
-                            .foregroundStyle(.quinary)
-                    }
-                }
-
                 Text(line.content)
                     .font(.system(size: 36))
                     .bold()

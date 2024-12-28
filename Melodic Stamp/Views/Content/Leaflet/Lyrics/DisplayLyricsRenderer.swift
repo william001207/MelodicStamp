@@ -16,7 +16,7 @@ struct DisplayLyricsRenderer<Animated>: TextRenderer where Animated: AnimatedStr
     var elapsedTime: TimeInterval
     var strings: [Animated]
 
-    var inactiveOpacity: CGFloat = 0.25
+    var inactiveOpacity: CGFloat = 0.55
     var blendRadius: CGFloat = 20
     var shadowColor: Color = .white.opacity(0.1)
     var shadowRadius: CGFloat = 5

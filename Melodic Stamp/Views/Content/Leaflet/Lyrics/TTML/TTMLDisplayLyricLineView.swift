@@ -5,11 +5,11 @@
 //  Created by Xinshao_Air on 2024/12/24.
 //
 
-import Luminare
+// import Luminare
 import SwiftUI
 
 struct TTMLDisplayLyricLineView: View {
-    @Environment(\.luminareAnimation) private var animation
+    // @Environment(\.luminareAnimation) private var animation
 
     var line: TTMLLyricLine
     var elapsedTime: TimeInterval
@@ -26,15 +26,18 @@ struct TTMLDisplayLyricLineView: View {
             Group {
                 if isHighlighted {
                     Text(stringContent(of: line.lyrics))
+//                        .font(.system(size: 36))
                         .font(.title)
                         .bold()
                         .textRenderer(lyricsRenderer)
 
                     additionalContent(for: line.lyrics)
+//                        .font(.system(size: 22))
                         .font(.title3)
 
                     Group {
                         Text(stringContent(of: line.backgroundLyrics))
+//                            .font(.system(size: 28))
                             .font(.title2)
                             .bold()
                             .textRenderer(backgroundLyricsRenderer)
@@ -45,22 +48,26 @@ struct TTMLDisplayLyricLineView: View {
                     .transition(.blurReplace)
                 } else {
                     Text(stringContent(of: line.lyrics))
+//                        .font(.system(size: 36))
                         .font(.title)
                         .bold()
                         .foregroundStyle(.white.opacity(isAnimationHighlighted ? 1 : 0.1))
                         .brightness(isAnimationHighlighted ? 1.5 : 1.0)
 
                     additionalContent(for: line.lyrics)
+//                        .font(.system(size: 22))
                         .font(.title3)
 
                     Group {
                         Text(stringContent(of: line.backgroundLyrics))
+//                            .font(.system(size: 28))
                             .font(.title2)
                             .bold()
                             .foregroundStyle(.white.opacity(isAnimationHighlighted ? 1 : 0.1))
                             .brightness(isAnimationHighlighted ? 1.5 : 1.0)
 
                         additionalContent(for: line.backgroundLyrics)
+//                            .font(.system(size: 22))
                             .font(.title3)
                     }
                     .transition(.blurReplace)

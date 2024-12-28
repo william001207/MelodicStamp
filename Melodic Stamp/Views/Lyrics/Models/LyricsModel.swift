@@ -73,7 +73,7 @@ extension LyricsParser {
                     if let next, let nextIndex {
                         // Has a suffixing line
 
-                        let suspensionThreshold: TimeInterval = 1
+                        let suspensionThreshold: TimeInterval = 4
                         let shouldSuspend = if let beginTime = next.beginTime {
                             beginTime - endTime >= suspensionThreshold
                         } else { false }
