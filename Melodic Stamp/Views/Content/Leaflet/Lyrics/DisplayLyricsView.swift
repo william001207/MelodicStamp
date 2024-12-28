@@ -21,17 +21,7 @@ struct DisplayLyricsView: View {
     @State private var isHovering: Bool = false
 
     @State private var fineGrainedElapsedTime: TimeInterval = 0.0
-//    @State private var timer: Timer?
     @State private var timer = Timer.publish(every: 0.01, on: .main, in: .default).autoconnect()
-    
-//    private var lyricLines: [any LyricLine] {
-//        switch lyrics.storage {
-//        case .raw(let parser as any LyricsParser), .lrc(let parser as any LyricsParser), .ttml(let parser as any LyricsParser):
-//            parser.lines
-//        default:
-//            []
-//        }
-//    }
     
     var body: some View {
         // Avoid multiple instantializations
@@ -44,7 +34,7 @@ struct DisplayLyricsView: View {
                 BouncyScrollView(
                     bounceDelay: 0.2,
                     range: 0 ..< lines.count,
-                    highlightedRange: highlightedRange,
+                    highlightedRange: range,
                     alignment: .center
                 ) { index, isHighlighted in
                     lyricLine(line: lines[index], index: index, isHighlighted: isHighlighted)
