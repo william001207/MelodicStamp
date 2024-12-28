@@ -40,7 +40,7 @@ struct DisplayLyricsView: View {
                     let span = lyrics.storage?.parser.duration(after: index)
                     let beginTime = span?.begin ?? .zero
                     let endTime = span?.end ?? player.duration.timeInterval
-                    
+
                     ProgressDotsView(elapsedTime: fineGrainedElapsedTime, beginTime: beginTime, endTime: endTime)
                 }
             } else {
@@ -56,7 +56,7 @@ struct DisplayLyricsView: View {
         .onChange(of: player.current, initial: true) { _, newValue in
             if let newValue {
                 connectTimer()
-                
+
                 Task {
                     let raw = await newValue.metadata.poll(for: \.lyrics).current
                     await lyrics.read(raw)

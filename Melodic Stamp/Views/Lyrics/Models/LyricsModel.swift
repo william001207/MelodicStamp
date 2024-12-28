@@ -34,9 +34,9 @@ protocol LyricsParser {
     init(string: String) throws
 
     func highlight(at time: TimeInterval) -> Range<Int>
-    
+
     func duration(of index: Int) -> (begin: TimeInterval?, end: TimeInterval?)
-    
+
     func duration(after index: Int) -> (begin: TimeInterval?, end: TimeInterval?)
 }
 
@@ -139,16 +139,16 @@ extension LyricsParser {
             return 0 ..< 0
         }
     }
-    
+
     func duration(of index: Int) -> (begin: TimeInterval?, end: TimeInterval?) {
         guard lines.indices.contains(index) else { return (nil, nil) }
         return (lines[index].beginTime, lines[index].endTime)
     }
-    
+
     func duration(after index: Int) -> (begin: TimeInterval?, end: TimeInterval?) {
         guard lines.indices.contains(index) else { return (nil, nil) }
         let duration = duration(of: index)
-        
+
         if let endTime = duration.end {
             let suffixes = lines.enumerated()
                 .filter {
@@ -161,7 +161,7 @@ extension LyricsParser {
                     let rhsBeginTime = $1.element.beginTime ?? .nan
                     return lhsBeginTime < rhsBeginTime
                 }
-            
+
             return (endTime, suffixes.first?.element.beginTime)
         } else {
             return (nil, nil)
@@ -213,7 +213,7 @@ enum LyricsStorage {
 struct RawLyrics: Hashable, Equatable, Identifiable {
     var url: URL
     var content: String?
-    
+
     var id: URL { url }
 }
 
@@ -231,21 +231,21 @@ struct RawLyrics: Hashable, Equatable, Identifiable {
     func read(_ raw: RawLyrics?, autoRecognizes: Bool = true, forced: Bool = false) async {
         guard forced || raw != self.raw else { return }
         self.raw = raw
-        
+
         guard let raw else {
             // Explicitly set to nothing
             storage = nil
             type = nil
             return
         }
-        
+
         guard let content = raw.content else {
             // Implicitly fails, reading nothing
             storage = nil
             type = nil
             return
         }
-        
+
         if autoRecognizes {
             do {
                 type = try recognize(string: content) ?? .raw

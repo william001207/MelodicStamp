@@ -440,16 +440,18 @@ extension Metadata {
         state = .fine
         print("Successfully written metadata to \(url)")
     }
-    
+
     func poll<V>(for keyPath: WritableKeyPath<Metadata, Entry<V>>) async -> MetadataBatchEditingEntry<V> {
         print("Started polling metadata for \(keyPath)")
-        while !state.isLoaded { try? await Task.sleep(for: .milliseconds(100)) }
-        
+        while !state.isLoaded {
+            try? await Task.sleep(for: .milliseconds(100))
+        }
+
         var entry: MetadataBatchEditingEntry<V>?
         repeat {
             entry = self[extracting: keyPath]
         } while entry == nil
-        
+
         print("Succeed polling metadata for \(keyPath)")
         return entry!
     }
