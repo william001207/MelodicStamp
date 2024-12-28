@@ -16,7 +16,7 @@ struct LeafletView: View {
     @State private var dominantColors: [Color] = [.init(hex: 0x929292), .init(hex: 0xFFFFFF), .init(hex: 0x929292)]
     @State private var playbackTime: PlaybackTime?
     @State private var isPlaying: Bool = false
-    @State private var hasLyrics: Bool = true
+    @State private var isShowingLyrics: Bool = true
 
     var body: some View {
         if !player.hasCurrentTrack {
@@ -30,10 +30,16 @@ struct LeafletView: View {
                         [cover]
                     } else { [] }
 
-                    MusicCover(
-                        images: images, hasPlaceholder: true,
-                        cornerRadius: 12
-                    )
+                    AliveButton {
+                        withAnimation {
+                            isShowingLyrics.toggle()
+                        }
+                    } label: {
+                        MusicCover(
+                            images: images, hasPlaceholder: true,
+                            cornerRadius: 12
+                        )
+                    }
                     .containerRelativeFrame(.vertical, alignment: .center) { length, axis in
                         switch axis {
                         case .horizontal:
@@ -53,7 +59,7 @@ struct LeafletView: View {
                         }
                     }
 
-                    if hasLyrics {
+                    if isShowingLyrics {
                         DisplayLyricsView()
                             .transition(.blurReplace)
                     }
@@ -74,20 +80,6 @@ struct LeafletView: View {
             }
             .onReceive(player.isPlayingPublisher) { isPlaying in
                 self.isPlaying = isPlaying
-            }
-            // For testing
-            .overlay(alignment: .top) {
-                HStack {
-                    Button("Toggle Lyrics") {
-                        withAnimation(.smooth(duration: 0.45)) {
-                            hasLyrics.toggle()
-                        }
-                    }
-                    .padding(.top, 100)
-
-                    AudioVisualizer()
-                        .frame(width: 20, height: 20)
-                }
             }
         }
     }

@@ -37,7 +37,7 @@ protocol LyricsParser {
 
     func duration(of index: Int) -> (begin: TimeInterval?, end: TimeInterval?)
 
-    func duration(after index: Int) -> (begin: TimeInterval?, end: TimeInterval?)
+    func duration(before index: Int) -> (begin: TimeInterval?, end: TimeInterval?)
 }
 
 extension LyricsParser {
@@ -145,24 +145,24 @@ extension LyricsParser {
         return (lines[index].beginTime, lines[index].endTime)
     }
 
-    func duration(after index: Int) -> (begin: TimeInterval?, end: TimeInterval?) {
+    func duration(before index: Int) -> (begin: TimeInterval?, end: TimeInterval?) {
         guard lines.indices.contains(index) else { return (nil, nil) }
         let duration = duration(of: index)
 
-        if let endTime = duration.end {
-            let suffixes = lines.enumerated()
+        if let time = duration.begin {
+            let prefixes = lines.enumerated()
                 .filter {
                     if let beginTime = $0.element.beginTime {
-                        beginTime > endTime
+                        beginTime <= time
                     } else { false }
                 }
                 .sorted {
                     let lhsBeginTime = $0.element.beginTime ?? .nan
                     let rhsBeginTime = $1.element.beginTime ?? .nan
-                    return lhsBeginTime < rhsBeginTime
+                    return lhsBeginTime > rhsBeginTime
                 }
 
-            return (endTime, suffixes.first?.element.beginTime)
+            return (prefixes.first?.element.endTime, time)
         } else {
             return (nil, nil)
         }

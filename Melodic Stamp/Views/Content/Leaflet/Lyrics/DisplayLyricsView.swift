@@ -36,12 +36,12 @@ struct DisplayLyricsView: View {
                     alignment: .center
                 ) { index, isHighlighted in
                     lyricLine(line: lines[index], index: index, isHighlighted: isHighlighted)
-                } indicators: { index, _ in
-                    let span = lyrics.storage?.parser.duration(after: index)
+                } indicator: { index, _ in
+                    let span = lyrics.storage?.parser.duration(before: index)
                     let beginTime = span?.begin ?? .zero
                     let endTime = span?.end ?? player.duration.timeInterval
 
-                    ProgressDotsView(elapsedTime: fineGrainedElapsedTime, beginTime: beginTime, endTime: endTime)
+                    ProgressDotsContainerView(elapsedTime: fineGrainedElapsedTime, beginTime: beginTime, endTime: endTime)
                 }
             } else {
                 Color.clear

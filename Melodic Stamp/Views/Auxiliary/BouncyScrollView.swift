@@ -17,7 +17,7 @@ enum BouncyScrollViewAlignment {
     case center
 }
 
-struct BouncyScrollView<Content: View, Indicators: View>: View {
+struct BouncyScrollView<Content: View, Indicator: View>: View {
     var offset: CGFloat = 50
     var delay: TimeInterval = 0.08
     var bounceDelay: TimeInterval = 0.5
@@ -27,7 +27,7 @@ struct BouncyScrollView<Content: View, Indicators: View>: View {
     var alignment: BouncyScrollViewAlignment = .top
 
     @ViewBuilder var content: (_ index: Int, _ isHighlighted: Bool) -> Content
-    @ViewBuilder var indicators: (_ index: Int, _ isHighlighted: Bool) -> Indicators
+    @ViewBuilder var indicator: (_ index: Int, _ isHighlighted: Bool) -> Indicator
 
     @State private var containerSize: CGSize = .zero
     @State private var animationState: BouncyScrollViewAnimationState = .intermediate
@@ -56,7 +56,7 @@ struct BouncyScrollView<Content: View, Indicators: View>: View {
                                 .offset(y: proportion * offset)
                                 .background {
                                     if index == highlightedRange.lowerBound {
-                                        indicators(index, isHighlighted)
+                                        indicator(index, isHighlighted)
                                             .opacity(proportion)
                                             .animation(.default, value: proportion)
                                     }
@@ -112,7 +112,7 @@ struct BouncyScrollView<Content: View, Indicators: View>: View {
     }
 
     private var hasIndicators: Bool {
-        Indicators.self != EmptyView.self
+        Indicator.self != EmptyView.self
     }
 
     private var canPauseAnimation: Bool {
