@@ -48,7 +48,9 @@ struct FloatingTabBarView: View {
             isHovering = false
         }
         .onHover { hover in
-            isHovering = hover
+            withAnimation(animation) {
+                isHovering = hover
+            }
         }
         .onChange(of: selectedContentTab) { _, newValue in
             guard isInspectorPresented else { return }
@@ -62,7 +64,6 @@ struct FloatingTabBarView: View {
         .clipShape(.rect(cornerRadius: 24))
         .frame(maxWidth: .infinity, alignment: .leading)
         .contentShape(.rect(cornerRadius: 24))
-        .animation(animation, value: isExpanded)
         .fixedSize(horizontal: false, vertical: true) // Resize window
     }
 
@@ -94,13 +95,18 @@ struct FloatingTabBarView: View {
         } label: {
             label(for: tab, isSelected: isSelected)
         } onGestureChanged: { _ in
-            isDragging = true
+            withAnimation(animation) {
+                isDragging = true
+            }
         } onGestureEnded: { _ in
-            isDragging = false
+            withAnimation(animation) {
+                isDragging = false
+            }
         }
         .onHover { hover in
             withAnimation(animationFast) {
                 if hover {
+                    hoveringTabs.removeAll()
                     hoveringTabs.insert(tab)
                 } else {
                     hoveringTabs.remove(tab)

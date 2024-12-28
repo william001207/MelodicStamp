@@ -8,7 +8,7 @@
 import AppKit
 import SwiftUI
 
-@Observable class FloatingWindowsModel {
+@MainActor @Observable final class FloatingWindowsModel {
     private var isInFullScreen: Bool = false
 
     var tabBarWindow: NSWindow?
@@ -61,15 +61,15 @@ import SwiftUI
             object: NSApp.mainWindow
         )
     }
+    
+    func show() {
+        tabBarWindow?.animator().alphaValue = 1
+        playerWindow?.animator().alphaValue = 1
+    }
 
     func hide() {
         tabBarWindow?.animator().alphaValue = 0
         playerWindow?.animator().alphaValue = 0
-    }
-
-    func show() {
-        tabBarWindow?.animator().alphaValue = 1
-        playerWindow?.animator().alphaValue = 1
     }
 
     func addTabBar(@ViewBuilder content: () -> some View) {
@@ -84,9 +84,9 @@ import SwiftUI
 
         floatingWindow.alphaValue = 0
         applicationWindow.addChildWindow(floatingWindow, ordered: .above)
-
+        tabBarWindow = floatingWindow
+        
         DispatchQueue.main.async {
-            self.tabBarWindow = floatingWindow
             self.updateTabBarPosition(window: floatingWindow, in: applicationWindow)
             floatingWindow.animator().alphaValue = 1
         }
@@ -104,9 +104,9 @@ import SwiftUI
 
         floatingWindow.alphaValue = 0
         applicationWindow.addChildWindow(floatingWindow, ordered: .above)
-
+        playerWindow = floatingWindow
+        
         DispatchQueue.main.async {
-            self.playerWindow = floatingWindow
             self.updatePlayerPosition(window: floatingWindow, in: applicationWindow)
             floatingWindow.animator().alphaValue = 1
         }
