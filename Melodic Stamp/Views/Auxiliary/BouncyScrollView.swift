@@ -20,15 +20,15 @@ enum BouncyScrollViewAlignment {
 enum BouncyScrollViewIndicator {
     case invisible
     case visible(content: AnyView)
-    
+
     static func visible(@ViewBuilder _ content: @escaping () -> some View) -> Self {
         .visible(content: .init(content()))
     }
-    
+
     var isVisible: Bool {
         switch self {
-        case .visible: return true
-        case .invisible: return false
+        case .visible: true
+        case .invisible: false
         }
     }
 }
@@ -75,7 +75,7 @@ struct BouncyScrollView<Content: View>: View {
                                         switch indicator(index, isHighlighted) {
                                         case .invisible:
                                             EmptyView()
-                                        case .visible(let content):
+                                        case let .visible(content):
                                             content
                                                 .opacity(proportion)
                                                 .animation(.default, value: proportion)
@@ -310,14 +310,14 @@ struct BouncyScrollView<Content: View>: View {
                 ))
                 .opacity(isHighlighted ? 1 : 0.5)
         } indicator: { _, _ in
-                .visible {
-                    HStack {
-                        Circle()
-                        Circle()
-                        Circle()
-                    }
-                    .frame(height: 10)
+            .visible {
+                HStack {
+                    Circle()
+                    Circle()
+                    Circle()
                 }
+                .frame(height: 10)
+            }
         }
         .border(.foreground)
         .frame(height: 400)

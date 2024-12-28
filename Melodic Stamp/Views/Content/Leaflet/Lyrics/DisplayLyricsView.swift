@@ -36,15 +36,15 @@ struct DisplayLyricsView: View {
                     alignment: .center
                 ) { index, isHighlighted in
                     lyricLine(line: lines[index], index: index, isHighlighted: isHighlighted)
-                } indicator: { index, _ in
-                        .invisible
+                } indicator: { _, _ in
+                    .invisible
 //                    let span = lyrics.storage?.parser.duration(before: index)
 //                    let beginTime = span?.begin ?? .zero
 //                    let endTime = span?.end ?? player.duration.timeInterval
 //
 //                    HStack {
 //                        ProgressDotsContainerView(elapsedTime: fineGrainedElapsedTime, beginTime: beginTime, endTime: endTime)
-//                        
+//
 //                        let progress = (fineGrainedElapsedTime - beginTime) / (endTime - beginTime)
 //                        ProgressView(value: max(0, min(1, progress)))
 //                    }

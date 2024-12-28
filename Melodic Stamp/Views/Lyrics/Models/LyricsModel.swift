@@ -44,14 +44,14 @@ extension LyricsParser {
     // Do not use sequences, otherwise causing huge performance issues
     func highlight(at time: TimeInterval) -> Range<Int> {
         let endIndex = lines.endIndex
-        
+
         let previous = lines.last {
             if let beginTime = $0.beginTime {
                 beginTime <= time
             } else { false }
         }
         let previousIndex = previous.flatMap(lines.firstIndex)
-        
+
         if let previous, let previousIndex {
             // Has a prefixing line
 
@@ -62,14 +62,13 @@ extension LyricsParser {
 
                 if reachedEndTime {
                     // Reached the prefixing line's ending time
-                    
+
                     let next = lines.first {
                         if let beginTime = $0.beginTime {
                             beginTime > time
                         } else { false }
                     }
                     let nextIndex = next.flatMap(lines.firstIndex)
-                    
 
                     if let next, let nextIndex {
                         // Has a suffixing line
@@ -107,7 +106,7 @@ extension LyricsParser {
                 }
             } else {
                 // The prefixing line specifies no ending times
-                
+
                 let next = lines.first {
                     if let beginTime = $0.beginTime {
                         beginTime > time
@@ -126,7 +125,7 @@ extension LyricsParser {
                         $0.endTime == previous.endTime
                     }
                     let furthestIndex = furthest.flatMap(lines.firstIndex)
-                    
+
                     return if let furthestIndex {
                         furthestIndex ..< (previousIndex + 1)
                     } else {

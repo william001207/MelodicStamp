@@ -12,13 +12,12 @@ import SFSafeSymbols
 struct TTMLLyricLine: LyricLine {
     var index: Int
     var position: TTMLPosition
-    
+
     // Do not use sequences, otherwise causing huge performance issues
     var beginTime: TimeInterval? {
         if
             let lyricsBeginTime = lyrics.beginTime,
-            let backgroundLyricsBeginTime = backgroundLyrics.beginTime
-        {
+            let backgroundLyricsBeginTime = backgroundLyrics.beginTime {
             min(lyricsBeginTime, backgroundLyricsBeginTime)
         } else if let lyricsBeginTime = lyrics.beginTime {
             lyricsBeginTime
@@ -28,11 +27,11 @@ struct TTMLLyricLine: LyricLine {
             nil
         }
     }
+
     var endTime: TimeInterval? {
         if
             let lyricsEndTime = lyrics.endTime,
-            let backgroundLyricsEndTime = backgroundLyrics.endTime
-        {
+            let backgroundLyricsEndTime = backgroundLyrics.endTime {
             max(lyricsEndTime, backgroundLyricsEndTime)
         } else if let lyricsEndTime = lyrics.endTime {
             lyricsEndTime
