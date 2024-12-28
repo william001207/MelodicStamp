@@ -10,7 +10,7 @@ import Luminare
 import SwiftUI
 
 struct InspectorCommonMetadataView: View {
-    @Environment(MetadataEditorModel.self) var metadataEditor
+    @Environment(MetadataEditorModel.self) private var metadataEditor
 
     @Environment(\.undoManager) private var undoManager
     @Environment(\.luminareMinHeight) private var minHeight

@@ -16,7 +16,7 @@ struct AdaptableMusicCovers<Content>: View where Content: View {
         case list
     }
 
-    @Environment(AttachedPicturesHandlerModel.self) var attachedPicturesHandler
+    @Environment(AttachedPicturesHandlerModel.self) private var attachedPicturesHandler
 
     var layout: Layout = .flow
     var contentWidth: CGFloat = 300, contentHeight: CGFloat = 200

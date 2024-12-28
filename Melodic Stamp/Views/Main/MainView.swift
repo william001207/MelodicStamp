@@ -33,9 +33,9 @@ private extension View {
 }
 
 struct MainView: View {
-    @Environment(FileManagerModel.self) var fileManager
-    @Environment(PlayerModel.self) var player
-    @Environment(MetadataEditorModel.self) var metadataEditor
+    @Environment(FileManagerModel.self) private var fileManager
+    @Environment(PlayerModel.self) private var player
+    @Environment(MetadataEditorModel.self) private var metadataEditor
 
     @Environment(\.appearsActive) private var isActive
 

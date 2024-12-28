@@ -9,7 +9,7 @@ import CSFBAudioEngine
 import SwiftUI
 
 struct PlaylistItemView: View {
-    @Environment(PlayerModel.self) var player
+    @Environment(PlayerModel.self) private var player
 
     var item: PlaylistItem
     var isSelected: Bool

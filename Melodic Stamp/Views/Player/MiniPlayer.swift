@@ -28,9 +28,9 @@ struct MiniPlayer: View {
 
     @FocusState private var isFocused: Bool
 
-    @Environment(WindowManagerModel.self) var windowManager
-    @Environment(PlayerModel.self) var player
-    @Environment(PlayerKeyboardControlModel.self) var playerKeyboardControl
+    @Environment(WindowManagerModel.self) private var windowManager
+    @Environment(PlayerModel.self) private var player
+    @Environment(PlayerKeyboardControlModel.self) private var playerKeyboardControl
 
     var namespace: Namespace.ID
 

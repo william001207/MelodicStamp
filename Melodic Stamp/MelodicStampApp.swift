@@ -11,7 +11,7 @@ import UniformTypeIdentifiers
 
 @main
 struct MelodicStampApp: App {
-    @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
+    @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
 
     @Environment(\.openWindow) private var openWindow
 

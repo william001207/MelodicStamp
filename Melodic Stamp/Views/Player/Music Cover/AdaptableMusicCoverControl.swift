@@ -11,7 +11,7 @@ import SwiftUI
 struct AdaptableMusicCoverControl: View {
     typealias Entries = MetadataBatchEditingEntries<Set<AttachedPicture>>
 
-    @Environment(AttachedPicturesHandlerModel.self) var attachedPicturesHandler
+    @Environment(AttachedPicturesHandlerModel.self) private var attachedPicturesHandler
 
     @Environment(\.undoManager) private var undoManager
 

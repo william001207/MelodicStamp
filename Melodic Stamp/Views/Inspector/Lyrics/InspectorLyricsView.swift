@@ -8,9 +8,9 @@
 import SwiftUI
 
 struct InspectorLyricsView: View {
-    @Environment(PlayerModel.self) var player
-    @Environment(MetadataEditorModel.self) var metadataEditor
-    @Environment(LyricsModel.self) var lyrics
+    @Environment(PlayerModel.self) private var player
+    @Environment(MetadataEditorModel.self) private var metadataEditor
+    @Environment(LyricsModel.self) private var lyrics
 
     @State private var playbackTime: PlaybackTime?
 
@@ -27,7 +27,7 @@ struct InspectorLyricsView: View {
                     ScrollView {
                         // Don't apply `.contentMargins()`, otherwise causing `LazyVStack` related glitches
                         LazyVStack(alignment: alignment, spacing: 10) {
-                            ForEach(Array(lines.enumerated()), id: \.element) { index, line in
+                            ForEach(Array(lines.enumerated()), id: \.offset) { index, line in
                                 lyricLine(line: line, index: index)
                             }
                             .textSelection(.enabled)

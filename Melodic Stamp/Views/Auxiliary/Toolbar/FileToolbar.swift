@@ -9,8 +9,8 @@ import SFSafeSymbols
 import SwiftUI
 
 struct FileToolbar: View {
-    @Environment(FileManagerModel.self) var fileManager
-    @Environment(PlayerModel.self) var player
+    @Environment(FileManagerModel.self) private var fileManager
+    @Environment(PlayerModel.self) private var player
 
     var body: some View {
         Menu {

@@ -11,8 +11,8 @@ import SFSafeSymbols
 import SwiftUI
 
 struct PlaylistView: View {
-    @Environment(PlayerModel.self) var player
-    @Environment(MetadataEditorModel.self) var metadataEditor
+    @Environment(PlayerModel.self) private var player
+    @Environment(MetadataEditorModel.self) private var metadataEditor
 
     @Environment(\.resetFocus) private var resetFocus
     @Environment(\.luminareMinHeight) private var minHeight

@@ -9,7 +9,7 @@ import Luminare
 import SwiftUI
 
 struct FloatingTabBarView: View {
-    @Environment(FloatingWindowsModel.self) var floatingWindows
+    @Environment(FloatingWindowsModel.self) private var floatingWindows
 
     @Environment(\.luminareAnimation) private var animation
     @Environment(\.luminareAnimationFast) private var animationFast

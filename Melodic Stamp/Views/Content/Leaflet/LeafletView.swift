@@ -9,9 +9,9 @@ import DominantColors
 import SwiftUI
 
 struct LeafletView: View {
-    @Environment(PlayerModel.self) var player
-    @Environment(MetadataEditorModel.self) var metadataEditor
-    @Environment(LyricsModel.self) var lyrics
+    @Environment(PlayerModel.self) private var player
+    @Environment(MetadataEditorModel.self) private var metadataEditor
+    @Environment(LyricsModel.self) private var lyrics
 
     @State private var dominantColors: [Color] = [.init(hex: 0x929292), .init(hex: 0xFFFFFF), .init(hex: 0x929292)]
     @State private var playbackTime: PlaybackTime?

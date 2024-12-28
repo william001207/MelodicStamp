@@ -9,7 +9,7 @@ import Luminare
 import SwiftUI
 
 struct InspectorAdvancedMetadataView: View {
-    @Environment(MetadataEditorModel.self) var metadataEditor
+    @Environment(MetadataEditorModel.self) private var metadataEditor
 
     @State private var ratingDecreasedAnimation: Bool = false
     @State private var ratingIncreasedAnimation: Bool = false
