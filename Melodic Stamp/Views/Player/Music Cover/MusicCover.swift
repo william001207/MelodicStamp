@@ -14,28 +14,26 @@ struct MusicCover: View {
     var cornerRadius: CGFloat = 8
 
     var body: some View {
-        Group {
-            if !images.isEmpty {
-                // TODO: Handle multiple images
-                image(images.first!)
-            } else {
-                Group {
-                    if hasPlaceholder {
-                        Rectangle()
-                            .foregroundStyle(.placeholder.quinary)
-                            .overlay {
-                                Image(systemSymbol: .photoOnRectangleAngled)
-                                    .imageScale(.large)
-                                    .foregroundStyle(.placeholder)
-                            }
-                    } else {
-                        Color.clear
-                    }
+        if !images.isEmpty {
+            // TODO: Handle multiple images
+            image(images.first!)
+        } else {
+            Group {
+                if hasPlaceholder {
+                    Rectangle()
+                        .foregroundStyle(.placeholder.quinary)
+                        .overlay {
+                            Image(systemSymbol: .photoOnRectangleAngled)
+                                .imageScale(.large)
+                                .foregroundStyle(.placeholder)
+                        }
+                } else {
+                    Color.clear
                 }
-                .aspectRatio(1 / 1, contentMode: .fit)
             }
+            .aspectRatio(1 / 1, contentMode: .fit)
+            .clipShape(.rect(cornerRadius: cornerRadius))
         }
-        .clipShape(.rect(cornerRadius: cornerRadius))
     }
 
     @ViewBuilder private func image(_ image: NSImage) -> some View {
@@ -43,5 +41,11 @@ struct MusicCover: View {
             .resizable()
             .interpolation(.high)
             .aspectRatio(contentMode: .fit)
+            .clipShape(.rect(cornerRadius: cornerRadius))
     }
+}
+
+#Preview {
+    MusicCover(images: [.templateArtwork], cornerRadius: 12)
+        .scaleEffect(0.85, anchor: .center)
 }

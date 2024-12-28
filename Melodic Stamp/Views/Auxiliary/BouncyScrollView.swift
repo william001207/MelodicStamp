@@ -42,7 +42,7 @@ struct BouncyScrollView<Content: View, Indicators: View>: View {
                 .frame(height: offset)
             
             Spacer()
-                .frame(height: compensate)
+                .frame(height: max(0, compensate))
             
             LazyVStack(spacing: 0) {
                 ForEach(range, id: \.self) { index in
@@ -67,7 +67,7 @@ struct BouncyScrollView<Content: View, Indicators: View>: View {
                             
                         }
                     }
-                    .animation(.spring(bounce: 0.20).delay(delay), value: animationState)
+                    .animation(.spring(bounce: 0.2).delay(delay), value: animationState)
                     .animation(.smooth, value: highlightedRange)
                     .onGeometryChange(for: CGSize.self) { proxy in
                         proxy.size

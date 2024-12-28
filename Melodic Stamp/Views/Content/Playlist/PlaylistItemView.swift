@@ -84,7 +84,7 @@ struct PlaylistItemView: View {
         ZStack {
             if isMetadataLoaded, let image = item.metadata.thumbnail {
                 MusicCover(
-                    images: [image], hasPlaceholder: false, cornerRadius: 0
+                    images: [image], hasPlaceholder: false, cornerRadius: 8
                 )
                 .overlay {
                     if isHovering {

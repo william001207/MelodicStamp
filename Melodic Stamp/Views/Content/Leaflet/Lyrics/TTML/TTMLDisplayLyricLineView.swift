@@ -37,6 +37,7 @@ struct TTMLDisplayLyricLineView: View {
                     
                     additionalContent(for: line.lyrics)
                         .font(.title3)
+                    
                     Group {
                         Text(stringContent(of: line.backgroundLyrics))
                             .font(.title2)

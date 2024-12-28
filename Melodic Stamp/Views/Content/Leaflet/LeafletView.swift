@@ -22,34 +22,53 @@ struct LeafletView: View {
         if !player.hasCurrentTrack {
             ExcerptView(tab: SidebarContentTab.leaflet)
         } else {
-            HStack(spacing: 75) {
-                Group {
-                    if
+            ZStack {
+                HStack(spacing: 50) {
+                    let images: [NSImage] = if
                         let attachedPictures = player.current?.metadata[extracting: \.attachedPictures]?.current,
-                        let cover = ThumbnailMaker.getCover(from: attachedPictures)?.image {
-                        MusicCover(
-                            images: [cover], hasPlaceholder: false,
-                            cornerRadius: 20
-                        )
-//                        .frame(width: isPlaying ? 350 : 300, height: isPlaying ? 350 : 300)
-                        .scaleEffect(isPlaying ? 1 : 0.85, anchor: .center)
-                        .shadow(radius: isPlaying ? 20 : 10)
-                        .animation(.spring(duration: 0.65, bounce: 0.45, blendDuration: 0.75), value: isPlaying)
-                        .onChange(of: player.currentIndex, initial: true) { _, _ in
+                        let cover = ThumbnailMaker.getCover(from: attachedPictures)?.image
+                    {
+                        [cover]
+                    } else { [] }
+                    
+                    MusicCover(
+                        images: images, hasPlaceholder: true,
+                        cornerRadius: 12
+                    )
+                    .containerRelativeFrame(.vertical, alignment: .center) { length, axis in
+                        switch axis {
+                        case .horizontal:
+                            length
+                        case .vertical:
+                            min(500, length * 0.5)
+                        }
+                    }
+                    .scaleEffect(isPlaying ? 1 : 0.85, anchor: .center)
+                    .shadow(radius: isPlaying ? 20 : 10)
+                    .animation(.spring(duration: 0.65, bounce: 0.45, blendDuration: 0.75), value: isPlaying)
+                    .onChange(of: player.currentIndex, initial: true) { _, _ in
+                        if let cover = images.first {
                             Task {
                                 dominantColors = try await extractDominantColors(from: cover)
                             }
                         }
                     }
+                    
+                    if hasLyrics {
+                        DisplayLyricsView()
+                            .transition(.blurReplace)
+                    }
                 }
-                .frame(width: 350, height: 350, alignment: .center)
-
-                if hasLyrics {
-                    DisplayLyricsView()
-                        .transition(.blurReplace)
+                .containerRelativeFrame(.horizontal, alignment: .center) { length, axis in
+                    switch axis {
+                    case .horizontal:
+                        let padding = length * 0.1
+                        return length - 2 * min(100, padding)
+                    case .vertical:
+                        return length
+                    }
                 }
             }
-            .padding(.horizontal, 100)
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
             .background {
                 AnimatedGrid(colors: dominantColors)
