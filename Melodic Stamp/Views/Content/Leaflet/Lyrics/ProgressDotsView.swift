@@ -1,5 +1,5 @@
 //
-//  ProgressDotsContainerView.swift
+//  ProgressDotsView.swift
 //  Melodic Stamp
 //
 //  Created by Xinshao_Air on 2024/12/25.
@@ -8,15 +8,16 @@
 import SwiftUI
 
 struct ProgressDotsContainerView: View {
-    let currentTime: TimeInterval
-    let startTime: TimeInterval
+    let elapsedTime: TimeInterval
+    let beginTime: TimeInterval
     let endTime: TimeInterval
-    @State private var showProgressDots: Bool = true
+
+    @State private var isVisible: Bool = true
 
     var body: some View {
         VStack {
-            if showProgressDots {
-                ProgressDotsView(currentTime: currentTime, startTime: startTime, endTime: endTime)
+            if isVisible {
+                ProgressDotsView(elapsedTime: elapsedTime, beginTime: beginTime, endTime: endTime)
                     .frame(width: 150, height: 75, alignment: .leading)
                     .transition(
                         .asymmetric(
@@ -32,45 +33,44 @@ struct ProgressDotsContainerView: View {
                     .padding(.horizontal, 10)
             }
         }
+        .animation(.default, value: isVisible)
         .onAppear {
-            checkTimeAndUpdate()
+            update(time: elapsedTime)
         }
-        .onChange(of: currentTime) { _, _ in
-            checkTimeAndUpdate()
+        .onChange(of: elapsedTime) { _, newValue in
+            update(time: newValue)
         }
     }
 
-    private func checkTimeAndUpdate() {
-        withAnimation {
-            showProgressDots = currentTime >= startTime && currentTime < endTime
-        }
+    private func update(time: TimeInterval) {
+        isVisible = time >= beginTime && time < endTime
     }
 }
 
 struct ProgressDotsView: View {
-    var currentTime: TimeInterval
-    var startTime: TimeInterval
+    var elapsedTime: TimeInterval
+    var beginTime: TimeInterval
     var endTime: TimeInterval
 
-    private var progress: Double {
-        let totalTime = endTime - startTime
-        guard totalTime > 0 else { return 0 }
-        return min(max((currentTime - startTime) / totalTime, 0), 1)
+    private var progress: CGFloat {
+        let duration = endTime - beginTime
+        guard duration > 0 else { return 0 }
+        return min(max((elapsedTime - beginTime) / duration, 0), 1)
     }
 
     var body: some View {
         HStack(spacing: progress >= 0.93 ? (progress >= 0.99 ? 3 : 12) : 10) {
-            DotView(progress: progress, activationRange: 0.33...0.66)
-            DotView(progress: progress, activationRange: 0.66...0.90)
-            DotView(progress: progress, activationRange: 0.90...0.96)
+            ProgressDotView(progress: progress, activationRange: 0.33...0.66)
+            ProgressDotView(progress: progress, activationRange: 0.66...0.90)
+            ProgressDotView(progress: progress, activationRange: 0.90...0.96)
         }
         .animation(.smooth(duration: 0.75), value: progress)
     }
 }
 
-struct DotView: View {
-    var progress: Double
-    var activationRange: ClosedRange<Double>
+struct ProgressDotView: View {
+    var progress: CGFloat
+    var activationRange: ClosedRange<CGFloat>
     @State private var isBreathing = false
 
     private var activationProgress: Double {
@@ -79,33 +79,31 @@ struct DotView: View {
     }
 
     private var scale: CGFloat {
-        // Handle different states based on progress
+        // Handles different states based on progress
         if progress >= 0.99 {
-            0.5 + CGFloat((1 - progress) * 0.5) // Scale down to 0.5 after 0.99
+            0.5 + (1 - progress) * 0.5 // Scales down to 0.5 after 0.99
         } else if progress >= 0.93 {
-            1.0 + CGFloat(activationProgress) * 0.5 // Scale up between 0.93 and 0.99
+            1 + activationProgress * 0.5 // Scales up between 0.93 and 0.99
         } else {
             isBreathing ? 1.25 : 1.0 // Breathing effect when not active
         }
     }
 
-    /*
-     private var offset: CGFloat {
-         // Add a slight offset when progress is beyond 0.93
-         if progress >= 0.99 {
-             return CGFloat(activationProgress) * 5 // Offset between 0 to -10 based on activationProgress
-         } else if progress >= 0.91 {
-             return CGFloat(activationProgress) * -10
-         } else {
-             return 0
-         }
-     }
-     */
+    private var offset: CGFloat {
+        // A slight offset when progress is beyond 0.93
+        if progress >= 0.99 {
+            CGFloat(activationProgress) * 5
+        } else if progress >= 0.91 {
+            CGFloat(activationProgress) * -10
+        } else {
+            0
+        }
+    }
 
-    private var brightnessAdjustment: Double {
-        // Adjust brightness based on progress
+    private var brightnessAdjustment: CGFloat {
+        // Adjusts brightness based on progress
         if progress >= 0.93 {
-            Double(activationProgress) * 0.75 // Brightness adjustment
+            activationProgress * 0.75
         } else {
             0
         }

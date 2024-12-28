@@ -34,6 +34,10 @@ protocol LyricsParser {
     init(string: String) throws
 
     func highlight(at time: TimeInterval) -> Range<Int>
+    
+    func duration(of index: Int) -> (begin: TimeInterval?, end: TimeInterval?)
+    
+    func duration(after index: Int) -> (begin: TimeInterval?, end: TimeInterval?)
 }
 
 extension LyricsParser {
@@ -50,7 +54,7 @@ extension LyricsParser {
                 let rhsBeginTime = $1.element.beginTime ?? .nan
                 return lhsBeginTime > rhsBeginTime
             }
-        
+
         // Lines that begin after the target time, sorted by ascending beginning times
         let suffixes = lines.enumerated()
             .filter {
@@ -63,30 +67,30 @@ extension LyricsParser {
                 let rhsBeginTime = $1.element.beginTime ?? .nan
                 return lhsBeginTime < rhsBeginTime
             }
-        
+
         let lastPrefix = prefixes.first
         let firstSuffix = suffixes.first
         let endIndex = lines.endIndex
-        
+
         if let lastPrefix {
             // Has a prefixing line
-            
+
             if let endTime = lastPrefix.element.endTime {
                 // The prefixing line specifies an ending time
-                
+
                 let reachedEndTime = endTime < time
-                
+
                 if reachedEndTime {
                     // Reached the prefixing line's ending time
-                    
+
                     if let firstSuffix {
                         // Has a suffixing line
-                        
+
                         let suspensionThreshold: TimeInterval = 1
                         let shouldSuspend = if let beginTime = firstSuffix.element.beginTime {
                             beginTime - endTime >= suspensionThreshold
                         } else { false }
-                        
+
                         return if shouldSuspend {
                             // Suspend before the suffixing line begins
                             firstSuffix.offset ..< firstSuffix.offset
@@ -96,43 +100,71 @@ extension LyricsParser {
                         }
                     } else {
                         // Has no suffixing lines
-                        
+
                         return endIndex ..< endIndex
                     }
                 } else {
                     // Still in the range of the prefixing line
-                    
+
                     let firstPrefix = prefixes
                         .prefix {
                             $0.element.endTime == endTime
                         }
                         .first
-                    
+
                     return (firstPrefix?.offset ?? 0) ..< (lastPrefix.offset + 1)
                 }
             } else {
                 // The prefixing line specifies no ending times
-                
+
                 if let firstSuffix {
                     // Has a suffixing line
-                    
+
                     return lastPrefix.offset ..< firstSuffix.offset
                 } else {
                     // Has no suffixing lines
-                    
+
                     let firstPrefix = prefixes
                         .prefix {
                             $0.element.endTime == nil
                         }
                         .first
-                    
+
                     return (firstPrefix?.offset ?? 0) ..< (lastPrefix.offset + 1)
                 }
             }
         } else {
             // Has no prefixing lines
-            
+
             return 0 ..< 0
+        }
+    }
+    
+    func duration(of index: Int) -> (begin: TimeInterval?, end: TimeInterval?) {
+        guard lines.indices.contains(index) else { return (nil, nil) }
+        return (lines[index].beginTime, lines[index].endTime)
+    }
+    
+    func duration(after index: Int) -> (begin: TimeInterval?, end: TimeInterval?) {
+        guard lines.indices.contains(index) else { return (nil, nil) }
+        let duration = duration(of: index)
+        
+        if let endTime = duration.end {
+            let suffixes = lines.enumerated()
+                .filter {
+                    if let beginTime = $0.element.beginTime {
+                        beginTime > endTime
+                    } else { false }
+                }
+                .sorted {
+                    let lhsBeginTime = $0.element.beginTime ?? .nan
+                    let rhsBeginTime = $1.element.beginTime ?? .nan
+                    return lhsBeginTime < rhsBeginTime
+                }
+            
+            return (endTime, suffixes.first?.element.beginTime)
+        } else {
+            return (nil, nil)
         }
     }
 }
@@ -163,14 +195,14 @@ enum LyricsStorage {
         case .ttml: .ttml
         }
     }
-    
+
     var parser: any LyricsParser {
         switch self {
-        case .raw(let parser):
+        case let .raw(parser):
             parser
-        case .lrc(let parser):
+        case let .lrc(parser):
             parser
-        case .ttml(let parser):
+        case let .ttml(parser):
             parser
         }
     }
@@ -184,7 +216,7 @@ enum LyricsStorage {
     var type: LyricsType?
 
     private var cache: String?
-    
+
     var lines: [any LyricLine] {
         storage?.parser.lines ?? []
     }
@@ -239,7 +271,7 @@ enum LyricsStorage {
             if url == self.url {
                 result
             } else {
-                0..<0
+                0 ..< 0
             }
         } else {
             result

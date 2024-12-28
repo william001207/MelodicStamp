@@ -433,7 +433,7 @@ extension PlayerModel {
 }
 
 extension PlayerModel: AudioPlayer.Delegate {
-    func audioPlayerEndOfAudio(_ audioPlayer: AudioPlayer) {
+    func audioPlayerEndOfAudio(_: AudioPlayer) {
         let index = if playbackLooping {
             // Play again
             currentIndex
@@ -442,7 +442,7 @@ extension PlayerModel: AudioPlayer.Delegate {
             nextIndex
         }
         guard let index else { return }
-        
+
         do {
             if let decoder = try playlist[index].decoder() {
                 try player.enqueue(decoder)

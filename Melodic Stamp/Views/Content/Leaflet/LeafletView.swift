@@ -26,11 +26,10 @@ struct LeafletView: View {
                 HStack(spacing: 50) {
                     let images: [NSImage] = if
                         let attachedPictures = player.current?.metadata[extracting: \.attachedPictures]?.current,
-                        let cover = ThumbnailMaker.getCover(from: attachedPictures)?.image
-                    {
+                        let cover = ThumbnailMaker.getCover(from: attachedPictures)?.image {
                         [cover]
                     } else { [] }
-                    
+
                     MusicCover(
                         images: images, hasPlaceholder: true,
                         cornerRadius: 12
@@ -53,7 +52,7 @@ struct LeafletView: View {
                             }
                         }
                     }
-                    
+
                     if hasLyrics {
                         DisplayLyricsView()
                             .transition(.blurReplace)

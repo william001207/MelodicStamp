@@ -25,7 +25,7 @@ struct TTMLDisplayLyricLineView: View {
                         .font(.title)
                         .bold()
                         .textRenderer(textRenderer(for: line.lyrics))
-                    
+
                     additionalContent(for: line.lyrics)
                         .font(.title3)
                 } else {
@@ -34,16 +34,16 @@ struct TTMLDisplayLyricLineView: View {
                         .bold()
                         .foregroundStyle(.white.opacity(isAnimationHighlighted ? 1 : 0.1))
                         .brightness(isAnimationHighlighted ? 1.5 : 1.0)
-                    
+
                     additionalContent(for: line.lyrics)
                         .font(.title3)
-                    
+
                     Group {
                         Text(stringContent(of: line.backgroundLyrics))
                             .font(.title2)
                             .bold()
                             .textRenderer(textRenderer(for: line.backgroundLyrics))
-                        
+
                         additionalContent(for: line.backgroundLyrics)
                             .font(.title3)
                     }
@@ -62,22 +62,22 @@ struct TTMLDisplayLyricLineView: View {
         // Isolating switching animation between renderers
         .animation(nil, value: isHighlighted)
     }
-    
+
     private var textAlignment: TextAlignment {
         switch line.position {
         case .main:
-                .leading
+            .leading
         case .sub:
-                .trailing
+            .trailing
         }
     }
-    
+
     private var alignment: Alignment {
         switch line.position {
         case .main:
-                .leading
+            .leading
         case .sub:
-                .trailing
+            .trailing
         }
     }
 
@@ -95,7 +95,7 @@ struct TTMLDisplayLyricLineView: View {
     private func stringContent(of lyrics: TTMLLyrics) -> String {
         lyrics.map(\.content).joined()
     }
-    
+
     private func textRenderer(for lyrics: TTMLLyrics) -> some TextRenderer {
         DisplayLyricsRenderer(elapsedTime: elapsedTime, strings: lyrics.children)
     }

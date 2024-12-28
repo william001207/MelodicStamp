@@ -44,7 +44,7 @@ struct MainView: View {
     @Binding var isInspectorPresented: Bool
     @Binding var selectedContentTab: SidebarContentTab
     @Binding var selectedInspectorTab: SidebarInspectorTab
-    
+
     @State private var inspectorLyrics: LyricsModel = .init()
     @State private var displayLyrics: LyricsModel = .init()
 

@@ -20,8 +20,7 @@ enum BouncyScrollViewAlignment {
 struct BouncyScrollView<Content: View, Indicators: View>: View {
     var offset: CGFloat = 50
     var delay: TimeInterval = 0.08
-    var delayBeforePush: TimeInterval = 0.5
-    var canPushAnimation: Bool = true
+    var bounceDelay: TimeInterval = 0.5
 
     var range: Range<Int>
     var highlightedRange: Range<Int>
@@ -40,22 +39,22 @@ struct BouncyScrollView<Content: View, Indicators: View>: View {
         ScrollView {
             Spacer()
                 .frame(height: offset)
-            
+
             Spacer()
                 .frame(height: max(0, compensate))
-            
+
             LazyVStack(spacing: 0) {
                 ForEach(range, id: \.self) { index in
                     let isHighlighted = highlightedRange.contains(index)
                     let delay = delay(at: index)
-                    
+
                     Group {
                         if let offset = contentOffsets[index] {
                             let proportion = proportion(at: index)
-                            
+
                             content(index, isHighlighted)
                                 .offset(y: proportion * offset)
-                                .overlay {
+                                .background {
                                     if index == highlightedRange.lowerBound {
                                         indicators(index, isHighlighted)
                                             .opacity(proportion)
@@ -64,7 +63,6 @@ struct BouncyScrollView<Content: View, Indicators: View>: View {
                                 }
                         } else {
                             content(index, isHighlighted)
-                            
                         }
                     }
                     .animation(.spring(bounce: 0.2).delay(delay), value: animationState)
@@ -76,7 +74,7 @@ struct BouncyScrollView<Content: View, Indicators: View>: View {
                     }
                 }
             }
-            
+
             Spacer()
                 .frame(height: containerSize.height)
         }
@@ -103,13 +101,10 @@ struct BouncyScrollView<Content: View, Indicators: View>: View {
         }
         .onChange(of: highlightedRange) { oldValue, newValue in
             let isLowerBoundChanged = oldValue.lowerBound != newValue.lowerBound
-            let isPauseChanged = oldValue.isEmpty != newValue.isEmpty && canPauseAnimation
-            
+            let isPauseChanged = oldValue.isEmpty != newValue.isEmpty
+
             guard isLowerBoundChanged || isPauseChanged else { return }
             updateAnimationState()
-        }
-        .onChange(of: canPushAnimation) { _, _ in
-            tryPushAnimation()
         }
         .observeAnimation(for: scrollOffset) { value in
             scrollPosition.scrollTo(y: value)
@@ -123,7 +118,7 @@ struct BouncyScrollView<Content: View, Indicators: View>: View {
     private var canPauseAnimation: Bool {
         hasIndicators && highlightedRange.isEmpty
     }
-    
+
     private var compensate: CGFloat {
         switch alignment {
         case .top:
@@ -136,13 +131,13 @@ struct BouncyScrollView<Content: View, Indicators: View>: View {
             }
         }
     }
-    
+
     private func fold(until index: Int) -> CGFloat {
         let indices = contentOffsets.keys
         let index = if let maxIndex = indices.max() {
             min(index, maxIndex)
         } else { index }
-        
+
         return contentOffsets
             .filter { $0.key < index }
             .map(\.value)
@@ -151,13 +146,13 @@ struct BouncyScrollView<Content: View, Indicators: View>: View {
 
     private func updateAnimationState() {
         animationState = .intermediate
-        DispatchQueue.main.asyncAfter(deadline: .now() + delayBeforePush) {
-            tryPushAnimation()
+        DispatchQueue.main.asyncAfter(deadline: .now() + bounceDelay) {
+            pushAnimation()
         }
     }
 
-    private func tryPushAnimation() {
-        guard canPushAnimation, !canPauseAnimation else { return }
+    private func pushAnimation() {
+        guard !canPauseAnimation else { return }
         animationState = .pushed
     }
 
@@ -182,119 +177,107 @@ struct BouncyScrollView<Content: View, Indicators: View>: View {
 }
 
 #Preview {
-    @Previewable @State var canPushAnimation = true
     @Previewable @State var highlightedRange: Range<Int> = 0 ..< 1
     @Previewable @State var alignment: BouncyScrollViewAlignment = .top
     let count = 20
 
     VStack {
-        Picker("Alignment", selection: $alignment) {
-            Text("Top")
-                .tag(BouncyScrollViewAlignment.top)
-            Text("Center")
-                .tag(BouncyScrollViewAlignment.center)
-        }
-        .pickerStyle(SegmentedPickerStyle())
-        .padding()
+        VStack {
+            Picker("Alignment", selection: $alignment) {
+                Text("Top")
+                    .tag(BouncyScrollViewAlignment.top)
+                Text("Center")
+                    .tag(BouncyScrollViewAlignment.center)
+            }
+            .pickerStyle(SegmentedPickerStyle())
 
-        HStack {
-            let upperBound = highlightedRange.upperBound
+            HStack {
+                let upperBound = highlightedRange.upperBound
 
-            Text("Lower bound: \(highlightedRange.lowerBound)")
-                .fixedSize()
-                .frame(width: 100, alignment: .leading)
+                Text("Lower bound: \(highlightedRange.lowerBound)")
+                    .fixedSize()
+                    .frame(width: 100, alignment: .leading)
 
-            if upperBound > 0 {
-                Slider(
-                    value: Binding {
-                        Double(highlightedRange.lowerBound)
-                    } set: { newValue in
-                        let newBound = min(Int(newValue), upperBound)
-                        highlightedRange = max(0, newBound) ..< upperBound
-                    },
-                    in: 0...Double(upperBound),
-                    step: 1
-                ) {
-                    EmptyView()
-                } minimumValueLabel: {
-                    Text("\(0)")
-                } maximumValueLabel: {
-                    Text("\(upperBound)")
+                if upperBound > 0 {
+                    Slider(
+                        value: Binding {
+                            Double(highlightedRange.lowerBound)
+                        } set: { newValue in
+                            let newBound = min(Int(newValue), upperBound)
+                            highlightedRange = max(0, newBound) ..< upperBound
+                        },
+                        in: 0...Double(upperBound),
+                        step: 1
+                    ) {
+                        EmptyView()
+                    } minimumValueLabel: {
+                        Text("\(0)")
+                    } maximumValueLabel: {
+                        Text("\(upperBound)")
+                    }
+                    .monospaced()
+                } else {
+                    Slider(
+                        value: .constant(0),
+                        in: 0...1,
+                        step: 1
+                    ) {
+                        EmptyView()
+                    } minimumValueLabel: {
+                        Text("\(0)")
+                    } maximumValueLabel: {
+                        Text("\(0)")
+                    }
+                    .disabled(true)
+                    .monospaced()
                 }
-                .monospaced()
-            } else {
-                Slider(
-                    value: .constant(0),
-                    in: 0...1,
-                    step: 1
-                ) {
-                    EmptyView()
-                } minimumValueLabel: {
-                    Text("\(0)")
-                } maximumValueLabel: {
-                    Text("\(0)")
+            }
+
+            HStack {
+                let lowerBound = highlightedRange.lowerBound
+
+                Text("Upper bound: \(highlightedRange.upperBound)")
+                    .fixedSize()
+                    .frame(width: 100, alignment: .leading)
+
+                if lowerBound < count {
+                    Slider(
+                        value: Binding {
+                            Double(highlightedRange.upperBound)
+                        } set: { newValue in
+                            let newBound = max(Int(newValue), lowerBound)
+                            highlightedRange = lowerBound ..< min(count, newBound)
+                        },
+                        in: Double(lowerBound)...Double(count),
+                        step: 1
+                    ) {
+                        EmptyView()
+                    } minimumValueLabel: {
+                        Text("\(lowerBound)")
+                    } maximumValueLabel: {
+                        Text("\(count)")
+                    }
+                    .monospaced()
+                } else {
+                    Slider(
+                        value: .constant(1),
+                        in: 0...1,
+                        step: 1
+                    ) {
+                        EmptyView()
+                    } minimumValueLabel: {
+                        Text("\(count)")
+                    } maximumValueLabel: {
+                        Text("\(count)")
+                    }
+                    .disabled(true)
+                    .monospaced()
                 }
-                .disabled(true)
-                .monospaced()
             }
         }
         .padding()
-
-        HStack {
-            let lowerBound = highlightedRange.lowerBound
-
-            Text("Upper bound: \(highlightedRange.upperBound)")
-                .fixedSize()
-                .frame(width: 100, alignment: .leading)
-
-            if lowerBound < count {
-                Slider(
-                    value: Binding {
-                        Double(highlightedRange.upperBound)
-                    } set: { newValue in
-                        let newBound = max(Int(newValue), lowerBound)
-                        highlightedRange = lowerBound ..< min(count, newBound)
-                    },
-                    in: Double(lowerBound)...Double(count),
-                    step: 1
-                ) {
-                    EmptyView()
-                } minimumValueLabel: {
-                    Text("\(lowerBound)")
-                } maximumValueLabel: {
-                    Text("\(count)")
-                }
-                .monospaced()
-            } else {
-                Slider(
-                    value: .constant(1),
-                    in: 0...1,
-                    step: 1
-                ) {
-                    EmptyView()
-                } minimumValueLabel: {
-                    Text("\(count)")
-                } maximumValueLabel: {
-                    Text("\(count)")
-                }
-                .disabled(true)
-                .monospaced()
-            }
-        }
-        .padding()
-
-        Button {
-            canPushAnimation.toggle()
-        } label: {
-            if canPushAnimation {
-                Text("Disallow Animation Pushing")
-            } else {
-                Text("Allow Animation Pushing")
-            }
-        }
 
         BouncyScrollView(
-            canPushAnimation: canPushAnimation,
             range: 0 ..< count,
             highlightedRange: highlightedRange,
             alignment: alignment
@@ -311,7 +294,12 @@ struct BouncyScrollView<Content: View, Indicators: View>: View {
                 ))
                 .opacity(isHighlighted ? 1 : 0.5)
         } indicators: { _, _ in
-            EmptyView()
+            HStack {
+                Circle()
+                Circle()
+                Circle()
+            }
+            .frame(height: 10)
         }
         .border(.foreground)
         .frame(height: 400)

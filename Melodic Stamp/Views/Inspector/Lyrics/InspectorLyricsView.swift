@@ -17,7 +17,7 @@ struct InspectorLyricsView: View {
     var body: some View {
         // Avoid multiple instantializations
         let lines = lyrics.lines
-        
+
         Group {
             switch entries.type {
             case .none, .varied:

@@ -61,7 +61,7 @@ import SwiftUI
             object: NSApp.mainWindow
         )
     }
-    
+
     func show() {
         tabBarWindow?.animator().alphaValue = 1
         playerWindow?.animator().alphaValue = 1
@@ -85,7 +85,7 @@ import SwiftUI
         floatingWindow.alphaValue = 0
         applicationWindow.addChildWindow(floatingWindow, ordered: .above)
         tabBarWindow = floatingWindow
-        
+
         DispatchQueue.main.async {
             self.updateTabBarPosition(window: floatingWindow, in: applicationWindow)
             floatingWindow.animator().alphaValue = 1
@@ -105,7 +105,7 @@ import SwiftUI
         floatingWindow.alphaValue = 0
         applicationWindow.addChildWindow(floatingWindow, ordered: .above)
         playerWindow = floatingWindow
-        
+
         DispatchQueue.main.async {
             self.updatePlayerPosition(window: floatingWindow, in: applicationWindow)
             floatingWindow.animator().alphaValue = 1

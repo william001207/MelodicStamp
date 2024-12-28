@@ -30,14 +30,18 @@ struct DisplayLyricsView: View {
         Group {
             if !lines.isEmpty {
                 BouncyScrollView(
-                    delayBeforePush: 0.2,
-                    canPushAnimation: true,
+                    bounceDelay: 0.2,
                     range: 0 ..< lines.count,
                     highlightedRange: range,
                     alignment: .center
                 ) { index, isHighlighted in
                     lyricLine(line: lines[index], index: index, isHighlighted: isHighlighted)
-                } indicators: { _, _ in
+                } indicators: { index, _ in
+                    let span = lyrics.storage?.parser.duration(after: index)
+                    let beginTime = span?.begin ?? .zero
+                    let endTime = span?.end ?? player.duration.timeInterval
+                    
+                    ProgressDotsView(elapsedTime: fineGrainedElapsedTime, beginTime: beginTime, endTime: endTime)
                 }
             } else {
                 Color.clear
@@ -80,7 +84,7 @@ struct DisplayLyricsView: View {
             fineGrainedElapsedTime += 0.01
         }
     }
-    
+
     private var highlightedRange: Range<Int> {
         if let timeElapsed = playbackTime?.elapsed {
             lyrics.highlight(at: timeElapsed)
@@ -107,12 +111,12 @@ struct DisplayLyricsView: View {
         .opacity(isHighlighted || isHovering ? 1 : opacity(for: index))
     }
 
-    @ViewBuilder private func rawLyricLine(line: RawLyricLine, index: Int, isHighlighted _: Bool)
+    @ViewBuilder private func rawLyricLine(line: RawLyricLine, index _: Int, isHighlighted _: Bool)
         -> some View {
         Text(line.content)
     }
 
-    @ViewBuilder private func lrcLyricLine(line: LRCLyricLine, index: Int, isHighlighted _: Bool)
+    @ViewBuilder private func lrcLyricLine(line: LRCLyricLine, index _: Int, isHighlighted _: Bool)
         -> some View {
         if line.isValid {
             HStack {
@@ -130,14 +134,14 @@ struct DisplayLyricsView: View {
         }
     }
 
-    @ViewBuilder private func ttmlLyricLine(line: TTMLLyricLine, index: Int, isHighlighted: Bool)
+    @ViewBuilder private func ttmlLyricLine(line: TTMLLyricLine, index _: Int, isHighlighted: Bool)
         -> some View {
         TTMLDisplayLyricLineView(
             line: line, elapsedTime: fineGrainedElapsedTime,
             isHighlighted: isHighlighted
         )
     }
-    
+
     private func loadLyrics() {
         guard
             let current = player.current,
