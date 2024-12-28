@@ -25,38 +25,38 @@ import SwiftUI
     func observeFullScreen() {
         NotificationCenter.default.addObserver(
             self,
-            selector: #selector(windowWillEnterFullScreen(_:)),
+            selector: #selector(windowWillEnterFullScreen),
             name: NSWindow.willEnterFullScreenNotification,
             object: NSApp.mainWindow
         )
         NotificationCenter.default.addObserver(
             self,
-            selector: #selector(windowDidEnterFullScreen(_:)),
+            selector: #selector(windowDidEnterFullScreen),
             name: NSWindow.didEnterFullScreenNotification,
             object: NSApp.mainWindow
         )
 
         NotificationCenter.default.addObserver(
             self,
-            selector: #selector(windowWillExitFullScreen(_:)),
+            selector: #selector(windowWillExitFullScreen),
             name: NSWindow.willExitFullScreenNotification,
             object: NSApp.mainWindow
         )
         NotificationCenter.default.addObserver(
             self,
-            selector: #selector(windowDidExitFullScreen(_:)),
+            selector: #selector(windowDidExitFullScreen),
             name: NSWindow.didExitFullScreenNotification,
             object: NSApp.mainWindow
         )
         NotificationCenter.default.addObserver(
             self,
-            selector: #selector(windowDidMove(_:)),
+            selector: #selector(windowDidMove),
             name: NSWindow.didMoveNotification,
             object: NSApp.mainWindow
         )
         NotificationCenter.default.addObserver(
             self,
-            selector: #selector(windowDidResize(_:)),
+            selector: #selector(windowDidResize),
             name: NSWindow.didResizeNotification,
             object: NSApp.mainWindow
         )

@@ -15,7 +15,7 @@ import Foundation
     required init(string: String) throws {
         self.lines = string
             .split(separator: .newlineSequence)
-            .map(String.init(_:))
+            .map(String.init)
             .map { .init(content: $0) }
     }
 }

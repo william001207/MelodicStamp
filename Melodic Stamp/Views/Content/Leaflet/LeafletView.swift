@@ -89,6 +89,6 @@ struct LeafletView: View {
             nsImage: image, quality: .low,
             algorithm: .CIE94, maxCount: 3, options: [.excludeBlack], sorting: .lightness
         )
-        return colors.map(Color.init(_:))
+        return colors.map(Color.init)
     }
 }

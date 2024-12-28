@@ -305,7 +305,7 @@ private extension Metadata {
             replayGainTrackPeak: metadata?.replayGainTrackPeak,
             replayGainReferenceLoudness: metadata?.replayGainReferenceLoudness,
             additional: metadata?.additionalMetadata.map(
-                AdditionalMetadata.init(_:))
+                AdditionalMetadata.init)
         )
     }
 
@@ -346,7 +346,7 @@ private extension Metadata {
             replayGainReferenceLoudness.current
         metadata.additionalMetadata = additional.current
 
-        attachedPictures.current.forEach(metadata.attachPicture(_:))
+        attachedPictures.current.forEach(metadata.attachPicture)
 
         return metadata
     }

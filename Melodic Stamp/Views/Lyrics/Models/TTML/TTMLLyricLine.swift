@@ -97,7 +97,7 @@ typealias TTMLLocale = Locale
 
 extension TTMLLocale {
     var main: String? {
-        identifier.split(separator: /[-_]/).first.map(String.init(_:))
+        identifier.split(separator: /[-_]/).first.map(String.init)
     }
 
     var symbolLocalization: Localization? {

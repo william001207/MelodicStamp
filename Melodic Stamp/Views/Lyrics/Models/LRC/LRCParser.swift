@@ -23,7 +23,7 @@ import RegexBuilder
 
         let contents = string
             .split(separator: .newlineSequence)
-            .map(String.init(_:))
+            .map(String.init)
 
         try contents.forEach {
             let tagRegex = Regex {

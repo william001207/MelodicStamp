@@ -423,11 +423,11 @@ extension PlayerModel {
         let channelDataPointer = channelData[0]
         let frameLength = Int(buffer.frameLength)
 
-        audioDataBuffer = Array(UnsafeBufferPointer(start: channelDataPointer, count: frameLength)).map(CGFloat.init(_:))
+        audioDataBuffer = Array(UnsafeBufferPointer(start: channelDataPointer, count: frameLength)).map(CGFloat.init)
 
         Task { @MainActor in
-            let fftMagnitudes = await FFTHelper.perform(audioDataBuffer.map(Float.init(_:)))
-            self.visualizationDataSubject.send(fftMagnitudes.map(CGFloat.init(_:)))
+            let fftMagnitudes = await FFTHelper.perform(audioDataBuffer.map(Float.init))
+            self.visualizationDataSubject.send(fftMagnitudes.map(CGFloat.init))
         }
     }
 }
