@@ -38,7 +38,7 @@ protocol LyricsParser {
 
 extension LyricsParser {
     func highlight(at time: TimeInterval) -> Range<Int> {
-        // Lines that begin before (or equal) the target time, sorted by ascending beginning times
+        // Lines that begin before (or equal) the target time, sorted by descending beginning times
         let prefixes = lines.enumerated()
             .filter {
                 if let beginTime = $0.element.beginTime {
@@ -48,7 +48,7 @@ extension LyricsParser {
             .sorted {
                 let lhsBeginTime = $0.element.beginTime ?? .nan
                 let rhsBeginTime = $1.element.beginTime ?? .nan
-                return lhsBeginTime < rhsBeginTime
+                return lhsBeginTime > rhsBeginTime
             }
         
         // Lines that begin after the target time, sorted by ascending beginning times
@@ -64,7 +64,7 @@ extension LyricsParser {
                 return lhsBeginTime < rhsBeginTime
             }
         
-        let lastPrefix = prefixes.last
+        let lastPrefix = prefixes.first
         let firstSuffix = suffixes.first
         let endIndex = lines.endIndex
         
@@ -103,7 +103,7 @@ extension LyricsParser {
                     // Still in the range of the prefixing line
                     
                     let firstPrefix = prefixes
-                        .drop {
+                        .prefix {
                             $0.element.endTime == endTime
                         }
                         .first
@@ -121,7 +121,7 @@ extension LyricsParser {
                     // Has no suffixing lines
                     
                     let firstPrefix = prefixes
-                        .drop {
+                        .prefix {
                             $0.element.endTime == nil
                         }
                         .first
