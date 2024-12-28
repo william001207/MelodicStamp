@@ -1,51 +1,62 @@
 //
-//  DisplayLyricsView.swift
+//  MiniPlayerLyrics.swift
 //  Melodic Stamp
 //
-//  Created by Xinshao_Air on 2024/12/24.
+//  Created by Xinshao_Air on 2024/12/28.
 //
 
-import Luminare
 import SwiftUI
 
-struct DisplayLyricsView: View {
+struct MiniPlayerLyrics: View {
+    
     @Environment(PlayerModel.self) private var player
     @Environment(LyricsModel.self) private var lyrics
-
-    @Environment(\.luminareAnimation) private var animation
-
-    @State private var playbackTime: PlaybackTime?
-
+    
     @State private var isPlaying: Bool = false
-    @State private var isHovering: Bool = false
-
+    @State private var playbackTime: PlaybackTime?
     @State private var fineGrainedElapsedTime: TimeInterval = 0.0
     @State private var timer = Timer.publish(every: 0.01, on: .main, in: .default).autoconnect()
-
-    var body: some View {
-        // Avoid multiple instantializations
-        let lines = lyricLines
-
-        Group {
-            if !lines.isEmpty {
-                BouncyScrollView(
-                    delayBeforePush: 0.2,
-                    canPushAnimation: true,
-                    range: 0 ..< lines.count,
-                    highlightedRange: highlightedRange,
-                    alignment: .center
-                ) { index, isHighlighted in
-                    lyricLine(line: lines[index], index: index, isHighlighted: isHighlighted)
-                } indicators: { _, _ in
-                }
-            } else {
-                Color.clear
-            }
+    @State private var previousHighlightedRange: Range<Int>? = nil
+    
+    private var lyricLines: [any LyricLine] {
+        switch lyrics.storage {
+        case let .raw(parser as any LyricsParser), .lrc(let parser as any LyricsParser), .ttml(let parser as any LyricsParser):
+            parser.lines
+        default:
+            []
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .onHover { hover in
-            withAnimation(.smooth(duration: 0.45)) {
-                isHovering = hover
+    }
+    
+    private var highlightedRange: Range<Int> {
+        if let timeElapsed = playbackTime?.elapsed {
+            lyrics.find(at: timeElapsed)
+        } else {
+            0 ..< 0
+        }
+    }
+    
+    private var currentHighlightedRange: Range<Int> {
+        highlightedRange.isEmpty ? (previousHighlightedRange ?? 0..<0) : highlightedRange
+    }
+    
+    var body: some View {
+        HStack {
+            Group {
+                if !currentHighlightedRange.isEmpty {
+                    ForEach(currentHighlightedRange, id: \.self) { index in
+                        let line = lyricLines[index]
+                        lyricLine(line: line, index: index, isHighlighted: true)
+                    }
+                } else {
+                    Text("No lyrics available")
+                }
+            }
+            .bold()
+            .foregroundColor(.secondary)
+        }
+        .onChange(of: highlightedRange) { _, newRange in
+            if !newRange.isEmpty {
+                previousHighlightedRange = newRange
             }
         }
         .onChange(of: player.current, initial: true) { _, newValue in
@@ -79,24 +90,7 @@ struct DisplayLyricsView: View {
             fineGrainedElapsedTime += 0.01
         }
     }
-
-    private var lyricLines: [any LyricLine] {
-        switch lyrics.storage {
-        case let .raw(parser as any LyricsParser), .lrc(let parser as any LyricsParser), .ttml(let parser as any LyricsParser):
-            parser.lines
-        default:
-            []
-        }
-    }
     
-    private var highlightedRange: Range<Int> {
-        if let timeElapsed = playbackTime?.elapsed {
-            lyrics.find(at: timeElapsed)
-        } else {
-            0 ..< 0
-        }
-    }
-
     @ViewBuilder private func lyricLine(
         line: any LyricLine, index: Int, isHighlighted: Bool
     ) -> some View {
@@ -112,41 +106,45 @@ struct DisplayLyricsView: View {
                 EmptyView()
             }
         }
-        .padding(.bottom, 32)
-        .blur(radius: isHighlighted || isHovering ? 0 : blurRadius(for: index))
-        .opacity(isHighlighted || isHovering ? 1 : opacity(for: index))
+        .transition(.blurReplace(.downUp))
+        .animation(.smooth, value: index)
     }
-
+    
     @ViewBuilder private func rawLyricLine(line: RawLyricLine, isHighlighted _: Bool)
         -> some View {
         Text(line.content)
+                .lineLimit(1)
     }
 
     @ViewBuilder private func lrcLyricLine(line: LRCLyricLine, isHighlighted _: Bool)
         -> some View {
         if line.isValid {
             HStack {
-                /*
-                ForEach(line.tags) { tag in
-                    if !tag.type.isMetadata {
-                        Text(tag.content)
-                            .foregroundStyle(.quinary)
-                    }
-                }
-                */
                 Text(line.content)
-                    .font(.system(size: 36))
                     .bold()
+                    .lineLimit(1)
             }
         }
     }
-
+    
     @ViewBuilder private func ttmlLyricLine(line: TTMLLyricLine, isHighlighted: Bool)
         -> some View {
-        TTMLDisplayLyricLineView(
-            line: line, elapsedTime: fineGrainedElapsedTime,
-            isHighlighted: isHighlighted
-        )
+            Group {
+                if isHighlighted {
+                    Text(stringContent(of: line.lyrics))
+                        .bold()
+                        .textRenderer(textRenderer(for: line.lyrics))
+                        .font(.title3)
+                        .lineLimit(1)
+                } else {
+                    Text(stringContent(of: line.lyrics))
+                        .bold()
+                        .foregroundStyle(.white.opacity(isHighlighted ? 1 : 0.1))
+                        .brightness(isHighlighted ? 1.5 : 1.0)
+                        .lineLimit(1)
+                }
+            }
+            .foregroundStyle(Color.secondary)
     }
     
     private func loadLyrics() {
@@ -164,20 +162,16 @@ struct DisplayLyricsView: View {
     private func disconnectTimer() {
         timer.upstream.connect().cancel()
     }
-
-    private func opacity(for index: Int) -> Double {
-        let distance = abs(index - (highlightedRange.lowerBound))
-        let maxOpacity = 0.55
-        let minOpacity = 0.125
-        let factor = maxOpacity - (Double(distance) * 0.05)
-        return max(minOpacity, min(factor, maxOpacity))
+    
+    private func stringContent(of lyrics: TTMLLyrics) -> String {
+        lyrics.map(\.content).joined()
     }
-
-    private func blurRadius(for index: Int) -> CGFloat {
-        let distance = abs(index - (highlightedRange.lowerBound))
-        let maxBlur: CGFloat = 5.0
-        let minBlur: CGFloat = 0.0
-        let factor = CGFloat(distance) * 1.0
-        return max(minBlur, min(factor, maxBlur))
+    
+    private func textRenderer(for lyrics: TTMLLyrics) -> some TextRenderer {
+        DisplayLyricsRenderer(elapsedTime: fineGrainedElapsedTime, strings: lyrics.children, lift: 0)
     }
+}
+
+#Preview {
+    MiniPlayerLyrics()
 }

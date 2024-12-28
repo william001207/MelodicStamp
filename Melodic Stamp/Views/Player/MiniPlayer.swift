@@ -192,12 +192,10 @@ struct MiniPlayer: View {
                     case .title:
                         MusicTitle(item: player.current)
                     case .lyrics:
-                        // TODO: Add lyrics control
-                        Text("Lyrics")
-                            .bold()
+                        MiniPlayerLyrics()
                     }
                 }
-//                .contentTransition(.numericText())
+                // .contentTransition(.numericText())
                 .animation(.default, value: player.currentIndex)
                 .matchedGeometryEffect(id: PlayerNamespace.title, in: namespace)
                 .padding(.bottom, 2)
