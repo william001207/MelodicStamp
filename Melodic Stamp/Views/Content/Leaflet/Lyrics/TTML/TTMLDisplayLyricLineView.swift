@@ -19,6 +19,7 @@ struct TTMLDisplayLyricLineView: View {
 
     var body: some View {
         VStack(alignment: .center, spacing: 5) {
+            // Avoid multiple instantializations
             let lyricsRenderer = textRenderer(for: line.lyrics)
             let backgroundLyricsRenderer = textRenderer(for: line.backgroundLyrics)
 

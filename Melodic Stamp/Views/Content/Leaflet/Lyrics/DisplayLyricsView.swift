@@ -117,6 +117,7 @@ struct DisplayLyricsView: View {
         line: any LyricLine, index: Int, isHighlighted: Bool,
         highlightedRange: Range<Int>
     ) -> some View {
+        // Avoid multiple instantializations
         let isActive = isHighlighted || isHovering
         let blurRadius = blurRadius(for: index, in: highlightedRange)
         let opacity = opacity(for: index, in: highlightedRange)
