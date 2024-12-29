@@ -53,7 +53,7 @@ struct LeafletView: View {
                     .animation(.spring(duration: 0.65, bounce: 0.45, blendDuration: 0.75), value: isPlaying)
                     .onChange(of: player.currentIndex, initial: true) { _, _ in
                         if let cover = images.first {
-                            Task {
+                            Task { @MainActor in
                                 dominantColors = try await extractDominantColors(from: cover)
                             }
                         }

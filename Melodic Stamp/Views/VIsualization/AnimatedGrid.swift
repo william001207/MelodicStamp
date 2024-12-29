@@ -8,36 +8,33 @@
 import MeshGradient
 import MeshGradientCHeaders
 
-// TODO: Add an effect that shakes along with the music.
+// TODO: Add an effect that shakes along with the music
 import SwiftUI
 
 struct AnimatedGrid: View {
     typealias MeshColor = SIMD3<Float>
 
     var colors: [Color]
-    var randomizer = MeshRandomizer(colorRandomizer: MeshRandomizer.arrayBasedColorRandomizer(availableColors: meshColors))
-
-    var simdColors: [simd_float3] {
-        colors.map { $0.toSimdFloat3() }
-    }
 
     var body: some View {
         MeshGradient(
             initialGrid: generatePlainGrid(),
             animatorConfiguration: .init(
                 animationSpeedRange: 4...5,
-                meshRandomizer:
-                MeshRandomizer(
-                    colorRandomizer:
-                    MeshRandomizer.arrayBasedColorRandomizer(
-                        availableColors: simdColors
-                    )
-                )
+                meshRandomizer: randomizer
             )
         )
     }
+    
+    private var simdColors: [simd_float3] {
+        colors.map { $0.toSimdFloat3() }
+    }
+    
+    private var randomizer: MeshRandomizer {
+        MeshRandomizer(colorRandomizer: MeshRandomizer.arrayBasedColorRandomizer(availableColors: simdColors))
+    }
 
-    func generatePlainGrid(size: Int = 4) -> MeshGradientGrid<ControlPoint> {
+    private func generatePlainGrid(size: Int = 4) -> MeshGradientGrid<ControlPoint> {
         let preparationGrid = MeshGradientGrid<MeshColor>(repeating: .zero, width: size, height: size)
         var result = MeshGenerator.generate(colorDistribution: preparationGrid)
 
@@ -52,12 +49,4 @@ struct AnimatedGrid: View {
 
         return result
     }
-}
-
-private var meshColors: [simd_float3] {
-    [
-        Color(hex: 0x808080).toSimdFloat3(),
-        Color(hex: 0x808080).toSimdFloat3(),
-        Color(hex: 0x808080).toSimdFloat3()
-    ]
 }
