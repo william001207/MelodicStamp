@@ -133,17 +133,15 @@ struct InspectorLyricsView: View {
             }
             .foregroundStyle(.quinary)
 
-            if line.isValid, !line.content.isEmpty {
-                switch line.type {
-                case .main:
-                    Text(line.content)
-                case let .translation(locale):
-                    Text(locale)
-                        .foregroundStyle(.placeholder)
-
-                    Text(line.content)
-                        .foregroundStyle(.secondary)
-                }
+            switch line.type {
+            case .main:
+                Text(line.content)
+            case let .translation(locale):
+                Text(locale)
+                    .foregroundStyle(.placeholder)
+                
+                Text(line.content)
+                    .foregroundStyle(.secondary)
             }
         }
         .foregroundStyle(.tint)

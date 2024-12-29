@@ -82,7 +82,7 @@ import SwiftSoup
                 let text = textNode.text().trimmingCharacters(in: .whitespacesAndNewlines)
                 guard !text.isEmpty else { continue }
 
-                lyrics.append(.init(text: text))
+                lyrics.append(.init(beginTime: beginTime, endTime: endTime, text: text))
             } else if
                 let spanElement = node as? Element,
                 spanElement.tagName() == "span" {

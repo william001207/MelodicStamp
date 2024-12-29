@@ -139,24 +139,32 @@ struct DisplayLyricsView: View {
         .opacity(isActive ? 1 : opacity)
     }
 
-    @ViewBuilder private func rawLyricLine(line: RawLyricLine, index _: Int, isHighlighted _: Bool)
-        -> some View {
+    @ViewBuilder private func rawLyricLine(line: RawLyricLine, index _: Int, isHighlighted _: Bool) -> some View {
         Text(line.content)
+            .font(.title)
+            .bold()
+            .foregroundStyle(.white)
     }
 
-    @ViewBuilder private func lrcLyricLine(line: LRCLyricLine, index _: Int, isHighlighted _: Bool)
-        -> some View {
-        if line.isValid {
-            HStack {
+    @ViewBuilder private func lrcLyricLine(line: LRCLyricLine, index _: Int, isHighlighted _: Bool) -> some View {
+        Group {
+            switch line.type {
+            case .main:
                 Text(line.content)
-                    .font(.system(size: 36))
-                    .bold()
+                    .foregroundStyle(.white)
+            case let .translation(locale):
+                Text(locale)
+                    .foregroundStyle(.placeholder)
+                
+                Text(line.content)
+                    .foregroundStyle(.white.secondary)
             }
         }
+        .font(.title)
+        .bold()
     }
 
-    @ViewBuilder private func ttmlLyricLine(line: TTMLLyricLine, index _: Int, isHighlighted: Bool)
-        -> some View {
+    @ViewBuilder private func ttmlLyricLine(line: TTMLLyricLine, index _: Int, isHighlighted: Bool) -> some View {
         TTMLDisplayLyricLineView(
             line: line, elapsedTime: fineGrainedElapsedTime,
             isHighlighted: isHighlighted
