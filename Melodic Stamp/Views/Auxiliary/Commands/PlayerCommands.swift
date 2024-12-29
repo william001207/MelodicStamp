@@ -84,8 +84,16 @@ struct PlayerCommands: Commands {
 
                 Divider()
 
-                Button(player?.isMuted ?? false ? "Unmute" : "Mute") {
-                    player?.isMuted.toggle()
+                Group {
+                    if let player {
+                        @Bindable var player = player
+                        
+                        Toggle("Mute", isOn: $player.isMuted)
+                    } else {
+                        Button("Mute") {
+                            // Do nothing
+                        }
+                    }
                 }
                 .keyboardShortcut("m", modifiers: [.command, .control])
 
@@ -185,6 +193,10 @@ struct PlayerCommands: Commands {
                         }
                     }
                     .badge(playbackName)
+                } else {
+                    Button("Playback") {
+                        // Do nothing
+                    }
                 }
             }
             .disabled(!hasPlayer || !hasPlayerKeyboardControl)

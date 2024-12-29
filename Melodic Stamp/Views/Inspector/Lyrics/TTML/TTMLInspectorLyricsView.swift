@@ -26,7 +26,7 @@ struct TTMLInspectorLyricsView: View {
                                 .luminareMinHeight(24)
 
                             ForEach(0 ..< lyric.trailingSpaceCount, id: \.self) { _ in
-                                Text(" ")
+                                Text(verbatim: " ")
                             }
                         }
                         .bold()
@@ -49,18 +49,18 @@ struct TTMLInspectorLyricsView: View {
                             Image(systemSymbol: symbol)
                         }
 
-                        Text("\(translation.locale.identifier)")
+                        Text(translation.locale.identifier)
                     }
                     .foregroundStyle(.secondary)
 
-                    Text("\(translation.text)")
+                    Text(translation.text)
                 }
                 .foregroundStyle(.tint)
             }
 
             if let roman = lyrics.roman {
                 TTMLInspectorInformationView(systemSymbol: .characterPhonetic) {
-                    Text("\(roman)")
+                    Text(roman)
                 }
                 .foregroundStyle(.purple)
             }

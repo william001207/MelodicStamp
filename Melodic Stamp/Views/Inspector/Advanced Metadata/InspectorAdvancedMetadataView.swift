@@ -68,9 +68,10 @@ struct InspectorAdvancedMetadataView: View {
             entries: metadataEditor[extracting: \.isCompilation],
             defaultValue: false
         ) { binding in
-            Toggle("", isOn: binding)
-                .labelsHidden()
-                .toggleStyle(.switch)
+            Toggle(isOn: binding) {
+                EmptyView()
+            }
+            .toggleStyle(.switch)
         } emptyView: {
             EmptyView()
         } label: {
