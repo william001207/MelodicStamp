@@ -174,13 +174,17 @@ extension LyricsParser {
         let duration = duration(of: index)
 
         if let time = duration.begin {
-            let previous = lines.last {
-                if let beginTime = $0.beginTime {
-                    beginTime < time
-                } else { false }
+            if index > 0 {
+                let previous = lines.last {
+                    if let beginTime = $0.beginTime {
+                        beginTime < time
+                    } else { false }
+                }
+                
+                return (previous?.endTime, time)
+            } else {
+                return (.zero, time)
             }
-
-            return (previous?.endTime, time)
         } else {
             return (nil, nil)
         }
