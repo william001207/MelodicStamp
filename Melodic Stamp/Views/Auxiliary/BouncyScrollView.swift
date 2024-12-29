@@ -59,39 +59,17 @@ struct BouncyScrollView<Content: View>: View {
             Spacer()
                 .frame(height: max(0, compensate))
 
-            LazyVStack(spacing: 0) {
-                ForEach(range, id: \.self) { index in
-                    let isHighlighted = highlightedRange.contains(index)
-                    let delay = delay(at: index)
-
-                    Group {
-                        if let offset = contentOffsets[index] {
-                            let proportion = proportion(at: index)
-
-                            content(index, isHighlighted)
-                                .offset(y: proportion * offset)
-                                .background {
-                                    if index == highlightedRange.lowerBound {
-                                        switch indicator(index, isHighlighted) {
-                                        case .invisible:
-                                            EmptyView()
-                                        case let .visible(content):
-                                            content
-                                                .opacity(proportion)
-                                                .animation(.default, value: proportion)
-                                        }
-                                    }
-                                }
-                        } else {
-                            content(index, isHighlighted)
-                        }
+            if isInitialized {
+                LazyVStack(spacing: 0) {
+                    ForEach(range, id: \.self) { index in
+                        content(at: index)
                     }
-                    .animation(.spring(bounce: 0.2).delay(delay), value: animationState)
-                    .animation(.smooth, value: highlightedRange)
-                    .onGeometryChange(for: CGSize.self) { proxy in
-                        proxy.size
-                    } action: { newValue in
-                        contentOffsets.updateValue(newValue.height, forKey: index)
+                }
+            } else {
+                // Temporarily force loads all elements
+                VStack(spacing: 0) {
+                    ForEach(range, id: \.self) { index in
+                        content(at: index)
                     }
                 }
             }
@@ -153,6 +131,46 @@ struct BouncyScrollView<Content: View>: View {
             } else {
                 containerSize.height / 2
             }
+        }
+    }
+    
+    private var isInitialized: Bool {
+        Set(contentOffsets.keys).isSuperset(of: IndexSet(integersIn: range))
+    }
+    
+    @ViewBuilder private func content(at index: Int) -> some View {
+        let isHighlighted = highlightedRange.contains(index)
+        let delay = delay(at: index)
+        
+        Group {
+            if let offset = contentOffsets[index] {
+                let proportion = proportion(at: index)
+                
+                content(index, isHighlighted)
+                    .offset(y: proportion * offset)
+                    .background {
+                        if index == highlightedRange.lowerBound {
+                            switch indicator(index, isHighlighted) {
+                            case .invisible:
+                                EmptyView()
+                            case let .visible(content):
+                                content
+                                    .opacity(proportion)
+                                    .animation(.default, value: proportion)
+                            }
+                        }
+                    }
+            } else {
+                content(index, isHighlighted)
+            }
+        }
+        .animation(.spring(bounce: 0.2).delay(delay), value: animationState)
+        .animation(.smooth, value: highlightedRange)
+        .onGeometryChange(for: CGSize.self) { proxy in
+            proxy.size
+        } action: { newValue in
+            print("Element [\(index)]: content offset changed")
+            contentOffsets.updateValue(newValue.height, forKey: index)
         }
     }
 
