@@ -82,14 +82,17 @@ import SwiftSoup
                 let text = textNode.text().trimmingCharacters(in: .whitespacesAndNewlines)
                 guard !text.isEmpty else { continue }
 
-                lyrics.append(.init(beginTime: beginTime, endTime: endTime, text: text))
+                lyrics.append(.init(
+                    beginTime: beginTime, endTime: endTime,
+                    text: text.normalizingParentheses
+                ))
             } else if
                 let spanElement = node as? Element,
                 spanElement.tagName() == "span" {
                 let (beginTime, endTime) = try readTimestamp(from: spanElement)
                 let spanText = try spanElement
                     .text()
-                    .normalizeSpaces()
+                    .normalizingSpaces
 
                 if
                     let roleData = try TTMLData(type: .role, element: spanElement),
@@ -99,7 +102,10 @@ import SwiftSoup
                         guard let language = try TTMLData(type: .language, element: spanElement) else { break }
 
                         let locale = Locale(identifier: language.content)
-                        lyrics.translations.append(.init(locale: locale, text: spanText))
+                        lyrics.translations.append(.init(
+                            locale: locale,
+                            text: spanText.normalizingParentheses
+                        ))
                     case .roman:
                         lyrics.roman = spanText
                     case .background:
@@ -116,7 +122,8 @@ import SwiftSoup
                     text.replace(spanText, with: "", maxReplacements: 1)
                 } else {
                     lyrics.append(.init(
-                        beginTime: beginTime, endTime: endTime, text: spanText
+                        beginTime: beginTime, endTime: endTime,
+                        text: spanText.normalizingParentheses
                     ))
                 }
             }

@@ -62,14 +62,14 @@ struct BouncyScrollView<Content: View>: View {
             if isInitialized {
                 LazyVStack(spacing: 0) {
                     ForEach(range, id: \.self) { index in
-                        content(at: index)
+                            content(at: index)
                     }
                 }
             } else {
                 // Temporarily force loads all elements
                 VStack(spacing: 0) {
                     ForEach(range, id: \.self) { index in
-                        content(at: index)
+                            content(at: index)
                     }
                 }
             }
@@ -139,7 +139,7 @@ struct BouncyScrollView<Content: View>: View {
     }
     
     private var animationCompensate: CGFloat {
-        contentOffsets[highlightedRange.upperBound + 1] ?? 0
+        contentOffsets[highlightedRange.upperBound - 1] ?? 0
     }
 
     @ViewBuilder private func content(at index: Int) -> some View {

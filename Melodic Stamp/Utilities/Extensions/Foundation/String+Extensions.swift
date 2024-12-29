@@ -46,7 +46,11 @@ extension String {
 }
 
 extension String {
-    func normalizeSpaces() -> String {
+    var normalizingParentheses: String {
+        replacing(/[\[\]\()（）]/, with: "")
+    }
+    
+    var normalizingSpaces: String {
         replacing(/\\u{(00A0|20[0-9A])}/, with: "")
     }
 

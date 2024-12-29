@@ -9,79 +9,43 @@
 import SwiftUI
 
 struct TTMLDisplayLyricLineView: View {
-    // @Environment(\.luminareAnimation) private var animation
-
     var line: TTMLLyricLine
     var elapsedTime: TimeInterval
     var isHighlighted: Bool = false
+    var isNearlyHighlighted: Bool = false
+    
+    var inactiveOpacity: Double = 0.55
+    var highlightDelay: TimeInterval = 0.25
 
-    @State private var isAnimationHighlighted: Bool = false
+    @State private var isActive: Bool = false
 
     var body: some View {
-        VStack(alignment: .center, spacing: 5) {
-            // Avoid multiple instantializations
-            let hasBackgroundLyrics = !line.backgroundLyrics.isEmpty
-            let lyricsRenderer = textRenderer(for: line.lyrics)
-            let backgroundLyricsRenderer = textRenderer(for: line.backgroundLyrics)
+        ZStack {
+            // It's a must to avoid view hierarchies from being reconstructed
+            // This is causing surprisingly low impact on performance, so use it
+            activeContent()
+                .opacity(isActive ? 1 : 0)
+                .frame(maxWidth: .infinity, alignment: alignment)
 
-            // Do not extract any views from inside the if branch, otherwise causing animation loss
-            Group {
-                if isHighlighted {
-                    Text(stringContent(of: line.lyrics))
-                        .font(.title)
-                        .bold()
-                        .textRenderer(lyricsRenderer)
-
-                    additionalContent(for: line.lyrics)
-                        .font(.title3)
-
-                    if hasBackgroundLyrics {
-                        Group {
-                            Text(stringContent(of: line.backgroundLyrics))
-                                .font(.title2)
-                                .bold()
-                                .textRenderer(backgroundLyricsRenderer)
-                            
-                            additionalContent(for: line.backgroundLyrics)
-                                .font(.title3)
-                        }
-                        .transition(.blurReplace)
-                    }
-                } else {
-                    Group {
-                        Text(stringContent(of: line.lyrics))
-                            .font(.title)
-                            .bold()
-                        
-                        additionalContent(for: line.lyrics)
-                            .font(.title3)
-                        
-                        if hasBackgroundLyrics {
-                            Group {
-                                Text(stringContent(of: line.backgroundLyrics))
-                                    .font(.title2)
-                                    .bold()
-                                
-                                additionalContent(for: line.backgroundLyrics)
-                                    .font(.title3)
-                            }
-                            .transition(.blurReplace)
-                        }
-                    }
-                    .foregroundStyle(.white.opacity(isAnimationHighlighted ? 1 : 0.1))
-                    .brightness(isAnimationHighlighted ? 1.5 : 1)
+            inactiveContent()
+                .frame(maxWidth: .infinity, alignment: alignment)
+                .opacity(isActive ? 0 : 1)
+        }
+        .multilineTextAlignment(textAlignment)
+        .frame(maxWidth: .infinity, alignment: alignment)
+        // Isolating switching animation between renderers
+        .onChange(of: isHighlighted, initial: true) { _, newValue in
+            if !newValue {
+                withAnimation(.smooth(duration: 0.25).delay(highlightDelay)) {
+                    isActive = false
+                }
+            } else {
+                withAnimation(.smooth(duration: 0.1)) {
+                    isActive = true
                 }
             }
-            .multilineTextAlignment(textAlignment)
-            .frame(maxWidth: .infinity, alignment: alignment)
         }
-        .onChange(of: isHighlighted) { _, newValue in
-            withAnimation(.smooth(duration: 0.45).delay(0.25)) {
-                isAnimationHighlighted = newValue
-            }
-        }
-        // Isolating switching animation between renderers
-        .animation(.smooth(duration: 0.1), value: isHighlighted)
+        .animation(nil, value: isHighlighted)
     }
 
     private var textAlignment: TextAlignment {
@@ -102,7 +66,67 @@ struct TTMLDisplayLyricLineView: View {
         }
     }
 
-    @ViewBuilder private func additionalContent(for lyrics: TTMLLyrics) -> some View {
+    @ViewBuilder private func activeContent() -> some View {
+        let hasBackgroundLyrics = !line.backgroundLyrics.isEmpty
+        let lyricsRenderer = textRenderer(for: line.lyrics)
+        let backgroundLyricsRenderer = textRenderer(for: line.backgroundLyrics)
+
+        VStack(alignment: alignment.horizontal, spacing: 5) {
+            Text(stringContent(of: line.lyrics))
+                .font(.title)
+                .bold()
+                .textRenderer(lyricsRenderer)
+
+            additionalContent(for: line.lyrics)
+                .font(.title3)
+
+            if hasBackgroundLyrics {
+                Group {
+                    Text(stringContent(of: line.backgroundLyrics))
+                        .font(.title2)
+                        .bold()
+                        .textRenderer(backgroundLyricsRenderer)
+
+                    additionalContent(for: line.backgroundLyrics)
+                        .font(.title3)
+                }
+                .transition(.blurReplace)
+            }
+        }
+    }
+
+    @ViewBuilder private func inactiveContent() -> some View {
+        let hasBackgroundLyrics = !line.backgroundLyrics.isEmpty
+
+        VStack(alignment: alignment.horizontal, spacing: 5) {
+            Text(stringContent(of: line.lyrics))
+                .font(.title)
+                .bold()
+                .opacity(inactiveOpacity)
+
+            additionalContent(for: line.lyrics)
+                .font(.title3)
+                .opacity(inactiveOpacity)
+
+            if hasBackgroundLyrics {
+                Group {
+                    Text(stringContent(of: line.backgroundLyrics))
+                        .font(.title2)
+                        .bold()
+                        .opacity(inactiveOpacity)
+
+                    additionalContent(for: line.backgroundLyrics)
+                        .font(.title3)
+                        .opacity(inactiveOpacity)
+                }
+                .transition(.blurReplace)
+            }
+        }
+    }
+
+    @ViewBuilder private func additionalContent(for lyrics: TTMLLyrics)
+        -> some View
+    {
         ForEach(lyrics.translations) { translation in
             Text(translation.text)
         }
@@ -118,6 +142,9 @@ struct TTMLDisplayLyricLineView: View {
     }
 
     private func textRenderer(for lyrics: TTMLLyrics) -> some TextRenderer {
-        DisplayLyricsRenderer(elapsedTime: elapsedTime, strings: lyrics.children)
+        DisplayLyricsRenderer(
+            elapsedTime: elapsedTime, strings: lyrics.children,
+            inactiveOpacity: inactiveOpacity
+        )
     }
 }

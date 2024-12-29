@@ -66,24 +66,9 @@ struct TTMLLyric: Equatable, Hashable, Identifiable, AnimatedString {
     var beginTime: TimeInterval?
     var endTime: TimeInterval?
     var text: String
-
     var trailingSpaceCount: Int = 0
 
     let id = UUID()
-
-    init(
-        beginTime: TimeInterval? = nil,
-        endTime: TimeInterval? = nil,
-        text: String,
-        trailingSpaceCount: Int = 0
-    ) {
-        self.beginTime = beginTime
-        self.endTime = endTime
-        self.trailingSpaceCount = trailingSpaceCount
-
-        // Remove parentheses
-        self.text = text.replacing(/[\[\]\()]/, with: "")
-    }
 
     var content: String {
         text + .init(repeating: " ", count: trailingSpaceCount)
