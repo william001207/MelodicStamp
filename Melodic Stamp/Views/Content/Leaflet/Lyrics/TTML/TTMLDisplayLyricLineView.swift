@@ -12,27 +12,47 @@ struct TTMLDisplayLyricLineView: View {
     var line: TTMLLyricLine
     var elapsedTime: TimeInterval
     var isHighlighted: Bool = false
-    var isNearlyHighlighted: Bool = false
     
     var inactiveOpacity: Double = 0.55
     var highlightDelay: TimeInterval = 0.25
 
     @State private var isActive: Bool = false
+    @State private var backgroundContentSize: CGSize = .zero
 
     var body: some View {
-        ZStack {
-            // It's a must to avoid view hierarchies from being reconstructed
-            // This is causing surprisingly low impact on performance, so use it
-            activeContent()
-                .opacity(isActive ? 1 : 0)
-                .frame(maxWidth: .infinity, alignment: alignment)
-
-            inactiveContent()
-                .frame(maxWidth: .infinity, alignment: alignment)
-                .opacity(isActive ? 0 : 1)
+        VStack(spacing: 5) {
+            ZStack {
+                // It's a must to avoid view hierarchies from being reconstructed
+                // This is causing surprisingly low impact on performance, so use it
+                activeContent()
+                    .frame(maxWidth: .infinity, alignment: alignment)
+                    .opacity(isActive ? 1 : 0)
+                
+                inactiveContent()
+                    .frame(maxWidth: .infinity, alignment: alignment)
+                    .opacity(isActive ? 0 : 1)
+            }
+            
+            if !line.backgroundLyrics.isEmpty {
+                Color.clear
+                    .frame(height: isActive ? backgroundContentSize.height : 0)
+                    .frame(maxWidth: .infinity)
+                    .overlay(alignment: alignment) {
+                        backgroundContent()
+                            .blur(radius: isActive ? 0 : 8)
+                            .scaleEffect(isActive ? 1 : 0.8, anchor: .bottom)
+                            .opacity(isActive ? 1 : 0)
+                            .onGeometryChange(for: CGSize.self) { proxy in
+                                proxy.size
+                            } action: { newValue in
+                                backgroundContentSize = newValue
+                            }
+                    }
+            }
         }
         .multilineTextAlignment(textAlignment)
         .frame(maxWidth: .infinity, alignment: alignment)
+        .animation(.smooth, value: elapsedTime) // For text rendering
         // Isolating switching animation between renderers
         .onChange(of: isHighlighted, initial: true) { _, newValue in
             if !newValue {
@@ -67,60 +87,43 @@ struct TTMLDisplayLyricLineView: View {
     }
 
     @ViewBuilder private func activeContent() -> some View {
-        let hasBackgroundLyrics = !line.backgroundLyrics.isEmpty
         let lyricsRenderer = textRenderer(for: line.lyrics)
-        let backgroundLyricsRenderer = textRenderer(for: line.backgroundLyrics)
 
         VStack(alignment: alignment.horizontal, spacing: 5) {
             Text(stringContent(of: line.lyrics))
                 .font(.title)
                 .bold()
                 .textRenderer(lyricsRenderer)
-
+            
             additionalContent(for: line.lyrics)
                 .font(.title3)
-
-            if hasBackgroundLyrics {
-                Group {
-                    Text(stringContent(of: line.backgroundLyrics))
-                        .font(.title2)
-                        .bold()
-                        .textRenderer(backgroundLyricsRenderer)
-
-                    additionalContent(for: line.backgroundLyrics)
-                        .font(.title3)
-                }
-                .transition(.blurReplace)
-            }
         }
     }
 
     @ViewBuilder private func inactiveContent() -> some View {
-        let hasBackgroundLyrics = !line.backgroundLyrics.isEmpty
-
         VStack(alignment: alignment.horizontal, spacing: 5) {
             Text(stringContent(of: line.lyrics))
                 .font(.title)
                 .bold()
                 .opacity(inactiveOpacity)
-
+            
             additionalContent(for: line.lyrics)
                 .font(.title3)
                 .opacity(inactiveOpacity)
-
-            if hasBackgroundLyrics {
-                Group {
-                    Text(stringContent(of: line.backgroundLyrics))
-                        .font(.title2)
-                        .bold()
-                        .opacity(inactiveOpacity)
-
-                    additionalContent(for: line.backgroundLyrics)
-                        .font(.title3)
-                        .opacity(inactiveOpacity)
-                }
-                .transition(.blurReplace)
-            }
+        }
+    }
+    
+    @ViewBuilder private func backgroundContent() -> some View {
+        let backgroundLyricsRenderer = textRenderer(for: line.backgroundLyrics)
+        
+        VStack(alignment: alignment.horizontal, spacing: 5) {
+            Text(stringContent(of: line.backgroundLyrics))
+                .font(.title2)
+                .bold()
+                .textRenderer(backgroundLyricsRenderer)
+            
+            additionalContent(for: line.backgroundLyrics)
+                .font(.title3)
         }
     }
 

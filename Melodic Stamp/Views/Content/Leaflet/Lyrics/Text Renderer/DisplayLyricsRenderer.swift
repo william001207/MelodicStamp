@@ -27,7 +27,24 @@ struct DisplayLyricsGroupCache {
         groups[hashableKey] = value
     }
 }
-/*
+
+//protocol DisplayLyricsRendererEffect {
+//    associatedtype Animated: AnimatedString
+//    
+//    var elapsedTime: TimeInterval { get }
+//    var strings: [Animated] { get }
+//    
+//    var inactiveOpacity: CGFloat { get set }
+//    var blendRadius: CGFloat { get set }
+//    var shadowColor: Color { get set }
+//    var shadowRadius: CGFloat { get set }
+//    
+//    var lift: CGFloat { get set }
+//    var brightness: CGFloat { get set }
+//    var softness: CGFloat { get set }
+//}
+
+///*
 struct DisplayLyricsRenderer<Animated>: TextRenderer where Animated: AnimatedString {
     var animatableData: TimeInterval {
         get { elapsedTime }
@@ -160,8 +177,9 @@ struct DisplayLyricsRenderer<Animated>: TextRenderer where Animated: AnimatedStr
         return 1 - expDecay * oscillation
     }
 }
-*/
+//*/
 
+/*
 struct DisplayLyricsRenderer<Animated>: TextRenderer where Animated: AnimatedString {
     var animatableData: TimeInterval {
         get { elapsedTime }
@@ -404,3 +422,4 @@ struct DisplayLyricsRenderer<Animated>: TextRenderer where Animated: AnimatedStr
         return 1 - expDecay * oscillation
     }
 }
+*/
