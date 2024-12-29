@@ -9,19 +9,19 @@ import SwiftUI
 
 struct DisplayLyricsGroupCache {
     static var shared = Self()
-    
+
     var groups: [[AnyHashable]: [AnyHashable: [Text.Layout.RunSlice]]] = [:]
-    
-    func contains<Animated>(key: [Animated]) -> Bool where Animated: AnimatedString {
+
+    func contains(key: [some AnimatedString]) -> Bool {
         let hashableKey = key.map(\.self)
         return groups[hashableKey]?.keys.contains(hashableKey) ?? false
     }
-    
+
     func get<Animated>(key: [Animated]) -> [Animated: [Text.Layout.RunSlice]]? where Animated: AnimatedString {
         let hashableKey = key.map(\.self)
         return groups[hashableKey] as? [Animated: [Text.Layout.RunSlice]]
     }
-    
+
     mutating func set<Animated>(key: [Animated], value: [Animated: [Text.Layout.RunSlice]]) where Animated: AnimatedString {
         let hashableKey = key.map(\.self)
         groups[hashableKey] = value
@@ -67,7 +67,7 @@ struct DisplayLyricsRenderer<Animated>: TextRenderer where Animated: AnimatedStr
 
     func draw(layout: Text.Layout, in context: inout GraphicsContext) {
         var group: [Animated: [Text.Layout.RunSlice]] = [:]
-        
+
         // Cache grouping result if possible
         // Since the grouping should always be identical to an array of animated strings
         if let cached = DisplayLyricsGroupCache.shared.get(key: strings) {
@@ -76,7 +76,7 @@ struct DisplayLyricsRenderer<Animated>: TextRenderer where Animated: AnimatedStr
             group = self.group(layout: layout)
             DisplayLyricsGroupCache.shared.set(key: strings, value: group)
         }
-        
+
         for (lyric, slices) in group {
             let totalWidth = slices.reduce(0) { $0 + $1.typographicBounds.width }
             var offset: CGFloat = 0
@@ -85,7 +85,7 @@ struct DisplayLyricsRenderer<Animated>: TextRenderer where Animated: AnimatedStr
                 let width = slice.typographicBounds.width
                 let percentage = offset / totalWidth
                 let durationPercentage = width / totalWidth
-                
+
                 draw(
                     slice: slice,
                     beginTime: (lyric.beginTime ?? 0) + percentage * ((lyric.endTime ?? 0) - (lyric.beginTime ?? 0)),

@@ -21,7 +21,7 @@ struct DisplayLyricsView: View {
 
     @State private var fineGrainedElapsedTime: TimeInterval = .zero
     @State private var timer = Timer.publish(every: 0.01, on: .main, in: .default).autoconnect()
-    
+
     var body: some View {
         // Avoid multiple instantializations
         let lines = lyrics.lines
@@ -44,16 +44,16 @@ struct DisplayLyricsView: View {
                     let span = lyrics.storage?.parser.duration(before: index)
                     let beginTime = span?.begin
                     let endTime = span?.end
-                    
+
                     if let beginTime, let endTime {
                         let duration = endTime - beginTime
                         let progress = (fineGrainedElapsedTime - beginTime) / duration
-                        
+
                         return if duration >= 4, progress <= 1 {
                             .visible {
                                 HStack {
                                     ProgressDotsContainerView(elapsedTime: fineGrainedElapsedTime, beginTime: beginTime, endTime: endTime)
-                                    
+
                                     ProgressView(value: max(0, progress))
                                 }
                             }
@@ -121,7 +121,7 @@ struct DisplayLyricsView: View {
         let isActive = isHighlighted || isHovering
         let blurRadius = blurRadius(for: index, in: highlightedRange)
         let opacity = opacity(for: index, in: highlightedRange)
-        
+
         VStack(spacing: .zero) {
             switch line {
             case let line as RawLyricLine:

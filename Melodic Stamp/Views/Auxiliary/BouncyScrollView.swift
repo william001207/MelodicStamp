@@ -112,7 +112,7 @@ struct BouncyScrollView<Content: View>: View {
             scrollPosition.scrollTo(y: value)
         }
     }
-    
+
     private var isIndicatorVisible: Bool {
         indicator(highlightedRange.lowerBound, true).isVisible
     }
@@ -133,19 +133,19 @@ struct BouncyScrollView<Content: View>: View {
             }
         }
     }
-    
+
     private var isInitialized: Bool {
         Set(contentOffsets.keys).isSuperset(of: IndexSet(integersIn: range))
     }
-    
+
     @ViewBuilder private func content(at index: Int) -> some View {
         let isHighlighted = highlightedRange.contains(index)
         let delay = delay(at: index)
-        
+
         Group {
             if let offset = contentOffsets[index] {
                 let proportion = proportion(at: index)
-                
+
                 content(index, isHighlighted)
                     .offset(y: proportion * offset)
                     .background {

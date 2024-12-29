@@ -25,11 +25,11 @@ struct AnimatedGrid: View {
             )
         )
     }
-    
+
     private var simdColors: [simd_float3] {
         colors.map { $0.toSimdFloat3() }
     }
-    
+
     private var randomizer: MeshRandomizer {
         MeshRandomizer(colorRandomizer: MeshRandomizer.arrayBasedColorRandomizer(availableColors: simdColors))
     }
