@@ -16,31 +16,31 @@ struct DisplayLyricsView: View {
 
     @State private var playbackTime: PlaybackTime?
 
-    @State private var highlightedRange: Range<Int> = 0..<0
     @State private var isPlaying: Bool = false
     @State private var isHovering: Bool = false
 
-    @State private var fineGrainedElapsedTime: TimeInterval = 0.0
+    @State private var fineGrainedElapsedTime: TimeInterval = .zero
     @State private var timer = Timer.publish(every: 0.01, on: .main, in: .default).autoconnect()
     
     var body: some View {
         // Avoid multiple instantializations
         let lines = lyrics.lines
-
-        let range = highlightedRange
+        let highlightedRange = highlightedRange
 
         Group {
             if !lines.isEmpty {
                 BouncyScrollView(
                     bounceDelay: 0.2,
                     range: 0 ..< lines.count,
-                    highlightedRange: range,
+                    highlightedRange: highlightedRange,
                     alignment: .center
                 ) { index, isHighlighted in
-                    lyricLine(line: lines[index], index: index, isHighlighted: isHighlighted)
+                    lyricLine(
+                        line: lines[index], index: index, isHighlighted: isHighlighted,
+                        highlightedRange: highlightedRange
+                    )
 
                 } indicator: { index, _ in
-                        //.invisible
                     let span = lyrics.storage?.parser.duration(before: index)
                     let beginTime = span?.begin
                     let endTime = span?.end
@@ -93,33 +93,34 @@ struct DisplayLyricsView: View {
         .onChange(of: playbackTime) { _, newValue in
             guard let elapsed = newValue?.elapsed else { return }
             fineGrainedElapsedTime = elapsed
-            if self.range != highlightedRange {
-                highlightedRange = self.range
-            }
         }
         .onReceive(player.isPlayingPublisher) { isPlaying in
             self.isPlaying = isPlaying
         }
         .onReceive(player.playbackTimePublisher) { playbackTime in
             self.playbackTime = playbackTime
-            if let timeElapsed = playbackTime?.elapsed {
-                fineGrainedElapsedTime = timeElapsed
-            }
         }
         .onReceive(timer) { _ in
             fineGrainedElapsedTime += 0.01
         }
     }
 
-    private var range: Range<Int> {
+    private var highlightedRange: Range<Int> {
         if let timeElapsed = playbackTime?.elapsed {
-            return lyrics.highlight(at: timeElapsed)
+            lyrics.highlight(at: timeElapsed)
         } else {
-            return 0 ..< 0
+            0 ..< 0
         }
     }
 
-    @ViewBuilder private func lyricLine(line: any LyricLine, index: Int, isHighlighted: Bool) -> some View {
+    @ViewBuilder private func lyricLine(
+        line: any LyricLine, index: Int, isHighlighted: Bool,
+        highlightedRange: Range<Int>
+    ) -> some View {
+        let isActive = isHighlighted || isHovering
+        let blurRadius = blurRadius(for: index, in: highlightedRange)
+        let opacity = opacity(for: index, in: highlightedRange)
+        
         VStack(spacing: .zero) {
             switch line {
             case let line as RawLyricLine:
@@ -133,8 +134,8 @@ struct DisplayLyricsView: View {
             }
         }
         .padding(.bottom, 32)
-        .blur(radius: isHighlighted || isHovering ? 0 : blurRadius(for: index))
-        .opacity(isHighlighted || isHovering ? 1 : opacity(for: index))
+        .blur(radius: isActive ? 0 : blurRadius)
+        .opacity(isActive ? 1 : opacity)
     }
 
     @ViewBuilder private func rawLyricLine(line: RawLyricLine, index _: Int, isHighlighted _: Bool)
@@ -169,18 +170,18 @@ struct DisplayLyricsView: View {
         timer.upstream.connect().cancel()
     }
 
-    private func opacity(for index: Int) -> Double {
+    private func opacity(for index: Int, in highlightedRange: Range<Int>) -> CGFloat {
         let distance = abs(index - (highlightedRange.lowerBound))
         let maxOpacity = 0.55
         let minOpacity = 0.125
-        let factor = maxOpacity - (Double(distance) * 0.05)
+        let factor = maxOpacity - (CGFloat(distance) * 0.05)
         return max(minOpacity, min(factor, maxOpacity))
     }
 
-    private func blurRadius(for index: Int) -> CGFloat {
+    private func blurRadius(for index: Int, in highlightedRange: Range<Int>) -> CGFloat {
         let distance = abs(index - (highlightedRange.lowerBound))
-        let maxBlur: CGFloat = 5.0
-        let minBlur: CGFloat = 0.0
+        let maxBlur = 5.0
+        let minBlur = 0.0
         let factor = CGFloat(distance) * 1.0
         return max(minBlur, min(factor, maxBlur))
     }
