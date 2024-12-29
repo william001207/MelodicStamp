@@ -39,7 +39,6 @@ struct DisplayLyricsView: View {
                         line: lines[index], index: index, isHighlighted: isHighlighted,
                         highlightedRange: highlightedRange
                     )
-
                 } indicator: { index, _ in
                     let span = lyrics.storage?.parser.duration(before: index)
                     let beginTime = span?.begin
@@ -53,8 +52,9 @@ struct DisplayLyricsView: View {
                             .visible {
                                 HStack {
                                     ProgressDotsContainerView(elapsedTime: fineGrainedElapsedTime, beginTime: beginTime, endTime: endTime)
-
-                                    ProgressView(value: max(0, progress))
+                                        .frame(maxWidth: .infinity, alignment: .leading)
+                                        .padding(.bottom, 32)
+                                    // ProgressView(value: max(0, progress))
                                 }
                             }
                         } else { .invisible }
@@ -146,20 +146,23 @@ struct DisplayLyricsView: View {
             .foregroundStyle(.white)
     }
 
-    @ViewBuilder private func lrcLyricLine(line: LRCLyricLine, index _: Int, isHighlighted _: Bool) -> some View {
+    @ViewBuilder private func lrcLyricLine(line: LRCLyricLine, index _: Int, isHighlighted : Bool) -> some View {
         Group {
             switch line.type {
             case .main:
                 Text(line.content)
-                    .foregroundStyle(.white)
+                    //.foregroundStyle(.white)
             case let .translation(locale):
                 Text(locale)
-                    .foregroundStyle(.placeholder)
+                    //.foregroundStyle(.placeholder)
                 
                 Text(line.content)
-                    .foregroundStyle(.white.secondary)
+                    //.foregroundStyle(.white.secondary)
             }
         }
+        .multilineTextAlignment(.leading)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .foregroundStyle(isHighlighted ? Color.white : Color.white.opacity(0.5))
         .font(.title)
         .bold()
     }

@@ -75,6 +75,7 @@ struct TTMLLyric: Equatable, Hashable, Identifiable, AnimatedString {
     }
 }
 
+
 // MARK: - Translation
 
 typealias TTMLLocale = Locale

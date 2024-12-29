@@ -43,7 +43,7 @@ struct ProgressDotsContainerView: View {
     }
 
     private func update(time: TimeInterval) {
-        isVisible = time >= beginTime && time < endTime
+        isVisible = time >= beginTime && time < endTime - 0.75
     }
 }
 
@@ -53,7 +53,8 @@ struct ProgressDotsView: View {
     var endTime: TimeInterval
 
     private var progress: CGFloat {
-        let duration = endTime - beginTime
+        let newEndTime = endTime - 0.75
+        let duration = newEndTime - beginTime
         guard duration > 0 else { return 0 }
         return min(max((elapsedTime - beginTime) / duration, 0), 1)
     }
@@ -62,7 +63,7 @@ struct ProgressDotsView: View {
         HStack(spacing: progress >= 0.93 ? (progress >= 0.99 ? 3 : 12) : 10) {
             ProgressDotView(progress: progress, activationRange: 0.33...0.66)
             ProgressDotView(progress: progress, activationRange: 0.66...0.90)
-            ProgressDotView(progress: progress, activationRange: 0.90...0.96)
+            ProgressDotView(progress: progress, activationRange: 0.90...0.95)
         }
         .animation(.smooth(duration: 0.75), value: progress)
     }
