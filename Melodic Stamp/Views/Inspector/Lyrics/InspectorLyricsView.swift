@@ -139,7 +139,7 @@ struct InspectorLyricsView: View {
             case let .translation(locale):
                 Text(locale)
                     .foregroundStyle(.placeholder)
-                
+
                 Text(line.content)
                     .foregroundStyle(.secondary)
             }

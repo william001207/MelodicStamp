@@ -87,7 +87,7 @@ struct PlayerCommands: Commands {
                 Group {
                     if let player {
                         @Bindable var player = player
-                        
+
                         Toggle("Mute", isOn: $player.isMuted)
                     } else {
                         Button("Mute") {

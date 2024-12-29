@@ -139,16 +139,16 @@ extension LyricsParser {
             }
         } else {
             // Has no prefixing lines
-            
+
             let next = lines.first
-            
+
             if let next {
                 // Has a suffixing line
-                
+
                 let shouldSuspend = if let beginTime = next.beginTime {
                     beginTime >= suspensionThreshold
                 } else { false }
-                
+
                 return if shouldSuspend {
                     // Suspend before the suffixing line begins
                     0 ..< 0
@@ -158,7 +158,7 @@ extension LyricsParser {
                 }
             } else {
                 // Has no suffixing lines
-                
+
                 return endIndex ..< endIndex
             }
         }
@@ -180,7 +180,7 @@ extension LyricsParser {
                         beginTime < time
                     } else { false }
                 }
-                
+
                 return (previous?.endTime, time)
             } else {
                 return (.zero, time)

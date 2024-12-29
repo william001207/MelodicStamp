@@ -12,7 +12,7 @@ struct TTMLDisplayLyricLineView: View {
     var line: TTMLLyricLine
     var elapsedTime: TimeInterval
     var isHighlighted: Bool = false
-    
+
     var inactiveOpacity: Double = 0.55
     var highlightDelay: TimeInterval = 0.25
 
@@ -27,12 +27,12 @@ struct TTMLDisplayLyricLineView: View {
                 activeContent()
                     .frame(maxWidth: .infinity, alignment: alignment)
                     .opacity(isActive ? 1 : 0)
-                
+
                 inactiveContent()
                     .frame(maxWidth: .infinity, alignment: alignment)
                     .opacity(isActive ? 0 : 1)
             }
-            
+
             if !line.backgroundLyrics.isEmpty {
                 Color.clear
                     .frame(height: isActive ? backgroundContentSize.height : 0)
@@ -94,7 +94,7 @@ struct TTMLDisplayLyricLineView: View {
                 .font(.title)
                 .bold()
                 .textRenderer(lyricsRenderer)
-            
+
             additionalContent(for: line.lyrics)
                 .font(.title3)
         }
@@ -106,30 +106,29 @@ struct TTMLDisplayLyricLineView: View {
                 .font(.title)
                 .bold()
                 .opacity(inactiveOpacity)
-            
+
             additionalContent(for: line.lyrics)
                 .font(.title3)
                 .opacity(inactiveOpacity)
         }
     }
-    
+
     @ViewBuilder private func backgroundContent() -> some View {
         let backgroundLyricsRenderer = textRenderer(for: line.backgroundLyrics)
-        
+
         VStack(alignment: alignment.horizontal, spacing: 5) {
             Text(stringContent(of: line.backgroundLyrics))
                 .font(.title2)
                 .bold()
                 .textRenderer(backgroundLyricsRenderer)
-            
+
             additionalContent(for: line.backgroundLyrics)
                 .font(.title3)
         }
     }
 
     @ViewBuilder private func additionalContent(for lyrics: TTMLLyrics)
-        -> some View
-    {
+        -> some View {
         ForEach(lyrics.translations) { translation in
             Text(translation.text)
         }

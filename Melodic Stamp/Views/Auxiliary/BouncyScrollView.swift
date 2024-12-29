@@ -62,14 +62,14 @@ struct BouncyScrollView<Content: View>: View {
             if isInitialized {
                 LazyVStack(spacing: 0) {
                     ForEach(range, id: \.self) { index in
-                            content(at: index)
+                        content(at: index)
                     }
                 }
             } else {
                 // Temporarily force loads all elements
                 VStack(spacing: 0) {
                     ForEach(range, id: \.self) { index in
-                            content(at: index)
+                        content(at: index)
                     }
                 }
             }
@@ -116,7 +116,7 @@ struct BouncyScrollView<Content: View>: View {
     private var isIndicatorVisible: Bool {
         indicator(highlightedRange.lowerBound, true).isVisible
     }
-    
+
     private var isInitialized: Bool {
         Set(contentOffsets.keys).isSuperset(of: IndexSet(integersIn: range))
     }
@@ -137,7 +137,7 @@ struct BouncyScrollView<Content: View>: View {
             }
         }
     }
-    
+
     private var animationCompensate: CGFloat {
         contentOffsets[highlightedRange.upperBound - 1] ?? 0
     }
@@ -146,7 +146,7 @@ struct BouncyScrollView<Content: View>: View {
         let isHighlighted = highlightedRange.contains(index)
         let delay = delay(at: index)
         let proportion = proportion(at: index)
-        
+
         content(index, isHighlighted)
             .onGeometryChange(for: CGSize.self) { proxy in
                 proxy.size
