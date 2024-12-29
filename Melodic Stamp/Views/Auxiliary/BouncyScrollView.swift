@@ -57,7 +57,7 @@ struct BouncyScrollView<Content: View>: View {
                 .frame(height: offset)
 
             Spacer()
-                .frame(height: max(0, compensate))
+                .frame(height: max(0, alignmentCompensate))
 
             if isInitialized {
                 LazyVStack(spacing: 0) {
@@ -116,12 +116,16 @@ struct BouncyScrollView<Content: View>: View {
     private var isIndicatorVisible: Bool {
         indicator(highlightedRange.lowerBound, true).isVisible
     }
+    
+    private var isInitialized: Bool {
+        Set(contentOffsets.keys).isSuperset(of: IndexSet(integersIn: range))
+    }
 
     private var canPauseAnimation: Bool {
         highlightedRange.isEmpty && isIndicatorVisible
     }
 
-    private var compensate: CGFloat {
+    private var alignmentCompensate: CGFloat {
         switch alignment {
         case .top:
             .zero
@@ -133,45 +137,37 @@ struct BouncyScrollView<Content: View>: View {
             }
         }
     }
-
-    private var isInitialized: Bool {
-        Set(contentOffsets.keys).isSuperset(of: IndexSet(integersIn: range))
+    
+    private var animationCompensate: CGFloat {
+        contentOffsets[highlightedRange.upperBound + 1] ?? 0
     }
 
     @ViewBuilder private func content(at index: Int) -> some View {
         let isHighlighted = highlightedRange.contains(index)
         let delay = delay(at: index)
-
-        Group {
-            if let offset = contentOffsets[index] {
-                let proportion = proportion(at: index)
-
-                content(index, isHighlighted)
-                    .offset(y: proportion * offset)
-                    .background {
-                        if index == highlightedRange.lowerBound {
-                            switch indicator(index, isHighlighted) {
-                            case .invisible:
-                                EmptyView()
-                            case let .visible(content):
-                                content
-                                    .opacity(proportion)
-                                    .animation(.default, value: proportion)
-                            }
-                        }
-                    }
-            } else {
-                content(index, isHighlighted)
+        let proportion = proportion(at: index)
+        
+        content(index, isHighlighted)
+            .onGeometryChange(for: CGSize.self) { proxy in
+                proxy.size
+            } action: { newValue in
+                contentOffsets.updateValue(newValue.height, forKey: index)
             }
-        }
-        .animation(.spring(bounce: 0.2).delay(delay), value: animationState)
-        .animation(.smooth, value: highlightedRange)
-        .onGeometryChange(for: CGSize.self) { proxy in
-            proxy.size
-        } action: { newValue in
-            print("Element [\(index)]: content offset changed")
-            contentOffsets.updateValue(newValue.height, forKey: index)
-        }
+            .offset(y: proportion * animationCompensate)
+            .background {
+                if index == highlightedRange.lowerBound {
+                    switch indicator(index, isHighlighted) {
+                    case .invisible:
+                        EmptyView()
+                    case let .visible(content):
+                        content
+                            .opacity(proportion)
+                            .animation(.default, value: proportion)
+                    }
+                }
+            }
+            .animation(.spring(bounce: 0.2).delay(delay), value: animationState)
+            .animation(.smooth, value: highlightedRange)
     }
 
     private func fold(until index: Int) -> CGFloat {

@@ -20,6 +20,7 @@ struct TTMLDisplayLyricLineView: View {
     var body: some View {
         VStack(alignment: .center, spacing: 5) {
             // Avoid multiple instantializations
+            let hasBackgroundLyrics = !line.backgroundLyrics.isEmpty
             let lyricsRenderer = textRenderer(for: line.lyrics)
             let backgroundLyricsRenderer = textRenderer(for: line.backgroundLyrics)
 
@@ -34,50 +35,53 @@ struct TTMLDisplayLyricLineView: View {
                     additionalContent(for: line.lyrics)
                         .font(.title3)
 
-                    Group {
-                        Text(stringContent(of: line.backgroundLyrics))
-                            .font(.title2)
-                            .bold()
-                            .textRenderer(backgroundLyricsRenderer)
-
-                        additionalContent(for: line.backgroundLyrics)
-                            .font(.title3)
+                    if hasBackgroundLyrics {
+                        Group {
+                            Text(stringContent(of: line.backgroundLyrics))
+                                .font(.title2)
+                                .bold()
+                                .textRenderer(backgroundLyricsRenderer)
+                            
+                            additionalContent(for: line.backgroundLyrics)
+                                .font(.title3)
+                        }
+                        .transition(.blurReplace)
                     }
-                    .transition(.blurReplace)
                 } else {
-                    Text(stringContent(of: line.lyrics))
-                        .font(.title)
-                        .bold()
-                        .foregroundStyle(.white.opacity(isAnimationHighlighted ? 1 : 0.1))
-                        .brightness(isAnimationHighlighted ? 1.5 : 1.0)
-
-                    additionalContent(for: line.lyrics)
-                        .font(.title3)
-
                     Group {
-                        Text(stringContent(of: line.backgroundLyrics))
-                            .font(.title2)
+                        Text(stringContent(of: line.lyrics))
+                            .font(.title)
                             .bold()
-                            .foregroundStyle(.white.opacity(isAnimationHighlighted ? 1 : 0.1))
-                            .brightness(isAnimationHighlighted ? 1.5 : 1.0)
-
-                        additionalContent(for: line.backgroundLyrics)
+                        
+                        additionalContent(for: line.lyrics)
                             .font(.title3)
+                        
+                        if hasBackgroundLyrics {
+                            Group {
+                                Text(stringContent(of: line.backgroundLyrics))
+                                    .font(.title2)
+                                    .bold()
+                                
+                                additionalContent(for: line.backgroundLyrics)
+                                    .font(.title3)
+                            }
+                            .transition(.blurReplace)
+                        }
                     }
-                    .transition(.blurReplace)
+                    .foregroundStyle(.white.opacity(isAnimationHighlighted ? 1 : 0.1))
+                    .brightness(isAnimationHighlighted ? 1.5 : 1)
                 }
             }
             .multilineTextAlignment(textAlignment)
             .frame(maxWidth: .infinity, alignment: alignment)
         }
-        .foregroundStyle(.white.opacity(isHighlighted ? 1 : 0.5))
         .onChange(of: isHighlighted) { _, newValue in
             withAnimation(.smooth(duration: 0.45).delay(0.25)) {
                 isAnimationHighlighted = newValue
             }
         }
         // Isolating switching animation between renderers
-        .animation(nil, value: isHighlighted)
+        .animation(.smooth(duration: 0.1), value: isHighlighted)
     }
 
     private var textAlignment: TextAlignment {

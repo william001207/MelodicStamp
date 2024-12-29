@@ -82,7 +82,7 @@ struct TTMLLyric: Equatable, Hashable, Identifiable, AnimatedString {
         self.trailingSpaceCount = trailingSpaceCount
 
         // Remove parentheses
-        self.text = text.replacing(/[\[\]\()【】（）]/, with: "")
+        self.text = text.replacing(/[\[\]\()]/, with: "")
     }
 
     var content: String {

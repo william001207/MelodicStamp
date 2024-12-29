@@ -15,7 +15,7 @@ import UniformTypeIdentifiers
     typealias Entries = MetadataBatchEditingEntries<Set<AttachedPicture>>
 
     static var allowedContentTypes: [UTType] {
-        [.jpeg, .png, .tiff, .bmp, .gif, .heic, .heif, .rawImage]
+        [.jpeg, .png, .tiff, .bmp, .gif, .heic, .heif, .webP, .rawImage]
     }
 
     private func isModified(of types: [APType]? = nil, entry: Entry, countAsEmpty fallback: Bool = true) -> Bool {
