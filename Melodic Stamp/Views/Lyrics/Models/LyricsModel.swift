@@ -52,7 +52,7 @@ extension LyricsParser {
         }
         let previousIndex = previous.flatMap(lines.firstIndex)
 
-        if let previous, let previousIndex {
+        if let previous, let previousIndex, let beginTime = previous.beginTime {
             // Has a prefixing line
 
             if let endTime = previous.endTime {
@@ -82,8 +82,8 @@ extension LyricsParser {
                             // Suspend before the suffixing line begins
                             nextIndex ..< nextIndex
                         } else {
-                            // Hold until the suffixing line begins
-                            previousIndex ..< nextIndex
+                            // Present the suffixing line in advance
+                            nextIndex ..< nextIndex
                         }
                     } else {
                         // Has no suffixing lines
@@ -94,7 +94,9 @@ extension LyricsParser {
                     // Still in the range of the prefixing line
 
                     let furthest = lines.first {
-                        $0.endTime == previous.endTime
+                        if let endTime = $0.endTime {
+                            endTime > beginTime
+                        } else { false }
                     }
                     let furthestIndex = furthest.flatMap(lines.firstIndex)
 
@@ -122,7 +124,9 @@ extension LyricsParser {
                     // Has no suffixing lines
 
                     let furthest = lines.first {
-                        $0.endTime == previous.endTime
+                        if let endTime = $0.endTime {
+                            endTime > beginTime
+                        } else { false }
                     }
                     let furthestIndex = furthest.flatMap(lines.firstIndex)
 
