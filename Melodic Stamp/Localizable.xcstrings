@@ -10,16 +10,10 @@
     "--:--" : {
 
     },
-    "·" : {
-
-    },
     "#%lld" : {
 
     },
     "%@" : {
-
-    },
-    "%lld Songs" : {
 
     },
     "%lld words" : {
@@ -60,6 +54,18 @@
     },
     "Analytics" : {
 
+    },
+    "App: (Subtitle) Songs" : {
+      "comment" : "The subtitle displayed when there are songs in the playlist and nothing is playing",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%lld Songs"
+          }
+        }
+      }
     },
     "Artist" : {
 
@@ -216,6 +222,30 @@
     },
     "Music Brainz" : {
 
+    },
+    "MusicTitle : (Separator) Stringified Artists" : {
+      "comment" : "The separator between artists in a stringified title",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : ", "
+          }
+        }
+      }
+    },
+    "MusicTitle: (Separator) Artists" : {
+      "comment" : "The separator between artists in a regular title",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "·"
+          }
+        }
+      }
     },
     "Mute" : {
 

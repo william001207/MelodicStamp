@@ -1,8 +1,8 @@
 //
-//  String+Extension.swift
+//  String+Extensions.swift
 //  Melodic Stamp
 //
-//  Created by Xinshao_Air on 2024/12/1.
+//  Created by KrLite on 2024/12/29.
 //
 
 import Foundation

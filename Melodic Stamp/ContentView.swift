@@ -124,7 +124,11 @@ struct ContentView: View {
         if let current = player.current {
             MusicTitle.stringifiedTitle(mode: .artists, for: current)
         } else if !player.isPlaylistEmpty {
-            .init(localized: "\(player.playlist.count) Songs")
+            .init(localized: .init(
+                "App: (Subtitle) Songs",
+                defaultValue: "\(player.playlist.count) Songs",
+                comment: "The subtitle displayed when there are songs in the playlist and nothing is playing"
+            ))
         } else {
             .init()
         }

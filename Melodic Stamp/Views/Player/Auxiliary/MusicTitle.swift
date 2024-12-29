@@ -58,7 +58,12 @@ struct MusicTitle: View {
                             ForEach(Array(artists.enumerated()), id: \.offset) {
                                 offset, composer in
                                 if offset > 0 {
-                                    Text("·")
+                                    let separator = String(localized: .init(
+                                        "MusicTitle: (Separator) Artists",
+                                        defaultValue: "·",
+                                        comment: "The separator between artists in a regular title"
+                                    ))
+                                    Text(separator)
                                         .foregroundStyle(.placeholder)
                                 }
 
@@ -94,7 +99,12 @@ struct MusicTitle: View {
 
         if mode.hasArtists {
             if let artist = item.metadata[extracting: \.artist]?.initial {
-                components.append(artist)
+                let separator = String(localized: .init(
+                    "MusicTitle : (Separator) Stringified Artists",
+                    defaultValue: ", ",
+                    comment: "The separator between artists in a stringified title"
+                ))
+                components.append(Metadata.splitArtists(from: artist).joined(separator: separator))
             }
         }
         return components.joined(separator: separator)
