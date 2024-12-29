@@ -44,6 +44,7 @@ extension LyricsParser {
     // Do not use sequences, otherwise causing huge performance issues
     func highlight(at time: TimeInterval) -> Range<Int> {
         let endIndex = lines.endIndex
+        let suspensionThreshold: TimeInterval = 4
 
         let previous = lines.last {
             if let beginTime = $0.beginTime {
@@ -73,7 +74,6 @@ extension LyricsParser {
                     if let next, let nextIndex {
                         // Has a suffixing line
 
-                        let suspensionThreshold: TimeInterval = 4
                         let shouldSuspend = if let beginTime = next.beginTime {
                             beginTime - endTime >= suspensionThreshold
                         } else { false }
@@ -83,7 +83,7 @@ extension LyricsParser {
                             nextIndex ..< nextIndex
                         } else {
                             // Present the suffixing line in advance
-                            nextIndex ..< nextIndex
+                            nextIndex ..< (nextIndex + 1)
                         }
                     } else {
                         // Has no suffixing lines
@@ -139,8 +139,28 @@ extension LyricsParser {
             }
         } else {
             // Has no prefixing lines
-
-            return 0 ..< 0
+            
+            let next = lines.first
+            
+            if let next {
+                // Has a suffixing line
+                
+                let shouldSuspend = if let beginTime = next.beginTime {
+                    beginTime >= suspensionThreshold
+                } else { false }
+                
+                return if shouldSuspend {
+                    // Suspend before the suffixing line begins
+                    0 ..< 0
+                } else {
+                    // Present the suffixing line in advance
+                    0 ..< 1
+                }
+            } else {
+                // Has no suffixing lines
+                
+                return endIndex ..< endIndex
+            }
         }
     }
 
