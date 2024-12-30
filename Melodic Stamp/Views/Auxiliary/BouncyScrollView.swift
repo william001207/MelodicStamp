@@ -66,7 +66,7 @@ struct BouncyScrollView<Content: View>: View {
                     }
                 }
             } else {
-                // Temporarily force loads all elements
+                // Temporarily force loading all elements
                 VStack(spacing: 0) {
                     ForEach(range, id: \.self) { index in
                         content(at: index)
@@ -121,6 +121,10 @@ struct BouncyScrollView<Content: View>: View {
         Set(contentOffsets.keys).isSuperset(of: IndexSet(integersIn: range))
     }
 
+    private var reachedEnd: Bool {
+        highlightedRange.lowerBound >= range.upperBound
+    }
+
     private var canPauseAnimation: Bool {
         highlightedRange.isEmpty && isIndicatorVisible
     }
@@ -139,7 +143,7 @@ struct BouncyScrollView<Content: View>: View {
     }
 
     private var animationCompensate: CGFloat {
-        contentOffsets[highlightedRange.upperBound - 1] ?? 0
+        contentOffsets[highlightedRange.upperBound - 1] ?? .zero
     }
 
     @ViewBuilder private func content(at index: Int) -> some View {
@@ -168,12 +172,13 @@ struct BouncyScrollView<Content: View>: View {
             }
             .animation(.spring(bounce: 0.2).delay(delay), value: animationState)
             .animation(.smooth, value: highlightedRange)
+            .animation(.smooth, value: animationCompensate)
     }
 
     private func fold(until index: Int) -> CGFloat {
         let indices = contentOffsets.keys
         let index = if let maxIndex = indices.max() {
-            min(index, maxIndex)
+            min(index, maxIndex + 1)
         } else { index }
 
         return contentOffsets
@@ -183,6 +188,8 @@ struct BouncyScrollView<Content: View>: View {
     }
 
     private func updateAnimationState() {
+        guard !reachedEnd else { return }
+
         animationState = .intermediate
         DispatchQueue.main.asyncAfter(deadline: .now() + bounceDelay) {
             pushAnimation()
@@ -195,12 +202,11 @@ struct BouncyScrollView<Content: View>: View {
     }
 
     private func proportion(at index: Int) -> CGFloat {
-        if index >= highlightedRange.lowerBound {
-            switch animationState {
-            case .intermediate: 1
-            case .pushed: 0
-            }
-        } else { 0 }
+        guard index >= highlightedRange.lowerBound else { return .zero }
+        return switch animationState {
+        case .intermediate: 1
+        case .pushed: 0
+        }
     }
 
     private func delay(at index: Int) -> CGFloat {
@@ -316,6 +322,7 @@ struct BouncyScrollView<Content: View>: View {
         .padding()
 
         BouncyScrollView(
+            offset: 0,
             range: 0 ..< count,
             highlightedRange: highlightedRange,
             alignment: alignment

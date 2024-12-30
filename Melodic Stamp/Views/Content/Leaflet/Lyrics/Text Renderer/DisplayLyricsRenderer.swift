@@ -8,41 +8,38 @@
 import SwiftUI
 
 struct DisplayLyricsGroupCache {
+    typealias Key = [AnyHashable]
+    typealias Value = [AnyHashable: [Text.Layout.RunSlice]]
+    typealias Identifier = AnyHashable
+
     static var shared = Self()
 
-    var groups: [[AnyHashable]: [AnyHashable: [Text.Layout.RunSlice]]] = [:]
+    var groups: [Key: (identifier: Identifier, value: Value)] = [:]
 
     func contains(key: [some AnimatedString]) -> Bool {
         let hashableKey = key.map(\.self)
-        return groups[hashableKey]?.keys.contains(hashableKey) ?? false
+        return groups.keys.contains(hashableKey)
     }
 
-    func get<Animated>(key: [Animated]) -> [Animated: [Text.Layout.RunSlice]]? where Animated: AnimatedString {
+    func get<Animated>(
+        key: [Animated],
+        identifiedBy identifier: Identifier
+    ) -> [Animated: [Text.Layout.RunSlice]]? where Animated: AnimatedString {
         let hashableKey = key.map(\.self)
-        return groups[hashableKey] as? [Animated: [Text.Layout.RunSlice]]
+        guard let pair = groups[hashableKey] else { return nil }
+
+        guard pair.identifier == identifier else { return nil }
+        return pair.value as? [Animated: [Text.Layout.RunSlice]]
     }
 
-    mutating func set<Animated>(key: [Animated], value: [Animated: [Text.Layout.RunSlice]]) where Animated: AnimatedString {
+    mutating func set<Animated>(
+        key: [Animated], value: [Animated: [Text.Layout.RunSlice]],
+        identifiedBy identifier: Identifier
+    ) where Animated: AnimatedString {
         let hashableKey = key.map(\.self)
-        groups[hashableKey] = value
+        groups[hashableKey] = (identifier, value)
     }
 }
-
-// protocol DisplayLyricsRendererEffect {
-//    associatedtype Animated: AnimatedString
-//
-//    var elapsedTime: TimeInterval { get }
-//    var strings: [Animated] { get }
-//
-//    var inactiveOpacity: CGFloat { get set }
-//    var blendRadius: CGFloat { get set }
-//    var shadowColor: Color { get set }
-//    var shadowRadius: CGFloat { get set }
-//
-//    var lift: CGFloat { get set }
-//    var brightness: CGFloat { get set }
-//    var softness: CGFloat { get set }
-// }
 
 /// *
 struct DisplayLyricsRenderer<Animated>: TextRenderer where Animated: AnimatedString {
@@ -83,15 +80,16 @@ struct DisplayLyricsRenderer<Animated>: TextRenderer where Animated: AnimatedStr
     }
 
     func draw(layout: Text.Layout, in context: inout GraphicsContext) {
+        let identifier = layout.hashValue
         var group: [Animated: [Text.Layout.RunSlice]] = [:]
 
         // Cache grouping result if possible
         // Since the grouping should always be identical to an array of animated strings
-        if let cached = DisplayLyricsGroupCache.shared.get(key: strings) {
+        if let cached = DisplayLyricsGroupCache.shared.get(key: strings, identifiedBy: identifier) {
             group = cached
         } else {
             group = self.group(layout: layout)
-            DisplayLyricsGroupCache.shared.set(key: strings, value: group)
+            DisplayLyricsGroupCache.shared.set(key: strings, value: group, identifiedBy: identifier)
         }
 
         for (lyric, slices) in group {
@@ -103,10 +101,13 @@ struct DisplayLyricsRenderer<Animated>: TextRenderer where Animated: AnimatedStr
                 let percentage = offset / totalWidth
                 let durationPercentage = width / totalWidth
 
+                let beginTime = lyric.beginTime ?? .zero
+                let endTime = lyric.endTime ?? .zero
+
                 draw(
                     slice: slice,
-                    beginTime: (lyric.beginTime ?? 0) + percentage * ((lyric.endTime ?? 0) - (lyric.beginTime ?? 0)),
-                    endTime: (lyric.beginTime ?? 0) + (percentage + durationPercentage) * ((lyric.endTime ?? 0) - (lyric.beginTime ?? 0)),
+                    beginTime: beginTime + percentage * (endTime - beginTime),
+                    endTime: beginTime + (percentage + durationPercentage) * (endTime - beginTime),
                     in: &context
                 )
                 offset += width

@@ -30,7 +30,7 @@ struct DisplayLyricsView: View {
         Group {
             if !lines.isEmpty {
                 BouncyScrollView(
-                    bounceDelay: 0.15,
+                    bounceDelay: 0.085,
                     range: 0 ..< lines.count,
                     highlightedRange: highlightedRange,
                     alignment: .center

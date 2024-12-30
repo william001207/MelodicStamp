@@ -16,3 +16,37 @@ extension Text.Layout {
         flatMap(\.self)
     }
 }
+
+extension Text.Layout: @retroactive Hashable {
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(isTruncated)
+        for flattenedRun in flattenedRuns {
+            hasher.combine(flattenedRun)
+        }
+    }
+}
+
+extension Text.Layout.Run: @retroactive Hashable {
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(layoutDirection)
+        hasher.combine(typographicBounds)
+        hasher.combine(characterIndices)
+    }
+}
+
+extension Text.Layout.RunSlice: @retroactive Hashable {
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(run)
+        hasher.combine(indices)
+    }
+}
+
+extension Text.Layout.TypographicBounds: @retroactive Hashable {
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(origin)
+        hasher.combine(width)
+        hasher.combine(ascent)
+        hasher.combine(descent)
+        hasher.combine(leading)
+    }
+}
