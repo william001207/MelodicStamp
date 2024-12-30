@@ -249,11 +249,11 @@ struct RawLyrics: Hashable, Equatable, Identifiable {
     var lines: [any LyricLine] {
         storage?.parser.lines ?? []
     }
-    
+
     func isIdentical(to url: URL) -> Bool {
         url == raw?.url
     }
-    
+
     func clear(_ url: URL? = nil) {
         guard let url, !isIdentical(to: url) else {
             storage = nil

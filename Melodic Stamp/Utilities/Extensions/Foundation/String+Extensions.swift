@@ -16,7 +16,7 @@ extension String {
         // Japanese
         /[あえいおう]+/,
         // Chinese
-        /[啊呀哈嗯嘿噢哦嗷呼嘻呃呵]+/,
+        /[啊呀哈嗯嘿噢哦嗷呼嘻呃呵]+/
     ]
 }
 
@@ -62,11 +62,11 @@ extension String {
     var reversed: String {
         String(reversed())
     }
-    
+
     var removingParentheses: String {
         replacing(/[\[\]\()（）]/, with: "")
     }
-    
+
     var removingPunctuations: String {
         replacing(/[\p{P}\s]/, with: "")
     }

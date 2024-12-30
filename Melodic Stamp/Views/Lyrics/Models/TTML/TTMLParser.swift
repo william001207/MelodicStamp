@@ -131,7 +131,7 @@ import SwiftSoup
 
         // Preservs spaces between span elements
         lyrics.insertSpaces(template: text)
-        
+
         // Finds vowels
         lyrics.findVowels()
     }

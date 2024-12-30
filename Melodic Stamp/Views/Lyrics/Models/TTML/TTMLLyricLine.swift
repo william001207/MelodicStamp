@@ -82,7 +82,7 @@ extension TTMLLyric {
                 .starts(with: $0)
         } && !isVowel
     }
-    
+
     var endsWithVowel: Bool {
         String.vowels.contains {
             content.removingPunctuations
@@ -90,14 +90,14 @@ extension TTMLLyric {
                 .starts(with: $0)
         } && !isVowel
     }
-    
+
     var isVowel: Bool {
         String.vowels.contains {
             content.removingPunctuations
                 .wholeMatch(of: $0) != nil
         }
     }
-    
+
     var isNonVowel: Bool {
         !(isVowel || startsWithVowel || endsWithVowel)
     }
@@ -133,7 +133,7 @@ struct TTMLTranslation: Equatable, Hashable, Identifiable {
 struct TTMLLyrics: Equatable, Hashable {
     var beginTime: TimeInterval?
     var endTime: TimeInterval?
-    
+
     var vowels: Set<TimeInterval> = []
 
     var children: [TTMLLyric] = []
@@ -181,29 +181,29 @@ extension TTMLLyrics {
         let threshold: TimeInterval = 1
         var result: Set<TimeInterval> = []
         var latestVowel: TimeInterval?
-        
-        enumerated().forEach { index, lyric in
-            guard let beginTime = lyric.beginTime, let endTime = lyric.endTime else { return }
+
+        for (index, lyric) in enumerated() {
+            guard let beginTime = lyric.beginTime, let endTime = lyric.endTime else { continue }
             let reachedEnd = index >= endIndex - 1
-            
+
             if let unweappedLatestVowel = latestVowel {
                 // Find an ending vowel
-                
-                if reachedEnd || lyric.startsWithVowel || !lyric.isVowel  {
+
+                if reachedEnd || lyric.startsWithVowel || !lyric.isVowel {
                     latestVowel = nil
-                    
+
                     if endTime - unweappedLatestVowel >= threshold {
                         // Reached threshold, count as a long vowel
-                        
+
                         result.insert(unweappedLatestVowel)
                     }
                 }
             } else {
                 // Find a starting vowel
-                
+
                 if lyric.endsWithVowel || lyric.isVowel {
                     latestVowel = beginTime
-                    
+
                     if endTime - beginTime >= threshold {
                         // Must be a long vowel, insert in advance
                         result.insert(beginTime)
@@ -211,10 +211,10 @@ extension TTMLLyrics {
                 }
             }
         }
-        
+
         vowels = result
     }
-    
+
     mutating func insertSpaces(template: String) {
         let terminator: Character = ";"
         var indexedTemplate = template
