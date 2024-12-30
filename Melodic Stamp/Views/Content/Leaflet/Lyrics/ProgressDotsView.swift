@@ -30,7 +30,7 @@ struct ProgressDotsContainerView: View {
                         )
                     )
                     .padding(.vertical, 10)
-                    .padding(.horizontal, 10)
+                    .padding(.horizontal, 2)
             }
         }
         .animation(.default, value: isVisible)

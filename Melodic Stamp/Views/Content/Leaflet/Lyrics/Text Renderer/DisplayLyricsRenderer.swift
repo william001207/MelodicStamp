@@ -95,8 +95,6 @@ struct DisplayLyricsRenderer<Animated>: TextRenderer where Animated: AnimatedStr
         let identifier = layout.hashValue
         var group: [Animated: [Text.Layout.RunSlice]] = [:]
 
-        // Cache grouping result if possible
-        // Since the grouping should always be identical to an array of animated strings
         if let cached = DisplayLyricsGroupCache.shared.get(key: strings, identifiedBy: identifier) {
             group = cached
         } else {
@@ -132,40 +130,49 @@ struct DisplayLyricsRenderer<Animated>: TextRenderer where Animated: AnimatedStr
         beginTime: TimeInterval, endTime: TimeInterval,
         in context: inout GraphicsContext
     ) {
-        let elapsedTime = elapsedTime - beginTime
+        let elapsed = elapsedTime - beginTime
         let duration = endTime - beginTime
 
-        let unclampedProgress = elapsedTime / duration
+        let unclampedProgress = elapsed / duration
         let progress = max(0, min(1, unclampedProgress))
-        let softenProgress = max(0, min(1, elapsedTime / (duration / softness)))
+        let softenProgress = max(0, min(1, elapsed / (duration / softness)))
 
         let bounds = slice.typographicBounds.rect
         let unclampedFilledWidth = bounds.width * unclampedProgress
         let filledWidth = bounds.width * progress
-        let lift = lift * bentSigmoid(softenProgress)
+        let liftAmount = lift * bentSigmoid(softenProgress)
 
         let timeToVowels = timeToVowels(at: self.elapsedTime - Double(index) * glowDelay)
 
         do {
             var context = context
 
-            // Scale
+            // Scale with wave effect
+            /*
             if let timeToNearestVowel = timeToVowels.min() {
-                let glowScale = lerp(
-                    1, glowScale,
-                    factor: bellCurve(timeToNearestVowel)
-                )
+                for (index, char) in strings.enumerated() {
+                    guard let charBeginTime = char.beginTime, let charEndTime = char.endTime else { continue }
 
-                context.translateBy(x: bounds.minX, y: bounds.midY)
-                context.scaleBy(x: glowScale, y: glowScale)
-                context.translateBy(x: -bounds.minX, y: -bounds.midY)
+                    let charProgress = progressForTime(elapsedTime, charStartTime: charBeginTime, charEndTime: charEndTime)
+
+                    let scale = 1.0 + sin(charProgress * .pi) * 0.2
+                    // let dynamicGlowRadius = sin(charProgress * .pi) * 10.0
+                    // let opacity = sin(charProgress * .pi) * 0.8 + 0.5
+
+                    context.translateBy(x: bounds.midX, y: bounds.midY)
+                    context.scaleBy(x: scale, y: scale)
+                    context.translateBy(x: -bounds.midX, y: -bounds.midY)
+
+                    //context.addFilter(.shadow(color: glowColor.opacity(opacity), radius: dynamicGlowRadius))
+                }
             }
+            */
 
             // Unfilled
             do {
                 var context = context
 
-                context.translateBy(x: 0, y: -lift)
+                context.translateBy(x: 0, y: -liftAmount)
                 context.opacity = inactiveOpacity
                 context.draw(slice)
             }
@@ -181,13 +188,16 @@ struct DisplayLyricsRenderer<Animated>: TextRenderer where Animated: AnimatedStr
                 ))
 
                 // Shadow
+                /*
                 if let timeToNearestVowel = timeToVowels.min() {
-                    let glowFactor = lerp(1, glowScale, factor: bellCurve(timeToNearestVowel))
-                    context.addFilter(.shadow(color: glowColor, radius: glowRadius * glowFactor))
+                    let dynamicGlowRadius = sin(progress * .pi) * 10.0
+                    context.addFilter(.shadow(color: glowColor, radius: dynamicGlowRadius))
                 } else {
-                    context.addFilter(.shadow(color: shadowColor, radius: shadowRadius))
+                    
                 }
+                */
 
+                context.addFilter(.shadow(color: shadowColor, radius: shadowRadius))
                 // Mask
                 context.clipToLayer { context in
                     context.fill(mask, with: .linearGradient(
@@ -198,7 +208,7 @@ struct DisplayLyricsRenderer<Animated>: TextRenderer where Animated: AnimatedStr
                 }
 
                 // Lift
-                context.translateBy(x: 0, y: -lift)
+                context.translateBy(x: 0, y: -liftAmount)
 
                 // Brightness
                 context.addFilter(.brightness(brightness * progress))
@@ -208,6 +218,12 @@ struct DisplayLyricsRenderer<Animated>: TextRenderer where Animated: AnimatedStr
             }
         }
     }
+    /*
+    private func progressForTime(_ currentTime: TimeInterval, charStartTime: TimeInterval, charEndTime: TimeInterval) -> Double {
+        guard charEndTime > charStartTime else { return 1.0 }
+        return min(max((currentTime - charStartTime) / (charEndTime - charStartTime), 0.0), 1.0)
+    }
+    */
 
     /// Generates a bell curve value for a given x, mean, standard deviation, and amplitude.
     /// It's worth noting that the integral of this bell curve is not 1, instead, the max value of this bell curve is always 1.
@@ -239,254 +255,8 @@ struct DisplayLyricsRenderer<Animated>: TextRenderer where Animated: AnimatedStr
         guard curvature != 0 else { return value }
         guard value >= -1, value <= 1 else { return value }
 
-        return if value >= 0 {
-            1 / (1 + exp(-curvature * (value - 0.5)))
-        } else {
-            -bentSigmoid(-value)
-        }
+        return value >= 0
+            ? 1 / (1 + exp(-curvature * (value - 0.5)))
+            : -bentSigmoid(-value)
     }
 }
-
-/*
- struct DisplayLyricsRenderer<Animated>: TextRenderer where Animated: AnimatedString {
-     var animatableData: TimeInterval {
-         get { elapsedTime }
-         set { elapsedTime = newValue }
-     }
-
-     var elapsedTime: TimeInterval
-     var strings: [Animated]
-
-     var inactiveOpacity: CGFloat = 0.55
-     var blendRadius: CGFloat = 20
-     var shadowColor: Color = .white.opacity(0.1)
-     var shadowRadius: CGFloat = 5
-
-     var brightness: CGFloat = 0.5
-     var lift: CGFloat = 2.5
-     var softness: CGFloat = 0.75
-
-     private var specialGroups: [Range<Int>] = []
-
-     init(elapsedTime: TimeInterval, strings: [Animated]) {
-         self.elapsedTime = elapsedTime
-         self.strings = strings
-         self.specialGroups = Self.findSpecialGroups(in: strings)
-     }
-
-     static func findSpecialGroups(in strings: [Animated]) -> [Range<Int>] {
-         var groups: [Range<Int>] = []
-         var currentGroupStart: Int?
-         var currentGroupDuration: TimeInterval = 0
-         var currentGroupChars: Int = 0
-
-         for (index, string) in strings.enumerated() {
-             let isLatin = string.content.range(of: "^[A-Za-z-]+$", options: .regularExpression) != nil
-             let hasSpace = string.content.contains(" ")
-
-             if isLatin && !hasSpace {
-                 if currentGroupStart == nil {
-                     currentGroupStart = index
-                 }
-                 currentGroupDuration += (string.endTime ?? 0) - (string.beginTime ?? 0)
-                 currentGroupChars += string.content.count
-             } else {
-                 if let start = currentGroupStart {
-                     if currentGroupDuration > 0.9 && currentGroupChars >= 3 {
-                         groups.append(start..<index)
-                     }
-                     currentGroupStart = nil
-                     currentGroupDuration = 0
-                     currentGroupChars = 0
-                 }
-             }
-         }
-
-         if let start = currentGroupStart, currentGroupDuration > 0.9, currentGroupChars >= 3 {
-             groups.append(start..<strings.count)
-         }
-         return groups
-     }
-
-     func group(layout: Text.Layout) -> [Animated: [Text.Layout.RunSlice]] {
-         let slices = Array(layout.flattenedRunSlices)
-         var result: [Animated: [Text.Layout.RunSlice]] = [:]
-         var index = 0
-
-         for string in strings {
-             let count = string.content.count
-             let endIndex = index + count
-             guard endIndex <= slices.endIndex else { break }
-
-             result.updateValue(
-                 Array(slices[index ..< endIndex]),
-                 forKey: string
-             )
-             index = endIndex
-         }
-         return result
-     }
-
-     func draw(layout: Text.Layout, in context: inout GraphicsContext) {
-         var group: [Animated: [Text.Layout.RunSlice]] = [:]
-
-         if let cached = DisplayLyricsGroupCache.shared.get(key: strings) {
-             group = cached
-         } else {
-             group = self.group(layout: layout)
-             DisplayLyricsGroupCache.shared.set(key: strings, value: group)
-         }
-
-         for (lyric, slices) in group {
-             guard let index = strings.firstIndex(where: { $0.id == lyric.id }) else { continue }
-
-             let isSpecial = specialGroups.contains { $0.contains(index) }
-
-             let totalWidth = slices.reduce(0) { $0 + $1.typographicBounds.width }
-             var offset: CGFloat = 0
-
-             for slice in slices {
-                 let width = slice.typographicBounds.width
-                 let percentage = offset / totalWidth
-                 let durationPercentage = width / totalWidth
-
-                 if isSpecial {
-                     drawSpecial(
-                         slice: slice,
-                         beginTime: (lyric.beginTime ?? 0) + percentage * ((lyric.endTime ?? 0) - (lyric.beginTime ?? 0)),
-                         endTime: (lyric.beginTime ?? 0) + (percentage + durationPercentage) * ((lyric.endTime ?? 0) - (lyric.beginTime ?? 0)),
-                         in: &context
-                     )
-                 } else {
-                     draw(
-                         slice: slice,
-                         beginTime: (lyric.beginTime ?? 0) + percentage * ((lyric.endTime ?? 0) - (lyric.beginTime ?? 0)),
-                         endTime: (lyric.beginTime ?? 0) + (percentage + durationPercentage) * ((lyric.endTime ?? 0) - (lyric.beginTime ?? 0)),
-                         in: &context
-                     )
-                     offset += width
-                 }
-             }
-         }
-     }
-
-     func drawSpecial(
-         slice: Text.Layout.RunSlice,
-         beginTime: TimeInterval, endTime: TimeInterval,
-         in context: inout GraphicsContext
-     ) {
-         let elapsedTime = self.elapsedTime - beginTime
-         let duration = endTime - beginTime
-
-         let unclampedProgress: Double = elapsedTime / duration
-         let progress: Double = max(0, min(1, unclampedProgress))
-         let softenProgress: Double = max(0, min(1, elapsedTime / (duration / softness)))
-
-         let scale = 1.0 + sin(progress * .pi) * 0.2
-         let glowRadius = sin(progress * .pi) * 10.0
-         let opacity = sin(progress * .pi) * 0.8 + 0.5
-
-         let bounds = slice.typographicBounds.rect
-         let unclampedFilledWidth = bounds.width * CGFloat(unclampedProgress)
-         let filledWidth = bounds.width * CGFloat(progress)
-         let liftAmount = lift * damping(CGFloat(softenProgress))
-
-         do {
-             let mask = Path(.init(
-                 x: bounds.minX,
-                 y: bounds.minY,
-                 width: filledWidth + blendRadius / 2,
-                 height: bounds.height
-             ))
-
-             var context = context
-             context.addFilter(.shadow(color: shadowColor, radius: shadowRadius))
-
-             context.translateBy(x: bounds.midX, y: bounds.midY)
-             context.scaleBy(x: scale, y: scale)
-             context.translateBy(x: -bounds.midX, y: -bounds.midY)
-
-             let shadowFilter = GraphicsContext.Filter.shadow(
-                 color: Color.white.opacity(opacity),
-                 radius: glowRadius,
-                 x: 0,
-                 y: 0
-             )
-             context.addFilter(shadowFilter)
-
-             context.clipToLayer { context in
-                 context.fill(mask, with: .linearGradient(
-                     .init(colors: [.white, .white.opacity(0.1)]),
-                     startPoint: .init(x: bounds.minX + unclampedFilledWidth - blendRadius / 2, y: 0),
-                     endPoint: .init(x: bounds.minX + unclampedFilledWidth + blendRadius / 2, y: 0)
-                 ))
-             }
-
-             context.translateBy(x: 0, y: -liftAmount)
-             context.addFilter(.brightness(Double(brightness) * progress))
-             context.draw(slice)
-         }
-     }
-
-     func draw(
-         slice: Text.Layout.RunSlice,
-         beginTime: TimeInterval, endTime: TimeInterval,
-         in context: inout GraphicsContext
-     ) {
-         let elapsedTime = self.elapsedTime - beginTime
-         let duration = endTime - beginTime
-
-         let unclampedProgress: Double = elapsedTime / duration
-         let progress: Double = max(0, min(1, unclampedProgress))
-         let softenProgress: Double = max(0, min(1, elapsedTime / (duration / softness)))
-
-         let bounds = slice.typographicBounds.rect
-         let unclampedFilledWidth = bounds.width * CGFloat(unclampedProgress)
-         let filledWidth = bounds.width * CGFloat(progress)
-         let liftAmount = lift * damping(CGFloat(softenProgress))
-
-         do {
-             var context = context
-
-             context.translateBy(x: 0, y: -liftAmount)
-             context.opacity = inactiveOpacity
-             context.draw(slice)
-         }
-
-         do {
-             let mask = Path(.init(
-                 x: bounds.minX,
-                 y: bounds.minY,
-                 width: filledWidth + blendRadius / 2,
-                 height: bounds.height
-             ))
-
-             var context = context
-             context.addFilter(.shadow(color: shadowColor, radius: shadowRadius))
-             context.clipToLayer { context in
-                 context.fill(mask, with: .linearGradient(
-                     .init(colors: [.white, .clear]),
-                     startPoint: .init(x: bounds.minX + unclampedFilledWidth - blendRadius / 2, y: 0),
-                     endPoint: .init(x: bounds.minX + unclampedFilledWidth + blendRadius / 2, y: 0)
-                 ))
-             }
-
-             context.translateBy(x: 0, y: -liftAmount)
-             context.addFilter(.brightness(Double(brightness) * progress))
-
-             context.draw(slice)
-         }
-     }
-
-     private func damping(_ t: CGFloat, stiffness: CGFloat = 1, ratio: CGFloat = 0.5) -> CGFloat {
-         guard t >= 0, t <= 1 else { return t }
-
-         let omega0 = sqrt(stiffness)
-         let dampingCoeff = 2 * ratio * omega0
-         let expDecay = exp(-dampingCoeff * t)
-         let oscillation = cos(omega0 * sqrt(1 - pow(ratio, 2)) * t)
-
-         return 1 - expDecay * oscillation
-     }
- }
- */

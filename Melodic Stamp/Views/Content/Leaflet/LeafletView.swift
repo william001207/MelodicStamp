@@ -86,8 +86,8 @@ struct LeafletView: View {
 
     private func extractDominantColors(from image: NSImage) async throws -> [Color] {
         let colors = try DominantColors.dominantColors(
-            nsImage: image, quality: .low,
-            algorithm: .CIE94, maxCount: 3, options: [.excludeBlack], sorting: .lightness
+            nsImage: image, quality: .fair,
+            algorithm: .CIEDE2000, maxCount: 3, sorting: .lightness
         )
         return colors.map(Color.init)
     }
