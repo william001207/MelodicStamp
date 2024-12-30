@@ -107,7 +107,7 @@ final class MetadataBatchEditingEntry<V: Hashable & Equatable>: Identifiable {
         }
     }
 
-    func projectedUnwrappedValue<Clean>() -> Binding<Clean>? where V == Clean? {
+    func projectedUnwrappedValue<Wrapped>() -> Binding<Wrapped>? where V == Wrapped? {
         if current == nil {
             nil
         } else {
@@ -174,7 +174,7 @@ extension MetadataBatchEditingEntry: Equatable {
         }
     }
 
-    func projectedUnwrappedValue<Clean>() -> Binding<Clean>? where V == Clean? {
+    func projectedUnwrappedValue<Wrapped>() -> Binding<Wrapped>? where V == Wrapped? {
         switch type {
         case .none, .varied:
             nil
