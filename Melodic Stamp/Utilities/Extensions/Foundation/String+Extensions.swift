@@ -8,6 +8,19 @@
 import Foundation
 
 extension String {
+    static let vowels: [Regex] = [
+        // English
+        /[aeiou]+/,
+        /[aeou]+[hm]+/,
+        /hm*/,
+        // Japanese
+        /[あえいおう]+/,
+        // Chinese
+        /[啊呀哈嗯嘿噢哦嗷呼嘻呃呵]+/,
+    ]
+}
+
+extension String {
     func extractNearest(from startString: String? = nil, to endString: String? = nil) -> Substring {
         let startIndex = if let startString, let index = range(of: startString)?.lowerBound {
             index
@@ -46,8 +59,16 @@ extension String {
 }
 
 extension String {
-    var normalizingParentheses: String {
+    var reversed: String {
+        String(reversed())
+    }
+    
+    var removingParentheses: String {
         replacing(/[\[\]\()（）]/, with: "")
+    }
+    
+    var removingPunctuations: String {
+        replacing(/[\p{P}\s]/, with: "")
     }
 
     var normalizingSpaces: String {

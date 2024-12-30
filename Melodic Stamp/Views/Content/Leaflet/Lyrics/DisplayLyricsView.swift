@@ -73,6 +73,7 @@ struct DisplayLyricsView: View {
         .onChange(of: player.current, initial: true) { _, newValue in
             if let newValue {
                 connectTimer()
+                lyrics.clear(newValue.url)
 
                 Task {
                     let raw = await newValue.metadata.poll(for: \.lyrics).current

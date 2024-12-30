@@ -357,7 +357,7 @@ private extension Metadata {
 extension Metadata: Modifiable {
     var isModified: Bool {
         guard state.isLoaded else { return false }
-        return !restorables.filter(\.isModified).isEmpty
+        return restorables.contains(where: \.isModified)
     }
 }
 

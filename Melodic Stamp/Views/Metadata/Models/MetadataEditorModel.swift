@@ -73,6 +73,6 @@ enum MetadataEditingState: Equatable {
 
 extension MetadataEditorModel: Modifiable {
     var isModified: Bool {
-        !metadatas.filter(\.isModified).isEmpty
+        metadatas.contains(where: \.isModified)
     }
 }

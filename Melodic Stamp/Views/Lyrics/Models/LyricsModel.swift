@@ -249,6 +249,18 @@ struct RawLyrics: Hashable, Equatable, Identifiable {
     var lines: [any LyricLine] {
         storage?.parser.lines ?? []
     }
+    
+    func isIdentical(to url: URL) -> Bool {
+        url == raw?.url
+    }
+    
+    func clear(_ url: URL? = nil) {
+        guard let url, !isIdentical(to: url) else {
+            storage = nil
+            type = nil
+            return
+        }
+    }
 
     func read(_ raw: RawLyrics?, autoRecognizes: Bool = true, forced: Bool = false) async {
         guard forced || raw != self.raw else { return }
@@ -256,15 +268,13 @@ struct RawLyrics: Hashable, Equatable, Identifiable {
 
         guard let raw else {
             // Explicitly set to nothing
-            storage = nil
-            type = nil
+            clear()
             return
         }
 
         guard let content = raw.content else {
             // Implicitly fails, reading nothing
-            storage = nil
-            type = nil
+            clear()
             return
         }
 
@@ -294,15 +304,11 @@ struct RawLyrics: Hashable, Equatable, Identifiable {
 
     func highlight(at time: TimeInterval, in url: URL? = nil) -> Range<Int> {
         guard let storage else { return 0 ..< 0 }
-        let result = storage.parser.highlight(at: time)
-        return if let url {
-            if url == raw?.url {
-                result
-            } else {
-                0 ..< 0
-            }
+        return if let url, !isIdentical(to: url) {
+            // Not the same song
+            0 ..< 0
         } else {
-            result
+            storage.parser.highlight(at: time)
         }
     }
 }

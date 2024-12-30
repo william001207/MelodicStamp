@@ -84,7 +84,7 @@ import SwiftSoup
 
                 lyrics.append(.init(
                     beginTime: beginTime, endTime: endTime,
-                    text: text.normalizingParentheses
+                    text: text.removingParentheses
                 ))
             } else if
                 let spanElement = node as? Element,
@@ -104,7 +104,7 @@ import SwiftSoup
                         let locale = Locale(identifier: language.content)
                         lyrics.translations.append(.init(
                             locale: locale,
-                            text: spanText.normalizingParentheses
+                            text: spanText.removingParentheses
                         ))
                     case .roman:
                         lyrics.roman = spanText
@@ -123,13 +123,16 @@ import SwiftSoup
                 } else {
                     lyrics.append(.init(
                         beginTime: beginTime, endTime: endTime,
-                        text: spanText.normalizingParentheses
+                        text: spanText.removingParentheses
                     ))
                 }
             }
         }
 
         // Preservs spaces between span elements
-        lyrics.insertSpaces(from: text)
+        lyrics.insertSpaces(template: text)
+        
+        // Finds vowels
+        lyrics.findVowels()
     }
 }

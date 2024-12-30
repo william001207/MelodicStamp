@@ -203,7 +203,7 @@ extension MetadataBatchEditingEntry: Equatable {
     }
 
     var isModified: Bool {
-        !filter(\.isModified).isEmpty
+        contains(where: \.isModified)
     }
 
     func restoreAll() {

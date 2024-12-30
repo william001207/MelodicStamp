@@ -73,15 +73,34 @@ struct TTMLLyric: Equatable, Hashable, Identifiable, AnimatedString {
     var content: String {
         text + .init(repeating: " ", count: trailingSpaceCount)
     }
+}
+
+extension TTMLLyric {
+    var startsWithVowel: Bool {
+        String.vowels.contains {
+            content.removingPunctuations
+                .starts(with: $0)
+        } && !isVowel
+    }
     
-    static let vowels: Set<Character> = [
-        // English
-        "a", "e", "i", "o", "u",
-        // Japanese
-        "あ", "え", "い", "お", "う",
-        // Chinese
-        "啊", "呀", "哈", "嗯", "嘿", "噢", "哦", "嗷", "呼", "嘻", "呃", "呵",
-    ]
+    var endsWithVowel: Bool {
+        String.vowels.contains {
+            content.removingPunctuations
+                .reversed
+                .starts(with: $0)
+        } && !isVowel
+    }
+    
+    var isVowel: Bool {
+        String.vowels.contains {
+            content.removingPunctuations
+                .wholeMatch(of: $0) != nil
+        }
+    }
+    
+    var isNonVowel: Bool {
+        !(isVowel || startsWithVowel || endsWithVowel)
+    }
 }
 
 // MARK: - Translation
@@ -114,6 +133,8 @@ struct TTMLTranslation: Equatable, Hashable, Identifiable {
 struct TTMLLyrics: Equatable, Hashable {
     var beginTime: TimeInterval?
     var endTime: TimeInterval?
+    
+    var vowels: Set<TimeInterval> = []
 
     var children: [TTMLLyric] = []
     var translations: [TTMLTranslation] = []
@@ -156,7 +177,45 @@ extension TTMLLyrics: RangeReplaceableCollection {
 }
 
 extension TTMLLyrics {
-    mutating func insertSpaces(from template: String) {
+    mutating func findVowels() {
+        let threshold: TimeInterval = 1
+        var result: Set<TimeInterval> = []
+        var latestVowel: TimeInterval?
+        
+        enumerated().forEach { index, lyric in
+            guard let beginTime = lyric.beginTime, let endTime = lyric.endTime else { return }
+            let reachedEnd = index >= endIndex - 1
+            
+            if let unweappedLatestVowel = latestVowel {
+                // Find an ending vowel
+                
+                if reachedEnd || lyric.startsWithVowel || !lyric.isVowel  {
+                    latestVowel = nil
+                    
+                    if endTime - unweappedLatestVowel >= threshold {
+                        // Reached threshold, count as a long vowel
+                        
+                        result.insert(unweappedLatestVowel)
+                    }
+                }
+            } else {
+                // Find a starting vowel
+                
+                if lyric.endsWithVowel || lyric.isVowel {
+                    latestVowel = beginTime
+                    
+                    if endTime - beginTime >= threshold {
+                        // Must be a long vowel, insert in advance
+                        result.insert(beginTime)
+                    }
+                }
+            }
+        }
+        
+        vowels = result
+    }
+    
+    mutating func insertSpaces(template: String) {
         let terminator: Character = ";"
         var indexedTemplate = template
         enumerated().forEach {
