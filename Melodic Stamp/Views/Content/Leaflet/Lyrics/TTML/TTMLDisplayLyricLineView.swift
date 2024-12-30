@@ -54,7 +54,7 @@ struct TTMLDisplayLyricLineView: View {
         }
         .multilineTextAlignment(textAlignment)
         .frame(maxWidth: .infinity, alignment: alignment)
-        .animation(.smooth, value: elapsedTime) // For text rendering
+        .animation(.linear, value: elapsedTime) // For text rendering
         .onChange(of: isHighlighted, initial: true) { _, newValue in
             if !newValue {
                 withAnimation(.smooth(duration: 0.25).delay(highlightReleasingDelay)) {

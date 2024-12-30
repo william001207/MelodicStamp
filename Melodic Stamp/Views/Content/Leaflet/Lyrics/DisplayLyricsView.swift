@@ -20,7 +20,7 @@ struct DisplayLyricsView: View {
     @State private var isHovering: Bool = false
 
     @State private var fineGrainedElapsedTime: TimeInterval = .zero
-    @State private var timer = Timer.publish(every: 0.01, on: .main, in: .default).autoconnect()
+//    @State private var timer = Timer.publish(every: 0.01, on: .main, in: .default).autoconnect()
 
     var body: some View {
         // Avoid multiple instantializations
@@ -72,7 +72,7 @@ struct DisplayLyricsView: View {
         }
         .onChange(of: player.current, initial: true) { _, newValue in
             if let newValue {
-                connectTimer()
+//                connectTimer()
                 lyrics.clear(newValue.url)
 
                 Task {
@@ -81,14 +81,14 @@ struct DisplayLyricsView: View {
                 }
             } else {
                 playbackTime = nil
-                disconnectTimer()
+//                disconnectTimer()
             }
         }
         .onChange(of: isPlaying, initial: true) { _, newValue in
             if newValue {
-                connectTimer()
+//                connectTimer()
             } else {
-                disconnectTimer()
+//                disconnectTimer()
             }
         }
         .onChange(of: playbackTime) { _, newValue in
@@ -101,9 +101,9 @@ struct DisplayLyricsView: View {
         .onReceive(player.playbackTimePublisher) { playbackTime in
             self.playbackTime = playbackTime
         }
-        .onReceive(timer) { _ in
-            fineGrainedElapsedTime += 0.01
-        }
+//        .onReceive(timer) { _ in
+//            fineGrainedElapsedTime += 0.01
+//        }
     }
 
     private var highlightedRange: Range<Int> {
@@ -175,13 +175,13 @@ struct DisplayLyricsView: View {
         )
     }
 
-    private func connectTimer() {
-        timer = Timer.publish(every: 0.01, on: .main, in: .default).autoconnect()
-    }
-
-    private func disconnectTimer() {
-        timer.upstream.connect().cancel()
-    }
+//    private func connectTimer() {
+//        timer = Timer.publish(every: 0.01, on: .main, in: .default).autoconnect()
+//    }
+//
+//    private func disconnectTimer() {
+//        timer.upstream.connect().cancel()
+//    }
 
     private func opacity(for index: Int, in highlightedRange: Range<Int>) -> CGFloat {
         let distance = abs(index - (highlightedRange.lowerBound))
