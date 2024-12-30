@@ -14,13 +14,9 @@ struct DisplayLyricsView: View {
 
     @Environment(\.luminareAnimation) private var animation
 
-    @State private var playbackTime: PlaybackTime?
-
-    @State private var isPlaying: Bool = false
     @State private var isHovering: Bool = false
 
-    @State private var fineGrainedElapsedTime: TimeInterval = .zero
-//    @State private var timer = Timer.publish(every: 0.01, on: .main, in: .default).autoconnect()
+    @State private var elapsedTime: TimeInterval = .zero
 
     var body: some View {
         // Avoid multiple instantializations
@@ -46,16 +42,13 @@ struct DisplayLyricsView: View {
 
                     if let beginTime, let endTime {
                         let duration = endTime - beginTime
-                        let progress = (fineGrainedElapsedTime - beginTime) / duration
+                        let progress = (elapsedTime - beginTime) / duration
 
                         return if duration >= 4, progress <= 1 {
                             .visible {
-                                HStack {
-                                    ProgressDotsContainerView(elapsedTime: fineGrainedElapsedTime, beginTime: beginTime, endTime: endTime)
-                                        .frame(maxWidth: .infinity, alignment: .leading)
-                                        .padding(.bottom, 32)
-                                    // ProgressView(value: max(0, progress))
-                                }
+                                ProgressDotsContainerView(elapsedTime: elapsedTime, beginTime: beginTime, endTime: endTime)
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                    .padding(.bottom, 32)
                             }
                         } else { .invisible }
                     } else { return .invisible }
@@ -72,46 +65,22 @@ struct DisplayLyricsView: View {
         }
         .onChange(of: player.current, initial: true) { _, newValue in
             if let newValue {
-//                connectTimer()
                 lyrics.clear(newValue.url)
 
                 Task {
                     let raw = await newValue.metadata.poll(for: \.lyrics).current
                     await lyrics.read(raw)
                 }
-            } else {
-                playbackTime = nil
-//                disconnectTimer()
             }
-        }
-        .onChange(of: isPlaying, initial: true) { _, newValue in
-            if newValue {
-//                connectTimer()
-            } else {
-//                disconnectTimer()
-            }
-        }
-        .onChange(of: playbackTime) { _, newValue in
-            guard let elapsed = newValue?.elapsed else { return }
-            fineGrainedElapsedTime = elapsed
-        }
-        .onReceive(player.isPlayingPublisher) { isPlaying in
-            self.isPlaying = isPlaying
         }
         .onReceive(player.playbackTimePublisher) { playbackTime in
-            self.playbackTime = playbackTime
+            guard let elapsed = playbackTime?.elapsed else { return }
+            elapsedTime = elapsed
         }
-//        .onReceive(timer) { _ in
-//            fineGrainedElapsedTime += 0.01
-//        }
     }
 
     private var highlightedRange: Range<Int> {
-        if let timeElapsed = playbackTime?.elapsed {
-            lyrics.highlight(at: timeElapsed)
-        } else {
-            0 ..< 0
-        }
+        lyrics.highlight(at: elapsedTime)
     }
 
     @ViewBuilder private func lyricLine(
@@ -170,18 +139,10 @@ struct DisplayLyricsView: View {
 
     @ViewBuilder private func ttmlLyricLine(line: TTMLLyricLine, index _: Int, isHighlighted: Bool) -> some View {
         TTMLDisplayLyricLineView(
-            line: line, elapsedTime: fineGrainedElapsedTime,
+            line: line, elapsedTime: elapsedTime,
             isHighlighted: isHighlighted
         )
     }
-
-//    private func connectTimer() {
-//        timer = Timer.publish(every: 0.01, on: .main, in: .default).autoconnect()
-//    }
-//
-//    private func disconnectTimer() {
-//        timer.upstream.connect().cancel()
-//    }
 
     private func opacity(for index: Int, in highlightedRange: Range<Int>) -> CGFloat {
         let distance = abs(index - (highlightedRange.lowerBound))
