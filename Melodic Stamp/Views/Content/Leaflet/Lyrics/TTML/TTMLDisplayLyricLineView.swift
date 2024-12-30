@@ -145,7 +145,8 @@ struct TTMLDisplayLyricLineView: View {
 
     private func textRenderer(for lyrics: TTMLLyrics) -> some TextRenderer {
         DisplayLyricsRenderer(
-            elapsedTime: elapsedTime, strings: lyrics.children,
+            elapsedTime: elapsedTime,
+            strings: lyrics.children, vowels: lyrics.vowels,
             inactiveOpacity: inactiveOpacity
         )
     }

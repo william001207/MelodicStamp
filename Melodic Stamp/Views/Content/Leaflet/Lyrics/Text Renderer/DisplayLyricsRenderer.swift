@@ -41,7 +41,6 @@ struct DisplayLyricsGroupCache {
     }
 }
 
-/// *
 struct DisplayLyricsRenderer<Animated>: TextRenderer where Animated: AnimatedString {
     var animatableData: TimeInterval {
         get { elapsedTime }
@@ -50,15 +49,28 @@ struct DisplayLyricsRenderer<Animated>: TextRenderer where Animated: AnimatedStr
 
     var elapsedTime: TimeInterval
     var strings: [Animated]
+    var vowels: Set<TimeInterval> = []
 
     var inactiveOpacity: Double = 0.55
     var blendRadius: Double = 20
+    
     var shadowColor: Color = .white.opacity(0.1)
     var shadowRadius: Double = 5
+    
+    var glowColor: Color = .white.opacity(0.65)
+    var glowScale: Double = 1.1
+    var glowRadius: Double = 8.5
+    var glowDelay: TimeInterval = 0.2
 
     var brightness: Double = 0.5
     var lift: Double = 1.25
     var softness: Double = 0.75
+    
+    func timeToVowels(at time: TimeInterval) -> [TimeInterval] {
+        vowels
+            .map { time - $0 }
+            .map(abs)
+    }
 
     func group(layout: Text.Layout) -> [Animated: [Text.Layout.RunSlice]] {
         let slices = Array(layout.flattenedRunSlices)
@@ -92,7 +104,7 @@ struct DisplayLyricsRenderer<Animated>: TextRenderer where Animated: AnimatedStr
             DisplayLyricsGroupCache.shared.set(key: strings, value: group, identifiedBy: identifier)
         }
 
-        for (lyric, slices) in group {
+        for (index, (lyric, slices)) in group.enumerated() {
             let totalWidth = slices.reduce(0) { $0 + $1.typographicBounds.width }
             var offset: Double = .zero
 
@@ -105,7 +117,7 @@ struct DisplayLyricsRenderer<Animated>: TextRenderer where Animated: AnimatedStr
                 let endTime = lyric.endTime ?? .zero
 
                 draw(
-                    slice: slice,
+                    slice: slice, index: index,
                     beginTime: beginTime + percentage * (endTime - beginTime),
                     endTime: beginTime + (percentage + durationPercentage) * (endTime - beginTime),
                     in: &context
@@ -116,7 +128,7 @@ struct DisplayLyricsRenderer<Animated>: TextRenderer where Animated: AnimatedStr
     }
 
     func draw(
-        slice: Text.Layout.RunSlice,
+        slice: Text.Layout.RunSlice, index: Int,
         beginTime: TimeInterval, endTime: TimeInterval,
         in context: inout GraphicsContext
     ) {
@@ -130,56 +142,110 @@ struct DisplayLyricsRenderer<Animated>: TextRenderer where Animated: AnimatedStr
         let bounds = slice.typographicBounds.rect
         let unclampedFilledWidth = bounds.width * unclampedProgress
         let filledWidth = bounds.width * progress
-        let lift = lift * damping(softenProgress)
-
-        // Unfilled
+        let lift = lift * bentSigmoid(softenProgress)
+        
+        let timeToVowels = timeToVowels(at: self.elapsedTime - Double(index) * glowDelay)
+        
         do {
             var context = context
-
-            context.translateBy(x: 0, y: -lift)
-            context.opacity = inactiveOpacity
-            context.draw(slice)
-        }
-
-        // Filled
-        do {
-            let mask = Path(.init(
-                x: bounds.minX,
-                y: bounds.minY,
-                width: filledWidth + blendRadius / 2,
-                height: bounds.height
-            ))
-
-            var context = context
-            context.addFilter(.shadow(color: shadowColor, radius: shadowRadius))
-            context.clipToLayer { context in
-                context.fill(mask, with: .linearGradient(
-                    .init(colors: [.white, .clear]),
-                    startPoint: .init(x: bounds.minX + unclampedFilledWidth - blendRadius / 2, y: 0),
-                    endPoint: .init(x: bounds.minX + unclampedFilledWidth + blendRadius / 2, y: 0)
-                ))
+            
+            // Scale
+            if let timeToNearestVowel = timeToVowels.min() {
+                let glowScale = lerp(
+                    1, glowScale,
+                    factor: bellCurve(timeToNearestVowel)
+                )
+                
+                context.translateBy(x: bounds.minX, y: bounds.midY)
+                context.scaleBy(x: glowScale, y: glowScale)
+                context.translateBy(x: -bounds.minX, y: -bounds.midY)
             }
-
-            context.translateBy(x: 0, y: -lift)
-            context.addFilter(.brightness(brightness * progress))
-
-            context.draw(slice)
+            
+            // Unfilled
+            do {
+                var context = context
+                
+                context.translateBy(x: 0, y: -lift)
+                context.opacity = inactiveOpacity
+                context.draw(slice)
+            }
+            
+            // Filled
+            do {
+                var context = context
+                let mask = Path(.init(
+                    x: bounds.minX,
+                    y: bounds.minY,
+                    width: filledWidth + blendRadius / 2,
+                    height: bounds.height
+                ))
+                
+                // Shadow
+                if let timeToNearestVowel = timeToVowels.min() {
+                    let glowFactor = lerp(1, glowScale, factor: bellCurve(timeToNearestVowel))
+                    context.addFilter(.shadow(color: glowColor, radius: glowRadius * glowFactor))
+                } else {
+                    context.addFilter(.shadow(color: shadowColor, radius: shadowRadius))
+                }
+                
+                // Mask
+                context.clipToLayer { context in
+                    context.fill(mask, with: .linearGradient(
+                        .init(colors: [.white, .clear]),
+                        startPoint: .init(x: bounds.minX + unclampedFilledWidth - blendRadius / 2, y: 0),
+                        endPoint: .init(x: bounds.minX + unclampedFilledWidth + blendRadius / 2, y: 0)
+                    ))
+                }
+                
+                // Lift
+                context.translateBy(x: 0, y: -lift)
+                
+                // Brightness
+                context.addFilter(.brightness(brightness * progress))
+                
+                // Draw
+                context.draw(slice)
+            }
         }
     }
-
-    private func damping(_ t: Double, stiffness: Double = 1, ratio: Double = 0.5) -> Double {
-        guard t >= 0, t <= 1 else { return t }
-
-        let omega0 = sqrt(stiffness) // Natural frequency
-        let damping = 2 * ratio * omega0 // Damping coefficient
-        let expDecay = exp(-damping * t) // Exponential decay
-        let oscillation = cos(omega0 * sqrt(1 - pow(ratio, 2)) * t)
-
-        return 1 - expDecay * oscillation
+    
+    /// Generates a bell curve value for a given x, mean, standard deviation, and amplitude.
+    /// It's worth noting that the integral of this bell curve is not 1, instead, the max value of this bell curve is always 1.
+    /// - Parameters:
+    ///   - x: The x-value at which to evaluate the bell curve.
+    ///   - mean: The mean (center) of the bell curve.
+    ///   - standardDeviation: The standard deviation (width) of the bell curve. Higher values result in a wider curve.
+    ///   - amplitude: The peak (height) of the bell curve.
+    /// - Returns: The y-value of the bell curve at the given x.
+    private func bellCurve(
+        _ value: Double,
+        mean: Double = .zero,
+        standardDeviation: Double = 1,
+        amplitude: Double = 1
+    ) -> CGFloat {
+        let exponent = -pow(value - mean, 2) / (2 * pow(standardDeviation, 2))
+        return amplitude * exp(exponent)
+    }
+    
+    /// Sigmoid-like function that bends the input curve around 0.5.
+    /// - Parameters:
+    ///   - x: The input value, expected to be in the range [0, 1].
+    ///   - curvature: A parameter to control the curvature. Higher values create a sharper bend.
+    /// - Returns: The transformed output in the range [0, 1].
+    private func bentSigmoid(
+        _ value: Double,
+        curvature: Double = 7.5
+    ) -> Double {
+        guard curvature != 0 else { return value }
+        guard value >= -1, value <= 1 else { return value }
+        
+        return if value >= 0 {
+            1 / (1 + exp(-curvature * (value - 0.5)))
+        } else {
+            -bentSigmoid(-value)
+        }
     }
 }
-
-// */
 
 /*
  struct DisplayLyricsRenderer<Animated>: TextRenderer where Animated: AnimatedString {
