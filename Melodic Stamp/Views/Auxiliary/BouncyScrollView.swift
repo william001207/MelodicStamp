@@ -143,7 +143,7 @@ struct BouncyScrollView<Content: View>: View {
     }
 
     private var animationCompensate: CGFloat {
-        contentOffsets[highlightedRange.upperBound - 1] ?? .zero
+        contentOffsets[max(0, highlightedRange.upperBound - 1)] ?? .zero
     }
 
     @ViewBuilder private func content(at index: Int) -> some View {

@@ -14,7 +14,7 @@ struct TTMLDisplayLyricLineView: View {
     var isHighlighted: Bool = false
 
     var inactiveOpacity: Double = 0.55
-    var highlightDelay: TimeInterval = 0.25
+    var highlightReleasingDelay: TimeInterval = 0.25
 
     @State private var isActive: Bool = false
     @State private var backgroundContentSize: CGSize = .zero
@@ -33,7 +33,9 @@ struct TTMLDisplayLyricLineView: View {
                     .opacity(isActive ? 0 : 1)
             }
 
+            // Shows background lyrics when necessary (has background lyrics && lyrics is active)
             if !line.backgroundLyrics.isEmpty {
+                // Avoid using conditional content, instead, shrink this view to affect layout
                 Color.clear
                     .frame(height: isActive ? backgroundContentSize.height : 0)
                     .frame(maxWidth: .infinity)
@@ -55,7 +57,7 @@ struct TTMLDisplayLyricLineView: View {
         .animation(.smooth, value: elapsedTime) // For text rendering
         .onChange(of: isHighlighted, initial: true) { _, newValue in
             if !newValue {
-                withAnimation(.smooth(duration: 0.25).delay(highlightDelay)) {
+                withAnimation(.smooth(duration: 0.25).delay(highlightReleasingDelay)) {
                     isActive = false
                 }
             } else {

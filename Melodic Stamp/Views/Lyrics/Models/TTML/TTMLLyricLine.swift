@@ -73,6 +73,15 @@ struct TTMLLyric: Equatable, Hashable, Identifiable, AnimatedString {
     var content: String {
         text + .init(repeating: " ", count: trailingSpaceCount)
     }
+    
+    static let vowels: Set<Character> = [
+        // English
+        "a", "e", "i", "o", "u",
+        // Japanese
+        "あ", "え", "い", "お", "う",
+        // Chinese
+        "啊", "呀", "哈", "嗯", "嘿", "噢", "哦", "嗷", "呼", "嘻", "呃", "呵",
+    ]
 }
 
 // MARK: - Translation

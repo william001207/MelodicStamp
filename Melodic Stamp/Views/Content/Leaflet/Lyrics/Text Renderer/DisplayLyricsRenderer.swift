@@ -51,14 +51,14 @@ struct DisplayLyricsRenderer<Animated>: TextRenderer where Animated: AnimatedStr
     var elapsedTime: TimeInterval
     var strings: [Animated]
 
-    var inactiveOpacity: CGFloat = 0.55
-    var blendRadius: CGFloat = 20
+    var inactiveOpacity: Double = 0.55
+    var blendRadius: Double = 20
     var shadowColor: Color = .white.opacity(0.1)
-    var shadowRadius: CGFloat = 5
+    var shadowRadius: Double = 5
 
-    var brightness: CGFloat = 0.5
-    var lift: CGFloat = 2.5
-    var softness: CGFloat = 0.75
+    var brightness: Double = 0.5
+    var lift: Double = 1.25
+    var softness: Double = 0.75
 
     func group(layout: Text.Layout) -> [Animated: [Text.Layout.RunSlice]] {
         let slices = Array(layout.flattenedRunSlices)
@@ -94,7 +94,7 @@ struct DisplayLyricsRenderer<Animated>: TextRenderer where Animated: AnimatedStr
 
         for (lyric, slices) in group {
             let totalWidth = slices.reduce(0) { $0 + $1.typographicBounds.width }
-            var offset: CGFloat = 0
+            var offset: Double = .zero
 
             for slice in slices {
                 let width = slice.typographicBounds.width
@@ -123,14 +123,14 @@ struct DisplayLyricsRenderer<Animated>: TextRenderer where Animated: AnimatedStr
         let elapsedTime = elapsedTime - beginTime
         let duration = endTime - beginTime
 
-        let unclampedProgress: Double = elapsedTime / duration
-        let progress: Double = max(0, min(1, unclampedProgress))
-        let softenProgress: Double = max(0, min(1, elapsedTime / (duration / softness)))
+        let unclampedProgress = elapsedTime / duration
+        let progress = max(0, min(1, unclampedProgress))
+        let softenProgress = max(0, min(1, elapsedTime / (duration / softness)))
 
         let bounds = slice.typographicBounds.rect
-        let unclampedFilledWidth = bounds.width * CGFloat(unclampedProgress)
-        let filledWidth = bounds.width * CGFloat(progress)
-        let lift = lift * damping(CGFloat(softenProgress))
+        let unclampedFilledWidth = bounds.width * unclampedProgress
+        let filledWidth = bounds.width * progress
+        let lift = lift * damping(softenProgress)
 
         // Unfilled
         do {
@@ -161,13 +161,13 @@ struct DisplayLyricsRenderer<Animated>: TextRenderer where Animated: AnimatedStr
             }
 
             context.translateBy(x: 0, y: -lift)
-            context.addFilter(.brightness(Double(brightness) * progress))
+            context.addFilter(.brightness(brightness * progress))
 
             context.draw(slice)
         }
     }
 
-    private func damping(_ t: CGFloat, stiffness: CGFloat = 1, ratio: CGFloat = 0.5) -> CGFloat {
+    private func damping(_ t: Double, stiffness: Double = 1, ratio: Double = 0.5) -> Double {
         guard t >= 0, t <= 1 else { return t }
 
         let omega0 = sqrt(stiffness) // Natural frequency
