@@ -53,10 +53,10 @@ struct DisplayLyricsRenderer<Animated>: TextRenderer where Animated: AnimatedStr
 
     var inactiveOpacity: Double = 0.55
     var blendRadius: Double = 20
-    
+
     var shadowColor: Color = .white.opacity(0.1)
     var shadowRadius: Double = 5
-    
+
     var glowColor: Color = .white.opacity(0.65)
     var glowScale: Double = 1.1
     var glowRadius: Double = 8.5
@@ -65,7 +65,7 @@ struct DisplayLyricsRenderer<Animated>: TextRenderer where Animated: AnimatedStr
     var brightness: Double = 0.5
     var lift: Double = 1.25
     var softness: Double = 0.75
-    
+
     func timeToVowels(at time: TimeInterval) -> [TimeInterval] {
         vowels
             .map { time - $0 }
@@ -143,33 +143,33 @@ struct DisplayLyricsRenderer<Animated>: TextRenderer where Animated: AnimatedStr
         let unclampedFilledWidth = bounds.width * unclampedProgress
         let filledWidth = bounds.width * progress
         let lift = lift * bentSigmoid(softenProgress)
-        
+
         let timeToVowels = timeToVowels(at: self.elapsedTime - Double(index) * glowDelay)
-        
+
         do {
             var context = context
-            
+
             // Scale
             if let timeToNearestVowel = timeToVowels.min() {
                 let glowScale = lerp(
                     1, glowScale,
                     factor: bellCurve(timeToNearestVowel)
                 )
-                
+
                 context.translateBy(x: bounds.minX, y: bounds.midY)
                 context.scaleBy(x: glowScale, y: glowScale)
                 context.translateBy(x: -bounds.minX, y: -bounds.midY)
             }
-            
+
             // Unfilled
             do {
                 var context = context
-                
+
                 context.translateBy(x: 0, y: -lift)
                 context.opacity = inactiveOpacity
                 context.draw(slice)
             }
-            
+
             // Filled
             do {
                 var context = context
@@ -179,7 +179,7 @@ struct DisplayLyricsRenderer<Animated>: TextRenderer where Animated: AnimatedStr
                     width: filledWidth + blendRadius / 2,
                     height: bounds.height
                 ))
-                
+
                 // Shadow
                 if let timeToNearestVowel = timeToVowels.min() {
                     let glowFactor = lerp(1, glowScale, factor: bellCurve(timeToNearestVowel))
@@ -187,7 +187,7 @@ struct DisplayLyricsRenderer<Animated>: TextRenderer where Animated: AnimatedStr
                 } else {
                     context.addFilter(.shadow(color: shadowColor, radius: shadowRadius))
                 }
-                
+
                 // Mask
                 context.clipToLayer { context in
                     context.fill(mask, with: .linearGradient(
@@ -196,19 +196,19 @@ struct DisplayLyricsRenderer<Animated>: TextRenderer where Animated: AnimatedStr
                         endPoint: .init(x: bounds.minX + unclampedFilledWidth + blendRadius / 2, y: 0)
                     ))
                 }
-                
+
                 // Lift
                 context.translateBy(x: 0, y: -lift)
-                
+
                 // Brightness
                 context.addFilter(.brightness(brightness * progress))
-                
+
                 // Draw
                 context.draw(slice)
             }
         }
     }
-    
+
     /// Generates a bell curve value for a given x, mean, standard deviation, and amplitude.
     /// It's worth noting that the integral of this bell curve is not 1, instead, the max value of this bell curve is always 1.
     /// - Parameters:
@@ -226,7 +226,7 @@ struct DisplayLyricsRenderer<Animated>: TextRenderer where Animated: AnimatedStr
         let exponent = -pow(value - mean, 2) / (2 * pow(standardDeviation, 2))
         return amplitude * exp(exponent)
     }
-    
+
     /// Sigmoid-like function that bends the input curve around 0.5.
     /// - Parameters:
     ///   - x: The input value, expected to be in the range [0, 1].
@@ -238,7 +238,7 @@ struct DisplayLyricsRenderer<Animated>: TextRenderer where Animated: AnimatedStr
     ) -> Double {
         guard curvature != 0 else { return value }
         guard value >= -1, value <= 1 else { return value }
-        
+
         return if value >= 0 {
             1 / (1 + exp(-curvature * (value - 0.5)))
         } else {
