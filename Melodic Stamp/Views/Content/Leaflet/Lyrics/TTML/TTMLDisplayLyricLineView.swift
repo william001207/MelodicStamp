@@ -25,12 +25,10 @@ struct TTMLDisplayLyricLineView: View {
                 // It's a must to avoid view hierarchies from being reconstructed
                 // This is causing surprisingly low impact on performance, so use it
                 activeContent()
-                    .foregroundStyle(Color.white)
                     .frame(maxWidth: .infinity, alignment: alignment)
                     .opacity(isActive ? 1 : 0)
 
                 inactiveContent()
-                    .foregroundStyle(Color.white)
                     .frame(maxWidth: .infinity, alignment: alignment)
                     .opacity(isActive ? 0 : 1)
             }
@@ -43,7 +41,6 @@ struct TTMLDisplayLyricLineView: View {
                     .frame(maxWidth: .infinity)
                     .overlay(alignment: alignment) {
                         backgroundContent()
-                            .foregroundStyle(Color.white)
                             .blur(radius: isActive ? 0 : 8)
                             .scaleEffect(isActive ? 1 : 0.8, anchor: .bottom)
                             .opacity(isActive ? 1 : 0)
@@ -55,6 +52,7 @@ struct TTMLDisplayLyricLineView: View {
                     }
             }
         }
+        .foregroundStyle(.white)
         .multilineTextAlignment(textAlignment)
         .frame(maxWidth: .infinity, alignment: alignment)
         .animation(.linear, value: elapsedTime) // For text rendering
