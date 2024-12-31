@@ -36,9 +36,9 @@ protocol Player {
 extension Player {
     func setPlaying(_ playing: Bool) {
         if playing {
-            pause()
-        } else {
             play()
+        } else {
+            pause()
         }
     }
 
