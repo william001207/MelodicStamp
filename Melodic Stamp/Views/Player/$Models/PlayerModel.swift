@@ -177,6 +177,8 @@ import SwiftUI
     init(_ player: Player) {
         self.player = player
         super.init()
+        
+        self.player.delegate = self
 
 //        player.delegate = self
         setupRemoteTransportControls()
@@ -334,21 +336,21 @@ extension PlayerModel {
 //        } catch {}
 //    }
 
-    //    func exportWAVEFile(url: URL) {
-    //        let destURL = url.deletingPathExtension().appendingPathExtension("wav")
-    //        if FileManager.default.fileExists(atPath: destURL.path) {
-    //            // TODO: Handle this
-    //            return
-    //        }
-    //
-    //        do {
-    //            try AudioConverter.convert(url, to: destURL)
-    //            try? AudioFile.copyMetadata(from: url, to: destURL)
-    //        } catch {
-    //            try? FileManager.default.trashItem(at: destURL, resultingItemURL: nil)
-    //
-    //        }
-    //    }
+//    func exportWAVEFile(url: URL) {
+//        let destURL = url.deletingPathExtension().appendingPathExtension("wav")
+//        if FileManager.default.fileExists(atPath: destURL.path) {
+//            // TODO: Handle this
+//            return
+//        }
+//
+//        do {
+//            try AudioConverter.convert(url, to: destURL)
+//            try? AudioFile.copyMetadata(from: url, to: destURL)
+//        } catch {
+//            try? FileManager.default.trashItem(at: destURL, resultingItemURL: nil)
+//
+//        }
+//    }
 
 //    private func setupAudioVisualization() {
 //        player.withEngine { [weak self] engine in
@@ -379,7 +381,7 @@ extension PlayerModel {
 }
 
 extension PlayerModel: PlayerDelegate {
-    func playerDidFinishPlaying(_ player: any MelodicStamp.Player) {
+    func playerDidFinishPlaying(_ player: some MelodicStamp.Player) {
         let index = if playbackLooping {
             // Play again
             currentIndex
@@ -387,8 +389,8 @@ extension PlayerModel: PlayerDelegate {
             // Jump to next track
             nextIndex
         }
+        
         guard let index, playlist.indices.contains(index) else { return }
-
         player.enqueue(playlist[index])
     }
 }

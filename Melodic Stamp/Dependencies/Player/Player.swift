@@ -8,6 +8,8 @@
 import Foundation
 
 protocol Player {
+    var delegate: (any PlayerDelegate)? { get set }
+    
     var isPlaying: Bool { get }
     var isMuted: Bool { get }
 
@@ -60,10 +62,12 @@ extension Player {
 }
 
 protocol PlayerDelegate {
-    func playerDidFinishPlaying(_ player: Player)
+    func playerDidFinishPlaying(_ player: some Player)
 }
 
 struct BlankPlayer: Player {
+    var delegate: (any PlayerDelegate)?
+    
     var isPlaying: Bool { false }
 
     var isMuted: Bool { false }

@@ -8,10 +8,15 @@
 import Foundation
 import SFBAudioEngine
 
-class SFBAudioEnginePlayer: Player {
+class SFBAudioEnginePlayer: NSObject, Player {
     init(_ player: AudioPlayer = .init()) {
         self.player = player
+        super.init()
+        
+        self.player.delegate = self
     }
+    
+    var delegate: (any PlayerDelegate)?
 
     private var player: AudioPlayer
     private var mutedVolume: CGFloat = .zero
@@ -108,6 +113,88 @@ extension SFBAudioEnginePlayer {
             return enablesDoP ? try DoPDecoder(decoder: dsdDecoder) : try DSDPCMDecoder(decoder: dsdDecoder)
         } else {
             return nil
+        }
+    }
+}
+
+extension SFBAudioEnginePlayer: AudioPlayer.Delegate {
+    func audioPlayerEndOfAudio(_ audioPlayer: AudioPlayer) {
+        delegate?.playerDidFinishPlaying(self)
+        
+        if let delegate = self.delegate as? AudioPlayer.Delegate {
+            delegate.audioPlayerEndOfAudio?(audioPlayer)
+        }
+    }
+    
+    func audioPlayer(_ audioPlayer: AudioPlayer, decodingStarted decoder: any PCMDecoding) {
+        if let delegate = self.delegate as? AudioPlayer.Delegate {
+            delegate.audioPlayer?(audioPlayer, decodingStarted: decoder)
+        }
+    }
+    
+    func audioPlayer(_ audioPlayer: AudioPlayer, decodingComplete decoder: any PCMDecoding) {
+        if let delegate = self.delegate as? AudioPlayer.Delegate {
+            delegate.audioPlayer?(audioPlayer, decodingComplete: decoder)
+        }
+    }
+    
+    func audioPlayer(_ audioPlayer: AudioPlayer, encounteredError error: any Error) {
+        if let delegate = self.delegate as? AudioPlayer.Delegate {
+            delegate.audioPlayer?(audioPlayer, encounteredError: error)
+        }
+    }
+    
+    func audioPlayer(_ audioPlayer: AudioPlayer, renderingStarted decoder: any PCMDecoding) {
+        if let delegate = self.delegate as? AudioPlayer.Delegate {
+            delegate.audioPlayer?(audioPlayer, renderingStarted: decoder)
+        }
+    }
+    
+    func audioPlayer(_ audioPlayer: AudioPlayer, renderingComplete decoder: any PCMDecoding) {
+        if let delegate = self.delegate as? AudioPlayer.Delegate {
+            delegate.audioPlayer?(audioPlayer, renderingComplete: decoder)
+        }
+    }
+    
+    func audioPlayer(_ audioPlayer: AudioPlayer, audioWillEndAt hostTime: UInt64) {
+        if let delegate = self.delegate as? AudioPlayer.Delegate {
+            delegate.audioPlayer?(audioPlayer, audioWillEndAt: hostTime)
+        }
+    }
+    
+    func audioPlayer(_ audioPlayer: AudioPlayer, renderingWillStart decoder: any PCMDecoding, at hostTime: UInt64) {
+        if let delegate = self.delegate as? AudioPlayer.Delegate {
+            delegate.audioPlayer?(audioPlayer, renderingWillStart: decoder, at: hostTime)
+        }
+    }
+    
+    func audioPlayer(_ audioPlayer: AudioPlayer, renderingWillComplete decoder: any PCMDecoding, at hostTime: UInt64) {
+        if let delegate = self.delegate as? AudioPlayer.Delegate {
+            delegate.audioPlayer?(audioPlayer, renderingWillComplete: decoder, at: hostTime)
+        }
+    }
+    
+    func audioPlayer(_ audioPlayer: AudioPlayer, decodingCanceled decoder: any PCMDecoding, partiallyRendered: Bool) {
+        if let delegate = self.delegate as? AudioPlayer.Delegate {
+            delegate.audioPlayer?(audioPlayer, decodingCanceled: decoder, partiallyRendered: partiallyRendered)
+        }
+    }
+    
+    func audioPlayerNowPlayingChanged(_ audioPlayer: AudioPlayer) {
+        if let delegate = self.delegate as? AudioPlayer.Delegate {
+            delegate.audioPlayerNowPlayingChanged?(audioPlayer)
+        }
+    }
+    
+    func audioPlayerPlaybackStateChanged(_ audioPlayer: AudioPlayer) {
+        if let delegate = self.delegate as? AudioPlayer.Delegate {
+            delegate.audioPlayerPlaybackStateChanged?(audioPlayer)
+        }
+    }
+    
+    func audioPlayerAVAudioEngineConfigurationChange(_ audioPlayer: AudioPlayer) {
+        if let delegate = self.delegate as? AudioPlayer.Delegate {
+            delegate.audioPlayerAVAudioEngineConfigurationChange?(audioPlayer)
         }
     }
 }
