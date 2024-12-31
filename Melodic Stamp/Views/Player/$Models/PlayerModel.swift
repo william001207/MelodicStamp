@@ -29,7 +29,7 @@ import SwiftUI
     // MARK: Publishers
 
     private var cancellables = Set<AnyCancellable>()
-    private let timer = TimerPublisher(interval: 0.25)
+    private let timer = TimerPublisher(interval: 0.1)
 
     private var playbackTimeSubject = PassthroughSubject<PlaybackTime?, Never>()
     private var isPlayingSubject = PassthroughSubject<Bool, Never>()
@@ -177,7 +177,7 @@ import SwiftUI
     init(_ player: Player) {
         self.player = player
         super.init()
-        
+
         self.player.delegate = self
 
 //        player.delegate = self
@@ -389,7 +389,7 @@ extension PlayerModel: PlayerDelegate {
             // Jump to next track
             nextIndex
         }
-        
+
         guard let index, playlist.indices.contains(index) else { return }
         player.enqueue(playlist[index])
     }

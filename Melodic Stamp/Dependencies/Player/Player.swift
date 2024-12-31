@@ -9,7 +9,7 @@ import Foundation
 
 protocol Player {
     var delegate: (any PlayerDelegate)? { get set }
-    
+
     var isPlaying: Bool { get }
     var isMuted: Bool { get }
 
@@ -67,7 +67,7 @@ protocol PlayerDelegate {
 
 struct BlankPlayer: Player {
     var delegate: (any PlayerDelegate)?
-    
+
     var isPlaying: Bool { false }
 
     var isMuted: Bool { false }
