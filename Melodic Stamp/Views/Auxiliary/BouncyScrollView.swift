@@ -33,7 +33,7 @@ enum BouncyScrollViewIndicator {
     }
 }
 
-struct BouncyScrollView<Content: View>: View {
+struct BouncyScrollView<Content>: View where Content: View {
     var offset: CGFloat = 50
     var delay: TimeInterval = 0.08
     var bounceDelay: TimeInterval = 0.5
@@ -93,9 +93,15 @@ struct BouncyScrollView<Content: View>: View {
         .onAppear {
             updateAnimationState()
         }
-        .onChange(of: highlightedRange) { _, newValue in
+        .onChange(of: highlightedRange) { _, _ in
             withAnimation(.bouncy) {
-                scrollOffset = fold(until: newValue.lowerBound)
+                scroll()
+            }
+        }
+        .onChange(of: contentOffsets) { _, _ in
+            // Corrects offsets when contents changed
+            withAnimation(.smooth) {
+                scroll()
             }
         }
         .onChange(of: highlightedRange) { oldValue, newValue in
@@ -173,6 +179,10 @@ struct BouncyScrollView<Content: View>: View {
             .animation(.spring(bounce: 0.2).delay(delay), value: animationState)
             .animation(.smooth, value: highlightedRange)
             .animation(.smooth, value: animationCompensate)
+    }
+
+    private func scroll() {
+        scrollOffset = fold(until: highlightedRange.lowerBound)
     }
 
     private func fold(until index: Int) -> CGFloat {

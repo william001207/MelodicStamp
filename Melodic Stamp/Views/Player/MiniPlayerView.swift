@@ -34,6 +34,8 @@ struct MiniPlayerView: View {
 
     var namespace: Namespace.ID
 
+    @State private var lyrics: LyricsModel = .init()
+
     @State private var activeControl: ActiveControl = .progress
     @State private var headerControl: HeaderControl = .title
 
@@ -77,6 +79,18 @@ struct MiniPlayerView: View {
         .focused($isFocused)
         .onAppear {
             isFocused = true
+        }
+
+        // Load lyrics
+        .onChange(of: player.current, initial: true) { _, newValue in
+            if let newValue {
+                lyrics.clear(newValue.url)
+
+                Task {
+                    let raw = await newValue.metadata.poll(for: \.lyrics).current
+                    await lyrics.read(raw)
+                }
+            }
         }
 
         // Receive playback time update
