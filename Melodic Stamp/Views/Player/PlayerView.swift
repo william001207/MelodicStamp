@@ -1,5 +1,5 @@
 //
-//  Player.swift
+//  PlayerView.swift
 //  MelodicStamp
 //
 //  Created by KrLite on 2024/11/22.
@@ -8,7 +8,7 @@
 import SFSafeSymbols
 import SwiftUI
 
-struct Player: View {
+struct PlayerView: View {
     @Environment(WindowManagerModel.self) private var windowManager
     @Environment(PlayerModel.self) private var player
     @Environment(PlayerKeyboardControlModel.self) private var playerKeyboardControl

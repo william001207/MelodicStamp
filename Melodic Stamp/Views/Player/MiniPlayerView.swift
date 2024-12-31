@@ -1,5 +1,5 @@
 //
-//  MiniPlayer.swift
+//  MiniPlayerView.swift
 //  MelodicStamp
 //
 //  Created by KrLite on 2024/11/20.
@@ -8,7 +8,7 @@
 import SFSafeSymbols
 import SwiftUI
 
-struct MiniPlayer: View {
+struct MiniPlayerView: View {
     enum ActiveControl: Equatable {
         case progress
         case volume
@@ -465,5 +465,5 @@ struct MiniPlayer: View {
 #Preview {
     @Previewable @Namespace var namespace
 
-    MiniPlayer(namespace: namespace)
+    MiniPlayerView(namespace: namespace)
 }

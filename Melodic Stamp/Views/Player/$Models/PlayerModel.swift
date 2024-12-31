@@ -14,52 +14,12 @@ import SFBAudioEngine
 import SFSafeSymbols
 import SwiftUI
 
-// MARK: - Playback Mode
-
-enum PlaybackMode: String, Hashable, Equatable, CaseIterable, Identifiable {
-    var id: String { rawValue }
-
-    case sequential
-    case loop
-    case shuffle
-
-    var image: Image {
-        switch self {
-        case .sequential:
-            .init(systemSymbol: .musicNoteList)
-        case .loop:
-            .init(systemSymbol: .repeat)
-        case .shuffle:
-            .init(systemSymbol: .shuffle)
-        }
-    }
-
-    func cycle(negate: Bool = false) -> Self {
-        switch self {
-        case .sequential:
-            negate ? .shuffle : .loop
-        case .loop:
-            negate ? .sequential : .shuffle
-        case .shuffle:
-            negate ? .loop : .sequential
-        }
-    }
-}
-
-struct PlaybackTime: Hashable {
-    fileprivate(set) var duration: Duration
-    fileprivate(set) var elapsed: TimeInterval
-
-    var remaining: TimeInterval { duration.timeInterval - elapsed }
-    var progress: CGFloat { elapsed / duration.timeInterval }
-}
-
-// MARK: - Player Model - Fields
+// MARK: - Fields
 
 @Observable final class PlayerModel: NSObject {
     // MARK: Player
 
-    private var player: AudioPlayer = .init()
+    private var player: some Player
 
     private var outputDevices: [AudioDevice] = []
     private var selectedDevice: AudioDevice?
@@ -87,70 +47,61 @@ struct PlaybackTime: Hashable {
 
     // MARK: Playlist & Playback
 
-    private(set) var current: PlaylistItem?
-    private(set) var playlist: [PlaylistItem] = []
+    private(set) var current: PlayableItem?
+    private(set) var playlist: [PlayableItem] = []
 
     var playbackMode: PlaybackMode = .sequential
     var playbackLooping: Bool = false
-
-    var duration: Duration { player.time?.total.map { .seconds($0) } ?? .zero }
-    var timeElapsed: TimeInterval { player.time?.current ?? .zero }
-    var timeRemaining: TimeInterval { player.time?.remaining ?? .zero }
+    
+    var playbackTime: PlaybackTime? { player.playbackTime }
+    var unwrappedPlaybackTime: PlaybackTime {
+        playbackTime ?? .init()
+    }
 
     // MARK: FFT
 
     private var audioDataBuffer: [CGFloat] = []
 
-    // MARK: Functional
+    // MARK: Responsive
 
     var progress: CGFloat {
         get {
-            player.time?.progress ?? .zero
+            unwrappedPlaybackTime.progress
         }
 
         set {
-            // Debounce and cancel if adjustment is smaller than 0.09s
-            let difference = abs(newValue - progress)
-            let timeDifference = duration.timeInterval * difference
-            guard timeDifference > 9 / 100 else { return }
-
-            player.seek(position: max(0, min(1, newValue)))
+            player.seekProgress(to: newValue)
             updateNowPlayingInfo()
         }
     }
 
-    private var mutedVolume: CGFloat = .zero
     var volume: CGFloat {
         get {
-            if isMuted {
-                mutedVolume
-            } else {
-                CGFloat(player.volume)
-            }
+            player.playbackVolume
         }
 
         set {
-            isMuted = false
-            do {
-                try player.setVolume(Float(newValue))
-            } catch {}
+            player.seekVolume(to: newValue)
         }
     }
 
     var isPlaying: Bool {
-        player.isPlaying
+        get {
+            player.isPlaying
+        }
+        
+        set {
+            player.setPlaying(newValue)
+        }
     }
 
-    var isMuted: Bool = false {
-        didSet {
-            do {
-                if isMuted {
-                    mutedVolume = CGFloat(player.volume)
-                    try player.setVolume(0)
-                } else {
-                    try player.setVolume(Float(mutedVolume))
-                }
-            } catch {}
+    var isMuted: Bool {
+        get {
+            player.isMuted
+        }
+        
+        set {
+            player.setMuted(newValue)
         }
     }
 
@@ -223,20 +174,21 @@ struct PlaybackTime: Hashable {
 
     override init() {
         super.init()
-        player.delegate = self
+        
+//        player.delegate = self
         setupRemoteTransportControls()
-        setupAudioVisualization()
+//        setupAudioVisualization()
+        
         timer
             .receive(on: DispatchQueue.main)
             .sink { _ in
                 playbackTime: do {
-                    if let time = self.player.time {
-                        guard
-                            let total = time.total,
-                            let current = time.current
-                        else { break playbackTime }
+                    if let playbackTime = self.playbackTime {
+                        let duration = playbackTime.duration
+                        let elapsed = playbackTime.elapsed
+                        
                         self.playbackTimeSubject.send(.init(
-                            duration: total.duration, elapsed: current
+                            duration: duration, elapsed: elapsed
                         ))
                     } else {
                         self.playbackTimeSubject.send(nil)
@@ -248,11 +200,12 @@ struct PlaybackTime: Hashable {
                 }
             }
             .store(in: &cancellables)
+        
         //        updateDeviceMenu()
     }
 }
 
-// MARK: - Player Model - Functions
+// MARK: - Functions
 
 extension PlayerModel {
     func randomIndex() -> Int? {
@@ -266,19 +219,17 @@ extension PlayerModel {
         }
     }
 
-    func play(item: PlaylistItem) {
+    func play(item: PlayableItem) {
         addToPlaylist(urls: [item.url])
 
         Task { @MainActor in
-            if let decoder = try item.decoder() {
-                self.current = item
-                try self.player.play(decoder)
-            }
+            current = item
+            player.play(item)
         }
     }
 
     func play(url: URL) {
-        if let item = PlaylistItem(url: url) {
+        if let item = PlayableItem(url: url) {
             play(item: item)
         }
     }
@@ -287,13 +238,13 @@ extension PlayerModel {
         for url in urls {
             guard !playlist.contains(where: { $0.url == url }) else { continue }
 
-            if let item = PlaylistItem(url: url) {
+            if let item = PlayableItem(url: url) {
                 addToPlaylist(items: [item])
             }
         }
     }
 
-    func addToPlaylist(items: [PlaylistItem]) {
+    func addToPlaylist(items: [PlayableItem]) {
         for item in items {
             guard !playlist.contains(item) else { continue }
             playlist.append(item)
@@ -316,11 +267,7 @@ extension PlayerModel {
         playlist.move(fromOffsets: indices, toOffset: destination)
     }
 
-    func seek(position: Double) {
-        player.seek(position: position)
-    }
-
-    func removeFromPlaylist(items: [PlaylistItem]) {
+    func removeFromPlaylist(items: [PlayableItem]) {
         removeFromPlaylist(urls: items.map(\.url))
     }
 
@@ -328,34 +275,32 @@ extension PlayerModel {
         removeFromPlaylist(items: playlist)
     }
 
-    func updateDeviceMenu() {
-        do {
-            outputDevices = try AudioDevice.devices.filter { try $0.supportsOutput }
-            if let uid = UserDefaults.standard.string(forKey: "deviceUID"),
-               let deviceID = try? AudioSystemObject.instance.deviceID(forUID: uid),
-               let device = outputDevices.first(where: { $0.objectID == deviceID }) {
-                selectedDevice = device
-                try? player.setOutputDeviceID(deviceID)
-            } else {
-                selectedDevice = outputDevices.first
-                if let device = selectedDevice {
-                    try? player.setOutputDeviceID(device.objectID)
-                }
-            }
-        } catch {}
-    }
-
-    func setOutputDevice(_ device: AudioDevice) {
-        do {
-            try player.setOutputDeviceID(device.objectID)
-            selectedDevice = device
-        } catch {}
-    }
+//    func updateDeviceMenu() {
+//        do {
+//            outputDevices = try AudioDevice.devices.filter { try $0.supportsOutput }
+//            if let uid = UserDefaults.standard.string(forKey: "deviceUID"),
+//               let deviceID = try? AudioSystemObject.instance.deviceID(forUID: uid),
+//               let device = outputDevices.first(where: { $0.objectID == deviceID }) {
+//                selectedDevice = device
+//                try? player.setOutputDeviceID(deviceID)
+//            } else {
+//                selectedDevice = outputDevices.first
+//                if let device = selectedDevice {
+//                    try? player.setOutputDeviceID(device.objectID)
+//                }
+//            }
+//        } catch {}
+//    }
+//
+//    func setOutputDevice(_ device: AudioDevice) {
+//        do {
+//            try player.setOutputDeviceID(device.objectID)
+//            selectedDevice = device
+//        } catch {}
+//    }
 
     func play() {
-        do {
-            try player.play()
-        } catch {}
+        player.play()
     }
 
     func pause() {
@@ -363,9 +308,7 @@ extension PlayerModel {
     }
 
     func togglePlayPause() {
-        do {
-            try player.togglePlayPause()
-        } catch {}
+        player.togglePlaying()
     }
 
     func nextTrack() {
@@ -404,18 +347,18 @@ extension PlayerModel {
     //        }
     //    }
 
-    private func setupAudioVisualization() {
-        player.withEngine { [weak self] engine in
-            guard let self else { return }
-
-            let inputNode = engine.mainMixerNode
-            let bus = 0
-
-            inputNode.installTap(onBus: bus, bufferSize: 1024, format: inputNode.outputFormat(forBus: bus)) { buffer, _ in
-                self.processAudioBuffer(buffer)
-            }
-        }
-    }
+//    private func setupAudioVisualization() {
+//        player.withEngine { [weak self] engine in
+//            guard let self else { return }
+//
+//            let inputNode = engine.mainMixerNode
+//            let bus = 0
+//
+//            inputNode.installTap(onBus: bus, bufferSize: 1024, format: inputNode.outputFormat(forBus: bus)) { buffer, _ in
+//                self.processAudioBuffer(buffer)
+//            }
+//        }
+//    }
 
     private func processAudioBuffer(_ buffer: AVAudioPCMBuffer) {
         guard let channelData = buffer.floatChannelData else { return }
@@ -441,13 +384,9 @@ extension PlayerModel: AudioPlayer.Delegate {
             // Jump to next track
             nextIndex
         }
-        guard let index else { return }
+        guard let index, playlist.indices.contains(index) else { return }
 
-        do {
-            if let decoder = try playlist[index].decoder() {
-                try player.enqueue(decoder)
-            }
-        } catch {}
+        player.enqueue(playlist[index])
     }
 
     func audioPlayerNowPlayingChanged(_ audioPlayer: AudioPlayer) {
@@ -505,14 +444,17 @@ extension PlayerModel {
             -multiplier
         }
         let progress = progress + delta * adjustedMultiplier
-//        self.progress = progress
+        self.progress = progress
 
         return progress >= 0 && progress <= 1
     }
 
     @discardableResult func adjustTime(delta: TimeInterval = 1, multiplier: CGFloat = 1, sign: FloatingPointSign = .plus) -> Bool {
-        guard duration > .zero else { return false }
-        return adjustProgress(delta: delta / duration.timeInterval, multiplier: multiplier, sign: sign)
+        guard unwrappedPlaybackTime.duration > .zero else { return false }
+        return adjustProgress(
+            delta: delta / unwrappedPlaybackTime.duration.timeInterval,
+            multiplier: multiplier, sign: sign
+        )
     }
 
     @discardableResult func adjustVolume(delta: CGFloat = 0.01, multiplier: CGFloat = 1, sign: FloatingPointSign = .plus) -> Bool {
@@ -545,8 +487,8 @@ extension PlayerModel {
         var info = infoCenter.nowPlayingInfo ?? .init()
 
         if hasCurrentTrack {
-            info[MPMediaItemPropertyPlaybackDuration] = duration.timeInterval
-            info[MPNowPlayingInfoPropertyElapsedPlaybackTime] = timeElapsed
+            info[MPMediaItemPropertyPlaybackDuration] = unwrappedPlaybackTime.duration.timeInterval
+            info[MPNowPlayingInfoPropertyElapsedPlaybackTime] = unwrappedPlaybackTime.elapsed
         } else {
             info[MPMediaItemPropertyPlaybackDuration] = nil
             info[MPNowPlayingInfoPropertyElapsedPlaybackTime] = nil

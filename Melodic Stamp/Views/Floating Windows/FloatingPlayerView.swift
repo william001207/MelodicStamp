@@ -19,7 +19,7 @@ struct FloatingPlayerView: View {
         ZStack {
             VisualEffectView(material: .popover, blendingMode: .behindWindow)
 
-            Player(namespace: namespace)
+            PlayerView(namespace: namespace)
         }
         .frame(width: 800, height: 100)
         .clipShape(.rect(cornerRadius: 25))

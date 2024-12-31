@@ -147,7 +147,7 @@ struct DisplayLyricsRenderer<Animated>: TextRenderer where Animated: AnimatedStr
         do {
             var context = context
 
-            // Scale with wave effect
+            // Wave effect
             /*
             if let timeToNearestVowel = timeToVowels.min() {
                 for (index, char) in strings.enumerated() {
@@ -218,45 +218,11 @@ struct DisplayLyricsRenderer<Animated>: TextRenderer where Animated: AnimatedStr
             }
         }
     }
+    
     /*
     private func progressForTime(_ currentTime: TimeInterval, charStartTime: TimeInterval, charEndTime: TimeInterval) -> Double {
         guard charEndTime > charStartTime else { return 1.0 }
         return min(max((currentTime - charStartTime) / (charEndTime - charStartTime), 0.0), 1.0)
     }
     */
-
-    /// Generates a bell curve value for a given x, mean, standard deviation, and amplitude.
-    /// It's worth noting that the integral of this bell curve is not 1, instead, the max value of this bell curve is always 1.
-    /// - Parameters:
-    ///   - x: The x-value at which to evaluate the bell curve.
-    ///   - mean: The mean (center) of the bell curve.
-    ///   - standardDeviation: The standard deviation (width) of the bell curve. Higher values result in a wider curve.
-    ///   - amplitude: The peak (height) of the bell curve.
-    /// - Returns: The y-value of the bell curve at the given x.
-    private func bellCurve(
-        _ value: Double,
-        mean: Double = .zero,
-        standardDeviation: Double = 1,
-        amplitude: Double = 1
-    ) -> CGFloat {
-        let exponent = -pow(value - mean, 2) / (2 * pow(standardDeviation, 2))
-        return amplitude * exp(exponent)
-    }
-
-    /// Sigmoid-like function that bends the input curve around 0.5.
-    /// - Parameters:
-    ///   - x: The input value, expected to be in the range [0, 1].
-    ///   - curvature: A parameter to control the curvature. Higher values create a sharper bend.
-    /// - Returns: The transformed output in the range [0, 1].
-    private func bentSigmoid(
-        _ value: Double,
-        curvature: Double = 7.5
-    ) -> Double {
-        guard curvature != 0 else { return value }
-        guard value >= -1, value <= 1 else { return value }
-
-        return value >= 0
-            ? 1 / (1 + exp(-curvature * (value - 0.5)))
-            : -bentSigmoid(-value)
-    }
 }

@@ -177,8 +177,8 @@ struct PlaylistView: View {
         .buttonStyle(.luminare)
     }
 
-    @ViewBuilder private func itemView(for item: PlaylistItem) -> some View {
-        PlaylistItemView(
+    @ViewBuilder private func itemView(for item: PlayableItem) -> some View {
+        PlayableItemView(
             item: item,
             isSelected: metadataEditor.items.contains(item)
         )
@@ -226,7 +226,7 @@ struct PlaylistView: View {
         }
     }
 
-    @ViewBuilder private func contextMenu(for item: PlaylistItem) -> some View {
+    @ViewBuilder private func contextMenu(for item: PlayableItem) -> some View {
         Button {
             player.play(item: item)
         } label: {
@@ -271,7 +271,7 @@ struct PlaylistView: View {
         return true
     }
 
-    @discardableResult private func handleRemove(items: [PlaylistItem]) -> Bool {
+    @discardableResult private func handleRemove(items: [PlayableItem]) -> Bool {
         guard canRemove else { return false }
         player.removeFromPlaylist(items: items)
         items.forEach { metadataEditor.items.remove($0) }

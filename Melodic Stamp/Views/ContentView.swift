@@ -37,7 +37,7 @@ struct ContentView: View {
                 mainView()
                     .presentedWindowStyle(.titleBar)
             case .miniPlayer:
-                miniPlayer()
+                miniPlayerView()
                     .presentedWindowStyle(.hiddenTitleBar)
             }
         }
@@ -157,8 +157,8 @@ struct ContentView: View {
         }
     }
 
-    @ViewBuilder private func miniPlayer() -> some View {
-        MiniPlayer(namespace: namespace)
+    @ViewBuilder private func miniPlayerView() -> some View {
+        MiniPlayerView(namespace: namespace)
             .padding(8)
             .background {
                 VisualEffectView(

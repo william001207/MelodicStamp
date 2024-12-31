@@ -1,5 +1,5 @@
 //
-//  PlaylistItemView.swift
+//  PlayableItemView.swift
 //  MelodicStamp
 //
 //  Created by KrLite on 2024/11/23.
@@ -8,10 +8,10 @@
 import CSFBAudioEngine
 import SwiftUI
 
-struct PlaylistItemView: View {
+struct PlayableItemView: View {
     @Environment(PlayerModel.self) private var player
 
-    var item: PlaylistItem
+    var item: PlayableItem
     var isSelected: Bool
 
     @State private var isHovering: Bool = false
