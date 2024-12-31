@@ -10,16 +10,18 @@ import CAAudioHardware
 import Combine
 import MediaPlayer
 import os.log
-import SFBAudioEngine
 import SFSafeSymbols
 import SwiftUI
+import SFBAudioEngine
 
 // MARK: - Fields
 
 @Observable final class PlayerModel: NSObject {
+    typealias Player = MelodicStamp.Player
+    
     // MARK: Player
 
-    private var player: some Player
+    private var player: Player
 
     private var outputDevices: [AudioDevice] = []
     private var selectedDevice: AudioDevice?
@@ -172,7 +174,8 @@ import SwiftUI
         }
     }
 
-    override init() {
+    init(_ player: Player) {
+        self.player = player
         super.init()
         
 //        player.delegate = self
@@ -321,15 +324,15 @@ extension PlayerModel {
         play(item: playlist[previousIndex])
     }
 
-    func analyzeFiles(urls: [URL]) {
-        do {
-            let rg = try ReplayGainAnalyzer.analyzeAlbum(urls)
-            os_log("Album gain %.2f dB, peak %.8f; Tracks: [%{public}@]", log: OSLog.default, type: .info, rg.0.gain, rg.0.peak, rg.1.map { url, replayGain in
-                String(format: "\"%@\" gain %.2f dB, peak %.8f", FileManager.default.displayName(atPath: url.lastPathComponent), replayGain.gain, replayGain.peak)
-            }.joined(separator: ", "))
-            // TODO: Notice user we're done
-        } catch {}
-    }
+//    func analyzeFiles(urls: [URL]) {
+//        do {
+//            let rg = try ReplayGainAnalyzer.analyzeAlbum(urls)
+//            os_log("Album gain %.2f dB, peak %.8f; Tracks: [%{public}@]", log: OSLog.default, type: .info, rg.0.gain, rg.0.peak, rg.1.map { url, replayGain in
+//                String(format: "\"%@\" gain %.2f dB, peak %.8f", FileManager.default.displayName(atPath: url.lastPathComponent), replayGain.gain, replayGain.peak)
+//            }.joined(separator: ", "))
+//            // TODO: Notice user we're done
+//        } catch {}
+//    }
 
     //    func exportWAVEFile(url: URL) {
     //        let destURL = url.deletingPathExtension().appendingPathExtension("wav")
@@ -375,8 +378,8 @@ extension PlayerModel {
     }
 }
 
-extension PlayerModel: AudioPlayer.Delegate {
-    func audioPlayerEndOfAudio(_: AudioPlayer) {
+extension PlayerModel: PlayerDelegate {
+    func playerDidFinishPlaying(_ player: any MelodicStamp.Player) {
         let index = if playbackLooping {
             // Play again
             currentIndex
@@ -385,10 +388,12 @@ extension PlayerModel: AudioPlayer.Delegate {
             nextIndex
         }
         guard let index, playlist.indices.contains(index) else { return }
-
+        
         player.enqueue(playlist[index])
     }
+}
 
+extension PlayerModel: AudioPlayer.Delegate {
     func audioPlayerNowPlayingChanged(_ audioPlayer: AudioPlayer) {
         DispatchQueue.main.async {
             if let nowPlayingDecoder = audioPlayer.nowPlaying,
@@ -399,13 +404,13 @@ extension PlayerModel: AudioPlayer.Delegate {
                 self.current = nil
                 self.nextTrack()
             }
-
+            
             self.updateNowPlayingState()
             self.updateNowPlayingInfo()
             self.updateNowPlayingMetadataInfo()
         }
     }
-
+    
     func audioPlayerPlaybackStateChanged(_: AudioPlayer) {
         DispatchQueue.main.async {
             self.updateNowPlayingState()
@@ -413,7 +418,7 @@ extension PlayerModel: AudioPlayer.Delegate {
             self.updateNowPlayingMetadataInfo()
         }
     }
-
+    
     func audioPlayer(_ audioPlayer: AudioPlayer, encounteredError _: Error) {
         audioPlayer.stop()
     }

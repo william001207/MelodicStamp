@@ -14,27 +14,27 @@ protocol Player {
     var playbackTime: PlaybackTime? { get }
     var playbackVolume: CGFloat { get }
 
-    mutating func play(_ item: PlayableItem)
-    mutating func enqueue(_ item: PlayableItem)
+    func play(_ item: PlayableItem)
+    func enqueue(_ item: PlayableItem)
     
-    mutating func play()
-    mutating func pause()
-    mutating func stop()
-    mutating func mute()
-    mutating func unmute()
+    func play()
+    func pause()
+    func stop()
+    func mute()
+    func unmute()
     
-    mutating func setPlaying(_ playing: Bool)
-    mutating func togglePlaying()
-    mutating func setMuted(_ muted: Bool)
-    mutating func toggleMuted()
+    func setPlaying(_ playing: Bool)
+    func togglePlaying()
+    func setMuted(_ muted: Bool)
+    func toggleMuted()
 
-    mutating func seekTime(to time: TimeInterval)
-    mutating func seekProgress(to progress: CGFloat)
-    mutating func seekVolume(to volume: CGFloat)
+    func seekTime(to time: TimeInterval)
+    func seekProgress(to progress: CGFloat)
+    func seekVolume(to volume: CGFloat)
 }
 
 extension Player {
-    mutating func setPlaying(_ playing: Bool) {
+    func setPlaying(_ playing: Bool) {
         if playing {
             pause()
         } else {
@@ -42,11 +42,11 @@ extension Player {
         }
     }
     
-    mutating func togglePlaying() {
+    func togglePlaying() {
         setPlaying(!isPlaying)
     }
     
-    mutating func setMuted(_ muted: Bool) {
+    func setMuted(_ muted: Bool) {
         if muted {
             mute()
         } else {
@@ -54,7 +54,41 @@ extension Player {
         }
     }
     
-    mutating func toggleMuted() {
+    func toggleMuted() {
         setMuted(!isMuted)
     }
+}
+
+protocol PlayerDelegate {
+    func playerDidFinishPlaying(_ player: Player)
+}
+
+struct BlankPlayer: Player {
+    var isPlaying: Bool { false }
+    
+    var isMuted: Bool { false }
+    
+    var playbackTime: PlaybackTime? { nil}
+    
+    var playbackVolume: CGFloat { .zero }
+    
+    func play(_ item: PlayableItem) {}
+    
+    func enqueue(_ item: PlayableItem) {}
+    
+    func play() {}
+    
+    func pause() {}
+    
+    func stop() {}
+    
+    func mute() {}
+    
+    func unmute() {}
+    
+    func seekTime(to time: TimeInterval) {}
+    
+    func seekProgress(to progress: CGFloat) {}
+    
+    func seekVolume(to volume: CGFloat) {}
 }

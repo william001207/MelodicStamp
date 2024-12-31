@@ -7,6 +7,7 @@
 
 import Combine
 import SwiftUI
+import SFBAudioEngine
 
 struct ContentView: View {
     @Environment(\.appearsActive) private var isActive
@@ -19,7 +20,7 @@ struct ContentView: View {
     @State private var floatingWindows: FloatingWindowsModel = .init()
     @State private var windowManager: WindowManagerModel = .init()
     @State private var fileManager: FileManagerModel = .init()
-    @State private var player: PlayerModel = .init()
+    @State private var player: PlayerModel = .init(SFBAudioEnginePlayer())
     @State private var playerKeyboardControl: PlayerKeyboardControlModel = .init()
     @State private var metadataEditor: MetadataEditorModel = .init()
 
@@ -198,5 +199,37 @@ struct ContentView: View {
     private func destroyFloatingWindows() {
         floatingWindows.removeTabBar()
         floatingWindows.removePlayer()
+    }
+}
+
+struct ContentEnvironmentsPreviewModifier: PreviewModifier {
+    typealias Context = (
+        floatingWindows: FloatingWindowsModel,
+        windowManager: WindowManagerModel,
+        fileManager: FileManagerModel,
+        player: PlayerModel,
+        playerKeyboardControl: PlayerKeyboardControlModel,
+        metadataEditor: MetadataEditorModel
+    )
+    
+    static func makeSharedContext() async throws -> Context {
+         (
+            FloatingWindowsModel(),
+            WindowManagerModel(),
+            FileManagerModel(),
+            PlayerModel(BlankPlayer()),
+            PlayerKeyboardControlModel(),
+            MetadataEditorModel()
+         )
+    }
+    
+    func body(content: Content, context: Context) -> some View {
+        content
+            .environment(context.floatingWindows)
+            .environment(context.windowManager)
+            .environment(context.fileManager)
+            .environment(context.player)
+            .environment(context.playerKeyboardControl)
+            .environment(context.metadataEditor)
     }
 }

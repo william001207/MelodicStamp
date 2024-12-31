@@ -119,3 +119,17 @@ struct MainView: View {
         .ignoresSafeArea()
     }
 }
+
+#Preview(traits: .modifier(ContentEnvironmentsPreviewModifier())) {
+    @Previewable @Namespace var namespace
+    @Previewable @State var isInspectorPresented: Bool = true
+    @Previewable @State var selectedContentTab: SidebarContentTab = .playlist
+    @Previewable @State var selectedInspectorTab: SidebarInspectorTab = .commonMetadata
+    
+    MainView(
+        namespace: namespace,
+        isInspectorPresented: $isInspectorPresented,
+        selectedContentTab: $selectedContentTab,
+        selectedInspectorTab: $selectedInspectorTab
+    )
+}

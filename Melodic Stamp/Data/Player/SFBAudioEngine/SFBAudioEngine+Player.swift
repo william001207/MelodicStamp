@@ -8,7 +8,11 @@
 import Foundation
 import SFBAudioEngine
 
-struct SFBAudioPlayer: Player {
+class SFBAudioEnginePlayer: Player {
+    init(_ player: AudioPlayer = .init()) {
+        self.player = player
+    }
+    
     private var player: AudioPlayer
     private var mutedVolume: CGFloat = .zero
     
@@ -26,7 +30,7 @@ struct SFBAudioPlayer: Player {
         .init(player.volume)
     }
     
-    mutating func play(_ item: PlayableItem) {
+    func play(_ item: PlayableItem) {
         do {
             if let decoder = try Self.decoder(for: item) {
                 try player.play(decoder)
@@ -36,7 +40,7 @@ struct SFBAudioPlayer: Player {
         }
     }
     
-    mutating func enqueue(_ item: PlayableItem) {
+    func enqueue(_ item: PlayableItem) {
         do {
             if let decoder = try Self.decoder(for: item) {
                 try player.enqueue(decoder)
@@ -46,7 +50,7 @@ struct SFBAudioPlayer: Player {
         }
     }
     
-    mutating func play() {
+    func play() {
         do {
             try player.play()
         } catch {
@@ -54,34 +58,34 @@ struct SFBAudioPlayer: Player {
         }
     }
     
-    mutating func pause() {
+    func pause() {
         player.pause()
     }
     
-    mutating func stop() {
+    func stop() {
         player.stop()
     }
     
-    mutating func mute() {
+    func mute() {
         isMuted = true
         mutedVolume = playbackVolume
         seekVolume(to: .zero)
     }
     
-    mutating func unmute() {
+    func unmute() {
         isMuted = false
         seekVolume(to: mutedVolume)
     }
     
-    mutating func seekTime(to time: TimeInterval) {
+    func seekTime(to time: TimeInterval) {
         player.seek(time: time)
     }
     
-    mutating func seekProgress(to progress: CGFloat) {
+    func seekProgress(to progress: CGFloat) {
         player.seek(position: Double(progress))
     }
     
-    mutating func seekVolume(to volume: CGFloat) {
+    func seekVolume(to volume: CGFloat) {
         do {
             try player.setVolume(Float(volume))
         } catch {
@@ -90,7 +94,7 @@ struct SFBAudioPlayer: Player {
     }
 }
 
-extension SFBAudioPlayer {
+extension SFBAudioEnginePlayer {
     static func decoder(for item: PlayableItem, enablesDoP: Bool = false) throws -> PCMDecoding? {
         let url = item.url
         guard url.startAccessingSecurityScopedResource() else { return nil }
