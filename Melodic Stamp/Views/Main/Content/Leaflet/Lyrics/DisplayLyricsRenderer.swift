@@ -142,31 +142,31 @@ struct DisplayLyricsRenderer<Animated>: TextRenderer where Animated: AnimatedStr
         let filledWidth = bounds.width * progress
         let liftAmount = lift * bentSigmoid(softenProgress)
 
-        let timeToVowels = timeToVowels(at: self.elapsedTime - Double(index) * glowDelay)
+        let timeToVowels = timeToVowels(at: elapsedTime - Double(index) * glowDelay)
 
         do {
             var context = context
 
             // Wave effect
             /*
-            if let timeToNearestVowel = timeToVowels.min() {
-                for (index, char) in strings.enumerated() {
-                    guard let charBeginTime = char.beginTime, let charEndTime = char.endTime else { continue }
+             if let timeToNearestVowel = timeToVowels.min() {
+                 for (index, char) in strings.enumerated() {
+                     guard let charBeginTime = char.beginTime, let charEndTime = char.endTime else { continue }
 
-                    let charProgress = progressForTime(elapsedTime, charStartTime: charBeginTime, charEndTime: charEndTime)
+                     let charProgress = progressForTime(elapsedTime, charStartTime: charBeginTime, charEndTime: charEndTime)
 
-                    let scale = 1.0 + sin(charProgress * .pi) * 0.2
-                    // let dynamicGlowRadius = sin(charProgress * .pi) * 10.0
-                    // let opacity = sin(charProgress * .pi) * 0.8 + 0.5
+                     let scale = 1.0 + sin(charProgress * .pi) * 0.2
+                     // let dynamicGlowRadius = sin(charProgress * .pi) * 10.0
+                     // let opacity = sin(charProgress * .pi) * 0.8 + 0.5
 
-                    context.translateBy(x: bounds.midX, y: bounds.midY)
-                    context.scaleBy(x: scale, y: scale)
-                    context.translateBy(x: -bounds.midX, y: -bounds.midY)
+                     context.translateBy(x: bounds.midX, y: bounds.midY)
+                     context.scaleBy(x: scale, y: scale)
+                     context.translateBy(x: -bounds.midX, y: -bounds.midY)
 
-                    //context.addFilter(.shadow(color: glowColor.opacity(opacity), radius: dynamicGlowRadius))
-                }
-            }
-            */
+                     //context.addFilter(.shadow(color: glowColor.opacity(opacity), radius: dynamicGlowRadius))
+                 }
+             }
+             */
 
             // Unfilled
             do {
@@ -189,13 +189,13 @@ struct DisplayLyricsRenderer<Animated>: TextRenderer where Animated: AnimatedStr
 
                 // Shadow
                 /*
-                if let timeToNearestVowel = timeToVowels.min() {
-                    let dynamicGlowRadius = sin(progress * .pi) * 10.0
-                    context.addFilter(.shadow(color: glowColor, radius: dynamicGlowRadius))
-                } else {
-                    
-                }
-                */
+                 if let timeToNearestVowel = timeToVowels.min() {
+                     let dynamicGlowRadius = sin(progress * .pi) * 10.0
+                     context.addFilter(.shadow(color: glowColor, radius: dynamicGlowRadius))
+                 } else {
+
+                 }
+                 */
 
                 context.addFilter(.shadow(color: shadowColor, radius: shadowRadius))
                 // Mask
@@ -218,11 +218,11 @@ struct DisplayLyricsRenderer<Animated>: TextRenderer where Animated: AnimatedStr
             }
         }
     }
-    
+
     /*
-    private func progressForTime(_ currentTime: TimeInterval, charStartTime: TimeInterval, charEndTime: TimeInterval) -> Double {
-        guard charEndTime > charStartTime else { return 1.0 }
-        return min(max((currentTime - charStartTime) / (charEndTime - charStartTime), 0.0), 1.0)
-    }
-    */
+     private func progressForTime(_ currentTime: TimeInterval, charStartTime: TimeInterval, charEndTime: TimeInterval) -> Double {
+         guard charEndTime > charStartTime else { return 1.0 }
+         return min(max((currentTime - charStartTime) / (charEndTime - charStartTime), 0.0), 1.0)
+     }
+     */
 }

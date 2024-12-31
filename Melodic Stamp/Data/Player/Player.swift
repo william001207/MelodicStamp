@@ -10,19 +10,19 @@ import Foundation
 protocol Player {
     var isPlaying: Bool { get }
     var isMuted: Bool { get }
-    
+
     var playbackTime: PlaybackTime? { get }
     var playbackVolume: CGFloat { get }
 
     func play(_ item: PlayableItem)
     func enqueue(_ item: PlayableItem)
-    
+
     func play()
     func pause()
     func stop()
     func mute()
     func unmute()
-    
+
     func setPlaying(_ playing: Bool)
     func togglePlaying()
     func setMuted(_ muted: Bool)
@@ -41,11 +41,11 @@ extension Player {
             play()
         }
     }
-    
+
     func togglePlaying() {
         setPlaying(!isPlaying)
     }
-    
+
     func setMuted(_ muted: Bool) {
         if muted {
             mute()
@@ -53,7 +53,7 @@ extension Player {
             unmute()
         }
     }
-    
+
     func toggleMuted() {
         setMuted(!isMuted)
     }
@@ -65,30 +65,30 @@ protocol PlayerDelegate {
 
 struct BlankPlayer: Player {
     var isPlaying: Bool { false }
-    
+
     var isMuted: Bool { false }
-    
-    var playbackTime: PlaybackTime? { nil}
-    
+
+    var playbackTime: PlaybackTime? { nil }
+
     var playbackVolume: CGFloat { .zero }
-    
-    func play(_ item: PlayableItem) {}
-    
-    func enqueue(_ item: PlayableItem) {}
-    
+
+    func play(_: PlayableItem) {}
+
+    func enqueue(_: PlayableItem) {}
+
     func play() {}
-    
+
     func pause() {}
-    
+
     func stop() {}
-    
+
     func mute() {}
-    
+
     func unmute() {}
-    
-    func seekTime(to time: TimeInterval) {}
-    
-    func seekProgress(to progress: CGFloat) {}
-    
-    func seekVolume(to volume: CGFloat) {}
+
+    func seekTime(to _: TimeInterval) {}
+
+    func seekProgress(to _: CGFloat) {}
+
+    func seekVolume(to _: CGFloat) {}
 }

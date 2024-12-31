@@ -6,8 +6,8 @@
 //
 
 import Combine
-import SwiftUI
 import SFBAudioEngine
+import SwiftUI
 
 struct ContentView: View {
     @Environment(\.appearsActive) private var isActive
@@ -211,18 +211,18 @@ struct ContentEnvironmentsPreviewModifier: PreviewModifier {
         playerKeyboardControl: PlayerKeyboardControlModel,
         metadataEditor: MetadataEditorModel
     )
-    
+
     static func makeSharedContext() async throws -> Context {
-         (
+        (
             FloatingWindowsModel(),
             WindowManagerModel(),
             FileManagerModel(),
             PlayerModel(BlankPlayer()),
             PlayerKeyboardControlModel(),
             MetadataEditorModel()
-         )
+        )
     }
-    
+
     func body(content: Content, context: Context) -> some View {
         content
             .environment(context.floatingWindows)

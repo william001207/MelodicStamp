@@ -1,5 +1,5 @@
 //
-//  AudioPlayer+Extensions.swift
+//  SFBAudioEngine+Player.swift
 //  Melodic Stamp
 //
 //  Created by KrLite on 2024/12/31.
@@ -12,24 +12,24 @@ class SFBAudioEnginePlayer: Player {
     init(_ player: AudioPlayer = .init()) {
         self.player = player
     }
-    
+
     private var player: AudioPlayer
     private var mutedVolume: CGFloat = .zero
-    
+
     var isPlaying: Bool { player.isPlaying }
     private(set) var isMuted: Bool = false
-    
+
     var playbackTime: PlaybackTime? {
         player.time.flatMap {
             guard let total = $0.total, let current = $0.current else { return nil }
             return .init(duration: total.duration, elapsed: current)
         }
     }
-    
+
     var playbackVolume: CGFloat {
         .init(player.volume)
     }
-    
+
     func play(_ item: PlayableItem) {
         do {
             if let decoder = try Self.decoder(for: item) {
@@ -39,7 +39,7 @@ class SFBAudioEnginePlayer: Player {
             print(error)
         }
     }
-    
+
     func enqueue(_ item: PlayableItem) {
         do {
             if let decoder = try Self.decoder(for: item) {
@@ -49,7 +49,7 @@ class SFBAudioEnginePlayer: Player {
             print(error)
         }
     }
-    
+
     func play() {
         do {
             try player.play()
@@ -57,34 +57,34 @@ class SFBAudioEnginePlayer: Player {
             print(error)
         }
     }
-    
+
     func pause() {
         player.pause()
     }
-    
+
     func stop() {
         player.stop()
     }
-    
+
     func mute() {
         isMuted = true
         mutedVolume = playbackVolume
         seekVolume(to: .zero)
     }
-    
+
     func unmute() {
         isMuted = false
         seekVolume(to: mutedVolume)
     }
-    
+
     func seekTime(to time: TimeInterval) {
         player.seek(time: time)
     }
-    
+
     func seekProgress(to progress: CGFloat) {
         player.seek(position: Double(progress))
     }
-    
+
     func seekVolume(to volume: CGFloat) {
         do {
             try player.setVolume(Float(volume))

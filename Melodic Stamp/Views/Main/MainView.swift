@@ -122,10 +122,10 @@ struct MainView: View {
 
 #Preview(traits: .modifier(ContentEnvironmentsPreviewModifier())) {
     @Previewable @Namespace var namespace
-    @Previewable @State var isInspectorPresented: Bool = true
+    @Previewable @State var isInspectorPresented = true
     @Previewable @State var selectedContentTab: SidebarContentTab = .playlist
     @Previewable @State var selectedInspectorTab: SidebarInspectorTab = .commonMetadata
-    
+
     MainView(
         namespace: namespace,
         isInspectorPresented: $isInspectorPresented,

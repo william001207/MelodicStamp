@@ -1,5 +1,5 @@
 //
-//  PlayableItemView.swift
+//  PlaylistItemView.swift
 //  MelodicStamp
 //
 //  Created by KrLite on 2024/11/23.

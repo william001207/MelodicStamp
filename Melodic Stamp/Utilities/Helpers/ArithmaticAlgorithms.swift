@@ -41,8 +41,8 @@ func bentSigmoid<Value>(
 ) -> Value where Value: BinaryFloatingPoint {
     guard curvature != 0 else { return value }
     guard value >= -1, value <= 1 else { return value }
-    
+
     return value >= 0
-    ? Value(1 / (1 + exp(Double(-curvature * (value - 0.5)))))
-    : -bentSigmoid(-value)
+        ? Value(1 / (1 + exp(Double(-curvature * (value - 0.5)))))
+        : -bentSigmoid(-value)
 }

@@ -10,15 +10,15 @@ import CAAudioHardware
 import Combine
 import MediaPlayer
 import os.log
+import SFBAudioEngine
 import SFSafeSymbols
 import SwiftUI
-import SFBAudioEngine
 
 // MARK: - Fields
 
 @Observable final class PlayerModel: NSObject {
     typealias Player = MelodicStamp.Player
-    
+
     // MARK: Player
 
     private var player: Player
@@ -54,7 +54,7 @@ import SFBAudioEngine
 
     var playbackMode: PlaybackMode = .sequential
     var playbackLooping: Bool = false
-    
+
     var playbackTime: PlaybackTime? { player.playbackTime }
     var unwrappedPlaybackTime: PlaybackTime {
         playbackTime ?? .init()
@@ -91,7 +91,7 @@ import SFBAudioEngine
         get {
             player.isPlaying
         }
-        
+
         set {
             player.setPlaying(newValue)
         }
@@ -101,7 +101,7 @@ import SFBAudioEngine
         get {
             player.isMuted
         }
-        
+
         set {
             player.setMuted(newValue)
         }
@@ -177,11 +177,11 @@ import SFBAudioEngine
     init(_ player: Player) {
         self.player = player
         super.init()
-        
+
 //        player.delegate = self
         setupRemoteTransportControls()
 //        setupAudioVisualization()
-        
+
         timer
             .receive(on: DispatchQueue.main)
             .sink { _ in
@@ -189,7 +189,7 @@ import SFBAudioEngine
                     if let playbackTime = self.playbackTime {
                         let duration = playbackTime.duration
                         let elapsed = playbackTime.elapsed
-                        
+
                         self.playbackTimeSubject.send(.init(
                             duration: duration, elapsed: elapsed
                         ))
@@ -203,7 +203,7 @@ import SFBAudioEngine
                 }
             }
             .store(in: &cancellables)
-        
+
         //        updateDeviceMenu()
     }
 }
@@ -388,7 +388,7 @@ extension PlayerModel: PlayerDelegate {
             nextIndex
         }
         guard let index, playlist.indices.contains(index) else { return }
-        
+
         player.enqueue(playlist[index])
     }
 }
@@ -404,13 +404,13 @@ extension PlayerModel: AudioPlayer.Delegate {
                 self.current = nil
                 self.nextTrack()
             }
-            
+
             self.updateNowPlayingState()
             self.updateNowPlayingInfo()
             self.updateNowPlayingMetadataInfo()
         }
     }
-    
+
     func audioPlayerPlaybackStateChanged(_: AudioPlayer) {
         DispatchQueue.main.async {
             self.updateNowPlayingState()
@@ -418,7 +418,7 @@ extension PlayerModel: AudioPlayer.Delegate {
             self.updateNowPlayingMetadataInfo()
         }
     }
-    
+
     func audioPlayer(_ audioPlayer: AudioPlayer, encounteredError _: Error) {
         audioPlayer.stop()
     }
