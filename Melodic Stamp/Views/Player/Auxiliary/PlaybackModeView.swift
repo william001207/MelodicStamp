@@ -1,6 +1,6 @@
 //
 //  PlaybackModeView.swift
-//  Melodic Stamp
+//  MelodicStamp
 //
 //  Created by KrLite on 2024/12/8.
 //
@@ -12,7 +12,7 @@ struct PlaybackModeView: View {
 
     var body: some View {
         HStack {
-            mode.image
+            Image(systemSymbol: mode.systemSymbol)
 
             Text(Self.name(of: mode))
         }

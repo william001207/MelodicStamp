@@ -201,35 +201,3 @@ struct ContentView: View {
         floatingWindows.removePlayer()
     }
 }
-
-struct ContentEnvironmentsPreviewModifier: PreviewModifier {
-    typealias Context = (
-        floatingWindows: FloatingWindowsModel,
-        windowManager: WindowManagerModel,
-        fileManager: FileManagerModel,
-        player: PlayerModel,
-        playerKeyboardControl: PlayerKeyboardControlModel,
-        metadataEditor: MetadataEditorModel
-    )
-
-    static func makeSharedContext() async throws -> Context {
-        (
-            FloatingWindowsModel(),
-            WindowManagerModel(),
-            FileManagerModel(),
-            PlayerModel(BlankPlayer()),
-            PlayerKeyboardControlModel(),
-            MetadataEditorModel()
-        )
-    }
-
-    func body(content: Content, context: Context) -> some View {
-        content
-            .environment(context.floatingWindows)
-            .environment(context.windowManager)
-            .environment(context.fileManager)
-            .environment(context.player)
-            .environment(context.playerKeyboardControl)
-            .environment(context.metadataEditor)
-    }
-}

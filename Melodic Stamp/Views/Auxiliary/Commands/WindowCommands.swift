@@ -1,6 +1,6 @@
 //
 //  WindowCommands.swift
-//  Melodic Stamp
+//  MelodicStamp
 //
 //  Created by KrLite on 2024/12/8.
 //

@@ -1,6 +1,6 @@
 //
 //  AdaptableMusicCoverControl.swift
-//  Melodic Stamp
+//  MelodicStamp
 //
 //  Created by KrLite on 2024/12/1.
 //
@@ -149,14 +149,30 @@ struct AdaptableMusicCoverControl: View {
         }
     }
 
-//    private func registerUndo(_ oldValue: Set<AttachedPicture>, for entries: Entries) {
-//        guard oldValue != entries.projectedValue?.wrappedValue ?? [] else { return }
-//        undoManager?.registerUndo(withTarget: self.attachedPicturesHandler) { _ in
-//            let entries = self.entries
-//            let fallback = self.attachedPicturesHandler.copy(contents: entries)
-//            entries.setAll(oldValue)
-//
-//            self.registerUndo(fallback, for: entries)
-//        }
-//    }
+    private func registerUndo(_ oldValue: Set<AttachedPicture>, for entries: Entries) {
+        guard oldValue != entries.projectedValue?.wrappedValue ?? [] else { return }
+        undoManager?.registerUndo(withTarget: attachedPicturesHandler) { _ in
+            let entries = self.entries
+            let fallback = attachedPicturesHandler.copy(contents: entries)
+            entries.setAll(oldValue)
+
+            registerUndo(fallback, for: entries)
+        }
+    }
+}
+
+private struct AdaptableMusicCoverControlPreview: View {
+    @Environment(MetadataEditorModel.self) private var metadataEditor
+
+    var body: some View {
+        AdaptableMusicCoverControl(
+            entries: metadataEditor[extracting: \.attachedPictures],
+            type: .other
+        )
+    }
+}
+
+#Preview(traits: .modifier(SampleEnvironmentsPreviewModifier())) {
+    AdaptableMusicCoverControlPreview()
+        .environment(AttachedPicturesHandlerModel())
 }

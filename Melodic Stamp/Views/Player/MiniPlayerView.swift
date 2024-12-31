@@ -157,7 +157,7 @@ struct MiniPlayerView: View {
                 player.playbackMode = player.playbackMode.cycle(
                     negate: hasShift)
             } label: {
-                player.playbackMode.image
+                Image(systemSymbol: player.playbackMode.systemSymbol)
                     .contentTransition(.symbolEffect(.replace))
                     .frame(width: 16)
             }
@@ -462,7 +462,7 @@ struct MiniPlayerView: View {
     }
 }
 
-#Preview {
+#Preview(traits: .modifier(SampleEnvironmentsPreviewModifier())) {
     @Previewable @Namespace var namespace
 
     MiniPlayerView(namespace: namespace)

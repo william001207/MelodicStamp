@@ -1,6 +1,6 @@
 //
 //  AdaptableMusicCovers.swift
-//  Melodic Stamp
+//  MelodicStamp
 //
 //  Created by KrLite on 2024/12/1.
 //
@@ -86,4 +86,21 @@ struct AdaptableMusicCovers<Content>: View where Content: View {
     }
 
     @ViewBuilder private func listView() -> some View {}
+}
+
+private struct AdaptableMusicCoversPreview: View {
+    @Environment(MetadataEditorModel.self) private var metadataEditor
+
+    var body: some View {
+        AdaptableMusicCovers(
+            entries: metadataEditor[extracting: \.attachedPictures]
+        ) {
+            Color.red
+        }
+    }
+}
+
+#Preview(traits: .modifier(SampleEnvironmentsPreviewModifier())) {
+    AdaptableMusicCoversPreview()
+        .environment(AttachedPicturesHandlerModel())
 }

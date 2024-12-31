@@ -1,6 +1,6 @@
 //
 //  InspectorLyricsView.swift
-//  Melodic Stamp
+//  MelodicStamp
 //
 //  Created by Xinshao_Air on 2024/12/1.
 //

@@ -1,6 +1,6 @@
 //
 //  EditingCommands.swift
-//  Melodic Stamp
+//  MelodicStamp
 //
 //  Created by KrLite on 2024/11/24.
 //

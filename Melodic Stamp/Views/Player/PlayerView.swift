@@ -69,7 +69,7 @@ struct PlayerView: View {
                 player.playbackMode = player.playbackMode.cycle(
                     negate: hasShift)
             } label: {
-                player.playbackMode.image
+                Image(systemSymbol: player.playbackMode.systemSymbol)
                     .font(.headline)
                     .contentTransition(.symbolEffect(.replace))
                     .frame(width: 20)
@@ -291,4 +291,10 @@ struct PlayerView: View {
             player.volume = newValue
         }
     }
+}
+
+#Preview(traits: .modifier(SampleEnvironmentsPreviewModifier())) {
+    @Previewable @Namespace var namespace
+
+    PlayerView(namespace: namespace)
 }
