@@ -15,7 +15,6 @@ struct DisplayLyricsView: View {
     @Environment(\.luminareAnimation) private var animation
 
     @State private var isHovering: Bool = false
-
     @State private var elapsedTime: TimeInterval = .zero
 
     var body: some View {

@@ -265,7 +265,7 @@ struct MiniPlayerView: View {
                 )
 
                 AliveButton {
-                    player.togglePlayPause()
+                    player.isPlaying.toggle()
                     playerKeyboardControl.isPressingSpace = false
                 } label: {
                     player.playPauseImage

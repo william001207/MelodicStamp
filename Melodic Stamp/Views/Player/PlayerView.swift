@@ -147,7 +147,7 @@ struct PlayerView: View {
             )
 
             AliveButton {
-                player.togglePlayPause()
+                player.isPlaying.toggle()
                 playerKeyboardControl.isPressingSpace = false
             } label: {
                 player.playPauseImage

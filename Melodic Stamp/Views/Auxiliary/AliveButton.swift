@@ -19,10 +19,11 @@ struct AliveButton<Label>: View where Label: View {
     var hoveringStyle: AnyShapeStyle?
     var disabledStyle: AnyShapeStyle
 
-    var onGestureChanged: (DragGesture.Value) -> ()
-    var onGestureEnded: (DragGesture.Value) -> ()
     var action: () -> ()
     @ViewBuilder var label: () -> Label
+    
+    var onGestureChanged: ((DragGesture.Value) -> Void)?
+    var onGestureEnded: ((DragGesture.Value) -> Void)?
 
     @State private var isHovering: Bool = false
     @State private var isActive: Bool = false
@@ -33,8 +34,8 @@ struct AliveButton<Label>: View where Label: View {
         enabledStyle: some ShapeStyle = .primary, hoveringStyle: some ShapeStyle, disabledStyle: some ShapeStyle = .quinary,
         action: @escaping () -> (),
         @ViewBuilder label: @escaping () -> Label,
-        onGestureChanged: @escaping (DragGesture.Value) -> () = { _ in },
-        onGestureEnded: @escaping (DragGesture.Value) -> () = { _ in }
+        onGestureChanged: ((DragGesture.Value) -> ())? = nil,
+        onGestureEnded: ((DragGesture.Value) -> ())? = nil
     ) {
         self.scaleFactor = scaleFactor
         self.shadowRadius = shadowRadius
@@ -53,8 +54,8 @@ struct AliveButton<Label>: View where Label: View {
         enabledStyle: some ShapeStyle = .primary, disabledStyle: some ShapeStyle = .quinary,
         action: @escaping () -> (),
         @ViewBuilder label: @escaping () -> Label,
-        onGestureChanged: @escaping (DragGesture.Value) -> () = { _ in },
-        onGestureEnded: @escaping (DragGesture.Value) -> () = { _ in }
+        onGestureChanged: ((DragGesture.Value) -> ())? = nil,
+        onGestureEnded: ((DragGesture.Value) -> ())? = nil
     ) {
         self.scaleFactor = scaleFactor
         self.shadowRadius = shadowRadius
@@ -75,7 +76,7 @@ struct AliveButton<Label>: View where Label: View {
                     guard isEnabled else { return }
                     isActive = true
 
-                    onGestureChanged(gesture)
+                    onGestureChanged?(gesture)
                 }
                 .onEnded { gesture in
                     guard isEnabled else { return }
@@ -86,7 +87,7 @@ struct AliveButton<Label>: View where Label: View {
                         action()
                     }
 
-                    onGestureEnded(gesture)
+                    onGestureEnded?(gesture)
                 })
             .onGeometryChange(for: CGRect.self) { proxy in
                 proxy.frame(in: .local)

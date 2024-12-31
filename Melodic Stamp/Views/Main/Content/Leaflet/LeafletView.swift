@@ -32,7 +32,11 @@ struct LeafletView: View {
 
                     AliveButton {
                         withAnimation {
-                            isShowingLyrics.toggle()
+                            if hasLyrics {
+                                isShowingLyrics.toggle()
+                            } else {
+                                player.isPlaying.toggle()
+                            }
                         }
                     } label: {
                         MusicCover(
@@ -59,7 +63,7 @@ struct LeafletView: View {
                         }
                     }
 
-                    if isShowingLyrics {
+                    if hasLyrics && isShowingLyrics {
                         DisplayLyricsView()
                             .transition(.blurReplace)
                     }
@@ -82,6 +86,10 @@ struct LeafletView: View {
                 self.isPlaying = isPlaying
             }
         }
+    }
+    
+    private var hasLyrics: Bool {
+        !lyrics.lines.isEmpty
     }
 
     private func extractDominantColors(from image: NSImage) async throws -> [Color] {
