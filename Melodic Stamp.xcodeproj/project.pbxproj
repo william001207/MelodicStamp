@@ -11,7 +11,6 @@
 		2845A9F72D08745900CD7517 /* SmartCache in Frameworks */ = {isa = PBXBuildFile; productRef = 2845A9F62D08745900CD7517 /* SmartCache */; };
 		28797B9A2D10724C00FB4395 /* SwiftUIIntrospect in Frameworks */ = {isa = PBXBuildFile; productRef = 28797B992D10724C00FB4395 /* SwiftUIIntrospect */; };
 		287F978D2CF3160700C60307 /* Luminare in Frameworks */ = {isa = PBXBuildFile; productRef = 287F978C2CF3160700C60307 /* Luminare */; };
-		28BA12B92D2504860066F8EB /* SwiftState in Frameworks */ = {isa = PBXBuildFile; productRef = 28BA12B82D2504860066F8EB /* SwiftState */; };
 		65DFF89D2CFC2A6F00285040 /* SwiftSoup in Frameworks */ = {isa = PBXBuildFile; productRef = 65DFF89C2CFC2A6F00285040 /* SwiftSoup */; };
 		65EE5C962D1CEBBD0026B8F1 /* MeshGradient in Frameworks */ = {isa = PBXBuildFile; productRef = 65EE5C952D1CEBBD0026B8F1 /* MeshGradient */; };
 		65EE5C982D1CEBBD0026B8F1 /* MeshGradientCHeaders in Frameworks */ = {isa = PBXBuildFile; productRef = 65EE5C972D1CEBBD0026B8F1 /* MeshGradientCHeaders */; };
@@ -52,7 +51,6 @@
 				65F1DA7D2CED77F100389E37 /* SFBAudioEngine in Frameworks */,
 				65F1DA842CED788D00389E37 /* CAAudioHardware in Frameworks */,
 				65EE5C982D1CEBBD0026B8F1 /* MeshGradientCHeaders in Frameworks */,
-				28BA12B92D2504860066F8EB /* SwiftState in Frameworks */,
 				65EE5C962D1CEBBD0026B8F1 /* MeshGradient in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -109,7 +107,6 @@
 				65EE5C952D1CEBBD0026B8F1 /* MeshGradient */,
 				65EE5C972D1CEBBD0026B8F1 /* MeshGradientCHeaders */,
 				65EE5C9A2D1CEBD30026B8F1 /* DominantColors */,
-				28BA12B82D2504860066F8EB /* SwiftState */,
 			);
 			productName = MelodicStamp;
 			productReference = 65F1DA012CECCEE900389E37 /* MelodicStamp.app */;
@@ -153,7 +150,6 @@
 				28797B982D10724C00FB4395 /* XCRemoteSwiftPackageReference "swiftui-introspect" */,
 				65EE5C942D1CEBBD0026B8F1 /* XCRemoteSwiftPackageReference "MeshGradient" */,
 				65EE5C992D1CEBD30026B8F1 /* XCRemoteSwiftPackageReference "DominantColors" */,
-				28BA12B72D2504860066F8EB /* XCRemoteSwiftPackageReference "SwiftState" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 65F1DA022CECCEE900389E37 /* Products */;
@@ -427,14 +423,6 @@
 				kind = branch;
 			};
 		};
-		28BA12B72D2504860066F8EB /* XCRemoteSwiftPackageReference "SwiftState" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/ReactKit/SwiftState";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 6.0.1;
-			};
-		};
 		65DFF89B2CFC2A6F00285040 /* XCRemoteSwiftPackageReference "SwiftSoup" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/scinfu/SwiftSoup";
@@ -521,11 +509,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 287F978B2CF3160600C60307 /* XCRemoteSwiftPackageReference "Luminare" */;
 			productName = Luminare;
-		};
-		28BA12B82D2504860066F8EB /* SwiftState */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 28BA12B72D2504860066F8EB /* XCRemoteSwiftPackageReference "SwiftState" */;
-			productName = SwiftState;
 		};
 		65DFF89C2CFC2A6F00285040 /* SwiftSoup */ = {
 			isa = XCSwiftPackageProductDependency;

@@ -1,5 +1,5 @@
 {
-  "originHash" : "929863181f094d28a7f795a93a449fddae64259aac0f264e52bfe6cf4a440f37",
+  "originHash" : "4514d8c92410fcfc774b458dffb34494e8fb2175ee96501b6f61195093c93412",
   "pins" : [
     {
       "identity" : "avfaudioextensions",
@@ -242,15 +242,6 @@
       "state" : {
         "revision" : "0837db354faf9c9deb710dc597046edaadf5360f",
         "version" : "2.7.6"
-      }
-    },
-    {
-      "identity" : "swiftstate",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/ReactKit/SwiftState",
-      "state" : {
-        "revision" : "887e75b96da6be36a062e1b0ef832c32a803348b",
-        "version" : "6.0.1"
       }
     },
     {

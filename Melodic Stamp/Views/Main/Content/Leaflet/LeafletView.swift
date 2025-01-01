@@ -7,67 +7,20 @@
 
 import DominantColors
 import SwiftUI
-import SwiftState
 
 struct LeafletView: View {
     @Environment(PlayerModel.self) private var player
     @Environment(MetadataEditorModel.self) private var metadataEditor
     @Environment(LyricsModel.self) private var lyrics
 
-    @SwiftUI.State private var dominantColors: [Color] = [.init(hex: 0x929292), .init(hex: 0xFFFFFF), .init(hex: 0x929292)]
-    @SwiftUI.State private var isPlaying: Bool = false
-    @SwiftUI.State private var isShowingLyrics: Bool = true
-    
-    @SwiftUI.State private var interactionStateDelegationProgress: CGFloat = .zero
-    @SwiftUI.State private var interactionStateDispatch: DispatchWorkItem?
-    @SwiftUI.State private var hasInteractionStateProgressRing: Bool = true
-    
-    lazy var interactionStateMachine: AppleMusicScrollViewInteractionState.Machine = .init(state: .following) { machine in
-        machine.addRoutes(event: .userInteraction, transitions: [
-            .following => .intermediate,
-            .countingDown => .intermediate
-        ])
-        machine.addRoutes(event: .isolate, transitions: [
-            .any => .isolated
-        ])
-        machine.addRoutes(event: .follow, transitions: [
-            .any => .following
-        ])
-        machine.addRoutes(event: .countDown, transitions: [
-            .intermediate => .countingDown
-        ])
-        
-        machine.addHandler(event: .userInteraction) { context in
-            interactionStateDispatch?.cancel()
-            let dispatch = DispatchWorkItem {
-                machine <-! .countDown
-            }
-            interactionStateDispatch = dispatch
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1, execute: dispatch)
-        }
-        
-        machine.addHandler(event: .countDown) { context in
-            interactionStateDispatch?.cancel()
-            let dispatch = DispatchWorkItem {
-                machine <-! .follow
-            }
-            interactionStateDispatch = dispatch
-            DispatchQueue.main.asyncAfter(deadline: .now() + 3, execute: dispatch)
-            
-            interactionStateDelegationProgress = 0
-            withAnimation(.smooth(duration: 3)) {
-                interactionStateDelegationProgress = 1
-            }
-        }
-        
-        machine.addHandler(.any => .countingDown) { context in
-            hasInteractionStateProgressRing = true
-        }
-        
-        machine.addHandler(.countingDown => .any) { context in
-            hasInteractionStateProgressRing = false
-        }
-    }
+    @State private var dominantColors: [Color] = [.init(hex: 0x929292), .init(hex: 0xFFFFFF), .init(hex: 0x929292)]
+    @State private var scrollability: BouncyScrollViewScrollability = .scrollsToHighlighted
+    @State private var isPlaying: Bool = false
+    @State private var isShowingLyrics: Bool = true
+
+    @State private var scrollabilityDelegationProgress: CGFloat = .zero
+    @State private var scrollabilityDispatch: DispatchWorkItem?
+    @State private var hasScrollabilityProgressRing: Bool = true
 
     var body: some View {
         if !player.hasCurrentTrack {
@@ -109,26 +62,54 @@ struct LeafletView: View {
                     }
 
                     if hasLyrics, isShowingLyrics {
-                        DisplayLyricsView(interactionStateMachine: interactionStateMachine)
+                        DisplayLyricsView(scrollability: $scrollability)
                             .overlay(alignment: .trailing) {
                                 Group {
-                                    if !interactionStateMachine.state.isDelegated {
-                                        DisplayLyricsInteractionStateButton(
-                                            interactionStateMachine: interactionStateMachine,
-                                            progress: interactionStateDelegationProgress,
-                                            hasProgressRing: hasInteractionStateProgressRing && interactionStateDelegationProgress > 0
+                                    if !scrollability.isDelegated {
+                                        DisplayLyricsScrollabilityButton(
+                                            scrollability: $scrollability,
+                                            progress: scrollabilityDelegationProgress,
+                                            hasProgressRing: hasScrollabilityProgressRing && scrollabilityDelegationProgress > 0
                                         )
                                         .tint(.white)
                                     }
                                 }
                                 .transition(.blurReplace)
-                                .animation(.bouncy, value: interactionStateMachine.state.isDelegated)
+                                .animation(.bouncy, value: scrollability.isDelegated)
                                 .padding(12)
                                 .alignmentGuide(.trailing) { d in
                                     d[.leading]
                                 }
                             }
                             .transition(.blurReplace)
+                            .onChange(of: scrollability) { _, _ in
+                                switch scrollability {
+                                case .scrollsToHighlighted:
+                                    hasScrollabilityProgressRing = false
+                                case .waitsForScroll:
+                                    hasScrollabilityProgressRing = false
+                                case .definedByApplication:
+                                    hasScrollabilityProgressRing = true
+
+                                    scrollabilityDelegationProgress = .zero
+                                    withAnimation(.smooth(duration: 3)) {
+                                        scrollabilityDelegationProgress = 1
+                                    }
+
+                                    let dispatch = DispatchWorkItem {
+                                        scrollability = .scrollsToHighlighted
+                                    }
+                                    scrollabilityDispatch = dispatch
+                                    DispatchQueue.main.asyncAfter(deadline: .now() + 3, execute: dispatch)
+                                case .definedByUser:
+                                    hasScrollabilityProgressRing = false
+
+                                    scrollabilityDispatch?.cancel()
+                                    withAnimation(.smooth) {
+                                        scrollabilityDelegationProgress = 1
+                                    }
+                                }
+                            }
                     }
                 }
                 .containerRelativeFrame(.horizontal, alignment: .center) { length, axis in
@@ -190,7 +171,7 @@ struct LeafletView: View {
 }
 
 #Preview(traits: .modifier(SampleEnvironmentsPreviewModifier())) {
-    @Previewable @SwiftUI.State var lyrics: LyricsModel = .init()
+    @Previewable @State var lyrics: LyricsModel = .init()
 
     LeafletView()
         .environment(lyrics)
