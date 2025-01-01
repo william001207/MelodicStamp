@@ -14,13 +14,13 @@ struct LeafletView: View {
     @Environment(LyricsModel.self) private var lyrics
 
     @State private var dominantColors: [Color] = [.init(hex: 0x929292), .init(hex: 0xFFFFFF), .init(hex: 0x929292)]
-    @State private var scrollability: BouncyScrollViewScrollability = .scrollsToHighlighted
+    @State private var interactionState: AppleMusicScrollViewInteractionState = .following
     @State private var isPlaying: Bool = false
     @State private var isShowingLyrics: Bool = true
 
-    @State private var scrollabilityDelegationProgress: CGFloat = .zero
-    @State private var scrollabilityDispatch: DispatchWorkItem?
-    @State private var hasScrollabilityProgressRing: Bool = true
+    @State private var interactionStateDelegationProgress: CGFloat = .zero
+    @State private var interactionStateDispatch: DispatchWorkItem?
+    @State private var hasInteractionStateProgressRing: Bool = true
 
     var body: some View {
         if !player.hasCurrentTrack {
@@ -62,51 +62,51 @@ struct LeafletView: View {
                     }
 
                     if hasLyrics, isShowingLyrics {
-                        DisplayLyricsView(scrollability: $scrollability)
+                        DisplayLyricsView(interactionState: $interactionState)
                             .overlay(alignment: .trailing) {
                                 Group {
-                                    if !scrollability.isDelegated {
-                                        DisplayLyricsScrollabilityButton(
-                                            scrollability: $scrollability,
-                                            progress: scrollabilityDelegationProgress,
-                                            hasProgressRing: hasScrollabilityProgressRing && scrollabilityDelegationProgress > 0
+                                    if !interactionState.isDelegated {
+                                        DisplayLyricsInteractionStateButton(
+                                            interactionState: $interactionState,
+                                            progress: interactionStateDelegationProgress,
+                                            hasProgressRing: hasInteractionStateProgressRing && interactionStateDelegationProgress > 0
                                         )
                                         .tint(.white)
                                     }
                                 }
                                 .transition(.blurReplace)
-                                .animation(.bouncy, value: scrollability.isDelegated)
+                                .animation(.bouncy, value: interactionState.isDelegated)
                                 .padding(12)
                                 .alignmentGuide(.trailing) { d in
                                     d[.leading]
                                 }
                             }
                             .transition(.blurReplace)
-                            .onChange(of: scrollability) { _, _ in
-                                switch scrollability {
-                                case .scrollsToHighlighted:
-                                    hasScrollabilityProgressRing = false
-                                case .waitsForScroll:
-                                    hasScrollabilityProgressRing = false
-                                case .definedByApplication:
-                                    hasScrollabilityProgressRing = true
+                            .onChange(of: interactionState) { _, _ in
+                                switch interactionState {
+                                case .following:
+                                    hasInteractionStateProgressRing = false
+                                case .intermediate:
+                                    hasInteractionStateProgressRing = false
+                                case .countingDown:
+                                    hasInteractionStateProgressRing = true
 
-                                    scrollabilityDelegationProgress = .zero
+                                    interactionStateDelegationProgress = .zero
                                     withAnimation(.smooth(duration: 3)) {
-                                        scrollabilityDelegationProgress = 1
+                                        interactionStateDelegationProgress = 1
                                     }
 
                                     let dispatch = DispatchWorkItem {
-                                        scrollability = .scrollsToHighlighted
+                                        interactionState = .following
                                     }
-                                    scrollabilityDispatch = dispatch
+                                    interactionStateDispatch = dispatch
                                     DispatchQueue.main.asyncAfter(deadline: .now() + 3, execute: dispatch)
-                                case .definedByUser:
-                                    hasScrollabilityProgressRing = false
+                                case .isolated:
+                                    hasInteractionStateProgressRing = false
 
-                                    scrollabilityDispatch?.cancel()
+                                    interactionStateDispatch?.cancel()
                                     withAnimation(.smooth) {
-                                        scrollabilityDelegationProgress = 1
+                                        interactionStateDelegationProgress = 1
                                     }
                                 }
                             }

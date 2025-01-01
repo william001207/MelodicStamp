@@ -8,7 +8,7 @@
 import SFSafeSymbols
 import SwiftUI
 
-struct DisplayLyricsScrollabilityButton: View, Animatable {
+struct DisplayLyricsInteractionStateButton: View, Animatable {
     var animatableData: CGFloat {
         get { progress }
         set { progress = newValue }
@@ -16,7 +16,7 @@ struct DisplayLyricsScrollabilityButton: View, Animatable {
 
     @Namespace private var namespace
 
-    @Binding var scrollability: BouncyScrollViewScrollability
+    @Binding var interactionState: AppleMusicScrollViewInteractionState
     var progress: CGFloat
     var lineWidth: CGFloat = 4
     var hasProgressRing: Bool = true
@@ -37,7 +37,7 @@ struct DisplayLyricsScrollabilityButton: View, Animatable {
                     }
 
                 Group {
-                    if scrollability.isControlledByUser {
+                    if interactionState.isIsolated {
                         Image(systemSymbol: .lockOpenFill)
                     } else {
                         Image(systemSymbol: .lockFill)
@@ -48,28 +48,28 @@ struct DisplayLyricsScrollabilityButton: View, Animatable {
             .padding(12)
         }
         .animation(.default, value: hasProgressRing)
-        .animation(.default, value: scrollability)
+        .animation(.default, value: interactionState)
     }
 
     private var binding: Binding<Bool> {
         Binding {
-            scrollability.isControlledByUser
+            interactionState.isIsolated
         } set: { newValue in
             if newValue {
-                scrollability = .definedByUser
+                interactionState = .isolated
             } else {
-                scrollability = .scrollsToHighlighted
+                interactionState = .following
             }
         }
     }
 }
 
 #Preview {
-    @Previewable @State var scrollability: BouncyScrollViewScrollability = .scrollsToHighlighted
+    @Previewable @State var interactionState: AppleMusicScrollViewInteractionState = .following
     @Previewable @State var progress: CGFloat = .zero
 
     VStack {
-        DisplayLyricsScrollabilityButton(scrollability: $scrollability, progress: progress)
+        DisplayLyricsInteractionStateButton(interactionState: $interactionState, progress: progress)
 
         Slider(value: $progress, in: 0...1)
     }

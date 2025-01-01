@@ -14,7 +14,7 @@ struct DisplayLyricsView: View {
 
     @Environment(\.luminareAnimation) private var animation
 
-    @Binding var scrollability: BouncyScrollViewScrollability
+    @Binding var interactionState: AppleMusicScrollViewInteractionState
 
     @State private var isHovering: Bool = false
     @State private var hoveredIndex: Int? = nil
@@ -22,7 +22,7 @@ struct DisplayLyricsView: View {
     @State private var duration: Duration = .zero
     @State private var elapsedTime: TimeInterval = .zero
 
-    @State private var scrollabilityDispatch: DispatchWorkItem?
+    @State private var interactionStateDispatch: DispatchWorkItem?
 
     var body: some View {
         // Avoid multiple instantializations
@@ -31,8 +31,8 @@ struct DisplayLyricsView: View {
 
         Group {
             if !lines.isEmpty {
-                BouncyScrollView(
-                    scrollability: scrollability,
+                AppleMusicScrollView(
+                    interactionState: interactionState,
                     bounceDelay: 0.085,
                     range: 0 ..< lines.count,
                     highlightedRange: highlightedRange,
@@ -61,15 +61,15 @@ struct DisplayLyricsView: View {
                     } else { return .invisible }
                 } onScrolling: { position, _ in
                     guard position.isPositionedByUser else { return }
-                    guard !scrollability.isControlledByUser else { return }
+                    guard !interactionState.isIsolated else { return }
 
-                    scrollability = .waitsForScroll
-                    scrollabilityDispatch?.cancel()
+                    interactionState = .intermediate
+                    interactionStateDispatch?.cancel()
 
                     let dspatch = DispatchWorkItem {
-                        scrollability = .definedByApplication
+                        interactionState = .countingDown
                     }
-                    scrollabilityDispatch = dspatch
+                    interactionStateDispatch = dspatch
                     DispatchQueue.main.asyncAfter(deadline: .now() + 1, execute: dspatch)
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
