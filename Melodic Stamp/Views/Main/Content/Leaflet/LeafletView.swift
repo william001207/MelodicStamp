@@ -82,6 +82,9 @@ struct LeafletView: View {
                                 }
                                 .transition(.blurReplace)
                                 .animation(.bouncy, value: scrollability.isDelegated)
+                                .alignmentGuide(.trailing) { d in
+                                    d[.leading]
+                                }
                             }
                             .transition(.blurReplace)
                             .onChange(of: scrollability) { _, _ in
