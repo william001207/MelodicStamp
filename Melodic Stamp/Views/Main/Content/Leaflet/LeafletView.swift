@@ -131,6 +131,7 @@ struct LeafletView: View {
             .animation(.bouncy, value: hasLyrics)
             .background {
                 AnimatedGrid(colors: dominantColors)
+                    .brightness(-0.075)
             }
             
             // Read lyrics

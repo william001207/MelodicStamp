@@ -18,6 +18,8 @@ struct DisplayLyricsView: View {
 
     @State private var isHovering: Bool = false
     @State private var elapsedTime: TimeInterval = .zero
+    @State private var durationTime: Duration = .zero
+    @State private var hoveredIndex: Int? = nil
 
     @State private var scrollabilityDispatch: DispatchWorkItem?
 
@@ -82,6 +84,8 @@ struct DisplayLyricsView: View {
         .onReceive(player.playbackTimePublisher) { playbackTime in
             guard let elapsed = playbackTime?.elapsed else { return }
             elapsedTime = elapsed
+            guard let duration = playbackTime?.duration else { return }
+            durationTime = duration
         }
     }
 
@@ -97,22 +101,38 @@ struct DisplayLyricsView: View {
         let isActive = isHighlighted || isHovering
         let blurRadius = blurRadius(for: index, in: highlightedRange)
         let opacity = opacity(for: index, in: highlightedRange)
+        let isHovered = index == hoveredIndex
 
         VStack(spacing: .zero) {
-            switch line {
-            case let line as RawLyricLine:
-                rawLyricLine(line: line, index: index, isHighlighted: isHighlighted)
-            case let line as LRCLyricLine:
-                lrcLyricLine(line: line, index: index, isHighlighted: isHighlighted)
-            case let line as TTMLLyricLine:
-                ttmlLyricLine(line: line, index: index, isHighlighted: isHighlighted)
-            default:
-                EmptyView()
+            Group {
+                AliveButton {
+                    let newProgress = (line.beginTime ?? .zero) / durationTime.timeInterval
+                    player.progress = max(0, min(1, newProgress))
+                } label: {
+                    switch line {
+                    case let line as RawLyricLine:
+                        rawLyricLine(line: line, index: index, isHighlighted: isHighlighted)
+                    case let line as LRCLyricLine:
+                        lrcLyricLine(line: line, index: index, isHighlighted: isHighlighted)
+                    case let line as TTMLLyricLine:
+                        ttmlLyricLine(line: line, index: index, isHighlighted: isHighlighted)
+                    default:
+                        EmptyView()
+                    }
+                }
+            }
+            .padding(6)
+            .blur(radius: isActive ? 0 : blurRadius)
+            .opacity(isActive ? 1 : opacity)
+            .background(isHovered ? Color.secondary.opacity(0.35) : Color.clear)
+            .cornerRadius(10)
+            .onHover { hovering in
+                withAnimation(.smooth(duration: 0.25)) {
+                    hoveredIndex = hovering ? index : nil
+                }
             }
         }
         .padding(.bottom, 32)
-        .blur(radius: isActive ? 0 : blurRadius)
-        .opacity(isActive ? 1 : opacity)
     }
 
     @ViewBuilder private func rawLyricLine(line: RawLyricLine, index _: Int, isHighlighted _: Bool) -> some View {

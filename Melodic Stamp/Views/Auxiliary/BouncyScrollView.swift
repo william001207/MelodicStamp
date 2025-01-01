@@ -213,7 +213,7 @@ struct BouncyScrollView<Content>: View where Content: View {
             }
             .animation(.spring(bounce: 0.2).delay(delay), value: animationState)
             .animation(.smooth, value: highlightedRange)
-            .animation(.smooth, value: animationCompensate)
+            .animation(.spring, value: animationCompensate)
     }
 
     private func scrollToHighlighted() {
