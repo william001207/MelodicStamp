@@ -119,7 +119,6 @@ struct DisplayLyricsView: View {
         Text(line.content)
             .font(.title)
             .bold()
-            .foregroundStyle(.white)
     }
 
     @ViewBuilder private func lrcLyricLine(line: LRCLyricLine, index _: Int, isHighlighted: Bool) -> some View {
@@ -127,13 +126,10 @@ struct DisplayLyricsView: View {
             switch line.type {
             case .main:
                 Text(line.content)
-            // .foregroundStyle(.white)
             case let .translation(locale):
                 Text(locale)
-                // .foregroundStyle(.placeholder)
 
                 Text(line.content)
-                // .foregroundStyle(.white.secondary)
             }
         }
         .multilineTextAlignment(.leading)

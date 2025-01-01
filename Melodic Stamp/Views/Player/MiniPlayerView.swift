@@ -80,9 +80,18 @@ struct MiniPlayerView: View {
         .onAppear {
             isFocused = true
         }
-
-        // Load lyrics
-        .onChange(of: player.current, initial: true) { _, newValue in
+        
+        // Read lyrics
+        // Don't extract this logic or modify the tasks!
+        .onAppear {
+            guard let current = player.current else { return }
+            
+            Task {
+                let raw = await current.metadata.poll(for: \.lyrics).current
+                await lyrics.read(raw)
+            }
+        }
+        .onChange(of: player.current) { _, newValue in
             guard let newValue else { return }
             lyrics.clear(newValue.url)
 
@@ -152,6 +161,22 @@ struct MiniPlayerView: View {
             return false
         }
         return isProgressBarHovering || isProgressBarActive
+    }
+    
+    private var progressBinding: Binding<CGFloat> {
+        Binding {
+            playbackTime?.progress ?? .zero
+        } set: { newValue in
+            player.progress = newValue
+        }
+    }
+    
+    private var volumeBinding: Binding<CGFloat> {
+        Binding {
+            player.volume
+        } set: { newValue in
+            player.volume = newValue
+        }
     }
 
     @ViewBuilder private func header() -> some View {
@@ -455,22 +480,6 @@ struct MiniPlayerView: View {
             guard !hover else { return }
 
             isProgressBarHovering = false
-        }
-    }
-
-    private var progressBinding: Binding<CGFloat> {
-        Binding {
-            playbackTime?.progress ?? .zero
-        } set: { newValue in
-            player.progress = newValue
-        }
-    }
-
-    private var volumeBinding: Binding<CGFloat> {
-        Binding {
-            player.volume
-        } set: { newValue in
-            player.volume = newValue
         }
     }
 }

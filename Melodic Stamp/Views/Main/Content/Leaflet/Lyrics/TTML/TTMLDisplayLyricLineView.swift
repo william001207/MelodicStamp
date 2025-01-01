@@ -52,7 +52,6 @@ struct TTMLDisplayLyricLineView: View {
                     }
             }
         }
-        .foregroundStyle(.white)
         .multilineTextAlignment(textAlignment)
         .frame(maxWidth: .infinity, alignment: alignment)
         .animation(.linear, value: elapsedTime) // For text rendering

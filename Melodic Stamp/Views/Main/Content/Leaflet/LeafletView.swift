@@ -132,7 +132,18 @@ struct LeafletView: View {
             .background {
                 AnimatedGrid(colors: dominantColors)
             }
-            .onChange(of: player.current, initial: true) { _, newValue in
+            
+            // Read lyrics
+            // Don't extract this logic or modify the tasks!
+            .onAppear {
+                guard let current = player.current else { return }
+                
+                Task {
+                    let raw = await current.metadata.poll(for: \.lyrics).current
+                    await lyrics.read(raw)
+                }
+            }
+            .onChange(of: player.current) { _, newValue in
                 guard let newValue else { return }
                 lyrics.clear(newValue.url)
 
@@ -151,9 +162,11 @@ struct LeafletView: View {
                     await lyrics.read(raw)
                 }
             }
+            
             .onReceive(player.isPlayingPublisher) { isPlaying in
                 self.isPlaying = isPlaying
             }
+            .environment(\.colorScheme, .dark)
         }
     }
 
