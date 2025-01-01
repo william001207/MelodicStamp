@@ -97,7 +97,7 @@ struct PlayerView: View {
                 ShrinkableMarqueeScrollView {
                     MusicTitle(item: player.current)
                 }
-//                .contentTransition(.numericText())
+                //                .contentTransition(.numericText())
                 .animation(.default, value: player.currentIndex)
                 .matchedGeometryEffect(id: PlayerNamespace.title, in: namespace)
 

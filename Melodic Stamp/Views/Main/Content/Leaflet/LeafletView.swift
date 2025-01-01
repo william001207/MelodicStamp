@@ -28,21 +28,15 @@ struct LeafletView: View {
         } else {
             ZStack {
                 HStack(spacing: 50) {
+                    @Bindable var player = player
+
                     let images: [NSImage] = if
                         let attachedPictures = player.current?.metadata[extracting: \.attachedPictures]?.current,
                         let cover = ThumbnailMaker.getCover(from: attachedPictures)?.image {
                         [cover]
                     } else { [] }
 
-                    AliveButton {
-                        withAnimation {
-                            if hasLyrics {
-                                isShowingLyrics.toggle()
-                            } else {
-                                player.isPlaying.toggle()
-                            }
-                        }
-                    } label: {
+                    AliveButton(isOn: hasLyrics ? $isShowingLyrics : $player.isPlaying) {
                         MusicCover(
                             images: images, hasPlaceholder: true,
                             cornerRadius: 12
@@ -130,6 +124,7 @@ struct LeafletView: View {
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
             .animation(.bouncy, value: hasLyrics)
+            .animation(.bouncy, value: isShowingLyrics)
             .background {
                 AnimatedGrid(colors: dominantColors)
                     .brightness(-0.075)
@@ -151,16 +146,6 @@ struct LeafletView: View {
 
                 Task {
                     let raw = await newValue.metadata.poll(for: \.lyrics).current
-                    await lyrics.read(raw)
-                }
-            }
-            .onChange(of: isShowingLyrics) { _, newValue in
-                guard newValue else { return }
-                guard let current = player.current else { return }
-                lyrics.clear(current.url)
-
-                Task {
-                    let raw = await current.metadata.poll(for: \.lyrics).current
                     await lyrics.read(raw)
                 }
             }

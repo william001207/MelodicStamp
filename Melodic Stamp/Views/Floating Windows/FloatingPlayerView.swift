@@ -8,11 +8,6 @@
 import SwiftUI
 
 struct FloatingPlayerView: View {
-    @Environment(FloatingWindowsModel.self) private var floatingWindows
-    @Environment(WindowManagerModel.self) private var windowManager
-    @Environment(PlayerModel.self) private var player
-    @Environment(PlayerKeyboardControlModel.self) private var playerKeyboardControl
-
     @Namespace private var namespace
 
     var body: some View {

@@ -183,18 +183,10 @@ struct AliveButton<Label>: View where Label: View {
     }
 
     private var computedScaleFactor: CGFloat {
-        if isActive {
-            if isPressing {
-                scaleFactor * 0.95
-            } else {
-                scaleFactor
-            }
+        if isPressing {
+            scaleFactor * 0.95
         } else {
-            if isPressing {
-                1.05
-            } else {
-                1
-            }
+            isActive ? scaleFactor : 1
         }
     }
 

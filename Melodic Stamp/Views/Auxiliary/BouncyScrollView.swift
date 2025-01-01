@@ -120,6 +120,7 @@ struct BouncyScrollView<Content>: View where Content: View {
         }
         .onAppear {
             updateAnimationState()
+            scrollToHighlighted()
         }
         .onChange(of: highlightedRange, initial: true) { _, _ in
             withAnimation(.bouncy) {
@@ -183,8 +184,7 @@ struct BouncyScrollView<Content>: View where Content: View {
     }
 
     private var animationCompensate: CGFloat {
-        guard scrollability.isDelegated else { return .zero }
-        return contentOffsets[max(0, highlightedRange.upperBound - 1)] ?? .zero
+        contentOffsets[max(0, highlightedRange.upperBound - 1)] ?? .zero
     }
 
     @ViewBuilder private func content(at index: Int) -> some View {
@@ -192,13 +192,15 @@ struct BouncyScrollView<Content>: View where Content: View {
         let delay = delay(at: index)
         let proportion = proportion(at: index)
 
+        let compensate = scrollability.isDelegated || isIndicatorVisible ? animationCompensate : .zero
+
         content(index, isHighlighted)
             .onGeometryChange(for: CGSize.self) { proxy in
                 proxy.size
             } action: { newValue in
                 contentOffsets.updateValue(newValue.height, forKey: index)
             }
-            .offset(y: proportion * animationCompensate)
+            .offset(y: proportion * compensate)
             .background {
                 if index == highlightedRange.lowerBound {
                     switch indicator(index, isHighlighted) {
@@ -214,6 +216,8 @@ struct BouncyScrollView<Content>: View where Content: View {
             .animation(.spring(bounce: 0.2).delay(delay), value: animationState)
             .animation(.smooth, value: highlightedRange)
             .animation(.spring, value: animationCompensate)
+            .animation(.smooth, value: scrollability.isDelegated)
+            .animation(.smooth, value: isIndicatorVisible)
     }
 
     private func scrollToHighlighted() {
