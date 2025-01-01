@@ -133,12 +133,12 @@ struct LeafletView: View {
                 AnimatedGrid(colors: dominantColors)
                     .brightness(-0.075)
             }
-            
+
             // Read lyrics
             // Don't extract this logic or modify the tasks!
             .onAppear {
                 guard let current = player.current else { return }
-                
+
                 Task {
                     let raw = await current.metadata.poll(for: \.lyrics).current
                     await lyrics.read(raw)
@@ -163,7 +163,7 @@ struct LeafletView: View {
                     await lyrics.read(raw)
                 }
             }
-            
+
             .onReceive(player.isPlayingPublisher) { isPlaying in
                 self.isPlaying = isPlaying
             }

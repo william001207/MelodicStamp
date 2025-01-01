@@ -80,12 +80,12 @@ struct MiniPlayerView: View {
         .onAppear {
             isFocused = true
         }
-        
+
         // Read lyrics
         // Don't extract this logic or modify the tasks!
         .onAppear {
             guard let current = player.current else { return }
-            
+
             Task {
                 let raw = await current.metadata.poll(for: \.lyrics).current
                 await lyrics.read(raw)
@@ -162,7 +162,7 @@ struct MiniPlayerView: View {
         }
         return isProgressBarHovering || isProgressBarActive
     }
-    
+
     private var progressBinding: Binding<CGFloat> {
         Binding {
             playbackTime?.progress ?? .zero
@@ -170,7 +170,7 @@ struct MiniPlayerView: View {
             player.progress = newValue
         }
     }
-    
+
     private var volumeBinding: Binding<CGFloat> {
         Binding {
             player.volume

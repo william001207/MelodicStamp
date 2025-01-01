@@ -22,17 +22,10 @@ struct DisplayLyricsScrollabilityButton: View, Animatable {
     var hasProgressRing: Bool = true
 
     var body: some View {
-        AliveButton {
-            scrollability = switch scrollability {
-            case .scrollsToHighlighted, .waitsForScroll, .definedByApplication:
-                .definedByUser
-            case .definedByUser:
-                .scrollsToHighlighted
-            }
-        } label: {
+        AliveButton(isOn: binding) {
             ZStack {
                 Circle()
-                    .fill(.thinMaterial)
+                    .fill(.ultraThinMaterial)
                     .frame(width: 48)
                     .overlay {
                         if hasProgressRing {
@@ -43,11 +36,10 @@ struct DisplayLyricsScrollabilityButton: View, Animatable {
                     }
 
                 Group {
-                    switch scrollability {
-                    case .definedByUser:
-                        Image(systemSymbol: .lockOpenFill)
-                    default:
+                    if scrollability.isDelegated {
                         Image(systemSymbol: .lockFill)
+                    } else {
+                        Image(systemSymbol: .lockOpenFill)
                     }
                 }
                 .font(.title2)
@@ -55,6 +47,19 @@ struct DisplayLyricsScrollabilityButton: View, Animatable {
             .padding(12)
         }
         .animation(.default, value: hasProgressRing)
+        .animation(.default, value: scrollability)
+    }
+
+    private var binding: Binding<Bool> {
+        Binding {
+            scrollability == .scrollsToHighlighted
+        } set: { newValue in
+            if newValue {
+                scrollability = .scrollsToHighlighted
+            } else {
+                scrollability = .definedByUser
+            }
+        }
     }
 }
 
