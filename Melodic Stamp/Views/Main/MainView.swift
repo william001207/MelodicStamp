@@ -48,6 +48,8 @@ struct MainView: View {
     @State private var inspectorLyrics: LyricsModel = .init()
     @State private var displayLyrics: LyricsModel = .init()
 
+    @State private var shouldRefresh: Bool = false
+
     var body: some View {
         content()
             .frame(minWidth: 600)
@@ -71,22 +73,24 @@ struct MainView: View {
     }
 
     @ViewBuilder private func content() -> some View {
-        switch selectedContentTab {
-        case .playlist:
-            PlaylistView(namespace: namespace)
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .ignoresSafeArea()
-                .morphed()
-                .background {
-                    VisualEffectView(material: .headerView, blendingMode: .behindWindow)
-                }
-                .ignoresSafeArea()
-        case .leaflet:
-            LeafletView()
-                .environment(displayLyrics)
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .ignoresSafeArea()
+        Group {
+            switch selectedContentTab {
+            case .playlist:
+                PlaylistView(namespace: namespace)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .ignoresSafeArea()
+                    .morphed()
+            case .leaflet:
+                LeafletView()
+                    .environment(displayLyrics)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .ignoresSafeArea()
+            }
         }
+        .background {
+            VisualEffectView(material: .headerView, blendingMode: .behindWindow)
+        }
+        .ignoresSafeArea()
     }
 
     @ViewBuilder private func inspector() -> some View {

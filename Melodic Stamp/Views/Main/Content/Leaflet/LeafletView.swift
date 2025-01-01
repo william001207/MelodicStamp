@@ -13,7 +13,7 @@ struct LeafletView: View {
     @Environment(MetadataEditorModel.self) private var metadataEditor
     @Environment(LyricsModel.self) private var lyrics
 
-    @State private var dominantColors: [Color] = [.init(hex: 0x929292), .init(hex: 0xFFFFFF), .init(hex: 0x929292)]
+    @State private var dominantColors: [Color] = []
     @State private var interactionState: AppleMusicScrollViewInteractionState = .following
     @State private var isPlaying: Bool = false
     @State private var isShowingLyrics: Bool = true
@@ -58,6 +58,8 @@ struct LeafletView: View {
                             Task { @MainActor in
                                 dominantColors = try await extractDominantColors(from: cover)
                             }
+                        } else {
+                            dominantColors = []
                         }
                     }
 
@@ -126,8 +128,10 @@ struct LeafletView: View {
             .animation(.bouncy, value: hasLyrics)
             .animation(.bouncy, value: isShowingLyrics)
             .background {
-                AnimatedGrid(colors: dominantColors)
-                    .brightness(-0.075)
+                if !dominantColors.isEmpty {
+                    AnimatedGrid(colors: dominantColors)
+                        .brightness(-0.075)
+                }
             }
 
             // Read lyrics
@@ -153,7 +157,7 @@ struct LeafletView: View {
             .onReceive(player.isPlayingPublisher) { isPlaying in
                 self.isPlaying = isPlaying
             }
-            .environment(\.colorScheme, .dark)
+            .colorScheme(.dark)
         }
     }
 
