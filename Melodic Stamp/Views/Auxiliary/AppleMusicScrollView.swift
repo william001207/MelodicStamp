@@ -1,44 +1,19 @@
 //
-//  BouncyScrollView.swift
+//  AppleMusicScrollView.swift
 //  MelodicStamp
 //
 //  Created by Xinshao_Air on 2024/12/24.
 //
 
 import SwiftUI
+import SwiftState
 
-enum BouncyScrollViewAnimationState {
-    case intermediate
-    case pushed
-}
-
-enum BouncyScrollViewAlignment {
+enum AppleMusicScrollViewAlignment {
     case top
     case center
 }
 
-enum BouncyScrollViewScrollability {
-    case scrollsToHighlighted
-    case waitsForScroll
-    case definedByUser
-    case definedByApplication
-
-    var isDelegated: Bool {
-        switch self {
-        case .scrollsToHighlighted: true
-        default: false
-        }
-    }
-
-    var isControlledByUser: Bool {
-        switch self {
-        case .definedByUser: true
-        default: false
-        }
-    }
-}
-
-enum BouncyScrollViewIndicator {
+enum AppleMusicScrollViewIndicator {
     case invisible
     case visible(content: AnyView)
 
@@ -54,8 +29,43 @@ enum BouncyScrollViewIndicator {
     }
 }
 
-struct BouncyScrollView<Content>: View where Content: View {
-    var scrollability: BouncyScrollViewScrollability = .scrollsToHighlighted
+enum AppleMusicScrollViewAnimationState {
+    case intermediate
+    case pushed
+}
+
+enum AppleMusicScrollViewInteractionState: StateType {
+    typealias Machine = StateMachine<Self, Event>
+    
+    enum Event: EventType {
+        case userInteraction
+        case countDown
+        case isolate
+        case follow
+    }
+    
+    case following
+    case isolated
+    case intermediate
+    case countingDown
+    
+    var isDelegated: Bool {
+        switch self {
+        case .following: true
+        default: false
+        }
+    }
+    
+    var isIsolated: Bool {
+        switch self {
+        case .isolated: true
+        default: false
+        }
+    }
+}
+
+struct AppleMusicScrollView<Content>: View where Content: View {
+    var interactionState: AppleMusicScrollViewInteractionState = .following
 
     var offset: CGFloat = 50
     var delay: TimeInterval = 0.08
@@ -63,18 +73,18 @@ struct BouncyScrollView<Content>: View where Content: View {
 
     var range: Range<Int>
     var highlightedRange: Range<Int>
-    var alignment: BouncyScrollViewAlignment = .top
+    var alignment: AppleMusicScrollViewAlignment = .top
 
     @ViewBuilder var content: (_ index: Int, _ isHighlighted: Bool) -> Content
-    var indicator: (_ index: Int, _ isHighlighted: Bool) -> BouncyScrollViewIndicator
+    var indicator: (_ index: Int, _ isHighlighted: Bool) -> AppleMusicScrollViewIndicator
 
     var onScrolling: ((ScrollPosition, CGPoint) -> ())?
 
-    @State private var containerSize: CGSize = .zero
-    @State private var animationState: BouncyScrollViewAnimationState = .intermediate
-    @State private var scrollPosition: ScrollPosition = .init()
-    @State private var scrollOffset: CGFloat = .zero
-    @State private var contentOffsets: [Int: CGFloat] = [:]
+    @SwiftUI.State private var containerSize: CGSize = .zero
+    @SwiftUI.State private var animationState: AppleMusicScrollViewAnimationState = .intermediate
+    @SwiftUI.State private var scrollPosition: ScrollPosition = .init()
+    @SwiftUI.State private var scrollOffset: CGFloat = .zero
+    @SwiftUI.State private var contentOffsets: [Int: CGFloat] = [:]
 
     var body: some View {
         ScrollView {
@@ -89,6 +99,9 @@ struct BouncyScrollView<Content>: View where Content: View {
                     ForEach(range, id: \.self) { index in
                         content(at: index)
                     }
+                }
+                .onAppear {
+                    scrollToHighlighted()
                 }
             } else {
                 // Temporarily force loading all elements
@@ -120,7 +133,6 @@ struct BouncyScrollView<Content>: View where Content: View {
         }
         .onAppear {
             updateAnimationState()
-            scrollToHighlighted()
         }
         .onChange(of: highlightedRange, initial: true) { _, _ in
             withAnimation(.bouncy) {
@@ -133,7 +145,7 @@ struct BouncyScrollView<Content>: View where Content: View {
                 scrollToHighlighted()
             }
         }
-        .onChange(of: scrollability, initial: true) { _, _ in
+        .onChange(of: interactionState, initial: true) { _, _ in
             // Scrolls to highlighted when externally allowed
             withAnimation(.smooth) {
                 scrollToHighlighted()
@@ -192,7 +204,7 @@ struct BouncyScrollView<Content>: View where Content: View {
         let delay = delay(at: index)
         let proportion = proportion(at: index)
 
-        let compensate = scrollability.isDelegated || isIndicatorVisible ? animationCompensate : .zero
+        let compensate = interactionState.isDelegated || isIndicatorVisible ? animationCompensate : .zero
 
         content(index, isHighlighted)
             .onGeometryChange(for: CGSize.self) { proxy in
@@ -216,12 +228,12 @@ struct BouncyScrollView<Content>: View where Content: View {
             .animation(.spring(bounce: 0.2).delay(delay), value: animationState)
             .animation(.smooth, value: highlightedRange)
             .animation(.spring, value: animationCompensate)
-            .animation(.smooth, value: scrollability.isDelegated)
+            .animation(.smooth, value: interactionState.isDelegated)
             .animation(.smooth, value: isIndicatorVisible)
     }
 
     private func scrollToHighlighted() {
-        guard scrollability.isDelegated else { return }
+        guard interactionState.isDelegated else { return }
         scrollOffset = fold(until: highlightedRange.lowerBound)
     }
 
@@ -271,17 +283,17 @@ struct BouncyScrollView<Content>: View where Content: View {
 }
 
 #Preview {
-    @Previewable @State var highlightedRange: Range<Int> = 0 ..< 1
-    @Previewable @State var alignment: BouncyScrollViewAlignment = .top
+    @Previewable @SwiftUI.State var highlightedRange: Range<Int> = 0 ..< 1
+    @Previewable @SwiftUI.State var alignment: AppleMusicScrollViewAlignment = .top
     let count = 20
 
     VStack {
         VStack {
             Picker("Alignment", selection: $alignment) {
                 Text("Top")
-                    .tag(BouncyScrollViewAlignment.top)
+                    .tag(AppleMusicScrollViewAlignment.top)
                 Text("Center")
-                    .tag(BouncyScrollViewAlignment.center)
+                    .tag(AppleMusicScrollViewAlignment.center)
             }
             .pickerStyle(SegmentedPickerStyle())
 
@@ -371,7 +383,7 @@ struct BouncyScrollView<Content>: View where Content: View {
         }
         .padding()
 
-        BouncyScrollView(
+        AppleMusicScrollView(
             offset: 0,
             range: 0 ..< count,
             highlightedRange: highlightedRange,

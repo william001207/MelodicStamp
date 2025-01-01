@@ -1,5 +1,5 @@
 //
-//  DisplayLyricsScrollabilityButton.swift
+//  DisplayLyricsInteractionStateButton.swift
 //  MelodicStamp
 //
 //  Created by KrLite on 2025/1/1.
@@ -7,8 +7,9 @@
 
 import SFSafeSymbols
 import SwiftUI
+import SwiftState
 
-struct DisplayLyricsScrollabilityButton: View, Animatable {
+struct DisplayLyricsInteractionStateButton: View, Animatable {
     var animatableData: CGFloat {
         get { progress }
         set { progress = newValue }
@@ -16,7 +17,8 @@ struct DisplayLyricsScrollabilityButton: View, Animatable {
 
     @Namespace private var namespace
 
-    @Binding var scrollability: BouncyScrollViewScrollability
+    let interactionStateMachine: AppleMusicScrollViewInteractionState.Machine
+    
     var progress: CGFloat
     var lineWidth: CGFloat = 4
     var hasProgressRing: Bool = true
@@ -37,7 +39,7 @@ struct DisplayLyricsScrollabilityButton: View, Animatable {
                     }
 
                 Group {
-                    if scrollability.isControlledByUser {
+                    if interactionStateMachine.state.isIsolated {
                         Image(systemSymbol: .lockOpenFill)
                     } else {
                         Image(systemSymbol: .lockFill)
@@ -48,28 +50,36 @@ struct DisplayLyricsScrollabilityButton: View, Animatable {
             .padding(12)
         }
         .animation(.default, value: hasProgressRing)
-        .animation(.default, value: scrollability)
+        .animation(.default, value: interactionStateMachine.state)
     }
 
     private var binding: Binding<Bool> {
         Binding {
-            scrollability.isControlledByUser
+            interactionStateMachine.state.isIsolated
         } set: { newValue in
             if newValue {
-                scrollability = .definedByUser
+                interactionStateMachine <-! .isolate
             } else {
-                scrollability = .scrollsToHighlighted
+                interactionStateMachine <-! .follow
             }
         }
     }
 }
 
 #Preview {
-    @Previewable @State var scrollability: BouncyScrollViewScrollability = .scrollsToHighlighted
-    @Previewable @State var progress: CGFloat = .zero
+    @Previewable @SwiftUI.State var progress: CGFloat = .zero
+    
+    lazy var interactionStateMachine: AppleMusicScrollViewInteractionState.Machine = .init(state: .following) { machine in
+        machine.addRoutes(event: .isolate, transitions: [
+            .any => .isolated
+        ])
+        machine.addRoutes(event: .follow, transitions: [
+            .any => .following
+        ])
+    }
 
     VStack {
-        DisplayLyricsScrollabilityButton(scrollability: $scrollability, progress: progress)
+        DisplayLyricsInteractionStateButton(interactionStateMachine: interactionStateMachine, progress: progress)
 
         Slider(value: $progress, in: 0...1)
     }
