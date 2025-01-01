@@ -21,9 +21,9 @@ struct AliveButton<Label>: View where Label: View {
 
     var action: () -> ()
     @ViewBuilder var label: () -> Label
-    
-    var onGestureChanged: ((DragGesture.Value) -> Void)?
-    var onGestureEnded: ((DragGesture.Value) -> Void)?
+
+    var onGestureChanged: ((DragGesture.Value) -> ())?
+    var onGestureEnded: ((DragGesture.Value) -> ())?
 
     @State private var isHovering: Bool = false
     @State private var isActive: Bool = false

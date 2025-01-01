@@ -14,8 +14,12 @@ struct DisplayLyricsView: View {
 
     @Environment(\.luminareAnimation) private var animation
 
+    @Binding var scrollability: BouncyScrollViewScrollability
+
     @State private var isHovering: Bool = false
     @State private var elapsedTime: TimeInterval = .zero
+
+    @State private var scrollabilityDispatch: DispatchWorkItem?
 
     var body: some View {
         // Avoid multiple instantializations
@@ -25,6 +29,7 @@ struct DisplayLyricsView: View {
         Group {
             if !lines.isEmpty {
                 BouncyScrollView(
+                    scrollability: scrollability,
                     bounceDelay: 0.085,
                     range: 0 ..< lines.count,
                     highlightedRange: highlightedRange,
@@ -51,6 +56,18 @@ struct DisplayLyricsView: View {
                             }
                         } else { .invisible }
                     } else { return .invisible }
+                } onScrolling: { position, _ in
+                    guard position.isPositionedByUser else { return }
+                    guard !scrollability.isControlledByUser else { return }
+
+                    scrollability = .waitsForScroll
+                    scrollabilityDispatch?.cancel()
+
+                    let dspatch = DispatchWorkItem {
+                        scrollability = .definedByApplication
+                    }
+                    scrollabilityDispatch = dspatch
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1, execute: dspatch)
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {
@@ -60,16 +77,6 @@ struct DisplayLyricsView: View {
         .onHover { hover in
             withAnimation(.smooth(duration: 0.45)) {
                 isHovering = hover
-            }
-        }
-        .onChange(of: player.current, initial: true) { _, newValue in
-            if let newValue {
-                lyrics.clear(newValue.url)
-
-                Task {
-                    let raw = await newValue.metadata.poll(for: \.lyrics).current
-                    await lyrics.read(raw)
-                }
             }
         }
         .onReceive(player.playbackTimePublisher) { playbackTime in

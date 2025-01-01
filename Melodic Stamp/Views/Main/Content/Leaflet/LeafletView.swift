@@ -14,9 +14,13 @@ struct LeafletView: View {
     @Environment(LyricsModel.self) private var lyrics
 
     @State private var dominantColors: [Color] = [.init(hex: 0x929292), .init(hex: 0xFFFFFF), .init(hex: 0x929292)]
-    @State private var playbackTime: PlaybackTime?
+    @State private var scrollability: BouncyScrollViewScrollability = .scrollsToHighlighted
     @State private var isPlaying: Bool = false
     @State private var isShowingLyrics: Bool = true
+
+    @State private var scrollabilityDelegationProgress: CGFloat = .zero
+    @State private var scrollabilityDispatch: DispatchWorkItem?
+    @State private var hasScrollabilityProgressRing: Bool = true
 
     var body: some View {
         if !player.hasCurrentTrack {
@@ -63,9 +67,51 @@ struct LeafletView: View {
                         }
                     }
 
-                    if hasLyrics && isShowingLyrics {
-                        DisplayLyricsView()
+                    if hasLyrics, isShowingLyrics {
+                        DisplayLyricsView(scrollability: $scrollability)
+                            .overlay(alignment: .trailing) {
+                                Group {
+                                    if !scrollability.isDelegated {
+                                        DisplayLyricsScrollabilityButton(
+                                            scrollability: $scrollability,
+                                            progress: scrollabilityDelegationProgress,
+                                            hasProgressRing: hasScrollabilityProgressRing && scrollabilityDelegationProgress > 0
+                                        )
+                                        .tint(.white)
+                                    }
+                                }
+                                .transition(.blurReplace)
+                                .animation(.bouncy, value: scrollability.isDelegated)
+                            }
                             .transition(.blurReplace)
+                            .onChange(of: scrollability) { _, _ in
+                                switch scrollability {
+                                case .scrollsToHighlighted:
+                                    hasScrollabilityProgressRing = false
+                                case .waitsForScroll:
+                                    hasScrollabilityProgressRing = false
+                                case .definedByApplication:
+                                    hasScrollabilityProgressRing = true
+
+                                    scrollabilityDelegationProgress = .zero
+                                    withAnimation(.smooth(duration: 3)) {
+                                        scrollabilityDelegationProgress = 1
+                                    }
+
+                                    let dispatch = DispatchWorkItem {
+                                        scrollability = .scrollsToHighlighted
+                                    }
+                                    scrollabilityDispatch = dispatch
+                                    DispatchQueue.main.asyncAfter(deadline: .now() + 3, execute: dispatch)
+                                case .definedByUser:
+                                    hasScrollabilityProgressRing = false
+
+                                    scrollabilityDispatch?.cancel()
+                                    withAnimation(.smooth) {
+                                        scrollabilityDelegationProgress = 1
+                                    }
+                                }
+                            }
                     }
                 }
                 .containerRelativeFrame(.horizontal, alignment: .center) { length, axis in
@@ -79,15 +125,35 @@ struct LeafletView: View {
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
+            .animation(.bouncy, value: hasLyrics)
             .background {
                 AnimatedGrid(colors: dominantColors)
+            }
+            .onChange(of: player.current, initial: true) { _, newValue in
+                guard let newValue else { return }
+                lyrics.clear(newValue.url)
+
+                Task {
+                    let raw = await newValue.metadata.poll(for: \.lyrics).current
+                    await lyrics.read(raw)
+                }
+            }
+            .onChange(of: isShowingLyrics) { _, newValue in
+                guard newValue else { return }
+                guard let current = player.current else { return }
+                lyrics.clear(current.url)
+
+                Task {
+                    let raw = await current.metadata.poll(for: \.lyrics).current
+                    await lyrics.read(raw)
+                }
             }
             .onReceive(player.isPlayingPublisher) { isPlaying in
                 self.isPlaying = isPlaying
             }
         }
     }
-    
+
     private var hasLyrics: Bool {
         !lyrics.lines.isEmpty
     }
@@ -99,4 +165,11 @@ struct LeafletView: View {
         )
         return colors.map(Color.init)
     }
+}
+
+#Preview(traits: .modifier(SampleEnvironmentsPreviewModifier())) {
+    @Previewable @State var lyrics: LyricsModel = .init()
+
+    LeafletView()
+        .environment(lyrics)
 }

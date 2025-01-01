@@ -19,12 +19,21 @@ enum BouncyScrollViewAlignment {
 
 enum BouncyScrollViewScrollability {
     case scrollsToHighlighted
+    case waitsForScroll
     case definedByUser
-    
+    case definedByApplication
+
     var isDelegated: Bool {
         switch self {
         case .scrollsToHighlighted: true
-        case .definedByUser: false
+        default: false
+        }
+    }
+
+    var isControlledByUser: Bool {
+        switch self {
+        case .definedByUser: true
+        default: false
         }
     }
 }
@@ -47,7 +56,7 @@ enum BouncyScrollViewIndicator {
 
 struct BouncyScrollView<Content>: View where Content: View {
     var scrollability: BouncyScrollViewScrollability = .scrollsToHighlighted
-    
+
     var offset: CGFloat = 50
     var delay: TimeInterval = 0.08
     var bounceDelay: TimeInterval = 0.5
@@ -58,8 +67,8 @@ struct BouncyScrollView<Content>: View where Content: View {
 
     @ViewBuilder var content: (_ index: Int, _ isHighlighted: Bool) -> Content
     var indicator: (_ index: Int, _ isHighlighted: Bool) -> BouncyScrollViewIndicator
-    
-    var onScrolling: ((ScrollPosition, CGPoint) -> Void)?
+
+    var onScrolling: ((ScrollPosition, CGPoint) -> ())?
 
     @State private var containerSize: CGSize = .zero
     @State private var animationState: BouncyScrollViewAnimationState = .intermediate
@@ -101,7 +110,7 @@ struct BouncyScrollView<Content>: View where Content: View {
             guard scrollPosition.isPositionedByUser else { return }
             // Without animation
             scrollOffset = newValue.y
-            
+
             onScrolling?(scrollPosition, newValue)
         }
         .onGeometryChange(for: CGSize.self) { proxy in
@@ -132,7 +141,7 @@ struct BouncyScrollView<Content>: View where Content: View {
         .onChange(of: highlightedRange, initial: true) { oldValue, newValue in
             let isLowerBoundChanged = oldValue.lowerBound != newValue.lowerBound
             let isUpperBoundChanged = oldValue.upperBound != newValue.upperBound
-            
+
             if isLowerBoundChanged {
                 updateAnimationState()
             } else if isUpperBoundChanged {
@@ -174,7 +183,8 @@ struct BouncyScrollView<Content>: View where Content: View {
     }
 
     private var animationCompensate: CGFloat {
-        contentOffsets[max(0, highlightedRange.upperBound - 1)] ?? .zero
+        guard scrollability.isDelegated else { return .zero }
+        return contentOffsets[max(0, highlightedRange.upperBound - 1)] ?? .zero
     }
 
     @ViewBuilder private func content(at index: Int) -> some View {

@@ -83,13 +83,12 @@ struct MiniPlayerView: View {
 
         // Load lyrics
         .onChange(of: player.current, initial: true) { _, newValue in
-            if let newValue {
-                lyrics.clear(newValue.url)
+            guard let newValue else { return }
+            lyrics.clear(newValue.url)
 
-                Task {
-                    let raw = await newValue.metadata.poll(for: \.lyrics).current
-                    await lyrics.read(raw)
-                }
+            Task {
+                let raw = await newValue.metadata.poll(for: \.lyrics).current
+                await lyrics.read(raw)
             }
         }
 

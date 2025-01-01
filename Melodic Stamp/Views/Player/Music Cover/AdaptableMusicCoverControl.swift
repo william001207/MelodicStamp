@@ -173,6 +173,8 @@ private struct AdaptableMusicCoverControlPreview: View {
 }
 
 #Preview(traits: .modifier(SampleEnvironmentsPreviewModifier())) {
+    @Previewable @State var attachedPicturesHandler: AttachedPicturesHandlerModel = .init()
+
     AdaptableMusicCoverControlPreview()
-        .environment(AttachedPicturesHandlerModel())
+        .environment(attachedPicturesHandler)
 }
