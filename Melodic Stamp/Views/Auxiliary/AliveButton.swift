@@ -172,10 +172,9 @@ struct AliveButton<Label>: View where Label: View {
             .onHover { hover in
                 isHovering = hover
             }
-
             .foregroundStyle(style)
             .scaleEffect(computedScaleFactor, anchor: .center)
-            .shadow(radius: isActive ? shadowRadius : 0)
+            .shadow(color: .black.opacity(isActive ? 0.1 : 0), radius: isActive ? shadowRadius : 0)
             .animation(hasHoveringStyle ? .default : nil, value: isHovering) // Avoid unnecessary transitions on hover
             .animation(.bouncy, value: isActive)
             .animation(.bouncy, value: isPressing)

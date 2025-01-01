@@ -131,6 +131,18 @@ struct LeafletView: View {
                 if !dominantColors.isEmpty {
                     AnimatedGrid(colors: dominantColors)
                         .brightness(-0.075)
+                } else {
+                    Rectangle()
+                        .fill(.ultraThinMaterial)
+                        .opacity(0.5)
+
+                    LinearGradient(
+                        colors: [.clear, .accent],
+                        startPoint: .top, endPoint: .bottom
+                    )
+                    .opacity(0.65)
+                    .brightness(-0.075)
+                    .blendMode(.multiply)
                 }
             }
 

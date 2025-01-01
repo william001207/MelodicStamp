@@ -103,7 +103,7 @@ struct DisplayLyricsView: View {
         let opacity = opacity(for: index, in: highlightedRange)
         let isHovering = index == hoveredIndex
 
-        AliveButton {
+        AliveButton(enabledStyle: .white) {
             guard let beginTime = line.beginTime else { return }
             player.time = beginTime
         } label: {
