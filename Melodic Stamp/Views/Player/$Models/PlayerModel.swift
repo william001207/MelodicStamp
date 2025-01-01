@@ -76,6 +76,17 @@ import SwiftUI
             updateNowPlayingInfo()
         }
     }
+    
+    var time: TimeInterval {
+        get {
+            unwrappedPlaybackTime.elapsed
+        }
+        
+        set {
+            player.seekTime(to: newValue)
+            updateNowPlayingInfo()
+        }
+    }
 
     var volume: CGFloat {
         get {

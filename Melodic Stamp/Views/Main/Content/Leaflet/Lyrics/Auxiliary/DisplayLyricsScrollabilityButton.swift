@@ -25,7 +25,8 @@ struct DisplayLyricsScrollabilityButton: View, Animatable {
         AliveButton(isOn: binding) {
             ZStack {
                 Circle()
-                    .fill(.ultraThinMaterial)
+                    .foregroundStyle(.background)
+                    .opacity(0.1)
                     .frame(width: 48)
                     .overlay {
                         if hasProgressRing {
@@ -36,10 +37,10 @@ struct DisplayLyricsScrollabilityButton: View, Animatable {
                     }
 
                 Group {
-                    if scrollability.isDelegated {
-                        Image(systemSymbol: .lockFill)
-                    } else {
+                    if scrollability.isControlledByUser {
                         Image(systemSymbol: .lockOpenFill)
+                    } else {
+                        Image(systemSymbol: .lockFill)
                     }
                 }
                 .font(.title2)
@@ -52,12 +53,12 @@ struct DisplayLyricsScrollabilityButton: View, Animatable {
 
     private var binding: Binding<Bool> {
         Binding {
-            scrollability == .scrollsToHighlighted
+            scrollability.isControlledByUser
         } set: { newValue in
             if newValue {
-                scrollability = .scrollsToHighlighted
-            } else {
                 scrollability = .definedByUser
+            } else {
+                scrollability = .scrollsToHighlighted
             }
         }
     }
