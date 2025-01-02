@@ -14,7 +14,7 @@ struct DisplayLyricsView: View {
 
     @Environment(\.luminareAnimation) private var animation
 
-    @Binding var interactionState: AppleMusicScrollViewInteractionState
+    @Binding var interactionState: AppleMusicLyricsViewInteractionState
 
     @State private var isHovering: Bool = false
     @State private var hoveredIndex: Int? = nil
@@ -31,7 +31,7 @@ struct DisplayLyricsView: View {
 
         Group {
             if !lines.isEmpty {
-                AppleMusicScrollView(
+                AppleMusicLyricsView(
                     interactionState: interactionState,
                     bounceDelay: 0.085,
                     range: 0 ..< lines.count,

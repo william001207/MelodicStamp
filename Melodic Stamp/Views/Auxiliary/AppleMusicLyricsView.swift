@@ -1,5 +1,5 @@
 //
-//  AppleMusicScrollView.swift
+//  AppleMusicLyricsView.swift
 //  MelodicStamp
 //
 //  Created by Xinshao_Air on 2024/12/24.
@@ -7,17 +7,17 @@
 
 import SwiftUI
 
-enum AppleMusicScrollViewAnimationState {
+enum AppleMusicLyricsViewAnimationState {
     case intermediate
     case pushed
 }
 
-enum AppleMusicScrollViewAlignment {
+enum AppleMusicLyricsViewAlignment {
     case top
     case center
 }
 
-enum AppleMusicScrollViewInteractionState {
+enum AppleMusicLyricsViewInteractionState {
     case following
     case isolated
     case intermediate
@@ -38,7 +38,7 @@ enum AppleMusicScrollViewInteractionState {
     }
 }
 
-enum AppleMusicScrollViewIndicator {
+enum AppleMusicLyricsViewIndicator {
     case invisible
     case visible(content: AnyView)
 
@@ -54,8 +54,8 @@ enum AppleMusicScrollViewIndicator {
     }
 }
 
-struct AppleMusicScrollView<Content>: View where Content: View {
-    var interactionState: AppleMusicScrollViewInteractionState = .following
+struct AppleMusicLyricsView<Content>: View where Content: View {
+    var interactionState: AppleMusicLyricsViewInteractionState = .following
 
     var offset: CGFloat = 50
     var delay: TimeInterval = 0.08
@@ -63,15 +63,15 @@ struct AppleMusicScrollView<Content>: View where Content: View {
 
     var range: Range<Int>
     var highlightedRange: Range<Int>
-    var alignment: AppleMusicScrollViewAlignment = .top
+    var alignment: AppleMusicLyricsViewAlignment = .top
 
     @ViewBuilder var content: (_ index: Int, _ isHighlighted: Bool) -> Content
-    var indicator: (_ index: Int, _ isHighlighted: Bool) -> AppleMusicScrollViewIndicator
+    var indicator: (_ index: Int, _ isHighlighted: Bool) -> AppleMusicLyricsViewIndicator
 
     var onScrolling: ((ScrollPosition, CGPoint) -> ())?
 
     @State private var containerSize: CGSize = .zero
-    @State private var animationState: AppleMusicScrollViewAnimationState = .intermediate
+    @State private var animationState: AppleMusicLyricsViewAnimationState = .intermediate
     @State private var scrollPosition: ScrollPosition = .init()
     @State private var scrollOffset: CGFloat = .zero
     @State private var contentOffsets: [Int: CGFloat] = [:]
@@ -289,16 +289,16 @@ struct AppleMusicScrollView<Content>: View where Content: View {
 
 #Preview {
     @Previewable @State var highlightedRange: Range<Int> = 0 ..< 1
-    @Previewable @State var alignment: AppleMusicScrollViewAlignment = .top
+    @Previewable @State var alignment: AppleMusicLyricsViewAlignment = .top
     let count = 20
 
     VStack {
         VStack {
             Picker("Alignment", selection: $alignment) {
                 Text("Top")
-                    .tag(AppleMusicScrollViewAlignment.top)
+                    .tag(AppleMusicLyricsViewAlignment.top)
                 Text("Center")
-                    .tag(AppleMusicScrollViewAlignment.center)
+                    .tag(AppleMusicLyricsViewAlignment.center)
             }
             .pickerStyle(SegmentedPickerStyle())
 
@@ -388,7 +388,7 @@ struct AppleMusicScrollView<Content>: View where Content: View {
         }
         .padding()
 
-        AppleMusicScrollView(
+        AppleMusicLyricsView(
             offset: 0,
             range: 0 ..< count,
             highlightedRange: highlightedRange,

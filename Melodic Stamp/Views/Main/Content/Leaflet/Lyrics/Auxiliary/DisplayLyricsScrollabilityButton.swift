@@ -16,7 +16,7 @@ struct DisplayLyricsInteractionStateButton: View, Animatable {
 
     @Namespace private var namespace
 
-    @Binding var interactionState: AppleMusicScrollViewInteractionState
+    @Binding var interactionState: AppleMusicLyricsViewInteractionState
     var progress: CGFloat
     var lineWidth: CGFloat = 4
     var hasProgressRing: Bool = true
@@ -65,7 +65,7 @@ struct DisplayLyricsInteractionStateButton: View, Animatable {
 }
 
 #Preview {
-    @Previewable @State var interactionState: AppleMusicScrollViewInteractionState = .following
+    @Previewable @State var interactionState: AppleMusicLyricsViewInteractionState = .following
     @Previewable @State var progress: CGFloat = .zero
 
     VStack {
