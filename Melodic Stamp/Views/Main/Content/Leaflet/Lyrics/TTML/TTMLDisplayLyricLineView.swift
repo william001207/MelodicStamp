@@ -22,41 +22,24 @@ struct TTMLDisplayLyricLineView: View {
     var body: some View {
         VStack(spacing: 5) {
             ZStack {
-                // It's a must to avoid view hierarchies from being reconstructed
-                // This is causing surprisingly low impact on performance, so use it
                 if isActive {
                     activeContent()
                         .frame(maxWidth: .infinity, alignment: alignment)
-//                        .opacity(isActive ? 1 : 0)
                 } else {
                     inactiveContent()
                         .frame(maxWidth: .infinity, alignment: alignment)
-//                        .opacity(isActive ? 0 : 1)
                 }
             }
 
             // Shows background lyrics when necessary (has background lyrics && lyrics is active)
-            if !line.backgroundLyrics.isEmpty {
-                // Avoid using conditional content, instead, shrink this view to affect layout
-                Color.clear
-                    .frame(height: isActive ? backgroundContentSize.height : 0)
-                    .frame(maxWidth: .infinity)
-                    .overlay(alignment: alignment) {
-                        backgroundContent()
-                            .blur(radius: isActive ? 0 : 8)
-                            .scaleEffect(isActive ? 1 : 0.8, anchor: .bottom)
-                            .opacity(isActive ? 1 : 0)
-                            .onGeometryChange(for: CGSize.self) { proxy in
-                                proxy.size
-                            } action: { newValue in
-                                backgroundContentSize = newValue
-                            }
-                    }
+            if isActive, !line.backgroundLyrics.isEmpty {
+                backgroundContent()
+                    .frame(maxWidth: .infinity, alignment: alignment)
+                    .transition(.blurReplace)
             }
         }
         .multilineTextAlignment(textAlignment)
         .frame(maxWidth: .infinity, alignment: alignment)
-        .animation(.linear, value: elapsedTime) // For text rendering
         .onChange(of: isHighlighted, initial: true) { _, newValue in
             if !newValue {
                 withAnimation(.smooth(duration: 0.25).delay(highlightReleasingDelay)) {
@@ -68,6 +51,7 @@ struct TTMLDisplayLyricLineView: View {
                 }
             }
         }
+        .animation(.linear, value: elapsedTime) // For time interpolation
     }
 
     private var textAlignment: TextAlignment {
@@ -93,12 +77,12 @@ struct TTMLDisplayLyricLineView: View {
 
         VStack(alignment: alignment.horizontal, spacing: 5) {
             Text(stringContent(of: line.lyrics))
-                .font(.system(size: 30))
+                .font(.title)
                 .bold()
                 .textRenderer(lyricsRenderer)
 
             additionalContent(for: line.lyrics)
-                .font(.system(size: 20))
+                .font(.title3)
                 .opacity(0.75)
         }
     }
@@ -106,12 +90,12 @@ struct TTMLDisplayLyricLineView: View {
     @ViewBuilder private func inactiveContent() -> some View {
         VStack(alignment: alignment.horizontal, spacing: 5) {
             Text(stringContent(of: line.lyrics))
-                .font(.system(size: 30))
+                .font(.title)
                 .bold()
                 .opacity(inactiveOpacity)
 
             additionalContent(for: line.lyrics)
-                .font(.system(size: 20))
+                .font(.title3)
                 .opacity(inactiveOpacity)
         }
     }
@@ -121,12 +105,12 @@ struct TTMLDisplayLyricLineView: View {
 
         VStack(alignment: alignment.horizontal, spacing: 5) {
             Text(stringContent(of: line.backgroundLyrics))
-                .font(.system(size: 25))
+                .font(.title2)
                 .bold()
                 .textRenderer(backgroundLyricsRenderer)
 
             additionalContent(for: line.backgroundLyrics)
-                .font(.system(size: 20))
+                .font(.title3)
                 .opacity(0.75)
         }
     }

@@ -150,6 +150,7 @@ struct DisplayLyricsView: View {
                     .font(.system(size: 30))
                     .bold()
                     .opacity(isHighlighted ? 1.0 : 0.55)
+                
                 if let translation = line.translation {
                     Text(translation)
                         .font(.system(size: 20))
