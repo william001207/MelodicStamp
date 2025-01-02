@@ -56,6 +56,8 @@ struct MiniPlayerView: View {
 
     @State private var playbackTime: PlaybackTime?
 
+    @State private var isPlaylistPresented: Bool = false
+
     var body: some View {
         VStack(spacing: 12) {
             header()
@@ -192,23 +194,12 @@ struct MiniPlayerView: View {
 
     @ViewBuilder private func header() -> some View {
         HStack(alignment: .center, spacing: 12) {
-            // Share
-            if isTitleHovering {
-                AliveButton(
-                    enabledStyle: .tertiary, hoveringStyle: .secondary
-                ) {} label: {
-                    Image(systemSymbol: .squareAndArrowUp)
-                }
-                .transition(.blurReplace)
-            }
-
             // Playback mode
             AliveButton(
                 enabledStyle: .tertiary, hoveringStyle: .secondary
             ) {
                 let hasShift = NSEvent.modifierFlags.contains(.shift)
-                player.playbackMode = player.playbackMode.cycle(
-                    negate: hasShift)
+                player.playbackMode = player.playbackMode.cycle(negate: hasShift)
             } label: {
                 Image(systemSymbol: player.playbackMode.systemSymbol)
                     .contentTransition(.symbolEffect(.replace))
@@ -225,8 +216,7 @@ struct MiniPlayerView: View {
                 player.playbackLooping.toggle()
             } label: {
                 Image(systemSymbol: .repeat1)
-                    .font(.headline)
-                    .frame(width: 16)
+                    .frame(width: 16, height: 16)
                     .aliveHighlight(player.playbackLooping)
             }
             .matchedGeometryEffect(
@@ -268,8 +258,10 @@ struct MiniPlayerView: View {
                 ) {
                     alwaysOnTop.isAlwaysOnTop.toggle()
                 } label: {
-                    Image(systemSymbol: alwaysOnTop.isAlwaysOnTop ? .pinFill : .pinSlashFill)
+                    Image(systemSymbol: .pinFill)
+                        .frame(width: 16, height: 16)
                         .contentTransition(.symbolEffect(.replace))
+                        .aliveHighlight(alwaysOnTop.isAlwaysOnTop)
                 }
                 .transition(.blurReplace)
             }
@@ -296,6 +288,7 @@ struct MiniPlayerView: View {
     @ViewBuilder private func leadingControls() -> some View {
         if !isProgressBarExpanded {
             Group {
+                // Previous track
                 AliveButton {
                     player.previousTrack()
                     playerKeyboardControl.previousSongButtonBounceAnimation
@@ -313,6 +306,7 @@ struct MiniPlayerView: View {
                     id: PlayerNamespace.previousSongButton, in: namespace
                 )
 
+                // Play / pause
                 AliveButton {
                     player.isPlaying.toggle()
                     playerKeyboardControl.isPressingSpace = false
@@ -333,6 +327,7 @@ struct MiniPlayerView: View {
                     id: PlayerNamespace.playPauseButton, in: namespace
                 )
 
+                // Next track
                 AliveButton {
                     player.nextTrack()
                     playerKeyboardControl.nextSongButtonBounceAnimation.toggle()
@@ -370,6 +365,7 @@ struct MiniPlayerView: View {
         }
 
         if activeControl == .volume || !isProgressBarExpanded {
+            // Speaker
             AliveButton(enabledStyle: .secondary) {
                 switch activeControl {
                 case .progress:
@@ -391,7 +387,10 @@ struct MiniPlayerView: View {
                 id: PlayerNamespace.volumeButton, in: namespace
             )
 
-            AliveButton(enabledStyle: .secondary) {} label: {
+            // Playlist
+            AliveButton(enabledStyle: .secondary) {
+                isPlaylistPresented.toggle()
+            } label: {
                 Image(systemSymbol: .listTriangle)
             }
             .matchedGeometryEffect(

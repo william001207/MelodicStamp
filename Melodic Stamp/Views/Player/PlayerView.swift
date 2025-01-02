@@ -62,6 +62,7 @@ struct PlayerView: View {
 
     @ViewBuilder private func header() -> some View {
         HStack(alignment: .center, spacing: 12) {
+            // Playback mode
             AliveButton(
                 enabledStyle: .tertiary, hoveringStyle: .secondary
             ) {
@@ -78,6 +79,7 @@ struct PlayerView: View {
                 id: PlayerNamespace.playbackModeButton, in: namespace
             )
 
+            // Playback looping
             AliveButton(
                 enabledStyle: .tertiary, hoveringStyle: .secondary
             ) {
@@ -85,7 +87,7 @@ struct PlayerView: View {
             } label: {
                 Image(systemSymbol: .repeat1)
                     .font(.headline)
-                    .frame(width: 20)
+                    .frame(width: 20, height: 20)
                     .aliveHighlight(player.playbackLooping)
             }
             .matchedGeometryEffect(
@@ -113,6 +115,7 @@ struct PlayerView: View {
 
             Spacer()
 
+            // Expand / shrink
             AliveButton(
                 enabledStyle: .tertiary, hoveringStyle: .secondary
             ) {
@@ -131,6 +134,7 @@ struct PlayerView: View {
 
     @ViewBuilder private func leadingControls() -> some View {
         Group {
+            // Previous track
             AliveButton {
                 player.previousTrack()
                 playerKeyboardControl.previousSongButtonBounceAnimation.toggle()
@@ -147,6 +151,7 @@ struct PlayerView: View {
                 id: PlayerNamespace.previousSongButton, in: namespace
             )
 
+            // Play / pause
             AliveButton {
                 player.isPlaying.toggle()
                 playerKeyboardControl.isPressingSpace = false
@@ -165,6 +170,7 @@ struct PlayerView: View {
                 id: PlayerNamespace.playPauseButton, in: namespace
             )
 
+            // Next track
             AliveButton {
                 player.nextTrack()
                 playerKeyboardControl.nextSongButtonBounceAnimation.toggle()
@@ -204,6 +210,7 @@ struct PlayerView: View {
         .animation(.default.speed(2), value: player.isMuted)
         .matchedGeometryEffect(id: PlayerNamespace.volumeBar, in: namespace)
 
+        // Speaker
         AliveButton(enabledStyle: .secondary) {
             player.isMuted.toggle()
         } label: {
