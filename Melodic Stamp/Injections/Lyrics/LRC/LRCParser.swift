@@ -19,15 +19,13 @@ import RegexBuilder
     }
 
     private func parse(string: String) throws {
-        lines = []
+        var lines: [LRCLyricLine] = []
 
         let contents = string
             .split(separator: .newlineSequence)
             .map(String.init)
 
-        var previousLine: LRCLyricLine?
-
-        try contents.forEach {
+        for content in contents {
             let tagRegex = Regex {
                 "["
                 Capture {
@@ -46,10 +44,9 @@ import RegexBuilder
                 }
             }
 
-            guard
-                let match = try lineRegex.wholeMatch(
-                    in: $0.trimmingCharacters(in: .whitespacesAndNewlines))
-            else { return }
+            guard let match = try lineRegex.wholeMatch(
+                in: content.trimmingCharacters(in: .whitespacesAndNewlines)
+            ) else { return }
             // Output: (original, tagString, _, content)
 
             let tagString = String(match.output.1).trimmingCharacters(in: .whitespacesAndNewlines)
@@ -60,11 +57,8 @@ import RegexBuilder
                 tags.append(String(match.output.1).trimmingCharacters(in: .whitespacesAndNewlines))
             }
 
-//            print("Extracting LRC lyric line: \(tags), \"\(content)\"")
-
             var line: LRCLyricLine = .init(content: content)
-
-            var isTranslationLine = false
+            
             for tag in tags {
                 if let time = try TimeInterval(lyricTimestamp: tag) {
                     // Parse timestamp
@@ -79,34 +73,26 @@ import RegexBuilder
                     // Parse tag
                     do {
                         if let tag = try Self.parseTag(string: tag) {
-                            if tag.type == .translation {
-                                isTranslationLine = true
-                                line.type = .translation
-                            } else {
-                                line.tags.append(tag)
-                            }
+                            line.tags.append(tag)
                         }
                     } catch {}
                 }
             }
 
-            if isTranslationLine, var previousLine = previousLine, previousLine.type == .main {
-                previousLine.translation = line.content
-                if let lastIndex = lines.lastIndex(where: { $0.id == previousLine.id }) {
-                    lines[lastIndex] = previousLine
-                }
-            } else if previousLine != nil, previousLine?.type == .main, tags.isEmpty {
-                if var previousLine = previousLine {
-                    previousLine.translation = content
-                    if let lastIndex = lines.lastIndex(where: { $0.id == previousLine.id }) {
-                        lines[lastIndex] = previousLine
-                    }
-                }
+            let isTranslation = line.tags.map(\.type).contains(.translation)
+            if isTranslation {
+                // Append translation to last line
+                
+                let lastIndex = lines.endIndex - 1
+                guard lines.indices.contains(lastIndex) else { continue }
+                
+                lines[lastIndex].translation = line.content
             } else {
                 lines.append(line)
-                previousLine = line
             }
         }
+        
+        self.lines = lines
     }
 
     static func parseTag(string: String) throws -> Tag? {

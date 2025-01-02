@@ -11,14 +11,8 @@ import RegexBuilder
 struct LRCLyricLine: LyricLine, AnimatedString {
     typealias Tag = LRCTag
 
-    enum LRCLyricType: Hashable, Equatable {
-        case main
-        case translation
-    }
-
     let id: UUID = .init()
-
-    var type: LRCLyricType = .main
+    
     var beginTime: TimeInterval?
     var endTime: TimeInterval?
 
