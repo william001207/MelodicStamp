@@ -58,7 +58,7 @@ import RegexBuilder
             }
 
             var line: LRCLyricLine = .init(content: content)
-            
+
             for tag in tags {
                 if let time = try TimeInterval(lyricTimestamp: tag) {
                     // Parse timestamp
@@ -82,16 +82,16 @@ import RegexBuilder
             let isTranslation = line.tags.map(\.type).contains(.translation)
             if isTranslation {
                 // Append translation to last line
-                
+
                 let lastIndex = lines.endIndex - 1
                 guard lines.indices.contains(lastIndex) else { continue }
-                
+
                 lines[lastIndex].translation = line.content
             } else {
                 lines.append(line)
             }
         }
-        
+
         self.lines = lines
     }
 

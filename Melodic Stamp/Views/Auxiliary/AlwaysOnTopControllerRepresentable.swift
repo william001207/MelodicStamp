@@ -14,11 +14,11 @@ struct AlwaysOnTopControllerRepresentable: NSViewControllerRepresentable {
     func makeNSViewController(context: Context) -> NSViewController {
         let hostingController = AlwaysOnTopHostingController(rootView: EmptyView())
         context.coordinator.hostingController = hostingController
-        
+
         return hostingController
     }
 
-    func updateNSViewController(_ nsViewController: NSViewController, context: Context) {
+    func updateNSViewController(_: NSViewController, context: Context) {
         if let hostingController = context.coordinator.hostingController {
             hostingController.isAlwaysOnTop = isAlwaysOnTop
             hostingController.titleVisibility = titleVisibility
@@ -41,7 +41,7 @@ class AlwaysOnTopHostingController<Content: View>: NSHostingController<Content> 
     override func viewWillLayout() {
         super.viewWillLayout()
 
-        if let window = self.view.window {
+        if let window = view.window {
             switch titleVisibility {
             case .visible:
                 window.titleVisibility = .hidden
@@ -56,9 +56,9 @@ class AlwaysOnTopHostingController<Content: View>: NSHostingController<Content> 
             @unknown default:
                 break
             }
-            
+
             window.level = isAlwaysOnTop ? .floating : .normal
-            
+
             if isAlwaysOnTop {
                 window.collectionBehavior.insert(.canJoinAllSpaces)
             } else {

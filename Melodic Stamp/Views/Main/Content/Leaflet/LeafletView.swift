@@ -15,7 +15,7 @@ struct LeafletView: View {
 
     @State private var dominantColors: [Color] = [.init(hex: 0x929292), .init(hex: 0xFFFFFF), .init(hex: 0x929292)]
     @State private var interactionState: AppleMusicLyricsViewInteractionState = .following
-    
+
     @State private var isPlaying: Bool = false
     @State private var isShowingLyrics: Bool = true
 
@@ -63,7 +63,7 @@ struct LeafletView: View {
                                 guard !interactionState.isIsolated else { return }
                                 interactionStateDispatch?.cancel()
                                 interactionState = .intermediate
-                                
+
                                 let dspatch = DispatchWorkItem {
                                     interactionState = .countingDown
                                 }
@@ -97,12 +97,12 @@ struct LeafletView: View {
                                 case .countingDown:
                                     interactionStateDispatch?.cancel()
                                     hasInteractionStateProgressRing = true
-                                    
+
                                     interactionStateDelegationProgress = .zero
                                     withAnimation(.smooth(duration: 3)) {
                                         interactionStateDelegationProgress = 1
                                     }
-                                    
+
                                     let dispatch = DispatchWorkItem {
                                         interactionState = .following
                                     }
@@ -111,7 +111,7 @@ struct LeafletView: View {
                                 case .isolated:
                                     interactionStateDispatch?.cancel()
                                     hasInteractionStateProgressRing = false
-                                    
+
                                     withAnimation(.smooth) {
                                         interactionStateDelegationProgress = 1
                                     }

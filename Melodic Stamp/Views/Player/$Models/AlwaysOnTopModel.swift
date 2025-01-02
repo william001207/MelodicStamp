@@ -10,7 +10,7 @@ import SwiftUI
 @Observable final class AlwaysOnTopModel {
     var isAlwaysOnTop: Bool = true
     var titleVisibility: NSWindow.TitleVisibility = .hidden
-    
+
     func giveUp() {
         isAlwaysOnTop = false
         titleVisibility = .visible

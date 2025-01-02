@@ -15,7 +15,7 @@ struct DisplayLyricsView: View {
     @Environment(\.luminareAnimation) private var animation
 
     @Binding var interactionState: AppleMusicLyricsViewInteractionState
-    var onScrolling: ((ScrollPosition, CGPoint) -> Void)?
+    var onScrolling: ((ScrollPosition, CGPoint) -> ())?
 
     @State private var isHovering: Bool = false
     @State private var hoveredIndex: Int? = nil
@@ -139,7 +139,7 @@ struct DisplayLyricsView: View {
                     .font(.system(size: 30))
                     .bold()
                     .opacity(isHighlighted ? 1.0 : 0.55)
-                
+
                 if let translation = line.translation {
                     Text(translation)
                         .font(.system(size: 20))

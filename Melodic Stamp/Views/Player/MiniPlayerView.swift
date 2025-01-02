@@ -24,7 +24,7 @@ struct MiniPlayerView: View {
     enum HeaderControl: Equatable {
         case title
         case lyrics
-        
+
         var hasThumbnail: Bool {
             switch self {
             case .title: true
@@ -85,7 +85,6 @@ struct MiniPlayerView: View {
         .focusable()
         .focusEffectDisabled()
         .focused($isFocused)
-        
         // Allow fully customization to corresponding window
         .background {
             AlwaysOnTopControllerRepresentable(
@@ -237,9 +236,9 @@ struct MiniPlayerView: View {
             AliveButton {
                 headerControl = switch headerControl {
                 case .title:
-                        .lyrics
+                    .lyrics
                 case .lyrics:
-                        .title
+                    .title
                 }
             } label: {
                 ShrinkableMarqueeScrollView {
@@ -261,7 +260,7 @@ struct MiniPlayerView: View {
                 MusicCover(images: [thumbnail], hasPlaceholder: false, cornerRadius: 2)
                     .padding(.bottom, 2)
             }
-            
+
             // Pin / unpin
             if isTitleHovering || alwaysOnTop.isAlwaysOnTop {
                 AliveButton(

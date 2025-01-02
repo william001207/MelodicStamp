@@ -44,10 +44,11 @@ struct TTMLLyricLine: LyricLine {
 
     var lyrics: TTMLLyrics = .init()
     var backgroundLyrics: TTMLLyrics = .init()
-    
+
     var content: String {
         lyrics.map(\.content).joined()
     }
+
     var backgroundContent: String {
         backgroundLyrics.map(\.content).joined()
     }

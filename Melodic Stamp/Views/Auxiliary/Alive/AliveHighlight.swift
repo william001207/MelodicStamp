@@ -5,16 +5,16 @@
 //  Created by KrLite on 2025/1/2.
 //
 
-import SwiftUI
 import Luminare
+import SwiftUI
 
 struct AliveHighlight<Content>: View where Content: View {
     @Environment(\.luminareAnimation) private var animation
-    
+
     var isHighlighted: Bool = false
     var cornerRadius: CGFloat = 8
     @ViewBuilder var content: () -> Content
-    
+
     var body: some View {
         content()
             .background {
@@ -32,7 +32,7 @@ struct AliveHighlight<Content>: View where Content: View {
 struct AliveHighlightViewModifier: ViewModifier {
     var isHighlighted: Bool = false
     var cornerRadius: CGFloat = 8
-    
+
     func body(content: Content) -> some View {
         AliveHighlight(isHighlighted: isHighlighted, cornerRadius: cornerRadius) {
             content
@@ -41,8 +41,8 @@ struct AliveHighlightViewModifier: ViewModifier {
 }
 
 #Preview {
-    @Previewable @State var isHighlighted: Bool = false
-    
+    @Previewable @State var isHighlighted = false
+
     AliveButton {
         isHighlighted.toggle()
     } label: {

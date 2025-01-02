@@ -12,7 +12,7 @@ struct LRCLyricLine: LyricLine, AnimatedString {
     typealias Tag = LRCTag
 
     let id: UUID = .init()
-    
+
     var beginTime: TimeInterval?
     var endTime: TimeInterval?
 

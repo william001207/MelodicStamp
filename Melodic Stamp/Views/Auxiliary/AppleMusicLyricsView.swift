@@ -79,7 +79,7 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
     var body: some View {
         // Avoid multiple instantializations
         let isInitialized = isInitialized
-        
+
         ScrollView {
             Spacer()
                 .frame(height: offset)
@@ -156,7 +156,7 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
             scrollPosition.scrollTo(y: value)
         }
     }
-    
+
     private var isIndicatorVisible: Bool {
         indicator(highlightedRange.lowerBound, true).isVisible
     }
@@ -172,7 +172,7 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
     private var canPauseAnimation: Bool {
         highlightedRange.isEmpty && isIndicatorVisible
     }
-    
+
     private var alignmentCompensate: CGFloat {
         switch alignment {
         case .top:
@@ -220,7 +220,7 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
             .animation(.smooth, value: highlightedRange)
             .animation(.spring, value: animationCompensate)
             .animation(.smooth, value: interactionState.isDelegated)
-            // .animation(.smooth, value: isIndicatorVisible)
+        // .animation(.smooth, value: isIndicatorVisible)
     }
 
     private func scrollToHighlighted() {

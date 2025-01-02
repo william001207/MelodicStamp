@@ -5,17 +5,17 @@
 //  Created by KrLite on 2025/1/1.
 //
 
-import Foundation
 import Combine
+import Foundation
 
 @dynamicMemberLookup
 class Observable<M: AnyObject>: ObservableObject {
     var model: M
-    
+
     init(_ model: M) {
         self.model = model
     }
-    
+
     subscript<T>(dynamicMember keyPath: WritableKeyPath<M, T>) -> T {
         get { model[keyPath: keyPath] }
         set {
