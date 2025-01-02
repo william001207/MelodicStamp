@@ -160,7 +160,8 @@ struct ContentView: View {
 
     @ViewBuilder private func miniPlayerView() -> some View {
         MiniPlayerView(namespace: namespace)
-            .padding(8)
+            .padding(12)
+            .padding(.top, 4)
             .background {
                 VisualEffectView(
                     material: .hudWindow, blendingMode: .behindWindow

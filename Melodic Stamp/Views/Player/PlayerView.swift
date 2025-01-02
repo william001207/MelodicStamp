@@ -83,9 +83,10 @@ struct PlayerView: View {
             ) {
                 player.playbackLooping.toggle()
             } label: {
-                PlaybackLoopingView(isEnabled: player.playbackLooping)
+                Image(systemSymbol: .repeat1)
                     .font(.headline)
                     .frame(width: 20)
+                    .aliveHighlight(player.playbackLooping)
             }
             .matchedGeometryEffect(
                 id: PlayerNamespace.playbackLoopingButton, in: namespace

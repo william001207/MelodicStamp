@@ -15,6 +15,9 @@ struct ProgressDotsContainerView: View {
     @State private var isVisible: Bool = true
 
     var body: some View {
+        // Avoid multiple instantializations
+        let isVisible = isVisible
+        
         VStack {
             if isVisible {
                 ProgressDotsView(elapsedTime: elapsedTime, beginTime: beginTime, endTime: endTime)

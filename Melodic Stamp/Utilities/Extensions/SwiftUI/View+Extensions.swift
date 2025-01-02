@@ -12,3 +12,9 @@ extension View {
         modifier(AnimationObserverModifier(for: observedValue, onChange: onChange, onComplete: onComplete))
     }
 }
+
+extension View {
+    @ViewBuilder func aliveHighlight(_ isHighlighted: Bool, cornerRadius: CGFloat = 8) -> some View {
+        modifier(AliveHighlightViewModifier(isHighlighted: isHighlighted, cornerRadius: cornerRadius))
+    }
+}

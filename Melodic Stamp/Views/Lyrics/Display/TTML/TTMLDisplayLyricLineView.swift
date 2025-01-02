@@ -75,7 +75,7 @@ struct TTMLDisplayLyricLineView: View {
         let lyricsRenderer = textRenderer(for: line.lyrics)
 
         VStack(alignment: alignment.horizontal, spacing: 5) {
-            Text(stringContent(of: line.lyrics))
+            Text(line.content)
                 .font(.title)
                 .bold()
                 .textRenderer(lyricsRenderer)
@@ -88,7 +88,7 @@ struct TTMLDisplayLyricLineView: View {
 
     @ViewBuilder private func inactiveContent() -> some View {
         VStack(alignment: alignment.horizontal, spacing: 5) {
-            Text(stringContent(of: line.lyrics))
+            Text(line.content)
                 .font(.title)
                 .bold()
                 .opacity(inactiveOpacity)
@@ -103,7 +103,7 @@ struct TTMLDisplayLyricLineView: View {
         let backgroundLyricsRenderer = textRenderer(for: line.backgroundLyrics)
 
         VStack(alignment: alignment.horizontal, spacing: 5) {
-            Text(stringContent(of: line.backgroundLyrics))
+            Text(line.backgroundContent)
                 .font(.title2)
                 .bold()
                 .textRenderer(backgroundLyricsRenderer)
@@ -124,10 +124,6 @@ struct TTMLDisplayLyricLineView: View {
             Text(roman)
                 .bold()
         }
-    }
-
-    private func stringContent(of lyrics: TTMLLyrics) -> String {
-        lyrics.map(\.content).joined()
     }
 
     private func textRenderer(for lyrics: TTMLLyrics) -> some TextRenderer {

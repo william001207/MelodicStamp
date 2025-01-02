@@ -169,7 +169,8 @@ struct PlaylistView: View {
             Button {
                 player.playbackLooping.toggle()
             } label: {
-                PlaybackLoopingView(isEnabled: player.playbackLooping)
+                Image(systemSymbol: .repeat1)
+                    .aliveHighlight(player.playbackLooping)
                     .padding()
             }
             .aspectRatio(1 / 1, contentMode: .fit)

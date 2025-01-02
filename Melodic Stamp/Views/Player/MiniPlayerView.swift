@@ -24,6 +24,13 @@ struct MiniPlayerView: View {
     enum HeaderControl: Equatable {
         case title
         case lyrics
+        
+        var hasThumbnail: Bool {
+            switch self {
+            case .title: true
+            case .lyrics: false
+            }
+        }
     }
 
     @FocusState private var isFocused: Bool
@@ -35,12 +42,11 @@ struct MiniPlayerView: View {
     var namespace: Namespace.ID
 
     @State private var lyrics: LyricsModel = .init()
+    @State private var alwaysOnTop: AlwaysOnTopModel = .init()
 
     @State private var activeControl: ActiveControl = .progress
     @State private var headerControl: HeaderControl = .title
 
-    @State private var isFloating: Bool = false
-    @State private var isTitleBarHidden: Bool = true
     @State private var isTitleHovering: Bool = false
     @State private var isProgressBarHovering: Bool = false
     @State private var isProgressBarActive: Bool = false
@@ -79,12 +85,12 @@ struct MiniPlayerView: View {
         .focusable()
         .focusEffectDisabled()
         .focused($isFocused)
-        .onAppear {
-            isFocused = true
-            isTitleBarHidden = true
-        }
+        
+        // Allow fully customization to corresponding window
         .background {
-            WindowControllerRepresentable(isFloating: $isFloating, isTitleBarHidden: $isTitleBarHidden)
+            AlwaysOnTopControllerRepresentable(
+                isAlwaysOnTop: $alwaysOnTop.isAlwaysOnTop, titleVisibility: $alwaysOnTop.titleVisibility
+            )
         }
 
         // Read lyrics
@@ -187,13 +193,17 @@ struct MiniPlayerView: View {
 
     @ViewBuilder private func header() -> some View {
         HStack(alignment: .center, spacing: 12) {
-            AliveButton(
-                enabledStyle: .tertiary, hoveringStyle: .secondary
-            ) {} label: {
-                Image(systemSymbol: .squareAndArrowUp)
+            // Share
+            if isTitleHovering {
+                AliveButton(
+                    enabledStyle: .tertiary, hoveringStyle: .secondary
+                ) {} label: {
+                    Image(systemSymbol: .squareAndArrowUp)
+                }
+                .transition(.blurReplace)
             }
-            .opacity(isTitleHovering ? 1 : 0)
 
+            // Playback mode
             AliveButton(
                 enabledStyle: .tertiary, hoveringStyle: .secondary
             ) {
@@ -209,34 +219,34 @@ struct MiniPlayerView: View {
                 id: PlayerNamespace.playbackModeButton, in: namespace
             )
 
+            // Playback looping
             AliveButton(
                 enabledStyle: .tertiary, hoveringStyle: .secondary
             ) {
                 player.playbackLooping.toggle()
             } label: {
-                PlaybackLoopingView(isEnabled: player.playbackLooping)
+                Image(systemSymbol: .repeat1)
                     .font(.headline)
                     .frame(width: 16)
+                    .aliveHighlight(player.playbackLooping)
             }
             .matchedGeometryEffect(
                 id: PlayerNamespace.playbackLoopingButton, in: namespace
             )
 
             AliveButton {
-                headerControl =
-                    switch headerControl {
-                    case .title:
+                headerControl = switch headerControl {
+                case .title:
                         .lyrics
-                    case .lyrics:
+                case .lyrics:
                         .title
-                    }
+                }
             } label: {
                 ShrinkableMarqueeScrollView {
                     switch headerControl {
                     case .title:
                         MusicTitle(item: player.current)
                     case .lyrics:
-                        // TODO: Add lyrics control
                         DisplaySingleLyricLineView()
                             .environment(lyrics)
                     }
@@ -247,41 +257,39 @@ struct MiniPlayerView: View {
                 .padding(.bottom, 2)
             }
 
-            Group {
-                switch headerControl {
-                case .title:
-                    if let thumbnail = player.current?.metadata.thumbnail {
-                        MusicCover(images: [thumbnail], hasPlaceholder: false, cornerRadius: 2)
-                    }
-                default:
-                    EmptyView()
-                }
+            if headerControl.hasThumbnail, let thumbnail = player.current?.metadata.thumbnail {
+                MusicCover(images: [thumbnail], hasPlaceholder: false, cornerRadius: 2)
+                    .padding(.bottom, 2)
             }
-            .padding(.bottom, 2)
-
-            AliveButton(
-                enabledStyle: .tertiary, hoveringStyle: .secondary
-            ) {
-                isFloating = false
-                isTitleBarHidden = false
-                windowManager.style = .main
-            } label: {
-                Image(systemSymbol: .arrowUpLeftAndArrowDownRight)
-            }
-            .matchedGeometryEffect(
-                id: PlayerNamespace.expandShrinkButton, in: namespace
-            )
-            .opacity(isTitleHovering ? 1 : 0)
             
-            AliveButton(
-                enabledStyle: .tertiary, hoveringStyle: .secondary
-            ) {
-                isFloating.toggle()
-            } label: {
-                Image(systemSymbol: isFloating ? .pin : .pinSlash)
-                    .contentTransition(.symbolEffect(.replace))
+            // Pin / unpin
+            if isTitleHovering || alwaysOnTop.isAlwaysOnTop {
+                AliveButton(
+                    enabledStyle: .tertiary, hoveringStyle: .secondary
+                ) {
+                    alwaysOnTop.isAlwaysOnTop.toggle()
+                } label: {
+                    Image(systemSymbol: alwaysOnTop.isAlwaysOnTop ? .pinFill : .pinSlashFill)
+                        .contentTransition(.symbolEffect(.replace))
+                }
+                .transition(.blurReplace)
             }
-            .opacity(isTitleHovering ? 1 : 0)
+
+            // Expand / shrink
+            if isTitleHovering {
+                AliveButton(
+                    enabledStyle: .tertiary, hoveringStyle: .secondary
+                ) {
+                    alwaysOnTop.giveUp()
+                    windowManager.style = .main
+                } label: {
+                    Image(systemSymbol: .arrowUpLeftAndArrowDownRight)
+                }
+                .matchedGeometryEffect(
+                    id: PlayerNamespace.expandShrinkButton, in: namespace
+                )
+                .transition(.blurReplace)
+            }
         }
         .frame(height: 16)
     }

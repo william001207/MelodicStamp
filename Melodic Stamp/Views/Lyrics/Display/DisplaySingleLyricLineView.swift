@@ -15,13 +15,16 @@ struct DisplaySingleLyricLineView: View {
     @State private var elapsedTime: TimeInterval = 0.0
     
     var body: some View {
-        HStack {
+        Group {
             let lines = lyrics.lines
             let highlightedRange = highlightedRange
             let index = highlightedRange.upperBound - 1
             
-            if highlightedRange.contains(index) {
+            if highlightedRange.contains(index), hasContent(at: index) {
                 lyricLine(line: lines[index], index: index)
+            } else {
+                ProgressDotsView(elapsedTime: 0, beginTime: 0, endTime: 0)
+                    .scaleEffect(0.7)
             }
         }
         .onReceive(player.playbackTimePublisher) { playbackTime in
@@ -52,7 +55,6 @@ struct DisplaySingleLyricLineView: View {
         }
         .bold()
         .lineLimit(1)
-        .foregroundStyle(Color.black)
     }
     
     @ViewBuilder private func rawLyricLine(line: RawLyricLine) -> some View {
@@ -65,23 +67,20 @@ struct DisplaySingleLyricLineView: View {
     }
     
     @ViewBuilder private func ttmlLyricLine(line: TTMLLyricLine) -> some View {
-        let lyricsRenderer = textRenderer(for: line.lyrics)
-        
-        Text(stringContent(of: line.lyrics))
-            .textRenderer(lyricsRenderer)
-    }
-    
-    private func stringContent(of lyrics: TTMLLyrics) -> String {
-        lyrics.map(\.content).joined()
-    }
-    
-    private func textRenderer(for lyrics: TTMLLyrics) -> some TextRenderer {
-        DisplayLyricsRenderer(
+        let lyricsRenderer = DisplayLyricsRenderer(
             elapsedTime: elapsedTime,
-            strings: lyrics.children, vowels: lyrics.vowels,
+            strings: line.lyrics.children, vowels: line.lyrics.vowels,
             inactiveOpacity: 0.25,
             brightness: 0,
             lift: 0
         )
+        
+        Text(line.content)
+            .textRenderer(lyricsRenderer)
+    }
+    
+    private func hasContent(at index: Int) -> Bool {
+        guard lyrics.lines.indices.contains(index) else { return false }
+        return !lyrics.lines[index].content.isEmpty
     }
 }
