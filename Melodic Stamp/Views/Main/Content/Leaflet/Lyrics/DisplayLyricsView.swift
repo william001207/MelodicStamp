@@ -54,8 +54,9 @@ struct DisplayLyricsView: View {
                         return if duration >= 4, progress <= 1 {
                             .visible {
                                 ProgressDotsContainerView(elapsedTime: elapsedTime, beginTime: beginTime, endTime: endTime)
+                                    .padding(8.5)
                                     .frame(maxWidth: .infinity, alignment: .leading)
-                                    .padding(.bottom, 32)
+                                    .padding(.bottom, 21)
                             }
                         } else { .invisible }
                     } else { return .invisible }
@@ -85,7 +86,6 @@ struct DisplayLyricsView: View {
         .onReceive(player.playbackTimePublisher) { playbackTime in
             guard let playbackTime else { return }
             elapsedTime = playbackTime.elapsed
-            duration = playbackTime.duration
         }
     }
 
@@ -134,7 +134,7 @@ struct DisplayLyricsView: View {
                 }
             }
         }
-        .padding(.bottom, 32)
+        .padding(.bottom, 21)
     }
 
     @ViewBuilder private func rawLyricLine(line: RawLyricLine, index _: Int, isHighlighted _: Bool) -> some View {
@@ -144,21 +144,23 @@ struct DisplayLyricsView: View {
     }
 
     @ViewBuilder private func lrcLyricLine(line: LRCLyricLine, index _: Int, isHighlighted: Bool) -> some View {
-        Group {
-            switch line.type {
-            case .main:
+        VStack(spacing: 5) {
+            Group {
                 Text(line.content)
-            case let .translation(locale):
-                Text(locale)
-
-                Text(line.content)
+                    .font(.system(size: 30))
+                    .bold()
+                    .opacity(isHighlighted ? 1.0 : 0.55)
+                if let translation = line.translation {
+                    Text(translation)
+                        .font(.system(size: 20))
+                        .opacity(isHighlighted ? 0.75 : 0.55)
+                }
             }
+            .multilineTextAlignment(.leading)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .font(.title)
+            .bold()
         }
-        .multilineTextAlignment(.leading)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .foregroundStyle(isHighlighted ? Color.white : Color.white.opacity(0.5))
-        .font(.title)
-        .bold()
     }
 
     @ViewBuilder private func ttmlLyricLine(line: TTMLLyricLine, index _: Int, isHighlighted: Bool) -> some View {
@@ -178,8 +180,8 @@ struct DisplayLyricsView: View {
 
     private func blurRadius(for index: Int, in highlightedRange: Range<Int>) -> CGFloat {
         let distance = abs(index - (highlightedRange.lowerBound))
-        let maxBlur = 5.0
-        let minBlur = 0.0
+        let maxBlur = 6.0
+        let minBlur = 1.0
         let factor = CGFloat(distance) * 1.0
         return max(minBlur, min(factor, maxBlur))
     }

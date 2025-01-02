@@ -25,6 +25,8 @@ import RegexBuilder
             .split(separator: .newlineSequence)
             .map(String.init)
 
+        var previousLine: LRCLyricLine?
+
         try contents.forEach {
             let tagRegex = Regex {
                 "["
@@ -62,6 +64,7 @@ import RegexBuilder
 
             var line: LRCLyricLine = .init(content: content)
 
+            var isTranslationLine = false
             for tag in tags {
                 if let time = try TimeInterval(lyricTimestamp: tag) {
                     // Parse timestamp
@@ -76,14 +79,9 @@ import RegexBuilder
                     // Parse tag
                     do {
                         if let tag = try Self.parseTag(string: tag) {
-                            if tag.type.isMetadata {
-                                switch tag.type {
-                                case .translation:
-                                    line.type = .translation(locale: tag.content)
-                                default:
-                                    // TODO: Handle more metadatas
-                                    break
-                                }
+                            if tag.type == .translation {
+                                isTranslationLine = true
+                                line.type = .translation
                             } else {
                                 line.tags.append(tag)
                             }
@@ -92,7 +90,22 @@ import RegexBuilder
                 }
             }
 
-            lines.append(line)
+            if isTranslationLine, var previousLine = previousLine, previousLine.type == .main {
+                previousLine.translation = line.content
+                if let lastIndex = lines.lastIndex(where: { $0.id == previousLine.id }) {
+                    lines[lastIndex] = previousLine
+                }
+            } else if previousLine != nil, previousLine?.type == .main, tags.isEmpty {
+                if var previousLine = previousLine {
+                    previousLine.translation = content
+                    if let lastIndex = lines.lastIndex(where: { $0.id == previousLine.id }) {
+                        lines[lastIndex] = previousLine
+                    }
+                }
+            } else {
+                lines.append(line)
+                previousLine = line
+            }
         }
     }
 

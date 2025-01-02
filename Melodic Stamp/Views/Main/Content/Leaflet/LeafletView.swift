@@ -13,7 +13,7 @@ struct LeafletView: View {
     @Environment(MetadataEditorModel.self) private var metadataEditor
     @Environment(LyricsModel.self) private var lyrics
 
-    @State private var dominantColors: [Color] = []
+    @State private var dominantColors: [Color] = [.init(hex: 0x929292), .init(hex: 0xFFFFFF), .init(hex: 0x929292)]
     @State private var interactionState: AppleMusicScrollViewInteractionState = .following
     @State private var isPlaying: Bool = false
     @State private var isShowingLyrics: Bool = true
@@ -67,16 +67,16 @@ struct LeafletView: View {
                                                 hasProgressRing: hasInteractionStateProgressRing && interactionStateDelegationProgress > 0
                                             )
                                             .tint(.white)
+                                            .transition(.blurReplace(.downUp))
                                         }
                                     }
-                                    .transition(.blurReplace)
                                     .animation(.bouncy, value: interactionState.isDelegated)
                                     .padding(12)
                                     .alignmentGuide(.trailing) { d in
                                         d[.leading]
                                     }
                                 }
-                                .transition(.blurReplace)
+                                .transition(.blurReplace(.downUp))
                                 .onChange(of: interactionState) { _, _ in
                                     switch interactionState {
                                     case .following:
@@ -124,7 +124,6 @@ struct LeafletView: View {
             .background {
                 if hasCover {
                     AnimatedGrid(colors: dominantColors)
-                        .brightness(-0.075)
                 } else {
                     ZStack {
                         Rectangle()
@@ -189,7 +188,7 @@ struct LeafletView: View {
     private func extractDominantColors(from image: NSImage) async throws -> [Color] {
         let colors = try DominantColors.dominantColors(
             nsImage: image, quality: .fair,
-            algorithm: .CIEDE2000, maxCount: 3, sorting: .lightness
+            algorithm: .CIEDE2000, maxCount: 3, options: [.excludeWhite], sorting: .lightness
         )
         return colors.map(Color.init)
     }

@@ -13,7 +13,7 @@ struct LRCLyricLine: LyricLine, AnimatedString {
 
     enum LRCLyricType: Hashable, Equatable {
         case main
-        case translation(locale: String)
+        case translation
     }
 
     let id: UUID = .init()
@@ -24,4 +24,5 @@ struct LRCLyricLine: LyricLine, AnimatedString {
 
     var tags: [LRCTag] = []
     var content: String
+    var translation: String?
 }

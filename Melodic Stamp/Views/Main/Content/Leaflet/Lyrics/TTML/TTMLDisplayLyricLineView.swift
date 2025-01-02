@@ -24,13 +24,15 @@ struct TTMLDisplayLyricLineView: View {
             ZStack {
                 // It's a must to avoid view hierarchies from being reconstructed
                 // This is causing surprisingly low impact on performance, so use it
-                activeContent()
-                    .frame(maxWidth: .infinity, alignment: alignment)
-                    .opacity(isActive ? 1 : 0)
-
-                inactiveContent()
-                    .frame(maxWidth: .infinity, alignment: alignment)
-                    .opacity(isActive ? 0 : 1)
+                if isActive {
+                    activeContent()
+                        .frame(maxWidth: .infinity, alignment: alignment)
+//                        .opacity(isActive ? 1 : 0)
+                } else {
+                    inactiveContent()
+                        .frame(maxWidth: .infinity, alignment: alignment)
+//                        .opacity(isActive ? 0 : 1)
+                }
             }
 
             // Shows background lyrics when necessary (has background lyrics && lyrics is active)
@@ -91,24 +93,25 @@ struct TTMLDisplayLyricLineView: View {
 
         VStack(alignment: alignment.horizontal, spacing: 5) {
             Text(stringContent(of: line.lyrics))
-                .font(.title)
+                .font(.system(size: 30))
                 .bold()
                 .textRenderer(lyricsRenderer)
 
             additionalContent(for: line.lyrics)
-                .font(.title3)
+                .font(.system(size: 20))
+                .opacity(0.75)
         }
     }
 
     @ViewBuilder private func inactiveContent() -> some View {
         VStack(alignment: alignment.horizontal, spacing: 5) {
             Text(stringContent(of: line.lyrics))
-                .font(.title)
+                .font(.system(size: 30))
                 .bold()
                 .opacity(inactiveOpacity)
 
             additionalContent(for: line.lyrics)
-                .font(.title3)
+                .font(.system(size: 20))
                 .opacity(inactiveOpacity)
         }
     }
@@ -118,12 +121,13 @@ struct TTMLDisplayLyricLineView: View {
 
         VStack(alignment: alignment.horizontal, spacing: 5) {
             Text(stringContent(of: line.backgroundLyrics))
-                .font(.title2)
+                .font(.system(size: 25))
                 .bold()
                 .textRenderer(backgroundLyricsRenderer)
 
             additionalContent(for: line.backgroundLyrics)
-                .font(.title3)
+                .font(.system(size: 20))
+                .opacity(0.75)
         }
     }
 

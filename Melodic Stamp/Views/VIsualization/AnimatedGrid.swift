@@ -20,9 +20,12 @@ struct AnimatedGrid: View {
         MeshGradient(
             initialGrid: generatePlainGrid(),
             animatorConfiguration: .init(
+                framesPerSecond: 120,
                 animationSpeedRange: 4...5,
                 meshRandomizer: randomizer
-            )
+            ),
+            grainAlpha: 0,
+            resolutionScale: 0.8
         )
     }
 

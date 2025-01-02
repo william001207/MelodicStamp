@@ -142,10 +142,10 @@ struct DisplayLyricsRenderer<Animated>: TextRenderer where Animated: AnimatedStr
         let filledWidth = bounds.width * progress
         let liftAmount = lift * bentSigmoid(softenProgress)
 
-        let timeToVowels = timeToVowels(at: elapsedTime - Double(index) * glowDelay)
+        // let timeToVowels = timeToVowels(at: elapsedTime - Double(index) * glowDelay)
 
         do {
-            var context = context
+            // var context = context
 
             // Wave effect
             /*

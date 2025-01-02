@@ -141,8 +141,7 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/Xinshao-air/MeshGradient.git",
       "state" : {
-        "branch" : "main",
-        "revision" : "879c06685d207d0d29ef6a241a980c79cee6393d"
+        "revision" : "3d8937a09f659a4890e71053fab0d3c6555e8fd8"
       }
     },
     {

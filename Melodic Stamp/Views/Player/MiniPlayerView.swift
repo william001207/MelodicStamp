@@ -39,6 +39,8 @@ struct MiniPlayerView: View {
     @State private var activeControl: ActiveControl = .progress
     @State private var headerControl: HeaderControl = .title
 
+    @State private var isFloating: Bool = false
+    @State private var isTitleBarHidden: Bool = true
     @State private var isTitleHovering: Bool = false
     @State private var isProgressBarHovering: Bool = false
     @State private var isProgressBarActive: Bool = false
@@ -79,6 +81,10 @@ struct MiniPlayerView: View {
         .focused($isFocused)
         .onAppear {
             isFocused = true
+            isTitleBarHidden = true
+        }
+        .background {
+            WindowControllerRepresentable(isFloating: $isFloating, isTitleBarHidden: $isTitleBarHidden)
         }
 
         // Read lyrics
@@ -231,8 +237,8 @@ struct MiniPlayerView: View {
                         MusicTitle(item: player.current)
                     case .lyrics:
                         // TODO: Add lyrics control
-                        Text("Lyrics")
-                            .bold()
+                        MiniPlayerLyrics()
+                            .environment(lyrics)
                     }
                 }
 //                .contentTransition(.numericText())
@@ -256,6 +262,8 @@ struct MiniPlayerView: View {
             AliveButton(
                 enabledStyle: .tertiary, hoveringStyle: .secondary
             ) {
+                isFloating = false
+                isTitleBarHidden = false
                 windowManager.style = .main
             } label: {
                 Image(systemSymbol: .arrowUpLeftAndArrowDownRight)
@@ -263,6 +271,16 @@ struct MiniPlayerView: View {
             .matchedGeometryEffect(
                 id: PlayerNamespace.expandShrinkButton, in: namespace
             )
+            .opacity(isTitleHovering ? 1 : 0)
+            
+            AliveButton(
+                enabledStyle: .tertiary, hoveringStyle: .secondary
+            ) {
+                isFloating.toggle()
+            } label: {
+                Image(systemSymbol: isFloating ? .pin : .pinSlash)
+                    .contentTransition(.symbolEffect(.replace))
+            }
             .opacity(isTitleHovering ? 1 : 0)
         }
         .frame(height: 16)
