@@ -77,6 +77,9 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
     @State private var contentOffsets: [Int: CGFloat] = [:]
 
     var body: some View {
+        // Avoid multiple instantializations
+        let isInitialized = isInitialized
+        
         ScrollView {
             Spacer()
                 .frame(height: offset)
@@ -84,7 +87,7 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
             Spacer()
                 .frame(height: max(0, alignmentCompensate))
 
-            if isInitialized() {
+            if isInitialized {
                 LazyVStack(spacing: 0) {
                     ForEach(range, id: \.self) { index in
                         content(at: index)
@@ -153,7 +156,7 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
             scrollPosition.scrollTo(y: value)
         }
     }
-/*
+    
     private var isIndicatorVisible: Bool {
         indicator(highlightedRange.lowerBound, true).isVisible
     }
@@ -168,23 +171,6 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
 
     private var canPauseAnimation: Bool {
         highlightedRange.isEmpty && isIndicatorVisible
-    }
-*/
-    
-    private func isIndicatorVisible() -> Bool {
-        indicator(highlightedRange.lowerBound, true).isVisible
-    }
-
-    private func isInitialized() -> Bool {
-        Set(contentOffsets.keys).isSuperset(of: IndexSet(integersIn: range))
-    }
-
-    private func reachedEnd() -> Bool {
-        highlightedRange.lowerBound >= range.upperBound
-    }
-
-    private func canPauseAnimation() -> Bool {
-        highlightedRange.isEmpty && isIndicatorVisible()
     }
     
     private var alignmentCompensate: CGFloat {
@@ -209,7 +195,7 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
         let delay = delay(at: index)
         let proportion = proportion(at: index)
 
-        let compensate = interactionState.isDelegated || isIndicatorVisible() ? animationCompensate : .zero
+        let compensate = interactionState.isDelegated || isIndicatorVisible ? animationCompensate : .zero
 
         content(index, isHighlighted)
             .onGeometryChange(for: CGSize.self) { proxy in
@@ -255,7 +241,7 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
     }
 
     private func updateAnimationState() {
-        guard !reachedEnd() else { return }
+        guard !reachedEnd else { return }
 
         animationState = .intermediate
         DispatchQueue.main.asyncAfter(deadline: .now() + bounceDelay) {
@@ -264,7 +250,7 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
     }
 
     private func pushAnimation() {
-        guard !canPauseAnimation() else { return }
+        guard !canPauseAnimation else { return }
         animationState = .pushed
     }
 
