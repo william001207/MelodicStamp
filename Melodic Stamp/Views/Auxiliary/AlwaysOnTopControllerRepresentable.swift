@@ -44,10 +44,8 @@ class AlwaysOnTopHostingController<Content: View>: NSHostingController<Content> 
         if let window = view.window {
             switch titleVisibility {
             case .visible:
-                window.titleVisibility = .hidden
-                window.titlebarAppearsTransparent = false
-                window.styleMask.remove(.fullSizeContentView)
-                window.titlebarSeparatorStyle = .automatic
+                // Handled by SwiftUI
+                break
             case .hidden:
                 window.titleVisibility = .hidden
                 window.titlebarAppearsTransparent = true

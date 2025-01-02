@@ -299,8 +299,7 @@ struct MiniPlayerView: View {
                 .disabled(!player.hasPreviousTrack)
                 .symbolEffect(
                     .bounce,
-                    value: playerKeyboardControl
-                        .previousSongButtonBounceAnimation
+                    value: playerKeyboardControl.previousSongButtonBounceAnimation
                 )
                 .matchedGeometryEffect(
                     id: PlayerNamespace.previousSongButton, in: namespace
@@ -348,23 +347,28 @@ struct MiniPlayerView: View {
     }
 
     @ViewBuilder private func trailingControls() -> some View {
-        if activeControl == .volume {
-            Group {
-                if isProgressBarExpanded {
-                    // Preserves spacing
-                    Spacer()
-                        .frame(width: 0)
-                } else {
-                    AliveButton {
-                        activeControl = .progress
-                    } label: {
-                        Image(systemSymbol: .chevronLeft)
-                    }
+        let isVolumeControlActive = activeControl == .volume
+
+        if isVolumeControlActive {
+            if isProgressBarExpanded {
+                // Preserves spacing
+                Spacer()
+                    .frame(width: 0)
+            } else {
+                // Regain progress control
+                AliveButton {
+                    activeControl = .progress
+                } label: {
+                    Image(systemSymbol: .chevronLeft)
                 }
+
+                // Route picker
+                RoutePickerView()
+                    .frame(width: 16)
             }
         }
 
-        if activeControl == .volume || !isProgressBarExpanded {
+        if isVolumeControlActive || !isProgressBarExpanded {
             // Speaker
             AliveButton(enabledStyle: .secondary) {
                 switch activeControl {
@@ -396,13 +400,20 @@ struct MiniPlayerView: View {
             .matchedGeometryEffect(
                 id: PlayerNamespace.playlistButton, in: namespace
             )
+            .popover(isPresented: $isPlaylistPresented, arrowEdge: .bottom) {
+                Text("Playlist")
+                    .padding()
+            }
         }
     }
 
     @ViewBuilder private func progressBar() -> some View {
+        let isProgressControlActive = activeControl == .progress
+        let isVolumeControlActive = activeControl == .volume
+
         HStack(alignment: .center, spacing: 8) {
             Group {
-                if activeControl == .progress {
+                if isProgressControlActive {
                     let time: TimeInterval? = if isProgressBarActive {
                         // Use adjustment time
                         if shouldUseRemainingDuration {
@@ -450,24 +461,24 @@ struct MiniPlayerView: View {
                 ProgressBar(
                     value: value,
                     isActive: $isProgressBarActive,
-                    isDelegated: activeControl == .progress,
-                    externalOvershootSign: activeControl == .progress
+                    isDelegated: isProgressControlActive,
+                    externalOvershootSign: isProgressControlActive
                         ? playerKeyboardControl
                         .progressBarExternalOvershootSign
                         : playerKeyboardControl.volumeBarExternalOvershootSign
                 ) { _, newValue in
                     adjustmentPercentage = newValue
                 } onOvershootOffsetChange: { oldValue, newValue in
-                    if activeControl == .volume, oldValue <= 0, newValue > 0 {
+                    if isVolumeControlActive, oldValue <= 0, newValue > 0 {
                         playerKeyboardControl.speakerButtonBounceAnimation
                             .toggle()
                     }
                 }
-                .disabled(activeControl == .progress && !player.hasCurrentTrack)
+                .disabled(isProgressControlActive && !player.hasCurrentTrack)
                 .foregroundStyle(
                     isProgressBarActive
                         ? .primary
-                        : activeControl == .volume && player.isMuted
+                        : isVolumeControlActive && player.isMuted
                         ? .quaternary : .secondary
                 )
                 .backgroundStyle(.quinary)
@@ -478,7 +489,7 @@ struct MiniPlayerView: View {
             )
             .onHover { hover in
                 let canHover =
-                    player.hasCurrentTrack || activeControl == .volume
+                    player.hasCurrentTrack || isVolumeControlActive
                 guard canHover, hover else { return }
 
                 isProgressBarHovering = true
@@ -487,7 +498,7 @@ struct MiniPlayerView: View {
             .matchedGeometryEffect(id: activeControl.id, in: namespace)
 
             Group {
-                if activeControl == .progress {
+                if isProgressControlActive {
                     DurationText(duration: playbackTime?.duration)
                         .frame(width: 40)
                         .foregroundStyle(.secondary)

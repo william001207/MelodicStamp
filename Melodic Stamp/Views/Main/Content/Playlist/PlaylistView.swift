@@ -171,6 +171,7 @@ struct PlaylistView: View {
             } label: {
                 Image(systemSymbol: .repeat1)
                     .aliveHighlight(player.playbackLooping)
+                    .luminareAnimation(.instant)
                     .padding()
             }
             .aspectRatio(1 / 1, contentMode: .fit)

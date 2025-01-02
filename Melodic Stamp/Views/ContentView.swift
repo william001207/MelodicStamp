@@ -57,11 +57,14 @@ struct ContentView: View {
                 if newValue {
                     initializeFloatingWindows()
                 } else {
-                    destroyFloatingWindows()
+                    // This breaks route pickers
+                    // destroyFloatingWindows()
                 }
             case .miniPlayer:
                 destroyFloatingWindows()
             }
+
+            guard newValue else { return }
             isFocused = true
             resetFocus(in: namespace)
         }
