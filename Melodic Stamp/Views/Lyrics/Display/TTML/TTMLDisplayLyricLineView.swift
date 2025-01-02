@@ -17,7 +17,6 @@ struct TTMLDisplayLyricLineView: View {
     var highlightReleasingDelay: TimeInterval = 0.25
 
     @State private var isActive: Bool = false
-    @State private var backgroundContentSize: CGSize = .zero
 
     var body: some View {
         VStack(spacing: 5) {
@@ -31,7 +30,7 @@ struct TTMLDisplayLyricLineView: View {
                 }
             }
 
-            // Shows background lyrics when necessary (has background lyrics && lyrics is active)
+            // Shows background lyrics when necessary
             if isActive, !line.backgroundLyrics.isEmpty {
                 backgroundContent()
                     .frame(maxWidth: .infinity, alignment: alignment)

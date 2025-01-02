@@ -15,14 +15,13 @@ struct DisplayLyricsView: View {
     @Environment(\.luminareAnimation) private var animation
 
     @Binding var interactionState: AppleMusicLyricsViewInteractionState
+    var onScrolling: ((ScrollPosition, CGPoint) -> Void)?
 
     @State private var isHovering: Bool = false
     @State private var hoveredIndex: Int? = nil
 
     @State private var duration: Duration = .zero
     @State private var elapsedTime: TimeInterval = .zero
-
-    @State private var interactionStateDispatch: DispatchWorkItem?
 
     var body: some View {
         // Avoid multiple instantializations
@@ -60,18 +59,8 @@ struct DisplayLyricsView: View {
                             }
                         } else { .invisible }
                     } else { return .invisible }
-                } onScrolling: { position, _ in
-                    guard position.isPositionedByUser else { return }
-                    guard !interactionState.isIsolated else { return }
-
-                    interactionState = .intermediate
-                    interactionStateDispatch?.cancel()
-
-                    let dspatch = DispatchWorkItem {
-                        interactionState = .countingDown
-                    }
-                    interactionStateDispatch = dspatch
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 1, execute: dspatch)
+                } onScrolling: { position, point in
+                    onScrolling?(position, point)
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {

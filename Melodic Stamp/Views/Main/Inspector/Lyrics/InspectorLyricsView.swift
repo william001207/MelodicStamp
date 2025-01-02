@@ -134,6 +134,7 @@ struct InspectorLyricsView: View {
             .foregroundStyle(.quinary)
 
             Text(line.content)
+            
             if let translation = line.translation {
                 Text(translation)
             }

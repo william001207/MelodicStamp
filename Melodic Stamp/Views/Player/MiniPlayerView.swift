@@ -237,7 +237,7 @@ struct MiniPlayerView: View {
                         MusicTitle(item: player.current)
                     case .lyrics:
                         // TODO: Add lyrics control
-                        MiniPlayerLyrics()
+                        DisplaySingleLyricLineView()
                             .environment(lyrics)
                     }
                 }

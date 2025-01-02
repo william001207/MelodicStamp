@@ -58,54 +58,67 @@ struct LeafletView: View {
                         }
 
                         if hasLyrics, isShowingLyrics {
-                            DisplayLyricsView(interactionState: $interactionState)
-                                .overlay(alignment: .trailing) {
-                                    Group {
-                                        if !interactionState.isDelegated {
-                                            DisplayLyricsInteractionStateButton(
-                                                interactionState: $interactionState,
-                                                progress: interactionStateDelegationProgress,
-                                                hasProgressRing: hasInteractionStateProgressRing && interactionStateDelegationProgress > 0
-                                            )
-                                            .tint(.white)
-                                            .transition(.blurReplace(.downUp))
-                                        }
-                                    }
-                                    .animation(.bouncy, value: interactionState.isDelegated)
-                                    .padding(12)
-                                    .alignmentGuide(.trailing) { d in
-                                        d[.leading]
+                            DisplayLyricsView(interactionState: $interactionState) { position, _ in
+                                guard position.isPositionedByUser else { return }
+                                guard !interactionState.isIsolated else { return }
+                                interactionStateDispatch?.cancel()
+                                interactionState = .intermediate
+                                
+                                let dspatch = DispatchWorkItem {
+                                    interactionState = .countingDown
+                                }
+                                interactionStateDispatch = dspatch
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 1, execute: dspatch)
+                            }
+                            .overlay(alignment: .trailing) {
+                                Group {
+                                    if !interactionState.isDelegated {
+                                        AppleMusicLyricsViewInteractionStateButton(
+                                            interactionState: $interactionState,
+                                            progress: interactionStateDelegationProgress,
+                                            hasProgressRing: hasInteractionStateProgressRing && interactionStateDelegationProgress > 0
+                                        )
+                                        .tint(.white)
+                                        .transition(.blurReplace(.downUp))
                                     }
                                 }
-                                .transition(.blurReplace(.downUp))
-                                .onChange(of: interactionState) { _, _ in
-                                    switch interactionState {
-                                    case .following:
-                                        hasInteractionStateProgressRing = false
-                                    case .intermediate:
-                                        hasInteractionStateProgressRing = false
-                                    case .countingDown:
-                                        hasInteractionStateProgressRing = true
-
-                                        interactionStateDelegationProgress = .zero
-                                        withAnimation(.smooth(duration: 3)) {
-                                            interactionStateDelegationProgress = 1
-                                        }
-
-                                        let dispatch = DispatchWorkItem {
-                                            interactionState = .following
-                                        }
-                                        interactionStateDispatch = dispatch
-                                        DispatchQueue.main.asyncAfter(deadline: .now() + 3, execute: dispatch)
-                                    case .isolated:
-                                        hasInteractionStateProgressRing = false
-
-                                        interactionStateDispatch?.cancel()
-                                        withAnimation(.smooth) {
-                                            interactionStateDelegationProgress = 1
-                                        }
-                                    }
+                                .animation(.bouncy, value: interactionState.isDelegated)
+                                .padding(12)
+                                .alignmentGuide(.trailing) { d in
+                                    d[.leading]
                                 }
+                            }
+                            .transition(.blurReplace(.downUp))
+                            .onChange(of: interactionState) { _, _ in
+                                switch interactionState {
+                                case .following:
+                                    interactionStateDispatch?.cancel()
+                                    hasInteractionStateProgressRing = false
+                                case .countingDown:
+                                    interactionStateDispatch?.cancel()
+                                    hasInteractionStateProgressRing = true
+                                    
+                                    interactionStateDelegationProgress = .zero
+                                    withAnimation(.smooth(duration: 3)) {
+                                        interactionStateDelegationProgress = 1
+                                    }
+                                    
+                                    let dispatch = DispatchWorkItem {
+                                        interactionState = .following
+                                    }
+                                    interactionStateDispatch = dispatch
+                                    DispatchQueue.main.asyncAfter(deadline: .now() + 3, execute: dispatch)
+                                case .isolated:
+                                    interactionStateDispatch?.cancel()
+                                    hasInteractionStateProgressRing = false
+                                    
+                                    withAnimation(.smooth) {
+                                        interactionStateDelegationProgress = 1
+                                    }
+                                default:
+                                    break
+                                }
+                            }
                         }
                     }
                     .containerRelativeFrame(.horizontal, alignment: .center) { length, axis in

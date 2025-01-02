@@ -1,5 +1,5 @@
 //
-//  DisplayLyricsScrollabilityButton.swift
+//  AppleMusicLyricsViewInteractionStateButton.swift
 //  MelodicStamp
 //
 //  Created by KrLite on 2025/1/1.
@@ -8,7 +8,7 @@
 import SFSafeSymbols
 import SwiftUI
 
-struct DisplayLyricsInteractionStateButton: View, Animatable {
+struct AppleMusicLyricsViewInteractionStateButton: View, Animatable {
     var animatableData: CGFloat {
         get { progress }
         set { progress = newValue }
@@ -69,7 +69,7 @@ struct DisplayLyricsInteractionStateButton: View, Animatable {
     @Previewable @State var progress: CGFloat = .zero
 
     VStack {
-        DisplayLyricsInteractionStateButton(interactionState: $interactionState, progress: progress)
+        AppleMusicLyricsViewInteractionStateButton(interactionState: $interactionState, progress: progress)
 
         Slider(value: $progress, in: 0...1)
     }

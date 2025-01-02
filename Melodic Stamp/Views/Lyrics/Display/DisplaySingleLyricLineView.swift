@@ -1,5 +1,5 @@
 //
-//  MiniPlayerLyrics.swift
+//  DisplaySingleLyricLineView.swift
 //  Melodic Stamp
 //
 //  Created by Xinshao_Air on 2024/12/28.
@@ -7,36 +7,32 @@
 
 import SwiftUI
 
-struct MiniPlayerLyrics: View {
-    
+struct DisplaySingleLyricLineView: View {
     @Environment(PlayerModel.self) private var player
     @Environment(LyricsModel.self) private var lyrics
     
     @State private var playbackTime: PlaybackTime?
     @State private var elapsedTime: TimeInterval = 0.0
-        
-    private var highlightedRange: Range<Int> {
-        lyrics.highlight(at: elapsedTime)
-    }
     
     var body: some View {
         HStack {
             let lines = lyrics.lines
             let highlightedRange = highlightedRange
+            let index = highlightedRange.upperBound - 1
             
-            if !highlightedRange.isEmpty {
-                ForEach(highlightedRange, id: \.self) { index in
-                    lyricLine(line: lines[index], index: index)
-                }
-            } else {
-                Text("No lyrics available")
+            if highlightedRange.contains(index) {
+                lyricLine(line: lines[index], index: index)
             }
         }
-        .animation(.linear, value: elapsedTime) // For text rendering
         .onReceive(player.playbackTimePublisher) { playbackTime in
             guard let playbackTime else { return }
             elapsedTime = playbackTime.elapsed
         }
+        .animation(.linear, value: elapsedTime) // For time interpolation
+    }
+    
+    private var highlightedRange: Range<Int> {
+        lyrics.highlight(at: elapsedTime)
     }
     
     @ViewBuilder private func lyricLine(
@@ -70,6 +66,7 @@ struct MiniPlayerLyrics: View {
     
     @ViewBuilder private func ttmlLyricLine(line: TTMLLyricLine) -> some View {
         let lyricsRenderer = textRenderer(for: line.lyrics)
+        
         Text(stringContent(of: line.lyrics))
             .textRenderer(lyricsRenderer)
     }
@@ -87,8 +84,4 @@ struct MiniPlayerLyrics: View {
             lift: 0
         )
     }
-}
-
-#Preview {
-    MiniPlayerLyrics()
 }
