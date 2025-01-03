@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import CSFBAudioEngine
 
 protocol Player {
     var delegate: (any PlayerDelegate)? { get set }
@@ -33,6 +34,8 @@ protocol Player {
     func seekTime(to time: TimeInterval)
     func seekProgress(to progress: CGFloat)
     func seekVolume(to volume: CGFloat)
+    
+    func withEngine(_ block: @escaping (AVAudioEngine) -> Void)
 }
 
 extension Player {
@@ -66,6 +69,7 @@ protocol PlayerDelegate {
 }
 
 struct BlankPlayer: Player {
+    
     var delegate: (any PlayerDelegate)?
 
     var isPlaying: Bool { false }
@@ -95,4 +99,6 @@ struct BlankPlayer: Player {
     func seekProgress(to _: CGFloat) {}
 
     func seekVolume(to _: CGFloat) {}
+    
+    func withEngine(_ block: @escaping (AVAudioEngine) -> Void) {}
 }

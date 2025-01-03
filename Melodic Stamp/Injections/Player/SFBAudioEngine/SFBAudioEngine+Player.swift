@@ -9,6 +9,7 @@ import Foundation
 import SFBAudioEngine
 
 class SFBAudioEnginePlayer: NSObject, Player {
+    
     init(_ player: AudioPlayer = .init()) {
         self.player = player
         super.init()
@@ -95,6 +96,12 @@ class SFBAudioEnginePlayer: NSObject, Player {
             try player.setVolume(Float(volume))
         } catch {
             print(error)
+        }
+    }
+    
+    func withEngine(_ block: @escaping (AVAudioEngine) -> Void) {
+        player.withEngine { [weak self] engine in
+            block(engine)
         }
     }
 }

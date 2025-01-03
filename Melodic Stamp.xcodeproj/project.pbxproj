@@ -428,7 +428,7 @@
 			repositoryURL = "https://github.com/Xinshao-air/MeshGradient.git";
 			requirement = {
 				kind = revision;
-				revision = 3d8937a09f659a4890e71053fab0d3c6555e8fd8;
+				revision = 1d797ddba0be0f2d88b7e76720dc26907be42b5c;
 			};
 		};
 		65DFF89B2CFC2A6F00285040 /* XCRemoteSwiftPackageReference "SwiftSoup" */ = {

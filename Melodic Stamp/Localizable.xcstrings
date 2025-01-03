@@ -347,6 +347,9 @@
         }
       }
     },
+    "Edit" : {
+
+    },
     "Editor" : {
       "localizations" : {
         "zh-Hans" : {
