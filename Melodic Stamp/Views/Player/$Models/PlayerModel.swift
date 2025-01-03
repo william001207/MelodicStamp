@@ -193,7 +193,7 @@ import SwiftUI
 
 //        player.delegate = self
         setupRemoteTransportControls()
-//        setupAudioVisualization()
+        setupAudioVisualization()
 
         timer
             .receive(on: DispatchQueue.main)
@@ -363,18 +363,18 @@ extension PlayerModel {
 //        }
 //    }
 
-//    private func setupAudioVisualization() {
-//        player.withEngine { [weak self] engine in
-//            guard let self else { return }
-//
-//            let inputNode = engine.mainMixerNode
-//            let bus = 0
-//
-//            inputNode.installTap(onBus: bus, bufferSize: 1024, format: inputNode.outputFormat(forBus: bus)) { buffer, _ in
-//                self.processAudioBuffer(buffer)
-//            }
-//        }
-//    }
+    private func setupAudioVisualization() {
+        player.withEngine { [weak self] engine in
+            guard let self else { return }
+
+            let inputNode = engine.mainMixerNode
+            let bus = 0
+
+            inputNode.installTap(onBus: bus, bufferSize: 1024, format: inputNode.outputFormat(forBus: bus)) { buffer, _ in
+                self.processAudioBuffer(buffer)
+            }
+        }
+    }
 
     private func processAudioBuffer(_ buffer: AVAudioPCMBuffer) {
         guard let channelData = buffer.floatChannelData else { return }

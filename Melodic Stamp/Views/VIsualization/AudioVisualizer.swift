@@ -28,7 +28,7 @@ struct AudioVisualizer: View {
                         .animation(.smooth, value: normalizedHeight)
                 }
             }
-            .frame(width: 40, height: 40, alignment: .center)
+            .frame(width: 20, height: 20, alignment: .center)
         }
         .onReceive(player.visualizationDataPublisher) { visualizationData in
             frequencyData = sampleData(visualizationData, count: 5)
@@ -44,3 +44,4 @@ struct AudioVisualizer: View {
         }
     }
 }
+
