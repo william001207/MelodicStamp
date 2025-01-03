@@ -236,7 +236,7 @@ struct MiniPlayerView: View {
                     case .title:
                         MusicTitle(item: player.current)
                     case .lyrics:
-                        DisplaySingleLyricLineView()
+                        ComposedLyricsView()
                             .environment(lyrics)
                     }
                 }

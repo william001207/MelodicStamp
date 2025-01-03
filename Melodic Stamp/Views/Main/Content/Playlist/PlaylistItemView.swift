@@ -95,23 +95,14 @@ struct PlayableItemView: View {
                     }
                 }
 
-                if isHovering {
-                    Image(
-                        systemSymbol: isMetadataLoaded
-                            ? .playFill : .playSlashFill
-                    )
-                    .foregroundStyle(.white)
+                if isHovering, isMetadataLoaded {
+                    Image(systemSymbol: .playFill)
+                        .foregroundStyle(.white)
                 }
             } else {
-                Rectangle()
-                    .foregroundStyle(.placeholder.quinary)
-
-                if isHovering {
-                    Image(
-                        systemSymbol: isMetadataLoaded
-                            ? .playFill : .playSlashFill
-                    )
-                    .foregroundStyle(.primary)
+                if isHovering, isMetadataLoaded {
+                    Image(systemSymbol: .playFill)
+                        .foregroundStyle(.primary)
                 }
             }
         }

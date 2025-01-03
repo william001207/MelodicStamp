@@ -112,6 +112,11 @@ struct MainView: View {
                     }
             case .lyrics:
                 InspectorLyricsView()
+                    .toolbar {
+                        if isInspectorPresented {
+                            LyricsToolbar()
+                        }
+                    }
             case .analytics:
                 InspectorAnalyticsView()
             }
