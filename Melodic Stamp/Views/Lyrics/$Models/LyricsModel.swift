@@ -10,7 +10,7 @@ import SwiftSoup
 
 // MARK: - Lyrics Model
 
-@Observable class LyricsModel {
+@Observable @MainActor class LyricsModel {
     private(set) var storage: LyricsStorage?
     private(set) var raw: RawLyrics?
     var type: LyricsType?

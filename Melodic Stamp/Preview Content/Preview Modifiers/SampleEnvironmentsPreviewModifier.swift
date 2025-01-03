@@ -50,11 +50,11 @@ struct SampleEnvironmentsPreviewModifier: PreviewModifier {
 }
 
 extension SampleEnvironmentsPreviewModifier {
-    static var sampleURL: URL {
+    nonisolated static var sampleURL: URL {
         .init(string: "https://example.com")!
     }
 
-    static var sampleMetadata: Metadata {
+    @MainActor static var sampleMetadata: Metadata {
         let metadata = AudioMetadata()
 
         metadata.attachPicture(NSImage.templateArtwork.attachedPicture(of: .other)!)
@@ -62,7 +62,7 @@ extension SampleEnvironmentsPreviewModifier {
         return .init(url: sampleURL, from: metadata)
     }
 
-    static var samplePlayableItem: PlayableItem {
+    @MainActor static var samplePlayableItem: PlayableItem {
         .init(
             url: sampleURL,
             metadata: sampleMetadata

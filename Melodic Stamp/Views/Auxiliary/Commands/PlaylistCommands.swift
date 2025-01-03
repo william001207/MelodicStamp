@@ -16,9 +16,11 @@ struct PlaylistCommands: Commands {
             Group {
                 if let metadataEditor {
                     Button("Clear Selection") {
-                        metadataEditor.items.removeAll()
+                        Task { @MainActor in
+                            metadataEditor.items.removeAll()
+                        }
                     }
-                    .disabled(metadataEditor.items.isEmpty)
+                    .disabled(!metadataEditor.items.isEmpty)
                 } else {
                     Button("Clear Selection") {}
                         .disabled(true)
@@ -27,16 +29,20 @@ struct PlaylistCommands: Commands {
 
             Group {
                 if let player, let metadataEditor {
-                    if metadataEditor.items.isEmpty {
+                    if !metadataEditor.items.isEmpty {
                         Button("Remove All") {
                             player.removeFromPlaylist(items: player.playlist)
-                            metadataEditor.items.removeAll()
+                            Task { @MainActor in
+                                metadataEditor.items.removeAll()
+                            }
                         }
                         .disabled(player.playlist.isEmpty)
                     } else {
                         Button("Remove from Playlist") {
                             player.removeFromPlaylist(items: .init(metadataEditor.items))
-                            metadataEditor.items.removeAll()
+                            Task { @MainActor in
+                                metadataEditor.items.removeAll()
+                            }
                         }
                     }
                 } else {
@@ -50,8 +56,10 @@ struct PlaylistCommands: Commands {
                 if
                     let player, let metadataEditor,
                     metadataEditor.items.count == 1,
-                    let item = metadataEditor.items.first {
+                    let item = metadataEditor.items.first
+                {
                     let title = MusicTitle.stringifiedTitle(mode: .title, for: item)
+                    
                     Button {
                         player.play(item: item)
                     } label: {

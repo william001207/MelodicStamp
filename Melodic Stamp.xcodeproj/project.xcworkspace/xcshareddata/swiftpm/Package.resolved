@@ -1,5 +1,5 @@
 {
-  "originHash" : "4514d8c92410fcfc774b458dffb34494e8fb2175ee96501b6f61195093c93412",
+  "originHash" : "e686ef22f63e18dd647be7a9dacdadc0b4c42d4876a185fd371bb6be4b52df42",
   "pins" : [
     {
       "identity" : "avfaudioextensions",
@@ -26,6 +26,15 @@
       "state" : {
         "revision" : "0cceb710cad35b9aaf5bb6b65faf71436b6aa7c3",
         "version" : "2.0.3"
+      }
+    },
+    {
+      "identity" : "codeeditorview",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/mchakravarty/CodeEditorView",
+      "state" : {
+        "revision" : "3d2f385aa1583828cdb8e454aea8f1163df23be8",
+        "version" : "0.14.0"
       }
     },
     {
@@ -141,7 +150,6 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/Xinshao-air/MeshGradient.git",
       "state" : {
-        "branch" : "main",
         "revision" : "3d8937a09f659a4890e71053fab0d3c6555e8fd8"
       }
     },
@@ -188,6 +196,15 @@
       "state" : {
         "revision" : "74201a6af424e7e3a007fd5e401e9d2ce6896628",
         "version" : "0.2.2"
+      }
+    },
+    {
+      "identity" : "rearrange",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/ChimeHQ/Rearrange.git",
+      "state" : {
+        "revision" : "5ff7f3363f7a08f77e0d761e38e6add31c2136e1",
+        "version" : "1.8.1"
       }
     },
     {

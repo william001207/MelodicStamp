@@ -5,7 +5,7 @@
 //  Created by KrLite on 2024/12/1.
 //
 
-import CSFBAudioEngine
+@preconcurrency import CSFBAudioEngine
 import SwiftUI
 
 struct AdaptableMusicCoverControl: View {
@@ -129,12 +129,12 @@ struct AdaptableMusicCoverControl: View {
         if let binding = entries.projectedValue {
             let attachedPictures: [AttachedPicture] = .init(
                 binding.wrappedValue)
-
+            
             let images =
-                attachedPictures
-                    .filter { $0.type == type }
-                    .compactMap(\.image)
-
+            attachedPictures
+                .filter { $0.type == type }
+                .compactMap(\.image)
+            
             MusicCover(images: images, cornerRadius: 8)
                 .background {
                     if attachedPicturesHandler.isModified(
@@ -146,17 +146,6 @@ struct AdaptableMusicCoverControl: View {
                 }
         } else {
             MusicCover(images: [], cornerRadius: 8)
-        }
-    }
-
-    private func registerUndo(_ oldValue: Set<AttachedPicture>, for entries: Entries) {
-        guard oldValue != entries.projectedValue?.wrappedValue ?? [] else { return }
-        undoManager?.registerUndo(withTarget: attachedPicturesHandler) { _ in
-            let entries = self.entries
-            let fallback = attachedPicturesHandler.copy(contents: entries)
-            entries.setAll(oldValue)
-
-            registerUndo(fallback, for: entries)
         }
     }
 }

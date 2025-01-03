@@ -9,7 +9,7 @@ import Luminare
 import SwiftUI
 
 struct LabeledOptionalControl<V, Label, Content, ContentB>: View
-    where V: Hashable & Equatable, Label: View, Content: View, ContentB: View {
+    where V: Hashable & Equatable & Sendable, Label: View, Content: View, ContentB: View {
     typealias Entries = MetadataBatchEditingEntries<V?>
 
     @Environment(\.undoManager) private var undoManager
@@ -112,10 +112,12 @@ struct LabeledOptionalControl<V, Label, Content, ContentB>: View
         undoTargetCheckpoint.set(oldValue)
 
         undoManager?.registerUndo(withTarget: entries) { entries in
-            let fallback = entries.projectedUnwrappedValue()?.wrappedValue
-            entries.setAll(oldValue)
-
-            registerUndo(fallback, for: entries)
+            Task { @MainActor in
+                let fallback = entries.projectedUnwrappedValue()?.wrappedValue
+                entries.setAll(oldValue)
+                
+                registerUndo(fallback, for: entries)
+            }
         }
     }
 

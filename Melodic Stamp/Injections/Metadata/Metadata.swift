@@ -9,11 +9,43 @@
 import MediaPlayer
 import SwiftUI
 
+// MARK: - Modifiable
+
+@MainActor protocol Modifiable {
+    var isModified: Bool { get }
+}
+
+// MARK: - Restorable
+
+@MainActor protocol Restorable: Equatable, Modifiable {
+    associatedtype V: Equatable
+    
+    var current: V { get set }
+    var initial: V { get set }
+    
+    mutating func restore()
+    mutating func apply()
+}
+
+extension Restorable {
+    var isModified: Bool {
+        current != initial
+    }
+    
+    mutating func restore() {
+        current = initial
+    }
+    
+    mutating func apply() {
+        initial = current
+    }
+}
+
 // MARK: - Metadata
 
 // MARK: Definition
 
-@Observable final class Metadata: Identifiable {
+@Observable @MainActor final class Metadata: Identifiable {
     typealias Entry = MetadataEntry
 
     enum State {
@@ -49,8 +81,8 @@ import SwiftUI
         }
     }
 
-    var id: URL { url }
-    let url: URL
+    nonisolated var id: URL { url }
+    nonisolated let url: URL
 
     private(set) var properties: AudioProperties!
     private(set) var state: State
@@ -472,28 +504,28 @@ extension Metadata {
 // MARK: Extensions
 
 extension Metadata {
-    static func splitArtists(from artist: String) -> [Substring] {
+    nonisolated static func splitArtists(from artist: String) -> [Substring] {
         artist.split(separator: /[\/,]\s*/)
+    }
+    
+    nonisolated static func fallbackTitle(url: URL) -> String {
+        String(url.lastPathComponent.dropLast(url.pathExtension.count + 1))
     }
 }
 
 extension Metadata: Equatable {
-    static func == (lhs: Metadata, rhs: Metadata) -> Bool {
+    nonisolated static func == (lhs: Metadata, rhs: Metadata) -> Bool {
         lhs.id == rhs.id
     }
 }
 
 extension Metadata: Hashable {
-    func hash(into hasher: inout Hasher) {
+    nonisolated func hash(into hasher: inout Hasher) {
         hasher.combine(id)
     }
 }
 
 extension Metadata {
-    static func fallbackTitle(url: URL) -> String {
-        String(url.lastPathComponent.dropLast(url.pathExtension.count + 1))
-    }
-
     func updateNowPlayingInfo() {
         let infoCenter = MPNowPlayingInfoCenter.default()
         var info = infoCenter.nowPlayingInfo ?? .init()
@@ -543,7 +575,7 @@ extension Metadata {
         dict[MPMediaItemPropertyReleaseDate] = releaseDate.initial
     }
 
-    static func resetNowPlayingInfo() {
+    nonisolated static func resetNowPlayingInfo() {
         let infoCenter = MPNowPlayingInfoCenter.default()
         var info = infoCenter.nowPlayingInfo ?? .init()
 
@@ -552,7 +584,7 @@ extension Metadata {
         infoCenter.nowPlayingInfo = info
     }
 
-    static func resetNowPlayingInfo(for dict: inout [String: Any]) {
+    nonisolated static func resetNowPlayingInfo(for dict: inout [String: Any]) {
         dict[MPMediaItemPropertyArtwork] = nil
 
         dict[MPMediaItemPropertyTitle] = nil

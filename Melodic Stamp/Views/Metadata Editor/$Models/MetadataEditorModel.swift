@@ -22,7 +22,7 @@ enum MetadataEditingState: Equatable {
     }
 }
 
-@Observable class MetadataEditorModel: Identifiable {
+@Observable @MainActor final class MetadataEditorModel: Identifiable {
     let id: UUID = .init()
 
     var items: Set<PlayableItem> = .init()

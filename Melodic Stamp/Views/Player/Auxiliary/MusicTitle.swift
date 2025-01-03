@@ -40,37 +40,48 @@ struct MusicTitle: View {
         if let item {
             HStack(spacing: 12) {
                 if mode.hasTitle {
+                    var title: String?
+                    
                     Group {
-                        if let title = item.metadata[extracting: \.title]?
-                            .initial, !title.isEmpty {
+                        if let title, !title.isEmpty {
                             Text(title)
                         } else {
                             Text(Self.fallbackTitle(for: item))
                         }
                     }
                     .bold()
+                    .task { @MainActor in
+                        title = item.metadata[extracting: \.title]?.initial
+                    }
                 }
 
                 if mode.hasArtists {
-                    if let artist = item.metadata[extracting: \.artist]?.initial {
-                        HStack(spacing: 4) {
-                            let artists = Metadata.splitArtists(from: artist)
-                            ForEach(Array(artists.enumerated()), id: \.offset) {
-                                offset, composer in
-                                if offset > 0 {
-                                    let separator = String(localized: .init(
-                                        "MusicTitle: (Separator) Artists",
-                                        defaultValue: "·",
-                                        comment: "The separator between artists in a regular title"
-                                    ))
-                                    Text(separator)
-                                        .foregroundStyle(.placeholder)
+                    var artist: String?
+                    
+                    Group {
+                        if let artist {
+                            HStack(spacing: 4) {
+                                let artists = Metadata.splitArtists(from: artist)
+                                ForEach(Array(artists.enumerated()), id: \.offset) {
+                                    offset, composer in
+                                    if offset > 0 {
+                                        let separator = String(localized: .init(
+                                            "MusicTitle: (Separator) Artists",
+                                            defaultValue: "·",
+                                            comment: "The separator between artists in a regular title"
+                                        ))
+                                        Text(separator)
+                                            .foregroundStyle(.placeholder)
+                                    }
+                                    
+                                    Text(composer)
+                                        .foregroundStyle(.secondary)
                                 }
-
-                                Text(composer)
-                                    .foregroundStyle(.secondary)
                             }
                         }
+                    }
+                    .task { @MainActor in
+                        artist = item.metadata[extracting: \.artist]?.initial
                     }
                 }
             }
@@ -81,11 +92,11 @@ struct MusicTitle: View {
         }
     }
 
-    static func fallbackTitle(for item: PlayableItem) -> String {
+    nonisolated static func fallbackTitle(for item: PlayableItem) -> String {
         Metadata.fallbackTitle(url: item.url)
     }
 
-    static func stringifiedTitle(
+    @MainActor static func stringifiedTitle(
         mode: DisplayMode = .comprehensive, for item: PlayableItem, separator: String = " "
     ) -> String {
         var components: [String] = []

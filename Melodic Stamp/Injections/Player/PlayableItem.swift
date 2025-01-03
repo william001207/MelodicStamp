@@ -15,10 +15,10 @@ struct PlayableItem: Identifiable {
     let url: URL
     @State var metadata: Metadata
 
-    init?(url: URL) {
+    init?(url: URL) async {
         self.url = url
 
-        guard let metadata = Metadata(url: url) else { return nil }
+        guard let metadata = await Metadata(url: url) else { return nil }
         self.metadata = metadata
     }
 
@@ -40,8 +40,8 @@ extension PlayableItem: Hashable {
     }
 }
 
-extension PlayableItem: LuminareSelectionData {
-    var isSelectable: Bool {
+extension PlayableItem: @preconcurrency LuminareSelectionData {
+    @MainActor var isSelectable: Bool {
         metadata.state.isLoaded
     }
 }
