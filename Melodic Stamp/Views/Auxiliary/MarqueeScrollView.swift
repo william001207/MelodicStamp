@@ -166,9 +166,7 @@ struct MarqueeScrollView<Content>: View where Content: View {
         guard canMarquee else { return }
 
         idleTimer = .scheduledTimer(withTimeInterval: delay, repeats: false) { _ in
-            Task {
-                await resumeAnimation()
-            }
+            resumeAnimation()
         }
     }
 

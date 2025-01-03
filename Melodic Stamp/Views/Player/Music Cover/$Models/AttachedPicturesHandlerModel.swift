@@ -5,16 +5,16 @@
 //  Created by KrLite on 2024/12/1.
 //
 
-@preconcurrency import CSFBAudioEngine
+import CSFBAudioEngine
 import SwiftUI
 import UniformTypeIdentifiers
 
-@Observable @MainActor final class AttachedPicturesHandlerModel: Sendable {
+@Observable class AttachedPicturesHandlerModel {
     typealias APType = AttachedPicture.`Type`
     typealias Entry = MetadataBatchEditingEntry<Set<AttachedPicture>>
     typealias Entries = MetadataBatchEditingEntries<Set<AttachedPicture>>
 
-    nonisolated static var allowedContentTypes: [UTType] {
+    static var allowedContentTypes: [UTType] {
         [.jpeg, .png, .tiff, .bmp, .gif, .heic, .heif, .webP, .rawImage]
     }
 
@@ -120,7 +120,7 @@ import UniformTypeIdentifiers
 }
 
 extension AttachedPicturesHandlerModel {
-    static func copy(contents entries: Entries) -> Set<AttachedPicture> {
+    func copy(contents entries: Entries) -> Set<AttachedPicture> {
         let oldValue = entries.projectedValue?.wrappedValue ?? []
         var newValue: Set<AttachedPicture> = []
         oldValue.forEach { newValue.insert($0.copy() as! AttachedPicture) }
@@ -130,17 +130,15 @@ extension AttachedPicturesHandlerModel {
     func registerUndo(_ oldValue: Set<AttachedPicture>, for entries: Entries, in undoManager: UndoManager?) {
         guard oldValue != entries.projectedValue?.wrappedValue ?? [] else { return }
         undoManager?.registerUndo(withTarget: self) { _ in
-            Task { @MainActor in
-                let fallback = Self.copy(contents: entries)
-                entries.setAll(oldValue)
-                
-                self.registerUndo(fallback, for: entries, in: undoManager)
-            }
+            let fallback = self.copy(contents: entries)
+            entries.setAll(oldValue)
+
+            self.registerUndo(fallback, for: entries, in: undoManager)
         }
     }
 
     private func withUndo(for entries: Entries, in undoManager: UndoManager?, _ body: () -> ()) {
-        let fallback = Self.copy(contents: entries)
+        let fallback = copy(contents: entries)
         body()
         registerUndo(fallback, for: entries, in: undoManager)
     }

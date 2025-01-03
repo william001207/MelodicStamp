@@ -8,18 +8,16 @@
 import Foundation
 
 extension String {
-    static var vowels: [Regex<Substring>] {
-        [
-            // English
-            /[aeiou]+/,
-            /[aeou]+[hm]+/,
-            /hm*/,
-            // Japanese
-            /[あえいおう]+/,
-            // Chinese
-            /[啊呀哈嗯嘿噢哦嗷呼嘻呃呵]+/
-        ]
-    }
+    static let vowels: [Regex] = [
+        // English
+        /[aeiou]+/,
+        /[aeou]+[hm]+/,
+        /hm*/,
+        // Japanese
+        /[あえいおう]+/,
+        // Chinese
+        /[啊呀哈嗯嘿噢哦嗷呼嘻呃呵]+/
+    ]
 }
 
 extension String {

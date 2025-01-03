@@ -16,7 +16,7 @@ import SwiftUI
 
 // MARK: - Fields
 
-@Observable @MainActor final class PlayerModel: NSObject {
+@Observable final class PlayerModel: NSObject {
     typealias Player = MelodicStamp.Player
 
     // MARK: Player
@@ -245,10 +245,8 @@ extension PlayerModel {
     }
 
     func play(url: URL) {
-        Task { @MainActor in
-            if let item = await PlayableItem(url: url) {
-                play(item: item)
-            }
+        if let item = PlayableItem(url: url) {
+            play(item: item)
         }
     }
 
@@ -256,10 +254,8 @@ extension PlayerModel {
         for url in urls {
             guard !playlist.contains(where: { $0.url == url }) else { continue }
 
-            Task { @MainActor in
-                if let item = await PlayableItem(url: url) {
-                    addToPlaylist(items: [item])
-                }
+            if let item = PlayableItem(url: url) {
+                addToPlaylist(items: [item])
             }
         }
     }
@@ -380,7 +376,7 @@ extension PlayerModel {
 //        }
 //    }
 
-    private func processAudioBuffer(_ buffer: AVAudioPCMBuffer) async {
+    private func processAudioBuffer(_ buffer: AVAudioPCMBuffer) {
         guard let channelData = buffer.floatChannelData else { return }
 
         let channelDataPointer = channelData[0]
@@ -388,12 +384,14 @@ extension PlayerModel {
 
         audioDataBuffer = Array(UnsafeBufferPointer(start: channelDataPointer, count: frameLength)).map(CGFloat.init)
 
-        let fftMagnitudes = await FFTHelper.perform(audioDataBuffer.map(Float.init))
-        self.visualizationDataSubject.send(fftMagnitudes.map(CGFloat.init))
+        Task { @MainActor in
+            let fftMagnitudes = await FFTHelper.perform(audioDataBuffer.map(Float.init))
+            self.visualizationDataSubject.send(fftMagnitudes.map(CGFloat.init))
+        }
     }
 }
 
-extension PlayerModel: @preconcurrency PlayerDelegate {
+extension PlayerModel: PlayerDelegate {
     func playerDidFinishPlaying(_ player: some MelodicStamp.Player) {
         let index = if playbackLooping {
             // Play again
@@ -408,26 +406,30 @@ extension PlayerModel: @preconcurrency PlayerDelegate {
     }
 }
 
-extension PlayerModel: @preconcurrency AudioPlayer.Delegate {
+extension PlayerModel: AudioPlayer.Delegate {
     func audioPlayerNowPlayingChanged(_ audioPlayer: AudioPlayer) {
-        if let nowPlayingDecoder = audioPlayer.nowPlaying,
-           let audioDecoder = nowPlayingDecoder as? AudioDecoder,
-           let url = audioDecoder.inputSource.url {
-            self.current = self.playlist.first(where: { $0.url == url })
-        } else {
-            self.current = nil
-            self.nextTrack()
+        DispatchQueue.main.async {
+            if let nowPlayingDecoder = audioPlayer.nowPlaying,
+               let audioDecoder = nowPlayingDecoder as? AudioDecoder,
+               let url = audioDecoder.inputSource.url {
+                self.current = self.playlist.first(where: { $0.url == url })
+            } else {
+                self.current = nil
+                self.nextTrack()
+            }
+
+            self.updateNowPlayingState()
+            self.updateNowPlayingInfo()
+            self.updateNowPlayingMetadataInfo()
         }
-        
-        self.updateNowPlayingState()
-        self.updateNowPlayingInfo()
-        self.updateNowPlayingMetadataInfo()
     }
 
     func audioPlayerPlaybackStateChanged(_: AudioPlayer) {
-        self.updateNowPlayingState()
-        self.updateNowPlayingInfo()
-        self.updateNowPlayingMetadataInfo()
+        DispatchQueue.main.async {
+            self.updateNowPlayingState()
+            self.updateNowPlayingInfo()
+            self.updateNowPlayingMetadataInfo()
+        }
     }
 
     func audioPlayer(_ audioPlayer: AudioPlayer, encounteredError _: Error) {
@@ -515,9 +517,7 @@ extension PlayerModel {
 
     func updateNowPlayingMetadataInfo() {
         if let current {
-            Task { @MainActor in
-                current.metadata.updateNowPlayingInfo()
-            }
+            current.metadata.updateNowPlayingInfo()
         } else {
             Metadata.resetNowPlayingInfo()
         }

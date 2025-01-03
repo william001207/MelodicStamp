@@ -8,7 +8,7 @@
 import SFSafeSymbols
 import SwiftUI
 
-struct AppleMusicLyricsViewInteractionStateButton: View, @preconcurrency Animatable {
+struct AppleMusicLyricsViewInteractionStateButton: View, Animatable {
     var animatableData: CGFloat {
         get { progress }
         set { progress = newValue }

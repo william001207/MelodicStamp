@@ -8,18 +8,18 @@
 
 import SwiftUI
 
-struct AnimationObserverModifier<Value: VectorArithmetic> {
+public struct AnimationObserverModifier<Value: VectorArithmetic> {
     private let observedValue: Value
     private let onChange: ((Value) -> ())?
     private let onComplete: (() -> ())?
 
-    var animatableData: Value {
+    public var animatableData: Value {
         didSet {
             notifyProgress()
         }
     }
 
-    init(for observedValue: Value, onChange: ((Value) -> ())? = nil, onComplete: (() -> ())? = nil) {
+    public init(for observedValue: Value, onChange: ((Value) -> ())? = nil, onComplete: (() -> ())? = nil) {
         self.observedValue = observedValue
         self.onChange = onChange
         self.onComplete = onComplete
@@ -28,16 +28,18 @@ struct AnimationObserverModifier<Value: VectorArithmetic> {
 }
 
 extension AnimationObserverModifier: AnimatableModifier {
-    func body(content: Content) -> some View {
+    public func body(content: Content) -> some View {
         content
     }
 }
 
 extension AnimationObserverModifier {
     private func notifyProgress() {
-        onChange?(animatableData)
-        if animatableData == observedValue {
-            onComplete?()
+        DispatchQueue.main.async {
+            onChange?(animatableData)
+            if animatableData == observedValue {
+                onComplete?()
+            }
         }
     }
 }

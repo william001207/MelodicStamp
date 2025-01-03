@@ -62,9 +62,8 @@ struct LeafletView: View {
                                 guard position.isPositionedByUser else { return }
                                 guard !interactionState.isIsolated else { return }
                                 interactionStateDispatch?.cancel()
-                                hasInteractionStateProgressRing = false
-
                                 interactionState = .intermediate
+
                                 let dspatch = DispatchWorkItem {
                                     interactionState = .countingDown
                                 }
@@ -164,7 +163,7 @@ struct LeafletView: View {
             .onAppear {
                 guard let current = player.current else { return }
 
-                Task { @MainActor in
+                Task {
                     let raw = await current.metadata.poll(for: \.lyrics).current
                     await lyrics.read(raw)
                 }
@@ -173,7 +172,7 @@ struct LeafletView: View {
                 guard let newValue else { return }
                 lyrics.clear(newValue.url)
 
-                Task { @MainActor in
+                Task {
                     let raw = await newValue.metadata.poll(for: \.lyrics).current
                     await lyrics.read(raw)
                 }
@@ -185,7 +184,7 @@ struct LeafletView: View {
             .colorScheme(.dark)
         }
     }
-    
+
     private var cover: NSImage? {
         if
             let attachedPictures = player.current?.metadata[extracting: \.attachedPictures]?.current,
@@ -193,9 +192,8 @@ struct LeafletView: View {
             cover
         } else { nil }
     }
-    
-    private var hasCover: Bool { cover != nil }
 
+    private var hasCover: Bool { cover != nil }
 
     private var hasLyrics: Bool {
         !lyrics.lines.isEmpty

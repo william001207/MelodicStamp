@@ -8,8 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		2810E2452CFB169E006FF94A /* Morphed in Frameworks */ = {isa = PBXBuildFile; productRef = 2810E2442CFB169E006FF94A /* Morphed */; };
-		2830C7892D28151B00002514 /* CodeEditorView in Frameworks */ = {isa = PBXBuildFile; productRef = 2830C7882D28151B00002514 /* CodeEditorView */; };
-		2830C78B2D28151B00002514 /* LanguageSupport in Frameworks */ = {isa = PBXBuildFile; productRef = 2830C78A2D28151B00002514 /* LanguageSupport */; };
 		2845A9F72D08745900CD7517 /* SmartCache in Frameworks */ = {isa = PBXBuildFile; productRef = 2845A9F62D08745900CD7517 /* SmartCache */; };
 		28797B9A2D10724C00FB4395 /* SwiftUIIntrospect in Frameworks */ = {isa = PBXBuildFile; productRef = 28797B992D10724C00FB4395 /* SwiftUIIntrospect */; };
 		287F978D2CF3160700C60307 /* Luminare in Frameworks */ = {isa = PBXBuildFile; productRef = 287F978C2CF3160700C60307 /* Luminare */; };
@@ -46,7 +44,6 @@
 				65F1DAB32CEDBED700389E37 /* SFSafeSymbols in Frameworks */,
 				2845A9F72D08745900CD7517 /* SmartCache in Frameworks */,
 				65D940472D26671900F67AA6 /* MeshGradient in Frameworks */,
-				2830C7892D28151B00002514 /* CodeEditorView in Frameworks */,
 				28797B9A2D10724C00FB4395 /* SwiftUIIntrospect in Frameworks */,
 				287F978D2CF3160700C60307 /* Luminare in Frameworks */,
 				65F1DA9D2CEDBD8700389E37 /* Defaults in Frameworks */,
@@ -54,7 +51,6 @@
 				65DFF89D2CFC2A6F00285040 /* SwiftSoup in Frameworks */,
 				65EE5C9B2D1CEBD30026B8F1 /* DominantColors in Frameworks */,
 				65F1DA7D2CED77F100389E37 /* SFBAudioEngine in Frameworks */,
-				2830C78B2D28151B00002514 /* LanguageSupport in Frameworks */,
 				65F1DA842CED788D00389E37 /* CAAudioHardware in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -111,8 +107,6 @@
 				65EE5C9A2D1CEBD30026B8F1 /* DominantColors */,
 				65D940462D26671900F67AA6 /* MeshGradient */,
 				65D940482D26671900F67AA6 /* MeshGradientCHeaders */,
-				2830C7882D28151B00002514 /* CodeEditorView */,
-				2830C78A2D28151B00002514 /* LanguageSupport */,
 			);
 			productName = MelodicStamp;
 			productReference = 65F1DA012CECCEE900389E37 /* MelodicStamp.app */;
@@ -156,7 +150,6 @@
 				28797B982D10724C00FB4395 /* XCRemoteSwiftPackageReference "swiftui-introspect" */,
 				65EE5C992D1CEBD30026B8F1 /* XCRemoteSwiftPackageReference "DominantColors" */,
 				65D940452D26671900F67AA6 /* XCRemoteSwiftPackageReference "MeshGradient" */,
-				2830C7872D28151B00002514 /* XCRemoteSwiftPackageReference "CodeEditorView" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 65F1DA022CECCEE900389E37 /* Products */;
@@ -340,7 +333,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = labs.cement.MelodicStamp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_VERSION = 6.0;
+				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
 		};
@@ -370,7 +363,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = labs.cement.MelodicStamp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_VERSION = 6.0;
+				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
 		};
@@ -404,14 +397,6 @@
 			requirement = {
 				branch = main;
 				kind = branch;
-			};
-		};
-		2830C7872D28151B00002514 /* XCRemoteSwiftPackageReference "CodeEditorView" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/mchakravarty/CodeEditorView";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 0.14.0;
 			};
 		};
 		2845A9F52D08745900CD7517 /* XCRemoteSwiftPackageReference "smart-cache" */ = {
@@ -509,16 +494,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 2810E2432CFB169E006FF94A /* XCRemoteSwiftPackageReference "Morphed" */;
 			productName = Morphed;
-		};
-		2830C7882D28151B00002514 /* CodeEditorView */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 2830C7872D28151B00002514 /* XCRemoteSwiftPackageReference "CodeEditorView" */;
-			productName = CodeEditorView;
-		};
-		2830C78A2D28151B00002514 /* LanguageSupport */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 2830C7872D28151B00002514 /* XCRemoteSwiftPackageReference "CodeEditorView" */;
-			productName = LanguageSupport;
 		};
 		2845A9F62D08745900CD7517 /* SmartCache */ = {
 			isa = XCSwiftPackageProductDependency;

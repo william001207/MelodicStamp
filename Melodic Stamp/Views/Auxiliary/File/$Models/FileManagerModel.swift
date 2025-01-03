@@ -19,7 +19,7 @@ enum FileAdderPresentationStyle {
     case formingNewPlaylist
 }
 
-@Observable @MainActor class FileManagerModel {
+@Observable class FileManagerModel {
     var isFileOpenerPresented: Bool = false
     private var fileOpenerPresentationStyle: FileOpenerPresentationStyle = .inCurrentPlaylist
 

@@ -10,7 +10,7 @@ import Luminare
 import SwiftSoup
 import SwiftUI
 
-@Observable @MainActor private final class LyricsAnalyzerModel {
+@Observable private final class LyricsAnalyzerModel {
     var parser: TTMLParser?
     var raw: String = ""
 

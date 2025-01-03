@@ -8,7 +8,7 @@
 import Luminare
 import SwiftUI
 
-struct LabeledTextField<F, Label>: View where F: ParseableFormatStyle, F.FormatOutput == String, F.FormatInput: Equatable & Hashable & Sendable, Label: View {
+struct LabeledTextField<F, Label>: View where F: ParseableFormatStyle, F.FormatOutput == String, F.FormatInput: Equatable & Hashable, Label: View {
     typealias Entries = MetadataBatchEditingEntries<F.FormatInput?>
 
     @Environment(\.undoManager) private var undoManager
@@ -241,12 +241,10 @@ struct LabeledTextField<F, Label>: View where F: ParseableFormatStyle, F.FormatO
         undoTargetCheckpoint.set(oldValue)
 
         undoManager?.registerUndo(withTarget: entries) { entries in
-            Task {
-                let fallback = await entries.projectedUnwrappedValue()?.wrappedValue
-                await entries.setAll(oldValue)
-                
-                await registerUndo(fallback, for: entries)
-            }
+            let fallback = entries.projectedUnwrappedValue()?.wrappedValue
+            entries.setAll(oldValue)
+
+            registerUndo(fallback, for: entries)
         }
     }
 }

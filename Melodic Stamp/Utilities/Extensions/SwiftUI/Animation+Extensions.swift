@@ -8,7 +8,7 @@
 import SwiftUI
 
 extension Animation {
-    static var instant: Self { .linear(duration: 0) }
+    static var instant = Self.linear(duration: 0)
 }
 
 extension Animation {
