@@ -157,6 +157,7 @@ struct LeafletView: View {
                     }
                 }
             }
+
             // Read lyrics
             // Don't extract this logic or modify the tasks!
             .onAppear {

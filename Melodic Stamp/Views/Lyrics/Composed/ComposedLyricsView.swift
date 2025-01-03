@@ -18,17 +18,21 @@ struct ComposedLyricsView: View {
         Group {
             let highlightedRange = highlightedRange
             let index = highlightedRange.upperBound - 1
-            let line = lyrics.lines[index]
 
-            if highlightedRange.contains(index), !line.content.isEmpty {
-                ComposedLyricLineView(
-                    line: line, index: index,
-                    highlightedRange: highlightedRange,
-                    elapsedTime: elapsedTime
-                )
+            if lyrics.lines.indices.contains(index) {
+                let line = lyrics.lines[index]
+
+                if highlightedRange.contains(index), !line.content.isEmpty {
+                    ComposedLyricLineView(
+                        line: line, index: index,
+                        highlightedRange: highlightedRange,
+                        elapsedTime: elapsedTime
+                    )
+                } else {
+                    emptyView()
+                }
             } else {
-                ProgressDotsView(elapsedTime: 0, beginTime: 0, endTime: 0)
-                    .scaleEffect(0.7)
+                emptyView()
             }
         }
         .onReceive(player.playbackTimePublisher) { playbackTime in
@@ -40,5 +44,10 @@ struct ComposedLyricsView: View {
 
     private var highlightedRange: Range<Int> {
         lyrics.highlight(at: elapsedTime)
+    }
+
+    @ViewBuilder private func emptyView() -> some View {
+        ProgressDotsView(elapsedTime: 0, beginTime: 0, endTime: 0)
+            .scaleEffect(0.7)
     }
 }

@@ -9,7 +9,6 @@ import Foundation
 import SFBAudioEngine
 
 class SFBAudioEnginePlayer: NSObject, Player {
-    
     init(_ player: AudioPlayer = .init()) {
         self.player = player
         super.init()
@@ -98,8 +97,8 @@ class SFBAudioEnginePlayer: NSObject, Player {
             print(error)
         }
     }
-    
-    func withEngine(_ block: @escaping (AVAudioEngine) -> Void) {
+
+    func withEngine(_ block: @escaping (AVAudioEngine) -> ()) {
         player.withEngine { [weak self] engine in
             block(engine)
         }
