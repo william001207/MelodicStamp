@@ -5,8 +5,6 @@
 //  Created by KrLite on 2024/12/18.
 //
 
-import CodeEditLanguages
-import CodeEditSourceEditor
 import Luminare
 import SwiftUI
 
@@ -17,7 +15,6 @@ enum LabeledTextEditorLayout {
 
 enum LabeledTextEditorStyle {
     case regular
-    case code(language: CodeLanguage)
 }
 
 struct LabeledTextEditor<Label, Info, V>: View where Label: View, Info: View, V: StringRepresentable & Hashable {
@@ -39,9 +36,6 @@ struct LabeledTextEditor<Label, Info, V>: View where Label: View, Info: View, V:
     @State private var isPresented: Bool = false
     @State private var isEditorHovering: Bool = false
     @State private var isControlsHidden: Bool = false
-
-    @State private var cursurPositions: [CursorPosition] = []
-    @State private var editorID: UUID = .init()
 
     init(
         entries: Entries,
@@ -169,8 +163,6 @@ struct LabeledTextEditor<Label, Info, V>: View where Label: View, Info: View, V:
                 switch style {
                 case .regular:
                     regularEditor(binding: binding)
-                case let .code(language):
-                    codeEditor(binding: binding, language: language)
                 }
             }
             .frame(minWidth: 640, minHeight: 520)
@@ -207,15 +199,8 @@ struct LabeledTextEditor<Label, Info, V>: View where Label: View, Info: View, V:
         }
     }
 
-    @ViewBuilder private func codeEditor(binding: Binding<String>, language: CodeLanguage) -> some View {
+    @ViewBuilder private func codeEditor(binding: Binding<String>) -> some View {
         ZStack(alignment: .bottomTrailing) {
-            CodeEditSourceEditor(
-                binding, language: language,
-                theme: colorScheme == .dark ? .defaultDark : .defaultLight,
-                font: .monospacedSystemFont(ofSize: 14, weight: .regular), tabWidth: 4, lineHeight: 1.172,
-                wrapLines: true, cursorPositions: $cursurPositions
-            )
-            .id(editorID)
 
             if isEditorHovering, !isControlsHidden {
                 controls()
@@ -235,7 +220,6 @@ struct LabeledTextEditor<Label, Info, V>: View where Label: View, Info: View, V:
 
             AliveButton {
                 entries.restoreAll()
-                editorID = .init()
             } label: {
                 Image(systemSymbol: .arrowUturnLeft)
             }
@@ -244,7 +228,6 @@ struct LabeledTextEditor<Label, Info, V>: View where Label: View, Info: View, V:
 
             AliveButton {
                 entries.setAll { V.wrappingUpdate($0, with: "") }
-                editorID = .init()
             } label: {
                 Image(systemSymbol: .trash)
             }
