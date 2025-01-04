@@ -137,7 +137,10 @@ struct LeafletView: View {
             .animation(.bouncy, value: isShowingLyrics)
             .background {
                 if hasCover {
-                    AnimatedGrid(colors: dominantColors)
+                    ZStack {
+                        AnimatedGrid(colors: dominantColors)
+                        Color.black.opacity(0.35)
+                    }
                 } else {
                     ZStack {
                         Rectangle()

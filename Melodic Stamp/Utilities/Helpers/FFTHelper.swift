@@ -9,7 +9,7 @@ import Accelerate
 import Foundation
 
 enum FFTHelper {
-    static func perform(_ data: [Float], sampleRate: Float, minFrequency: Float = 80, maxFrequency: Float = 2000) async -> [Float] {
+    static func perform(_ data: [Float], sampleRate: Float, minFrequency: Float = 20, maxFrequency: Float = 250) async -> [Float] {
         
         let monoData = data.enumerated().filter { $0.offset % 2 == 0 }.map { $0.element }
 
