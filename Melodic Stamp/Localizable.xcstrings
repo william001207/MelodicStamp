@@ -224,6 +224,9 @@
         }
       }
     },
+    "Clear" : {
+
+    },
     "Clear Selection" : {
       "localizations" : {
         "zh-Hans" : {
@@ -326,6 +329,9 @@
           }
         }
       }
+    },
+    "Dismiss" : {
+
     },
     "During Performance" : {
       "localizations" : {
@@ -433,6 +439,9 @@
     "Hello, World!" : {
 
     },
+    "Hide" : {
+
+    },
     "Illustration" : {
       "localizations" : {
         "zh-Hans" : {
@@ -515,6 +524,9 @@
           }
         }
       }
+    },
+    "Load from File" : {
+
     },
     "Loading…" : {
       "localizations" : {
@@ -1127,6 +1139,9 @@
           }
         }
       }
+    },
+    "You can access [AMLL TTML Tool](https://steve-xmh.github.io/amll-ttml-tool) to create TTML lyrics through a refined interface." : {
+
     }
   },
   "version" : "1.0"

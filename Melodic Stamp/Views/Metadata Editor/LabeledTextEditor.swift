@@ -7,6 +7,7 @@
 
 import Luminare
 import SwiftUI
+import UniformTypeIdentifiers
 
 enum LabeledTextEditorLayout {
     case field
@@ -28,12 +29,14 @@ struct LabeledTextEditor<Label, Info, V>: View where Label: View, Info: View, V:
     private var entries: Entries
     private var layout: LabeledTextEditorLayout
     private var style: LabeledTextEditorStyle
+    private var allowedFileTypes: [UTType]
     @ViewBuilder private var label: () -> Label
     @ViewBuilder private var info: () -> Info
 
     @State private var textInput: TextInputModel<V> = .init()
 
     @State private var isPresented: Bool = false
+    @State private var isFileImporterPresented: Bool = false
     @State private var isEditorHovering: Bool = false
     @State private var isControlsHidden: Bool = false
 
@@ -41,12 +44,14 @@ struct LabeledTextEditor<Label, Info, V>: View where Label: View, Info: View, V:
         entries: Entries,
         layout: LabeledTextEditorLayout = .field,
         style: LabeledTextEditorStyle = .regular,
+        allowedFileTypes: [UTType] = [.text],
         @ViewBuilder label: @escaping () -> Label,
         @ViewBuilder info: @escaping () -> Info
     ) {
         self.entries = entries
         self.layout = layout
         self.style = style
+        self.allowedFileTypes = allowedFileTypes
         self.label = label
         self.info = info
     }
@@ -55,12 +60,14 @@ struct LabeledTextEditor<Label, Info, V>: View where Label: View, Info: View, V:
         entries: Entries,
         layout: LabeledTextEditorLayout = .field,
         style: LabeledTextEditorStyle = .regular,
+        allowedFileTypes: [UTType] = [.text],
         @ViewBuilder label: @escaping () -> Label
     ) where Info == EmptyView {
         self.init(
             entries: entries,
             layout: layout,
             style: style,
+            allowedFileTypes: allowedFileTypes,
             label: label
         ) {
             EmptyView()
@@ -72,9 +79,10 @@ struct LabeledTextEditor<Label, Info, V>: View where Label: View, Info: View, V:
         entries: Entries,
         layout: LabeledTextEditorLayout = .field,
         style: LabeledTextEditorStyle = .regular,
+        allowedFileTypes: [UTType] = [.text],
         @ViewBuilder info: @escaping () -> Info
     ) where Label == Text {
-        self.init(entries: entries, layout: layout, style: style) {
+        self.init(entries: entries, layout: layout, style: style, allowedFileTypes: allowedFileTypes) {
             Text(key)
         } info: {
             info()
@@ -85,9 +93,10 @@ struct LabeledTextEditor<Label, Info, V>: View where Label: View, Info: View, V:
         _ key: LocalizedStringKey,
         entries: Entries,
         layout: LabeledTextEditorLayout = .field,
-        style: LabeledTextEditorStyle = .regular
+        style: LabeledTextEditorStyle = .regular,
+        allowedFileTypes: [UTType] = [.text]
     ) where Label == Text, Info == EmptyView {
-        self.init(key, entries: entries, layout: layout, style: style) {
+        self.init(key, entries: entries, layout: layout, style: style, allowedFileTypes: allowedFileTypes) {
             EmptyView()
         }
     }
@@ -165,14 +174,33 @@ struct LabeledTextEditor<Label, Info, V>: View where Label: View, Info: View, V:
                     regularEditor(binding: binding)
                 }
             }
-            .frame(minWidth: 640, minHeight: 520)
+            .frame(minWidth: 575, minHeight: 675)
             .onHover { hover in
                 withAnimation(animationFast) {
                     isEditorHovering = hover
+                }
+            }
+            .onChange(of: isEditorHovering) { _, newValue in
+                guard newValue else { return }
+                isControlsHidden = false
+            }
+            .fileImporter(
+                isPresented: $isFileImporterPresented,
+                allowedContentTypes: allowedFileTypes
+            ) { result in
+                switch result {
+                case let .success(success):
+                    guard success.startAccessingSecurityScopedResource() else { break }
+                    defer { success.stopAccessingSecurityScopedResource() }
 
-                    if hover {
-                        isControlsHidden = false
+                    do {
+                        let content = try String(contentsOf: success, encoding: .utf8)
+                        entries.setAll { V.wrappingUpdate($0, with: content) }
+                    } catch {
+                        break
                     }
+                case .failure:
+                    break
                 }
             }
         }
@@ -192,17 +220,16 @@ struct LabeledTextEditor<Label, Info, V>: View where Label: View, Info: View, V:
                 .luminareBordered(false)
                 .luminareHasBackground(false)
 
-            if isEditorHovering, !isControlsHidden {
+            if !isControlsHidden {
                 controls()
                     .padding(14)
             }
         }
     }
 
-    @ViewBuilder private func codeEditor(binding: Binding<String>) -> some View {
+    @ViewBuilder private func codeEditor(binding _: Binding<String>) -> some View {
         ZStack(alignment: .bottomTrailing) {
-
-            if isEditorHovering, !isControlsHidden {
+            if !isControlsHidden {
                 controls()
                     .padding(14)
             }
@@ -210,18 +237,22 @@ struct LabeledTextEditor<Label, Info, V>: View where Label: View, Info: View, V:
     }
 
     @ViewBuilder private func controls() -> some View {
-        HStack(spacing: 2) {
+        HStack {
             if Info.self != EmptyView.self {
                 info()
 
-                Spacer()
-                    .frame(width: 8)
+                Divider()
             }
 
             AliveButton {
                 entries.restoreAll()
             } label: {
-                Image(systemSymbol: .arrowUturnLeft)
+                HStack(alignment: .center, spacing: 2) {
+                    HoverableLabel { isHovering in
+                        Image(systemSymbol: .arrowUturnLeft)
+                        if isHovering { Text("Restore") }
+                    }
+                }
             }
             .foregroundStyle(.red)
             .disabled(!entries.isModified)
@@ -229,18 +260,38 @@ struct LabeledTextEditor<Label, Info, V>: View where Label: View, Info: View, V:
             AliveButton {
                 entries.setAll { V.wrappingUpdate($0, with: "") }
             } label: {
-                Image(systemSymbol: .trash)
+                HStack(alignment: .center, spacing: 2) {
+                    HoverableLabel { isHovering in
+                        Image(systemSymbol: .trash)
+                        if isHovering { Text("Clear") }
+                    }
+                }
             }
             .foregroundStyle(.red)
             .disabled(isEmpty)
 
-            Spacer()
-                .frame(width: 8)
+            AliveButton {
+                isFileImporterPresented.toggle()
+            } label: {
+                HStack(alignment: .center, spacing: 2) {
+                    HoverableLabel { isHovering in
+                        Image(systemSymbol: .docText)
+                        if isHovering { Text("Load from File") }
+                    }
+                }
+            }
+
+            Divider()
 
             AliveButton {
                 isPresented = false
             } label: {
-                Image(systemSymbol: .xmark)
+                HStack(alignment: .center, spacing: 2) {
+                    HoverableLabel { isHovering in
+                        Image(systemSymbol: .xmark)
+                        if isHovering { Text("Dismiss") }
+                    }
+                }
             }
 
             AliveButton {
@@ -248,9 +299,15 @@ struct LabeledTextEditor<Label, Info, V>: View where Label: View, Info: View, V:
                     isControlsHidden = true
                 }
             } label: {
-                Image(systemSymbol: .chevronRight)
+                HStack(alignment: .center, spacing: 2) {
+                    HoverableLabel { isHovering in
+                        Image(systemSymbol: .chevronRight)
+                        if isHovering { Text("Hide") }
+                    }
+                }
             }
         }
+        .frame(height: 16)
         .bold()
         .padding(8)
         .background {
@@ -259,5 +316,6 @@ struct LabeledTextEditor<Label, Info, V>: View where Label: View, Info: View, V:
         }
         .clipShape(.capsule)
         .shadow(color: .black.opacity(0.25), radius: 32)
+        .monospaced(false)
     }
 }
