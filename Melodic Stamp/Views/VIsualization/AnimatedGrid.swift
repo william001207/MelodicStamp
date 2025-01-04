@@ -13,19 +13,18 @@ typealias Color3 = simd_float3
 
 extension Color3 {
     static func lerp(_ a: Color3, _ b: Color3, _ t: Float) -> Color3 {
-        return a + (b - a) * t
+        a + (b - a) * t
     }
 }
 
 struct AnimatedGrid: View {
-    
     @Environment(PlayerModel.self) private var player
-    
+
     @State private var gradientSpeed: Float = 0.5
-    
+
     @State private var maxHistory: [CGFloat] = []
     @State private var minHistory: [CGFloat] = []
-    
+
     private let historyWindowSize = 10
 
     private var colors: [Color]
@@ -33,7 +32,7 @@ struct AnimatedGrid: View {
     private var simdColors: [simd_float3] {
         colors.map { $0.toSimdFloat3() }
     }
-    
+
     let colorA: simd_float3
     let colorB: simd_float3
     let colorC: simd_float3
@@ -46,23 +45,23 @@ struct AnimatedGrid: View {
         self.colorB = simdColors.indices.contains(1) ? simdColors[1] : simd_float3(0, 0, 0)
         self.colorC = simdColors.indices.contains(2) ? simdColors[2] : simd_float3(0, 0, 0)
     }
-    
+
     private var randomizer: MeshRandomizer {
-        MeshRandomizer(colorRandomizer: { color, initialColor, x, y, gridWidth, gridHeight in
+        MeshRandomizer(colorRandomizer: { color, _, x, y, gridWidth, gridHeight in
             // 计算 normalized position
             let normalizedX = Float(x) / Float(gridWidth - 1)
             let normalizedY = Float(y) / Float(gridHeight - 1)
-            
+
             let baseWeight = (normalizedX + normalizedY) / 1.2
-            
+
             let adjustedWeight = baseWeight * gradientSpeed
-            
+
             let colorAB = Color3.lerp(colorA, colorB, adjustedWeight)
             let colorBC = Color3.lerp(colorB, colorC, adjustedWeight)
             let colorCA = Color3.lerp(colorC, colorA, adjustedWeight)
-            
+
             let sumColor = [colorA, colorAB, colorB, colorBC, colorC, colorCA]
-            
+
             let index = (x + y) % sumColor.count
             color = sumColor[index]
         })
@@ -89,12 +88,11 @@ struct AnimatedGrid: View {
             updateHistory(max: newMax, min: newMin)
         }
     }
-    
+
     private func normalizeData(fftData: [CGFloat], maxHistory: [CGFloat], minHistory: [CGFloat]) -> (CGFloat, CGFloat, CGFloat) {
-        
-        let validFFTData = fftData.filter { $0.isFinite }
-        let validMaxHistory = maxHistory.filter { $0.isFinite }
-        let validMinHistory = minHistory.filter { $0.isFinite }
+        let validFFTData = fftData.filter(\.isFinite)
+        let validMaxHistory = maxHistory.filter(\.isFinite)
+        let validMinHistory = minHistory.filter(\.isFinite)
 
         let currentMax = validFFTData.max() ?? 0
         let currentMin = validFFTData.min() ?? 0
@@ -115,9 +113,8 @@ struct AnimatedGrid: View {
 
         return (normalizedValue, currentMax, currentMin)
     }
-    
+
     private func updateHistory(max: CGFloat, min: CGFloat) {
-        
         guard historyWindowSize > 0 else { return }
 
         if maxHistory.count >= historyWindowSize {

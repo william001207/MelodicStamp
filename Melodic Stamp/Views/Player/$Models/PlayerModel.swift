@@ -365,7 +365,7 @@ extension PlayerModel {
 
     private func setupAudioVisualization() {
         player.withEngine { [weak self] engine in
-            guard let self = self else { return }
+            guard let self else { return }
 
             let inputNode = engine.mainMixerNode
             let bus = 0

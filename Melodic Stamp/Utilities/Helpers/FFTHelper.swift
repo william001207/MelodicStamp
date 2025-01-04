@@ -10,8 +10,7 @@ import Foundation
 
 enum FFTHelper {
     static func perform(_ data: [Float], sampleRate: Float, minFrequency: Float = 20, maxFrequency: Float = 250) async -> [Float] {
-        
-        let monoData = data.enumerated().filter { $0.offset % 2 == 0 }.map { $0.element }
+        let monoData = data.enumerated().filter { $0.offset % 2 == 0 }.map(\.element)
 
         let log2n = vDSP_Length(log2(Float(monoData.count)))
         guard let fftSetup = vDSP_create_fftsetup(log2n, Int32(kFFTRadix2)) else {

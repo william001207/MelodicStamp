@@ -139,7 +139,9 @@ struct LeafletView: View {
                 if hasCover {
                     ZStack {
                         AnimatedGrid(colors: dominantColors)
-                        Color.black.opacity(0.35)
+
+                        Color.black
+                            .opacity(0.35)
                     }
                 } else {
                     ZStack {
