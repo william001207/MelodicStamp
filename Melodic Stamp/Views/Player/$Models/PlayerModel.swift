@@ -365,18 +365,21 @@ extension PlayerModel {
 
     private func setupAudioVisualization() {
         player.withEngine { [weak self] engine in
-            guard let self else { return }
+            guard let self = self else { return }
 
             let inputNode = engine.mainMixerNode
             let bus = 0
 
-            inputNode.installTap(onBus: bus, bufferSize: 1024, format: inputNode.outputFormat(forBus: bus)) { buffer, _ in
-                self.processAudioBuffer(buffer)
+            let format = inputNode.outputFormat(forBus: bus)
+            let sampleRate = format.sampleRate
+
+            inputNode.installTap(onBus: bus, bufferSize: 1024, format: format) { buffer, _ in
+                self.processAudioBuffer(buffer, sampleRate: Float(sampleRate))
             }
         }
     }
 
-    private func processAudioBuffer(_ buffer: AVAudioPCMBuffer) {
+    private func processAudioBuffer(_ buffer: AVAudioPCMBuffer, sampleRate: Float) {
         guard let channelData = buffer.floatChannelData else { return }
 
         let channelDataPointer = channelData[0]
@@ -385,7 +388,7 @@ extension PlayerModel {
         audioDataBuffer = Array(UnsafeBufferPointer(start: channelDataPointer, count: frameLength)).map(CGFloat.init)
 
         Task { @MainActor in
-            let fftMagnitudes = await FFTHelper.perform(audioDataBuffer.map(Float.init))
+            let fftMagnitudes = await FFTHelper.perform(audioDataBuffer.map(Float.init), sampleRate: sampleRate)
             self.visualizationDataSubject.send(fftMagnitudes.map(CGFloat.init))
         }
     }

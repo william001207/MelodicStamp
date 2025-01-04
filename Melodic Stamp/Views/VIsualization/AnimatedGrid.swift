@@ -13,7 +13,11 @@ struct AnimatedGrid: View {
     typealias MeshColor = SIMD3<Float>
 
     @Environment(PlayerModel.self) private var player
-    @State var gradientStep: CGFloat = 1.0
+    @State private var gradientStep: CGFloat = 1.0
+    @State private var maxHistory: [CGFloat] = []
+    @State private var minHistory: [CGFloat] = []
+    
+    private let historyWindowSize = 10
 
     var colors: [Color]
 
@@ -41,18 +45,60 @@ struct AnimatedGrid: View {
                     framesPerSecond: 120,
                     locationAnimationSpeedRange: 4...5,
                     tangentAnimationSpeedRange: 4...5,
-                    colorAnimationSpeedRange: 0.1...0.2,
+                    colorAnimationSpeedRange: 0.2...0.25,
                     meshRandomizer: randomizer
                 ),
                 grainAlpha: 0,
                 resolutionScale: 0.8
             )
         }
-        .onReceive(player.visualizationDataPublisher) { _ in
+        .onReceive(player.visualizationDataPublisher) { fftData in
+            let (normalizedData, newMax, newMin) = normalizeData(fftData: fftData, maxHistory: maxHistory, minHistory: minHistory)
+            
+            if !newMax.isNaN || !newMin.isNaN || !normalizedData.isNaN {
+                gradientStep = normalizedData
+                updateHistory(max: newMax, min: newMin)
+            }
+            
+            // print("gradientStep: \(gradientStep), normalizedData: \(normalizedData).")
         }
     }
+    
+    private func normalizeData(fftData: [CGFloat], maxHistory: [CGFloat], minHistory: [CGFloat]) -> (CGFloat, CGFloat, CGFloat) {
+        
+        let currentMax = fftData.max() ?? 0
+        let currentMin = fftData.min() ?? 0
+        let dynamicMax = max((maxHistory + [currentMax]).max() ?? 0, 1e-6)
+        let dynamicMin = min((minHistory + [currentMin]).min() ?? 0, dynamicMax - 1e-6)
 
-    private func generatePlainGrid(size: Int = 4) -> MeshGradientGrid<ControlPoint> {
+        if dynamicMax < dynamicMin {
+            return (0.6, dynamicMax, dynamicMin)
+        }
+
+        let fftPeak = fftData.max() ?? 0
+
+        let baseNormalizedValue = (fftPeak - dynamicMin) / (dynamicMax - dynamicMin)
+        let normalizedValue = 0.9 - (baseNormalizedValue * 0.2)
+
+        if normalizedValue.isNaN {
+            return (0.6, dynamicMax, dynamicMin)
+        }
+
+        return (normalizedValue, currentMax, currentMin)
+    }
+    
+    private func updateHistory(max: CGFloat, min: CGFloat) {
+        if maxHistory.count >= historyWindowSize {
+            maxHistory.removeFirst()
+        }
+        if minHistory.count >= historyWindowSize {
+            minHistory.removeFirst()
+        }
+        maxHistory.append(max)
+        minHistory.append(min)
+    }
+
+    func generatePlainGrid(size: Int = 4) -> MeshGradientGrid<ControlPoint> {
         let preparationGrid = MeshGradientGrid<MeshColor>(repeating: .zero, width: size, height: size)
         var result = MeshGenerator.generate(colorDistribution: preparationGrid)
 
