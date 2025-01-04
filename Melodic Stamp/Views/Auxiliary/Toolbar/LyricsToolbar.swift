@@ -11,9 +11,16 @@ struct LyricsToolbar: View {
     @Environment(MetadataEditorModel.self) private var metadataEditor
 
     var body: some View {
-        Button {} label: {
-            Image(systemSymbol: .pencilLine)
-            Text("Edit")
+        if metadataEditor.isVisible {
+            LabeledTextEditor(
+                entries: metadataEditor[extracting: \.lyrics],
+                layout: .button
+            ) {
+                Image(systemSymbol: .pencilLine)
+                Text("Edit")
+                    .monospaced(false)
+            }
+            .monospaced()
         }
     }
 }

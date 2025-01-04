@@ -219,6 +219,10 @@ extension MetadataBatchEditingEntry: Equatable {
     func setAll(_ newValue: V) {
         forEach { $0.current = newValue }
     }
+
+    func setAll(updating: @escaping (V) -> V) {
+        forEach { $0.current = updating($0.current) }
+    }
 }
 
 extension MetadataBatchEditingEntries: Sequence {

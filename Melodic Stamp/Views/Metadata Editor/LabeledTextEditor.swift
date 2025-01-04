@@ -5,115 +5,276 @@
 //  Created by KrLite on 2024/12/18.
 //
 
+import CodeEditLanguages
+import CodeEditSourceEditor
 import Luminare
 import SwiftUI
-import SwiftUIIntrospect
 
-struct LabeledTextEditor<Label>: View where Label: View {
-    typealias Entries = MetadataBatchEditingEntries<String?>
+enum LabeledTextEditorLayout {
+    case field
+    case button
+}
 
+enum LabeledTextEditorStyle {
+    case regular
+    case code(language: CodeLanguage)
+}
+
+struct LabeledTextEditor<Label, Info, V>: View where Label: View, Info: View, V: StringRepresentable & Hashable {
+    typealias Entries = MetadataBatchEditingEntries<V?>
+
+    @Environment(\.undoManager) private var undoManager
+    @Environment(\.colorScheme) private var colorScheme
     @Environment(\.luminareAnimationFast) private var animationFast
+    @Environment(\.luminareCompactButtonCornerRadii) private var cornerRadii
 
     private var entries: Entries
+    private var layout: LabeledTextEditorLayout
+    private var style: LabeledTextEditorStyle
     @ViewBuilder private var label: () -> Label
+    @ViewBuilder private var info: () -> Info
 
-    @State private var isEditorHovering: Bool = false
+    @State private var textInput: TextInputModel<V> = .init()
+
     @State private var isPresented: Bool = false
+    @State private var isEditorHovering: Bool = false
+    @State private var isControlsHidden: Bool = false
+
+    @State private var cursurPositions: [CursorPosition] = []
+    @State private var editorID: UUID = .init()
 
     init(
         entries: Entries,
-        @ViewBuilder label: @escaping () -> Label
+        layout: LabeledTextEditorLayout = .field,
+        style: LabeledTextEditorStyle = .regular,
+        @ViewBuilder label: @escaping () -> Label,
+        @ViewBuilder info: @escaping () -> Info
     ) {
         self.entries = entries
+        self.layout = layout
+        self.style = style
         self.label = label
+        self.info = info
+    }
+
+    init(
+        entries: Entries,
+        layout: LabeledTextEditorLayout = .field,
+        style: LabeledTextEditorStyle = .regular,
+        @ViewBuilder label: @escaping () -> Label
+    ) where Info == EmptyView {
+        self.init(
+            entries: entries,
+            layout: layout,
+            style: style,
+            label: label
+        ) {
+            EmptyView()
+        }
     }
 
     init(
         _ key: LocalizedStringKey,
-        entries: Entries
+        entries: Entries,
+        layout: LabeledTextEditorLayout = .field,
+        style: LabeledTextEditorStyle = .regular,
+        @ViewBuilder info: @escaping () -> Info
     ) where Label == Text {
-        self.init(entries: entries) {
+        self.init(entries: entries, layout: layout, style: style) {
             Text(key)
+        } info: {
+            info()
+        }
+    }
+
+    init(
+        _ key: LocalizedStringKey,
+        entries: Entries,
+        layout: LabeledTextEditorLayout = .field,
+        style: LabeledTextEditorStyle = .regular
+    ) where Label == Text, Info == EmptyView {
+        self.init(key, entries: entries, layout: layout, style: style) {
+            EmptyView()
         }
     }
 
     var body: some View {
-        HStack {
-            let isModified = entries.isModified
-            let binding: Binding<String> = Binding {
-                entries.projectedUnwrappedValue()?.wrappedValue ?? ""
-            } set: { newValue in
-                entries.setAll(newValue)
-            }
+        let isModified = entries.isModified
+        let binding: Binding<String> = Binding {
+            entries.projectedUnwrappedValue()?.wrappedValue.stringRepresentation ?? ""
+        } set: { newValue in
+            entries.setAll { V.wrappingUpdate($0, with: newValue) }
+        }
 
-            label()
+        Group {
+            switch layout {
+            case .field:
+                HStack {
+                    HStack {
+                        label()
 
-            Spacer()
+                        Spacer()
 
-            if !isEmpty {
-                Text("\(binding.wrappedValue.count) words")
-                    .foregroundStyle(.placeholder)
-            }
-
-            AliveButton {
-                isPresented.toggle()
-            } label: {
-                Image(systemSymbol: .textRedaction)
-                    .foregroundStyle(.tint)
-                    .tint(isModified ? .accent : .secondary)
-            }
-            .popover(isPresented: $isPresented, arrowEdge: .trailing) {
-                ZStack(alignment: .topTrailing) {
-                    LuminareTextEditor(text: binding)
-                        .opacity(0.9)
-                        .frame(width: 300, height: 450)
-                        .luminareBordered(false)
-                        .luminareHasBackground(false)
-
-                    if isEditorHovering {
-                        HStack(spacing: 2) {
-                            AliveButton {
-                                entries.restoreAll()
-                            } label: {
-                                Image(systemSymbol: .arrowUturnLeft)
-                            }
-                            .disabled(!entries.isModified)
-
-                            AliveButton {
-                                entries.setAll("")
-                            } label: {
-                                Image(systemSymbol: .trash)
-                            }
-                            .disabled(isEmpty)
+                        if !isEmpty {
+                            Text("\(binding.wrappedValue.count) words")
+                                .foregroundStyle(.placeholder)
                         }
-                        .foregroundStyle(.red)
-                        .bold()
-                        .shadow(color: .red, radius: 12)
-                        .padding(8)
-                        .background {
-                            Rectangle()
-                                .fill(.ultraThinMaterial)
+                    }
+                    .modifier(LuminareHoverable())
+                    .luminareAspectRatio(contentMode: .fill)
+                    .overlay {
+                        Group {
+                            if entries.isModified {
+                                UnevenRoundedRectangle(cornerRadii: cornerRadii)
+                                    .stroke(.primary)
+                                    .fill(.quinary.opacity(0.5))
+                                    .foregroundStyle(.tint)
+                            }
                         }
-                        .clipShape(.capsule)
-                        .padding(14)
+                        .allowsHitTesting(false)
+                    }
+
+                    AliveButton {
+                        isPresented.toggle()
+                    } label: {
+                        Image(systemSymbol: .textRedaction)
+                            .foregroundStyle(.tint)
+                            .tint(isModified ? .accent : .secondary)
                     }
                 }
-                .onHover { hover in
-                    withAnimation(animationFast) {
-                        isEditorHovering = hover
+            case .button:
+                Button {
+                    isPresented.toggle()
+                } label: {
+                    label()
+                }
+            }
+        }
+        .onAppear {
+            textInput.updateCheckpoint(for: entries)
+        }
+        .onChange(of: isPresented, initial: true) { _, newValue in
+            if newValue {
+                textInput.updateCheckpoint(for: entries)
+            } else {
+                textInput.registerUndoFromCheckpoint(for: entries, in: undoManager)
+            }
+        }
+        .onChange(of: entries.projectedValue?.wrappedValue) { oldValue, _ in
+            guard !isPresented else { return }
+            textInput.registerUndo(oldValue, for: entries, in: undoManager)
+        }
+        .sheet(isPresented: $isPresented) {
+            Group {
+                switch style {
+                case .regular:
+                    regularEditor(binding: binding)
+                case let .code(language):
+                    codeEditor(binding: binding, language: language)
+                }
+            }
+            .frame(minWidth: 640, minHeight: 520)
+            .onHover { hover in
+                withAnimation(animationFast) {
+                    isEditorHovering = hover
+
+                    if hover {
+                        isControlsHidden = false
                     }
                 }
             }
         }
-        .modifier(LuminareHoverable())
-        .luminareAspectRatio(contentMode: .fill)
     }
 
     private var isEmpty: Bool {
-        if let value = entries.projectedUnwrappedValue()?.wrappedValue {
-            value.isEmpty
+        if let binding = entries.projectedValue {
+            textInput.isEmpty(value: binding.wrappedValue)
         } else {
             true
         }
+    }
+
+    @ViewBuilder private func regularEditor(binding: Binding<String>) -> some View {
+        ZStack(alignment: .topTrailing) {
+            LuminareTextEditor(text: binding)
+                .luminareBordered(false)
+                .luminareHasBackground(false)
+
+            if isEditorHovering, !isControlsHidden {
+                controls()
+                    .padding(14)
+            }
+        }
+    }
+
+    @ViewBuilder private func codeEditor(binding: Binding<String>, language: CodeLanguage) -> some View {
+        ZStack(alignment: .bottomTrailing) {
+            CodeEditSourceEditor(
+                binding, language: language,
+                theme: colorScheme == .dark ? .defaultDark : .defaultLight,
+                font: .monospacedSystemFont(ofSize: 14, weight: .regular), tabWidth: 4, lineHeight: 1.172,
+                wrapLines: true, cursorPositions: $cursurPositions
+            )
+            .id(editorID)
+
+            if isEditorHovering, !isControlsHidden {
+                controls()
+                    .padding(14)
+            }
+        }
+    }
+
+    @ViewBuilder private func controls() -> some View {
+        HStack(spacing: 2) {
+            if Info.self != EmptyView.self {
+                info()
+
+                Spacer()
+                    .frame(width: 8)
+            }
+
+            AliveButton {
+                entries.restoreAll()
+                editorID = .init()
+            } label: {
+                Image(systemSymbol: .arrowUturnLeft)
+            }
+            .foregroundStyle(.red)
+            .disabled(!entries.isModified)
+
+            AliveButton {
+                entries.setAll { V.wrappingUpdate($0, with: "") }
+                editorID = .init()
+            } label: {
+                Image(systemSymbol: .trash)
+            }
+            .foregroundStyle(.red)
+            .disabled(isEmpty)
+
+            Spacer()
+                .frame(width: 8)
+
+            AliveButton {
+                isPresented = false
+            } label: {
+                Image(systemSymbol: .xmark)
+            }
+
+            AliveButton {
+                withAnimation(animationFast) {
+                    isControlsHidden = true
+                }
+            } label: {
+                Image(systemSymbol: .chevronRight)
+            }
+        }
+        .bold()
+        .padding(8)
+        .background {
+            Rectangle()
+                .fill(.ultraThinMaterial)
+        }
+        .clipShape(.capsule)
+        .shadow(color: .black.opacity(0.25), radius: 32)
     }
 }

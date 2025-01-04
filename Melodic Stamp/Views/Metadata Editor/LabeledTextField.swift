@@ -25,9 +25,9 @@ struct LabeledTextField<F, Label>: View where F: ParseableFormatStyle, F.FormatO
     private let showsLabel: Bool
     @ViewBuilder private var label: () -> Label
 
+    @State private var textInput: TextInputModel<F.FormatInput> = .init()
+
     @State private var isLabelHovering: Bool = false
-    @State private var checkpoint: Checkpoint<F.FormatInput?> = .invalid
-    @State private var undoTargetCheckpoint: Checkpoint<F.FormatInput?> = .invalid
 
     init(
         _ placeholder: LocalizedStringKey,
@@ -93,10 +93,14 @@ struct LabeledTextField<F, Label>: View where F: ParseableFormatStyle, F.FormatO
     }
 
     private var isActive: Bool {
+        !isEmpty
+    }
+
+    private var isEmpty: Bool {
         if let binding = entries.projectedValue {
-            !isEmpty(value: binding.wrappedValue)
+            textInput.isEmpty(value: binding.wrappedValue)
         } else {
-            false
+            true
         }
     }
 
@@ -109,21 +113,21 @@ struct LabeledTextField<F, Label>: View where F: ParseableFormatStyle, F.FormatO
         .focused($isFocused)
         .onAppear {
             isFocused = false
-            updateCheckpoint()
+            textInput.updateCheckpoint(for: entries)
         }
         .onSubmit {
             isFocused = false
         }
         .onChange(of: isFocused, initial: true) { _, newValue in
             if newValue {
-                updateCheckpoint()
+                textInput.updateCheckpoint(for: entries)
             } else {
-                registerUndoFromCheckpoint()
+                textInput.registerUndoFromCheckpoint(for: entries, in: undoManager)
             }
         }
         .onChange(of: entries.projectedValue?.wrappedValue) { oldValue, _ in
             guard !isFocused else { return }
-            registerUndo(oldValue, for: entries)
+            textInput.registerUndo(oldValue, for: entries, in: undoManager)
         }
         .overlay {
             Group {
@@ -199,52 +203,5 @@ struct LabeledTextField<F, Label>: View where F: ParseableFormatStyle, F.FormatO
         .foregroundStyle(.secondary)
         .buttonStyle(.luminareCompact)
         .luminareAspectRatio(contentMode: .fill)
-    }
-
-    private func isEmpty(value: F.FormatInput?) -> Bool {
-        guard let value else { return true }
-        return if let value = value as? String {
-            // Empty strings are empty too, as placeholders will display
-            value.isEmpty
-        } else {
-            false
-        }
-    }
-
-    private func areIdentical(_ oldValue: F.FormatInput?, _ newValue: F.FormatInput?) -> Bool {
-        oldValue == newValue || (isEmpty(value: oldValue) && isEmpty(value: newValue))
-    }
-
-    private func updateCheckpoint() {
-        checkpoint.set(entries.projectedUnwrappedValue()?.wrappedValue)
-    }
-
-    private func registerUndoFromCheckpoint() {
-        switch checkpoint {
-        case .invalid:
-            break
-        case let .valid(value):
-            registerUndo(value, for: entries)
-        }
-    }
-
-    private func registerUndo(_ oldValue: F.FormatInput?, for entries: Entries) {
-        let value = entries.projectedUnwrappedValue()?.wrappedValue
-        guard !areIdentical(oldValue, value) else { return }
-
-        switch undoTargetCheckpoint {
-        case .invalid:
-            break
-        case let .valid(value):
-            guard !areIdentical(oldValue, value) else { return }
-        }
-        undoTargetCheckpoint.set(oldValue)
-
-        undoManager?.registerUndo(withTarget: entries) { entries in
-            let fallback = entries.projectedUnwrappedValue()?.wrappedValue
-            entries.setAll(oldValue)
-
-            registerUndo(fallback, for: entries)
-        }
     }
 }

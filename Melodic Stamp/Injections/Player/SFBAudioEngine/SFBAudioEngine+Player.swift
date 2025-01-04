@@ -99,7 +99,7 @@ class SFBAudioEnginePlayer: NSObject, Player {
     }
 
     func withEngine(_ block: @escaping (AVAudioEngine) -> ()) {
-        player.withEngine { [weak self] engine in
+        player.withEngine { engine in
             block(engine)
         }
     }

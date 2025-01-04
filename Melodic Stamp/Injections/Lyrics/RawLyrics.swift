@@ -13,3 +13,15 @@ struct RawLyrics: Hashable, Equatable, Identifiable {
 
     var id: URL { url }
 }
+
+extension RawLyrics: StringRepresentable {
+    var stringRepresentation: String { content ?? "" }
+
+    static func wrappingUpdate(_ value: RawLyrics?, with stringRepresentation: String) -> RawLyrics? {
+        if let value {
+            .init(url: value.url, content: stringRepresentation)
+        } else {
+            nil
+        }
+    }
+}
