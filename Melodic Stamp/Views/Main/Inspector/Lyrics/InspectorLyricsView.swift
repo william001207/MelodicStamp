@@ -12,6 +12,8 @@ struct InspectorLyricsView: View {
     @Environment(MetadataEditorModel.self) private var metadataEditor
     @Environment(LyricsModel.self) private var lyrics
 
+    @Environment(\.appearsActive) private var appearsActive
+
     @State private var playbackTime: PlaybackTime?
 
     var body: some View {
@@ -19,11 +21,11 @@ struct InspectorLyricsView: View {
         let lines = lyrics.lines
 
         Group {
-            switch entries.type {
-            case .none, .varied:
-                ExcerptView(tab: SidebarInspectorTab.lyrics)
-            case .identical:
-                ScrollViewReader { _ in
+            if appearsActive {
+                switch entries.type {
+                case .none, .varied:
+                    ExcerptView(tab: SidebarInspectorTab.lyrics)
+                case .identical:
                     ScrollView {
                         // Don't apply `.contentMargins()`, otherwise causing `LazyVStack` related glitches
                         LazyVStack(alignment: alignment, spacing: 10) {
@@ -44,6 +46,8 @@ struct InspectorLyricsView: View {
                     .contentMargins(.top, 64, for: .scrollIndicators)
                     .contentMargins(.bottom, 94, for: .scrollIndicators)
                 }
+            } else {
+                ExcerptView(tab: SidebarInspectorTab.lyrics)
             }
         }
         .onChange(of: entries, initial: true) { _, _ in

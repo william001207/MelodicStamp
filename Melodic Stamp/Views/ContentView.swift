@@ -10,7 +10,7 @@ import SFBAudioEngine
 import SwiftUI
 
 struct ContentView: View {
-    @Environment(\.appearsActive) private var isActive
+    @Environment(\.appearsActive) private var appearsActive
     @Environment(\.resetFocus) private var resetFocus
 
     @FocusState private var isFocused
@@ -51,7 +51,7 @@ struct ContentView: View {
             isFocused = true
             resetFocus(in: namespace)
         }
-        .onChange(of: isActive, initial: true) { _, newValue in
+        .onChange(of: appearsActive, initial: true) { _, newValue in
             switch windowManager.style {
             case .main:
                 if newValue {
@@ -153,7 +153,7 @@ struct ContentView: View {
         }
         .frame(minHeight: 600)
         .ignoresSafeArea()
-        .onChange(of: isActive, initial: true) { _, _ in
+        .onChange(of: appearsActive, initial: true) { _, _ in
             DispatchQueue.main.async {
                 NSApp.mainWindow?.titlebarAppearsTransparent = true
                 NSApp.mainWindow?.titleVisibility = .visible
@@ -174,7 +174,7 @@ struct ContentView: View {
             .ignoresSafeArea()
             .frame(minWidth: 500, idealWidth: 500)
             .fixedSize(horizontal: false, vertical: true)
-            .onChange(of: isActive, initial: true) { _, _ in
+            .onChange(of: appearsActive, initial: true) { _, _ in
                 DispatchQueue.main.async {
                     NSApp.mainWindow?.titlebarAppearsTransparent = true
                     NSApp.mainWindow?.titleVisibility = .hidden
