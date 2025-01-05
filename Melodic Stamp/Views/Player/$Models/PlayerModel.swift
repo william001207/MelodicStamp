@@ -21,8 +21,8 @@ import SwiftUI
 
     private var player: any Player
 
-    private var devices: [AudioDevice] = []
-    private var selectedDevice: AudioDevice?
+    private(set) var outputDevices: [AudioDevice] = []
+    private(set) var selectedOutputDevice: AudioDevice?
 
     // MARK: Publishers
 
@@ -188,10 +188,9 @@ import SwiftUI
         super.init()
 
         self.player.delegate = self
-
-//        player.delegate = self
         setupRemoteTransportControls()
         setupEngine()
+        updateOutputDevices()
 
         timer
             .receive(on: DispatchQueue.main)
@@ -214,8 +213,6 @@ import SwiftUI
                 }
             }
             .store(in: &cancellables)
-
-        //        updateDeviceMenu()
     }
 }
 
@@ -372,18 +369,20 @@ extension PlayerModel {
 
     func updateOutputDevices() {
         do {
-            devices = try player.availableOutputDevices()
-            selectedDevice = try player.selectedOutputDevice()
+            outputDevices = try player.availableOutputDevices()
+            selectedOutputDevice = try player.selectedOutputDevice()
 
-            if let selectedDevice {
-                try selectOutputDevice(selectedDevice)
+            if let selectedOutputDevice {
+                selectOutputDevice(selectedOutputDevice)
             }
         } catch {}
     }
 
-    func selectOutputDevice(_ device: AudioDevice) throws {
-        try player.selectOutputDevice(device)
-        selectedDevice = device
+    func selectOutputDevice(_ device: AudioDevice) {
+        do {
+            try player.selectOutputDevice(device)
+            selectedOutputDevice = device
+        } catch {}
     }
 }
 

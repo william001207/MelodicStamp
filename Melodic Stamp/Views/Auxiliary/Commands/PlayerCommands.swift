@@ -200,6 +200,16 @@ struct PlayerCommands: Commands {
                 }
             }
             .disabled(!hasPlayer || !hasPlayerKeyboardControl)
+
+            if let player, !player.outputDevices.isEmpty {
+                let outputDeviceName = try? player.selectedOutputDevice?.name ?? ""
+
+                OutputDeviceMenu {
+                    Text("Output Device")
+                }
+                .badge(outputDeviceName)
+                .environment(player) // Important!
+            }
         }
     }
 }

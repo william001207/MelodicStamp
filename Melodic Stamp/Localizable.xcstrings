@@ -53,6 +53,12 @@
         }
       }
     },
+    "Aggregate" : {
+
+    },
+    "AirPlay" : {
+
+    },
     "Album" : {
       "localizations" : {
         "zh-Hans" : {
@@ -171,6 +177,9 @@
         }
       }
     },
+    "AVB" : {
+
+    },
     "Back Cover" : {
       "localizations" : {
         "zh-Hans" : {
@@ -211,7 +220,16 @@
         }
       }
     },
+    "Bluetooth" : {
+
+    },
+    "Bluetooth LE" : {
+
+    },
     "BPM" : {
+
+    },
+    "Built-in" : {
 
     },
     "Catalog Number" : {
@@ -300,6 +318,12 @@
         }
       }
     },
+    "Continuity Capture (Wired)" : {
+
+    },
+    "Continuity Capture (Wireless)" : {
+
+    },
     "Copyright" : {
       "localizations" : {
         "zh-Hans" : {
@@ -331,6 +355,9 @@
       }
     },
     "Dismiss" : {
+
+    },
+    "DisplayPort" : {
 
     },
     "During Performance" : {
@@ -386,6 +413,9 @@
         }
       }
     },
+    "FireWire" : {
+
+    },
     "Forming New Playlist" : {
       "localizations" : {
         "zh-Hans" : {
@@ -435,6 +465,9 @@
           }
         }
       }
+    },
+    "HDMI" : {
+
     },
     "Hello, World!" : {
 
@@ -744,6 +777,9 @@
         }
       }
     },
+    "Output Device" : {
+
+    },
     "Parse Lyrics" : {
 
     },
@@ -759,6 +795,9 @@
           }
         }
       }
+    },
+    "PCI" : {
+
     },
     "Pictures" : {
       "localizations" : {
@@ -1070,6 +1109,9 @@
         }
       }
     },
+    "Thunderbolt" : {
+
+    },
     "Title" : {
       "localizations" : {
         "zh-Hans" : {
@@ -1130,6 +1172,15 @@
         }
       }
     },
+    "Unknown" : {
+
+    },
+    "Unknown Device" : {
+
+    },
+    "USB" : {
+
+    },
     "Version" : {
       "localizations" : {
         "zh-Hans" : {
@@ -1139,6 +1190,9 @@
           }
         }
       }
+    },
+    "Virtual" : {
+
     },
     "You can use [AMLL TTML Tool](https://steve-xmh.github.io/amll-ttml-tool) to create TTML lyrics through a refined interface." : {
 
