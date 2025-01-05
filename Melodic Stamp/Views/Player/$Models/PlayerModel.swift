@@ -230,6 +230,10 @@ extension PlayerModel {
         }
     }
 
+    func stop() {
+        player.stop()
+    }
+
     func play(item: PlayableItem) {
         addToPlaylist(urls: [item.url])
 

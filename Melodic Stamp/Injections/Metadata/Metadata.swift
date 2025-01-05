@@ -45,7 +45,9 @@ import SwiftUI
 
     private(set) var properties: AudioProperties!
     private(set) var state: State
+
     private(set) var thumbnail: NSImage?
+    private(set) var menuThumbnail: NSImage?
 
     var attachedPictures: Entry<Set<AttachedPicture>>!
 
@@ -390,6 +392,7 @@ extension Metadata {
 
         if let image = ThumbnailMaker.getCover(from: attachedPictures.current)?.image {
             thumbnail = await ThumbnailMaker.make(image)
+            menuThumbnail = await ThumbnailMaker.make(image, resolution: 20)
         }
     }
 

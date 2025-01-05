@@ -5,6 +5,8 @@
 //  Created by KrLite on 2024/11/20.
 //
 
+import CAAudioHardware
+import Luminare
 import SFSafeSymbols
 import SwiftUI
 
@@ -36,6 +38,7 @@ struct MiniPlayerView: View {
     @FocusState private var isFocused: Bool
 
     @Environment(WindowManagerModel.self) private var windowManager
+    @Environment(FileManagerModel.self) private var fileManager
     @Environment(PlayerModel.self) private var player
     @Environment(PlayerKeyboardControlModel.self) private var playerKeyboardControl
 
@@ -55,8 +58,6 @@ struct MiniPlayerView: View {
     @State private var shouldUseRemainingDuration: Bool = true
 
     @State private var playbackTime: PlaybackTime?
-
-    @State private var isPlaylistPresented: Bool = false
 
     var body: some View {
         VStack(spacing: 12) {
@@ -192,6 +193,27 @@ struct MiniPlayerView: View {
 
     @ViewBuilder private func header() -> some View {
         HStack(alignment: .center, spacing: 12) {
+            if isTitleHovering {
+                // Playlist
+                Menu {
+                    Button("Open in Playlist") {
+                        fileManager.emitOpen(style: .inCurrentPlaylist)
+                    }
+
+                    Button("Add to Playlist") {
+                        fileManager.emitAdd(style: .toCurrentPlaylist)
+                    }
+
+                    Divider()
+
+                    playlistMenu()
+                } label: {
+                    Image(systemSymbol: .listTriangle)
+                }
+                .buttonStyle(.borderless)
+                .tint(.secondary)
+            }
+
             // Playback mode
             AliveButton(
                 enabledStyle: .tertiary, hoveringStyle: .secondary
@@ -353,6 +375,22 @@ struct MiniPlayerView: View {
                 Spacer()
                     .frame(width: 0)
             } else {
+                // Output device
+                if let outputDevice = player.selectedOutputDevice {
+                    let binding: Binding<AudioDevice> = Binding {
+                        outputDevice
+                    } set: { newValue in
+                        player.selectOutputDevice(newValue)
+                    }
+
+                    Picker("", selection: binding) {
+                        OutputDeviceList(devices: player.outputDevices)
+                    }
+                    .labelsHidden()
+                    .buttonStyle(.borderless)
+                    .tint(.secondary)
+                }
+
                 // Regain progress control
                 AliveButton {
                     activeControl = .progress
@@ -384,20 +422,6 @@ struct MiniPlayerView: View {
             .matchedGeometryEffect(
                 id: PlayerNamespace.volumeButton, in: namespace
             )
-
-            // Playlist
-            AliveButton(enabledStyle: .secondary) {
-                isPlaylistPresented.toggle()
-            } label: {
-                Image(systemSymbol: .listTriangle)
-            }
-            .matchedGeometryEffect(
-                id: PlayerNamespace.playlistButton, in: namespace
-            )
-            .popover(isPresented: $isPlaylistPresented, arrowEdge: .bottom) {
-                Text("Playlist")
-                    .padding()
-            }
         }
     }
 
@@ -509,6 +533,48 @@ struct MiniPlayerView: View {
             guard !hover else { return }
 
             isProgressBarHovering = false
+        }
+    }
+
+    @ViewBuilder private func playlistMenu() -> some View {
+        let selection: Binding<PlayableItem?> = Binding {
+            player.current
+        } set: { newValue in
+            if let newValue {
+                player.play(item: newValue)
+            } else {
+                player.stop()
+            }
+        }
+
+        Menu {
+            ForEach(player.playlist) { item in
+                let binding: Binding<Bool> = Binding {
+                    selection.wrappedValue == item
+                } set: { newValue in
+                    guard newValue else { return }
+                    selection.wrappedValue = item
+                }
+
+                Toggle(isOn: binding) {
+                    if let thumbnail = item.metadata.menuThumbnail {
+                        Image(nsImage: thumbnail)
+                    }
+
+                    let title = MusicTitle.stringifiedTitle(mode: .title, for: item)
+                    Text(title)
+
+                    let subtitle = MusicTitle.stringifiedTitle(mode: .artists, for: item)
+                    Text(subtitle)
+                }
+            }
+        } label: {
+            if let current = selection.wrappedValue {
+                let title = MusicTitle.stringifiedTitle(for: current)
+                Text("Playing \(title)")
+            } else {
+                Text("Playlist")
+            }
         }
     }
 }

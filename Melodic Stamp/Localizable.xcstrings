@@ -56,6 +56,16 @@
         }
       }
     },
+    "Add to Playlist" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "添加文件"
+          }
+        }
+      }
+    },
     "Advanced" : {
       "localizations" : {
         "zh-Hans" : {
@@ -857,6 +867,16 @@
         }
       }
     },
+    "Open in Playlist" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "打开文件"
+          }
+        }
+      }
+    },
     "Other" : {
       "localizations" : {
         "zh-Hans" : {
@@ -962,6 +982,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "播放器"
+          }
+        }
+      }
+    },
+    "Playing %@" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "正在播放《%@》"
           }
         }
       }
@@ -1187,7 +1217,14 @@
       }
     },
     "Settings…" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "设置…"
+          }
+        }
+      }
     },
     "Shuffle" : {
       "localizations" : {

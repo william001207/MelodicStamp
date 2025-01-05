@@ -5,6 +5,8 @@
 //  Created by KrLite on 2024/11/22.
 //
 
+import CAAudioHardware
+import Luminare
 import SFSafeSymbols
 import SwiftUI
 
@@ -114,6 +116,22 @@ struct PlayerView: View {
             .padding(.bottom, 2)
 
             Spacer()
+
+            // Output device
+            if let outputDevice = player.selectedOutputDevice {
+                let binding: Binding<AudioDevice> = Binding {
+                    outputDevice
+                } set: { newValue in
+                    player.selectOutputDevice(newValue)
+                }
+
+                Picker("", selection: binding) {
+                    OutputDeviceList(devices: player.outputDevices)
+                }
+                .labelsHidden()
+                .buttonStyle(.borderless)
+                .tint(.secondary)
+            }
 
             // Expand / shrink
             AliveButton(

@@ -35,6 +35,5 @@ class TitledWindowHostingController<Content: View>: NSHostingController<Content>
         window.toolbarStyle = .unified
         window.titlebarAppearsTransparent = false
         window.titlebarSeparatorStyle = .automatic
-        window.makeKeyAndOrderFront(true)
     }
 }

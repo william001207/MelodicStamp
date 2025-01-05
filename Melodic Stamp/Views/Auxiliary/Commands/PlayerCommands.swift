@@ -5,6 +5,7 @@
 //  Created by KrLite on 2024/12/8.
 //
 
+import CAAudioHardware
 import SwiftUI
 
 struct PlayerCommands: Commands {
@@ -201,14 +202,18 @@ struct PlayerCommands: Commands {
             }
             .disabled(!hasPlayer || !hasPlayerKeyboardControl)
 
-            if let player, !player.outputDevices.isEmpty {
-                let outputDeviceName = try? player.selectedOutputDevice?.name ?? ""
+            if let player, let outputDevice = player.selectedOutputDevice {
+                let binding: Binding<AudioDevice> = Binding {
+                    outputDevice
+                } set: { newValue in
+                    player.selectOutputDevice(newValue)
+                }
+                let outputDeviceName = try? outputDevice.name
 
-                OutputDeviceMenu {
-                    Text("Output Device")
+                Picker("Output Device", selection: binding) {
+                    OutputDeviceList(devices: player.outputDevices)
                 }
                 .badge(outputDeviceName)
-                .environment(player) // Important!
             }
         }
     }
