@@ -20,7 +20,8 @@ struct InspectorLyricsView: View {
         // Avoid multiple instantializations
         let lines = lyrics.lines
 
-        Group {
+        // Use ZStack to avoid reinstantializing toolbar content
+        ZStack {
             if appearsActive {
                 switch entries.type {
                 case .none, .varied:

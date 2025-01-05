@@ -37,7 +37,7 @@ struct PlaylistView: View {
                             .contextMenu {
                                 contextMenu(for: item)
                             }
-                            .redacted(reason: item.metadata.state.redactionReasons)
+                            .redacted(reason: item.metadata.state.isLoaded ? [] : .placeholder)
                     }
                     .onMove { indices, destination in
                         withAnimation {

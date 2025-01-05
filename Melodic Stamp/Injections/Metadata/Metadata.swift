@@ -38,15 +38,6 @@ import SwiftUI
                 true
             }
         }
-
-        var redactionReasons: RedactionReasons {
-            switch self {
-            case .loading:
-                .placeholder
-            default:
-                []
-            }
-        }
     }
 
     var id: URL { url }

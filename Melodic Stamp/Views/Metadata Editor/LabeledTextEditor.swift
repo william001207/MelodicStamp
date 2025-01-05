@@ -174,7 +174,8 @@ struct LabeledTextEditor<Label, Info, V>: View where Label: View, Info: View, V:
                     regularEditor(binding: binding)
                 }
             }
-            .frame(minWidth: 575, minHeight: 675)
+            .presentationSizing(.fitted)
+            .frame(minWidth: 725, minHeight: 500, maxHeight: 1200)
             .onHover { hover in
                 withAnimation(animationFast) {
                     isEditorHovering = hover

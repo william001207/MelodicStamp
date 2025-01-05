@@ -44,7 +44,9 @@ struct PlayableItemView: View {
                     if isMetadataModified {
                         Circle()
                             .foregroundStyle(.tint)
+                            .tint(isSelected ? .primary : .accent)
                             .padding(2)
+                            .animation(nil, value: isSelected)
                     }
 
                     Text(item.url.lastPathComponent)
