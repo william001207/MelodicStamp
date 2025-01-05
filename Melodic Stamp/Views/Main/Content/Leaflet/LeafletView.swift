@@ -61,7 +61,7 @@ struct LeafletView: View {
                         AnimatedGrid(colors: dominantColors)
 
                         Color.black
-                            .opacity(0.35)
+                            .opacity(0.225)
                     }
                 } else {
                     ZStack {
@@ -174,7 +174,9 @@ struct LeafletView: View {
     private func extractDominantColors(from image: NSImage) async throws -> [Color] {
         let colors = try DominantColors.dominantColors(
             nsImage: image, quality: .fair,
-            algorithm: .CIEDE2000, maxCount: 3, options: [.excludeWhite], sorting: .lightness
+            algorithm: .CIEDE2000, maxCount: 7,
+            options: [.excludeBlack], sorting: .frequency,
+            deltaColors: 6
         )
         return colors.map(Color.init)
     }
