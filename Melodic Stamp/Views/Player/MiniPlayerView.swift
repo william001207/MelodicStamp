@@ -361,10 +361,6 @@ struct MiniPlayerView: View {
                 } label: {
                     Image(systemSymbol: .chevronLeft)
                 }
-
-                // Route picker
-                RoutePickerView()
-                    .frame(width: 16)
             }
         }
 

@@ -128,10 +128,6 @@ struct PlayerView: View {
             .matchedGeometryEffect(
                 id: PlayerNamespace.expandShrinkButton, in: namespace
             )
-
-            // Route picker
-            RoutePickerView()
-                .frame(width: 20)
         }
         .frame(height: 20)
     }

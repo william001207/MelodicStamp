@@ -57,8 +57,7 @@ struct ContentView: View {
                 if newValue {
                     initializeFloatingWindows()
                 } else {
-                    // This breaks route pickers
-                    // destroyFloatingWindows()
+                    destroyFloatingWindows()
                 }
             case .miniPlayer:
                 destroyFloatingWindows()
