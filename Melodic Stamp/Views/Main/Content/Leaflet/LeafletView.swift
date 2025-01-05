@@ -174,8 +174,8 @@ struct LeafletView: View {
                 }
             }
             .onChange(of: player.current) { _, newValue in
+                lyrics.clear(newValue?.url)
                 guard let newValue else { return }
-                lyrics.clear(newValue.url)
 
                 Task {
                     let raw = await newValue.metadata.poll(for: \.lyrics).current
