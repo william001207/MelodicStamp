@@ -53,11 +53,10 @@ struct MelodicStampApp: App {
         .windowResizability(.contentSize)
         .windowStyle(.hiddenTitleBar)
         .windowToolbarStyle(.unified)
-        
+
         Settings {
             SettingsView()
         }
-        .windowResizability(.contentSize)
     }
 }
 

@@ -87,7 +87,7 @@ struct MiniPlayerView: View {
         .focusable()
         .focusEffectDisabled()
         .focused($isFocused)
-        // Allow fully customization to corresponding window
+        // Allow fully customization to the corresponding window
         .background {
             AlwaysOnTopControllerRepresentable(
                 isAlwaysOnTop: $alwaysOnTop.isAlwaysOnTop, titleVisibility: $alwaysOnTop.titleVisibility
