@@ -10,7 +10,7 @@ import SwiftUI
 
 struct DisplayLyricsGroupCache {
     typealias Key = [AnyHashable]
-    typealias Value = [AnyHashable: [Text.Layout.RunSlice]]
+    typealias Value = [(AnyHashable, [Text.Layout.RunSlice])]
     typealias Identifier = AnyHashable
 
     static var shared = Self()
@@ -25,16 +25,16 @@ struct DisplayLyricsGroupCache {
     func get<Animated>(
         key: [Animated],
         identifiedBy identifier: Identifier
-    ) -> [Animated: [Text.Layout.RunSlice]]? where Animated: AnimatedString {
+    ) -> [(Animated, [Text.Layout.RunSlice])]? where Animated: AnimatedString {
         let hashableKey = key.map(\.self)
         guard let pair = cache.value(forKey: hashableKey) else { return nil }
 
         guard pair.identifier == identifier else { return nil }
-        return pair.value as? [Animated: [Text.Layout.RunSlice]]
+        return pair.value as? [(Animated, [Text.Layout.RunSlice])]
     }
 
     mutating func set<Animated>(
-        key: [Animated], value: [Animated: [Text.Layout.RunSlice]],
+        key: [Animated], value: [(Animated, [Text.Layout.RunSlice])],
         identifiedBy identifier: Identifier
     ) where Animated: AnimatedString {
         let hashableKey = key.map(\.self)
@@ -50,7 +50,7 @@ struct DisplayLyricsRenderer<Animated>: TextRenderer where Animated: AnimatedStr
 
     var elapsedTime: TimeInterval
     var strings: [Animated]
-    var vowels: Set<TimeInterval> = []
+    var vowelTimes: Set<TTMLVowelTime> = []
 
     var inactiveOpacity: Double = 0.55
     var blendRadius: Double = 20
@@ -58,25 +58,27 @@ struct DisplayLyricsRenderer<Animated>: TextRenderer where Animated: AnimatedStr
     var shadowColor: Color = .white.opacity(0.1)
     var shadowRadius: Double = 5
 
-    var glowColor: Color = .white.opacity(0.65)
-    var glowScale: Double = 1.1
-    var glowRadius: Double = 8.5
-    var glowDelay: TimeInterval = 0.2
+    var glowColor: Color = .white.opacity(0.85)
+    var glowRadius: Double = 5
+
+    var wave: Double = 1.025
+    var waveDelay: TimeInterval = 0.102
+    var waveActivationDelay: TimeInterval = 0.07
 
     var brightness: Double = 0.5
     var lift: Double = 1.25
     var softness: Double = 0.75
-    var highlightDuration: Double = 0.75
 
-    func timeToVowels(at time: TimeInterval) -> [TimeInterval] {
-        vowels
-            .map { time - $0 }
-            .map(abs)
+    func timeToVowels(at time: TimeInterval) -> [(mark: TimeInterval, time: TTMLVowelTime)] {
+        vowelTimes
+            .map { (time - $0.beginTime, $0) }
+            .map { (abs($0), $1) }
     }
 
-    func group(layout: Text.Layout) -> [Animated: [Text.Layout.RunSlice]] {
+    // Do not use [Animated: [Text.Layout.RunSlice]] as it does not preserve insertion order!!!
+    func group(layout: Text.Layout) -> [(Animated, [Text.Layout.RunSlice])] {
         let slices = Array(layout.flattenedRunSlices)
-        var result: [Animated: [Text.Layout.RunSlice]] = [:]
+        var result: [(Animated, [Text.Layout.RunSlice])] = []
         var index = 0
 
         for string in strings {
@@ -84,10 +86,7 @@ struct DisplayLyricsRenderer<Animated>: TextRenderer where Animated: AnimatedStr
             let endIndex = index + count
             guard endIndex <= slices.endIndex else { break }
 
-            result.updateValue(
-                Array(slices[index ..< endIndex]),
-                forKey: string
-            )
+            result.append((string, Array(slices[index ..< endIndex])))
             index = endIndex
         }
         return result
@@ -95,7 +94,7 @@ struct DisplayLyricsRenderer<Animated>: TextRenderer where Animated: AnimatedStr
 
     func draw(layout: Text.Layout, in context: inout GraphicsContext) {
         let identifier = layout.hashValue
-        var group: [Animated: [Text.Layout.RunSlice]] = [:]
+        var group: [(Animated, [Text.Layout.RunSlice])] = []
 
         if let cached = DisplayLyricsGroupCache.shared.get(key: strings, identifiedBy: identifier) {
             group = cached
@@ -104,7 +103,9 @@ struct DisplayLyricsRenderer<Animated>: TextRenderer where Animated: AnimatedStr
             DisplayLyricsGroupCache.shared.set(key: strings, value: group, identifiedBy: identifier)
         }
 
-        for (index, (lyric, slices)) in group.enumerated() {
+        var accumulatedIndex: Int = .zero
+
+        for (lyric, slices) in group {
             let totalWidth = slices.reduce(0) { $0 + $1.typographicBounds.width }
             var offset: Double = .zero
 
@@ -118,12 +119,13 @@ struct DisplayLyricsRenderer<Animated>: TextRenderer where Animated: AnimatedStr
                 let duration = endTime - beginTime
 
                 draw(
-                    slice: slice, index: index,
+                    slice: slice, index: accumulatedIndex,
                     beginTime: beginTime + duration * percentage,
                     endTime: beginTime + duration * (percentage + durationPercentage),
                     in: &context
                 )
                 offset += width
+                accumulatedIndex += 1
             }
         }
     }
@@ -133,7 +135,6 @@ struct DisplayLyricsRenderer<Animated>: TextRenderer where Animated: AnimatedStr
         beginTime: TimeInterval, endTime: TimeInterval,
         in context: inout GraphicsContext
     ) {
-        print(index, timeToVowels)
         let elapsed = elapsedTime - beginTime
         let duration = endTime - beginTime
 
@@ -146,14 +147,33 @@ struct DisplayLyricsRenderer<Animated>: TextRenderer where Animated: AnimatedStr
         let filledWidth = bounds.width * progress
         let liftAmount = lift * bentSigmoid(softenProgress)
 
-        let timeToVowels = timeToVowels(at: elapsedTime - Double(index) * glowDelay)
+        let waveDelay = waveDelay * Double(index) - waveActivationDelay
+        let timeToVowels = timeToVowels(at: elapsedTime - waveDelay)
 
         do {
-            // Wave effect
-            if let timeToNearestVowel = timeToVowels.min() {
+            var context = context
+
+            // Premultiplied wave & glow effect for long vowels
+            wave: do {
+                if let timeToNearestVowel = timeToVowels.sorted(by: { $0.mark < $1.mark }).first {
+                    let isInRange = timeToNearestVowel.time.contains(time: beginTime)
+                    guard isInRange else { break wave }
+
+                    let waveProgress = bellCurve(timeToNearestVowel.mark, standardDeviation: 0.65)
+                    guard waveProgress > 1e-6 else { break wave }
+
+                    // Scale
+                    let waveAmount = lerp(1, wave, factor: waveProgress)
+                    context.translateBy(x: bounds.width / 2, y: bounds.height / 2)
+                    context.scaleBy(x: waveAmount, y: waveAmount)
+                    context.translateBy(x: -bounds.width / 2, y: -bounds.height / 2)
+
+                    // Glow
+                    context.addFilter(.shadow(color: glowColor.opacity(waveProgress), radius: glowRadius * waveProgress))
+                }
             }
 
-            // Unfilled
+            // Unfilled text
             do {
                 var context = context
 
@@ -162,7 +182,7 @@ struct DisplayLyricsRenderer<Animated>: TextRenderer where Animated: AnimatedStr
                 context.draw(slice)
             }
 
-            // Filled
+            // Filled text
             do {
                 var context = context
                 let mask = Path(.init(
@@ -173,16 +193,8 @@ struct DisplayLyricsRenderer<Animated>: TextRenderer where Animated: AnimatedStr
                 ))
 
                 // Shadow
-                /*
-                 if let timeToNearestVowel = timeToVowels.min() {
-                     let dynamicGlowRadius = sin(progress * .pi) * 10.0
-                     context.addFilter(.shadow(color: glowColor, radius: dynamicGlowRadius))
-                 } else {
-
-                 }
-                 */
                 context.addFilter(.shadow(color: shadowColor, radius: shadowRadius))
-                
+
                 // Mask
                 context.clipToLayer { context in
                     context.fill(mask, with: .linearGradient(

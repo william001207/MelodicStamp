@@ -27,6 +27,8 @@ struct AnimatedGrid: View {
 
     private var randomizer: MeshRandomizer {
         .init(colorRandomizer: { color, _, x, y, gridWidth, gridHeight in
+            guard !simdColors.isEmpty else { return }
+
             let normalizedX = Float(x) / Float(gridWidth - 1)
             let normalizedY = Float(y) / Float(gridHeight - 1)
 

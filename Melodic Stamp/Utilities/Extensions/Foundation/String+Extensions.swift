@@ -10,11 +10,11 @@ import Foundation
 extension String {
     static let vowels: [Regex] = [
         // English
-        /[aeiou]+/,
-        /[aeou]+[hm]+/,
-        /hm*/,
+        /[aeiouAEIOU]+/,
+        /[aeouAEIOU]+[hmHM]+/,
+        /[hH][mM]*/,
         // Japanese
-        /[あえいおう]+/,
+//        /[あえいおう]+/,
         // Chinese
         /[啊呀哈嗯嘿噢哦嗷呼嘻呃呵]+/
     ]

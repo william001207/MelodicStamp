@@ -125,9 +125,13 @@ struct LeafletView: View {
     }
 
     @ViewBuilder private func coverView(_ cover: NSImage) -> some View {
-        @Bindable var player = player
-
-        AliveButton(isOn: hasLyrics ? $isShowingLyrics : $player.isPlaying) {
+        AliveButton {
+            if hasLyrics {
+                isShowingLyrics.toggle()
+            } else {
+                player.isPlaying.toggle()
+            }
+        } label: {
             MusicCover(
                 images: [cover], hasPlaceholder: true,
                 cornerRadius: 12

@@ -41,7 +41,7 @@ struct ComposedLyricLineView: View {
     @ViewBuilder private func ttmlLyricLine(line: TTMLLyricLine) -> some View {
         let lyricsRenderer = DisplayLyricsRenderer(
             elapsedTime: elapsedTime,
-            strings: line.lyrics.children, vowels: line.lyrics.vowels,
+            strings: line.lyrics.children, vowelTimes: line.lyrics.vowelTimes,
             inactiveOpacity: 0.25,
             brightness: 0,
             lift: 0

@@ -26,6 +26,7 @@ import SwiftSoup
     func clear(_ url: URL? = nil) {
         guard let url, !isIdentical(to: url) else {
             storage = nil
+            raw = nil
             type = nil
             return
         }
