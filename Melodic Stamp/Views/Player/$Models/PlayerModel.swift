@@ -21,13 +21,20 @@ import SwiftUI
 
     private var player: any Player
 
+    // Do not use computed variables for the sake of correctly updating view data
     private(set) var outputDevices: [AudioDevice] = []
-    private(set) var selectedOutputDevice: AudioDevice?
+    var selectedOutputDevice: AudioDevice? {
+        didSet {
+            guard let selectedOutputDevice else { return }
+            selectOutputDevice(selectedOutputDevice)
+        }
+    }
 
     // MARK: Publishers
 
     private var cancellables = Set<AnyCancellable>()
     private let timer = TimerPublisher(interval: 0.1)
+    private let looseTimer = TimerPublisher(interval: 25)
 
     private var playbackTimeSubject = PassthroughSubject<PlaybackTime?, Never>()
     private var isPlayingSubject = PassthroughSubject<Bool, Never>()
@@ -54,9 +61,7 @@ import SwiftUI
     var playbackLooping: Bool = false
 
     var playbackTime: PlaybackTime? { player.playbackTime }
-    var unwrappedPlaybackTime: PlaybackTime {
-        playbackTime ?? .init()
-    }
+    var unwrappedPlaybackTime: PlaybackTime { playbackTime ?? .init() }
 
     // MARK: FFT
 
@@ -210,6 +215,15 @@ import SwiftUI
 
                 isPlaying: do {
                     self.isPlayingSubject.send(self.isPlaying)
+                }
+            }
+            .store(in: &cancellables)
+
+        looseTimer
+            .receive(on: DispatchQueue.main)
+            .sink { _ in
+                update: do {
+                    self.updateOutputDevices()
                 }
             }
             .store(in: &cancellables)
@@ -371,21 +385,21 @@ extension PlayerModel {
         }
     }
 
-    func updateOutputDevices() {
-        do {
-            outputDevices = try player.availableOutputDevices()
-            selectedOutputDevice = try player.selectedOutputDevice()
-
-            if let selectedOutputDevice {
-                selectOutputDevice(selectedOutputDevice)
-            }
-        } catch {}
-    }
-
+    // No side effects
     func selectOutputDevice(_ device: AudioDevice) {
         do {
             try player.selectOutputDevice(device)
-            selectedOutputDevice = device
+        } catch {}
+    }
+
+    func updateOutputDevices() {
+        do {
+            outputDevices = try player.availableOutputDevices()
+            print("Updated output device, found \(outputDevices.count)")
+
+            let selectedOutputDevice = try player.selectedOutputDevice()
+            guard self.selectedOutputDevice != selectedOutputDevice else { return }
+            self.selectedOutputDevice = selectedOutputDevice
         } catch {}
     }
 }

@@ -202,18 +202,20 @@ struct PlayerCommands: Commands {
             }
             .disabled(!hasPlayer || !hasPlayerKeyboardControl)
 
-            if let player, let outputDevice = player.selectedOutputDevice {
-                let binding: Binding<AudioDevice> = Binding {
-                    outputDevice
-                } set: { newValue in
-                    player.selectOutputDevice(newValue)
-                }
-                let outputDeviceName = try? outputDevice.name
+            if let player {
+                @Bindable var player = player
 
-                Picker("Output Device", selection: binding) {
-                    OutputDeviceList(devices: player.outputDevices)
+                if let binding = ~$player.selectedOutputDevice {
+                    let outputDeviceName = try? binding.wrappedValue.name
+
+                    Picker("Output Device", selection: binding) {
+                        OutputDeviceList(devices: player.outputDevices)
+                            .onAppear {
+                                player.updateOutputDevices()
+                            }
+                    }
+                    .badge(outputDeviceName)
                 }
-                .badge(outputDeviceName)
             }
         }
     }

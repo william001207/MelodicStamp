@@ -67,6 +67,7 @@ struct ContentView: View {
             guard newValue else { return }
             isFocused = true
             resetFocus(in: namespace)
+            player.updateOutputDevices()
         }
         .onChange(of: windowManager.style, initial: true) { _, newValue in
             switch newValue {

@@ -366,6 +366,7 @@ struct MiniPlayerView: View {
     }
 
     @ViewBuilder private func trailingControls() -> some View {
+        @Bindable var player = player
         let isVolumeControlActive = activeControl == .volume
 
         if isVolumeControlActive {
@@ -375,15 +376,12 @@ struct MiniPlayerView: View {
                     .frame(width: 0)
             } else {
                 // Output device
-                if let outputDevice = player.selectedOutputDevice {
-                    let binding: Binding<AudioDevice> = Binding {
-                        outputDevice
-                    } set: { newValue in
-                        player.selectOutputDevice(newValue)
-                    }
-
+                if let binding = ~$player.selectedOutputDevice {
                     Picker("", selection: binding) {
                         OutputDeviceList(devices: player.outputDevices)
+                            .onAppear {
+                                player.updateOutputDevices()
+                            }
                     }
                     .labelsHidden()
                     .buttonStyle(.borderless)

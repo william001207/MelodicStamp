@@ -63,6 +63,8 @@ struct PlayerView: View {
     }
 
     @ViewBuilder private func header() -> some View {
+        @Bindable var player = player
+
         HStack(alignment: .center, spacing: 12) {
             // Expand / shrink
             AliveButton(
@@ -126,15 +128,12 @@ struct PlayerView: View {
             Spacer()
 
             // Output device
-            if let outputDevice = player.selectedOutputDevice {
-                let binding: Binding<AudioDevice> = Binding {
-                    outputDevice
-                } set: { newValue in
-                    player.selectOutputDevice(newValue)
-                }
-
+            if let binding = ~$player.selectedOutputDevice {
                 Picker("", selection: binding) {
                     OutputDeviceList(devices: player.outputDevices)
+                        .onAppear {
+                            player.updateOutputDevices()
+                        }
                 }
                 .labelsHidden()
                 .buttonStyle(.borderless)
