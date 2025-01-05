@@ -9,6 +9,8 @@ import Foundation
 import SFBAudioEngine
 
 class SFBAudioEnginePlayer: NSObject, Player {
+    typealias OutputDevice = AudioDevice
+    
     init(_ player: AudioPlayer = .init()) {
         self.player = player
         super.init()
@@ -102,6 +104,10 @@ class SFBAudioEnginePlayer: NSObject, Player {
         player.withEngine { engine in
             block(engine)
         }
+    }
+    
+    func availableDevices() throws -> [OutputDevice] {
+        <#code#>
     }
 }
 

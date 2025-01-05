@@ -41,7 +41,8 @@ protocol Player {
     func withEngine(_ block: @escaping (AVAudioEngine) -> ())
     
     func availableDevices() throws -> [OutputDevice]
-    func setDevice(_ device: OutputDevice) throws
+    func selectedDevice() throws -> OutputDevice?
+    func selectDevice(_ device: OutputDevice) throws
 }
 
 extension Player {
@@ -129,5 +130,8 @@ class BlankPlayer: Player {
     func availableDevices() throws -> [BlankDevice] {
         [.init()]
     }
-    func setDevice(_ device: BlankDevice) throws {}
+    func selectedDevice() throws -> BlankDevice? {
+        .init()
+    }
+    func selectDevice(_ device: BlankDevice) throws {}
 }

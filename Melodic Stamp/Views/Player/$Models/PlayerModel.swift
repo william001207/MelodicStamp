@@ -17,14 +17,12 @@ import SwiftUI
 // MARK: - Fields
 
 @Observable final class PlayerModel: NSObject {
-    typealias Player = MelodicStamp.Player
-
     // MARK: Player
 
-    private var player: Player
+    private var player: any Player
 
-    private var outputDevices: [AudioDevice] = []
-    private var selectedDevice: AudioDevice?
+    private var devices: [any Device] = []
+    private var selectedDevice: (any Device)?
 
     // MARK: Publishers
 
@@ -157,7 +155,7 @@ import SwiftUI
 
     var nextIndex: Int? {
         guard hasNextTrack else { return nil }
-
+        
         switch playbackMode {
         case .sequential:
             guard let currentIndex else { return nil }
@@ -185,7 +183,7 @@ import SwiftUI
         }
     }
 
-    init(_ player: Player) {
+    init(_ player: some Player) {
         self.player = player
         super.init()
 
@@ -372,29 +370,57 @@ extension PlayerModel {
         }
     }
     
-//        func updateDeviceMenu() {
-//            do {
-//                outputDevices = try AudioDevice.devices.filter { try $0.supportsOutput }
-//                if let uid = UserDefaults.standard.string(forKey: "deviceUID"),
-//                   let deviceID = try? AudioSystemObject.instance.deviceID(forUID: uid),
-//                   let device = outputDevices.first(where: { $0.objectID == deviceID }) {
-//                    selectedDevice = device
-//                    try? player.setOutputDeviceID(deviceID)
-//                } else {
-//                    selectedDevice = outputDevices.first
-//                    if let device = selectedDevice {
-//                        try? player.setOutputDeviceID(device.objectID)
-//                    }
-//                }
-//            } catch {}
-//        }
-//    
-//        func setOutputDevice(_ device: AudioDevice) {
-//            do {
-//                try player.setOutputDeviceID(device.objectID)
-//                selectedDevice = device
-//            } catch {}
-//        }
+    func updateDevices() {
+        do {
+            devices = try player.availableDevices()
+            selectedDevice = try player.selectedDevice()
+            
+            if let selectedDevice {
+                try selectDevice(selectedDevice)
+            }
+        } catch {
+            
+        }
+    }
+    
+    func selectDevice(_ device: some Device) throws {
+        try selectDevice(typeErasured: device, for: player)
+    }
+    
+    private func selectDevice<P>(_ device: P.OutputDevice, for player: P) throws where P: Player {
+        try player.selectDevice(device)
+    }
+    
+    private func selectDevice<D, P>(typeErasured device: D, for player: P) throws where D: Device, P: Player {
+        if D.self == P.OutputDevice.self {
+            let device = device as! P.OutputDevice
+            try selectDevice(device, for: player)
+        }
+    }
+    
+            func updateDeviceMenu() {
+                do {
+                    outputDevices = try AudioDevice.devices.filter { try $0.supportsOutput }
+                    if let uid = UserDefaults.standard.string(forKey: "deviceUID"),
+                       let deviceID = try? AudioSystemObject.instance.deviceID(forUID: uid),
+                       let device = outputDevices.first(where: { $0.objectID == deviceID }) {
+                        selectedDevice = device
+                        try? player.setOutputDeviceID(deviceID)
+                    } else {
+                        selectedDevice = outputDevices.first
+                        if let device = selectedDevice {
+                            try? player.setOutputDeviceID(device.objectID)
+                        }
+                    }
+                } catch {}
+            }
+    
+            func setOutputDevice(_ device: AudioDevice) {
+                do {
+                    try player.setOutputDeviceID(device.objectID)
+                    selectedDevice = device
+                } catch {}
+            }
 }
 
 extension PlayerModel: PlayerDelegate {
