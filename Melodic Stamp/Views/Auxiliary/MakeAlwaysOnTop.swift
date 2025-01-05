@@ -1,5 +1,5 @@
 //
-//  AlwaysOnTopControllerRepresentable.swift
+//  MakeAlwaysOnTop.swift
 //  MelodicStamp
 //
 //  Created by Xinshao_Air on 2025/1/2.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct AlwaysOnTopControllerRepresentable: NSViewControllerRepresentable {
+struct MakeAlwaysOnTop: NSViewControllerRepresentable {
     @Binding var isAlwaysOnTop: Bool
     @Binding var titleVisibility: NSWindow.TitleVisibility
 
@@ -41,27 +41,27 @@ class AlwaysOnTopHostingController<Content: View>: NSHostingController<Content> 
     override func viewWillLayout() {
         super.viewWillLayout()
 
-        if let window = view.window {
-            switch titleVisibility {
-            case .visible:
-                // Handled by SwiftUI
-                break
-            case .hidden:
-                window.titleVisibility = .hidden
-                window.titlebarAppearsTransparent = true
-                window.styleMask.insert(.fullSizeContentView)
-                window.titlebarSeparatorStyle = .none
-            @unknown default:
-                break
-            }
+        guard let window = view.window else { return }
 
-            window.level = isAlwaysOnTop ? .floating : .normal
+        switch titleVisibility {
+        case .visible:
+            // Handled by SwiftUI
+            break
+        case .hidden:
+            window.titleVisibility = .hidden
+            window.titlebarAppearsTransparent = true
+            window.styleMask.insert(.fullSizeContentView)
+            window.titlebarSeparatorStyle = .none
+        @unknown default:
+            break
+        }
 
-            if isAlwaysOnTop {
-                window.collectionBehavior.insert(.canJoinAllSpaces)
-            } else {
-                window.collectionBehavior.remove(.canJoinAllSpaces)
-            }
+        window.level = isAlwaysOnTop ? .floating : .normal
+
+        if isAlwaysOnTop {
+            window.collectionBehavior.insert(.canJoinAllSpaces)
+        } else {
+            window.collectionBehavior.remove(.canJoinAllSpaces)
         }
     }
 }

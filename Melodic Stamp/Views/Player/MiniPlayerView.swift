@@ -88,11 +88,9 @@ struct MiniPlayerView: View {
         .focusEffectDisabled()
         .focused($isFocused)
         // Allow fully customization to the corresponding window
-        .background {
-            AlwaysOnTopControllerRepresentable(
-                isAlwaysOnTop: $alwaysOnTop.isAlwaysOnTop, titleVisibility: $alwaysOnTop.titleVisibility
-            )
-        }
+        .background(MakeAlwaysOnTop(
+            isAlwaysOnTop: $alwaysOnTop.isAlwaysOnTop, titleVisibility: $alwaysOnTop.titleVisibility
+        ))
 
         // Read lyrics
         // Don't extract this logic or modify the tasks!

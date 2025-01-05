@@ -12,47 +12,35 @@ struct SettingsView: View {
     @State private var selectedTab: SettingsTab = .general
 
     var body: some View {
-        TabView(selection: $selectedTab) {
-            TabSection {
-                Tab(value: SettingsTab.general) {
-                    wrapped {
-                        SettingsGeneralPage()
+        NavigationSplitView {
+            List(selection: $selectedTab) {
+                ForEach(SettingsTab.allCases) { tab in
+                    NavigationLink(value: tab) {
+                        switch tab {
+                        case .general:
+                            Image(systemSymbol: .gear)
+                            Text("General")
+                        case .visualization:
+                            Image(systemSymbol: .waveform)
+                            Text("Visualization")
+                        }
                     }
-                } label: {
-                    Text("General")
-                    Image(systemSymbol: .gear)
-                }
-
-                Tab(value: SettingsTab.visualization) {
-                    wrapped {
-                        SettingsVisualizationPage()
-                    }
-                } label: {
-                    Text("Visualization")
-                    Image(systemSymbol: .waveform)
                 }
             }
-        }
-        // Like the System Settings
-        .frame(minWidth: 715, maxWidth: 715, minHeight: 470, maxHeight: .infinity)
-    }
-
-    @ViewBuilder private func wrapped(@ViewBuilder content: () -> some View) -> some View {
-        Form {
-            content()
-        }
-        .formStyle(.grouped)
-        .overlay(alignment: .top) {
-            VisualEffectView(material: .headerView, blendingMode: .withinWindow)
-                .overlay(alignment: .bottom) {
-                    VStack {
-                        Divider()
-                    }
+        } detail: {
+            Form {
+                switch selectedTab {
+                case .general:
+                    SettingsGeneralPage()
+                        .navigationTitle(Text("General"))
+                case .visualization:
+                    SettingsVisualizationPage()
+                        .navigationTitle(Text("Visualization"))
                 }
-                .frame(height: 92)
-                .ignoresSafeArea()
+            }
+            .formStyle(.grouped)
         }
-        .safeAreaPadding(.top, 48)
+        .background(MakeTitledWindow())
     }
 }
 
