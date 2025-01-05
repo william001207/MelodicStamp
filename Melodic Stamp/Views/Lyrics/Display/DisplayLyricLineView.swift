@@ -76,19 +76,17 @@ struct DisplayLyricLineView: View {
         VStack(spacing: 5) {
             Group {
                 Text(line.content)
-                    .font(.system(size: 30))
-                    .bold()
+                    .font(.title)
                     .opacity(isHighlighted ? 1.0 : 0.55)
 
                 if let translation = line.translation {
                     Text(translation)
-                        .font(.system(size: 20))
+                        .font(.title3)
                         .opacity(isHighlighted ? 0.75 : 0.55)
                 }
             }
             .multilineTextAlignment(.leading)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .font(.title)
             .bold()
         }
     }

@@ -32,7 +32,7 @@ struct TTMLDisplayLyricLineView: View {
             }
 
             // Shows background lyrics when necessary
-            if isActive, !line.backgroundLyrics.isEmpty {
+            if isHighlighted, !line.backgroundLyrics.isEmpty {
                 backgroundContent()
                     .frame(maxWidth: .infinity, alignment: alignment)
                     .transition(.blurReplace)

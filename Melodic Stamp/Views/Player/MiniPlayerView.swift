@@ -193,25 +193,21 @@ struct MiniPlayerView: View {
 
     @ViewBuilder private func header() -> some View {
         HStack(alignment: .center, spacing: 12) {
+            
+            // Expand / shrink
             if isTitleHovering {
-                // Playlist
-                Menu {
-                    Button("Open in Playlist") {
-                        fileManager.emitOpen(style: .inCurrentPlaylist)
-                    }
-
-                    Button("Add to Playlist") {
-                        fileManager.emitAdd(style: .toCurrentPlaylist)
-                    }
-
-                    Divider()
-
-                    playlistMenu()
+                AliveButton(
+                    enabledStyle: .tertiary, hoveringStyle: .secondary
+                ) {
+                    alwaysOnTop.giveUp()
+                    windowManager.style = .main
                 } label: {
-                    Image(systemSymbol: .listTriangle)
+                    Image(systemSymbol: .arrowDownLeftAndArrowUpRight)
                 }
-                .buttonStyle(.borderless)
-                .tint(.secondary)
+                .matchedGeometryEffect(
+                    id: PlayerNamespace.expandShrinkButton, in: namespace
+                )
+                .transition(.blurReplace)
             }
 
             // Playback mode
@@ -285,21 +281,26 @@ struct MiniPlayerView: View {
                 }
                 .transition(.blurReplace)
             }
-
-            // Expand / shrink
+            
             if isTitleHovering {
-                AliveButton(
-                    enabledStyle: .tertiary, hoveringStyle: .secondary
-                ) {
-                    alwaysOnTop.giveUp()
-                    windowManager.style = .main
+                // Playlist
+                Menu {
+                    Button("Open in Playlist") {
+                        fileManager.emitOpen(style: .inCurrentPlaylist)
+                    }
+
+                    Button("Add to Playlist") {
+                        fileManager.emitAdd(style: .toCurrentPlaylist)
+                    }
+
+                    Divider()
+
+                    playlistMenu()
                 } label: {
-                    Image(systemSymbol: .arrowUpLeftAndArrowDownRight)
+                    Image(systemSymbol: .listTriangle)
                 }
-                .matchedGeometryEffect(
-                    id: PlayerNamespace.expandShrinkButton, in: namespace
-                )
-                .transition(.blurReplace)
+                .buttonStyle(.borderless)
+                .tint(.secondary)
             }
         }
         .frame(height: 16)

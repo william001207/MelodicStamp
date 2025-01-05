@@ -64,6 +64,23 @@ struct PlayerView: View {
 
     @ViewBuilder private func header() -> some View {
         HStack(alignment: .center, spacing: 12) {
+            
+            // Expand / shrink
+            AliveButton(
+                enabledStyle: .tertiary, hoveringStyle: .secondary
+            ) {
+                windowManager.style = .miniPlayer
+            } label: {
+                Image(systemSymbol: .arrowUpRightAndArrowDownLeft)
+                    .font(.headline)
+                    .frame(width: 20)
+            }
+            .matchedGeometryEffect(
+                id: PlayerNamespace.expandShrinkButton, in: namespace
+            )
+            
+            Divider()
+            
             // Playback mode
             AliveButton(
                 enabledStyle: .tertiary, hoveringStyle: .secondary
@@ -106,12 +123,14 @@ struct PlayerView: View {
                 .animation(.default, value: player.currentIndex)
                 .matchedGeometryEffect(id: PlayerNamespace.title, in: namespace)
 
+                /*
                 if let thumbnail = player.current?.metadata.thumbnail {
                     MusicCover(
                         images: [thumbnail], hasPlaceholder: false,
                         cornerRadius: 2
                     )
                 }
+                */
             }
             .padding(.bottom, 2)
 
@@ -132,20 +151,6 @@ struct PlayerView: View {
                 .buttonStyle(.borderless)
                 .tint(.secondary)
             }
-
-            // Expand / shrink
-            AliveButton(
-                enabledStyle: .tertiary, hoveringStyle: .secondary
-            ) {
-                windowManager.style = .miniPlayer
-            } label: {
-                Image(systemSymbol: .arrowDownRightAndArrowUpLeft)
-                    .font(.headline)
-                    .frame(width: 20)
-            }
-            .matchedGeometryEffect(
-                id: PlayerNamespace.expandShrinkButton, in: namespace
-            )
         }
         .frame(height: 20)
     }

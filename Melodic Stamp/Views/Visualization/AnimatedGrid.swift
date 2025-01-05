@@ -8,6 +8,7 @@
 import MeshGradient
 import MeshGradientCHeaders
 import SwiftUI
+import DominantColors
 
 typealias SIMDColor = simd_float3
 
