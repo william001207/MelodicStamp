@@ -17,7 +17,7 @@ struct AudioDeviceTransportTypeView: View {
         case .airPlay: Text("AirPlay")
         case .avb: Text("AVB")
         case .bluetooth: Text("Bluetooth")
-        case .bluetoothLE: Text("Bluetooth LE")
+        case .bluetoothLE: Text("Bluetooth (Low Energy)")
         case .builtIn: Text("Built-in")
         case .continuityCaptureWired: Text("Continuity Capture (Wired)")
         case .continuityCaptureWireless: Text("Continuity Capture (Wireless)")

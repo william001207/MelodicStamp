@@ -54,10 +54,24 @@
       }
     },
     "Aggregate" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "融合"
+          }
+        }
+      }
     },
     "AirPlay" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "隔空播放"
+          }
+        }
+      }
     },
     "Album" : {
       "localizations" : {
@@ -221,16 +235,37 @@
       }
     },
     "Bluetooth" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "蓝牙"
+          }
+        }
+      }
     },
-    "Bluetooth LE" : {
-
+    "Bluetooth (Low Energy)" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "蓝牙（低功耗）"
+          }
+        }
+      }
     },
     "BPM" : {
 
     },
     "Built-in" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "内置"
+          }
+        }
+      }
     },
     "Catalog Number" : {
       "localizations" : {
@@ -243,7 +278,14 @@
       }
     },
     "Clear" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "清除"
+          }
+        }
+      }
     },
     "Clear Selection" : {
       "localizations" : {
@@ -319,10 +361,24 @@
       }
     },
     "Continuity Capture (Wired)" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "连续互通捕捉（有线）"
+          }
+        }
+      }
     },
     "Continuity Capture (Wireless)" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "连续互通捕捉（无线）"
+          }
+        }
+      }
     },
     "Copyright" : {
       "localizations" : {
@@ -355,7 +411,14 @@
       }
     },
     "Dismiss" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "关闭"
+          }
+        }
+      }
     },
     "DisplayPort" : {
 
@@ -381,7 +444,14 @@
       }
     },
     "Edit" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "编辑"
+          }
+        }
+      }
     },
     "Editor" : {
       "localizations" : {
@@ -473,7 +543,14 @@
 
     },
     "Hide" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "隐藏"
+          }
+        }
+      }
     },
     "Illustration" : {
       "localizations" : {
@@ -559,7 +636,14 @@
       }
     },
     "Load from File" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "从文件加载"
+          }
+        }
+      }
     },
     "Loading…" : {
       "localizations" : {
@@ -778,7 +862,14 @@
       }
     },
     "Output Device" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "输出设备"
+          }
+        }
+      }
     },
     "Parse Lyrics" : {
 
@@ -1110,7 +1201,14 @@
       }
     },
     "Thunderbolt" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "雷电"
+          }
+        }
+      }
     },
     "Title" : {
       "localizations" : {
@@ -1173,10 +1271,24 @@
       }
     },
     "Unknown" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "未知"
+          }
+        }
+      }
     },
     "Unknown Device" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "未知设备"
+          }
+        }
+      }
     },
     "USB" : {
 
@@ -1192,10 +1304,24 @@
       }
     },
     "Virtual" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "虚拟"
+          }
+        }
+      }
     },
     "You can use [AMLL TTML Tool](https://steve-xmh.github.io/amll-ttml-tool) to create TTML lyrics through a refined interface." : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "你可以使用[AMLL TTML Tool](https://steve-xmh.github.io/amll-ttml-tool)可视化地创建逐字歌词。"
+          }
+        }
+      }
     }
   },
   "version" : "1.0"
