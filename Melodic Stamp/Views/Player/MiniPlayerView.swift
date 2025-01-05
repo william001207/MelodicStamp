@@ -193,9 +193,8 @@ struct MiniPlayerView: View {
 
     @ViewBuilder private func header() -> some View {
         HStack(alignment: .center, spacing: 12) {
-            
-            // Expand / shrink
             if isTitleHovering {
+                // Expand / shrink
                 AliveButton(
                     enabledStyle: .tertiary, hoveringStyle: .secondary
                 ) {
@@ -256,7 +255,6 @@ struct MiniPlayerView: View {
                             .environment(lyrics)
                     }
                 }
-//                .contentTransition(.numericText())
                 .animation(.default, value: player.currentIndex)
                 .matchedGeometryEffect(id: PlayerNamespace.title, in: namespace)
                 .padding(.bottom, 2)
@@ -281,7 +279,7 @@ struct MiniPlayerView: View {
                 }
                 .transition(.blurReplace)
             }
-            
+
             if isTitleHovering {
                 // Playlist
                 Menu {
