@@ -18,24 +18,12 @@ struct OutputDeviceView: View {
             } else {
                 Text("Unknown Device")
             }
-
-            if let icon {
-                icon
-            }
         }
     }
 
     private var name: String? {
         do {
             return try device.name
-        } catch {
-            return nil
-        }
-    }
-
-    private var icon: AsyncImage<Image>? {
-        do {
-            return try AsyncImage(url: device.icon)
         } catch {
             return nil
         }
