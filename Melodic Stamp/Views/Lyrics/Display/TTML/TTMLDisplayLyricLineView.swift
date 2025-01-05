@@ -12,6 +12,7 @@ struct TTMLDisplayLyricLineView: View {
     var line: TTMLLyricLine
     var elapsedTime: TimeInterval
     var isHighlighted: Bool = false
+    var shouldAnimate: Bool = true
 
     var inactiveOpacity: Double = 0.55
     var highlightReleasingDelay: TimeInterval = 0.25
@@ -72,13 +73,19 @@ struct TTMLDisplayLyricLineView: View {
     }
 
     @ViewBuilder private func activeContent() -> some View {
-        let lyricsRenderer = textRenderer(for: line.lyrics)
-
         VStack(alignment: alignment.horizontal, spacing: 5) {
-            Text(line.content)
-                .font(.title)
-                .bold()
-                .textRenderer(lyricsRenderer)
+            if shouldAnimate {
+                let lyricsRenderer = textRenderer(for: line.lyrics)
+
+                Text(line.content)
+                    .font(.title)
+                    .bold()
+                    .textRenderer(lyricsRenderer)
+            } else {
+                Text(line.content)
+                    .font(.title)
+                    .bold()
+            }
 
             additionalContent(for: line.lyrics)
                 .font(.title3)

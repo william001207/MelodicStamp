@@ -48,7 +48,6 @@ struct AnimatedGrid: View {
 
     private var randomizer: MeshRandomizer {
         MeshRandomizer(colorRandomizer: { color, _, x, y, gridWidth, gridHeight in
-            // 计算 normalized position
             let normalizedX = Float(x) / Float(gridWidth - 1)
             let normalizedY = Float(y) / Float(gridHeight - 1)
 

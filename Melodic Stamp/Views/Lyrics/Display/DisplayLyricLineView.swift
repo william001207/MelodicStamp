@@ -14,6 +14,8 @@ struct DisplayLyricLineView: View {
     var index: Int
     var highlightedRange: Range<Int>
     var elapsedTime: TimeInterval
+    var shouldFade: Bool = false
+    var shouldAnimate: Bool = true
 
     @State private var isHovering: Bool = false
 
@@ -40,8 +42,8 @@ struct DisplayLyricLineView: View {
                 }
             }
             .padding(8.5)
-            .blur(radius: isActive ? 0 : blurRadius)
-            .opacity(isActive ? 1 : opacity)
+            .blur(radius: isActive || !shouldFade ? 0 : blurRadius)
+            .opacity(isActive || !shouldFade ? 1 : opacity)
             .background {
                 Rectangle()
                     .foregroundStyle(.background)
@@ -61,7 +63,7 @@ struct DisplayLyricLineView: View {
     }
 
     private var isActive: Bool {
-        isHighlighted || isHovering
+        isHighlighted || isHovering || !shouldAnimate
     }
 
     @ViewBuilder private func rawLyricLine(line: RawLyricLine, index _: Int, isHighlighted _: Bool) -> some View {
@@ -94,7 +96,8 @@ struct DisplayLyricLineView: View {
     @ViewBuilder private func ttmlLyricLine(line: TTMLLyricLine, index _: Int, isHighlighted: Bool) -> some View {
         TTMLDisplayLyricLineView(
             line: line, elapsedTime: elapsedTime,
-            isHighlighted: isHighlighted
+            isHighlighted: isHighlighted,
+            shouldAnimate: shouldAnimate
         )
     }
 

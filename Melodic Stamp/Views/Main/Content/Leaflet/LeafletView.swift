@@ -13,15 +13,12 @@ struct LeafletView: View {
     @Environment(MetadataEditorModel.self) private var metadataEditor
     @Environment(LyricsModel.self) private var lyrics
 
+    @State private var interaction: AppleMusicLyricsViewInteractionModel = .init()
+
     @State private var dominantColors: [Color] = [.init(hex: 0x929292), .init(hex: 0xFFFFFF), .init(hex: 0x929292)]
-    @State private var interactionState: AppleMusicLyricsViewInteractionState = .following
 
     @State private var isPlaying: Bool = false
     @State private var isShowingLyrics: Bool = true
-
-    @State private var interactionStateDelegationProgress: CGFloat = .zero
-    @State private var interactionStateDispatch: DispatchWorkItem?
-    @State private var hasInteractionStateProgressRing: Bool = true
 
     var body: some View {
         if !player.hasCurrentTrack {
@@ -30,95 +27,18 @@ struct LeafletView: View {
             ZStack {
                 if hasCover || hasLyrics {
                     HStack(spacing: 50) {
-                        @Bindable var player = player
-
                         if let cover {
-                            AliveButton(isOn: hasLyrics ? $isShowingLyrics : $player.isPlaying) {
-                                MusicCover(
-                                    images: [cover], hasPlaceholder: true,
-                                    cornerRadius: 12
-                                )
-                            }
-                            .containerRelativeFrame(.vertical, alignment: .center) { length, axis in
-                                switch axis {
-                                case .horizontal:
-                                    length
-                                case .vertical:
-                                    min(500, length * 0.5)
+                            coverView(cover)
+                                .onChange(of: player.currentIndex, initial: true) { _, _ in
+                                    Task { @MainActor in
+                                        dominantColors = try await extractDominantColors(from: cover)
+                                    }
                                 }
-                            }
-                            .scaleEffect(isPlaying ? 1 : 0.85, anchor: .center)
-                            .shadow(radius: isPlaying ? 20 : 10)
-                            .animation(.spring(duration: 0.65, bounce: 0.45, blendDuration: 0.75), value: isPlaying)
-                            .onChange(of: player.currentIndex, initial: true) { _, _ in
-                                Task { @MainActor in
-                                    dominantColors = try await extractDominantColors(from: cover)
-                                }
-                            }
                         }
 
                         if hasLyrics, isShowingLyrics {
-                            DisplayLyricsView(interactionState: $interactionState) { position, _ in
-                                guard position.isPositionedByUser else { return }
-                                guard !interactionState.isIsolated else { return }
-                                interactionStateDispatch?.cancel()
-                                interactionState = .intermediate
-
-                                let dspatch = DispatchWorkItem {
-                                    interactionState = .countingDown
-                                }
-                                interactionStateDispatch = dspatch
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 1, execute: dspatch)
-                            }
-                            .overlay(alignment: .trailing) {
-                                Group {
-                                    if !interactionState.isDelegated {
-                                        AppleMusicLyricsViewInteractionStateButton(
-                                            interactionState: $interactionState,
-                                            progress: interactionStateDelegationProgress,
-                                            hasProgressRing: hasInteractionStateProgressRing && interactionStateDelegationProgress > 0
-                                        )
-                                        .tint(.white)
-                                        .transition(.blurReplace(.downUp))
-                                    }
-                                }
-                                .animation(.bouncy, value: interactionState.isDelegated)
-                                .padding(12)
-                                .alignmentGuide(.trailing) { d in
-                                    d[.leading]
-                                }
-                            }
-                            .transition(.blurReplace(.downUp))
-                            .onChange(of: interactionState) { _, _ in
-                                switch interactionState {
-                                case .following:
-                                    interactionStateDispatch?.cancel()
-                                    hasInteractionStateProgressRing = false
-                                case .countingDown:
-                                    interactionStateDispatch?.cancel()
-                                    hasInteractionStateProgressRing = true
-
-                                    interactionStateDelegationProgress = .zero
-                                    withAnimation(.smooth(duration: 3)) {
-                                        interactionStateDelegationProgress = 1
-                                    }
-
-                                    let dispatch = DispatchWorkItem {
-                                        interactionState = .following
-                                    }
-                                    interactionStateDispatch = dispatch
-                                    DispatchQueue.main.asyncAfter(deadline: .now() + 3, execute: dispatch)
-                                case .isolated:
-                                    interactionStateDispatch?.cancel()
-                                    hasInteractionStateProgressRing = false
-
-                                    withAnimation(.smooth) {
-                                        interactionStateDelegationProgress = 1
-                                    }
-                                default:
-                                    break
-                                }
-                            }
+                            lyricsView()
+                                .transition(.blurReplace(.downUp))
                         }
                     }
                     .containerRelativeFrame(.horizontal, alignment: .center) { length, axis in
@@ -202,6 +122,53 @@ struct LeafletView: View {
 
     private var hasLyrics: Bool {
         !lyrics.lines.isEmpty
+    }
+
+    @ViewBuilder private func coverView(_ cover: NSImage) -> some View {
+        @Bindable var player = player
+
+        AliveButton(isOn: hasLyrics ? $isShowingLyrics : $player.isPlaying) {
+            MusicCover(
+                images: [cover], hasPlaceholder: true,
+                cornerRadius: 12
+            )
+        }
+        .containerRelativeFrame(.vertical, alignment: .center) { length, axis in
+            switch axis {
+            case .horizontal:
+                length
+            case .vertical:
+                min(500, length * 0.5)
+            }
+        }
+        .scaleEffect(isPlaying ? 1 : 0.85, anchor: .center)
+        .shadow(radius: isPlaying ? 20 : 10)
+        .animation(.spring(duration: 0.65, bounce: 0.45, blendDuration: 0.75), value: isPlaying)
+    }
+
+    @ViewBuilder private func lyricsView() -> some View {
+        DisplayLyricsView(interactionState: $interaction.state) { position, _ in
+            guard position.isPositionedByUser else { return }
+            interaction.reset()
+        }
+        .overlay(alignment: .trailing) {
+            Group {
+                if !interaction.state.isDelegated {
+                    AppleMusicLyricsViewInteractionStateButton(
+                        interactionState: $interaction.state,
+                        progress: interaction.delegationProgress,
+                        hasProgressRing: interaction.hasProgressRing && interaction.delegationProgress > 0
+                    )
+                    .tint(.white)
+                    .transition(.blurReplace(.downUp))
+                }
+            }
+            .animation(.bouncy, value: interaction.state.isDelegated)
+            .padding(12)
+            .alignmentGuide(.trailing) { d in
+                d[.leading]
+            }
+        }
     }
 
     private func extractDominantColors(from image: NSImage) async throws -> [Color] {

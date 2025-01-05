@@ -40,7 +40,9 @@ struct DisplayLyricsView: View {
                     DisplayLyricLineView(
                         line: lines[index], index: index,
                         highlightedRange: highlightedRange,
-                        elapsedTime: elapsedTime
+                        elapsedTime: elapsedTime,
+                        shouldFade: !isHovering,
+                        shouldAnimate: interactionState.isDelegated
                     )
                     .padding(.bottom, 21)
                 } indicator: { index, _ in
