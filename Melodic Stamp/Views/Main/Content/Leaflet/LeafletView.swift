@@ -15,10 +15,10 @@ struct LeafletView: View {
 
     @State private var interaction: AppleMusicLyricsViewInteractionModel = .init()
 
-    @State private var dominantColors: [Color] = [.init(hex: 0x929292), .init(hex: 0xFFFFFF), .init(hex: 0x929292)]
-
     @State private var isPlaying: Bool = false
     @State private var isShowingLyrics: Bool = true
+
+    @State private var dominantColors: [Color] = [.init(hex: 0x929292), .init(hex: 0xFFFFFF), .init(hex: 0x929292)]
 
     var body: some View {
         if !player.hasCurrentTrack {

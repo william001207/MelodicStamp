@@ -23,6 +23,7 @@ import SwiftUI
         guard !state.isIsolated else { return }
         dispatch?.cancel()
         state = .intermediate
+        hasProgressRing = false
 
         let dspatch = DispatchWorkItem {
             self.state = .countingDown

@@ -23,6 +23,7 @@ struct ContentView: View {
     @State private var player: PlayerModel = .init(SFBAudioEnginePlayer())
     @State private var playerKeyboardControl: PlayerKeyboardControlModel = .init()
     @State private var metadataEditor: MetadataEditorModel = .init()
+    @State private var visualizer: VisualizerModel = .init()
 
     @State private var isInspectorPresented: Bool = false
     @State private var selectedContentTab: SidebarContentTab = .playlist
@@ -91,6 +92,9 @@ struct ContentView: View {
                 maxWidth = nil
             }
         }
+        .onReceive(player.visualizationDataPublisher) { fftData in
+            visualizer.normalizeData(fftData: fftData)
+        }
         .frame(minWidth: minWidth, maxWidth: maxWidth)
         // Environments
         .environment(floatingWindows)
@@ -99,6 +103,7 @@ struct ContentView: View {
         .environment(player)
         .environment(playerKeyboardControl)
         .environment(metadataEditor)
+        .environment(visualizer)
         // Focus management
         .focusable()
         .focusEffectDisabled()
