@@ -5,12 +5,11 @@
 //  Created by KrLite on 2024/12/31.
 //
 
+import CAAudioHardware
 import Foundation
 import SFBAudioEngine
 
 class SFBAudioEnginePlayer: NSObject, Player {
-    typealias OutputDevice = AudioDevice
-    
     init(_ player: AudioPlayer = .init()) {
         self.player = player
         super.init()
@@ -105,9 +104,25 @@ class SFBAudioEnginePlayer: NSObject, Player {
             block(engine)
         }
     }
-    
-    func availableDevices() throws -> [OutputDevice] {
-        <#code#>
+
+    func availableOutputDevices() throws -> [AudioDevice] {
+        try AudioDevice.devices.filter { try $0.supportsOutput }
+    }
+
+    func selectedOutputDevice() throws -> AudioDevice? {
+        let devices = try availableOutputDevices()
+        return if
+            let uid = UserDefaults.standard.string(forKey: "deviceUID"),
+            let deviceID = try? AudioSystemObject.instance.deviceID(forUID: uid),
+            let device = devices.first(where: { $0.objectID == deviceID }) {
+            device
+        } else {
+            devices.first
+        }
+    }
+
+    func selectOutputDevice(_ device: AudioDevice) throws {
+        try player.setOutputDeviceID(device.objectID)
     }
 }
 

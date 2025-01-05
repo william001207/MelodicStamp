@@ -5,8 +5,8 @@
 //  Created by Xinshao_Air on 2024/12/25.
 //
 
-import SwiftUI
 import SmartCache
+import SwiftUI
 
 struct DisplayLyricsGroupCache {
     typealias Key = [AnyHashable]
