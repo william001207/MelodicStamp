@@ -193,7 +193,7 @@ import SwiftUI
 
 //        player.delegate = self
         setupRemoteTransportControls()
-        setupAudioVisualization()
+        setupEngine()
 
         timer
             .receive(on: DispatchQueue.main)
@@ -226,7 +226,7 @@ import SwiftUI
 extension PlayerModel {
     func randomIndex() -> Int? {
         guard !playlist.isEmpty else { return nil }
-
+        
         if let current, let index = playlist.firstIndex(of: current) {
             let indices = Array(playlist.indices).filter { $0 != index }
             return indices.randomElement()
@@ -234,39 +234,39 @@ extension PlayerModel {
             return playlist.indices.randomElement()
         }
     }
-
+    
     func play(item: PlayableItem) {
         addToPlaylist(urls: [item.url])
-
+        
         Task { @MainActor in
             current = item
             player.play(item)
         }
     }
-
+    
     func play(url: URL) {
         if let item = PlayableItem(url: url) {
             play(item: item)
         }
     }
-
+    
     func addToPlaylist(urls: [URL]) {
         for url in urls {
             guard !playlist.contains(where: { $0.url == url }) else { continue }
-
+            
             if let item = PlayableItem(url: url) {
                 addToPlaylist(items: [item])
             }
         }
     }
-
+    
     func addToPlaylist(items: [PlayableItem]) {
         for item in items {
             guard !playlist.contains(item) else { continue }
             playlist.append(item)
         }
     }
-
+    
     func removeFromPlaylist(urls: [URL]) {
         for url in urls {
             if let index = playlist.firstIndex(where: { $0.url == url }) {
@@ -278,107 +278,86 @@ extension PlayerModel {
             }
         }
     }
-
+    
     func movePlaylist(fromOffsets indices: IndexSet, toOffset destination: Int) {
         playlist.move(fromOffsets: indices, toOffset: destination)
     }
-
+    
     func removeFromPlaylist(items: [PlayableItem]) {
         removeFromPlaylist(urls: items.map(\.url))
     }
-
+    
     func removeAll() {
         removeFromPlaylist(items: playlist)
     }
-
-//    func updateDeviceMenu() {
-//        do {
-//            outputDevices = try AudioDevice.devices.filter { try $0.supportsOutput }
-//            if let uid = UserDefaults.standard.string(forKey: "deviceUID"),
-//               let deviceID = try? AudioSystemObject.instance.deviceID(forUID: uid),
-//               let device = outputDevices.first(where: { $0.objectID == deviceID }) {
-//                selectedDevice = device
-//                try? player.setOutputDeviceID(deviceID)
-//            } else {
-//                selectedDevice = outputDevices.first
-//                if let device = selectedDevice {
-//                    try? player.setOutputDeviceID(device.objectID)
-//                }
-//            }
-//        } catch {}
-//    }
-//
-//    func setOutputDevice(_ device: AudioDevice) {
-//        do {
-//            try player.setOutputDeviceID(device.objectID)
-//            selectedDevice = device
-//        } catch {}
-//    }
-
+    
     func play() {
         player.play()
     }
-
+    
     func pause() {
         player.pause()
     }
-
+    
     func togglePlayPause() {
         player.togglePlaying()
     }
-
+    
     func nextTrack() {
         guard let nextIndex else { return }
         play(item: playlist[nextIndex])
     }
-
+    
     func previousTrack() {
         guard let previousIndex else { return }
         play(item: playlist[previousIndex])
     }
-
-//    func analyzeFiles(urls: [URL]) {
-//        do {
-//            let rg = try ReplayGainAnalyzer.analyzeAlbum(urls)
-//            os_log("Album gain %.2f dB, peak %.8f; Tracks: [%{public}@]", log: OSLog.default, type: .info, rg.0.gain, rg.0.peak, rg.1.map { url, replayGain in
-//                String(format: "\"%@\" gain %.2f dB, peak %.8f", FileManager.default.displayName(atPath: url.lastPathComponent), replayGain.gain, replayGain.peak)
-//            }.joined(separator: ", "))
-//            // TODO: Notice user we're done
-//        } catch {}
-//    }
-
-//    func exportWAVEFile(url: URL) {
-//        let destURL = url.deletingPathExtension().appendingPathExtension("wav")
-//        if FileManager.default.fileExists(atPath: destURL.path) {
-//            // TODO: Handle this
-//            return
-//        }
-//
-//        do {
-//            try AudioConverter.convert(url, to: destURL)
-//            try? AudioFile.copyMetadata(from: url, to: destURL)
-//        } catch {
-//            try? FileManager.default.trashItem(at: destURL, resultingItemURL: nil)
-//
-//        }
-//    }
-
-    private func setupAudioVisualization() {
+    
+    private func setupEngine() {
         player.withEngine { [weak self] engine in
             guard let self else { return }
-
+            
+            // Audio visualization
             let inputNode = engine.mainMixerNode
             let bus = 0
-
+            
             let format = inputNode.outputFormat(forBus: bus)
             let sampleRate = format.sampleRate
-
+            
             inputNode.installTap(onBus: bus, bufferSize: 1024, format: format) { buffer, _ in
                 self.processAudioBuffer(buffer, sampleRate: Float(sampleRate))
             }
         }
     }
+}
 
+extension PlayerModel {
+    //    func analyzeFiles(urls: [URL]) {
+    //        do {
+    //            let rg = try ReplayGainAnalyzer.analyzeAlbum(urls)
+    //            os_log("Album gain %.2f dB, peak %.8f; Tracks: [%{public}@]", log: OSLog.default, type: .info, rg.0.gain, rg.0.peak, rg.1.map { url, replayGain in
+    //                String(format: "\"%@\" gain %.2f dB, peak %.8f", FileManager.default.displayName(atPath: url.lastPathComponent), replayGain.gain, replayGain.peak)
+    //            }.joined(separator: ", "))
+    //            // TODO: Notice user we're done
+    //        } catch {}
+    //    }
+    
+    //    func exportWAVEFile(url: URL) {
+    //        let destURL = url.deletingPathExtension().appendingPathExtension("wav")
+    //        if FileManager.default.fileExists(atPath: destURL.path) {
+    //            // TODO: Handle this
+    //            return
+    //        }
+    //
+    //        do {
+    //            try AudioConverter.convert(url, to: destURL)
+    //            try? AudioFile.copyMetadata(from: url, to: destURL)
+    //        } catch {
+    //            try? FileManager.default.trashItem(at: destURL, resultingItemURL: nil)
+    //
+    //        }
+    //    }
+    
     private func processAudioBuffer(_ buffer: AVAudioPCMBuffer, sampleRate: Float) {
         guard let channelData = buffer.floatChannelData else { return }
 
@@ -392,6 +371,30 @@ extension PlayerModel {
             self.visualizationDataSubject.send(fftMagnitudes.map(CGFloat.init))
         }
     }
+    
+//        func updateDeviceMenu() {
+//            do {
+//                outputDevices = try AudioDevice.devices.filter { try $0.supportsOutput }
+//                if let uid = UserDefaults.standard.string(forKey: "deviceUID"),
+//                   let deviceID = try? AudioSystemObject.instance.deviceID(forUID: uid),
+//                   let device = outputDevices.first(where: { $0.objectID == deviceID }) {
+//                    selectedDevice = device
+//                    try? player.setOutputDeviceID(deviceID)
+//                } else {
+//                    selectedDevice = outputDevices.first
+//                    if let device = selectedDevice {
+//                        try? player.setOutputDeviceID(device.objectID)
+//                    }
+//                }
+//            } catch {}
+//        }
+//    
+//        func setOutputDevice(_ device: AudioDevice) {
+//            do {
+//                try player.setOutputDeviceID(device.objectID)
+//                selectedDevice = device
+//            } catch {}
+//        }
 }
 
 extension PlayerModel: PlayerDelegate {
