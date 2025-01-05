@@ -169,7 +169,10 @@ struct DisplayLyricsRenderer<Animated>: TextRenderer where Animated: AnimatedStr
                     context.translateBy(x: -bounds.width / 2, y: -bounds.height / 2)
 
                     // Glow
-                    context.addFilter(.shadow(color: glowColor.opacity(waveProgress), radius: glowRadius * waveProgress))
+                    context.addFilter(.shadow(
+                        color: glowColor.opacity(waveProgress),
+                        radius: glowRadius * waveProgress
+                    ))
                 }
             }
 
