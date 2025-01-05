@@ -17,6 +17,12 @@ extension Text.Layout {
     }
 }
 
+extension Text.Layout.Run {
+    var flattenedRunSlices: some RandomAccessCollection<Text.Layout.RunSlice> {
+        map(\.self)
+    }
+}
+
 extension Text.Layout: @retroactive Hashable {
     public func hash(into hasher: inout Hasher) {
         hasher.combine(isTruncated)

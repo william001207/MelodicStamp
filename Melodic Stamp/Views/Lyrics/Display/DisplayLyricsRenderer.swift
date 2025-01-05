@@ -115,13 +115,12 @@ struct DisplayLyricsRenderer<Animated>: TextRenderer where Animated: AnimatedStr
 
                 let beginTime = lyric.beginTime ?? .zero
                 let endTime = lyric.endTime ?? .zero
+                let duration = endTime - beginTime
 
                 draw(
-                    slice: slice,
-                    layout: layout,
-                    index: index,
-                    beginTime: beginTime + percentage * (endTime - beginTime),
-                    endTime: beginTime + (percentage + durationPercentage) * (endTime - beginTime),
+                    slice: slice, index: index,
+                    beginTime: beginTime + duration * percentage,
+                    endTime: beginTime + duration * (percentage + durationPercentage),
                     in: &context
                 )
                 offset += width
@@ -130,12 +129,11 @@ struct DisplayLyricsRenderer<Animated>: TextRenderer where Animated: AnimatedStr
     }
 
     func draw(
-        slice: Text.Layout.RunSlice,
-        layout: Text.Layout,
-        index: Int,
+        slice: Text.Layout.RunSlice, index: Int,
         beginTime: TimeInterval, endTime: TimeInterval,
         in context: inout GraphicsContext
     ) {
+        print(index, timeToVowels)
         let elapsed = elapsedTime - beginTime
         let duration = endTime - beginTime
 
@@ -153,58 +151,6 @@ struct DisplayLyricsRenderer<Animated>: TextRenderer where Animated: AnimatedStr
         do {
             // Wave effect
             if let timeToNearestVowel = timeToVowels.min() {
-                let slices = layout.flattenedRunSlices
-
-                for (index, slice) in slices.enumerated() {
-                    guard let animatedChar = strings.first(where: { index >= animatedCharIndex(for: $0) && index < animatedCharIndex(for: $0) + $0.content.count }) else {
-                        context.draw(slice)
-                        continue
-                    }
-                    let charStartTime = (animatedChar.beginTime ?? .zero) + Double(index - animatedCharIndex(for: animatedChar)) * highlightDuration / Double(animatedChar.content.count)
-                    let charEndTime = charStartTime + highlightDuration
-
-                    let charProgress = progressForTime(elapsedTime, charStartTime: charStartTime, charEndTime: charEndTime)
-
-                    let scale = 1.0 + sin(charProgress * .pi) * 0.25
-                    let dynamicGlowRadius = sin(charProgress * .pi) * 10.0
-                    let opacity = sin(charProgress * .pi) * 0.8 + 0.5
-
-                    var modifiedContext = context
-
-                    do {
-                        let mask = Path(.init(
-                            x: bounds.minX,
-                            y: bounds.minY,
-                            width: filledWidth + blendRadius / 2,
-                            height: bounds.height
-                        ))
-
-                        let shadowFilter = GraphicsContext.Filter.shadow(
-                            color: Color.white.opacity(opacity),
-                            radius: dynamicGlowRadius,
-                            x: 0,
-                            y: 0
-                        )
-
-                        modifiedContext.addFilter(shadowFilter)
-
-                        let bounds = slice.typographicBounds.rect
-
-                        modifiedContext.translateBy(x: bounds.midX, y: bounds.midY)
-                        modifiedContext.scaleBy(x: scale, y: scale)
-                        modifiedContext.translateBy(x: -bounds.midX, y: -bounds.midY)
-
-                        modifiedContext.clipToLayer { context in
-                            context.fill(mask, with: .linearGradient(
-                                .init(colors: [.white, .clear]),
-                                startPoint: .init(x: bounds.minX + unclampedFilledWidth - blendRadius / 2, y: 0),
-                                endPoint: .init(x: bounds.minX + unclampedFilledWidth + blendRadius / 2, y: 0)
-                            ))
-                        }
-                        modifiedContext.draw(slice)
-                    }
-                }
-                return
             }
 
             // Unfilled
@@ -235,8 +181,8 @@ struct DisplayLyricsRenderer<Animated>: TextRenderer where Animated: AnimatedStr
 
                  }
                  */
-
                 context.addFilter(.shadow(color: shadowColor, radius: shadowRadius))
+                
                 // Mask
                 context.clipToLayer { context in
                     context.fill(mask, with: .linearGradient(
@@ -256,14 +202,5 @@ struct DisplayLyricsRenderer<Animated>: TextRenderer where Animated: AnimatedStr
                 context.draw(slice)
             }
         }
-    }
-
-    private func animatedCharIndex(for animatedChar: any AnimatedString) -> Int {
-        strings.prefix { $0.content != animatedChar.content }.reduce(0) { $0 + $1.content.count }
-    }
-
-    private func progressForTime(_ currentTime: TimeInterval, charStartTime: TimeInterval, charEndTime: TimeInterval) -> Double {
-        guard charEndTime > charStartTime else { return 1.0 }
-        return min(max((currentTime - charStartTime) / (charEndTime - charStartTime), 0.0), 1.0)
     }
 }
