@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SmartCache
 
 struct DisplayLyricsGroupCache {
     typealias Key = [AnyHashable]
@@ -14,11 +15,11 @@ struct DisplayLyricsGroupCache {
 
     static var shared = Self()
 
-    var groups: [Key: (identifier: Identifier, value: Value)] = [:]
+    let cache: MemoryCache<Key, (identifier: Identifier, value: Value)> = .init(maximumCachedValues: 16)
 
     func contains(key: [some AnimatedString]) -> Bool {
         let hashableKey = key.map(\.self)
-        return groups.keys.contains(hashableKey)
+        return cache.value(forKey: hashableKey) != nil
     }
 
     func get<Animated>(
@@ -26,7 +27,7 @@ struct DisplayLyricsGroupCache {
         identifiedBy identifier: Identifier
     ) -> [Animated: [Text.Layout.RunSlice]]? where Animated: AnimatedString {
         let hashableKey = key.map(\.self)
-        guard let pair = groups[hashableKey] else { return nil }
+        guard let pair = cache.value(forKey: hashableKey) else { return nil }
 
         guard pair.identifier == identifier else { return nil }
         return pair.value as? [Animated: [Text.Layout.RunSlice]]
@@ -37,7 +38,7 @@ struct DisplayLyricsGroupCache {
         identifiedBy identifier: Identifier
     ) where Animated: AnimatedString {
         let hashableKey = key.map(\.self)
-        groups[hashableKey] = (identifier, value)
+        cache.insert((identifier, value), forKey: hashableKey)
     }
 }
 
