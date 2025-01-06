@@ -12,7 +12,11 @@ struct OutputDeviceList: View {
     var devices: [AudioDevice]
 
     var body: some View {
-        ForEach(groupedDevices.map { ($0, $1) }, id: \.0) { type, devices in
+        ForEach(
+            groupedDevices
+                .sorted { $0.key?.rawValue ?? 0 < $1.key?.rawValue ?? 0 },
+            id: \.key
+        ) { type, devices in
             if let type {
                 Section {
                     deviceList(in: devices)

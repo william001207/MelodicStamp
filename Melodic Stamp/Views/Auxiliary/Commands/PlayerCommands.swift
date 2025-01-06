@@ -180,6 +180,7 @@ struct PlayerCommands: Commands {
                                 guard newValue else { return }
                                 player.playbackMode = mode
                             }
+
                             Toggle(isOn: binding) {
                                 PlaybackModeView(mode: mode)
                             }
@@ -204,7 +205,6 @@ struct PlayerCommands: Commands {
 
             if let player {
                 @Bindable var player = player
-
                 if let binding = ~$player.selectedOutputDevice {
                     let outputDeviceName = try? binding.wrappedValue.name
 

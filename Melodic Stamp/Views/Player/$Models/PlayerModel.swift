@@ -27,6 +27,7 @@ import SwiftUI
         didSet {
             guard let selectedOutputDevice else { return }
             selectOutputDevice(selectedOutputDevice)
+            updateOutputDevices(refreshingSelected: false)
         }
     }
 
@@ -34,18 +35,27 @@ import SwiftUI
 
     private var cancellables = Set<AnyCancellable>()
     private let timer = TimerPublisher(interval: 0.1)
-    private let looseTimer = TimerPublisher(interval: 25)
 
     private var playbackTimeSubject = PassthroughSubject<PlaybackTime?, Never>()
+    private var volumeSubject = PassthroughSubject<CGFloat, Never>()
     private var isPlayingSubject = PassthroughSubject<Bool, Never>()
+    private var isMutedSubject = PassthroughSubject<Bool, Never>()
     private var visualizationDataSubject = PassthroughSubject<[CGFloat], Never>()
 
     var playbackTimePublisher: AnyPublisher<PlaybackTime?, Never> {
         playbackTimeSubject.eraseToAnyPublisher()
     }
 
+    var volumePublisher: AnyPublisher<CGFloat, Never> {
+        volumeSubject.eraseToAnyPublisher()
+    }
+
     var isPlayingPublisher: AnyPublisher<Bool, Never> {
         isPlayingSubject.eraseToAnyPublisher()
+    }
+
+    var isMutedPublisher: AnyPublisher<Bool, Never> {
+        isMutedSubject.eraseToAnyPublisher()
     }
 
     var visualizationDataPublisher: AnyPublisher<[CGFloat], Never> {
@@ -98,6 +108,7 @@ import SwiftUI
 
         set {
             player.seekVolume(to: newValue)
+            volumeSubject.send(newValue)
         }
     }
 
@@ -108,6 +119,7 @@ import SwiftUI
 
         set {
             player.setPlaying(newValue)
+            isPlayingSubject.send(newValue)
         }
     }
 
@@ -118,6 +130,7 @@ import SwiftUI
 
         set {
             player.setMuted(newValue)
+            isMutedSubject.send(newValue)
         }
     }
 
@@ -216,14 +229,9 @@ import SwiftUI
                 isPlaying: do {
                     self.isPlayingSubject.send(self.isPlaying)
                 }
-            }
-            .store(in: &cancellables)
 
-        looseTimer
-            .receive(on: DispatchQueue.main)
-            .sink { _ in
-                update: do {
-                    self.updateOutputDevices()
+                isMuted: do {
+                    self.isMutedSubject.send(self.isMuted)
                 }
             }
             .store(in: &cancellables)
@@ -385,21 +393,22 @@ extension PlayerModel {
         }
     }
 
-    // No side effects
-    func selectOutputDevice(_ device: AudioDevice) {
+    private func selectOutputDevice(_ device: AudioDevice) {
         do {
             try player.selectOutputDevice(device)
         } catch {}
     }
 
-    func updateOutputDevices() {
+    func updateOutputDevices(refreshingSelected: Bool = true) {
         do {
             outputDevices = try player.availableOutputDevices()
             print("Updated output device, found \(outputDevices.count)")
 
-            let selectedOutputDevice = try player.selectedOutputDevice()
-            guard self.selectedOutputDevice != selectedOutputDevice else { return }
-            self.selectedOutputDevice = selectedOutputDevice
+            if refreshingSelected {
+                let selectedOutputDevice = try player.selectedOutputDevice()
+                guard self.selectedOutputDevice != selectedOutputDevice else { return }
+                self.selectedOutputDevice = selectedOutputDevice
+            }
         } catch {}
     }
 }

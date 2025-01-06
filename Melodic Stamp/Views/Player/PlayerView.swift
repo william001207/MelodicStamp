@@ -24,6 +24,9 @@ struct PlayerView: View {
     @State private var shouldUseRemainingDuration: Bool = false
 
     @State private var playbackTime: PlaybackTime?
+    @State private var volume: CGFloat = .zero
+    @State private var isPlaying: Bool = false
+    @State private var isMuted: Bool = false
 
     var body: some View {
         VStack(alignment: .center, spacing: 12) {
@@ -52,9 +55,24 @@ struct PlayerView: View {
         .padding(.horizontal, 32)
         .padding(.vertical, 24)
         .frame(maxWidth: .infinity)
-        // Receive playback time update
+        // Receive publishers
         .onReceive(player.playbackTimePublisher) { playbackTime in
             self.playbackTime = playbackTime
+        }
+        .onReceive(player.volumePublisher) { volume in
+            self.volume = volume
+        }
+        .onReceive(player.isPlayingPublisher) { isPlaying in
+            self.isPlaying = isPlaying
+        }
+        .onReceive(player.isMutedPublisher) { isMuted in
+            self.isMuted = isMuted
+        }
+        .onAppear {
+            playbackTime = player.playbackTime
+            volume = player.volume
+            isPlaying = player.isPlaying
+            isMuted = player.isMuted
         }
         .onChange(of: player.currentIndex, initial: true) { _, newValue in
             guard newValue == nil else { return }
@@ -62,26 +80,38 @@ struct PlayerView: View {
         }
     }
 
+    private var progressBinding: Binding<CGFloat> {
+        Binding {
+            playbackTime?.progress ?? .zero
+        } set: { newValue in
+            player.progress = newValue
+        }
+    }
+
+    private var volumeBinding: Binding<CGFloat> {
+        Binding {
+            volume
+        } set: { newValue in
+            player.volume = newValue
+        }
+    }
+
+    private var isPlayingBinding: Binding<Bool> {
+        Binding { isPlaying } set: { newValue in
+            player.isPlaying = newValue
+        }
+    }
+
+    private var isMutedBinding: Binding<Bool> {
+        Binding { isMuted } set: { newValue in
+            player.isMuted = newValue
+        }
+    }
+
     @ViewBuilder private func header() -> some View {
         @Bindable var player = player
 
         HStack(alignment: .center, spacing: 12) {
-            // Expand / shrink
-            AliveButton(
-                enabledStyle: .tertiary, hoveringStyle: .secondary
-            ) {
-                windowManager.style = .miniPlayer
-            } label: {
-                Image(systemSymbol: .arrowUpRightAndArrowDownLeft)
-                    .font(.headline)
-                    .frame(width: 20)
-            }
-            .matchedGeometryEffect(
-                id: PlayerNamespace.expandShrinkButton, in: namespace
-            )
-
-            Divider()
-
             // Playback mode
             AliveButton(
                 enabledStyle: .tertiary, hoveringStyle: .secondary
@@ -98,6 +128,9 @@ struct PlayerView: View {
             .matchedGeometryEffect(
                 id: PlayerNamespace.playbackModeButton, in: namespace
             )
+            .contextMenu {
+                PlaybackModePicker(selection: $player.playbackMode)
+            }
 
             // Playback looping
             AliveButton(
@@ -128,17 +161,33 @@ struct PlayerView: View {
             Spacer()
 
             // Output device
-            if let binding = ~$player.selectedOutputDevice {
-                Picker("", selection: binding) {
-                    OutputDeviceList(devices: player.outputDevices)
-                        .onAppear {
-                            player.updateOutputDevices()
-                        }
+            Menu {
+                OutputDevicePicker(
+                    devices: player.outputDevices,
+                    selection: $player.selectedOutputDevice
+                )
+                .onAppear {
+                    player.updateOutputDevices()
                 }
-                .labelsHidden()
-                .buttonStyle(.borderless)
-                .tint(.secondary)
+            } label: {
+                Image(systemSymbol: .airplayaudio)
             }
+            .buttonStyle(.borderless)
+            .tint(.secondary.opacity(0.5))
+
+            // Expand / shrink
+            AliveButton(
+                enabledStyle: .tertiary, hoveringStyle: .secondary
+            ) {
+                windowManager.style = .miniPlayer
+            } label: {
+                Image(systemSymbol: .arrowDownRightAndArrowUpLeft)
+                    .font(.headline)
+                    .frame(width: 20)
+            }
+            .matchedGeometryEffect(
+                id: PlayerNamespace.expandShrinkButton, in: namespace
+            )
         }
         .frame(height: 20)
     }
@@ -214,11 +263,11 @@ struct PlayerView: View {
         )
         .foregroundStyle(
             isVolumeBarActive
-                ? .primary : player.isMuted ? .quaternary : .secondary
+                ? .primary : isMuted ? .quaternary : .secondary
         )
         .backgroundStyle(.quinary)
         .frame(width: 72, height: 12)
-        .animation(.default.speed(2), value: player.isMuted)
+        .animation(.default.speed(2), value: isMuted)
         .matchedGeometryEffect(id: PlayerNamespace.volumeBar, in: namespace)
 
         // Speaker
@@ -234,6 +283,9 @@ struct PlayerView: View {
             .bounce, value: playerKeyboardControl.speakerButtonBounceAnimation
         )
         .matchedGeometryEffect(id: PlayerNamespace.volumeButton, in: namespace)
+        .contextMenu {
+            Toggle("Mute", isOn: isMutedBinding)
+        }
     }
 
     @ViewBuilder private func progressBar() -> some View {
@@ -293,22 +345,6 @@ struct PlayerView: View {
             .matchedGeometryEffect(
                 id: PlayerNamespace.durationText, in: namespace
             )
-    }
-
-    private var progressBinding: Binding<CGFloat> {
-        Binding {
-            playbackTime?.progress ?? .zero
-        } set: { newValue in
-            player.progress = newValue
-        }
-    }
-
-    private var volumeBinding: Binding<CGFloat> {
-        Binding {
-            player.volume
-        } set: { newValue in
-            player.volume = newValue
-        }
     }
 }
 

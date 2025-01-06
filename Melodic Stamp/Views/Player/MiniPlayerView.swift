@@ -58,6 +58,9 @@ struct MiniPlayerView: View {
     @State private var shouldUseRemainingDuration: Bool = true
 
     @State private var playbackTime: PlaybackTime?
+    @State private var volume: CGFloat = .zero
+    @State private var isPlaying: Bool = false
+    @State private var isMuted: Bool = false
 
     var body: some View {
         VStack(spacing: 12) {
@@ -113,9 +116,24 @@ struct MiniPlayerView: View {
             }
         }
 
-        // Receive playback time update
+        // Receive publishers
         .onReceive(player.playbackTimePublisher) { playbackTime in
             self.playbackTime = playbackTime
+        }
+        .onReceive(player.volumePublisher) { volume in
+            self.volume = volume
+        }
+        .onReceive(player.isPlayingPublisher) { isPlaying in
+            self.isPlaying = isPlaying
+        }
+        .onReceive(player.isMutedPublisher) { isMuted in
+            self.isMuted = isMuted
+        }
+        .onAppear {
+            playbackTime = player.playbackTime
+            volume = player.volume
+            isPlaying = player.isPlaying
+            isMuted = player.isMuted
         }
         .onChange(of: player.currentIndex, initial: true) { _, newValue in
             guard newValue == nil else { return }
@@ -185,28 +203,47 @@ struct MiniPlayerView: View {
 
     private var volumeBinding: Binding<CGFloat> {
         Binding {
-            player.volume
+            volume
         } set: { newValue in
             player.volume = newValue
         }
     }
 
+    private var isPlayingBinding: Binding<Bool> {
+        Binding { isPlaying } set: { newValue in
+            player.isPlaying = newValue
+        }
+    }
+
+    private var isMutedBinding: Binding<Bool> {
+        Binding { isMuted } set: { newValue in
+            player.isMuted = newValue
+        }
+    }
+
     @ViewBuilder private func header() -> some View {
+        @Bindable var player = player
+
         HStack(alignment: .center, spacing: 12) {
             if isTitleHovering {
-                // Expand / shrink
-                AliveButton(
-                    enabledStyle: .tertiary, hoveringStyle: .secondary
-                ) {
-                    alwaysOnTop.giveUp()
-                    windowManager.style = .main
+                // Playlist
+                Menu {
+                    Button("Open in Playlist") {
+                        fileManager.emitOpen(style: .inCurrentPlaylist)
+                    }
+
+                    Button("Add to Playlist") {
+                        fileManager.emitAdd(style: .toCurrentPlaylist)
+                    }
+
+                    Divider()
+
+                    playlistMenu()
                 } label: {
-                    Image(systemSymbol: .arrowDownLeftAndArrowUpRight)
+                    Image(systemSymbol: .listTriangle)
                 }
-                .matchedGeometryEffect(
-                    id: PlayerNamespace.expandShrinkButton, in: namespace
-                )
-                .transition(.blurReplace)
+                .buttonStyle(.borderless)
+                .tint(.secondary)
             }
 
             // Playback mode
@@ -223,6 +260,9 @@ struct MiniPlayerView: View {
             .matchedGeometryEffect(
                 id: PlayerNamespace.playbackModeButton, in: namespace
             )
+            .contextMenu {
+                PlaybackModePicker(selection: $player.playbackMode)
+            }
 
             // Playback looping
             AliveButton(
@@ -281,24 +321,19 @@ struct MiniPlayerView: View {
             }
 
             if isTitleHovering {
-                // Playlist
-                Menu {
-                    Button("Open in Playlist") {
-                        fileManager.emitOpen(style: .inCurrentPlaylist)
-                    }
-
-                    Button("Add to Playlist") {
-                        fileManager.emitAdd(style: .toCurrentPlaylist)
-                    }
-
-                    Divider()
-
-                    playlistMenu()
+                // Expand / shrink
+                AliveButton(
+                    enabledStyle: .tertiary, hoveringStyle: .secondary
+                ) {
+                    alwaysOnTop.giveUp()
+                    windowManager.style = .main
                 } label: {
-                    Image(systemSymbol: .listTriangle)
+                    Image(systemSymbol: .arrowUpLeftAndArrowDownRight)
                 }
-                .buttonStyle(.borderless)
-                .tint(.secondary)
+                .matchedGeometryEffect(
+                    id: PlayerNamespace.expandShrinkButton, in: namespace
+                )
+                .transition(.blurReplace)
             }
         }
         .frame(height: 16)
@@ -376,35 +411,30 @@ struct MiniPlayerView: View {
                     .frame(width: 0)
             } else {
                 // Output device
-                if let binding = ~$player.selectedOutputDevice {
-                    Picker("", selection: binding) {
-                        OutputDeviceList(devices: player.outputDevices)
-                            .onAppear {
-                                player.updateOutputDevices()
-                            }
+                Menu {
+                    OutputDevicePicker(
+                        devices: player.outputDevices,
+                        selection: $player.selectedOutputDevice
+                    )
+                    .onAppear {
+                        player.updateOutputDevices()
                     }
-                    .labelsHidden()
-                    .buttonStyle(.borderless)
-                    .tint(.secondary)
-                }
-
-                // Regain progress control
-                AliveButton {
-                    activeControl = .progress
                 } label: {
-                    Image(systemSymbol: .chevronLeft)
+                    Image(systemSymbol: .airplayaudio)
                 }
+                .buttonStyle(.borderless)
+                .tint(.secondary)
             }
         }
 
         if isVolumeControlActive || !isProgressBarExpanded {
             // Speaker
             AliveButton(enabledStyle: .secondary) {
-                switch activeControl {
+                activeControl = switch activeControl {
                 case .progress:
-                    activeControl = .volume
+                    .volume
                 case .volume:
-                    player.isMuted.toggle()
+                    .progress
                 }
             } label: {
                 player.speakerImage
@@ -419,6 +449,9 @@ struct MiniPlayerView: View {
             .matchedGeometryEffect(
                 id: PlayerNamespace.volumeButton, in: namespace
             )
+            .contextMenu {
+                Toggle("Mute", isOn: isMutedBinding)
+            }
         }
     }
 
@@ -493,7 +526,7 @@ struct MiniPlayerView: View {
                 .foregroundStyle(
                     isProgressBarActive
                         ? .primary
-                        : isVolumeControlActive && player.isMuted
+                        : isVolumeControlActive && isMuted
                         ? .quaternary : .secondary
                 )
                 .backgroundStyle(.quinary)
@@ -509,7 +542,7 @@ struct MiniPlayerView: View {
 
                 isProgressBarHovering = true
             }
-            .animation(.default.speed(2), value: player.isMuted)
+            .animation(.default.speed(2), value: isMuted)
             .matchedGeometryEffect(id: activeControl.id, in: namespace)
 
             Group {
