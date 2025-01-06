@@ -1,8 +1,8 @@
 //
-//  PlayableItem.swift
+//  Track.swift
 //  MelodicStamp
 //
-//  Created by Xinshao_Air on 2024/11/20.
+//  Created by KrLite on 2024/11/20.
 //
 
 import AppKit
@@ -10,7 +10,7 @@ import CSFBAudioEngine
 import Luminare
 import SwiftUI
 
-struct PlayableItem: Identifiable {
+struct Track: Identifiable {
     let id = UUID()
     let url: URL
     @State var metadata: Metadata
@@ -28,19 +28,19 @@ struct PlayableItem: Identifiable {
     }
 }
 
-extension PlayableItem: Equatable {
-    static func == (lhs: PlayableItem, rhs: PlayableItem) -> Bool {
+extension Track: Equatable {
+    static func == (lhs: Track, rhs: Track) -> Bool {
         lhs.id == rhs.id
     }
 }
 
-extension PlayableItem: Hashable {
+extension Track: Hashable {
     func hash(into hasher: inout Hasher) {
         hasher.combine(id)
     }
 }
 
-extension PlayableItem: LuminareSelectionData {
+extension Track: LuminareSelectionData {
     var isSelectable: Bool {
         metadata.state.isLoaded
     }

@@ -99,14 +99,14 @@ struct MiniPlayerView: View {
         // Read lyrics
         // Don't extract this logic or modify the tasks!
         .onAppear {
-            guard let current = player.current else { return }
+            guard let track = player.track else { return }
 
             Task {
-                let raw = await current.metadata.poll(for: \.lyrics).current
+                let raw = await track.metadata.poll(for: \.lyrics).current
                 await lyrics.read(raw)
             }
         }
-        .onChange(of: player.current) { _, newValue in
+        .onChange(of: player.track) { _, newValue in
             guard let newValue else { return }
             lyrics.clear(newValue.url)
 
@@ -289,7 +289,7 @@ struct MiniPlayerView: View {
                 ShrinkableMarqueeScrollView {
                     switch headerControl {
                     case .title:
-                        MusicTitle(item: player.current)
+                        MusicTitle(item: player.track)
                     case .lyrics:
                         ComposedLyricsView()
                             .environment(lyrics)
@@ -300,7 +300,7 @@ struct MiniPlayerView: View {
                 .padding(.bottom, 2)
             }
 
-            if headerControl.hasThumbnail, let thumbnail = player.current?.metadata.thumbnail {
+            if headerControl.hasThumbnail, let thumbnail = player.track?.metadata.thumbnail {
                 MusicCover(images: [thumbnail], hasPlaceholder: false, cornerRadius: 2)
                     .padding(.bottom, 2)
             }
@@ -441,6 +441,7 @@ struct MiniPlayerView: View {
                     .contentTransition(.symbolEffect(.replace))
                     .frame(width: 20, height: 16)
             }
+            .disabled(!player.hasCurrentTrack)
             .symbolEffect(.bounce, value: activeControl)
             .symbolEffect(
                 .bounce,
@@ -522,7 +523,7 @@ struct MiniPlayerView: View {
                             .toggle()
                     }
                 }
-                .disabled(isProgressControlActive && !player.hasCurrentTrack)
+                .disabled(!player.hasCurrentTrack)
                 .foregroundStyle(
                     isProgressBarActive
                         ? .primary
@@ -567,8 +568,8 @@ struct MiniPlayerView: View {
     }
 
     @ViewBuilder private func playlistMenu() -> some View {
-        let selection: Binding<PlayableItem?> = Binding {
-            player.current
+        let selection: Binding<Track?> = Binding {
+            player.track
         } set: { newValue in
             if let newValue {
                 player.play(item: newValue)

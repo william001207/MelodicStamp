@@ -23,6 +23,7 @@ class SFBAudioEnginePlayer: NSObject, Player {
     private var mutedVolume: CGFloat = .zero
 
     var isPlaying: Bool { player.isPlaying }
+    var isRunning: Bool { player.engineIsRunning }
     private(set) var isMuted: Bool = false
 
     var playbackTime: PlaybackTime? {
@@ -36,7 +37,7 @@ class SFBAudioEnginePlayer: NSObject, Player {
         .init(player.volume)
     }
 
-    func play(_ item: PlayableItem) {
+    func play(_ item: Track) {
         do {
             if let decoder = try Self.decoder(for: item) {
                 try player.play(decoder)
@@ -46,7 +47,7 @@ class SFBAudioEnginePlayer: NSObject, Player {
         }
     }
 
-    func enqueue(_ item: PlayableItem) {
+    func enqueue(_ item: Track) {
         do {
             if let decoder = try Self.decoder(for: item) {
                 try player.enqueue(decoder)
@@ -138,7 +139,7 @@ class SFBAudioEnginePlayer: NSObject, Player {
 }
 
 extension SFBAudioEnginePlayer {
-    static func decoder(for item: PlayableItem, enablesDoP: Bool = false) throws -> PCMDecoding? {
+    static func decoder(for item: Track, enablesDoP: Bool = false) throws -> PCMDecoding? {
         let url = item.url
         guard url.startAccessingSecurityScopedResource() else { return nil }
         defer { url.stopAccessingSecurityScopedResource() }

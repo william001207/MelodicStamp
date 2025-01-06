@@ -14,9 +14,6 @@ struct PlayerCommands: Commands {
 
     var body: some Commands {
         CommandMenu("Player") {
-            let hasPlayer = player != nil
-            let hasPlayerKeyboardControl = playerKeyboardControl != nil
-
             Group {
                 Button(player?.isPlaying ?? false ? "Pause" : "Play") {
                     player?.togglePlayPause()
@@ -81,78 +78,81 @@ struct PlayerCommands: Commands {
                         .badge("×0.1")
                     }
                 }
-                .disabled(player?.hasCurrentTrack != true)
+                .disabled(!hasCurrentTrack)
 
                 Divider()
 
                 Group {
-                    if let player {
-                        @Bindable var player = player
-
-                        Toggle("Mute", isOn: $player.isMuted)
-                    } else {
-                        Button("Mute") {
-                            // Do nothing
+                    Group {
+                        if let player {
+                            @Bindable var player = player
+                            
+                            Toggle("Mute", isOn: $player.isMuted)
+                        } else {
+                            Button("Mute") {
+                                // Do nothing
+                            }
                         }
                     }
-                }
-                .keyboardShortcut("m", modifiers: [.command, .control])
-
-                Button("Louder") {
-                    guard let player else { return }
-                    playerKeyboardControl?.handleVolumeAdjustment(
-                        in: player, phase: .down, sign: .plus
-                    )
-                }
-                .keyboardShortcut(.upArrow, modifiers: .command)
-                .modifierKeyAlternate(.shift) {
+                    .keyboardShortcut("m", modifiers: [.command, .control])
+                    
                     Button("Louder") {
                         guard let player else { return }
                         playerKeyboardControl?.handleVolumeAdjustment(
-                            in: player, phase: .down, modifiers: .shift,
-                            sign: .plus
+                            in: player, phase: .down, sign: .plus
                         )
                     }
-                    .badge("×5")
-                }
-                .modifierKeyAlternate(.option) {
-                    Button("Louder") {
-                        guard let player else { return }
-                        playerKeyboardControl?.handleVolumeAdjustment(
-                            in: player, phase: .down, modifiers: .option,
-                            sign: .plus
-                        )
+                    .keyboardShortcut(.upArrow, modifiers: .command)
+                    .modifierKeyAlternate(.shift) {
+                        Button("Louder") {
+                            guard let player else { return }
+                            playerKeyboardControl?.handleVolumeAdjustment(
+                                in: player, phase: .down, modifiers: .shift,
+                                sign: .plus
+                            )
+                        }
+                        .badge("×5")
                     }
-                    .badge("×0.1")
-                }
-
-                Button("Quieter") {
-                    guard let player else { return }
-                    playerKeyboardControl?.handleVolumeAdjustment(
-                        in: player, phase: .down, sign: .minus
-                    )
-                }
-                .keyboardShortcut(.downArrow, modifiers: .command)
-                .modifierKeyAlternate(.shift) {
+                    .modifierKeyAlternate(.option) {
+                        Button("Louder") {
+                            guard let player else { return }
+                            playerKeyboardControl?.handleVolumeAdjustment(
+                                in: player, phase: .down, modifiers: .option,
+                                sign: .plus
+                            )
+                        }
+                        .badge("×0.1")
+                    }
+                    
                     Button("Quieter") {
                         guard let player else { return }
                         playerKeyboardControl?.handleVolumeAdjustment(
-                            in: player, phase: .down, modifiers: .shift,
-                            sign: .minus
+                            in: player, phase: .down, sign: .minus
                         )
                     }
-                    .badge("×5")
-                }
-                .modifierKeyAlternate(.option) {
-                    Button("Quieter") {
-                        guard let player else { return }
-                        playerKeyboardControl?.handleVolumeAdjustment(
-                            in: player, phase: .down, modifiers: .option,
-                            sign: .minus
-                        )
+                    .keyboardShortcut(.downArrow, modifiers: .command)
+                    .modifierKeyAlternate(.shift) {
+                        Button("Quieter") {
+                            guard let player else { return }
+                            playerKeyboardControl?.handleVolumeAdjustment(
+                                in: player, phase: .down, modifiers: .shift,
+                                sign: .minus
+                            )
+                        }
+                        .badge("×5")
                     }
-                    .badge("×0.1")
+                    .modifierKeyAlternate(.option) {
+                        Button("Quieter") {
+                            guard let player else { return }
+                            playerKeyboardControl?.handleVolumeAdjustment(
+                                in: player, phase: .down, modifiers: .option,
+                                sign: .minus
+                            )
+                        }
+                        .badge("×0.1")
+                    }
                 }
+                .disabled(!hasCurrentTrack)
 
                 Divider()
 
@@ -160,13 +160,13 @@ struct PlayerCommands: Commands {
                     player?.nextTrack()
                 }
                 .keyboardShortcut(.rightArrow, modifiers: [.command, .control])
-                .disabled(player?.hasNextTrack != true)
+                .disabled(!hasNextTrack)
 
                 Button("Previous Song") {
                     player?.previousTrack()
                 }
                 .keyboardShortcut(.leftArrow, modifiers: [.command, .control])
-                .disabled(player?.hasPreviousTrack != true)
+                .disabled(!hasPreviousTrack)
 
                 if let player {
                     @Bindable var player = player
@@ -219,4 +219,15 @@ struct PlayerCommands: Commands {
             }
         }
     }
+    
+    private var hasPlayer: Bool { player != nil }
+    
+    private var hasPlayerKeyboardControl: Bool { playerKeyboardControl != nil }
+    
+    private var hasCurrentTrack: Bool { player?.hasCurrentTrack ?? false }
+    
+    private var hasPreviousTrack: Bool { player?.hasPreviousTrack ?? false }
+    
+    private var hasNextTrack: Bool { player?.hasNextTrack ?? false }
+    
 }

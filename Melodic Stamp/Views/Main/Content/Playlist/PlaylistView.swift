@@ -179,9 +179,9 @@ struct PlaylistView: View {
         .buttonStyle(.luminare)
     }
 
-    @ViewBuilder private func itemView(for item: PlayableItem) -> some View {
+    @ViewBuilder private func itemView(for item: Track) -> some View {
         PlayableItemView(
-            item: item,
+            track: item,
             isSelected: metadataEditor.items.contains(item)
         )
         .swipeActions {
@@ -228,7 +228,7 @@ struct PlaylistView: View {
         }
     }
 
-    @ViewBuilder private func contextMenu(for item: PlayableItem) -> some View {
+    @ViewBuilder private func contextMenu(for item: Track) -> some View {
         Button {
             player.play(item: item)
         } label: {
@@ -273,7 +273,7 @@ struct PlaylistView: View {
         return true
     }
 
-    @discardableResult private func handleRemove(items: [PlayableItem]) -> Bool {
+    @discardableResult private func handleRemove(items: [Track]) -> Bool {
         guard canRemove else { return false }
         player.removeFromPlaylist(items: items)
         items.forEach { metadataEditor.items.remove($0) }

@@ -14,13 +14,14 @@ protocol Player {
     var delegate: (any PlayerDelegate)? { get set }
 
     var isPlaying: Bool { get }
+    var isRunning: Bool { get }
     var isMuted: Bool { get }
 
     var playbackTime: PlaybackTime? { get }
     var playbackVolume: CGFloat { get }
 
-    func play(_ item: PlayableItem)
-    func enqueue(_ item: PlayableItem)
+    func play(_ item: Track)
+    func enqueue(_ item: Track)
 
     func play()
     func pause()
@@ -80,16 +81,17 @@ class BlankPlayer: Player {
     var delegate: (any PlayerDelegate)?
 
     var isPlaying: Bool = false
+    var isRunning: Bool = true
     var isMuted: Bool = false
 
     var playbackTime: PlaybackTime? = .init(duration: .seconds(60), elapsed: .zero)
     var playbackVolume: CGFloat = 1
 
-    func play(_: PlayableItem) {
+    func play(_: Track) {
         isPlaying = true
     }
 
-    func enqueue(_: PlayableItem) {}
+    func enqueue(_: Track) {}
 
     func play() {
         isPlaying = true

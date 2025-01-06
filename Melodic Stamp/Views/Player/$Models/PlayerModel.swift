@@ -39,6 +39,7 @@ import SwiftUI
     private var playbackTimeSubject = PassthroughSubject<PlaybackTime?, Never>()
     private var volumeSubject = PassthroughSubject<CGFloat, Never>()
     private var isPlayingSubject = PassthroughSubject<Bool, Never>()
+    private var isRunningSubject = PassthroughSubject<Bool, Never>()
     private var isMutedSubject = PassthroughSubject<Bool, Never>()
     private var visualizationDataSubject = PassthroughSubject<[CGFloat], Never>()
 
@@ -53,6 +54,10 @@ import SwiftUI
     var isPlayingPublisher: AnyPublisher<Bool, Never> {
         isPlayingSubject.eraseToAnyPublisher()
     }
+    
+    var isRunningPublisher: AnyPublisher<Bool, Never> {
+        isRunningSubject.eraseToAnyPublisher()
+    }
 
     var isMutedPublisher: AnyPublisher<Bool, Never> {
         isMutedSubject.eraseToAnyPublisher()
@@ -64,8 +69,8 @@ import SwiftUI
 
     // MARK: Playlist & Playback
 
-    private(set) var current: PlayableItem?
-    private(set) var playlist: [PlayableItem] = []
+    private(set) var track: Track?
+    private(set) var playlist: [Track] = []
 
     var playbackMode: PlaybackMode = .sequential
     var playbackLooping: Bool = false
@@ -122,6 +127,10 @@ import SwiftUI
             isPlayingSubject.send(newValue)
         }
     }
+    
+    var isRunning: Bool {
+        player.isRunning
+    }
 
     var isMuted: Bool {
         get {
@@ -139,11 +148,11 @@ import SwiftUI
     }
 
     var hasCurrentTrack: Bool {
-        current != nil
+        track != nil
     }
 
     var hasNextTrack: Bool {
-        guard current != nil else { return false }
+        guard track != nil else { return false }
 
         switch playbackMode {
         case .sequential:
@@ -155,7 +164,7 @@ import SwiftUI
     }
 
     var hasPreviousTrack: Bool {
-        guard current != nil else { return false }
+        guard track != nil else { return false }
 
         switch playbackMode {
         case .sequential:
@@ -167,8 +176,8 @@ import SwiftUI
     }
 
     var currentIndex: Int? {
-        guard let current else { return nil }
-        return playlist.firstIndex(of: current)
+        guard let track else { return nil }
+        return playlist.firstIndex(of: track)
     }
 
     var nextIndex: Int? {
@@ -244,7 +253,7 @@ extension PlayerModel {
     func randomIndex() -> Int? {
         guard !playlist.isEmpty else { return nil }
 
-        if let current, let index = playlist.firstIndex(of: current) {
+        if let track, let index = playlist.firstIndex(of: track) {
             let indices = Array(playlist.indices).filter { $0 != index }
             return indices.randomElement()
         } else {
@@ -252,21 +261,18 @@ extension PlayerModel {
         }
     }
 
-    func stop() {
-        player.stop()
-    }
-
-    func play(item: PlayableItem) {
+    func play(item: Track) {
         addToPlaylist(urls: [item.url])
 
         Task { @MainActor in
-            current = item
+            track = item
             player.play(item)
+            isRunningSubject.send(true)
         }
     }
 
     func play(url: URL) {
-        if let item = PlayableItem(url: url) {
+        if let item = Track(url: url) {
             play(item: item)
         }
     }
@@ -275,13 +281,13 @@ extension PlayerModel {
         for url in urls {
             guard !playlist.contains(where: { $0.url == url }) else { continue }
 
-            if let item = PlayableItem(url: url) {
+            if let item = Track(url: url) {
                 addToPlaylist(items: [item])
             }
         }
     }
 
-    func addToPlaylist(items: [PlayableItem]) {
+    func addToPlaylist(items: [Track]) {
         for item in items {
             guard !playlist.contains(item) else { continue }
             playlist.append(item)
@@ -291,9 +297,9 @@ extension PlayerModel {
     func removeFromPlaylist(urls: [URL]) {
         for url in urls {
             if let index = playlist.firstIndex(where: { $0.url == url }) {
-                if current?.url == url {
+                if track?.url == url {
                     player.stop()
-                    current = nil
+                    track = nil
                 }
                 playlist.remove(at: index)
             }
@@ -304,7 +310,7 @@ extension PlayerModel {
         playlist.move(fromOffsets: indices, toOffset: destination)
     }
 
-    func removeFromPlaylist(items: [PlayableItem]) {
+    func removeFromPlaylist(items: [Track]) {
         removeFromPlaylist(urls: items.map(\.url))
     }
 
@@ -319,18 +325,35 @@ extension PlayerModel {
     func pause() {
         player.pause()
     }
+    
+    func stop() {
+        volume = .zero
+        isPlaying = false
+        isMuted = false
+        
+        player.stop()
+        isRunningSubject.send(false)
+    }
 
     func togglePlayPause() {
         player.togglePlaying()
     }
 
     func nextTrack() {
-        guard let nextIndex else { return }
+        guard let nextIndex else {
+            stop()
+            return
+        }
+        
         play(item: playlist[nextIndex])
     }
 
     func previousTrack() {
-        guard let previousIndex else { return }
+        guard let previousIndex else {
+            stop()
+            return
+        }
+        
         play(item: playlist[previousIndex])
     }
 
@@ -434,9 +457,8 @@ extension PlayerModel: AudioPlayer.Delegate {
             if let nowPlayingDecoder = audioPlayer.nowPlaying,
                let audioDecoder = nowPlayingDecoder as? AudioDecoder,
                let url = audioDecoder.inputSource.url {
-                self.current = self.playlist.first(where: { $0.url == url })
+                self.track = self.playlist.first { $0.url == url }
             } else {
-                self.current = nil
                 self.nextTrack()
             }
 
@@ -454,8 +476,9 @@ extension PlayerModel: AudioPlayer.Delegate {
         }
     }
 
-    func audioPlayer(_ audioPlayer: AudioPlayer, encounteredError _: Error) {
-        audioPlayer.stop()
+    func audioPlayer(_: AudioPlayer, encounteredError error: Error) {
+        stop()
+        print(error)
     }
 }
 
@@ -538,8 +561,8 @@ extension PlayerModel {
     }
 
     func updateNowPlayingMetadataInfo() {
-        if let current {
-            current.metadata.updateNowPlayingInfo()
+        if let track {
+            track.metadata.updateNowPlayingInfo()
         } else {
             Metadata.resetNowPlayingInfo()
         }
@@ -601,13 +624,13 @@ extension PlayerModel {
         }
 
         // Seek
-//        commandCenter.changePlaybackPositionCommand.addTarget { [unowned self] event in
-//            guard hasCurrentTrack else { return .noActionableNowPlayingItem }
-//            guard let event = event as? MPChangePlaybackPositionCommandEvent else { return .commandFailed }
-//
-//            progress = event.positionTime / duration.timeInterval
-//            return .success
-//        }
+        commandCenter.changePlaybackPositionCommand.addTarget { [unowned self] event in
+            guard hasCurrentTrack else { return .noActionableNowPlayingItem }
+            guard let event = event as? MPChangePlaybackPositionCommandEvent else { return .commandFailed }
+
+            progress = event.positionTime / unwrappedPlaybackTime.duration.timeInterval
+            return .success
+        }
 
         // Next track
         commandCenter.nextTrackCommand.addTarget { [unowned self] _ in

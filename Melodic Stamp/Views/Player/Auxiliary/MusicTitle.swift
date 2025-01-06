@@ -34,7 +34,7 @@ struct MusicTitle: View {
     }
 
     var mode: DisplayMode = .comprehensive
-    var item: PlayableItem?
+    var item: Track?
 
     var body: some View {
         if let item {
@@ -81,12 +81,12 @@ struct MusicTitle: View {
         }
     }
 
-    static func fallbackTitle(for item: PlayableItem) -> String {
+    static func fallbackTitle(for item: Track) -> String {
         Metadata.fallbackTitle(url: item.url)
     }
 
     static func stringifiedTitle(
-        mode: DisplayMode = .comprehensive, for item: PlayableItem, separator: String = " "
+        mode: DisplayMode = .comprehensive, for item: Track, separator: String = " "
     ) -> String {
         var components: [String] = []
         if mode.hasTitle {

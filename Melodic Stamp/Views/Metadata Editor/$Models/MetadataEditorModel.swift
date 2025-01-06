@@ -25,7 +25,7 @@ enum MetadataEditingState: Equatable {
 @Observable class MetadataEditorModel: Identifiable {
     let id: UUID = .init()
 
-    var items: Set<PlayableItem> = .init()
+    var items: Set<Track> = .init()
 
     var metadatas: Set<Metadata> {
         Set(items.map(\.metadata))

@@ -122,16 +122,16 @@ struct ContentView: View {
     }
 
     private var title: String {
-        if let current = player.current {
-            MusicTitle.stringifiedTitle(mode: .title, for: current)
+        if let track = player.track {
+            MusicTitle.stringifiedTitle(mode: .title, for: track)
         } else {
             Bundle.main.displayName
         }
     }
 
     private var subtitle: String {
-        if let current = player.current {
-            MusicTitle.stringifiedTitle(mode: .artists, for: current)
+        if let track = player.track {
+            MusicTitle.stringifiedTitle(mode: .artists, for: track)
         } else if !player.isPlaylistEmpty {
             .init(localized: .init(
                 "App: (Subtitle) Songs",

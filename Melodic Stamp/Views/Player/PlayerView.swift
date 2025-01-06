@@ -151,7 +151,7 @@ struct PlayerView: View {
 
             Group {
                 ShrinkableMarqueeScrollView {
-                    MusicTitle(item: player.current)
+                    MusicTitle(item: player.track)
                 }
                 .animation(.default, value: player.currentIndex)
                 .matchedGeometryEffect(id: PlayerNamespace.title, in: namespace)
@@ -261,6 +261,7 @@ struct PlayerView: View {
                 }
             }
         )
+        .disabled(!player.hasCurrentTrack)
         .foregroundStyle(
             isVolumeBarActive
                 ? .primary : isMuted ? .quaternary : .secondary
@@ -279,6 +280,7 @@ struct PlayerView: View {
                 .contentTransition(.symbolEffect(.replace))
                 .frame(width: 16)
         }
+        .disabled(!player.hasCurrentTrack)
         .symbolEffect(
             .bounce, value: playerKeyboardControl.speakerButtonBounceAnimation
         )

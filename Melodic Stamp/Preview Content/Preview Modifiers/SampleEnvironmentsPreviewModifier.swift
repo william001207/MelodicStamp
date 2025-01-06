@@ -62,7 +62,7 @@ extension SampleEnvironmentsPreviewModifier {
         return .init(url: sampleURL, from: metadata)
     }
 
-    static var samplePlayableItem: PlayableItem {
+    static var samplePlayableItem: Track {
         .init(
             url: sampleURL,
             metadata: sampleMetadata

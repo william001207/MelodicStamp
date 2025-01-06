@@ -11,25 +11,25 @@ import SwiftUI
 struct PlayableItemView: View {
     @Environment(PlayerModel.self) private var player
 
-    var item: PlayableItem
+    var track: Track
     var isSelected: Bool
 
     @State private var isHovering: Bool = false
 
     var body: some View {
         HStack(alignment: .center) {
-            let isMetadataLoaded = item.metadata.state.isLoaded
-            let isMetadataModified = item.metadata.isModified
+            let isMetadataLoaded = track.metadata.state.isLoaded
+            let isMetadataModified = track.metadata.isModified
 
             VStack(alignment: .leading, spacing: 2) {
                 HStack {
                     if isMetadataLoaded {
                         if isPlaying {
                             MarqueeScrollView(animate: false) {
-                                MusicTitle(item: item)
+                                MusicTitle(item: track)
                             }
                         } else {
-                            MusicTitle(item: item)
+                            MusicTitle(item: track)
                         }
                     } else {
                         Text("Loading…")
@@ -49,7 +49,7 @@ struct PlayableItemView: View {
                             .animation(nil, value: isSelected)
                     }
 
-                    Text(item.url.lastPathComponent)
+                    Text(track.url.lastPathComponent)
                         .font(.caption)
                         .foregroundStyle(.placeholder)
                 }
@@ -63,7 +63,7 @@ struct PlayableItemView: View {
             Spacer()
 
             AliveButton {
-                player.play(item: item)
+                player.play(item: track)
             } label: {
                 cover(isMetadataLoaded: isMetadataLoaded)
             }
@@ -79,12 +79,12 @@ struct PlayableItemView: View {
     }
 
     private var isPlaying: Bool {
-        player.current == item
+        player.track == track
     }
 
     @ViewBuilder private func cover(isMetadataLoaded: Bool) -> some View {
         ZStack {
-            if isMetadataLoaded, let image = item.metadata.thumbnail {
+            if isMetadataLoaded, let image = track.metadata.thumbnail {
                 MusicCover(
                     images: [image], hasPlaceholder: false, cornerRadius: 8
                 )
