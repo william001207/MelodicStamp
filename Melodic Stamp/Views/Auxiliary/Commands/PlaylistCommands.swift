@@ -53,7 +53,7 @@ struct PlaylistCommands: Commands {
                     let item = metadataEditor.items.first {
                     let title = MusicTitle.stringifiedTitle(mode: .title, for: item)
                     Button {
-                        player.play(item: item)
+                        player.play(track: item)
                     } label: {
                         if !title.isEmpty {
                             Text("Play \(title)")

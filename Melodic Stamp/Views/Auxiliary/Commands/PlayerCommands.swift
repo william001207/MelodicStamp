@@ -19,13 +19,13 @@ struct PlayerCommands: Commands {
                     player?.togglePlayPause()
                 }
                 .keyboardShortcut(.return, modifiers: .command)
-                .disabled(player?.hasCurrentTrack != true)
+                .disabled(!isPlayable)
 
                 Group {
                     Button("Fast Forward") {
                         guard let player else { return }
                         playerKeyboardControl?.handleProgressAdjustment(
-                            in: player, phase: .down, sign: .plus
+                            in: player, phase: .all, sign: .plus
                         )
                     }
                     .keyboardShortcut(.rightArrow, modifiers: .command)
@@ -33,7 +33,7 @@ struct PlayerCommands: Commands {
                         Button("Fast Forward") {
                             guard let player else { return }
                             playerKeyboardControl?.handleProgressAdjustment(
-                                in: player, phase: .down, modifiers: .shift,
+                                in: player, phase: .all, modifiers: .shift,
                                 sign: .plus
                             )
                         }
@@ -43,7 +43,7 @@ struct PlayerCommands: Commands {
                         Button("Fast Forward") {
                             guard let player else { return }
                             playerKeyboardControl?.handleProgressAdjustment(
-                                in: player, phase: .down, modifiers: .option,
+                                in: player, phase: .all, modifiers: .option,
                                 sign: .plus
                             )
                         }
@@ -53,7 +53,7 @@ struct PlayerCommands: Commands {
                     Button("Rewind") {
                         guard let player else { return }
                         playerKeyboardControl?.handleProgressAdjustment(
-                            in: player, phase: .down, sign: .minus
+                            in: player, phase: .all, sign: .minus
                         )
                     }
                     .keyboardShortcut(.leftArrow, modifiers: .command)
@@ -61,7 +61,7 @@ struct PlayerCommands: Commands {
                         Button("Rewind") {
                             guard let player else { return }
                             playerKeyboardControl?.handleProgressAdjustment(
-                                in: player, phase: .down, modifiers: .shift,
+                                in: player, phase: .all, modifiers: .shift,
                                 sign: .minus
                             )
                         }
@@ -71,14 +71,14 @@ struct PlayerCommands: Commands {
                         Button("Rewind") {
                             guard let player else { return }
                             playerKeyboardControl?.handleProgressAdjustment(
-                                in: player, phase: .down, modifiers: .option,
+                                in: player, phase: .all, modifiers: .option,
                                 sign: .minus
                             )
                         }
                         .badge("×0.1")
                     }
                 }
-                .disabled(!hasCurrentTrack)
+                .disabled(!isPlayable)
 
                 Divider()
 
@@ -86,7 +86,7 @@ struct PlayerCommands: Commands {
                     Group {
                         if let player {
                             @Bindable var player = player
-                            
+
                             Toggle("Mute", isOn: $player.isMuted)
                         } else {
                             Button("Mute") {
@@ -95,11 +95,11 @@ struct PlayerCommands: Commands {
                         }
                     }
                     .keyboardShortcut("m", modifiers: [.command, .control])
-                    
+
                     Button("Louder") {
                         guard let player else { return }
                         playerKeyboardControl?.handleVolumeAdjustment(
-                            in: player, phase: .down, sign: .plus
+                            in: player, phase: .all, sign: .plus
                         )
                     }
                     .keyboardShortcut(.upArrow, modifiers: .command)
@@ -107,7 +107,7 @@ struct PlayerCommands: Commands {
                         Button("Louder") {
                             guard let player else { return }
                             playerKeyboardControl?.handleVolumeAdjustment(
-                                in: player, phase: .down, modifiers: .shift,
+                                in: player, phase: .all, modifiers: .shift,
                                 sign: .plus
                             )
                         }
@@ -117,17 +117,17 @@ struct PlayerCommands: Commands {
                         Button("Louder") {
                             guard let player else { return }
                             playerKeyboardControl?.handleVolumeAdjustment(
-                                in: player, phase: .down, modifiers: .option,
+                                in: player, phase: .all, modifiers: .option,
                                 sign: .plus
                             )
                         }
                         .badge("×0.1")
                     }
-                    
+
                     Button("Quieter") {
                         guard let player else { return }
                         playerKeyboardControl?.handleVolumeAdjustment(
-                            in: player, phase: .down, sign: .minus
+                            in: player, phase: .all, sign: .minus
                         )
                     }
                     .keyboardShortcut(.downArrow, modifiers: .command)
@@ -135,7 +135,7 @@ struct PlayerCommands: Commands {
                         Button("Quieter") {
                             guard let player else { return }
                             playerKeyboardControl?.handleVolumeAdjustment(
-                                in: player, phase: .down, modifiers: .shift,
+                                in: player, phase: .all, modifiers: .shift,
                                 sign: .minus
                             )
                         }
@@ -145,28 +145,31 @@ struct PlayerCommands: Commands {
                         Button("Quieter") {
                             guard let player else { return }
                             playerKeyboardControl?.handleVolumeAdjustment(
-                                in: player, phase: .down, modifiers: .option,
+                                in: player, phase: .all, modifiers: .option,
                                 sign: .minus
                             )
                         }
                         .badge("×0.1")
                     }
                 }
-                .disabled(!hasCurrentTrack)
+                .disabled(!isPlayable)
 
                 Divider()
 
-                Button("Next Song") {
-                    player?.nextTrack()
-                }
-                .keyboardShortcut(.rightArrow, modifiers: [.command, .control])
-                .disabled(!hasNextTrack)
+                Group {
+                    Button("Next Track") {
+                        player?.nextTrack()
+                    }
+                    .keyboardShortcut(.rightArrow, modifiers: [.command, .control])
+                    .disabled(!hasNextTrack)
 
-                Button("Previous Song") {
-                    player?.previousTrack()
+                    Button("Previous Track") {
+                        player?.previousTrack()
+                    }
+                    .keyboardShortcut(.leftArrow, modifiers: [.command, .control])
+                    .disabled(!hasPreviousTrack)
                 }
-                .keyboardShortcut(.leftArrow, modifiers: [.command, .control])
-                .disabled(!hasPreviousTrack)
+                .disabled(!hasCurrentTrack)
 
                 if let player {
                     @Bindable var player = player
@@ -219,15 +222,16 @@ struct PlayerCommands: Commands {
             }
         }
     }
-    
+
     private var hasPlayer: Bool { player != nil }
-    
+
     private var hasPlayerKeyboardControl: Bool { playerKeyboardControl != nil }
-    
+
+    private var isPlayable: Bool { player?.isPlayable ?? false }
+
     private var hasCurrentTrack: Bool { player?.hasCurrentTrack ?? false }
-    
+
     private var hasPreviousTrack: Bool { player?.hasPreviousTrack ?? false }
-    
+
     private var hasNextTrack: Bool { player?.hasNextTrack ?? false }
-    
 }

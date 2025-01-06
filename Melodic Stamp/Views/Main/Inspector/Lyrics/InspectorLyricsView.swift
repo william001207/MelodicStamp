@@ -14,8 +14,6 @@ struct InspectorLyricsView: View {
 
     @Environment(\.appearsActive) private var appearsActive
 
-    @State private var playbackTime: PlaybackTime?
-
     var body: some View {
         // Avoid multiple instantializations
         let lines = lyrics.lines
@@ -56,14 +54,6 @@ struct InspectorLyricsView: View {
                 await loadLyrics()
             }
         }
-        // Receive playback time update
-        .onReceive(player.playbackTimePublisher) { playbackTime in
-            self.playbackTime = playbackTime
-        }
-        .onChange(of: player.currentIndex, initial: true) { _, newValue in
-            guard newValue == nil else { return }
-            playbackTime = nil
-        }
     }
 
     private var alignment: HorizontalAlignment {
@@ -86,8 +76,8 @@ struct InspectorLyricsView: View {
     }
 
     private var highlightedRange: Range<Int> {
-        if let timeElapsed = playbackTime?.elapsed {
-            lyrics.highlight(at: timeElapsed, in: player.track?.url)
+        if let elapsedTime = player.playbackTime?.elapsed {
+            lyrics.highlight(at: elapsedTime, in: player.track?.url)
         } else {
             0 ..< 0
         }

@@ -20,6 +20,23 @@ struct ProportionalWidthEffect: GeometryEffect {
     }
 }
 
+enum OvershootSign {
+    case positive
+    case negative
+    case none
+
+    init(_ sign: FloatingPointSign?) {
+        self = switch sign {
+        case .plus:
+            .positive
+        case .minus:
+            .negative
+        case nil:
+            .none
+        }
+    }
+}
+
 struct ProgressBar: View {
     enum UpdateType {
         case literal
@@ -41,7 +58,7 @@ struct ProgressBar: View {
 
     var shrinkFactor: CGFloat = 0.6
     var overshoot: CGFloat = 16
-    var externalOvershootSign: FloatingPointSign?
+    var externalOvershootSign: OvershootSign = .none
 
     var onPercentageChange: (CGFloat, CGFloat) -> () = { _, _ in }
     var onOvershootOffsetChange: (CGFloat, CGFloat) -> () = { _, _ in }
@@ -84,12 +101,12 @@ struct ProgressBar: View {
 
                 switch interactionState {
                 case .receiving:
-                    // start dragging
+                    // Start dragging
                     isActive = true
                     interactionState = .updating
                     update(percentage: gesture.location.x / containerSize.width)
                 case .updating:
-                    // update dragging
+                    // Update dragging
                     update(
                         percentage: gesture.translation.width / containerSize.width,
                         type: .offset
@@ -111,7 +128,6 @@ struct ProgressBar: View {
                 )
                 tryOvershoot(offset: 0)
             })
-
         .scaleEffect(.init(width: abs(overshootPercentage * overshootFactor) + 1, height: 1), anchor: .leading)
         .offset(x: overshootOffset)
         .animation(.default, value: overshootOffset)
@@ -143,14 +159,12 @@ struct ProgressBar: View {
     }
 
     private var overshootOffset: CGFloat {
-        if let externalOvershootSign {
-            switch externalOvershootSign {
-            case .plus:
-                overshoot
-            case .minus:
-                -overshoot
-            }
-        } else {
+        switch externalOvershootSign {
+        case .positive:
+            overshoot
+        case .negative:
+            -overshoot
+        case .none:
             if overshootPercentage >= 0 {
                 overshootPercentage * overshoot * 0.1
             } else {

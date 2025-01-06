@@ -20,9 +20,6 @@ struct DisplayLyricsView: View {
     @State private var isHovering: Bool = false
     @State private var hoveredIndex: Int? = nil
 
-    @State private var duration: Duration = .zero
-    @State private var elapsedTime: TimeInterval = .zero
-
     var body: some View {
         // Avoid multiple instantializations
         let lines = lyrics.lines
@@ -76,11 +73,11 @@ struct DisplayLyricsView: View {
                 isHovering = hover
             }
         }
-        .onReceive(player.playbackTimePublisher) { playbackTime in
-            guard let playbackTime else { return }
-            elapsedTime = playbackTime.elapsed
-        }
         .animation(.linear, value: elapsedTime) // For time interpolation
+    }
+
+    private var elapsedTime: CGFloat {
+        player.unwrappedPlaybackTime.elapsed
     }
 
     private var highlightedRange: Range<Int> {

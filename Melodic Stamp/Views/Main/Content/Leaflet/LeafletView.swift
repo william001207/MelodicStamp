@@ -13,11 +13,9 @@ struct LeafletView: View {
     @Environment(MetadataEditorModel.self) private var metadataEditor
     @Environment(LyricsModel.self) private var lyrics
 
-    @State private var interaction: AppleMusicLyricsViewInteractionModel = .init()
-
-    @State private var isPlaying: Bool = false
     @State private var isShowingLyrics: Bool = true
 
+    @State private var interaction: AppleMusicLyricsViewInteractionModel = .init()
     @State private var dominantColors: [Color] = [.init(hex: 0x929292), .init(hex: 0xFFFFFF), .init(hex: 0x929292)]
 
     var body: some View {
@@ -102,10 +100,6 @@ struct LeafletView: View {
                     await lyrics.read(raw)
                 }
             }
-
-            .onReceive(player.isPlayingPublisher) { isPlaying in
-                self.isPlaying = isPlaying
-            }
             .colorScheme(.dark)
         }
     }
@@ -145,9 +139,9 @@ struct LeafletView: View {
                 min(500, length * 0.5)
             }
         }
-        .scaleEffect(isPlaying ? 1 : 0.85, anchor: .center)
-        .shadow(radius: isPlaying ? 20 : 10)
-        .animation(.spring(duration: 0.65, bounce: 0.45, blendDuration: 0.75), value: isPlaying)
+        .scaleEffect(player.isPlaying ? 1 : 0.85, anchor: .center)
+        .shadow(radius: player.isPlaying ? 20 : 10)
+        .animation(.spring(duration: 0.65, bounce: 0.45, blendDuration: 0.75), value: player.isPlaying)
     }
 
     @ViewBuilder private func lyricsView() -> some View {

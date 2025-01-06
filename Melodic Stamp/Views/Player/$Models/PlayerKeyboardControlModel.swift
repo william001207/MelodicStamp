@@ -13,13 +13,22 @@ import SwiftUI
     var speakerButtonBounceAnimation: Bool = false
 
     var isPressingSpace: Bool = false
-    var progressBarExternalOvershootSign: FloatingPointSign?
-    var volumeBarExternalOvershootSign: FloatingPointSign?
+    var progressBarExternalOvershootSign: OvershootSign = .none
+    var volumeBarExternalOvershootSign: OvershootSign = .none
 
-    @discardableResult func handlePlayPause(in player: PlayerModel, phase: KeyPress.Phases, modifiers _: EventModifiers = []) -> KeyPress.Result {
+    @discardableResult func handlePlayPause(
+        in player: PlayerModel,
+        phase: KeyPress.Phases, modifiers: EventModifiers = []
+    ) -> KeyPress.Result {
         guard player.hasCurrentTrack else { return .ignored }
 
         switch phase {
+        case .all:
+            handlePlayPause(in: player, phase: .down, modifiers: modifiers)
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                self.handlePlayPause(in: player, phase: .up, modifiers: modifiers)
+            }
+            return .handled
         case .down:
             guard !isPressingSpace else { return .ignored }
 
@@ -34,10 +43,19 @@ import SwiftUI
         }
     }
 
-    @discardableResult func handleProgressAdjustment(in player: PlayerModel, phase: KeyPress.Phases, modifiers: EventModifiers = [], sign: FloatingPointSign) -> KeyPress.Result {
+    @discardableResult func handleProgressAdjustment(
+        in player: PlayerModel,
+        phase: KeyPress.Phases, modifiers: EventModifiers = [], sign: FloatingPointSign
+    ) -> KeyPress.Result {
         switch phase {
+        case .all:
+            handleProgressAdjustment(in: player, phase: .down, modifiers: modifiers, sign: sign)
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                self.handleProgressAdjustment(in: player, phase: .up, modifiers: modifiers, sign: sign)
+            }
+            return .handled
         case .down, .repeat:
-            guard player.hasCurrentTrack else { return .ignored }
+            guard player.isPlayable else { return .ignored }
 
             if modifiers.contains(.command) {
                 switch sign {
@@ -63,22 +81,31 @@ import SwiftUI
             let inRange = player.adjustTime(multiplier: multiplier, sign: sign)
 
             if !inRange {
-                progressBarExternalOvershootSign = sign
+                progressBarExternalOvershootSign = .init(sign)
             }
 
             return .handled
         case .up:
-            progressBarExternalOvershootSign = nil
-            return .ignored
+            progressBarExternalOvershootSign = .none
+            return .handled
         default:
             return .ignored
         }
     }
 
-    @discardableResult func handleVolumeAdjustment(in player: PlayerModel, phase: KeyPress.Phases, modifiers: EventModifiers = [], sign: FloatingPointSign) -> KeyPress.Result {
+    @discardableResult func handleVolumeAdjustment(
+        in player: PlayerModel,
+        phase: KeyPress.Phases, modifiers: EventModifiers = [], sign: FloatingPointSign
+    ) -> KeyPress.Result {
         switch phase {
+        case .all:
+            handleVolumeAdjustment(in: player, phase: .down, modifiers: modifiers, sign: sign)
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                self.handleVolumeAdjustment(in: player, phase: .up, modifiers: modifiers, sign: sign)
+            }
+            return .ignored
         case .down, .repeat:
-            guard player.hasCurrentTrack else { return .ignored }
+            guard player.isPlayable else { return .ignored }
 
             let hasShift = modifiers.contains(.shift)
             let hasOption = modifiers.contains(.option)
@@ -91,17 +118,14 @@ import SwiftUI
             let inRange = player.adjustVolume(multiplier: multiplier, sign: sign)
 
             if !inRange {
-                volumeBarExternalOvershootSign = sign
-
-                if sign == .plus {
-                    speakerButtonBounceAnimation.toggle()
-                }
+                volumeBarExternalOvershootSign = .init(sign)
+                speakerButtonBounceAnimation.toggle()
             }
 
             return .handled
         case .up:
-            progressBarExternalOvershootSign = nil
-            return .ignored
+            volumeBarExternalOvershootSign = .none
+            return .handled
         default:
             return .ignored
         }

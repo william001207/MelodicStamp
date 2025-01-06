@@ -36,36 +36,8 @@ import SwiftUI
     private var cancellables = Set<AnyCancellable>()
     private let timer = TimerPublisher(interval: 0.1)
 
-    private var playbackTimeSubject = PassthroughSubject<PlaybackTime?, Never>()
-    private var volumeSubject = PassthroughSubject<CGFloat, Never>()
-    private var isPlayingSubject = PassthroughSubject<Bool, Never>()
-    private var isRunningSubject = PassthroughSubject<Bool, Never>()
-    private var isMutedSubject = PassthroughSubject<Bool, Never>()
     private var visualizationDataSubject = PassthroughSubject<[CGFloat], Never>()
-
-    var playbackTimePublisher: AnyPublisher<PlaybackTime?, Never> {
-        playbackTimeSubject.eraseToAnyPublisher()
-    }
-
-    var volumePublisher: AnyPublisher<CGFloat, Never> {
-        volumeSubject.eraseToAnyPublisher()
-    }
-
-    var isPlayingPublisher: AnyPublisher<Bool, Never> {
-        isPlayingSubject.eraseToAnyPublisher()
-    }
-    
-    var isRunningPublisher: AnyPublisher<Bool, Never> {
-        isRunningSubject.eraseToAnyPublisher()
-    }
-
-    var isMutedPublisher: AnyPublisher<Bool, Never> {
-        isMutedSubject.eraseToAnyPublisher()
-    }
-
-    var visualizationDataPublisher: AnyPublisher<[CGFloat], Never> {
-        visualizationDataSubject.eraseToAnyPublisher()
-    }
+    var visualizationDataPublisher: AnyPublisher<[CGFloat], Never> { visualizationDataSubject.eraseToAnyPublisher() }
 
     // MARK: Playlist & Playback
 
@@ -75,7 +47,7 @@ import SwiftUI
     var playbackMode: PlaybackMode = .sequential
     var playbackLooping: Bool = false
 
-    var playbackTime: PlaybackTime? { player.playbackTime }
+    private(set) var playbackTime: PlaybackTime?
     var unwrappedPlaybackTime: PlaybackTime { playbackTime ?? .init() }
 
     // MARK: FFT
@@ -106,45 +78,47 @@ import SwiftUI
         }
     }
 
+    // Volume related things are delegated
+    private var _volume: CGFloat = .zero
     var volume: CGFloat {
-        get {
-            player.playbackVolume
-        }
+        get { _volume }
 
         set {
+            _volume = newValue
             player.seekVolume(to: newValue)
-            volumeSubject.send(newValue)
         }
     }
 
-    var isPlaying: Bool {
-        get {
-            player.isPlaying
-        }
-
-        set {
-            player.setPlaying(newValue)
-            isPlayingSubject.send(newValue)
+    var isPlaying: Bool = false {
+        didSet {
+            if isPlayable {
+                player.setPlaying(isPlaying)
+            } else {
+                guard isPlaying else { return }
+                play()
+            }
         }
     }
-    
-    var isRunning: Bool {
-        player.isRunning
-    }
 
+    private(set) var isRunning: Bool = false
+
+    // Volume related things are delegated
+    private var _isMuted: Bool = false
     var isMuted: Bool {
-        get {
-            player.isMuted
-        }
+        get { _isMuted }
 
         set {
+            _isMuted = newValue
             player.setMuted(newValue)
-            isMutedSubject.send(newValue)
         }
     }
 
     var isPlaylistEmpty: Bool {
         playlist.isEmpty
+    }
+
+    var isPlayable: Bool {
+        isRunning && hasCurrentTrack
     }
 
     var hasCurrentTrack: Bool {
@@ -223,24 +197,30 @@ import SwiftUI
             .receive(on: DispatchQueue.main)
             .sink { _ in
                 playbackTime: do {
-                    if let playbackTime = self.playbackTime {
+                    if let playbackTime = player.playbackTime {
                         let duration = playbackTime.duration
                         let elapsed = playbackTime.elapsed
 
-                        self.playbackTimeSubject.send(.init(
-                            duration: duration, elapsed: elapsed
-                        ))
+                        self.playbackTime = .init(duration: duration, elapsed: elapsed)
                     } else {
-                        self.playbackTimeSubject.send(nil)
+                        self.playbackTime = nil
                     }
                 }
 
+                volume: do {
+                    self._volume = player.playbackVolume
+                }
+
                 isPlaying: do {
-                    self.isPlayingSubject.send(self.isPlaying)
+                    self.isPlaying = player.isPlaying
+                }
+
+                isRunning: do {
+                    self.isRunning = player.isRunning
                 }
 
                 isMuted: do {
-                    self.isMutedSubject.send(self.isMuted)
+                    self._isMuted = player.isMuted
                 }
             }
             .store(in: &cancellables)
@@ -261,19 +241,18 @@ extension PlayerModel {
         }
     }
 
-    func play(item: Track) {
-        addToPlaylist(urls: [item.url])
+    func play(track: Track) {
+        addToPlaylist(urls: [track.url])
 
         Task { @MainActor in
-            track = item
-            player.play(item)
-            isRunningSubject.send(true)
+            self.track = track
+            player.play(track)
         }
     }
 
     func play(url: URL) {
         if let item = Track(url: url) {
-            play(item: item)
+            play(track: item)
         }
     }
 
@@ -319,20 +298,23 @@ extension PlayerModel {
     }
 
     func play() {
-        player.play()
+        if isRunning {
+            player.play()
+        } else if let track {
+            play(track: track)
+        }
     }
 
     func pause() {
         player.pause()
     }
-    
+
     func stop() {
         volume = .zero
         isPlaying = false
         isMuted = false
-        
+
         player.stop()
-        isRunningSubject.send(false)
     }
 
     func togglePlayPause() {
@@ -344,8 +326,8 @@ extension PlayerModel {
             stop()
             return
         }
-        
-        play(item: playlist[nextIndex])
+
+        play(track: playlist[nextIndex])
     }
 
     func previousTrack() {
@@ -353,8 +335,8 @@ extension PlayerModel {
             stop()
             return
         }
-        
-        play(item: playlist[previousIndex])
+
+        play(track: playlist[previousIndex])
     }
 
     private func setupEngine() {
@@ -492,7 +474,7 @@ extension PlayerModel {
     }
 
     var playPauseImage: Image {
-        if hasCurrentTrack, isPlaying {
+        if isPlayable, isPlaying {
             Image(systemSymbol: .pauseFill)
         } else {
             Image(systemSymbol: .playFill)
@@ -538,7 +520,7 @@ extension PlayerModel {
     func updateNowPlayingState() {
         let infoCenter = MPNowPlayingInfoCenter.default()
 
-        infoCenter.playbackState = if hasCurrentTrack {
+        infoCenter.playbackState = if isPlayable {
             isPlaying ? .playing : .paused
         } else {
             .stopped
@@ -549,7 +531,7 @@ extension PlayerModel {
         let infoCenter = MPNowPlayingInfoCenter.default()
         var info = infoCenter.nowPlayingInfo ?? .init()
 
-        if hasCurrentTrack {
+        if isPlayable {
             info[MPMediaItemPropertyPlaybackDuration] = unwrappedPlaybackTime.duration.timeInterval
             info[MPNowPlayingInfoPropertyElapsedPlaybackTime] = unwrappedPlaybackTime.elapsed
         } else {
@@ -573,7 +555,7 @@ extension PlayerModel {
 
         // Play
         commandCenter.playCommand.addTarget { [unowned self] _ in
-            guard hasCurrentTrack else { return .noActionableNowPlayingItem }
+            guard isPlayable else { return .noActionableNowPlayingItem }
 
             if isPlaying {
                 return .commandFailed
@@ -585,7 +567,7 @@ extension PlayerModel {
 
         // Pause
         commandCenter.pauseCommand.addTarget { [unowned self] _ in
-            guard hasCurrentTrack else { return .noActionableNowPlayingItem }
+            guard isPlayable else { return .noActionableNowPlayingItem }
 
             if !isPlaying {
                 return .commandFailed
@@ -597,7 +579,7 @@ extension PlayerModel {
 
         // Toggle play pause
         commandCenter.togglePlayPauseCommand.addTarget { [unowned self] _ in
-            guard hasCurrentTrack else { return .noActionableNowPlayingItem }
+            guard isPlayable else { return .noActionableNowPlayingItem }
 
             togglePlayPause()
             return .success
@@ -606,7 +588,7 @@ extension PlayerModel {
         // Skip forward
         commandCenter.skipForwardCommand.preferredIntervals = [1.0, 5.0, 15.0]
         commandCenter.skipForwardCommand.addTarget { [unowned self] event in
-            guard hasCurrentTrack else { return .noActionableNowPlayingItem }
+            guard isPlayable else { return .noActionableNowPlayingItem }
             guard let event = event as? MPSkipIntervalCommandEvent else { return .commandFailed }
 
             adjustTime(delta: event.interval, sign: .plus)
@@ -616,7 +598,7 @@ extension PlayerModel {
         // Skip backward
         commandCenter.skipBackwardCommand.preferredIntervals = [1.0, 5.0, 15.0]
         commandCenter.skipBackwardCommand.addTarget { [unowned self] event in
-            guard hasCurrentTrack else { return .noActionableNowPlayingItem }
+            guard isPlayable else { return .noActionableNowPlayingItem }
             guard let event = event as? MPSkipIntervalCommandEvent else { return .commandFailed }
 
             adjustTime(delta: event.interval, sign: .minus)
@@ -625,7 +607,7 @@ extension PlayerModel {
 
         // Seek
         commandCenter.changePlaybackPositionCommand.addTarget { [unowned self] event in
-            guard hasCurrentTrack else { return .noActionableNowPlayingItem }
+            guard isPlayable else { return .noActionableNowPlayingItem }
             guard let event = event as? MPChangePlaybackPositionCommandEvent else { return .commandFailed }
 
             progress = event.positionTime / unwrappedPlaybackTime.duration.timeInterval

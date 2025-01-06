@@ -57,11 +57,6 @@ struct MiniPlayerView: View {
     @State private var adjustmentPercentage: CGFloat = .zero
     @State private var shouldUseRemainingDuration: Bool = true
 
-    @State private var playbackTime: PlaybackTime?
-    @State private var volume: CGFloat = .zero
-    @State private var isPlaying: Bool = false
-    @State private var isMuted: Bool = false
-
     var body: some View {
         VStack(spacing: 12) {
             header()
@@ -116,30 +111,6 @@ struct MiniPlayerView: View {
             }
         }
 
-        // Receive publishers
-        .onReceive(player.playbackTimePublisher) { playbackTime in
-            self.playbackTime = playbackTime
-        }
-        .onReceive(player.volumePublisher) { volume in
-            self.volume = volume
-        }
-        .onReceive(player.isPlayingPublisher) { isPlaying in
-            self.isPlaying = isPlaying
-        }
-        .onReceive(player.isMutedPublisher) { isMuted in
-            self.isMuted = isMuted
-        }
-        .onAppear {
-            playbackTime = player.playbackTime
-            volume = player.volume
-            isPlaying = player.isPlaying
-            isMuted = player.isMuted
-        }
-        .onChange(of: player.currentIndex, initial: true) { _, newValue in
-            guard newValue == nil else { return }
-            playbackTime = nil
-        }
-
         // Regain progress control on new track
         .onChange(of: player.currentIndex) { _, newValue in
             guard newValue != nil else { return }
@@ -153,7 +124,7 @@ struct MiniPlayerView: View {
             )
         }
 
-        // Handle left arrow/right arrow down/repeat/up -> adjust progress and navigate track
+        // Handle left arrow/right arrow down/repeat/up -> adjust progress & volume
         .onKeyPress(keys: [.leftArrow, .rightArrow], phases: .all) { key in
             let sign: FloatingPointSign = key.key == .leftArrow ? .minus : .plus
 
@@ -191,34 +162,6 @@ struct MiniPlayerView: View {
             return false
         }
         return isProgressBarHovering || isProgressBarActive
-    }
-
-    private var progressBinding: Binding<CGFloat> {
-        Binding {
-            playbackTime?.progress ?? .zero
-        } set: { newValue in
-            player.progress = newValue
-        }
-    }
-
-    private var volumeBinding: Binding<CGFloat> {
-        Binding {
-            volume
-        } set: { newValue in
-            player.volume = newValue
-        }
-    }
-
-    private var isPlayingBinding: Binding<Bool> {
-        Binding { isPlaying } set: { newValue in
-            player.isPlaying = newValue
-        }
-    }
-
-    private var isMutedBinding: Binding<Bool> {
-        Binding { isMuted } set: { newValue in
-            player.isMuted = newValue
-        }
     }
 
     @ViewBuilder private func header() -> some View {
@@ -441,7 +384,6 @@ struct MiniPlayerView: View {
                     .contentTransition(.symbolEffect(.replace))
                     .frame(width: 20, height: 16)
             }
-            .disabled(!player.hasCurrentTrack)
             .symbolEffect(.bounce, value: activeControl)
             .symbolEffect(
                 .bounce,
@@ -451,12 +393,15 @@ struct MiniPlayerView: View {
                 id: PlayerNamespace.volumeButton, in: namespace
             )
             .contextMenu {
-                Toggle("Mute", isOn: isMutedBinding)
+                if player.isPlayable {
+                    Toggle("Mute", isOn: $player.isMuted)
+                }
             }
         }
     }
 
     @ViewBuilder private func progressBar() -> some View {
+        @Bindable var player = player
         let isProgressControlActive = activeControl == .progress
         let isVolumeControlActive = activeControl == .volume
 
@@ -466,20 +411,20 @@ struct MiniPlayerView: View {
                     let time: TimeInterval? = if isProgressBarActive {
                         // Use adjustment time
                         if shouldUseRemainingDuration {
-                            (playbackTime?.duration).map {
+                            (player.playbackTime?.duration).map {
                                 $0.timeInterval * (1 - adjustmentPercentage)
                             }
                         } else {
-                            (playbackTime?.duration).map {
+                            (player.playbackTime?.duration).map {
                                 $0.timeInterval * adjustmentPercentage
                             }
                         }
                     } else {
                         // Use track time
                         if shouldUseRemainingDuration {
-                            playbackTime?.remaining
+                            player.playbackTime?.remaining
                         } else {
-                            playbackTime?.elapsed
+                            player.playbackTime?.elapsed
                         }
                     }
 
@@ -502,9 +447,9 @@ struct MiniPlayerView: View {
                 let value: Binding<CGFloat> =
                     switch activeControl {
                     case .progress:
-                        player.hasCurrentTrack ? progressBinding : .constant(0)
+                        player.isPlayable ? $player.progress : .constant(0)
                     case .volume:
-                        volumeBinding
+                        $player.volume
                     }
 
                 ProgressBar(
@@ -512,22 +457,20 @@ struct MiniPlayerView: View {
                     isActive: $isProgressBarActive,
                     isDelegated: isProgressControlActive,
                     externalOvershootSign: isProgressControlActive
-                        ? playerKeyboardControl
-                        .progressBarExternalOvershootSign
+                        ? playerKeyboardControl.progressBarExternalOvershootSign
                         : playerKeyboardControl.volumeBarExternalOvershootSign
                 ) { _, newValue in
                     adjustmentPercentage = newValue
                 } onOvershootOffsetChange: { oldValue, newValue in
                     if isVolumeControlActive, oldValue <= 0, newValue > 0 {
-                        playerKeyboardControl.speakerButtonBounceAnimation
-                            .toggle()
+                        playerKeyboardControl.speakerButtonBounceAnimation.toggle()
                     }
                 }
-                .disabled(!player.hasCurrentTrack)
+                .disabled(!player.isPlayable)
                 .foregroundStyle(
                     isProgressBarActive
                         ? .primary
-                        : isVolumeControlActive && isMuted
+                        : isVolumeControlActive && player.isMuted
                         ? .quaternary : .secondary
                 )
                 .backgroundStyle(.quinary)
@@ -537,18 +480,16 @@ struct MiniPlayerView: View {
                 !isProgressBarHovering || isProgressBarActive ? 0 : 12
             )
             .onHover { hover in
-                let canHover =
-                    player.hasCurrentTrack || isVolumeControlActive
-                guard canHover, hover else { return }
+                guard player.isPlayable, hover else { return }
 
                 isProgressBarHovering = true
             }
-            .animation(.default.speed(2), value: isMuted)
+            .animation(.default.speed(2), value: player.isMuted)
             .matchedGeometryEffect(id: activeControl.id, in: namespace)
 
             Group {
                 if isProgressControlActive {
-                    DurationText(duration: playbackTime?.duration)
+                    DurationText(duration: player.playbackTime?.duration)
                         .frame(width: 40)
                         .foregroundStyle(.secondary)
                         .padding(.bottom, 1)
@@ -572,7 +513,7 @@ struct MiniPlayerView: View {
             player.track
         } set: { newValue in
             if let newValue {
-                player.play(item: newValue)
+                player.play(track: newValue)
             } else {
                 player.stop()
             }

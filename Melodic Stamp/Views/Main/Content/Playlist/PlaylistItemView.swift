@@ -38,7 +38,7 @@ struct PlayableItemView: View {
                 }
                 .font(.title3)
                 .frame(height: 24)
-                .opacity(!player.hasCurrentTrack || isPlaying ? 1 : 0.5)
+                .opacity(!player.isPlayable || isPlaying ? 1 : 0.5)
 
                 HStack(alignment: .center, spacing: 4) {
                     if isMetadataModified {
@@ -63,7 +63,7 @@ struct PlayableItemView: View {
             Spacer()
 
             AliveButton {
-                player.play(item: track)
+                player.play(track: track)
             } label: {
                 cover(isMetadataLoaded: isMetadataLoaded)
             }

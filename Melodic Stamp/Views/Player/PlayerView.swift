@@ -23,11 +23,6 @@ struct PlayerView: View {
     @State private var adjustmentPercentage: CGFloat = .zero
     @State private var shouldUseRemainingDuration: Bool = false
 
-    @State private var playbackTime: PlaybackTime?
-    @State private var volume: CGFloat = .zero
-    @State private var isPlaying: Bool = false
-    @State private var isMuted: Bool = false
-
     var body: some View {
         VStack(alignment: .center, spacing: 12) {
             header()
@@ -55,57 +50,6 @@ struct PlayerView: View {
         .padding(.horizontal, 32)
         .padding(.vertical, 24)
         .frame(maxWidth: .infinity)
-        // Receive publishers
-        .onReceive(player.playbackTimePublisher) { playbackTime in
-            self.playbackTime = playbackTime
-        }
-        .onReceive(player.volumePublisher) { volume in
-            self.volume = volume
-        }
-        .onReceive(player.isPlayingPublisher) { isPlaying in
-            self.isPlaying = isPlaying
-        }
-        .onReceive(player.isMutedPublisher) { isMuted in
-            self.isMuted = isMuted
-        }
-        .onAppear {
-            playbackTime = player.playbackTime
-            volume = player.volume
-            isPlaying = player.isPlaying
-            isMuted = player.isMuted
-        }
-        .onChange(of: player.currentIndex, initial: true) { _, newValue in
-            guard newValue == nil else { return }
-            playbackTime = nil
-        }
-    }
-
-    private var progressBinding: Binding<CGFloat> {
-        Binding {
-            playbackTime?.progress ?? .zero
-        } set: { newValue in
-            player.progress = newValue
-        }
-    }
-
-    private var volumeBinding: Binding<CGFloat> {
-        Binding {
-            volume
-        } set: { newValue in
-            player.volume = newValue
-        }
-    }
-
-    private var isPlayingBinding: Binding<Bool> {
-        Binding { isPlaying } set: { newValue in
-            player.isPlaying = newValue
-        }
-    }
-
-    private var isMutedBinding: Binding<Bool> {
-        Binding { isMuted } set: { newValue in
-            player.isMuted = newValue
-        }
     }
 
     @ViewBuilder private func header() -> some View {
@@ -251,8 +195,10 @@ struct PlayerView: View {
     }
 
     @ViewBuilder private func trailingControls() -> some View {
+        @Bindable var player = player
+
         ProgressBar(
-            value: volumeBinding,
+            value: $player.volume,
             isActive: $isVolumeBarActive,
             externalOvershootSign: playerKeyboardControl.volumeBarExternalOvershootSign,
             onOvershootOffsetChange: { oldValue, newValue in
@@ -261,14 +207,14 @@ struct PlayerView: View {
                 }
             }
         )
-        .disabled(!player.hasCurrentTrack)
+        .disabled(!player.isPlayable)
         .foregroundStyle(
             isVolumeBarActive
-                ? .primary : isMuted ? .quaternary : .secondary
+                ? .primary : player.isMuted ? .quaternary : .secondary
         )
         .backgroundStyle(.quinary)
         .frame(width: 72, height: 12)
-        .animation(.default.speed(2), value: isMuted)
+        .animation(.default.speed(2), value: player.isMuted)
         .matchedGeometryEffect(id: PlayerNamespace.volumeBar, in: namespace)
 
         // Speaker
@@ -280,34 +226,35 @@ struct PlayerView: View {
                 .contentTransition(.symbolEffect(.replace))
                 .frame(width: 16)
         }
-        .disabled(!player.hasCurrentTrack)
+        .disabled(!player.isPlayable)
         .symbolEffect(
             .bounce, value: playerKeyboardControl.speakerButtonBounceAnimation
         )
         .matchedGeometryEffect(id: PlayerNamespace.volumeButton, in: namespace)
         .contextMenu {
-            Toggle("Mute", isOn: isMutedBinding)
+            Toggle("Mute", isOn: $player.isMuted)
         }
     }
 
     @ViewBuilder private func progressBar() -> some View {
+        @Bindable var player = player
         let time: TimeInterval? = if isProgressBarActive {
             // Use adjustment time
             if shouldUseRemainingDuration {
-                (playbackTime?.duration).map {
+                (player.playbackTime?.duration).map {
                     $0.timeInterval * (1 - adjustmentPercentage)
                 }
             } else {
-                (playbackTime?.duration).map {
+                (player.playbackTime?.duration).map {
                     $0.timeInterval * adjustmentPercentage
                 }
             }
         } else {
             // Use track time
             if shouldUseRemainingDuration {
-                playbackTime?.remaining
+                player.playbackTime?.remaining
             } else {
-                playbackTime?.elapsed
+                player.playbackTime?.elapsed
             }
         }
 
@@ -324,23 +271,22 @@ struct PlayerView: View {
         .matchedGeometryEffect(id: PlayerNamespace.timeText, in: namespace)
 
         ProgressBar(
-            value: progressBinding,
+            value: $player.progress,
             isActive: $isProgressBarActive,
             isDelegated: true,
-            externalOvershootSign: playerKeyboardControl
-                .progressBarExternalOvershootSign,
+            externalOvershootSign: playerKeyboardControl.progressBarExternalOvershootSign,
             onPercentageChange: { _, newValue in
                 adjustmentPercentage = newValue
             }
         )
-        .disabled(!player.hasCurrentTrack)
+        .disabled(!player.isPlayable)
         .foregroundStyle(isProgressBarActive ? .primary : .secondary)
         .backgroundStyle(.quinary)
         .frame(height: 12)
         .matchedGeometryEffect(id: PlayerNamespace.progressBar, in: namespace)
         .padding(.horizontal, isProgressBarActive ? 0 : 12)
 
-        DurationText(duration: playbackTime?.duration)
+        DurationText(duration: player.playbackTime?.duration)
             .frame(width: 40)
             .foregroundStyle(.secondary)
             .padding(.bottom, 1)

@@ -71,7 +71,7 @@ struct PlaylistView: View {
                 }
                 .onKeyPress(.return) {
                     if metadataEditor.items.count == 1, let item = metadataEditor.items.first {
-                        player.play(item: item)
+                        player.play(track: item)
                         return .handled
                     } else {
                         return .ignored
@@ -187,7 +187,7 @@ struct PlaylistView: View {
         .swipeActions {
             // Play
             Button {
-                player.play(item: item)
+                player.play(track: item)
             } label: {
                 Image(systemSymbol: .play)
             }
@@ -230,7 +230,7 @@ struct PlaylistView: View {
 
     @ViewBuilder private func contextMenu(for item: Track) -> some View {
         Button {
-            player.play(item: item)
+            player.play(track: item)
         } label: {
             let title = MusicTitle.stringifiedTitle(mode: .title, for: item)
             if !title.isEmpty {

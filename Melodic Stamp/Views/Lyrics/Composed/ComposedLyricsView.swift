@@ -11,9 +11,6 @@ struct ComposedLyricsView: View {
     @Environment(PlayerModel.self) private var player
     @Environment(LyricsModel.self) private var lyrics
 
-    @State private var playbackTime: PlaybackTime?
-    @State private var elapsedTime: TimeInterval = 0.0
-
     var body: some View {
         Group {
             let highlightedRange = highlightedRange
@@ -35,11 +32,11 @@ struct ComposedLyricsView: View {
                 emptyView()
             }
         }
-        .onReceive(player.playbackTimePublisher) { playbackTime in
-            guard let playbackTime else { return }
-            elapsedTime = playbackTime.elapsed
-        }
         .animation(.linear, value: elapsedTime) // For time interpolation
+    }
+
+    private var elapsedTime: CGFloat {
+        player.unwrappedPlaybackTime.elapsed
     }
 
     private var highlightedRange: Range<Int> {
