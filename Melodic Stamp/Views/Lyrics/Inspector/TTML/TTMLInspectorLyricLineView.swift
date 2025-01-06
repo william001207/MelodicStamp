@@ -62,7 +62,7 @@ struct TTMLInspectorLyricLineView: View {
 
                     VStack {
                         DurationText(
-                            duration: line.beginTime?.duration,
+                            duration: line.beginTime.flatMap(Duration.init),
                             pattern: .minuteSecond(
                                 padMinuteToLength: 0,
                                 fractionalSecondsLength: 3
@@ -82,7 +82,7 @@ struct TTMLInspectorLyricLineView: View {
                         Spacer()
 
                         DurationText(
-                            duration: line.endTime?.duration,
+                            duration: line.endTime.flatMap(Duration.init),
                             pattern: .minuteSecond(
                                 padMinuteToLength: 0,
                                 fractionalSecondsLength: 3

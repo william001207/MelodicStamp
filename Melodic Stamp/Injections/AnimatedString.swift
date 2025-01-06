@@ -17,7 +17,7 @@ protocol AnimatedString: Equatable, Hashable, Identifiable {
 extension AnimatedString {
     var duration: Duration? {
         guard let beginTime, let endTime else { return nil }
-        return (endTime - beginTime).duration
+        return Duration(endTime - beginTime)
     }
 }
 

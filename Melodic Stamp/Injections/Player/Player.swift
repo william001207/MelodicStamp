@@ -118,7 +118,7 @@ class BlankPlayer: Player {
     }
 
     func seekProgress(to progress: CGFloat) {
-        playbackTime = .init(duration: .seconds(60), elapsed: progress * Duration.seconds(60).timeInterval)
+        playbackTime = .init(duration: .seconds(60), elapsed: progress * TimeInterval(Duration.seconds(60)))
     }
 
     func seekVolume(to volume: CGFloat) {

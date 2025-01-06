@@ -22,7 +22,8 @@ extension TimeInterval {
         self.init(floatLiteral: minutes * 60 + seconds + milliseconds / 1000)
     }
 
-    var duration: Duration {
-        .seconds(self)
+    init(_ duration: Duration) {
+        let components = duration.components
+        self = TimeInterval(components.seconds) + TimeInterval(components.attoseconds) * 1e-18
     }
 }

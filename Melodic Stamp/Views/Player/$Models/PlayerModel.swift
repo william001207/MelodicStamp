@@ -497,7 +497,7 @@ extension PlayerModel {
     @discardableResult func adjustTime(delta: TimeInterval = 1, multiplier: CGFloat = 1, sign: FloatingPointSign = .plus) -> Bool {
         guard unwrappedPlaybackTime.duration > .zero else { return false }
         return adjustProgress(
-            delta: delta / unwrappedPlaybackTime.duration.timeInterval,
+            delta: delta / TimeInterval(unwrappedPlaybackTime.duration),
             multiplier: multiplier, sign: sign
         )
     }
@@ -532,7 +532,7 @@ extension PlayerModel {
         var info = infoCenter.nowPlayingInfo ?? .init()
 
         if isPlayable {
-            info[MPMediaItemPropertyPlaybackDuration] = unwrappedPlaybackTime.duration.timeInterval
+            info[MPMediaItemPropertyPlaybackDuration] = TimeInterval(unwrappedPlaybackTime.duration)
             info[MPNowPlayingInfoPropertyElapsedPlaybackTime] = unwrappedPlaybackTime.elapsed
         } else {
             info[MPMediaItemPropertyPlaybackDuration] = nil
@@ -610,7 +610,7 @@ extension PlayerModel {
             guard isPlayable else { return .noActionableNowPlayingItem }
             guard let event = event as? MPChangePlaybackPositionCommandEvent else { return .commandFailed }
 
-            progress = event.positionTime / unwrappedPlaybackTime.duration.timeInterval
+            progress = event.positionTime / TimeInterval(unwrappedPlaybackTime.duration)
             return .success
         }
 

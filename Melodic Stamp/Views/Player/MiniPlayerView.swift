@@ -412,11 +412,11 @@ struct MiniPlayerView: View {
                         // Use adjustment time
                         if shouldUseRemainingDuration {
                             (player.playbackTime?.duration).map {
-                                $0.timeInterval * (1 - adjustmentPercentage)
+                                TimeInterval($0) * (1 - adjustmentPercentage)
                             }
                         } else {
                             (player.playbackTime?.duration).map {
-                                $0.timeInterval * adjustmentPercentage
+                                TimeInterval($0) * adjustmentPercentage
                             }
                         }
                     } else {
@@ -429,7 +429,7 @@ struct MiniPlayerView: View {
                     }
 
                     DurationText(
-                        duration: time?.duration,
+                        duration: time.flatMap(Duration.init),
                         sign: shouldUseRemainingDuration ? .minus : .plus
                     )
                     .frame(width: 40)

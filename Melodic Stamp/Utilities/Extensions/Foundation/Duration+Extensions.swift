@@ -8,8 +8,7 @@
 import Foundation
 
 extension Duration {
-    var timeInterval: TimeInterval {
-        let components = components
-        return TimeInterval(components.seconds) + TimeInterval(components.attoseconds) * 1e-18
+    init(_ timeInterval: TimeInterval) {
+        self = .seconds(timeInterval)
     }
 }

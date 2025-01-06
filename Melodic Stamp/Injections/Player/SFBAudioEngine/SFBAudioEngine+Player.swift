@@ -29,7 +29,7 @@ class SFBAudioEnginePlayer: NSObject, Player {
     var playbackTime: PlaybackTime? {
         player.time.flatMap {
             guard let total = $0.total, let current = $0.current else { return nil }
-            return .init(duration: total.duration, elapsed: current)
+            return .init(duration: Duration(total), elapsed: current)
         }
     }
 
