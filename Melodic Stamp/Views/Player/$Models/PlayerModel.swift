@@ -420,28 +420,28 @@ extension PlayerModel {
 
 extension PlayerModel: PlayerDelegate {
     func playerDidFinishPlaying(_ player: some MelodicStamp.Player) {
-        let index = if playbackLooping {
-            // Play again
-            currentIndex
-        } else {
-            // Jump to next track
-            nextIndex
+        DispatchQueue.main.async {
+            if self.playbackLooping {
+                if let track = self.track {
+                    // Plays again
+                    self.play(track: track)
+                }
+            } else {
+                // Jumps to next track
+                self.nextTrack()
+            }
         }
-
-        guard let index, playlist.indices.contains(index) else { return }
-        player.enqueue(playlist[index])
     }
 }
 
 extension PlayerModel: AudioPlayer.Delegate {
     func audioPlayerNowPlayingChanged(_ audioPlayer: AudioPlayer) {
         DispatchQueue.main.async {
+            // Updates track, otherwise keeps it
             if let nowPlayingDecoder = audioPlayer.nowPlaying,
                let audioDecoder = nowPlayingDecoder as? AudioDecoder,
                let url = audioDecoder.inputSource.url {
                 self.track = self.playlist.first { $0.url == url }
-            } else {
-                self.nextTrack()
             }
 
             self.updateNowPlayingState()

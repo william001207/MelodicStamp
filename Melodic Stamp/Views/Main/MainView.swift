@@ -62,7 +62,7 @@ struct MainView: View {
             .ignoresSafeArea()
             .luminareMinHeight(38)
             .toolbar {
-                // At least to preserve the titlebar style
+                // Preserves the titlebar style
                 Color.clear
             }
             .toolbar {

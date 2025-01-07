@@ -13,45 +13,43 @@ struct SettingsView: View {
     @State private var isSidebarVisible: Bool = false
 
     var body: some View {
-        AppKitNavigationSplitView(
-            sidebar: {
-                List(selection: $selectedTab) {
-                    ForEach(SettingsTab.allCases) { tab in
-                        switch tab {
-                        case .general:
-                            HStack {
-                                Image(systemSymbol: .gear)
-                                Text("General")
-                            }
-                            .tag(tab)
-                        case .visualization:
-                            HStack {
-                                Image(systemSymbol: .waveform)
-                                Text("Visualization")
-                            }
-                            .tag(tab)
-                        }
-                    }
-                }
-                .listStyle(SidebarListStyle())
-            },
-            detail: {
-                Form {
-                    switch selectedTab {
+        AppKitNavigationSplitView {
+            List(selection: $selectedTab) {
+                ForEach(SettingsTab.allCases) { tab in
+                    switch tab {
                     case .general:
-                        SettingsGeneralPage()
-                            .navigationTitle(Text("General"))
+                        HStack {
+                            Image(systemSymbol: .gear)
+                            Text("General")
+                        }
+                        .tag(tab)
                     case .visualization:
-                        SettingsVisualizationPage()
-                            .navigationTitle(Text("Visualization"))
+                        HStack {
+                            Image(systemSymbol: .waveform)
+                            Text("Visualization")
+                        }
+                        .tag(tab)
                     }
                 }
-                .formStyle(.grouped)
             }
-        )
+            .listStyle(SidebarListStyle())
+        } detail: {
+            Form {
+                switch selectedTab {
+                case .general:
+                    SettingsGeneralPage()
+                        .navigationTitle(Text("General"))
+                case .visualization:
+                    SettingsVisualizationPage()
+                        .navigationTitle(Text("Visualization"))
+                }
+            }
+            .formStyle(.grouped)
+        }
         .background(MakeTitledWindow())
         .ignoresSafeArea(.all)
         .toolbar {
+            // Preserves the titlebar style
             Color.clear
         }
     }
