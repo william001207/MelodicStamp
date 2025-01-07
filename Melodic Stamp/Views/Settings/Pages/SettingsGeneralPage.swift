@@ -6,11 +6,12 @@
 //
 
 import SwiftUI
+import Defaults
 
 struct SettingsGeneralPage: View {
     var body: some View {
-        Color.blue
-            .frame(height: 1000)
+        LazyVStack {
+        }
     }
 }
 

@@ -10,40 +10,54 @@ import SwiftUI
 
 struct SettingsView: View {
     @State private var selectedTab: SettingsTab = .general
+    @State private var isSidebarVisible: Bool = false
 
     var body: some View {
-        NavigationSplitView {
-            List(selection: $selectedTab) {
-                ForEach(SettingsTab.allCases) { tab in
-                    NavigationLink(value: tab) {
+        AppKitNavigationSplitView(
+            sidebar: {
+                List(selection: $selectedTab) {
+                    ForEach(SettingsTab.allCases) { tab in
                         switch tab {
                         case .general:
-                            Image(systemSymbol: .gear)
-                            Text("General")
+                            HStack {
+                                Image(systemSymbol: .gear)
+                                Text("General")
+                            }
+                            .tag(tab)
                         case .visualization:
-                            Image(systemSymbol: .waveform)
-                            Text("Visualization")
+                            HStack {
+                                Image(systemSymbol: .waveform)
+                                Text("Visualization")
+                            }
+                            .tag(tab)
                         }
                     }
                 }
-            }
-        } detail: {
-            Form {
-                switch selectedTab {
-                case .general:
-                    SettingsGeneralPage()
-                        .navigationTitle(Text("General"))
-                case .visualization:
-                    SettingsVisualizationPage()
-                        .navigationTitle(Text("Visualization"))
+                .listStyle(SidebarListStyle())
+            },
+            detail: {
+                Form {
+                    switch selectedTab {
+                    case .general:
+                        SettingsGeneralPage()
+                            .navigationTitle(Text("General"))
+                    case .visualization:
+                        SettingsVisualizationPage()
+                            .navigationTitle(Text("Visualization"))
+                    }
                 }
+                .formStyle(.grouped)
             }
-            .formStyle(.grouped)
-        }
+        )
         .background(MakeTitledWindow())
+        .ignoresSafeArea(.all)
+        .toolbar {
+            Color.clear
+        }
     }
 }
 
 #Preview {
     SettingsView()
 }
+

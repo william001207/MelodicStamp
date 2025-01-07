@@ -731,6 +731,9 @@
         }
       }
     },
+    "Melodic Stamp " : {
+
+    },
     "Metadata" : {
       "localizations" : {
         "zh-Hans" : {
@@ -1009,6 +1012,9 @@
           }
         }
       }
+    },
+    "Preview" : {
+
     },
     "Previous Song" : {
       "extractionState" : "stale",

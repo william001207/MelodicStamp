@@ -154,6 +154,7 @@ struct DisplayLyricsRenderer<Animated>: TextRenderer where Animated: AnimatedStr
             var context = context
 
             // Premultiplied wave & glow effect for long vowels
+            /*
             wave: do {
                 if let timeToNearestVowel = timeToVowels.sorted(by: { $0.mark < $1.mark }).first {
                     let isInRange = timeToNearestVowel.time.contains(time: beginTime)
@@ -175,6 +176,7 @@ struct DisplayLyricsRenderer<Animated>: TextRenderer where Animated: AnimatedStr
                     ))
                 }
             }
+            */
 
             // Unfilled text
             do {
