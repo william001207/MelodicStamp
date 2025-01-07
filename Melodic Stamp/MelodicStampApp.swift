@@ -87,7 +87,7 @@ struct MelodicStampApp: App {
         .windowStyle(.hiddenTitleBar)
         .windowToolbarStyle(.unified)
 
-        Window("", id: WindowID.settings.rawValue) {
+        Window(.init(verbatim: ""), id: WindowID.settings.rawValue) {
             SettingsView()
                 .onAppear {
                     isSettingsPresented = true

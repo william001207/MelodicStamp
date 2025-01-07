@@ -11,98 +11,92 @@ import SwiftUI
 
 struct AboutView: View {
     var body: some View {
-        HStack {
-            LuminareSection {
-                ZStack {
-                    MeshGradient(
-                        width: 4,
-                        height: 4,
-                        points: [
-                            [0.0, 0.0], [0.33, 0.0], [0.86, 0.0], [1.0, 0.0],
-                            [0.0, 0.2], [0.33, 0.5], [0.66, 0.25], [1.0, 0.6],
-                            [0.0, 0.32], [0.33, 0.55], [0.66, 0.3], [1.0, 0.72],
-                            [0.0, 1.0], [0.33, 1.0], [0.66, 1.0], [1.0, 1.0]
-                        ],
-                        colors: [
-                            .init(hex: 0x7DBEA3), .init(hex: 0x7DBEA3), .init(hex: 0xDBE79B), .init(hex: 0xDBE79B),
-                            .init(hex: 0x7DBEA3), .init(hex: 0xEBF1E3), .init(hex: 0xDBE79B), .init(hex: 0xDBE79B),
-                            .init(hex: 0x7DBEA3), .init(hex: 0xBDE4E0), .init(hex: 0xEBF1E3), .init(hex: 0xBDE4E0),
-                            .init(hex: 0xBDE4E0), .init(hex: 0xBDE4E0), .init(hex: 0xBDE4E0), .init(hex: 0xBDE4E0)
-                        ]
-                    )
+        ZStack {
+            gradient()
 
-                    VStack {
-                        Text("Melodic Stamp ")
-                            .font(.system(.title, design: .serif, weight: .semibold)) +
-                            Text("Preview")
-                            .font(.system(.title, design: .serif, weight: .light).italic())
-                    }
-                    .frame(width: 300, height: 175)
-                }
-            }
+            HStack(spacing: 25) {
+                appIcon()
+                    .padding(8)
 
-            VStack(spacing: 10) {
-                LuminareSection {
-                    HStack(spacing: 10) {
-                        Image("AppIcon")
-                            .resizable()
-                            .aspectRatio(contentMode: .fit)
-                            .frame(width: 45)
-                            .padding(8)
+                VStack(alignment: .leading, spacing: 17.5) {
+                    title()
 
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text(Bundle.main.displayName)
-                                .bold()
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(Bundle.main.copyright)
 
-                            Text(Bundle.main.copyright)
-                                .font(.system(.body, design: .default, weight: .regular))
-                                .foregroundStyle(.secondary)
+                        if let version = Bundle.main.appVersion {
+                            let build = Bundle.main.appBuild.flatMap(String.init) ?? ""
+                            let hasBuild = !build.isEmpty
 
-                            if let version = Bundle.main.appVersion {
-                                let build = Bundle.main.appBuild.flatMap(String.init) ?? ""
-                                let hasBuild = !build.isEmpty
+                            let combined: String = if hasBuild {
+                                .init(localized: "\(version) (\(build))")
+                            } else {
+                                version
+                            }
 
-                                let combined: String = if hasBuild {
-                                    .init(localized: "\(version) (\(build))")
-                                } else {
-                                    version
-                                }
-
-                                AliveButton {
-                                    NSPasteboard.general.setString(combined, forType: .string)
-                                } label: {
-                                    Text(combined)
-                                        .font(.system(.subheadline, design: .monospaced, weight: .ultraLight))
-                                        .foregroundStyle(.secondary)
-                                }
+                            AliveButton {
+                                NSPasteboard.general.setString(combined, forType: .string)
+                            } label: {
+                                Text(combined)
+                                    .font(.caption)
+                                    .monospaced()
+                                    .foregroundStyle(.tertiary)
                             }
                         }
                     }
-                    .frame(width: 300, height: 77, alignment: .center)
-                }
-
-                HStack {
-                    LuminareSection {
-                        HStack {}
-                            .frame(width: 145, height: 77, alignment: .center)
-                    }
-
-                    LuminareSection {
-                        HStack {}
-                            .frame(width: 145, height: 77, alignment: .center)
-                    }
                 }
             }
+            .padding(.horizontal, 25)
+            .padding(100)
         }
-        .padding(20)
-        .padding(.top, 16)
-        .background {
-            VisualEffectView(material: .hudWindow, blendingMode: .behindWindow)
-        }
-        .edgesIgnoringSafeArea(.all)
+        .ignoresSafeArea()
         .padding(.bottom, -28)
         .fixedSize()
-        .navigationTitle("")
+        .navigationTitle(.init(verbatim: ""))
+        .preferredColorScheme(.light)
+    }
+
+    private var previewBadge: String {
+        .init(localized: .init("About: (Badge) Preview", defaultValue: "Preview"))
+    }
+
+    @ViewBuilder private func appIcon() -> some View {
+        Image("AppIcon")
+            .resizable()
+            .aspectRatio(contentMode: .fit)
+            .frame(width: 72)
+    }
+
+    @ViewBuilder private func title() -> some View {
+        HStack {
+            Text(Bundle.main.displayName)
+                .fontWeight(.heavy)
+
+            Text(previewBadge)
+                .fontWeight(.ultraLight)
+                .italic()
+        }
+        .font(.title)
+        .fontDesign(.serif)
+    }
+
+    @ViewBuilder private func gradient() -> some View {
+        MeshGradient(
+            width: 4,
+            height: 4,
+            points: [
+                [0.0, 0.0], [0.33, 0.0], [0.86, 0.0], [1.0, 0.0],
+                [0.0, 0.2], [0.33, 0.5], [0.66, 0.25], [1.0, 0.6],
+                [0.0, 0.32], [0.33, 0.55], [0.66, 0.3], [1.0, 0.72],
+                [0.0, 1.0], [0.33, 1.0], [0.66, 1.0], [1.0, 1.0]
+            ],
+            colors: [
+                .init(hex: 0xB5A8FE), .init(hex: 0xD0B4FF), .init(hex: 0xF5CFFD), .init(hex: 0xFDCFCC),
+                .init(hex: 0x9D8DFE), .init(hex: 0xC4BDFF), .init(hex: 0xFDDBFB), .init(hex: 0xFFEDD6),
+                .init(hex: 0xBFBEFF), .init(hex: 0xD0D0FE), .init(hex: 0xCDEBFE), .init(hex: 0xCCFEEE),
+                .init(hex: 0xC0D4FF), .init(hex: 0xD7F5FE), .init(hex: 0xE7FEF1), .init(hex: 0xE0FEE4)
+            ]
+        )
     }
 }
 

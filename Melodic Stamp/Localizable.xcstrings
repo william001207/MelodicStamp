@@ -1,9 +1,6 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-    "" : {
-
-    },
     "--:--" : {
 
     },
@@ -731,9 +728,6 @@
         }
       }
     },
-    "Melodic Stamp " : {
-
-    },
     "Metadata" : {
       "localizations" : {
         "zh-Hans" : {
@@ -827,19 +821,15 @@
         }
       }
     },
-    "Next Song" : {
-      "extractionState" : "stale",
+    "Next Track" : {
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "下一首"
+            "value" : "下一曲"
           }
         }
       }
-    },
-    "Next Track" : {
-
     },
     "No." : {
 
@@ -1016,19 +1006,15 @@
     "Preview" : {
 
     },
-    "Previous Song" : {
-      "extractionState" : "stale",
+    "Previous Track" : {
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "上一首"
+            "value" : "上一曲"
           }
         }
       }
-    },
-    "Previous Track" : {
-
     },
     "Publisher Logo" : {
       "localizations" : {
