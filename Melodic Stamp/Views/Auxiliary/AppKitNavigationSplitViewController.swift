@@ -7,60 +7,63 @@
 
 import SwiftUI
 
-class AppKitNavigationSplitViewController<Sidebar: View, Detail: View>: NSSplitViewController {
-    
+// MARK: - View Controller
+
+class AppKitNavigationSplitViewController<Sidebar, Detail>: NSSplitViewController where Sidebar: View, Detail: View {
     var sidebarHostingController: NSHostingController<Sidebar>
     var detailHostingController: NSHostingController<Detail>
-    
+
     init(sidebar: Sidebar, detail: Detail) {
         self.sidebarHostingController = NSHostingController(rootView: sidebar)
         self.detailHostingController = NSHostingController(rootView: detail)
         super.init(nibName: nil, bundle: nil)
         setupSplitView()
     }
-    
-    required init?(coder: NSCoder) {
+
+    @available(*, unavailable)
+    required init?(coder _: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
- 
+
     private func setupSplitView() {
-        self.splitView.delegate = self
-        
+        splitView.delegate = self
+
         let sidebarItem = NSSplitViewItem(sidebarWithViewController: sidebarHostingController)
         sidebarItem.canCollapse = false
         sidebarItem.minimumThickness = 150
         sidebarItem.maximumThickness = 150
-        
+
         let detailItem = NSSplitViewItem(viewController: detailHostingController)
-        
-        self.addSplitViewItem(sidebarItem)
-        self.addSplitViewItem(detailItem)
+
+        addSplitViewItem(sidebarItem)
+        addSplitViewItem(detailItem)
     }
-    
-    // MARK: - NSSplitViewDelegate
-    
-    override func splitView(_ splitView: NSSplitView, canCollapseSubview subview: NSView) -> Bool {
-        return false
+
+    // MARK: Delegate
+
+    override func splitView(_: NSSplitView, canCollapseSubview _: NSView) -> Bool {
+        // Completely prohibits sidebar from collapsing
+        false
     }
-    
-    override func splitView(_ splitView: NSSplitView, shouldHideDividerAt dividerIndex: Int) -> Bool {
-        return true
+
+    override func splitView(_: NSSplitView, shouldHideDividerAt _: Int) -> Bool {
+        // Completely prohibits sidebar from collapsing
+        true
     }
 }
 
-// MARK: - NSViewControllerRepresentable
+// MARK: - View Controller Representable
 
-struct AppKitNavigationSplitView<Sidebar: View, Detail: View>: NSViewControllerRepresentable {
-    
-    let sidebar: () -> Sidebar
-    let detail: () -> Detail
-    
-    func makeNSViewController(context: Context) -> AppKitNavigationSplitViewController<Sidebar, Detail> {
+struct AppKitNavigationSplitView<Sidebar, Detail>: NSViewControllerRepresentable where Sidebar: View, Detail: View {
+    @ViewBuilder var sidebar: () -> Sidebar
+    @ViewBuilder var detail: () -> Detail
+
+    func makeNSViewController(context _: Context) -> AppKitNavigationSplitViewController<Sidebar, Detail> {
         let splitViewController = AppKitNavigationSplitViewController(sidebar: sidebar(), detail: detail())
         return splitViewController
     }
-    
-    func updateNSViewController(_ nsViewController: AppKitNavigationSplitViewController<Sidebar, Detail>, context: Context) {
+
+    func updateNSViewController(_ nsViewController: AppKitNavigationSplitViewController<Sidebar, Detail>, context _: Context) {
         nsViewController.sidebarHostingController.rootView = sidebar()
         nsViewController.detailHostingController.rootView = detail()
     }

@@ -9,34 +9,34 @@ import Foundation
 
 extension Bundle {
     var appName: String {
-        getInfo("CFBundleName") ?? "⚠️"
+        self[localizedInfo: "CFBundleName"] ?? "⚠️"
     }
 
     var displayName: String {
-        getInfo("CFBundleDisplayName") ?? "⚠️"
+        self[localizedInfo: "CFBundleDisplayName"] ?? "⚠️"
     }
 
     var bundleID: String {
-        getInfo("CFBundleIdentifier") ?? "⚠️"
+        self[localizedInfo: "CFBundleIdentifier"] ?? "⚠️"
     }
 
     var copyright: String {
-        getInfo("NSHumanReadableCopyright") ?? "⚠️"
+        self[localizedInfo: "NSHumanReadableCopyright"] ?? "⚠️"
     }
 
     var appBuild: Int? {
-        Int(getInfoDictionary("CFBundleVersion") ?? "")
+        self[info: "CFBundleVersion"].flatMap(Int.init)
     }
 
     var appVersion: String? {
-        getInfoDictionary("CFBundleShortVersionString")
+        self[info: "CFBundleShortVersionString"]
     }
 
-    func getInfo(_ key: String) -> String? {
+    subscript(localizedInfo key: String) -> String? {
         localizedInfoDictionary?[key] as? String
     }
-    
-    func getInfoDictionary(_ key: String) -> String? {
+
+    subscript(info key: String) -> String? {
         infoDictionary?[key] as? String
     }
 }

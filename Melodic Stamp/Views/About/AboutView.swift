@@ -5,9 +5,9 @@
 //  Created by KrLite on 2024/11/24.
 //
 
-import SwiftUI
 import Luminare
 import SFSafeSymbols
+import SwiftUI
 
 struct AboutView: View {
     var body: some View {
@@ -24,23 +24,23 @@ struct AboutView: View {
                             [0.0, 1.0], [0.33, 1.0], [0.66, 1.0], [1.0, 1.0]
                         ],
                         colors: [
-                            .init(hex: 0x7dbea3), .init(hex: 0x7dbea3), .init(hex: 0xdbe79b), .init(hex: 0xdbe79b),
-                            .init(hex: 0x7dbea3), .init(hex: 0xebf1e3), .init(hex: 0xdbe79b), .init(hex: 0xdbe79b),
-                            .init(hex: 0x7dbea3), .init(hex: 0xbde4e0), .init(hex: 0xebf1e3), .init(hex: 0xbde4e0),
-                            .init(hex: 0xbde4e0), .init(hex: 0xbde4e0), .init(hex: 0xbde4e0), .init(hex: 0xbde4e0)
+                            .init(hex: 0x7DBEA3), .init(hex: 0x7DBEA3), .init(hex: 0xDBE79B), .init(hex: 0xDBE79B),
+                            .init(hex: 0x7DBEA3), .init(hex: 0xEBF1E3), .init(hex: 0xDBE79B), .init(hex: 0xDBE79B),
+                            .init(hex: 0x7DBEA3), .init(hex: 0xBDE4E0), .init(hex: 0xEBF1E3), .init(hex: 0xBDE4E0),
+                            .init(hex: 0xBDE4E0), .init(hex: 0xBDE4E0), .init(hex: 0xBDE4E0), .init(hex: 0xBDE4E0)
                         ]
                     )
-                    
+
                     VStack {
                         Text("Melodic Stamp ")
                             .font(.system(.title, design: .serif, weight: .semibold)) +
-                        Text("Preview")
+                            Text("Preview")
                             .font(.system(.title, design: .serif, weight: .light).italic())
                     }
                     .frame(width: 300, height: 175)
                 }
             }
-            
+
             VStack(spacing: 10) {
                 LuminareSection {
                     HStack(spacing: 10) {
@@ -49,25 +49,25 @@ struct AboutView: View {
                             .aspectRatio(contentMode: .fit)
                             .frame(width: 45)
                             .padding(8)
-                        
+
                         VStack(alignment: .leading, spacing: 4) {
                             Text(Bundle.main.displayName)
                                 .bold()
-                            
+
                             Text(Bundle.main.copyright)
                                 .font(.system(.body, design: .default, weight: .regular))
                                 .foregroundStyle(.secondary)
-                            
+
                             if let version = Bundle.main.appVersion {
                                 let build = Bundle.main.appBuild.flatMap(String.init) ?? ""
                                 let hasBuild = !build.isEmpty
-                                
+
                                 let combined: String = if hasBuild {
                                     .init(localized: "\(version) (\(build))")
                                 } else {
                                     version
                                 }
-                                
+
                                 AliveButton {
                                     NSPasteboard.general.setString(combined, forType: .string)
                                 } label: {
@@ -80,20 +80,16 @@ struct AboutView: View {
                     }
                     .frame(width: 300, height: 77, alignment: .center)
                 }
-                
+
                 HStack {
                     LuminareSection {
-                        HStack {
-                            
-                        }
-                        .frame(width: 145, height: 77, alignment: .center)
+                        HStack {}
+                            .frame(width: 145, height: 77, alignment: .center)
                     }
-                    
+
                     LuminareSection {
-                        HStack {
-                            
-                        }
-                        .frame(width: 145, height: 77, alignment: .center)
+                        HStack {}
+                            .frame(width: 145, height: 77, alignment: .center)
                     }
                 }
             }

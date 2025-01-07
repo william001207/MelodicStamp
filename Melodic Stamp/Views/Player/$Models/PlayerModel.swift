@@ -419,7 +419,7 @@ extension PlayerModel {
 }
 
 extension PlayerModel: PlayerDelegate {
-    func playerDidFinishPlaying(_ player: some MelodicStamp.Player) {
+    func playerDidFinishPlaying(_: some MelodicStamp.Player) {
         DispatchQueue.main.async {
             if self.playbackLooping {
                 if let track = self.track {

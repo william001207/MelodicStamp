@@ -5,13 +5,12 @@
 //  Created by KrLite on 2025/1/5.
 //
 
-import SwiftUI
 import Defaults
+import SwiftUI
 
 struct SettingsGeneralPage: View {
     var body: some View {
-        LazyVStack {
-        }
+        LazyVStack {}
     }
 }
 
