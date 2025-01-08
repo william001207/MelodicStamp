@@ -78,7 +78,6 @@ import SwiftUI
         }
     }
 
-    // Volume related things are delegated
     private var _volume: CGFloat = .zero
     var volume: CGFloat {
         get { _volume }
@@ -89,8 +88,12 @@ import SwiftUI
         }
     }
 
-    var isPlaying: Bool = false {
-        didSet {
+    private var _isPlaying: Bool = false
+    var isPlaying: Bool {
+        get { _isPlaying }
+
+        set {
+            _isPlaying = newValue
             if isPlayable {
                 player.setPlaying(isPlaying)
             } else {
@@ -102,7 +105,6 @@ import SwiftUI
 
     private(set) var isRunning: Bool = false
 
-    // Volume related things are delegated
     private var _isMuted: Bool = false
     var isMuted: Bool {
         get { _isMuted }
@@ -197,30 +199,40 @@ import SwiftUI
             .receive(on: DispatchQueue.main)
             .sink { _ in
                 playbackTime: do {
-                    if let playbackTime = player.playbackTime {
-                        let duration = playbackTime.duration
-                        let elapsed = playbackTime.elapsed
-
-                        self.playbackTime = .init(duration: duration, elapsed: elapsed)
+                    if let updated = player.playbackTime {
+                        guard self.playbackTime != updated else { break playbackTime }
+                        self.playbackTime = updated
                     } else {
                         self.playbackTime = nil
                     }
                 }
 
                 volume: do {
-                    self._volume = player.playbackVolume
+                    let updated = player.playbackVolume
+
+                    guard self._volume != updated else { break volume }
+                    self._volume = updated
                 }
 
                 isPlaying: do {
-                    self.isPlaying = player.isPlaying
+                    let updated = player.isPlaying
+
+                    guard self._isPlaying != updated else { break isPlaying }
+                    self._isPlaying = updated
                 }
 
                 isRunning: do {
-                    self.isRunning = player.isRunning
+                    let updated = player.isRunning
+
+                    guard self.isRunning != updated else { break isRunning }
+                    self.isRunning = updated
                 }
 
                 isMuted: do {
-                    self._isMuted = player.isMuted
+                    let updated = player.isMuted
+
+                    guard self._isMuted != updated else { break isMuted }
+                    self._isMuted = updated
                 }
             }
             .store(in: &cancellables)

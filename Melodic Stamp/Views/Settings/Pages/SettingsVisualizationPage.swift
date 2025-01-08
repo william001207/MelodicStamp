@@ -9,10 +9,26 @@ import SwiftUI
 
 struct SettingsVisualizationPage: View {
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        LazyVStack {
+            Section {
+                VStack {
+                    SettingsView.bannerIcon(.waveform, color: .pink)
+
+                    Text("Visualization")
+                        .font(.title)
+
+                    Text("This is a sample description.")
+                        .foregroundStyle(.secondary)
+                }
+                .padding(7)
+            }
+        }
     }
 }
 
 #Preview {
-    SettingsVisualizationPage()
+    Form {
+        SettingsVisualizationPage()
+    }
+    .formStyle(.grouped)
 }

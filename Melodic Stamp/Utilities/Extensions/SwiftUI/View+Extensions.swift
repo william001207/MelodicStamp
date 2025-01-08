@@ -17,4 +17,8 @@ extension View {
     @ViewBuilder func aliveHighlight(_ isHighlighted: Bool, cornerRadius: CGFloat = 8) -> some View {
         modifier(AliveHighlightViewModifier(isHighlighted: isHighlighted, cornerRadius: cornerRadius))
     }
+
+    @ViewBuilder func gradientBackground(_ color: Color = .accent) -> some View {
+        modifier(GradientBackgroundModifier(color: color))
+    }
 }

@@ -10,10 +10,26 @@ import SwiftUI
 
 struct SettingsGeneralPage: View {
     var body: some View {
-        LazyVStack {}
+        LazyVStack {
+            Section {
+                VStack {
+                    SettingsView.bannerIcon(.gear, color: .gray)
+
+                    Text("General")
+                        .font(.title)
+
+                    Text("This is a sample description.")
+                        .foregroundStyle(.secondary)
+                }
+                .padding(7)
+            }
+        }
     }
 }
 
 #Preview {
-    SettingsGeneralPage()
+    Form {
+        SettingsGeneralPage()
+    }
+    .formStyle(.grouped)
 }

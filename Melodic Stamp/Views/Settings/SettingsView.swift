@@ -6,11 +6,14 @@
 //
 
 import Morphed
+import SFSafeSymbols
 import SwiftUI
 
 struct SettingsView: View {
     @State private var selectedTab: SettingsTab = .general
     @State private var isSidebarVisible: Bool = false
+
+    @State private var searchText: String = ""
 
     var body: some View {
         AppKitNavigationSplitView {
@@ -19,13 +22,13 @@ struct SettingsView: View {
                     switch tab {
                     case .general:
                         HStack {
-                            Image(systemSymbol: .gear)
+                            Self.sidebarIcon(.gear, color: .gray)
                             Text("General")
                         }
                         .tag(tab)
                     case .visualization:
                         HStack {
-                            Image(systemSymbol: .waveform)
+                            Self.sidebarIcon(.waveform, color: .pink)
                             Text("Visualization")
                         }
                         .tag(tab)
@@ -33,6 +36,7 @@ struct SettingsView: View {
                 }
             }
             .listStyle(.sidebar)
+            .searchable(text: $searchText)
         } detail: {
             Form {
                 switch selectedTab {
@@ -58,6 +62,25 @@ struct SettingsView: View {
             window.titlebarAppearsTransparent = false
             window.titlebarSeparatorStyle = .automatic
         })
+    }
+
+    @ViewBuilder static func sidebarIcon(_ symbol: SFSymbol, color: Color) -> some View {
+        Image(systemSymbol: symbol)
+            .colorScheme(.dark)
+            .frame(width: 16, height: 16)
+            .padding(2)
+            .gradientBackground(color)
+            .clipShape(.rect(cornerRadius: 5))
+    }
+
+    @ViewBuilder static func bannerIcon(_ symbol: SFSymbol, color: Color) -> some View {
+        Image(systemSymbol: symbol)
+            .colorScheme(.dark)
+            .font(.system(size: 42))
+            .frame(width: 50, height: 50)
+            .padding(6)
+            .gradientBackground(color)
+            .clipShape(.rect(cornerRadius: 16))
     }
 }
 

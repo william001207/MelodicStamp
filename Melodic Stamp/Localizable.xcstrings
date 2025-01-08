@@ -573,9 +573,6 @@
     "HDMI" : {
 
     },
-    "Hello, World!" : {
-
-    },
     "Hide" : {
       "localizations" : {
         "zh-Hans" : {
@@ -1263,6 +1260,9 @@
           }
         }
       }
+    },
+    "This is a sample description." : {
+
     },
     "Thunderbolt" : {
       "localizations" : {

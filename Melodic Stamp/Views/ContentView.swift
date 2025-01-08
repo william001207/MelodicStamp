@@ -122,10 +122,7 @@ struct ContentView: View {
     }
 
     private var title: String {
-        // Avoids multiple instantializations
-        let isPlayable = player.isPlayable
-
-        return if isPlayable, let track = player.track {
+        if player.isPlayable, let track = player.track {
             MusicTitle.stringifiedTitle(mode: .title, for: track)
         } else {
             Bundle.main.displayName
@@ -133,10 +130,7 @@ struct ContentView: View {
     }
 
     private var subtitle: String {
-        // Avoids multiple instantializations
-        let isPlayable = player.isPlayable
-
-        return if isPlayable, let track = player.track {
+        if player.isPlayable, let track = player.track {
             MusicTitle.stringifiedTitle(mode: .artists, for: track)
         } else if !player.isPlaylistEmpty {
             .init(localized: .init(
