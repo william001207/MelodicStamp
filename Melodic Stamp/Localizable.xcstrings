@@ -43,6 +43,17 @@
         }
       }
     },
+    "About: (Badge) Preview" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Preview"
+          }
+        }
+      }
+    },
     "Add Files" : {
       "localizations" : {
         "zh-Hans" : {
@@ -1002,9 +1013,6 @@
           }
         }
       }
-    },
-    "Preview" : {
-
     },
     "Previous Track" : {
       "localizations" : {
