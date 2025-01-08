@@ -21,7 +21,7 @@ struct DisplayLyricsView: View {
     @State private var hoveredIndex: Int? = nil
 
     var body: some View {
-        // Avoid multiple instantializations
+        // Avoids multiple instantializations
         let lines = lyrics.lines
         let highlightedRange = highlightedRange
 

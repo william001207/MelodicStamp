@@ -77,7 +77,7 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
     @State private var contentOffsets: [Int: CGFloat] = [:]
 
     var body: some View {
-        // Avoid multiple instantializations
+        // Avoids multiple instantializations
         let isInitialized = isInitialized
 
         ScrollView {

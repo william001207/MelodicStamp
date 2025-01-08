@@ -30,13 +30,6 @@ struct MelodicStampApp: App {
     var body: some Scene {
         WindowGroup(id: "content") {
             ContentView()
-                .onAppear {
-                    NSWindow.allowsAutomaticWindowTabbing = false
-                }
-                .onDisappear {
-                    dismissWindow(id: WindowID.about.rawValue)
-                    dismissWindow(id: WindowID.settings.rawValue)
-                }
         }
         .windowResizability(.contentSize)
         .windowToolbarStyle(.unified)

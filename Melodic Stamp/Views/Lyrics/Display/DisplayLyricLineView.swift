@@ -20,7 +20,7 @@ struct DisplayLyricLineView: View {
     @State private var isHovering: Bool = false
 
     var body: some View {
-        // Avoid multiple instantializations
+        // Avoids multiple instantializations
         let isActive = isActive
         let blurRadius = blurRadius(for: index, in: highlightedRange)
         let opacity = opacity(for: index, in: highlightedRange)

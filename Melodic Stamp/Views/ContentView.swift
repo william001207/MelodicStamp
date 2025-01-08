@@ -122,7 +122,10 @@ struct ContentView: View {
     }
 
     private var title: String {
-        if let track = player.track {
+        // Avoids multiple instantializations
+        let isPlayable = player.isPlayable
+
+        return if isPlayable, let track = player.track {
             MusicTitle.stringifiedTitle(mode: .title, for: track)
         } else {
             Bundle.main.displayName
@@ -130,7 +133,10 @@ struct ContentView: View {
     }
 
     private var subtitle: String {
-        if let track = player.track {
+        // Avoids multiple instantializations
+        let isPlayable = player.isPlayable
+
+        return if isPlayable, let track = player.track {
             MusicTitle.stringifiedTitle(mode: .artists, for: track)
         } else if !player.isPlaylistEmpty {
             .init(localized: .init(
@@ -139,7 +145,7 @@ struct ContentView: View {
                 comment: "The subtitle displayed when there are songs in the playlist and nothing is playing"
             ))
         } else {
-            .init()
+            ""
         }
     }
 

@@ -15,7 +15,7 @@ struct InspectorLyricsView: View {
     @Environment(\.appearsActive) private var appearsActive
 
     var body: some View {
-        // Avoid multiple instantializations
+        // Avoids multiple instantializations
         let lines = lyrics.lines
 
         // Use ZStack to avoid reinstantializing toolbar content
