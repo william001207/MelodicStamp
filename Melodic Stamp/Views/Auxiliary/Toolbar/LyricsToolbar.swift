@@ -29,7 +29,7 @@ struct LyricsToolbar: View {
                     isInfoPopoverPresented.toggle()
                 } label: {
                     Image(systemSymbol: .info)
-                        .popover(isPresented: $isInfoPopoverPresented) {
+                        .luminarePopover {
                             Text("""
                             You can use [AMLL TTML Tool](https://steve-xmh.github.io/amll-ttml-tool) to create TTML lyrics through a refined interface.
                             """)
