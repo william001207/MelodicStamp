@@ -10,10 +10,13 @@ import SwiftUI
 // MARK: - View Controller
 
 class AppKitNavigationSplitViewController<Sidebar, Detail>: NSSplitViewController where Sidebar: View, Detail: View {
-    var sidebarHostingController: NSHostingController<Sidebar>
-    var detailHostingController: NSHostingController<Detail>
+    var sidebarThickness: CGFloat
 
-    init(sidebar: Sidebar, detail: Detail) {
+    fileprivate var sidebarHostingController: NSHostingController<Sidebar>
+    fileprivate var detailHostingController: NSHostingController<Detail>
+
+    init(sidebarThickness: CGFloat = 214, sidebar: Sidebar, detail: Detail) {
+        self.sidebarThickness = sidebarThickness
         self.sidebarHostingController = NSHostingController(rootView: sidebar)
         self.detailHostingController = NSHostingController(rootView: detail)
         super.init(nibName: nil, bundle: nil)
@@ -30,8 +33,8 @@ class AppKitNavigationSplitViewController<Sidebar, Detail>: NSSplitViewControlle
 
         let sidebarItem = NSSplitViewItem(sidebarWithViewController: sidebarHostingController)
         sidebarItem.canCollapse = false
-        sidebarItem.minimumThickness = 150
-        sidebarItem.maximumThickness = 150
+        sidebarItem.minimumThickness = sidebarThickness
+        sidebarItem.maximumThickness = sidebarThickness
 
         let detailItem = NSSplitViewItem(viewController: detailHostingController)
 

@@ -70,6 +70,10 @@ struct MainView: View {
                     FileToolbar()
                 }
             }
+            .background(MakeCustomizable { window in
+                window.titlebarAppearsTransparent = true
+                window.titleVisibility = .visible
+            })
     }
 
     @ViewBuilder private func content() -> some View {

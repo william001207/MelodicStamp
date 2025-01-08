@@ -32,7 +32,7 @@ struct SettingsView: View {
                     }
                 }
             }
-            .listStyle(SidebarListStyle())
+            .listStyle(.sidebar)
         } detail: {
             Form {
                 switch selectedTab {
@@ -46,12 +46,18 @@ struct SettingsView: View {
             }
             .formStyle(.grouped)
         }
-        .background(MakeTitledWindow())
+        .frame(width: 712)
+        .frame(minHeight: 500, idealHeight: 778)
         .ignoresSafeArea(.all)
         .toolbar {
             // Preserves the titlebar style
             Color.clear
         }
+        .background(MakeCustomizable { window in
+            window.toolbarStyle = .unified
+            window.titlebarAppearsTransparent = false
+            window.titlebarSeparatorStyle = .automatic
+        })
     }
 }
 

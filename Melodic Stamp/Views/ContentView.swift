@@ -164,12 +164,6 @@ struct ContentView: View {
         }
         .frame(minHeight: 600)
         .ignoresSafeArea()
-        .onChange(of: appearsActive, initial: true) { _, _ in
-            DispatchQueue.main.async {
-                NSApp.mainWindow?.titlebarAppearsTransparent = true
-                NSApp.mainWindow?.titleVisibility = .visible
-            }
-        }
     }
 
     @ViewBuilder private func miniPlayerView() -> some View {

@@ -12,7 +12,7 @@ struct MakeAlwaysOnTop: NSViewControllerRepresentable {
     @Binding var titleVisibility: NSWindow.TitleVisibility
 
     func makeNSViewController(context: Context) -> NSViewController {
-        let hostingController = AlwaysOnTopHostingController(rootView: EmptyView())
+        let hostingController = AlwaysOnTopWindowHostingController(rootView: EmptyView())
         context.coordinator.hostingController = hostingController
 
         return hostingController
@@ -30,11 +30,11 @@ struct MakeAlwaysOnTop: NSViewControllerRepresentable {
     }
 
     class Coordinator {
-        var hostingController: AlwaysOnTopHostingController<EmptyView>!
+        var hostingController: AlwaysOnTopWindowHostingController<EmptyView>!
     }
 }
 
-class AlwaysOnTopHostingController<Content: View>: NSHostingController<Content> {
+class AlwaysOnTopWindowHostingController<Content: View>: NSHostingController<Content> {
     var isAlwaysOnTop: Bool = true
     var titleVisibility: NSWindow.TitleVisibility = .hidden
 
