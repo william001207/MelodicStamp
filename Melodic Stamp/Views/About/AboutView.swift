@@ -10,37 +10,72 @@ import SFSafeSymbols
 import SwiftUI
 
 struct AboutView: View {
+    @Environment(\.openURL) private var openURL
+
+    @State private var isVersionCopied: Bool = false
+
     var body: some View {
         ZStack {
             gradient()
 
             HStack(spacing: 25) {
                 appIcon()
+                    .shadow(radius: 24)
                     .padding(8)
 
                 VStack(alignment: .leading, spacing: 17.5) {
                     title()
 
                     VStack(alignment: .leading, spacing: 4) {
-                        Text(Bundle.main.copyright)
+                        AliveButton {
+                            openURL(organizationURL)
+                        } label: {
+                            Text(Bundle.main.copyright)
+                        }
+
+                        AliveButton {
+                            openURL(repositoryURL)
+                        } label: {
+                            HStack {
+                                Text("Open sourced on GitHub")
+                            }
+                            .font(.caption)
+                            .foregroundStyle(.tertiary)
+                        }
 
                         if let version = Bundle.main.appVersion {
                             let build = Bundle.main.appBuild.flatMap(String.init) ?? ""
                             let hasBuild = !build.isEmpty
 
                             let combined: String = if hasBuild {
-                                .init(localized: "\(version) (\(build))")
+                                .init(localized: .init(
+                                    "About: Version Template",
+                                    defaultValue: "\(version) (\(build))"
+                                ))
                             } else {
                                 version
                             }
 
                             AliveButton {
                                 NSPasteboard.general.setString(combined, forType: .string)
+
+                                isVersionCopied = true
+                                withAnimation(.default.delay(1.5)) {
+                                    isVersionCopied = false
+                                }
                             } label: {
-                                Text(combined)
-                                    .font(.caption)
-                                    .monospaced()
-                                    .foregroundStyle(.tertiary)
+                                HStack {
+                                    if isVersionCopied {
+                                        Text("Copied to clipboard!")
+                                    } else {
+                                        Text("Version")
+
+                                        Text(combined)
+                                            .monospaced()
+                                    }
+                                }
+                                .font(.caption)
+                                .foregroundStyle(.tertiary)
                             }
                         }
                     }
@@ -57,7 +92,7 @@ struct AboutView: View {
     }
 
     private var previewBadge: String {
-        .init(localized: .init("About: (Badge) Preview", defaultValue: "Preview"))
+        .init(localized: .init("About: Preview", defaultValue: "Preview"))
     }
 
     @ViewBuilder private func appIcon() -> some View {

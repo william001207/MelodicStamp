@@ -7,16 +7,6 @@
     "#%lld" : {
 
     },
-    "%@ (%@)" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "%1$@ (%2$@)"
-          }
-        }
-      }
-    },
     "%lld words" : {
       "localizations" : {
         "zh-Hans" : {
@@ -43,13 +33,24 @@
         }
       }
     },
-    "About: (Badge) Preview" : {
+    "About: Preview" : {
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "new",
             "value" : "Preview"
+          }
+        }
+      }
+    },
+    "About: Version Template" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ (%2$@)"
           }
         }
       }
@@ -881,6 +882,9 @@
           }
         }
       }
+    },
+    "Open sourced on GitHub" : {
+
     },
     "Other" : {
       "localizations" : {
