@@ -1,3 +1,10 @@
+//
+//  LeafletLyricsControlsView.swift
+//  MelodicStamp
+//
+//  Created by KrLite on 2025/01/05.
+//
+
 import SwiftUI
 
 struct LeafletLyricsControlsView: View {
