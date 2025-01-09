@@ -42,6 +42,8 @@ struct MiniPlayerView: View {
     @Environment(PlayerModel.self) private var player
     @Environment(PlayerKeyboardControlModel.self) private var playerKeyboardControl
 
+    @Environment(\.appearsActive) private var appearsActive
+
     @FocusState private var isFocused: Bool
 
     // MARK: - Fields
@@ -100,6 +102,9 @@ struct MiniPlayerView: View {
         .focusable()
         .focusEffectDisabled()
         .focused($isFocused)
+        .onChange(of: appearsActive, initial: true) { _, newValue in
+            isFocused = newValue
+        }
 
         // MARK: Window Customization
 

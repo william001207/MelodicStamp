@@ -16,6 +16,10 @@ struct LeafletView: View {
     @Environment(MetadataEditorModel.self) private var metadataEditor
     @Environment(LyricsModel.self) private var lyrics
 
+    @Environment(\.appearsActive) private var appearsActive
+
+    @FocusState private var isFocused: Bool
+
     // MARK: - Fields
 
     @State private var isShowingLyrics: Bool = true
@@ -100,6 +104,12 @@ struct LeafletView: View {
                         dominantColors = []
                     }
                 }
+            }
+            .focusable()
+            .focusEffectDisabled()
+            .focused($isFocused)
+            .onChange(of: appearsActive, initial: true) { _, newValue in
+                isFocused = newValue
             }
 
             // MARK: Lyrics
