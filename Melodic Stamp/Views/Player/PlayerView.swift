@@ -11,17 +11,27 @@ import SFSafeSymbols
 import SwiftUI
 
 struct PlayerView: View {
+    // MARK: - Environments
+
     @Environment(WindowManagerModel.self) private var windowManager
     @Environment(PlayerModel.self) private var player
     @Environment(PlayerKeyboardControlModel.self) private var playerKeyboardControl
 
+    // MARK: - Fields
+
     var namespace: Namespace.ID
+
+    // MARK: Appearance
 
     @State private var isProgressBarActive: Bool = false
     @State private var isVolumeBarActive: Bool = false
 
+    // MARK: Progress Bar
+
     @State private var adjustmentPercentage: CGFloat = .zero
     @State private var shouldUseRemainingDuration: Bool = false
+
+    // MARK: - Body
 
     var body: some View {
         VStack(alignment: .center, spacing: 12) {
@@ -52,11 +62,14 @@ struct PlayerView: View {
         .frame(maxWidth: .infinity)
     }
 
+    // MARK: - Header
+
     @ViewBuilder private func header() -> some View {
         @Bindable var player = player
 
         HStack(alignment: .center, spacing: 12) {
-            // Playback mode
+            // MARK: Playback Mode
+
             AliveButton(
                 enabledStyle: .tertiary, hoveringStyle: .secondary
             ) {
@@ -76,7 +89,8 @@ struct PlayerView: View {
                 PlaybackModePicker(selection: $player.playbackMode)
             }
 
-            // Playback looping
+            // MARK: Playback Looping
+
             AliveButton(
                 enabledStyle: .tertiary, hoveringStyle: .secondary
             ) {
@@ -104,7 +118,8 @@ struct PlayerView: View {
 
             Spacer()
 
-            // Output device
+            // MARK: Output Device
+
             Menu {
                 OutputDevicePicker(
                     devices: player.outputDevices,
@@ -119,7 +134,8 @@ struct PlayerView: View {
             .buttonStyle(.borderless)
             .tint(.secondary.opacity(0.5))
 
-            // Expand / shrink
+            // MARK: Expand / Shrink
+
             AliveButton(
                 enabledStyle: .tertiary, hoveringStyle: .secondary
             ) {
@@ -136,9 +152,12 @@ struct PlayerView: View {
         .frame(height: 20)
     }
 
+    // MARK: - Leading Controls
+
     @ViewBuilder private func leadingControls() -> some View {
         Group {
-            // Previous track
+            // MARK: Previous Track
+
             AliveButton {
                 player.previousTrack()
                 playerKeyboardControl.previousSongButtonBounceAnimation.toggle()
@@ -155,7 +174,8 @@ struct PlayerView: View {
                 id: PlayerNamespace.previousSongButton, in: namespace
             )
 
-            // Play / pause
+            // MARK: Play / Pause
+
             AliveButton {
                 player.isPlaying.toggle()
                 playerKeyboardControl.isPressingSpace = false
@@ -174,7 +194,8 @@ struct PlayerView: View {
                 id: PlayerNamespace.playPauseButton, in: namespace
             )
 
-            // Next track
+            // MARK: Next Track
+
             AliveButton {
                 player.nextTrack()
                 playerKeyboardControl.nextSongButtonBounceAnimation.toggle()
@@ -193,6 +214,8 @@ struct PlayerView: View {
         }
         .disabled(!player.hasCurrentTrack)
     }
+
+    // MARK: - Trailing Controls
 
     @ViewBuilder private func trailingControls() -> some View {
         @Bindable var player = player
@@ -217,7 +240,8 @@ struct PlayerView: View {
         .animation(.default.speed(2), value: player.isMuted)
         .matchedGeometryEffect(id: PlayerNamespace.volumeBar, in: namespace)
 
-        // Speaker
+        // MARK: Speaker
+
         AliveButton(enabledStyle: .secondary) {
             player.isMuted.toggle()
         } label: {
@@ -235,6 +259,8 @@ struct PlayerView: View {
             Toggle("Mute", isOn: $player.isMuted)
         }
     }
+
+    // MARK: - Progress Bar
 
     @ViewBuilder private func progressBar() -> some View {
         @Bindable var player = player

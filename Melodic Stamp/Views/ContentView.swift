@@ -10,12 +10,18 @@ import SFBAudioEngine
 import SwiftUI
 
 struct ContentView: View {
+    // MARK: - Environments
+
     @Environment(\.appearsActive) private var appearsActive
     @Environment(\.resetFocus) private var resetFocus
 
     @FocusState private var isFocused
 
     @Namespace private var namespace
+
+    // MARK: - Fields
+
+    // MARK: Models
 
     @State private var floatingWindows: FloatingWindowsModel = .init()
     @State private var windowManager: WindowManagerModel = .init()
@@ -25,12 +31,18 @@ struct ContentView: View {
     @State private var metadataEditor: MetadataEditorModel = .init()
     @State private var visualizer: VisualizerModel = .init()
 
+    // MARK: Sidebar & Inspector
+
     @State private var isInspectorPresented: Bool = false
     @State private var selectedContentTab: SidebarContentTab = .playlist
     @State private var selectedInspectorTab: SidebarInspectorTab = .commonMetadata
 
+    // MARK: Sizing
+
     @State private var minWidth: CGFloat?
     @State private var maxWidth: CGFloat?
+
+    // MARK: - Body
 
     var body: some View {
         Group {
@@ -97,7 +109,9 @@ struct ContentView: View {
             visualizer.normalizeData(fftData: fftData)
         }
         .frame(minWidth: minWidth, maxWidth: maxWidth)
-        // Environments
+
+        // MARK: Environments
+
         .environment(floatingWindows)
         .environment(windowManager)
         .environment(fileManager)
@@ -105,18 +119,24 @@ struct ContentView: View {
         .environment(playerKeyboardControl)
         .environment(metadataEditor)
         .environment(visualizer)
-        // Focus management
+
+        // MARK: Focus Management
+
         .focusable()
         .focusEffectDisabled()
         .prefersDefaultFocus(in: namespace)
         .focused($isFocused)
-        // Focused values
+
+        // MARK: Focused Values
+
         .focusedValue(\.windowManager, windowManager)
         .focusedValue(\.fileManager, fileManager)
         .focusedValue(\.player, player)
         .focusedValue(\.playerKeyboardControl, playerKeyboardControl)
         .focusedValue(\.metadataEditor, metadataEditor)
-        // Navigation
+
+        // MARK: Navigation
+
         .navigationTitle(title)
         .navigationSubtitle(subtitle)
     }
@@ -142,6 +162,8 @@ struct ContentView: View {
             ""
         }
     }
+    
+    // MARK: - Main View
 
     @ViewBuilder private func mainView() -> some View {
         MainView(
@@ -159,6 +181,8 @@ struct ContentView: View {
         .frame(minHeight: 600)
         .ignoresSafeArea()
     }
+    
+    // MARK: - Mini Player View
 
     @ViewBuilder private func miniPlayerView() -> some View {
         MiniPlayerView(namespace: namespace)
@@ -180,6 +204,8 @@ struct ContentView: View {
                 }
             }
     }
+
+    // MARK: - Functions
 
     private func initializeFloatingWindows() {
         floatingWindows.addTabBar {

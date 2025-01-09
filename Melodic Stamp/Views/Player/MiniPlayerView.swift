@@ -35,27 +35,41 @@ struct MiniPlayerView: View {
         }
     }
 
-    @FocusState private var isFocused: Bool
+    // MARK: - Environments
 
     @Environment(WindowManagerModel.self) private var windowManager
     @Environment(FileManagerModel.self) private var fileManager
     @Environment(PlayerModel.self) private var player
     @Environment(PlayerKeyboardControlModel.self) private var playerKeyboardControl
 
+    @FocusState private var isFocused: Bool
+
+    // MARK: - Fields
+
     var namespace: Namespace.ID
+
+    // MARK: Models
 
     @State private var lyrics: LyricsModel = .init()
     @State private var alwaysOnTop: AlwaysOnTopModel = .init()
 
+    // MARK: Controls
+
     @State private var activeControl: ActiveControl = .progress
     @State private var headerControl: HeaderControl = .title
+
+    // MARK: Appearance
 
     @State private var isTitleHovering: Bool = false
     @State private var isProgressBarHovering: Bool = false
     @State private var isProgressBarActive: Bool = false
 
+    // MARK: Progress Bar
+
     @State private var adjustmentPercentage: CGFloat = .zero
     @State private var shouldUseRemainingDuration: Bool = true
+
+    // MARK: - Body
 
     var body: some View {
         VStack(spacing: 12) {
@@ -86,12 +100,15 @@ struct MiniPlayerView: View {
         .focusable()
         .focusEffectDisabled()
         .focused($isFocused)
-        // Allow fully customization to the corresponding window
+
+        // MARK: Window Customization
+
         .background(MakeAlwaysOnTop(
             isAlwaysOnTop: $alwaysOnTop.isAlwaysOnTop, titleVisibility: $alwaysOnTop.titleVisibility
         ))
 
-        // Read lyrics
+        // MARK: Lyrics
+
         // Don't extract this logic or modify the tasks!
         .onAppear {
             guard let track = player.track else { return }
@@ -111,20 +128,24 @@ struct MiniPlayerView: View {
             }
         }
 
+        // MARK: Observations
+
         // Regain progress control on new track
         .onChange(of: player.currentIndex) { _, newValue in
             guard newValue != nil else { return }
             activeControl = .progress
         }
 
-        // Handle space down/up -> toggle play pause
-        .onKeyPress(keys: [.space], phases: .all) { key in
+        // MARK: Keyboard Handlers
+
+        // Handle [space / ⏎] -> toggle play / pause
+        .onKeyPress(keys: [.space, .return], phases: .all) { key in
             playerKeyboardControl.handlePlayPause(
                 in: player, phase: key.phase, modifiers: key.modifiers
             )
         }
 
-        // Handle left arrow/right arrow down/repeat/up -> adjust progress & volume
+        // Handle [← / →] -> adjust progress & volume
         .onKeyPress(keys: [.leftArrow, .rightArrow], phases: .all) { key in
             let sign: FloatingPointSign = key.key == .leftArrow ? .minus : .plus
 
@@ -142,7 +163,7 @@ struct MiniPlayerView: View {
             }
         }
 
-        // Handle escape -> regain progress control
+        // Handle [escape] -> regain progress control
         .onKeyPress(.escape) {
             guard activeControl == .volume else { return .ignored }
 
@@ -150,7 +171,7 @@ struct MiniPlayerView: View {
             return .handled
         }
 
-        // Handle m -> toggle mute
+        // Handle [m] -> toggle muted
         .onKeyPress(keys: ["m"], phases: .down) { _ in
             player.isMuted.toggle()
             return .handled
@@ -164,12 +185,15 @@ struct MiniPlayerView: View {
         return isProgressBarHovering || isProgressBarActive
     }
 
+    // MARK: - Header
+
     @ViewBuilder private func header() -> some View {
         @Bindable var player = player
 
         HStack(alignment: .center, spacing: 12) {
             if isTitleHovering {
-                // Playlist
+                // MARK: Playlist
+
                 Menu {
                     Button("Open in Playlist") {
                         fileManager.emitOpen(style: .inCurrentPlaylist)
@@ -189,7 +213,8 @@ struct MiniPlayerView: View {
                 .tint(.secondary)
             }
 
-            // Playback mode
+            // MARK: Playback Mode
+
             AliveButton(
                 enabledStyle: .tertiary, hoveringStyle: .secondary
             ) {
@@ -207,7 +232,8 @@ struct MiniPlayerView: View {
                 PlaybackModePicker(selection: $player.playbackMode)
             }
 
-            // Playback looping
+            // MARK: Playback Looping
+
             AliveButton(
                 enabledStyle: .tertiary, hoveringStyle: .secondary
             ) {
@@ -248,7 +274,8 @@ struct MiniPlayerView: View {
                     .padding(.bottom, 2)
             }
 
-            // Pin / unpin
+            // MARK: Pin / Unpin
+
             if isTitleHovering || alwaysOnTop.isAlwaysOnTop {
                 AliveButton(
                     enabledStyle: .tertiary, hoveringStyle: .secondary
@@ -264,7 +291,8 @@ struct MiniPlayerView: View {
             }
 
             if isTitleHovering {
-                // Expand / shrink
+                // MARK: Expand / Shrink
+
                 AliveButton(
                     enabledStyle: .tertiary, hoveringStyle: .secondary
                 ) {
@@ -282,10 +310,13 @@ struct MiniPlayerView: View {
         .frame(height: 16)
     }
 
+    // MARK: - Leading Controls
+
     @ViewBuilder private func leadingControls() -> some View {
         if !isProgressBarExpanded {
             Group {
-                // Previous track
+                // MARK: Previous Track
+
                 AliveButton {
                     player.previousTrack()
                     playerKeyboardControl.previousSongButtonBounceAnimation
@@ -302,7 +333,8 @@ struct MiniPlayerView: View {
                     id: PlayerNamespace.previousSongButton, in: namespace
                 )
 
-                // Play / pause
+                // MARK: Play / Pause
+
                 AliveButton {
                     player.isPlaying.toggle()
                     playerKeyboardControl.isPressingSpace = false
@@ -323,7 +355,8 @@ struct MiniPlayerView: View {
                     id: PlayerNamespace.playPauseButton, in: namespace
                 )
 
-                // Next track
+                // MARK: Next Track
+
                 AliveButton {
                     player.nextTrack()
                     playerKeyboardControl.nextSongButtonBounceAnimation.toggle()
@@ -343,6 +376,8 @@ struct MiniPlayerView: View {
         }
     }
 
+    // MARK: - Trailing Controls
+
     @ViewBuilder private func trailingControls() -> some View {
         @Bindable var player = player
         let isVolumeControlActive = activeControl == .volume
@@ -353,7 +388,8 @@ struct MiniPlayerView: View {
                 Spacer()
                     .frame(width: 0)
             } else {
-                // Output device
+                // MARK: Output Device
+
                 Menu {
                     OutputDevicePicker(
                         devices: player.outputDevices,
@@ -371,7 +407,8 @@ struct MiniPlayerView: View {
         }
 
         if isVolumeControlActive || !isProgressBarExpanded {
-            // Speaker
+            // MARK: Speaker
+
             AliveButton(enabledStyle: .secondary) {
                 activeControl = switch activeControl {
                 case .progress:
@@ -399,6 +436,8 @@ struct MiniPlayerView: View {
             }
         }
     }
+
+    // MARK: - Progress Bar
 
     @ViewBuilder private func progressBar() -> some View {
         @Bindable var player = player
@@ -507,6 +546,8 @@ struct MiniPlayerView: View {
             isProgressBarHovering = false
         }
     }
+
+    // MARK: - Playlist Menu
 
     @ViewBuilder private func playlistMenu() -> some View {
         let selection: Binding<Track?> = Binding {

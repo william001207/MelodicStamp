@@ -9,14 +9,23 @@ import DominantColors
 import SwiftUI
 
 struct LeafletView: View {
+    // MARK: - Environments
+
+    @Environment(PlayerKeyboardControlModel.self) private var playerKeyboardControl
     @Environment(PlayerModel.self) private var player
     @Environment(MetadataEditorModel.self) private var metadataEditor
     @Environment(LyricsModel.self) private var lyrics
 
+    // MARK: - Fields
+
     @State private var isShowingLyrics: Bool = true
 
     @State private var interaction: AppleMusicLyricsViewInteractionModel = .init()
-    @State private var dominantColors: [Color] = [.init(hex: 0x929292), .init(hex: 0xFFFFFF), .init(hex: 0x929292)]
+    @State private var dominantColors: [Color] = [
+        .init(hex: 0x929292), .init(hex: 0xFFFFFF), .init(hex: 0x929292)
+    ]
+
+    // MARK: - Body
 
     var body: some View {
         if !player.hasCurrentTrack {
@@ -25,6 +34,8 @@ struct LeafletView: View {
             ZStack {
                 if hasCover || hasLyrics {
                     HStack(spacing: 50) {
+                        // MARK: Cover
+
                         if let cover {
                             coverView(cover)
                                 .onChange(of: player.currentIndex, initial: true) { _, _ in
@@ -33,6 +44,8 @@ struct LeafletView: View {
                                     }
                                 }
                         }
+
+                        // MARK: Lyrics
 
                         if hasLyrics, isShowingLyrics {
                             lyricsView()
@@ -81,7 +94,8 @@ struct LeafletView: View {
                 }
             }
 
-            // Read lyrics
+            // MARK: Lyrics
+
             // Don't extract this logic or modify the tasks!
             .onAppear {
                 guard let track = player.track else { return }
@@ -100,7 +114,45 @@ struct LeafletView: View {
                     await lyrics.read(raw)
                 }
             }
+
+            // MARK: Color Scheme
+
             .colorScheme(.dark)
+
+            // MARK: Keyboard Handlers
+
+            // Handle [space / ⏎] -> toggle play / pause
+            .onKeyPress(keys: [.space, .return], phases: .all) { key in
+                playerKeyboardControl.handlePlayPause(
+                    in: player, phase: key.phase, modifiers: key.modifiers
+                )
+            }
+
+            // Handle [← / →] -> adjust progress
+            .onKeyPress(keys: [.leftArrow, .rightArrow], phases: .all) { key in
+                let sign: FloatingPointSign = key.key == .leftArrow ? .minus : .plus
+
+                return playerKeyboardControl.handleProgressAdjustment(
+                    in: player, phase: key.phase, modifiers: key.modifiers,
+                    sign: sign
+                )
+            }
+
+            // Handle [↑ / ↓] -> adjust volume
+            .onKeyPress(keys: [.leftArrow, .rightArrow], phases: .all) { key in
+                let sign: FloatingPointSign = key.key == .leftArrow ? .minus : .plus
+
+                return playerKeyboardControl.handleVolumeAdjustment(
+                    in: player, phase: key.phase, modifiers: key.modifiers,
+                    sign: sign
+                )
+            }
+
+            // Handle [m] -> toggle muted
+            .onKeyPress(keys: ["m"], phases: .down) { _ in
+                player.isMuted.toggle()
+                return .handled
+            }
         }
     }
 
@@ -117,6 +169,8 @@ struct LeafletView: View {
     private var hasLyrics: Bool {
         !lyrics.lines.isEmpty
     }
+
+    // MARK: - Cover View
 
     @ViewBuilder private func coverView(_ cover: NSImage) -> some View {
         AliveButton {
@@ -144,6 +198,8 @@ struct LeafletView: View {
         .animation(.spring(duration: 0.65, bounce: 0.45, blendDuration: 0.75), value: player.isPlaying)
     }
 
+    // MARK: - Lyrics View
+
     @ViewBuilder private func lyricsView() -> some View {
         DisplayLyricsView(interactionState: $interaction.state) { position, _ in
             guard position.isPositionedByUser else { return }
@@ -168,6 +224,8 @@ struct LeafletView: View {
             }
         }
     }
+
+    // MARK: - Functions
 
     private func extractDominantColors(from image: NSImage) async throws -> [Color] {
         let colors = try DominantColors.dominantColors(

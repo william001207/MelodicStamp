@@ -11,6 +11,8 @@ import SFSafeSymbols
 import SwiftUI
 
 struct PlaylistView: View {
+    // MARK: - Environments
+
     @Environment(PlayerModel.self) private var player
     @Environment(MetadataEditorModel.self) private var metadataEditor
 
@@ -18,7 +20,11 @@ struct PlaylistView: View {
     @Environment(\.luminareMinHeight) private var minHeight
     @Environment(\.luminareAnimation) private var animation
 
+    // MARK: - Fields
+
     var namespace: Namespace.ID
+
+    // MARK: - Body
 
     var body: some View {
         @Bindable var metadataEditor = metadataEditor
@@ -27,6 +33,8 @@ struct PlaylistView: View {
             if player.isPlaylistEmpty {
                 ExcerptView(tab: SidebarContentTab.playlist)
             } else {
+                // MARK: List
+
                 List(selection: $metadataEditor.items) {
                     Spacer()
                         .frame(height: 64 + minHeight)
@@ -55,6 +63,9 @@ struct PlaylistView: View {
                 .contentMargins(.bottom, 94, for: .scrollIndicators)
                 .animation(.default, value: player.playlist)
                 .animation(.default, value: metadataEditor.items)
+
+                // MARK: Keyboard Handlers
+
                 .onKeyPress(.escape) {
                     if handleEscape() {
                         .handled
@@ -78,6 +89,8 @@ struct PlaylistView: View {
                     }
                 }
             }
+
+            // MARK: Controls
 
             HStack(spacing: 0) {
                 Group {
@@ -112,9 +125,12 @@ struct PlaylistView: View {
         !player.playlist.isEmpty
     }
 
+    // MARK: - Leading Actions
+
     @ViewBuilder private func leadingActions() -> some View {
         HStack(spacing: 2) {
-            // Clear selection
+            // MARK: Clear Selection
+
             Button {
                 handleEscape()
             } label: {
@@ -124,7 +140,8 @@ struct PlaylistView: View {
             .aspectRatio(1 / 1, contentMode: .fit)
             .disabled(!canEscape)
 
-            // Remove selection from playlist / remove all
+            // MARK: Remove Selection from Playlist / Remove All
+
             Button(role: .destructive) {
                 if metadataEditor.items.isEmpty {
                     handleRemove(items: player.playlist)
@@ -152,9 +169,12 @@ struct PlaylistView: View {
         .buttonStyle(.luminare)
     }
 
+    // MARK: - Trailing Actions
+
     @ViewBuilder private func trailingActions() -> some View {
         HStack(spacing: 2) {
-            // Cycle playback mode
+            // MARK: Playback Mode
+
             Button {
                 let hasShift = NSEvent.modifierFlags.contains(.shift)
                 player.playbackMode = player.playbackMode.cycle(
@@ -165,7 +185,8 @@ struct PlaylistView: View {
             }
             .fixedSize(horizontal: true, vertical: false)
 
-            // Toggle infinite loop
+            // MARK: Playback Looping
+
             Button {
                 player.playbackLooping.toggle()
             } label: {
@@ -179,13 +200,16 @@ struct PlaylistView: View {
         .buttonStyle(.luminare)
     }
 
+    // MARK: - Item View
+
     @ViewBuilder private func itemView(for item: Track) -> some View {
         PlayableItemView(
             track: item,
             isSelected: metadataEditor.items.contains(item)
         )
         .swipeActions {
-            // Play
+            // MARK: Play
+
             Button {
                 player.play(track: item)
             } label: {
@@ -193,7 +217,8 @@ struct PlaylistView: View {
             }
             .tint(.accent)
 
-            // Remove from playlist
+            // MARK: Remove from Playlist
+
             Button(role: .destructive) {
                 handleRemove(items: [item])
             } label: {
@@ -202,7 +227,8 @@ struct PlaylistView: View {
             .tint(.red)
         }
         .swipeActions(edge: .leading) {
-            // Save metadata
+            // MARK: Save Metadata
+
             if item.metadata.isModified {
                 Button {
                     Task {
@@ -215,7 +241,8 @@ struct PlaylistView: View {
                 .tint(.green)
             }
 
-            // Restore metadata
+            // MARK: Restore Metadata
+
             if item.metadata.isModified {
                 Button {
                     item.metadata.restore()
@@ -228,7 +255,11 @@ struct PlaylistView: View {
         }
     }
 
+    // MARK: - Context Menu
+
     @ViewBuilder private func contextMenu(for item: Track) -> some View {
+        // MARK: Play
+
         Button {
             player.play(track: item)
         } label: {
@@ -241,6 +272,8 @@ struct PlaylistView: View {
         }
         .keyboardShortcut(.return, modifiers: [])
 
+        // MARK: Remove from Playlist
+
         Button("Remove from Playlist") {
             if metadataEditor.items.isEmpty {
                 handleRemove(items: [item])
@@ -252,6 +285,8 @@ struct PlaylistView: View {
 
         Divider()
 
+        // MARK: Save Metadata
+
         Button("Save Metadata") {
             Task {
                 try await item.metadata.write()
@@ -260,12 +295,16 @@ struct PlaylistView: View {
         .disabled(!item.metadata.isModified)
         .keyboardShortcut("s", modifiers: .command)
 
+        // MARK: Restore Metadata
+
         Button("Restore Metadata") {
             item.metadata.restore()
         }
         .disabled(!item.metadata.isModified)
         .keyboardShortcut("r", modifiers: .command)
     }
+
+    // MARK: - Functions
 
     @discardableResult private func handleEscape() -> Bool {
         guard canEscape else { return false }
