@@ -51,10 +51,9 @@ struct DisplayLyricLineView: View {
             }
             .clipShape(.rect(cornerRadius: 12))
             .onHover { hover in
-                withAnimation(.smooth(duration: 0.25)) {
-                    isHovering = hover
-                }
+                isHovering = hover
             }
+            .animation(.smooth(duration: 0.25), value: isHovering)
         }
     }
 

@@ -7,4 +7,7 @@
 
 import SwiftUI
 
-extension EnvironmentValues {}
+extension EnvironmentValues {
+    @Entry var isLyricsTranslationVisible: Bool = true
+    @Entry var isLyricsRomanVisible: Bool = true
+}

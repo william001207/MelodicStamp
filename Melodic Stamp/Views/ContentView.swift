@@ -162,7 +162,7 @@ struct ContentView: View {
             ""
         }
     }
-    
+
     // MARK: - Main View
 
     @ViewBuilder private func mainView() -> some View {
@@ -181,7 +181,7 @@ struct ContentView: View {
         .frame(minHeight: 600)
         .ignoresSafeArea()
     }
-    
+
     // MARK: - Mini Player View
 
     @ViewBuilder private func miniPlayerView() -> some View {

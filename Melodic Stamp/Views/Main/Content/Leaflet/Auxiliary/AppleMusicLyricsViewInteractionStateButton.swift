@@ -45,7 +45,6 @@ struct AppleMusicLyricsViewInteractionStateButton: View, Animatable {
                 }
                 .font(.title2)
             }
-            .padding(12)
         }
         .animation(.default, value: hasProgressRing)
         .animation(.default, value: interactionState)
