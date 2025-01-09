@@ -217,8 +217,12 @@ struct LeafletView: View {
         .overlay(alignment: .leading) {
             Group {
                 if isShowingLyrics {
-                    controls()
-                        .transition(.blurReplace(.downUp))
+                    LeafletLyricsControlsView(
+                        isTranslationVisible: $isTranslationVisible,
+                        isRomanVisible: $isRomanVisible,
+                        typeSize: $typeSize
+                    )
+                    .transition(.blurReplace(.downUp))
                 }
             }
             .padding(12)
@@ -253,83 +257,6 @@ struct LeafletView: View {
                 d[.leading]
             }
         }
-    }
-
-    // MARK: - Controls
-
-    @ViewBuilder private func controls() -> some View {
-        VStack(spacing: 4) {
-            AliveButton {
-                isTranslationVisible.toggle()
-            } label: {
-                Image(systemSymbol: .translate)
-                    .foregroundStyle(
-                        isTranslationVisible ? .primary
-                            : isControlsHovering ? .tertiary : .quaternary
-                    )
-                    .frame(height: 36)
-            }
-
-            AliveButton {
-                isRomanVisible.toggle()
-            } label: {
-                Image(systemSymbol: .characterPhonetic)
-                    .foregroundStyle(
-                        isRomanVisible ? .primary
-                            : isControlsHovering ? .tertiary : .quaternary
-                    )
-                    .frame(height: 36)
-            }
-
-            VStack(spacing: 8) {
-                let typeSizes: ClosedRange<DynamicTypeSize> = .small...(.large)
-
-                AliveButton {
-                    typeSize -~ typeSizes.lowerBound
-                } label: {
-                    Image(systemSymbol: .textformatSizeSmaller)
-                        .foregroundStyle(isControlsHovering && typeSize > typeSizes.lowerBound ? .primary : .quaternary)
-                }
-
-                ForEach(typeSizes, id: \.hashValue) { size in
-                    let isSelected = typeSize == size
-                    AliveButton {
-                        typeSize = size
-                    } label: {
-                        Circle()
-                            .frame(width: 4, height: 4)
-                            .scaleEffect(isSelected ? 1.5 : 1)
-                            .foregroundStyle(
-                                isSelected ? .primary
-                                    : isControlsHovering ? .tertiary : .quaternary
-                            )
-                    }
-                }
-
-                AliveButton {
-                    typeSize +~ typeSizes.upperBound
-                } label: {
-                    Image(systemSymbol: .textformatSizeLarger)
-                        .foregroundStyle(isControlsHovering && typeSize < typeSizes.upperBound ? .primary : .quaternary)
-                }
-            }
-            .animation(.smooth, value: typeSize)
-        }
-        .font(.title2)
-        .padding(.vertical, 12)
-        .frame(width: 48)
-        .background {
-            if isControlsHovering {
-                Rectangle()
-                    .foregroundStyle(.background)
-                    .opacity(0.1)
-            }
-        }
-        .clipShape(.capsule)
-        .onHover { hover in
-            isControlsHovering = hover
-        }
-        .animation(.smooth(duration: 0.25), value: isControlsHovering)
     }
 
     // MARK: - Functions
