@@ -2,75 +2,93 @@
 //  LeafletLyricsControlsView.swift
 //  MelodicStamp
 //
-//  Created by KrLite on 2025/01/05.
+//  Created by KrLite on 2025/1/10.
 //
 
 import SwiftUI
 
 struct LeafletLyricsControlsView: View {
-    @Binding var isTranslationVisible: Bool
-    @Binding var isRomanVisible: Bool
+    @Environment(\.lyricAttachments) private var availableAttachments
+    @Environment(\.lyricTypeSizes) private var availableTypeSizes
+
+    @Binding var attachments: LyricAttachments
     @Binding var typeSize: DynamicTypeSize
-    
+
     @State private var isHovering: Bool = false
 
     var body: some View {
-        VStack(spacing: 4) {
-            AliveButton {
-                isTranslationVisible.toggle()
-            } label: {
-                Image(systemSymbol: .translate)
-                    .foregroundStyle(
-                        isTranslationVisible ? .primary
-                            : isHovering ? .tertiary : .quaternary
-                    )
-                    .frame(height: 36)
-            }
+        VStack(spacing: 12) {
+            // MARK: Translation
 
-            AliveButton {
-                isRomanVisible.toggle()
-            } label: {
-                Image(systemSymbol: .characterPhonetic)
-                    .foregroundStyle(
-                        isRomanVisible ? .primary
-                            : isHovering ? .tertiary : .quaternary
-                    )
-                    .frame(height: 36)
-            }
-
-            VStack(spacing: 8) {
-                let typeSizes: ClosedRange<DynamicTypeSize> = .small...(.large)
-
+            if availableAttachments.contains(.translation) {
                 AliveButton {
-                    typeSize -~ typeSizes.lowerBound
+                    attachments.toggle(.translation)
                 } label: {
-                    Image(systemSymbol: .textformatSizeSmaller)
-                        .foregroundStyle(isHovering && typeSize > typeSizes.lowerBound ? .primary : .quaternary)
+                    Image(systemSymbol: .translate)
+                        .foregroundStyle(
+                            attachments.contains(.translation) ? .primary
+                                : isHovering ? .tertiary : .quaternary
+                        )
+                        .frame(height: 24)
                 }
+            }
 
-                ForEach(typeSizes, id: \.hashValue) { size in
-                    let isSelected = typeSize == size
+            // MARK: Roman
+
+            if availableAttachments.contains(.roman) {
+                AliveButton {
+                    attachments.toggle(.roman)
+                } label: {
+                    Image(systemSymbol: .characterPhonetic)
+                        .foregroundStyle(
+                            attachments.contains(.roman) ? .primary
+                                : isHovering ? .tertiary : .quaternary
+                        )
+                        .frame(height: 24)
+                }
+            }
+
+            // MARK: Type Sizes
+
+            if abs(availableTypeSizes.lowerBound.distance(to: availableTypeSizes.upperBound)) > 1 {
+                VStack(spacing: 8) {
                     AliveButton {
-                        typeSize = size
+                        typeSize -~ availableTypeSizes.lowerBound
                     } label: {
-                        Circle()
-                            .frame(width: 4, height: 4)
-                            .scaleEffect(isSelected ? 1.5 : 1)
+                        Image(systemSymbol: .textformatSizeSmaller)
                             .foregroundStyle(
-                                isSelected ? .primary
-                                    : isHovering ? .tertiary : .quaternary
+                                isHovering && typeSize > availableTypeSizes.lowerBound ? .primary : .quaternary
                             )
+                            .frame(height: 24)
+                    }
+
+                    ForEach(availableTypeSizes, id: \.hashValue) { size in
+                        let isSelected = typeSize == size
+                        AliveButton {
+                            typeSize = size
+                        } label: {
+                            Circle()
+                                .frame(width: 4, height: 4)
+                                .scaleEffect(isSelected ? 1.5 : 1)
+                                .foregroundStyle(
+                                    isSelected ? .primary
+                                        : isHovering ? .tertiary : .quaternary
+                                )
+                        }
+                    }
+
+                    AliveButton {
+                        typeSize +~ availableTypeSizes.upperBound
+                    } label: {
+                        Image(systemSymbol: .textformatSizeLarger)
+                            .foregroundStyle(
+                                isHovering && typeSize < availableTypeSizes.upperBound ? .primary : .quaternary
+                            )
+                            .frame(height: 24)
                     }
                 }
-
-                AliveButton {
-                    typeSize +~ typeSizes.upperBound
-                } label: {
-                    Image(systemSymbol: .textformatSizeLarger)
-                        .foregroundStyle(isHovering && typeSize < typeSizes.upperBound ? .primary : .quaternary)
-                }
+                .animation(.smooth, value: typeSize)
             }
-            .animation(.smooth, value: typeSize)
         }
         .font(.title2)
         .padding(.vertical, 12)

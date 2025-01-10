@@ -72,22 +72,9 @@ struct DisplayLyricLineView: View {
     }
 
     @ViewBuilder private func lrcLyricLine(line: LRCLyricLine, index _: Int, isHighlighted: Bool) -> some View {
-        VStack(spacing: 5) {
-            Group {
-                Text(line.content)
-                    .font(.title)
-                    .opacity(isHighlighted ? 1.0 : 0.55)
-
-                if let translation = line.translation {
-                    Text(translation)
-                        .font(.title3)
-                        .opacity(isHighlighted ? 0.75 : 0.55)
-                }
-            }
-            .multilineTextAlignment(.leading)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .bold()
-        }
+        LRCDisplayLyricLineView(
+            line: line, isHighlighted: isHighlighted
+        )
     }
 
     @ViewBuilder private func ttmlLyricLine(line: TTMLLyricLine, index _: Int, isHighlighted: Bool) -> some View {

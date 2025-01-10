@@ -8,6 +8,6 @@
 import SwiftUI
 
 extension EnvironmentValues {
-    @Entry var isLyricsTranslationVisible: Bool = true
-    @Entry var isLyricsRomanVisible: Bool = true
+    @Entry var lyricAttachments: LyricAttachments = .all
+    @Entry var lyricTypeSizes: ClosedRange<DynamicTypeSize> = .medium...(.xxLarge)
 }

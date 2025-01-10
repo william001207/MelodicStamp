@@ -19,6 +19,10 @@ import SwiftSoup
         storage?.parser.lines ?? []
     }
 
+    var attachments: LyricAttachments {
+        storage?.parser.attachments ?? []
+    }
+
     func isIdentical(to url: URL) -> Bool {
         url == raw?.url
     }

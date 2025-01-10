@@ -17,7 +17,8 @@ import SwiftSoup
 
     typealias Line = TTMLLyricLine
 
-    var lines: [TTMLLyricLine] = []
+    private(set) var lines: [TTMLLyricLine] = []
+    private(set) var attachments: LyricAttachments = []
 
     required init(string: String) throws {
         try parseLyrics(string: string)
@@ -47,6 +48,7 @@ import SwiftSoup
             )
 
             lines.append(line)
+            attachments.formUnion(line.attachments)
         }
     }
 

@@ -12,15 +12,14 @@ import RegexBuilder
     typealias Tag = LRCTag
     typealias Line = LRCLyricLine
 
-    var lines: [LRCLyricLine] = []
+    private(set) var lines: [LRCLyricLine] = []
+    private(set) var attachments: LyricAttachments = []
 
     required init(string: String) throws {
         try parse(string: string)
     }
 
     private func parse(string: String) throws {
-        var lines: [LRCLyricLine] = []
-
         let contents = string
             .split(separator: .newlineSequence)
             .map(String.init)
@@ -89,10 +88,9 @@ import RegexBuilder
                 lines[lastIndex].translation = line.content
             } else {
                 lines.append(line)
+                attachments.formUnion(line.attachments)
             }
         }
-
-        self.lines = lines
     }
 
     static func parseTag(string: String) throws -> Tag? {

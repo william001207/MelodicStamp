@@ -20,3 +20,15 @@ struct LRCLyricLine: LyricLine, AnimatedString {
     var content: String
     var translation: String?
 }
+
+extension LRCLyricLine {
+    var attachments: LyricAttachments {
+        var attachments: LyricAttachments = []
+
+        if translation != nil {
+            attachments.formUnion(.translation)
+        }
+
+        return attachments
+    }
+}

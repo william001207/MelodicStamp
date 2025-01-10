@@ -45,3 +45,21 @@ extension DynamicTypeSize {
         lhs = max(lhs.advanced(by: -1), rhs)
     }
 }
+
+extension DynamicTypeSize {
+    var scale: CGFloat {
+        switch self {
+        case .xSmall: 0.5
+        case .small: 0.6
+        case .medium: 0.8
+        case .large: 1
+        case .xLarge: 1.15
+        case .xxLarge: 1.275
+        case .xxxLarge: 1.35
+        case .accessibility1: 1.5
+        case .accessibility2: 1.75
+        case .accessibility3, .accessibility4, .accessibility5: 2
+        default: 1
+        }
+    }
+}

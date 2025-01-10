@@ -10,8 +10,7 @@ import SwiftUI
 
 struct TTMLDisplayLyricLineView: View {
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
-    @Environment(\.isLyricsTranslationVisible) private var isTranslationVisible
-    @Environment(\.isLyricsRomanVisible) private var isRomanVisible
+    @Environment(\.lyricAttachments) private var attachments
 
     var line: TTMLLyricLine
     var elapsedTime: TimeInterval
@@ -56,8 +55,7 @@ struct TTMLDisplayLyricLineView: View {
             }
         }
         .animation(.linear, value: elapsedTime) // For time interpolation
-        .animation(.smooth, value: isTranslationVisible)
-        .animation(.smooth, value: isRomanVisible)
+        .animation(.smooth, value: attachments)
     }
 
     private var textAlignment: TextAlignment {
@@ -78,21 +76,6 @@ struct TTMLDisplayLyricLineView: View {
         }
     }
 
-    private var fontScale: CGFloat {
-        switch dynamicTypeSize {
-        case .xSmall: 0.5
-        case .small: 0.6
-        case .medium: 0.8
-        case .large: 1
-        case .xLarge: 1.15
-        case .xxLarge: 1.275
-        case .xxxLarge: 1.35
-        case .accessibility1: 1.5
-        case .accessibility2: 1.75
-        default: 2
-        }
-    }
-
     @ViewBuilder private func activeContent() -> some View {
         VStack(alignment: alignment.horizontal, spacing: 5) {
             Group {
@@ -105,11 +88,11 @@ struct TTMLDisplayLyricLineView: View {
                     Text(line.content)
                 }
             }
-            .font(.system(size: 24 * fontScale))
+            .font(.system(size: 24 * dynamicTypeSize.scale))
             .bold()
 
             additionalContent(for: line.lyrics)
-                .font(.system(size: 14 * fontScale))
+                .font(.system(size: 14 * dynamicTypeSize.scale))
                 .opacity(0.75)
         }
     }
@@ -117,12 +100,12 @@ struct TTMLDisplayLyricLineView: View {
     @ViewBuilder private func inactiveContent() -> some View {
         VStack(alignment: alignment.horizontal, spacing: 5) {
             Text(line.content)
-                .font(.system(size: 24 * fontScale))
+                .font(.system(size: 24 * dynamicTypeSize.scale))
                 .bold()
                 .opacity(inactiveOpacity)
 
             additionalContent(for: line.lyrics)
-                .font(.system(size: 14 * fontScale))
+                .font(.system(size: 14 * dynamicTypeSize.scale))
                 .opacity(inactiveOpacity)
         }
     }
@@ -132,25 +115,25 @@ struct TTMLDisplayLyricLineView: View {
 
         VStack(alignment: alignment.horizontal, spacing: 5) {
             Text(line.backgroundContent)
-                .font(.system(size: 18.5 * fontScale))
+                .font(.system(size: 18.5 * dynamicTypeSize.scale))
                 .bold()
                 .textRenderer(backgroundLyricsRenderer)
 
             additionalContent(for: line.backgroundLyrics)
-                .font(.system(size: 14 * fontScale))
+                .font(.system(size: 14 * dynamicTypeSize.scale))
                 .opacity(0.75)
         }
     }
 
     @ViewBuilder private func additionalContent(for lyrics: TTMLLyrics) -> some View {
-        if isTranslationVisible {
+        if attachments.contains(.translation) {
             ForEach(lyrics.translations) { translation in
                 Text(translation.text)
             }
             .transition(.blurReplace)
         }
 
-        if isRomanVisible, let roman = lyrics.roman {
+        if attachments.contains(.roman), let roman = lyrics.roman {
             Text(roman)
                 .bold()
                 .transition(.blurReplace)

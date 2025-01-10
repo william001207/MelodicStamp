@@ -25,8 +25,7 @@ struct LeafletView: View {
     @State private var isShowingLyrics: Bool = true
     @State private var isControlsHovering: Bool = false
 
-    @State private var isTranslationVisible: Bool = true
-    @State private var isRomanVisible: Bool = true
+    @State private var attachments: LyricAttachments = .all
     @State private var typeSize: DynamicTypeSize = .large
 
     @State private var interaction: AppleMusicLyricsViewInteractionModel = .init()
@@ -59,8 +58,7 @@ struct LeafletView: View {
                         if hasLyrics, isShowingLyrics {
                             lyricsView()
                                 .transition(.blurReplace(.downUp))
-                                .environment(\.isLyricsTranslationVisible, isTranslationVisible)
-                                .environment(\.isLyricsRomanVisible, isRomanVisible)
+                                .environment(\.lyricAttachments, visibleAttachments)
                                 .dynamicTypeSize(typeSize)
                         }
                     }
@@ -71,6 +69,22 @@ struct LeafletView: View {
                             return length - 2 * max(100, padding)
                         case .vertical:
                             return length
+                        }
+                    }
+                    .overlay(alignment: .leading) {
+                        Group {
+                            if isShowingLyrics {
+                                LeafletLyricsControlsView(
+                                    attachments: $attachments,
+                                    typeSize: $typeSize
+                                )
+                                .transition(.blurReplace(.downUp))
+                                .environment(\.lyricAttachments, availableAttachments)
+                            }
+                        }
+                        .padding(12)
+                        .alignmentGuide(.leading) { d in
+                            d[.trailing]
                         }
                     }
                 }
@@ -188,6 +202,14 @@ struct LeafletView: View {
         !lyrics.lines.isEmpty
     }
 
+    private var availableAttachments: LyricAttachments {
+        lyrics.attachments
+    }
+
+    private var visibleAttachments: LyricAttachments {
+        lyrics.attachments.intersection(attachments)
+    }
+
     // MARK: - Cover View
 
     @ViewBuilder private func coverView(_ cover: NSImage) -> some View {
@@ -214,22 +236,6 @@ struct LeafletView: View {
         .scaleEffect(player.isPlaying ? 1 : 0.85, anchor: .center)
         .shadow(radius: player.isPlaying ? 20 : 10)
         .animation(.spring(duration: 0.65, bounce: 0.45, blendDuration: 0.75), value: player.isPlaying)
-        .overlay(alignment: .leading) {
-            Group {
-                if isShowingLyrics {
-                    LeafletLyricsControlsView(
-                        isTranslationVisible: $isTranslationVisible,
-                        isRomanVisible: $isRomanVisible,
-                        typeSize: $typeSize
-                    )
-                    .transition(.blurReplace(.downUp))
-                }
-            }
-            .padding(12)
-            .alignmentGuide(.leading) { d in
-                d[.trailing]
-            }
-        }
     }
 
     // MARK: - Lyrics View

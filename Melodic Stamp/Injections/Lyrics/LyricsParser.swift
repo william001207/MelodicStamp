@@ -7,28 +7,13 @@
 
 import Foundation
 
-// MARK: - Lyric Line (Protocol)
-
-protocol LyricLine: Equatable, Hashable, Identifiable {
-    var beginTime: TimeInterval? { get }
-    var endTime: TimeInterval? { get }
-    var content: String { get }
-
-    var isValid: Bool { get }
-}
-
-extension LyricLine {
-    var isValid: Bool {
-        beginTime != nil || endTime != nil
-    }
-}
-
 // MARK: - Lyrics Parser (Protocol)
 
 protocol LyricsParser {
     associatedtype Line: LyricLine
 
-    var lines: [Line] { get set }
+    var lines: [Line] { get }
+    var attachments: LyricAttachments { get }
 
     init(string: String) throws
 
@@ -40,6 +25,8 @@ protocol LyricsParser {
 }
 
 extension LyricsParser {
+    var attachments: LyricAttachments { [] }
+
     // Do not use sequences, otherwise causing huge performance issues
     func highlight(at time: TimeInterval) -> Range<Int> {
         let endIndex = lines.endIndex

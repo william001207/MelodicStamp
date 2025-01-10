@@ -9,41 +9,26 @@ import Foundation
 import RegexBuilder
 import SFSafeSymbols
 
+// MARK: - Lyric Line
+
 struct TTMLLyricLine: LyricLine {
+    let id = UUID()
+
     var index: Int
     var position: TTMLPosition
 
-    // Do not use sequences, otherwise causing huge performance issues
+    var lyrics: TTMLLyrics = .init()
+    var backgroundLyrics: TTMLLyrics = .init()
+}
+
+extension TTMLLyricLine {
     var beginTime: TimeInterval? {
-        if
-            let lyricsBeginTime = lyrics.beginTime,
-            let backgroundLyricsBeginTime = backgroundLyrics.beginTime {
-            min(lyricsBeginTime, backgroundLyricsBeginTime)
-        } else if let lyricsBeginTime = lyrics.beginTime {
-            lyricsBeginTime
-        } else if let backgroundLyricsBeginTime = backgroundLyrics.beginTime {
-            backgroundLyricsBeginTime
-        } else {
-            nil
-        }
+        [lyrics, backgroundLyrics].compactMap(\.beginTime).min()
     }
 
     var endTime: TimeInterval? {
-        if
-            let lyricsEndTime = lyrics.endTime,
-            let backgroundLyricsEndTime = backgroundLyrics.endTime {
-            max(lyricsEndTime, backgroundLyricsEndTime)
-        } else if let lyricsEndTime = lyrics.endTime {
-            lyricsEndTime
-        } else if let backgroundLyricsEndTime = backgroundLyrics.endTime {
-            backgroundLyricsEndTime
-        } else {
-            nil
-        }
+        [lyrics, backgroundLyrics].compactMap(\.endTime).max()
     }
-
-    var lyrics: TTMLLyrics = .init()
-    var backgroundLyrics: TTMLLyrics = .init()
 
     var content: String {
         lyrics.map(\.content).joined()
@@ -53,7 +38,19 @@ struct TTMLLyricLine: LyricLine {
         backgroundLyrics.map(\.content).joined()
     }
 
-    let id = UUID()
+    var attachments: LyricAttachments {
+        var attachments: LyricAttachments = []
+
+        if ![lyrics, backgroundLyrics].flatMap(\.translations).isEmpty {
+            attachments.formUnion(.translation)
+        }
+
+        if ![lyrics, backgroundLyrics].compactMap(\.roman).isEmpty {
+            attachments.formUnion(.roman)
+        }
+
+        return attachments
+    }
 }
 
 extension TTMLLyricLine: Equatable {
@@ -68,15 +65,47 @@ extension TTMLLyricLine: Hashable {
     }
 }
 
+// MARK: - Position
+
+enum TTMLPosition: String, Equatable, Hashable, Identifiable, CaseIterable, Codable {
+    case main
+    case sub
+
+    var id: String { rawValue }
+}
+
+// MARK: - Vowel Time
+
+struct TTMLVowelTime: Equatable, Hashable {
+    var beginTime: TimeInterval
+    var endTime: TimeInterval
+}
+
+extension TTMLVowelTime {
+    var abs: Self {
+        .init(beginTime: Swift.abs(beginTime), endTime: Swift.abs(endTime))
+    }
+
+    func contains(time: TimeInterval) -> Bool {
+        beginTime...endTime ~= time
+    }
+}
+
+extension TTMLVowelTime: Comparable {
+    static func < (lhs: TTMLVowelTime, rhs: TTMLVowelTime) -> Bool {
+        lhs.beginTime < rhs.beginTime
+    }
+}
+
 // MARK: - Lyric
 
 struct TTMLLyric: Equatable, Hashable, Identifiable, AnimatedString {
+    let id = UUID()
+
     var beginTime: TimeInterval?
     var endTime: TimeInterval?
     var text: String
     var trailingSpaceCount: Int = 0
-
-    let id = UUID()
 
     var content: String {
         text + .init(repeating: " ", count: trailingSpaceCount)
@@ -134,29 +163,6 @@ struct TTMLTranslation: Equatable, Hashable, Identifiable {
     var text: String
 
     let id = UUID()
-}
-
-// MARK: - Vowel Time
-
-struct TTMLVowelTime: Equatable, Hashable {
-    var beginTime: TimeInterval
-    var endTime: TimeInterval
-}
-
-extension TTMLVowelTime {
-    var abs: Self {
-        .init(beginTime: Swift.abs(beginTime), endTime: Swift.abs(endTime))
-    }
-
-    func contains(time: TimeInterval) -> Bool {
-        beginTime...endTime ~= time
-    }
-}
-
-extension TTMLVowelTime: Comparable {
-    static func < (lhs: TTMLVowelTime, rhs: TTMLVowelTime) -> Bool {
-        lhs.beginTime < rhs.beginTime
-    }
 }
 
 // MARK: - Lyrics
@@ -265,13 +271,4 @@ extension TTMLLyrics {
             self[index].trailingSpaceCount = spaceCount
         }
     }
-}
-
-// MARK: - Position
-
-enum TTMLPosition: String, Equatable, Hashable, Identifiable, CaseIterable, Codable {
-    case main
-    case sub
-
-    var id: String { rawValue }
 }
