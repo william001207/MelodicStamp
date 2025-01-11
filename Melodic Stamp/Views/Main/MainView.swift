@@ -6,31 +6,7 @@
 //
 
 import Luminare
-import Morphed
 import SwiftUI
-
-private extension View {
-    @ViewBuilder func morphed() -> some View {
-        morphed(
-            insets: .init(bottom: .fixed(length: 64).mirrored),
-            LinearGradient(
-                colors: [.white, .black],
-                startPoint: .top,
-                endPoint: .bottom
-            )
-        )
-        .ignoresSafeArea()
-        .morphed(
-            insets: .init(top: .fixed(length: 94).mirrored),
-            LinearGradient(
-                colors: [.white, .black],
-                startPoint: .bottom,
-                endPoint: .top
-            )
-        )
-        .ignoresSafeArea()
-    }
-}
 
 struct MainView: View {
     @Environment(FileManagerModel.self) private var fileManager
@@ -89,6 +65,7 @@ struct MainView: View {
                     .environment(displayLyrics)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                     .ignoresSafeArea()
+                    .morphed()
             }
         }
         .background {

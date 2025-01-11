@@ -98,6 +98,7 @@ struct LeafletLyricsControlsView: View {
                 Rectangle()
                     .foregroundStyle(.background)
                     .opacity(0.1)
+                    .blendMode(.multiply)
             }
         }
         .clipShape(.capsule)

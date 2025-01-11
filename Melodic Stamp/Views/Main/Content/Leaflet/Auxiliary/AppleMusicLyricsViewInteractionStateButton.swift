@@ -27,6 +27,7 @@ struct AppleMusicLyricsViewInteractionStateButton: View, Animatable {
                 Circle()
                     .foregroundStyle(.background)
                     .opacity(0.1)
+                    .blendMode(.multiply)
                     .frame(width: 48)
                     .overlay {
                         if hasProgressRing {

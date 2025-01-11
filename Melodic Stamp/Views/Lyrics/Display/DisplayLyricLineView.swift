@@ -48,6 +48,7 @@ struct DisplayLyricLineView: View {
                 Rectangle()
                     .foregroundStyle(.background)
                     .opacity(isHovering ? 0.1 : 0)
+                    .blendMode(.multiply)
             }
             .clipShape(.rect(cornerRadius: 12))
             .onHover { hover in
