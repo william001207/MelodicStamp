@@ -65,15 +65,6 @@ extension TTMLLyricLine: Hashable {
     }
 }
 
-// MARK: - Position
-
-enum TTMLPosition: String, Equatable, Hashable, Identifiable, CaseIterable, Codable {
-    case main
-    case sub
-
-    var id: String { rawValue }
-}
-
 // MARK: - Vowel Time
 
 struct TTMLVowelTime: Equatable, Hashable {
@@ -95,6 +86,15 @@ extension TTMLVowelTime: Comparable {
     static func < (lhs: TTMLVowelTime, rhs: TTMLVowelTime) -> Bool {
         lhs.beginTime < rhs.beginTime
     }
+}
+
+// MARK: - Translation
+
+struct TTMLTranslation: Equatable, Hashable, Identifiable {
+    var locale: TTMLLocale
+    var text: String
+
+    let id = UUID()
 }
 
 // MARK: - Lyric
@@ -138,31 +138,6 @@ extension TTMLLyric {
     var isNonVowel: Bool {
         !(isVowel || startsWithVowel || endsWithVowel)
     }
-}
-
-// MARK: - Translation
-
-typealias TTMLLocale = Locale
-
-extension TTMLLocale {
-    var main: String? {
-        identifier.split(separator: /[-_]/).first.map(String.init)
-    }
-
-    var symbolLocalization: Localization? {
-        main.flatMap(Localization.init(rawValue:))
-    }
-
-    func localize(systemSymbol symbol: SFSymbol) -> SFSymbol? {
-        symbolLocalization.flatMap(symbol.localized(to:))
-    }
-}
-
-struct TTMLTranslation: Equatable, Hashable, Identifiable {
-    var locale: TTMLLocale
-    var text: String
-
-    let id = UUID()
 }
 
 // MARK: - Lyrics

@@ -8,18 +8,28 @@
 import Foundation
 
 extension TimeInterval {
-    init?(lyricTimestamp string: String) throws {
-        let regex = /^(\d+):(\d+)\.(\d+)$/
+    init?(timestamp string: String) throws {
+        let prefixMillisecondsRegex = /(.+)\.(\d+)/
+        let minutesSecondsRegex = /(\d+)\:(\d+)/
 
-        guard let match = try regex.wholeMatch(in: string) else { return nil }
-        // output: (original, first, second, third)
+        guard
+            let prefixMillisecondsMatch = try prefixMillisecondsRegex.wholeMatch(in: string),
+            let milliseconds = Double(prefixMillisecondsMatch.output.2)
+        else { return nil }
+        let prefix = prefixMillisecondsMatch.output.1
 
-        let components = [match.output.1, match.output.2, match.output.3]
-            .compactMap { Int($0) }
-        guard components.count == 3 else { return nil }
+        if let minutesSecondsMatch = try minutesSecondsRegex.wholeMatch(in: prefix) {
+            guard
+                let minutes = Double(minutesSecondsMatch.output.1),
+                let seconds = Double(minutesSecondsMatch.output.2)
+            else { return nil }
 
-        let minutes = Double(components[0]), seconds = Double(components[1]), milliseconds = Double(components[2])
-        self.init(floatLiteral: minutes * 60 + seconds + milliseconds / 1000)
+            self = minutes * 60 + seconds + milliseconds / 1000
+        } else if let seconds = Double(prefix) {
+            self = seconds + milliseconds / 1000
+        } else {
+            return nil
+        }
     }
 
     init(_ duration: Duration) {

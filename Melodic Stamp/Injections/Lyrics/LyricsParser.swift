@@ -14,6 +14,7 @@ protocol LyricsParser {
 
     var lines: [Line] { get }
     var attachments: LyricAttachments { get }
+    var metadata: [LyricsMetadata] { get }
 
     init(string: String) throws
 
@@ -26,6 +27,7 @@ protocol LyricsParser {
 
 extension LyricsParser {
     var attachments: LyricAttachments { [] }
+    var metadata: [LyricsMetadata] { [] }
 
     // Do not use sequences, otherwise causing huge performance issues
     func highlight(at time: TimeInterval) -> Range<Int> {
@@ -89,7 +91,7 @@ extension LyricsParser {
                     return if let furthestIndex {
                         furthestIndex ..< (previousIndex + 1)
                     } else {
-                        0 ..< (previousIndex + 1)
+                        previousIndex ..< (previousIndex + 1)
                     }
                 }
             } else {
@@ -119,7 +121,7 @@ extension LyricsParser {
                     return if let furthestIndex {
                         furthestIndex ..< (previousIndex + 1)
                     } else {
-                        0 ..< (previousIndex + 1)
+                        previousIndex ..< (previousIndex + 1)
                     }
                 }
             }

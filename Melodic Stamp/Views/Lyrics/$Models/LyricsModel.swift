@@ -23,6 +23,10 @@ import SwiftSoup
         storage?.parser.attachments ?? []
     }
 
+    var metadata: [LyricsMetadata] {
+        storage?.parser.metadata ?? []
+    }
+
     func isIdentical(to url: URL) -> Bool {
         url == raw?.url
     }

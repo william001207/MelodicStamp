@@ -8,8 +8,8 @@
 import Foundation
 import RegexBuilder
 
-struct LRCTag: Hashable, Equatable, Identifiable {
-    enum TagType: String, Equatable, Hashable, Identifiable, CaseIterable, Codable {
+enum LRCTag: Hashable, Equatable, Identifiable {
+    enum Key: String, Hashable, Equatable, Identifiable, CaseIterable, Codable {
         case artist = "ar"
         case album = "al"
         case title = "ti"
@@ -18,54 +18,78 @@ struct LRCTag: Hashable, Equatable, Identifiable {
         case creator = "by"
         case offset
         case editor = "re"
-        case version = "ve"
+        case tool
+        case vertion = "ve"
         case translation = "tr"
 
         var id: String { rawValue }
+    }
 
-        var isMetadata: Bool {
-            switch self {
-            case .length, .offset, .translation: true
-            default: false
-            }
-        }
+    case artist(String)
+    case album(String)
+    case title(String)
+    case author(String)
+    case length(Duration)
+    case creator(String)
+    case offset(TimeInterval)
+    case editor(String)
+    case tool(String)
+    case version(String)
+    case translation(String)
 
-        var name: String {
-            switch self {
-            case .length: .init(localized: "Length")
-            case .offset: .init(localized: "Offset")
-            case .translation: .init(localized: "Translation")
-            case .artist: .init(localized: "Artist")
-            case .album: .init(localized: "Album")
-            case .title: .init(localized: "Title")
-            case .author: .init(localized: "Author")
-            case .creator: .init(localized: "Creator")
-            case .editor: .init(localized: "Editor")
-            case .version: .init(localized: "Version")
-            }
-        }
-
-        static var regex: Regex<Substring> {
-            Regex {
-                ChoiceOf {
-                    length.rawValue
-                    offset.rawValue
-                    translation.rawValue
-
-                    artist.rawValue
-                    album.rawValue
-                    title.rawValue
-                    author.rawValue
-                    creator.rawValue
-                    editor.rawValue
-                    version.rawValue
-                }
-            }
+    init?(key: Key, rawValue: String) throws {
+        switch key {
+        case .artist: self = .artist(rawValue)
+        case .album: self = .album(rawValue)
+        case .title: self = .title(rawValue)
+        case .author: self = .author(rawValue)
+        case .length:
+            guard let duration = try Duration(length: rawValue) else { return nil }
+            self = .length(duration)
+        case .creator: self = .creator(rawValue)
+        case .offset:
+            guard let time = try TimeInterval(timestamp: rawValue) else { return nil }
+            self = .offset(time)
+        case .editor: self = .editor(rawValue)
+        case .tool: self = .tool(rawValue)
+        case .vertion: self = .version(rawValue)
+        case .translation: self = .translation(rawValue)
         }
     }
 
-    var id: TagType { type }
+    var id: Key { key }
 
-    var type: TagType
-    var content: String
+    var key: Key {
+        switch self {
+        case .artist: .artist
+        case .album: .album
+        case .title: .title
+        case .author: .author
+        case .length: .length
+        case .creator: .creator
+        case .offset: .offset
+        case .editor: .editor
+        case .tool: .tool
+        case .version: .vertion
+        case .translation: .translation
+        }
+    }
+
+    static var regex: Regex<Substring> {
+        Regex {
+            ChoiceOf {
+                Key.artist.rawValue
+                Key.album.rawValue
+                Key.title.rawValue
+                Key.author.rawValue
+                Key.length.rawValue
+                Key.creator.rawValue
+                Key.offset.rawValue
+                Key.editor.rawValue
+                Key.tool.rawValue
+                Key.vertion.rawValue
+                Key.translation.rawValue
+            }
+        }
+    }
 }

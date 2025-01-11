@@ -5,12 +5,15 @@
 //  Created by KrLite on 2024/12/15.
 //
 
-import Foundation
 import RegexBuilder
+import SFSafeSymbols
 import SwiftSoup
+import SwiftUI
 
-struct TTMLData: Equatable, Hashable, Identifiable {
-    enum DataType: String, Equatable, Hashable, Identifiable, CaseIterable, Codable {
+// MARK: - Data
+
+enum TTMLData: Equatable, Hashable, Identifiable {
+    enum Key: String, Equatable, Hashable, Identifiable, CaseIterable, Codable {
         case begin
         case end
         case agent = "ttm:agent"
@@ -21,20 +24,73 @@ struct TTMLData: Equatable, Hashable, Identifiable {
         var id: String { rawValue }
     }
 
-    var id: DataType { type }
+    case begin(TimeInterval)
+    case end(TimeInterval)
+    case agent(TTMLPosition)
+    case role(TTMLRole)
+    case itunesKey(String)
+    case language(TTMLLocale)
 
-    var type: DataType
-    var content: String
+    var id: Key { key }
 
-    init(type: DataType, content: String) {
-        self.type = type
-        self.content = content
+    var key: Key {
+        switch self {
+        case .begin: .begin
+        case .end: .end
+        case .agent: .agent
+        case .role: .role
+        case .itunesKey: .itunesKey
+        case .language: .language
+        }
     }
 
-    init?(type: DataType, element: Element) throws {
-        try self.init(type: type, content: element.attr(type.rawValue))
+    init?(key: Key, element: Element) throws {
+        try self.init(key: key, rawValue: element.attr(key.rawValue))
+    }
+
+    init?(key: Key, rawValue: String) throws {
+        switch key {
+        case .begin:
+            guard let time = try TimeInterval(timestamp: rawValue) else { return nil }
+            self = .begin(time)
+        case .end:
+            guard let time = try TimeInterval(timestamp: rawValue) else { return nil }
+            self = .end(time)
+        case .agent:
+            guard let position = TTMLPosition(agent: rawValue) else { return nil }
+            self = .agent(position)
+        case .role:
+            guard let role = TTMLRole(rawValue: rawValue) else { return nil }
+            self = .role(role)
+        case .itunesKey: self = .itunesKey(rawValue)
+        case .language:
+            let locale = TTMLLocale(identifier: rawValue)
+            self = .language(locale)
+        }
     }
 }
+
+// MARK: - Position
+
+enum TTMLPosition: String, Equatable, Hashable, Identifiable, CaseIterable, Codable {
+    case main
+    case sub
+
+    var id: String { rawValue }
+
+    init?(agent: String) {
+        switch agent {
+        case "v1":
+            self = .main
+        case "v2":
+            self = .sub
+        default:
+            return nil
+        }
+    }
+}
+
+// MARK: - Role
 
 enum TTMLRole: String, Equatable, Hashable, Identifiable, CaseIterable, Codable {
     case translation = "x-translation"
@@ -42,4 +98,22 @@ enum TTMLRole: String, Equatable, Hashable, Identifiable, CaseIterable, Codable 
     case background = "x-bg"
 
     var id: String { rawValue }
+}
+
+// MARK: - Locale
+
+typealias TTMLLocale = Locale
+
+extension TTMLLocale {
+    var main: String? {
+        identifier.split(separator: /[-_]/).first.map(String.init)
+    }
+
+    var symbolLocalization: Localization? {
+        main.flatMap(Localization.init(rawValue:))
+    }
+
+    func localize(systemSymbol symbol: SFSymbol) -> SFSymbol? {
+        symbolLocalization.flatMap(symbol.localized(to:))
+    }
 }

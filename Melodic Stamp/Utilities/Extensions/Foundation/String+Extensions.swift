@@ -37,36 +37,6 @@ extension String {
 }
 
 extension String {
-    func toTTMLTimestamp() -> TimeInterval? {
-        let prefixMillisecondsRegex = /(.+)\.(\d+)/
-        let minutesSecondsRegex = /(\d+)\:(\d+)/
-
-        do {
-            guard
-                let prefixMillisecondsMatch = try prefixMillisecondsRegex.wholeMatch(in: self),
-                let milliseconds = Double(prefixMillisecondsMatch.output.2)
-            else { return nil }
-            let prefix = prefixMillisecondsMatch.output.1
-
-            if let minutesSecondsMatch = try minutesSecondsRegex.wholeMatch(in: prefix) {
-                guard
-                    let minutes = Double(minutesSecondsMatch.output.1),
-                    let seconds = Double(minutesSecondsMatch.output.2)
-                else { return nil }
-
-                return minutes * 60 + seconds + milliseconds / 1000
-            } else if let seconds = Double(prefix) {
-                return seconds + milliseconds / 1000
-            } else {
-                return nil
-            }
-        } catch {
-            return nil
-        }
-    }
-}
-
-extension String {
     var reversed: String {
         String(reversed())
     }

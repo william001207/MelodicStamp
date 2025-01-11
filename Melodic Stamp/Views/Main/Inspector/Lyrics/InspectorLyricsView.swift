@@ -104,30 +104,6 @@ struct InspectorLyricsView: View {
         let isHighlighted = highlightedRange.contains(index)
 
         HStack {
-            ForEach(line.tags) { tag in
-                if !tag.type.isMetadata {
-                    switch tag.type {
-                    case .artist:
-                        Text(tag.content)
-                    case .album:
-                        Text(tag.content)
-                    case .title:
-                        Text(tag.content)
-                    case .author:
-                        Text(tag.content)
-                    case .creator:
-                        Text(tag.content)
-                    case .editor:
-                        Text(tag.content)
-                    case .version:
-                        Text(tag.content)
-                    default:
-                        EmptyView()
-                    }
-                }
-            }
-            .foregroundStyle(.quinary)
-
             Text(line.content)
 
             if let translation = line.translation {

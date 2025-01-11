@@ -8,12 +8,13 @@
 import Foundation
 import RegexBuilder
 
-@Observable class LRCParser: LyricsParser {
+@Observable final class LRCParser: LyricsParser {
     typealias Tag = LRCTag
     typealias Line = LRCLyricLine
 
     private(set) var lines: [LRCLyricLine] = []
     private(set) var attachments: LyricAttachments = []
+    private(set) var metadata: [LyricsMetadata] = []
 
     required init(string: String) throws {
         try parse(string: string)
@@ -25,25 +26,12 @@ import RegexBuilder
             .map(String.init)
 
         for content in contents {
-            let tagRegex = Regex {
-                "["
-                Capture {
-                    OneOrMore(.anyNonNewline, .reluctant)
-                }
-                "]"
-            }
-            let lineRegex = Regex {
-                Capture {
-                    ZeroOrMore {
-                        tagRegex
-                    }
-                }
-                Capture {
-                    ZeroOrMore(.anyNonNewline)
-                }
+            if try Self.lineCommentRegex.wholeMatch(in: content) != nil {
+                // Passes comment line
+                continue
             }
 
-            guard let match = try lineRegex.wholeMatch(
+            guard let match = try Self.lineRegex.wholeMatch(
                 in: content.trimmingCharacters(in: .whitespacesAndNewlines)
             ) else { return }
             // Output: (original, tagString, _, content)
@@ -51,44 +39,67 @@ import RegexBuilder
             let tagString = String(match.output.1).trimmingCharacters(in: .whitespacesAndNewlines)
             let content = String(match.output.3).trimmingCharacters(in: .whitespacesAndNewlines)
 
+            guard !tagString.isEmpty else { continue }
             var tags: [String] = []
-            for match in tagString.matches(of: tagRegex) {
+            for match in tagString.matches(of: Self.tagRegex) {
                 tags.append(String(match.output.1).trimmingCharacters(in: .whitespacesAndNewlines))
             }
 
-            var line: LRCLyricLine = .init(content: content)
+            if content.isEmpty {
+                // Metadata definition
 
-            for tag in tags {
-                if let time = try TimeInterval(lyricTimestamp: tag) {
-                    // Parse timestamp
-                    if line.beginTime == nil {
-                        // Save as start time
-                        line.beginTime = time
-                    } else if line.endTime == nil {
-                        // Save as end time
-                        line.endTime = time
-                    }
-                } else {
-                    // Parse tag
+                for tag in tags {
+                    // Parses tag
                     do {
                         if let tag = try Self.parseTag(string: tag) {
-                            line.tags.append(tag)
+                            switch tag {
+                            case let .artist(value):
+                                metadata.append(.artist(value))
+                            case let .album(value):
+                                metadata.append(.album(value))
+                            case let .title(value):
+                                metadata.append(.title(value))
+                            case let .creator(value):
+                                metadata.append(.lyricist(value))
+                            case let .offset(value):
+                                metadata.append(.offset(value))
+                            default:
+                                break
+                            }
                         }
                     } catch {}
                 }
-            }
-
-            let isTranslation = line.tags.map(\.type).contains(.translation)
-            if isTranslation {
-                // Append translation to last line
-
-                let lastIndex = lines.endIndex - 1
-                guard lines.indices.contains(lastIndex) else { continue }
-
-                lines[lastIndex].translation = line.content
             } else {
-                lines.append(line)
-                attachments.formUnion(line.attachments)
+                // Lyric line
+
+                var line: LRCLyricLine = .init(content: content)
+
+                for tag in tags {
+                    // Only timestamps are valid in a lyric line
+                    guard let time = try TimeInterval(timestamp: tag) else { continue }
+
+                    // Parses timestamp
+                    if line.beginTime == nil {
+                        // Saves as start time
+                        line.beginTime = time
+                    } else if line.endTime == nil {
+                        // Saves as end time
+                        line.endTime = time
+                    }
+                }
+
+                let isTranslation = line.tags.map(\.key).contains(.translation)
+                if isTranslation {
+                    // Appends translation to last line
+
+                    let lastIndex = lines.endIndex - 1
+                    guard lines.indices.contains(lastIndex) else { continue }
+
+                    lines[lastIndex].translation = line.content
+                } else {
+                    lines.append(line)
+                    attachments.formUnion(line.attachments)
+                }
             }
         }
     }
@@ -96,7 +107,7 @@ import RegexBuilder
     static func parseTag(string: String) throws -> Tag? {
         let regex = Regex {
             Capture {
-                Tag.TagType.regex
+                Tag.regex
             }
             ":"
             Capture {
@@ -107,12 +118,38 @@ import RegexBuilder
         }
 
         guard let match = try regex.wholeMatch(in: string) else { return nil }
-        let key = String(match.output.1)
-        let value = String(match.output.2)
+        let keyString = String(match.output.1)
+        let valueString = String(match.output.2)
 
-        guard let type = Tag.TagType(rawValue: key) else {
-            return nil
+        guard let key = Tag.Key(rawValue: keyString) else { return nil }
+        return try .init(key: key, rawValue: valueString)
+    }
+}
+
+extension LRCParser {
+    private static let tagRegex = Regex {
+        "["
+        Capture {
+            OneOrMore(.anyNonNewline, .reluctant)
         }
-        return .init(type: type, content: value)
+        "]"
+    }
+
+    private static let lineRegex = Regex {
+        Capture {
+            ZeroOrMore {
+                tagRegex
+            }
+        }
+        Capture {
+            ZeroOrMore(.anyNonNewline)
+        }
+    }
+
+    private static let lineCommentRegex = Regex {
+        "#"
+        Capture {
+            ZeroOrMore(.anyNonNewline)
+        }
     }
 }

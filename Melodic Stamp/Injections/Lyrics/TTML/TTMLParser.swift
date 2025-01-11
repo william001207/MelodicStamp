@@ -28,16 +28,19 @@ import SwiftSoup
         guard let document = try? SwiftSoup.parse(string) else {
             throw ParseError.documentNotFound
         }
+
         guard let body = document.body() else {
             throw ParseError.bodyNotFound
         }
 
         for (index, pElement) in try body.getElementsByTag("p").enumerated() {
-            let agent = try TTMLData(type: .agent, element: pElement)
+            let position: TTMLPosition = if case let .agent(position) = try TTMLData(key: .agent, element: pElement) {
+                position
+            } else { .main }
 
             var line = TTMLLyricLine(
                 index: index,
-                position: Self.getPosition(fromAgent: agent?.content)
+                position: position
             )
 
             try Self.readNodes(
@@ -52,17 +55,14 @@ import SwiftSoup
         }
     }
 
-    static func getPosition(fromAgent agent: String?) -> TTMLPosition {
-        guard let agent else { return .main }
-        return switch agent {
-        case "v1": .main
-        default: .sub
-        }
-    }
-
     static func readTimestamp(from element: Element) throws -> (beginTime: TimeInterval?, endTime: TimeInterval?) {
-        let beginTime = try TTMLData(type: .begin, element: element)?.content.toTTMLTimestamp()
-        let endTime = try TTMLData(type: .end, element: element)?.content.toTTMLTimestamp()
+        let beginTime: TimeInterval? = if case let .begin(time) = try TTMLData(key: .begin, element: element) {
+            time
+        } else { nil }
+
+        let endTime: TimeInterval? = if case let .end(time) = try TTMLData(key: .end, element: element) {
+            time
+        } else { nil }
 
         return (beginTime, endTime)
     }
@@ -96,14 +96,11 @@ import SwiftSoup
                     .text()
                     .normalizingSpaces
 
-                if
-                    let roleData = try TTMLData(type: .role, element: spanElement),
-                    let role = TTMLRole(rawValue: roleData.content) {
+                if case let .role(role) = try TTMLData(key: .role, element: spanElement) {
                     switch role {
                     case .translation:
-                        guard let language = try TTMLData(type: .language, element: spanElement) else { break }
+                        guard case let .language(locale) = try TTMLData(key: .language, element: spanElement) else { break }
 
-                        let locale = Locale(identifier: language.content)
                         lyrics.translations.append(.init(
                             locale: locale,
                             text: spanText.removingParentheses

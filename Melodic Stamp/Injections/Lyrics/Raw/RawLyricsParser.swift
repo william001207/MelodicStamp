@@ -7,7 +7,7 @@
 
 import Foundation
 
-@Observable class RawLyricsParser: LyricsParser {
+@Observable final class RawLyricsParser: LyricsParser {
     typealias Line = RawLyricLine
 
     var lines: [RawLyricLine]
