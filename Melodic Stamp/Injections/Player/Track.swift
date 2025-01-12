@@ -10,22 +10,16 @@ import CSFBAudioEngine
 import Luminare
 import SwiftUI
 
-struct Track: Identifiable, RawRepresentable {
+@Observable final class Track: Identifiable {
     let id = UUID()
     let url: URL
-    @State var metadata: Metadata
-
-    var rawValue: URL { url }
+    var metadata: Metadata
 
     init?(url: URL) {
         self.url = url
 
         guard let metadata = Metadata(url: url) else { return nil }
         self.metadata = metadata
-    }
-
-    init?(rawValue: URL) {
-        self.init(url: rawValue)
     }
 
     init(url: URL, metadata: Metadata) {

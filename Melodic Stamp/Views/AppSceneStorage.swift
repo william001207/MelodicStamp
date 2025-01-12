@@ -8,16 +8,22 @@
 import SwiftUI
 
 enum AppSceneStorage: String, Hashable, Equatable, CaseIterable, Identifiable, Codable {
-    // MARK: Content View (Global Scene Scope)
+    // MARK: Content View
+
+    case contentTab
+    case inspectorTab
+
+    // MARK: Player
 
     case playlistURLs
-    case metadataURLs
+    case track
 
-    // MARK: Playlist View
+    case playbackMode
+    case playbackLooping
 
-    case playlistViewPlaybackMode
-    case playlistViewPlaybackPosition
-    case playlistViewPlaybackVolume
+    case playbackPosition
+    case playbackVolume
+    case playbackMuted
 
     var id: String { rawValue }
 

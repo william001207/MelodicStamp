@@ -303,8 +303,7 @@ private extension Metadata {
             replayGainTrackGain: metadata?.replayGainTrackGain,
             replayGainTrackPeak: metadata?.replayGainTrackPeak,
             replayGainReferenceLoudness: metadata?.replayGainReferenceLoudness,
-            additional: metadata?.additionalMetadata.map(
-                AdditionalMetadata.init)
+            additional: metadata?.additionalMetadata.map(AdditionalMetadata.init)
         )
     }
 
@@ -332,8 +331,7 @@ private extension Metadata {
         metadata.isrc = isrc.current?.formatted()
         metadata.lyrics = lyrics.current?.content
         metadata.mcn = mcn.current
-        metadata.musicBrainzRecordingID =
-            musicBrainzRecordingID.current?.uuidString
+        metadata.musicBrainzRecordingID = musicBrainzRecordingID.current?.uuidString
         metadata.musicBrainzReleaseID = musicBrainzReleaseID.current?.uuidString
         metadata.rating = rating.current
         metadata.releaseDate = releaseDate.current
@@ -341,8 +339,7 @@ private extension Metadata {
         metadata.replayGainAlbumPeak = replayGainAlbumPeak.current
         metadata.replayGainTrackGain = replayGainTrackGain.current
         metadata.replayGainTrackPeak = replayGainTrackPeak.current
-        metadata.replayGainReferenceLoudness =
-            replayGainReferenceLoudness.current
+        metadata.replayGainReferenceLoudness = replayGainReferenceLoudness.current
         metadata.additionalMetadata = additional.current
 
         attachedPictures.current.forEach(metadata.attachPicture)

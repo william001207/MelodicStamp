@@ -23,8 +23,6 @@ struct ContentView: View {
     @Default(.mainWindowBackgroundStyle) private var mainWindowBackgroundStyle
     @Default(.miniPlayerBackgroundStyle) private var miniPlayerBackgroundStyle
 
-    @Default(.memorizesPlaylists) private var memorizesPlaylists
-
     // MARK: - Fields
 
     // MARK: Models
@@ -39,18 +37,13 @@ struct ContentView: View {
     // MARK: Sidebar & Inspector
 
     @State private var isInspectorPresented: Bool = false
-    @State private var selectedContentTab: SidebarContentTab = .playlist
-    @State private var selectedInspectorTab: SidebarInspectorTab = .commonMetadata
+    @SceneStorage(AppSceneStorage.contentTab()) private var selectedContentTab: SidebarContentTab = .playlist
+    @SceneStorage(AppSceneStorage.inspectorTab()) private var selectedInspectorTab: SidebarInspectorTab = .commonMetadata
 
     // MARK: Sizing
 
     @State private var minWidth: CGFloat?
     @State private var maxWidth: CGFloat?
-
-    // MARK: Scene Storage
-
-    @SceneStorage(AppSceneStorage.playlistURLs()) private var sceneStoragePlaylistURLs: StringRepresentableArray<URL> = []
-    @SceneStorage(AppSceneStorage.metadataURLs()) private var sceneStorageMetadataURLs: StringRepresentableArray<URL> = []
 
     // MARK: - Body
 
@@ -67,11 +60,15 @@ struct ContentView: View {
                 }
             }
 
-            // MARK: File Importers
+            // MARK: Utility views
 
             .background {
-                FileImporters()
-                    .allowsHitTesting(false)
+                Group {
+                    FileImporters()
+
+                    DelegatedPlayerSceneStorage()
+                }
+                .allowsHitTesting(false)
             }
 
             // MARK: Window Styling
@@ -101,21 +98,6 @@ struct ContentView: View {
                 DispatchQueue.main.async {
                     maxWidth = nil
                 }
-            }
-
-            // MARK: Scene Storages
-
-            .onAppear {
-                guard memorizesPlaylists else { return }
-
-                restorePlaylistURLs()
-                restoreMetadataURLs()
-            }
-            .onChange(of: player.playlist) { _, newValue in
-                storePlaylistURLs(newValue)
-            }
-            .onChange(of: metadataEditor.tracks) { _, newValue in
-                storeMetadataURLs(.init(newValue))
             }
 
             // MARK: Receivers
@@ -294,44 +276,5 @@ struct ContentView: View {
     private func destroyFloatingWindows(from mainWindow: NSWindow? = nil) {
         floatingWindows.removeTabBar(from: mainWindow)
         floatingWindows.removePlayer(from: mainWindow)
-    }
-
-    private func restorePlaylistURLs() {
-        print(sceneStoragePlaylistURLs)
-        if !sceneStoragePlaylistURLs.isEmpty {
-            player.addToPlaylist(urls: sceneStoragePlaylistURLs)
-
-            print("Successfully restored \(sceneStoragePlaylistURLs.count) tracks into playlist")
-        }
-    }
-
-    private func restoreMetadataURLs() {
-        if !sceneStorageMetadataURLs.isEmpty {
-            let tracks = player.playlist.filter {
-                sceneStorageMetadataURLs.contains($0.url)
-            }
-            metadataEditor.tracks = .init(tracks)
-
-            print("Successfully restored \(tracks.count) tracks into metadata editor")
-        }
-    }
-
-    private func storePlaylistURLs(_ tracks: [Track]) {
-        if !tracks.isEmpty {
-            sceneStoragePlaylistURLs = tracks.map(\.url)
-        } else {
-            sceneStoragePlaylistURLs = []
-        }
-        print(sceneStoragePlaylistURLs)
-    }
-
-    private func storeMetadataURLs(_ tracks: [Track]) {
-        if !tracks.isEmpty {
-            sceneStorageMetadataURLs = tracks.map(\.url)
-
-            print("Successfully stored \(tracks.count) metadata tracks into scene storage")
-        } else {
-            sceneStorageMetadataURLs = []
-        }
     }
 }
