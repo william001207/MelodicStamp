@@ -111,13 +111,19 @@ struct TTMLDisplayLyricLineView: View {
     }
 
     @ViewBuilder private func backgroundContent() -> some View {
-        let backgroundLyricsRenderer = textRenderer(for: line.backgroundLyrics)
-
         VStack(alignment: alignment.horizontal, spacing: 5) {
-            Text(line.backgroundContent)
-                .font(.system(size: 18.5 * dynamicTypeSize.scale))
-                .bold()
-                .textRenderer(backgroundLyricsRenderer)
+            Group {
+                if shouldAnimate {
+                    let backgroundLyricsRenderer = textRenderer(for: line.backgroundLyrics)
+
+                    Text(line.backgroundContent)
+                        .textRenderer(backgroundLyricsRenderer)
+                } else {
+                    Text(line.backgroundContent)
+                }
+            }
+            .font(.system(size: 18.5 * dynamicTypeSize.scale))
+            .bold()
 
             additionalContent(for: line.backgroundLyrics)
                 .font(.system(size: 14 * dynamicTypeSize.scale))

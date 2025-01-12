@@ -90,7 +90,6 @@ struct LeafletView: View {
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
-            .morphed()
             .background {
                 if hasCover {
                     ZStack {

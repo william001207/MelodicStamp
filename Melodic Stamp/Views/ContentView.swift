@@ -297,6 +297,7 @@ struct ContentView: View {
     }
 
     private func restorePlaylistURLs() {
+        print(sceneStoragePlaylistURLs)
         if !sceneStoragePlaylistURLs.isEmpty {
             player.addToPlaylist(urls: sceneStoragePlaylistURLs)
 
@@ -321,6 +322,7 @@ struct ContentView: View {
         } else {
             sceneStoragePlaylistURLs = []
         }
+        print(sceneStoragePlaylistURLs)
     }
 
     private func storeMetadataURLs(_ tracks: [Track]) {

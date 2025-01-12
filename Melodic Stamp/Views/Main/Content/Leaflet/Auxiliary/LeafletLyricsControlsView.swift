@@ -87,7 +87,6 @@ struct LeafletLyricsControlsView: View {
                             .frame(height: 24)
                     }
                 }
-                .animation(.smooth, value: typeSize)
             }
         }
         .font(.title2)
