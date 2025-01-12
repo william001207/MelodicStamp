@@ -71,6 +71,7 @@ struct MelodicStampApp: App {
 
             WindowCommands()
         }
+        .windowManagerRole(.principal)
 
         Window("About \(Bundle.main.displayName)", id: WindowID.about.rawValue) {
             AboutView()
@@ -85,6 +86,7 @@ struct MelodicStampApp: App {
         .windowResizability(.contentSize)
         .windowStyle(.hiddenTitleBar)
         .windowToolbarStyle(.unified)
+        .windowManagerRole(.associated)
 
         Window("Settings", id: WindowID.settings.rawValue) {
             SettingsView()
@@ -98,6 +100,7 @@ struct MelodicStampApp: App {
         .defaultLaunchBehavior(.suppressed)
         .windowResizability(.contentSize)
         .windowToolbarStyle(.unified)
+        .windowManagerRole(.associated)
     }
 }
 

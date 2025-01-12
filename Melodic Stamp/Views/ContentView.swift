@@ -71,7 +71,6 @@ struct ContentView: View {
                     .allowsHitTesting(false)
             }
             .onAppear {
-                floatingWindows.observeFullScreen()
                 isFocused = true
                 resetFocus(in: namespace)
             }
@@ -190,6 +189,9 @@ struct ContentView: View {
             DispatchQueue.main.async {
                 initializeFloatingWindows(to: window)
             }
+        }
+        .onDisappear {
+            destroyFloatingWindows()
         }
         .onChange(of: appearsActive) { _, newValue in
             if newValue {

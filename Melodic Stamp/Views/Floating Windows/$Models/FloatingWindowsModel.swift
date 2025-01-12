@@ -17,51 +17,48 @@ import SwiftUI
     var isTabBarAdded: Bool { tabBarWindow != nil }
     var isPlayerAdded: Bool { playerWindow != nil }
 
-    func observeFullScreen() {
+    func observe(_ window: NSWindow? = nil) {
+        NotificationCenter.default.removeObserver(self)
+
+        guard let window else { return }
+
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(windowWillEnterFullScreen),
             name: NSWindow.willEnterFullScreenNotification,
-            object: NSApp.mainWindow
+            object: window
         )
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(windowDidEnterFullScreen),
             name: NSWindow.didEnterFullScreenNotification,
-            object: NSApp.mainWindow
+            object: window
         )
 
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(windowWillExitFullScreen),
             name: NSWindow.willExitFullScreenNotification,
-            object: NSApp.mainWindow
+            object: window
         )
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(windowDidExitFullScreen),
             name: NSWindow.didExitFullScreenNotification,
-            object: NSApp.mainWindow
+            object: window
         )
 
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(windowDidMove),
             name: NSWindow.didMoveNotification,
-            object: NSApp.mainWindow
+            object: window
         )
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(windowDidResize),
             name: NSWindow.didResizeNotification,
-            object: NSApp.mainWindow
-        )
-
-        NotificationCenter.default.addObserver(
-            self,
-            selector: #selector(windowWillClose),
-            name: NSWindow.willCloseNotification,
-            object: NSApp.mainWindow
+            object: window
         )
     }
 
@@ -205,19 +202,17 @@ extension FloatingWindowsModel {
         show()
     }
 
-    @objc func windowDidMove(_: Notification) {
-        updateTabBarPosition()
-        updatePlayerPosition()
-    }
-
-    @objc func windowDidResize(_: Notification) {
-        updateTabBarPosition()
-        updatePlayerPosition()
-    }
-
-    @objc func windowWillClose(_ notification: Notification) {
+    @objc func windowDidMove(_ notification: Notification) {
         guard let window = notification.object as? NSWindow else { return }
-        removeTabBar(from: window)
-        removePlayer(from: window)
+
+        updateTabBarPosition(in: window)
+        updatePlayerPosition(in: window)
+    }
+
+    @objc func windowDidResize(_ notification: Notification) {
+        guard let window = notification.object as? NSWindow else { return }
+
+        updateTabBarPosition(in: window)
+        updatePlayerPosition(in: window)
     }
 }
