@@ -9,7 +9,7 @@ import Foundation
 import RegexBuilder
 
 enum LRCTag: Hashable, Equatable, Identifiable {
-    enum Key: String, Hashable, Equatable, Identifiable, CaseIterable, Codable {
+    enum Key: String, Hashable, Equatable, CaseIterable, Identifiable, Codable {
         case artist = "ar"
         case album = "al"
         case title = "ti"
@@ -22,7 +22,7 @@ enum LRCTag: Hashable, Equatable, Identifiable {
         case vertion = "ve"
         case translation = "tr"
 
-        var id: String { rawValue }
+        var id: Self { self }
     }
 
     case artist(String)

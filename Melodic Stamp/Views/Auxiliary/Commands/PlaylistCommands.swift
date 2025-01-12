@@ -28,7 +28,7 @@ struct PlaylistCommands: Commands {
             Group {
                 if let player, let metadataEditor {
                     if metadataEditor.tracks.isEmpty {
-                        Button("Remove All") {
+                        Button("Clear Playlist") {
                             player.removeFromPlaylist(tracks: player.playlist)
                             metadataEditor.tracks.removeAll()
                         }
@@ -40,7 +40,7 @@ struct PlaylistCommands: Commands {
                         }
                     }
                 } else {
-                    Button("Remove All") {}
+                    Button("Clear Playlist") {}
                         .disabled(true)
                 }
             }

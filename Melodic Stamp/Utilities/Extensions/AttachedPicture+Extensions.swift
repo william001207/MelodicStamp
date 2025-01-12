@@ -53,16 +53,14 @@ extension AttachedPicture {
     }
 }
 
-enum AttachedPictureCategory: String, Hashable, Identifiable, Equatable, CaseIterable {
+enum AttachedPictureCategory: String, Hashable, Equatable, CaseIterable, Identifiable {
     case media
     case band
     case staff
     case scenes
     case metadata
 
-    var id: String {
-        rawValue
-    }
+    var id: Self { self }
 
     var allTypes: [AttachedPicture.`Type`] {
         AttachedPicture.allTypes.filter { $0.category == self }

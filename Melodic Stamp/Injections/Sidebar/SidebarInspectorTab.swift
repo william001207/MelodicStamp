@@ -14,7 +14,7 @@ enum SidebarInspectorTab: String, SidebarTab, CaseIterable, Codable {
     case lyrics
     case analytics
 
-    var id: String { rawValue }
+    var id: Self { self }
 
     var title: String {
         switch self {

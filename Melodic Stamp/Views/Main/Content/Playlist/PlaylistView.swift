@@ -155,7 +155,7 @@ struct PlaylistView: View {
                     Image(systemSymbol: .trashFill)
 
                     if !canRemove || metadataEditor.tracks.isEmpty {
-                        Text("Remove All")
+                        Text("Clear Playlist")
                     } else {
                         Text("Remove from Playlist")
                     }

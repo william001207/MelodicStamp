@@ -12,7 +12,7 @@ enum SidebarContentTab: String, SidebarTab, CaseIterable, Codable {
     case playlist
     case leaflet
 
-    var id: String { rawValue }
+    var id: Self { self }
 
     var title: String {
         switch self {

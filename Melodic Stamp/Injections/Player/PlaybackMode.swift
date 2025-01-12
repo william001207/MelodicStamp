@@ -10,11 +10,11 @@ import SFSafeSymbols
 import SwiftUI
 
 enum PlaybackMode: String, Hashable, Equatable, CaseIterable, Identifiable {
-    var id: String { rawValue }
-
     case sequential
     case loop
     case shuffle
+
+    var id: Self { self }
 
     var systemSymbol: SFSymbol {
         switch self {

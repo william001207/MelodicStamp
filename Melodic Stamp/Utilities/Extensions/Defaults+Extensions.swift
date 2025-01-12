@@ -11,9 +11,9 @@ import Foundation
 extension Defaults.Keys {
     // MARK: UI
 
-    static let isDynamicTitleBarEnabled: Key<Bool> = .init(
-        "isDynamicTitleBarEnabled",
-        default: true
+    static let dynamicTitleBar: Key<Defaults.DynamicTitleBar> = .init(
+        "dynamicTitleBar",
+        default: .whilePlaying
     )
 
     // MARK: Behavior

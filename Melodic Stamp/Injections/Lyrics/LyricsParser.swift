@@ -181,12 +181,10 @@ extension LyricsParser {
 
 // MARK: - Lyrics Type
 
-enum LyricsType: String, Hashable, Identifiable, CaseIterable {
+enum LyricsType: String, Hashable, CaseIterable, Identifiable {
     case raw // Raw splitted string, unparsed
     case lrc // Line based
     case ttml // Word based
 
-    var id: String {
-        rawValue
-    }
+    var id: Self { self }
 }

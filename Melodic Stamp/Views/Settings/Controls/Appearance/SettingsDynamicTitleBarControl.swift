@@ -9,12 +9,20 @@ import Defaults
 import SwiftUI
 
 struct SettingsDynamicTitleBarControl: View {
-    @Default(.isDynamicTitleBarEnabled) var isEnabled
+    @Default(.dynamicTitleBar) var dynamicTitleBar
 
     var body: some View {
-        Toggle(isOn: $isEnabled) {
+        Picker(selection: $dynamicTitleBar) {
+            ForEach(Defaults.DynamicTitleBar.allCases) { mode in
+                switch mode {
+                case .never: Text("Never")
+                case .always: Text("Always")
+                case .whilePlaying: Text("While playing")
+                }
+            }
+        } label: {
             Text("Dynamic title bar")
-            Text("Displays the information of the currently playing track on the title bar.")
+            Text("Displays the information of the currently playing track as window title.")
         }
     }
 }

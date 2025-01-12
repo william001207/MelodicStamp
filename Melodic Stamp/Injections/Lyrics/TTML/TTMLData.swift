@@ -13,7 +13,7 @@ import SwiftUI
 // MARK: - Data
 
 enum TTMLData: Equatable, Hashable, Identifiable {
-    enum Key: String, Equatable, Hashable, Identifiable, CaseIterable, Codable {
+    enum Key: String, Equatable, CaseIterable, Hashable, Identifiable, Codable {
         case begin
         case end
         case agent = "ttm:agent"
@@ -21,7 +21,7 @@ enum TTMLData: Equatable, Hashable, Identifiable {
         case itunesKey = "itunes:key"
         case language = "xml:lang"
 
-        var id: String { rawValue }
+        var id: Self { self }
     }
 
     case begin(TimeInterval)
@@ -72,11 +72,11 @@ enum TTMLData: Equatable, Hashable, Identifiable {
 
 // MARK: - Position
 
-enum TTMLPosition: String, Equatable, Hashable, Identifiable, CaseIterable, Codable {
+enum TTMLPosition: String, Equatable, Hashable, CaseIterable, Identifiable, Codable {
     case main
     case sub
 
-    var id: String { rawValue }
+    var id: Self { self }
 
     init?(agent: String) {
         switch agent {
@@ -92,12 +92,12 @@ enum TTMLPosition: String, Equatable, Hashable, Identifiable, CaseIterable, Coda
 
 // MARK: - Role
 
-enum TTMLRole: String, Equatable, Hashable, Identifiable, CaseIterable, Codable {
+enum TTMLRole: String, Equatable, Hashable, CaseIterable, Identifiable, Codable {
     case translation = "x-translation"
     case roman = "x-roman"
     case background = "x-bg"
 
-    var id: String { rawValue }
+    var id: Self { self }
 }
 
 // MARK: - Locale

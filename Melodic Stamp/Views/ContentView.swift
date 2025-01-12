@@ -22,6 +22,7 @@ struct ContentView: View {
 
     @Default(.mainWindowBackgroundStyle) private var mainWindowBackgroundStyle
     @Default(.miniPlayerBackgroundStyle) private var miniPlayerBackgroundStyle
+    @Default(.dynamicTitleBar) private var dynamicTitleBar
 
     // MARK: - Fields
 
@@ -140,24 +141,40 @@ struct ContentView: View {
     }
 
     private var title: String {
+        let fallbackTitle = Bundle.main.displayName
+
         if player.isPlayable, let track = player.track {
-            MusicTitle.stringifiedTitle(mode: .title, for: track)
+            let musicTitle = MusicTitle.stringifiedTitle(mode: .title, for: track)
+            return switch dynamicTitleBar {
+            case .never: fallbackTitle
+            case .always: musicTitle
+            case .whilePlaying: player.isPlaying ? musicTitle : fallbackTitle
+            }
         } else {
-            Bundle.main.displayName
+            return fallbackTitle
         }
     }
 
     private var subtitle: String {
-        if player.isPlayable, let track = player.track {
-            MusicTitle.stringifiedTitle(mode: .artists, for: track)
-        } else if !player.isPlaylistEmpty {
-            .init(localized: .init(
+        let fallbackTitle = if !player.isPlaylistEmpty {
+            String(localized: .init(
                 "App: (Subtitle) Songs",
                 defaultValue: "\(player.playlist.count) Songs",
                 comment: "The subtitle displayed when there are songs in the playlist and nothing is playing"
             ))
         } else {
             ""
+        }
+
+        if player.isPlayable, let track = player.track {
+            let musicSubtitle = MusicTitle.stringifiedTitle(mode: .artists, for: track)
+            return switch dynamicTitleBar {
+            case .never: fallbackTitle
+            case .always: musicSubtitle
+            case .whilePlaying: player.isPlaying ? musicSubtitle : fallbackTitle
+            }
+        } else {
+            return fallbackTitle
         }
     }
 

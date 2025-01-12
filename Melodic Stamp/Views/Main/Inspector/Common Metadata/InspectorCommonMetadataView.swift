@@ -97,7 +97,7 @@ struct InspectorCommonMetadataView: View {
                     } label: {
                         HStack {
                             Image(systemSymbol: .trashFill)
-                            Text("Remove All")
+                            Text("Clear")
                         }
                         .padding()
                     }

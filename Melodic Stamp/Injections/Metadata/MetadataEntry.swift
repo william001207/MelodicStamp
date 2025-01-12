@@ -246,10 +246,10 @@ extension MetadataBatchEditingEntries: Equatable {
 
 // MARK: - Metadata Value Type
 
-enum MetadataValueType: String, Identifiable, Hashable, Equatable, CaseIterable, Codable {
+enum MetadataValueType: String, Hashable, Equatable, CaseIterable, Identifiable, Codable {
     case none
     case identical
     case varied
 
-    var id: String { rawValue }
+    var id: Self { self }
 }
