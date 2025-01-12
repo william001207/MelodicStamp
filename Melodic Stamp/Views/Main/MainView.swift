@@ -38,7 +38,7 @@ struct MainView: View {
             .ignoresSafeArea()
             .luminareMinHeight(38)
             .toolbar {
-                // Preserves the titlebar style
+                // Preserves the titleBar style
                 Color.clear
             }
             .toolbar {
@@ -46,10 +46,10 @@ struct MainView: View {
                     FileToolbar()
                 }
             }
-            .background(MakeCustomizable { window in
+            .background(MakeCustomizable(customization: { window in
                 window.titlebarAppearsTransparent = true
                 window.titleVisibility = .visible
-            })
+            }))
     }
 
     @ViewBuilder private func content() -> some View {

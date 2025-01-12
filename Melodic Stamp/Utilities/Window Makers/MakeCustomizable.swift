@@ -8,10 +8,18 @@
 import SwiftUI
 
 struct MakeCustomizable: NSViewControllerRepresentable {
-    var customization: (NSWindow) -> ()
+    var customization: ((NSWindow) -> Void)?
+    var willAppear: ((NSWindow) -> Void)?
+    var didAppear: ((NSWindow) -> Void)?
+    var willDisappear: ((NSWindow) -> Void)?
+    var didDisappear: ((NSWindow) -> Void)?
 
     func makeNSViewController(context: Context) -> NSViewController {
-        let hostingController = CustomizableWindowHostingController(rootView: EmptyView(), customization: customization)
+        let hostingController = CustomizableWindowHostingController(
+            rootView: EmptyView(), customization: customization,
+            willAppear: willAppear, didAppear: didAppear,
+            willDisappear: willDisappear, didDisappear: didDisappear
+        )
         context.coordinator.hostingController = hostingController
 
         return hostingController
@@ -29,10 +37,22 @@ struct MakeCustomizable: NSViewControllerRepresentable {
 }
 
 class CustomizableWindowHostingController<Content: View>: NSHostingController<Content> {
-    var customization: (NSWindow) -> ()
+    var customization: ((NSWindow) -> Void)?
+    var willAppear: ((NSWindow) -> Void)?
+    var didAppear: ((NSWindow) -> Void)?
+    var willDisappear: ((NSWindow) -> Void)?
+    var didDisappear: ((NSWindow) -> Void)?
 
-    init(rootView: Content, customization: @escaping (NSWindow) -> ()) {
+    init(
+        rootView: Content, customization: ((NSWindow) -> Void)? = nil,
+        willAppear: ((NSWindow) -> Void)? = nil, didAppear: ((NSWindow) -> Void)? = nil,
+        willDisappear: ((NSWindow) -> Void)? = nil, didDisappear: ((NSWindow) -> Void)? = nil
+    ) {
         self.customization = customization
+        self.willAppear = willAppear
+        self.didAppear = didAppear
+        self.willDisappear = willDisappear
+        self.didDisappear = didDisappear
         super.init(rootView: rootView)
     }
 
@@ -45,6 +65,34 @@ class CustomizableWindowHostingController<Content: View>: NSHostingController<Co
         super.viewWillLayout()
 
         guard let window = view.window else { return }
-        customization(window)
+        customization?(window)
+    }
+    
+    override func viewWillAppear() {
+        super.viewWillAppear()
+        
+        guard let window = view.window else { return }
+        willAppear?(window)
+    }
+    
+    override func viewDidAppear() {
+        super.viewDidAppear()
+        
+        guard let window = view.window else { return }
+        didAppear?(window)
+    }
+    
+    override func viewWillDisappear() {
+        super.viewWillDisappear()
+        
+        guard let window = view.window else { return }
+        willDisappear?(window)
+    }
+    
+    override func viewDidDisappear() {
+        super.viewDidDisappear()
+        
+        guard let window = view.window else { return }
+        didDisappear?(window)
     }
 }

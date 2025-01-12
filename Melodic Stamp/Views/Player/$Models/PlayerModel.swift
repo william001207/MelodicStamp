@@ -13,6 +13,7 @@ import os.log
 import SFBAudioEngine
 import SFSafeSymbols
 import SwiftUI
+import Defaults
 
 // MARK: - Fields
 
@@ -44,7 +45,7 @@ import SwiftUI
     private(set) var track: Track?
     private(set) var playlist: [Track] = []
 
-    var playbackMode: PlaybackMode = .sequential
+    var playbackMode: PlaybackMode = Defaults[.defaultPlaybackMode]
     var playbackLooping: Bool = false
 
     private(set) var playbackTime: PlaybackTime?

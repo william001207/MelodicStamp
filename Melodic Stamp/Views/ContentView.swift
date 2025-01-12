@@ -11,6 +11,8 @@ import SwiftUI
 
 struct ContentView: View {
     // MARK: - Environments
+    
+    @Environment(FloatingWindowsModel.self) private var floatingWindows
 
     @Environment(\.appearsActive) private var appearsActive
     @Environment(\.resetFocus) private var resetFocus
@@ -23,7 +25,6 @@ struct ContentView: View {
 
     // MARK: Models
 
-    @State private var floatingWindows: FloatingWindowsModel = .init()
     @State private var windowManager: WindowManagerModel = .init()
     @State private var fileManager: FileManagerModel = .init()
     @State private var player: PlayerModel = .init(SFBAudioEnginePlayer())
@@ -65,17 +66,6 @@ struct ContentView: View {
             resetFocus(in: namespace)
         }
         .onChange(of: appearsActive, initial: true) { _, newValue in
-            switch windowManager.style {
-            case .main:
-                if newValue {
-                    initializeFloatingWindows()
-                } else {
-                    destroyFloatingWindows()
-                }
-            case .miniPlayer:
-                destroyFloatingWindows()
-            }
-
             guard newValue else { return }
             isFocused = true
             resetFocus(in: namespace)
@@ -166,20 +156,32 @@ struct ContentView: View {
     // MARK: - Main View
 
     @ViewBuilder private func mainView() -> some View {
-        MainView(
-            namespace: namespace,
-            isInspectorPresented: $isInspectorPresented,
-            selectedContentTab: $selectedContentTab,
-            selectedInspectorTab: $selectedInspectorTab
-        )
-        .onGeometryChange(for: CGRect.self) { proxy in
-            proxy.frame(in: .global)
-        } action: { _ in
-            floatingWindows.updateTabBarPosition()
-            floatingWindows.updatePlayerPosition()
+        CatchWindow { window in
+            MainView(
+                namespace: namespace,
+                isInspectorPresented: $isInspectorPresented,
+                selectedContentTab: $selectedContentTab,
+                selectedInspectorTab: $selectedInspectorTab
+            )
+            .onGeometryChange(for: CGRect.self) { proxy in
+                proxy.frame(in: .global)
+            } action: { _ in
+                floatingWindows.updateTabBarPosition(in: window)
+                floatingWindows.updatePlayerPosition(in: window)
+            }
+            .frame(minHeight: 600)
+            .ignoresSafeArea()
+            .onDisappear {
+                destroyFloatingWindows(from: window)
+            }
+            .onChange(of: appearsActive) { _, newValue in
+                if newValue {
+                    initializeFloatingWindows(to: window)
+                } else {
+                    destroyFloatingWindows(from: window)
+                }
+            }
         }
-        .frame(minHeight: 600)
-        .ignoresSafeArea()
     }
 
     // MARK: - Mini Player View
@@ -197,18 +199,12 @@ struct ContentView: View {
             .ignoresSafeArea()
             .frame(minWidth: 500, idealWidth: 500)
             .fixedSize(horizontal: false, vertical: true)
-            .onChange(of: appearsActive, initial: true) { _, _ in
-                DispatchQueue.main.async {
-                    NSApp.mainWindow?.titlebarAppearsTransparent = true
-                    NSApp.mainWindow?.titleVisibility = .hidden
-                }
-            }
     }
 
     // MARK: - Functions
 
-    private func initializeFloatingWindows() {
-        floatingWindows.addTabBar {
+    private func initializeFloatingWindows(to window: NSWindow? = nil) {
+        floatingWindows.addTabBar(to: window) {
             FloatingTabBarView(
                 isInspectorPresented: $isInspectorPresented,
                 selectedContentTab: $selectedContentTab,
@@ -216,7 +212,7 @@ struct ContentView: View {
             )
             .environment(floatingWindows)
         }
-        floatingWindows.addPlayer {
+        floatingWindows.addPlayer(to: window) {
             FloatingPlayerView()
                 .environment(floatingWindows)
                 .environment(windowManager)
@@ -225,8 +221,8 @@ struct ContentView: View {
         }
     }
 
-    private func destroyFloatingWindows() {
-        floatingWindows.removeTabBar()
-        floatingWindows.removePlayer()
+    private func destroyFloatingWindows(from window: NSWindow? = nil) {
+        floatingWindows.removeTabBar(from: window)
+        floatingWindows.removePlayer(from: window)
     }
 }

@@ -9,10 +9,20 @@ import SwiftUI
 
 struct SettingsLyricsPage: View {
     var body: some View {
-        LazyVStack {
-            Section {
-                SettingsExcerptView(.lyrics, descriptionKey: "Lyrics settings excerpt.")
-            }
+        SettingsExcerptView(.lyrics, descriptionKey: "Lyrics settings excerpt.")
+        
+        Section {
+            SettingsLyricsLyricFadingEffectControl()
+        }
+        
+        Section {
+            SettingsLyricsLyricAttachmentsControl()
+        } header: {
+            Text("Attachments")
+            Text("""
+The default visibility of components attached to lyric lines.
+Each can also be configured independently for every window in the leaflet page.
+""")
         }
     }
 }

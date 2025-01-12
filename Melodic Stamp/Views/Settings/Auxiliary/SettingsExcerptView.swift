@@ -41,6 +41,7 @@ struct SettingsExcerptView<Content>: View where Content: View {
             }
         }
         .padding(7)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 }
 

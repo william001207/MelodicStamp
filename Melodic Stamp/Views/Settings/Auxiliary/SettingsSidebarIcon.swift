@@ -23,7 +23,7 @@ struct SettingsSidebarIcon: View {
 
     var body: some View {
         Image(systemSymbol: systemSymbol)
-            .colorScheme(.dark)
+            .foregroundStyle(.white)
             .frame(width: 16, height: 16)
             .padding(2)
             .gradientBackground(color)

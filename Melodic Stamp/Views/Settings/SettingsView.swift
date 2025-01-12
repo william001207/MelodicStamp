@@ -52,14 +52,14 @@ struct SettingsView: View {
         .frame(minHeight: 500, idealHeight: 778)
         .ignoresSafeArea(.all)
         .toolbar {
-            // Preserves the titlebar style
+            // Preserves the titleBar style
             Color.clear
         }
-        .background(MakeCustomizable { window in
+        .background(MakeCustomizable(customization: { window in
             window.toolbarStyle = .unified
             window.titlebarAppearsTransparent = false
             window.titlebarSeparatorStyle = .automatic
-        })
+        }))
     }
 
     @ViewBuilder private func entry(_ tab: SettingsTab) -> some View {

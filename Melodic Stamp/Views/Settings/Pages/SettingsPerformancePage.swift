@@ -9,11 +9,7 @@ import SwiftUI
 
 struct SettingsPerformancePage: View {
     var body: some View {
-        LazyVStack {
-            Section {
-                SettingsExcerptView(.performance, descriptionKey: "Performance settings excerpt.")
-            }
-        }
+        SettingsExcerptView(.performance, descriptionKey: "Performance settings excerpt.")
     }
 }
 

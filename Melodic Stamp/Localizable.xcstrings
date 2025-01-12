@@ -193,6 +193,12 @@
         }
       }
     },
+    "Appearance" : {
+
+    },
+    "Applies a fading blur and opacity effect to lyrics that are not currently highlighted." : {
+
+    },
     "Artist" : {
       "localizations" : {
         "zh-Hans" : {
@@ -212,6 +218,9 @@
           }
         }
       }
+    },
+    "Attachments" : {
+
     },
     "AVB" : {
 
@@ -415,6 +424,9 @@
         }
       }
     },
+    "Default playback mode" : {
+
+    },
     "Discs" : {
       "localizations" : {
         "zh-Hans" : {
@@ -438,6 +450,9 @@
     "DisplayPort" : {
 
     },
+    "Displays current playing information on the title bar." : {
+
+    },
     "During Performance" : {
       "localizations" : {
         "zh-Hans" : {
@@ -458,6 +473,9 @@
         }
       }
     },
+    "Dynamic title bar" : {
+
+    },
     "Edit" : {
       "localizations" : {
         "zh-Hans" : {
@@ -467,6 +485,9 @@
           }
         }
       }
+    },
+    "Fading effect" : {
+
     },
     "Fast Forward" : {
       "localizations" : {
@@ -603,6 +624,9 @@
     "ISRC" : {
 
     },
+    "Launch Behaviors" : {
+
+    },
     "Lead Artist" : {
       "localizations" : {
         "zh-Hans" : {
@@ -705,6 +729,18 @@
           }
         }
       }
+    },
+    "Memorizes playback modes" : {
+
+    },
+    "Memorizes playback positions" : {
+
+    },
+    "Memorizes playback volumes" : {
+
+    },
+    "Memorizes playlists" : {
+
     },
     "Metadata" : {
       "localizations" : {
@@ -1110,6 +1146,12 @@
         }
       }
     },
+    "Restores playback modes for each window after launch." : {
+
+    },
+    "Restores playlists for each window after launch." : {
+
+    },
     "Rewind" : {
       "localizations" : {
         "zh-Hans" : {
@@ -1119,6 +1161,9 @@
           }
         }
       }
+    },
+    "Roman" : {
+
     },
     "Save" : {
       "localizations" : {
@@ -1230,6 +1275,9 @@
         }
       }
     },
+    "The default visibility of components attached to lyric lines.\nEach can also be configured independently for every window in the leaflet page." : {
+
+    },
     "Thunderbolt" : {
       "localizations" : {
         "zh-Hans" : {
@@ -1289,6 +1337,9 @@
           }
         }
       }
+    },
+    "Translation" : {
+
     },
     "Unknown" : {
       "localizations" : {

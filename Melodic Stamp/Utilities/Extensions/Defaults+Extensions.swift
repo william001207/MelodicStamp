@@ -17,21 +17,26 @@ extension Defaults.Keys {
     )
 
     // MARK: Behavior
+    
+    static let defaultPlaybackMode: Key<Defaults.PlaybackMode> = .init(
+        "defaultPlaybackMode",
+        default: .sequential
+    )
 
-    static let memorizesPlaylist: Key<Bool> = .init(
-        "memorizesPlaylist",
+    static let memorizesPlaybackModes: Key<Bool> = .init(
+        "memorizesPlaybackModes",
         default: true
     )
-    static let memorizesPlaybackPosition: Key<Bool> = .init(
-        "memorizesPlaybackPosition",
+    static let memorizesPlaylists: Key<Bool> = .init(
+        "memorizesPlaylists",
         default: true
     )
-    static let memorizesPlaybackVolume: Key<Bool> = .init(
-        "memorizesPlaybackVolume",
+    static let memorizesPlaybackPositions: Key<Bool> = .init(
+        "memorizesPlaybackPositions",
         default: true
     )
-    static let memorizesPlaybackMode: Key<Bool> = .init(
-        "memorizesPlaybackMode",
+    static let memorizesPlaybackVolumes: Key<Bool> = .init(
+        "memorizesPlaybackVolumes",
         default: true
     )
 

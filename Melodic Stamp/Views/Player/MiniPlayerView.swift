@@ -215,7 +215,7 @@ struct MiniPlayerView: View {
                     Image(systemSymbol: .listTriangle)
                 }
                 .buttonStyle(.borderless)
-                .tint(.secondary)
+                .tint(.secondary.opacity(0.5))
             }
 
             // MARK: Playback Mode

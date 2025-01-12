@@ -10,10 +10,18 @@ import SwiftUI
 
 struct SettingsGeneralPage: View {
     var body: some View {
-        LazyVStack {
-            Section {
-                SettingsExcerptView(.general, descriptionKey: "General settings excerpt.")
-            }
+        SettingsExcerptView(.general, descriptionKey: "General settings excerpt.")
+        
+        Section("Appearance") {
+            SettingsGeneralDynamicTitleBarControl()
+        }
+        
+        Section("Launch Behaviors") {
+            SettingsGeneralPlaybackModeMemorizationControl()
+        }
+        
+        Section {
+            SettingsGeneralPlaylistMemorizationControl()
         }
     }
 }

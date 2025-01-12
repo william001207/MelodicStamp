@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import SwiftUI
 
 extension SetAlgebra {
     mutating func toggle(_ option: Element) {

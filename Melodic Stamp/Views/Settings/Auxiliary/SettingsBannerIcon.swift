@@ -23,7 +23,7 @@ struct SettingsBannerIcon: View {
 
     var body: some View {
         Image(systemSymbol: systemSymbol)
-            .colorScheme(.dark)
+            .foregroundStyle(.white)
             .font(.system(size: 42))
             .frame(width: 50, height: 50)
             .padding(6)

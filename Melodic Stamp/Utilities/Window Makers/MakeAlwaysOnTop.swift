@@ -49,8 +49,8 @@ class AlwaysOnTopWindowHostingController<Content: View>: NSHostingController<Con
             break
         case .hidden:
             window.titleVisibility = .hidden
-            window.titlebarAppearsTransparent = true
             window.styleMask.insert(.fullSizeContentView)
+            window.titlebarAppearsTransparent = true
             window.titlebarSeparatorStyle = .none
         @unknown default:
             break

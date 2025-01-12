@@ -9,11 +9,7 @@ import SwiftUI
 
 struct SettingsVisualizationPage: View {
     var body: some View {
-        LazyVStack {
-            Section {
-                SettingsExcerptView(.visualization, descriptionKey: "Visualization settings excerpt.")
-            }
-        }
+        SettingsExcerptView(.visualization, descriptionKey: "Visualization settings excerpt.")
     }
 }
 
