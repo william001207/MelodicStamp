@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct LyricAttachments: OptionSet {
+struct LyricAttachments: OptionSet, Hashable, Equatable, Codable {
     let rawValue: Int
 
     static let translation = LyricAttachments(rawValue: 1 << 0)

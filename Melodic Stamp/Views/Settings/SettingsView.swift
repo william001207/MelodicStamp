@@ -13,40 +13,38 @@ struct SettingsView: View {
     @State private var selectedTab: SettingsTab = .general
     @State private var isSidebarVisible: Bool = false
 
-    @State private var searchText: String = ""
-
     var body: some View {
         AppKitNavigationSplitView {
             List(selection: $selectedTab) {
-                ForEach(SettingsTab.allCases) { tab in
-                    switch tab {
-                    case .general:
-                        HStack {
-                            Self.sidebarIcon(.gear, color: .gray)
-                            Text("General")
-                        }
-                        .tag(tab)
-                    case .visualization:
-                        HStack {
-                            Self.sidebarIcon(.waveform, color: .pink)
-                            Text("Visualization")
-                        }
-                        .tag(tab)
-                    }
+                Section {
+                    entry(.general)
+                }
+
+                Section {
+                    entry(.visualization)
+                    entry(.lyrics)
+                }
+
+                Section {
+                    entry(.performance)
                 }
             }
             .listStyle(.sidebar)
-            .searchable(text: $searchText)
         } detail: {
             Form {
-                switch selectedTab {
-                case .general:
-                    SettingsGeneralPage()
-                        .navigationTitle(Text("General"))
-                case .visualization:
-                    SettingsVisualizationPage()
-                        .navigationTitle(Text("Visualization"))
+                Group {
+                    switch selectedTab {
+                    case .general:
+                        SettingsGeneralPage()
+                    case .visualization:
+                        SettingsVisualizationPage()
+                    case .lyrics:
+                        SettingsLyricsPage()
+                    case .performance:
+                        SettingsPerformancePage()
+                    }
                 }
+                .navigationTitle(Text(selectedTab.name))
             }
             .formStyle(.grouped)
         }
@@ -64,23 +62,12 @@ struct SettingsView: View {
         })
     }
 
-    @ViewBuilder static func sidebarIcon(_ symbol: SFSymbol, color: Color) -> some View {
-        Image(systemSymbol: symbol)
-            .colorScheme(.dark)
-            .frame(width: 16, height: 16)
-            .padding(2)
-            .gradientBackground(color)
-            .clipShape(.rect(cornerRadius: 5))
-    }
-
-    @ViewBuilder static func bannerIcon(_ symbol: SFSymbol, color: Color) -> some View {
-        Image(systemSymbol: symbol)
-            .colorScheme(.dark)
-            .font(.system(size: 42))
-            .frame(width: 50, height: 50)
-            .padding(6)
-            .gradientBackground(color)
-            .clipShape(.rect(cornerRadius: 16))
+    @ViewBuilder private func entry(_ tab: SettingsTab) -> some View {
+        HStack {
+            SettingsSidebarIcon(tab)
+            Text(tab.name)
+        }
+        .tag(tab)
     }
 }
 

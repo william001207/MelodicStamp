@@ -67,4 +67,19 @@ extension Defaults.Keys {
         "isLyricsFadingEffectEnabled",
         default: true
     )
+    static let lyricAttachments: Key<Defaults.LyricAttachments> = .init(
+        "lyricAttachments",
+        default: .all
+    )
+
+    // MARK: Performance
+
+    static let hidesInspectorInBackground: Key<Bool> = .init(
+        "hidesInspectorInBackground",
+        default: false
+    )
+    static let hidesLyricsInBackground: Key<Bool> = .init(
+        "hidesLyricsInBackground",
+        default: false
+    )
 }

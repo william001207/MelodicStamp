@@ -12,16 +12,7 @@ struct SettingsGeneralPage: View {
     var body: some View {
         LazyVStack {
             Section {
-                VStack {
-                    SettingsView.bannerIcon(.gear, color: .gray)
-
-                    Text("General")
-                        .font(.title)
-
-                    Text("This is a sample description.")
-                        .foregroundStyle(.secondary)
-                }
-                .padding(7)
+                SettingsExcerptView(.general, descriptionKey: "General settings excerpt.")
             }
         }
     }

@@ -213,17 +213,6 @@
         }
       }
     },
-    "Author" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "作者"
-          }
-        }
-      }
-    },
     "AVB" : {
 
     },
@@ -426,17 +415,6 @@
         }
       }
     },
-    "Creator" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "创作者"
-          }
-        }
-      }
-    },
     "Discs" : {
       "localizations" : {
         "zh-Hans" : {
@@ -490,17 +468,6 @@
         }
       }
     },
-    "Editor" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "编辑"
-          }
-        }
-      }
-    },
     "Fast Forward" : {
       "localizations" : {
         "zh-Hans" : {
@@ -545,6 +512,9 @@
       }
     },
     "General" : {
+
+    },
+    "General settings excerpt." : {
 
     },
     "Genre" : {
@@ -663,17 +633,6 @@
         }
       }
     },
-    "Length" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "长度"
-          }
-        }
-      }
-    },
     "Load from File" : {
       "localizations" : {
         "zh-Hans" : {
@@ -723,6 +682,9 @@
           }
         }
       }
+    },
+    "Lyrics settings excerpt." : {
+
     },
     "Main Window" : {
       "localizations" : {
@@ -860,17 +822,6 @@
         }
       }
     },
-    "Offset" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "偏移"
-          }
-        }
-      }
-    },
     "Open File" : {
       "localizations" : {
         "zh-Hans" : {
@@ -941,6 +892,12 @@
       }
     },
     "PCI" : {
+
+    },
+    "Performance" : {
+
+    },
+    "Performance settings excerpt." : {
 
     },
     "Pictures" : {
@@ -1273,9 +1230,6 @@
         }
       }
     },
-    "This is a sample description." : {
-
-    },
     "Thunderbolt" : {
       "localizations" : {
         "zh-Hans" : {
@@ -1336,17 +1290,6 @@
         }
       }
     },
-    "Translation" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "翻译"
-          }
-        }
-      }
-    },
     "Unknown" : {
       "localizations" : {
         "zh-Hans" : {
@@ -1391,6 +1334,9 @@
       }
     },
     "Visualization" : {
+
+    },
+    "Visualization settings excerpt." : {
 
     },
     "You can use [AMLL TTML Tool](https://steve-xmh.github.io/amll-ttml-tool) to create TTML lyrics through a refined interface." : {
