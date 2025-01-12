@@ -17,45 +17,47 @@ import SwiftUI
     var isTabBarAdded: Bool { tabBarWindow != nil }
     var isPlayerAdded: Bool { playerWindow != nil }
 
+    private var mainWindowObserver = UUID()
+
     func observe(_ window: NSWindow? = nil) {
-        NotificationCenter.default.removeObserver(self)
+        NotificationCenter.default.removeObserver(mainWindowObserver)
 
         guard let window else { return }
 
         NotificationCenter.default.addObserver(
-            self,
+            mainWindowObserver,
             selector: #selector(windowWillEnterFullScreen),
             name: NSWindow.willEnterFullScreenNotification,
             object: window
         )
         NotificationCenter.default.addObserver(
-            self,
+            mainWindowObserver,
             selector: #selector(windowDidEnterFullScreen),
             name: NSWindow.didEnterFullScreenNotification,
             object: window
         )
 
         NotificationCenter.default.addObserver(
-            self,
+            mainWindowObserver,
             selector: #selector(windowWillExitFullScreen),
             name: NSWindow.willExitFullScreenNotification,
             object: window
         )
         NotificationCenter.default.addObserver(
-            self,
+            mainWindowObserver,
             selector: #selector(windowDidExitFullScreen),
             name: NSWindow.didExitFullScreenNotification,
             object: window
         )
 
         NotificationCenter.default.addObserver(
-            self,
+            mainWindowObserver,
             selector: #selector(windowDidMove),
             name: NSWindow.didMoveNotification,
             object: window
         )
         NotificationCenter.default.addObserver(
-            self,
+            mainWindowObserver,
             selector: #selector(windowDidResize),
             name: NSWindow.didResizeNotification,
             object: window

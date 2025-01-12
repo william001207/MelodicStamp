@@ -64,7 +64,7 @@ struct FloatingTabBarView: View {
         .clipShape(.rect(cornerRadius: 24))
         .frame(maxWidth: .infinity, alignment: .leading)
         .contentShape(.rect(cornerRadius: 24))
-        .fixedSize(horizontal: false, vertical: true) // Resize window
+        .fixedSize(horizontal: false, vertical: true) // Force resizing window
     }
 
     private var isExpanded: Bool {

@@ -5,9 +5,7 @@
 //  Created by KrLite on 2024/11/23.
 //
 
-import Combine
 import Defaults
-import SFBAudioEngine
 import SwiftUI
 
 struct ContentView: View {
@@ -24,6 +22,8 @@ struct ContentView: View {
 
     @Default(.mainWindowBackgroundStyle) private var mainWindowBackgroundStyle
     @Default(.miniPlayerBackgroundStyle) private var miniPlayerBackgroundStyle
+
+    @Default(.memorizesPlaylists) private var memorizesPlaylists
 
     // MARK: - Fields
 
@@ -49,8 +49,8 @@ struct ContentView: View {
 
     // MARK: Scene Storage
 
-//    @SceneStorage(AppSceneStorage.playlistTracks()) private var sceneStoragePlaylistTracks: [URL] = []
-//    @SceneStorage(AppSceneStorage.metadataTracks()) private var sceneStorageMetadataTracks: [URL] = []
+    @SceneStorage(AppSceneStorage.playlistURLs()) private var sceneStoragePlaylistURLs: StringRepresentableArray<URL> = []
+    @SceneStorage(AppSceneStorage.metadataURLs()) private var sceneStorageMetadataURLs: StringRepresentableArray<URL> = []
 
     // MARK: - Body
 
@@ -66,10 +66,16 @@ struct ContentView: View {
                         .presentedWindowStyle(.hiddenTitleBar)
                 }
             }
+
+            // MARK: File Importers
+
             .background {
                 FileImporters()
                     .allowsHitTesting(false)
             }
+
+            // MARK: Window Styling
+
             .onAppear {
                 isFocused = true
                 resetFocus(in: namespace)
@@ -96,6 +102,24 @@ struct ContentView: View {
                     maxWidth = nil
                 }
             }
+
+            // MARK: Scene Storages
+
+            .onAppear {
+                guard memorizesPlaylists else { return }
+
+                restorePlaylistURLs()
+                restoreMetadataURLs()
+            }
+            .onChange(of: player.playlist) { _, newValue in
+                storePlaylistURLs(newValue)
+            }
+            .onChange(of: metadataEditor.tracks) { _, newValue in
+                storeMetadataURLs(.init(newValue))
+            }
+
+            // MARK: Receivers
+
             .onReceive(player.visualizationDataPublisher) { fftData in
                 visualizer.normalizeData(fftData: fftData)
             }
@@ -243,6 +267,13 @@ struct ContentView: View {
                 selectedInspectorTab: $selectedInspectorTab
             )
             .environment(floatingWindows)
+            .onGeometryChange(for: CGSize.self) { proxy in
+                proxy.size
+            } action: { _ in
+                DispatchQueue.main.async {
+                    floatingWindows.updateTabBarPosition(in: mainWindow)
+                }
+            }
         }
         floatingWindows.addPlayer(to: mainWindow) {
             FloatingPlayerView()
@@ -250,11 +281,55 @@ struct ContentView: View {
                 .environment(windowManager)
                 .environment(player)
                 .environment(playerKeyboardControl)
+                .onGeometryChange(for: CGSize.self) { proxy in
+                    proxy.size
+                } action: { _ in
+                    DispatchQueue.main.async {
+                        floatingWindows.updatePlayerPosition(in: mainWindow)
+                    }
+                }
         }
     }
 
     private func destroyFloatingWindows(from mainWindow: NSWindow? = nil) {
         floatingWindows.removeTabBar(from: mainWindow)
         floatingWindows.removePlayer(from: mainWindow)
+    }
+
+    private func restorePlaylistURLs() {
+        if !sceneStoragePlaylistURLs.isEmpty {
+            player.addToPlaylist(urls: sceneStoragePlaylistURLs)
+
+            print("Successfully restored \(sceneStoragePlaylistURLs.count) tracks into playlist")
+        }
+    }
+
+    private func restoreMetadataURLs() {
+        if !sceneStorageMetadataURLs.isEmpty {
+            let tracks = player.playlist.filter {
+                sceneStorageMetadataURLs.contains($0.url)
+            }
+            metadataEditor.tracks = .init(tracks)
+
+            print("Successfully restored \(tracks.count) tracks into metadata editor")
+        }
+    }
+
+    private func storePlaylistURLs(_ tracks: [Track]) {
+        if !tracks.isEmpty {
+            sceneStoragePlaylistURLs = tracks.map(\.url)
+        } else {
+            sceneStoragePlaylistURLs = []
+        }
+    }
+
+    private func storeMetadataURLs(_ tracks: [Track]) {
+        if !tracks.isEmpty {
+            sceneStorageMetadataURLs = tracks.map(\.url)
+
+            print("Successfully stored \(tracks.count) metadata tracks into scene storage")
+        } else {
+            sceneStorageMetadataURLs = []
+        }
     }
 }

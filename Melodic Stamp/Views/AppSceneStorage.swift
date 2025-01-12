@@ -10,8 +10,8 @@ import SwiftUI
 enum AppSceneStorage: String, Hashable, Equatable, CaseIterable, Identifiable, Codable {
     // MARK: Content View (Global Scene Scope)
 
-    case playlistTracks
-    case metadataTracks
+    case playlistURLs
+    case metadataURLs
 
     // MARK: Playlist View
 
