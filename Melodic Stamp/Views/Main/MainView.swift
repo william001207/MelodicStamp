@@ -65,7 +65,6 @@ struct MainView: View {
                     .environment(displayLyrics)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                     .ignoresSafeArea()
-                    .morphed()
             }
         }
         .background {

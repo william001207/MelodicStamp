@@ -14,6 +14,9 @@ import SwiftUI
         }
     }
 
+    var countDownDelay: TimeInterval = 1
+    var countDownDuration: TimeInterval = 3
+
     var hasProgressRing: Bool = true
     var delegationProgress: CGFloat = .zero
 
@@ -21,15 +24,7 @@ import SwiftUI
 
     func reset() {
         guard !state.isIsolated else { return }
-        dispatch?.cancel()
         state = .intermediate
-        hasProgressRing = false
-
-        let dspatch = DispatchWorkItem {
-            self.state = .countingDown
-        }
-        dispatch = dspatch
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1, execute: dspatch)
     }
 
     func update(_ state: AppleMusicLyricsViewInteractionState) {
@@ -37,29 +32,45 @@ import SwiftUI
         case .following:
             dispatch?.cancel()
             hasProgressRing = false
+            delegationProgress = .zero
         case .countingDown:
             dispatch?.cancel()
             hasProgressRing = true
-
             delegationProgress = .zero
-            withAnimation(.smooth(duration: 3)) {
-                delegationProgress = 1
-            }
 
-            let dispatch = DispatchWorkItem {
-                self.state = .following
+            DispatchQueue.main.async {
+                withAnimation(.smooth(duration: self.countDownDuration)) {
+                    self.delegationProgress = 1
+                }
+
+                let dispatch = DispatchWorkItem {
+                    self.state = .following
+                }
+                self.dispatch = dispatch
+                DispatchQueue.main.asyncAfter(deadline: .now() + self.countDownDuration, execute: dispatch)
             }
-            self.dispatch = dispatch
-            DispatchQueue.main.asyncAfter(deadline: .now() + 3, execute: dispatch)
         case .isolated:
             dispatch?.cancel()
             hasProgressRing = false
+            delegationProgress = .zero
 
-            withAnimation(.smooth) {
-                delegationProgress = 1
+            DispatchQueue.main.async {
+                withAnimation(.smooth) {
+                    self.delegationProgress = 1
+                }
             }
-        default:
-            break
+        case .intermediate:
+            dispatch?.cancel()
+            hasProgressRing = false
+            delegationProgress = .zero
+
+            DispatchQueue.main.async {
+                let dispatch = DispatchWorkItem {
+                    self.state = .countingDown
+                }
+                self.dispatch = dispatch
+                DispatchQueue.main.asyncAfter(deadline: .now() + self.countDownDelay, execute: dispatch)
+            }
         }
     }
 }

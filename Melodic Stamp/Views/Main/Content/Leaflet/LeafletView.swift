@@ -90,8 +90,7 @@ struct LeafletView: View {
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
-            .animation(.bouncy, value: hasLyrics)
-            .animation(.bouncy, value: isShowingLyrics)
+            .morphed()
             .background {
                 if hasCover {
                     ZStack {
@@ -119,6 +118,8 @@ struct LeafletView: View {
                     }
                 }
             }
+            .animation(.bouncy, value: hasLyrics)
+            .animation(.bouncy, value: isShowingLyrics)
             .focusable()
             .focusEffectDisabled()
             .focused($isFocused)
