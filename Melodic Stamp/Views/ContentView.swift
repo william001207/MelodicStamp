@@ -177,7 +177,7 @@ struct ContentView: View {
             .onChange(of: appearsActive) { _, newValue in
                 if newValue {
                     DispatchQueue.main.async {
-                        initializeFloatingWindows()
+                        initializeFloatingWindows(to: window)
                     }
                 } else {
                     destroyFloatingWindows(from: window)
@@ -205,8 +205,8 @@ struct ContentView: View {
 
     // MARK: - Functions
 
-    private func initializeFloatingWindows() {
-        floatingWindows.addTabBar {
+    private func initializeFloatingWindows(to mainWindow: NSWindow? = nil) {
+        floatingWindows.addTabBar(to: mainWindow) {
             FloatingTabBarView(
                 isInspectorPresented: $isInspectorPresented,
                 selectedContentTab: $selectedContentTab,
@@ -214,7 +214,7 @@ struct ContentView: View {
             )
             .environment(floatingWindows)
         }
-        floatingWindows.addPlayer {
+        floatingWindows.addPlayer(to: mainWindow) {
             FloatingPlayerView()
                 .environment(floatingWindows)
                 .environment(windowManager)

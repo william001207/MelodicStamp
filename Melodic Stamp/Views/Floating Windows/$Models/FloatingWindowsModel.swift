@@ -67,9 +67,9 @@ import SwiftUI
         playerWindow?.animator().alphaValue = 0
     }
 
-    func addTabBar(@ViewBuilder content: @escaping () -> some View) {
+    func addTabBar(to mainWindow: NSWindow? = nil, @ViewBuilder content: @escaping () -> some View) {
         guard !isTabBarAdded else { return }
-        guard let applicationWindow = NSApp.mainWindow else { return }
+        guard let applicationWindow = mainWindow ?? NSApp.mainWindow else { return }
 
         let floatingWindow = NSWindow()
         tabBarWindow = floatingWindow
@@ -89,9 +89,9 @@ import SwiftUI
         }
     }
 
-    func addPlayer(@ViewBuilder content: @escaping () -> some View) {
+    func addPlayer(to mainWindow: NSWindow? = nil, @ViewBuilder content: @escaping () -> some View) {
         guard !isPlayerAdded else { return }
-        guard let applicationWindow = NSApp.mainWindow else { return }
+        guard let applicationWindow = mainWindow ?? NSApp.mainWindow else { return }
 
         let floatingWindow = NSWindow()
         playerWindow = floatingWindow
