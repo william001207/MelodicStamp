@@ -10,7 +10,7 @@ import SwiftUI
 
 struct SettingsLyricsLyricFadingEffectControl: View {
     @Default(.isLyricsFadingEffectEnabled) private var isEnabled
-    
+
     var body: some View {
         Toggle(isOn: $isEnabled) {
             Text("Fading effect")

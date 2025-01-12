@@ -17,7 +17,7 @@ extension Defaults.Keys {
     )
 
     // MARK: Behavior
-    
+
     static let defaultPlaybackMode: Key<Defaults.PlaybackMode> = .init(
         "defaultPlaybackMode",
         default: .sequential

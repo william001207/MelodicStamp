@@ -8,12 +8,12 @@
 import Accelerate
 import CAAudioHardware
 import Combine
+import Defaults
 import MediaPlayer
 import os.log
 import SFBAudioEngine
 import SFSafeSymbols
 import SwiftUI
-import Defaults
 
 // MARK: - Fields
 

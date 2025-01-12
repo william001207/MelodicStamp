@@ -9,34 +9,13 @@ import AppKit
 import SwiftUI
 
 @MainActor @Observable final class FloatingWindowsModel {
-    enum WindowStorage {
-        case none
-        case planned
-        case added(NSWindow)
-        
-        var isEmpty: Bool {
-            switch self {
-            case .none: true
-            default: false
-            }
-        }
-        
-        func callAsFunction() -> NSWindow? {
-            switch self {
-            case .none: nil
-            case .planned: nil
-            case .added(let window): window
-            }
-        }
-    }
-    
     private var isInFullScreen: Bool = false
 
-    var tabBarWindow: WindowStorage = .none
-    var playerWindow: WindowStorage = .none
+    var tabBarWindow: NSWindow?
+    var playerWindow: NSWindow?
 
-    var isTabBarAdded: Bool { !tabBarWindow.isEmpty }
-    var isPlayerAdded: Bool { !playerWindow.isEmpty }
+    var isTabBarAdded: Bool { tabBarWindow != nil }
+    var isPlayerAdded: Bool { playerWindow != nil }
 
     func observeFullScreen() {
         NotificationCenter.default.addObserver(
@@ -79,82 +58,78 @@ import SwiftUI
     }
 
     func show() {
-        tabBarWindow()?.animator().alphaValue = 1
-        playerWindow()?.animator().alphaValue = 1
+        tabBarWindow?.animator().alphaValue = 1
+        playerWindow?.animator().alphaValue = 1
     }
 
     func hide() {
-        tabBarWindow()?.animator().alphaValue = 0
-        playerWindow()?.animator().alphaValue = 0
+        tabBarWindow?.animator().alphaValue = 0
+        playerWindow?.animator().alphaValue = 0
     }
 
-    func addTabBar(to window: NSWindow? = nil, @ViewBuilder content: @escaping () -> some View) {
+    func addTabBar(@ViewBuilder content: @escaping () -> some View) {
         guard !isTabBarAdded else { return }
-        tabBarWindow = .planned
-        
-        guard let applicationWindow = window ?? NSApp.keyWindow else { return }
-        
+        guard let applicationWindow = NSApp.mainWindow else { return }
+
         let floatingWindow = NSWindow()
-        applicationWindow.addChildWindow(floatingWindow, ordered: .above)
-        self.tabBarWindow = .added(floatingWindow)
-        
+        tabBarWindow = floatingWindow
+
         floatingWindow.styleMask = .borderless
         floatingWindow.contentView = NSHostingView(rootView: content())
         floatingWindow.backgroundColor = .clear
         floatingWindow.level = .floating
         floatingWindow.collectionBehavior = [.fullScreenNone]
-        
+
         floatingWindow.alphaValue = 0
         floatingWindow.animator().alphaValue = 1
-        
+
         DispatchQueue.main.async {
-            self.updateTabBarPosition(window: floatingWindow, in: window)
+            applicationWindow.addChildWindow(floatingWindow, ordered: .above)
+            self.updateTabBarPosition(window: floatingWindow, in: applicationWindow)
         }
     }
 
-    func addPlayer(to window: NSWindow? = nil, @ViewBuilder content: @escaping () -> some View) {
+    func addPlayer(@ViewBuilder content: @escaping () -> some View) {
         guard !isPlayerAdded else { return }
-        playerWindow = .planned
-        
-        guard let applicationWindow = window ?? NSApp.keyWindow else { return }
-        
+        guard let applicationWindow = NSApp.mainWindow else { return }
+
         let floatingWindow = NSWindow()
-        applicationWindow.addChildWindow(floatingWindow, ordered: .above)
-        self.playerWindow = .added(floatingWindow)
-        
+        playerWindow = floatingWindow
+
         floatingWindow.styleMask = .borderless
         floatingWindow.contentView = NSHostingView(rootView: content())
         floatingWindow.backgroundColor = .clear
         floatingWindow.level = .floating
         floatingWindow.collectionBehavior = [.fullScreenNone]
-        
+
         floatingWindow.alphaValue = 0
         floatingWindow.animator().alphaValue = 1
-        
+
         DispatchQueue.main.async {
-            self.updatePlayerPosition(window: floatingWindow, in: window)
+            applicationWindow.addChildWindow(floatingWindow, ordered: .above)
+            self.updatePlayerPosition(window: floatingWindow, in: applicationWindow)
         }
     }
 
-    func removeTabBar(from window: NSWindow? = nil) {
-        guard let tabBarWindow = tabBarWindow(), let applicationWindow = window ?? NSApp.keyWindow else { return }
-        
-        self.tabBarWindow = .none
+    func removeTabBar(from mainWindow: NSWindow? = nil) {
+        guard let tabBarWindow, let applicationWindow = mainWindow ?? NSApp.mainWindow else { return }
+
         applicationWindow.removeChildWindow(tabBarWindow)
         tabBarWindow.orderOut(nil)
+        self.tabBarWindow = nil
     }
 
-    func removePlayer(from window: NSWindow? = nil) {
-        guard let playerWindow = playerWindow(), let applicationWindow = window ?? NSApp.keyWindow else { return }
-        
-        self.playerWindow = .none
+    func removePlayer(from mainWindow: NSWindow? = nil) {
+        guard let playerWindow, let applicationWindow = mainWindow ?? NSApp.mainWindow else { return }
+
         applicationWindow.removeChildWindow(playerWindow)
         playerWindow.orderOut(nil)
+        self.playerWindow = nil
     }
 
     func updateTabBarPosition(window: NSWindow? = nil, in mainWindow: NSWindow? = nil) {
         guard
-            let tabBarWindow = window ?? tabBarWindow(),
+            let tabBarWindow = window ?? tabBarWindow,
             let applicationWindow = mainWindow ?? NSApp.keyWindow,
             let screen = NSScreen.main
         else { return }
@@ -179,7 +154,7 @@ import SwiftUI
 
     func updatePlayerPosition(window: NSWindow? = nil, in mainWindow: NSWindow? = nil) {
         guard
-            let playerWindow = window ?? playerWindow(),
+            let playerWindow = window ?? playerWindow,
             let applicationWindow = mainWindow ?? NSApp.keyWindow,
             let screen = NSScreen.main
         else { return }

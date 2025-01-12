@@ -29,7 +29,7 @@ struct MelodicStampApp: App {
 
     @State private var isAboutPresented: Bool = false
     @State private var isSettingsPresented: Bool = false
-    
+
     @State private var floatingWindows: FloatingWindowsModel = .init()
 
     var body: some Scene {

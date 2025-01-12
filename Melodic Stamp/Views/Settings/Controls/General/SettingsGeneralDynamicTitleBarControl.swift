@@ -10,7 +10,7 @@ import SwiftUI
 
 struct SettingsGeneralDynamicTitleBarControl: View {
     @Default(.isDynamicTitleBarEnabled) var isEnabled
-    
+
     var body: some View {
         Toggle(isOn: $isEnabled) {
             Text("Dynamic title bar")

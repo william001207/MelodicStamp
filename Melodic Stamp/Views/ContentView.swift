@@ -11,7 +11,7 @@ import SwiftUI
 
 struct ContentView: View {
     // MARK: - Environments
-    
+
     @Environment(FloatingWindowsModel.self) private var floatingWindows
 
     @Environment(\.appearsActive) private var appearsActive
@@ -166,8 +166,8 @@ struct ContentView: View {
             .onGeometryChange(for: CGRect.self) { proxy in
                 proxy.frame(in: .global)
             } action: { _ in
-                floatingWindows.updateTabBarPosition(in: window)
-                floatingWindows.updatePlayerPosition(in: window)
+                floatingWindows.updateTabBarPosition()
+                floatingWindows.updatePlayerPosition()
             }
             .frame(minHeight: 600)
             .ignoresSafeArea()
@@ -176,7 +176,9 @@ struct ContentView: View {
             }
             .onChange(of: appearsActive) { _, newValue in
                 if newValue {
-                    initializeFloatingWindows(to: window)
+                    DispatchQueue.main.async {
+                        initializeFloatingWindows()
+                    }
                 } else {
                     destroyFloatingWindows(from: window)
                 }
@@ -203,8 +205,8 @@ struct ContentView: View {
 
     // MARK: - Functions
 
-    private func initializeFloatingWindows(to window: NSWindow? = nil) {
-        floatingWindows.addTabBar(to: window) {
+    private func initializeFloatingWindows() {
+        floatingWindows.addTabBar {
             FloatingTabBarView(
                 isInspectorPresented: $isInspectorPresented,
                 selectedContentTab: $selectedContentTab,
@@ -212,7 +214,7 @@ struct ContentView: View {
             )
             .environment(floatingWindows)
         }
-        floatingWindows.addPlayer(to: window) {
+        floatingWindows.addPlayer {
             FloatingPlayerView()
                 .environment(floatingWindows)
                 .environment(windowManager)
@@ -221,8 +223,8 @@ struct ContentView: View {
         }
     }
 
-    private func destroyFloatingWindows(from window: NSWindow? = nil) {
-        floatingWindows.removeTabBar(from: window)
-        floatingWindows.removePlayer(from: window)
+    private func destroyFloatingWindows(from mainWindow: NSWindow? = nil) {
+        floatingWindows.removeTabBar(from: mainWindow)
+        floatingWindows.removePlayer(from: mainWindow)
     }
 }

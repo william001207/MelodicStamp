@@ -10,12 +10,12 @@ import SwiftUI
 
 struct SettingsLyricsLyricAttachmentsControl: View {
     @Default(.lyricAttachments) private var lyricAttachments
-    
+
     var body: some View {
         Toggle("Translation", isOn: binding(of: .translation))
         Toggle("Roman", isOn: binding(of: .roman))
     }
-    
+
     private func binding(of option: LyricAttachments.Element) -> Binding<Bool> {
         Binding {
             lyricAttachments.contains(option)

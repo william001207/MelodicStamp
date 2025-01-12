@@ -11,15 +11,15 @@ import SwiftUI
 struct SettingsGeneralPage: View {
     var body: some View {
         SettingsExcerptView(.general, descriptionKey: "General settings excerpt.")
-        
+
         Section("Appearance") {
             SettingsGeneralDynamicTitleBarControl()
         }
-        
+
         Section("Launch Behaviors") {
             SettingsGeneralPlaybackModeMemorizationControl()
         }
-        
+
         Section {
             SettingsGeneralPlaylistMemorizationControl()
         }
