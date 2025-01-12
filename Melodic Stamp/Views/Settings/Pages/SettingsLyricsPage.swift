@@ -12,11 +12,11 @@ struct SettingsLyricsPage: View {
         SettingsExcerptView(.lyrics, descriptionKey: "Lyrics settings excerpt.")
 
         Section {
-            SettingsLyricsLyricFadingEffectControl()
+            SettingsLyricFadingEffectControl()
         }
 
         Section {
-            SettingsLyricsLyricAttachmentsControl()
+            SettingsLyricAttachmentsControl()
         } header: {
             Text("Attachments")
             Text("""

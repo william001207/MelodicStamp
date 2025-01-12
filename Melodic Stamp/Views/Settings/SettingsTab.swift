@@ -10,36 +10,41 @@ import SFSafeSymbols
 import SwiftUICore
 
 enum SettingsTab: Hashable, Equatable, Identifiable, CaseIterable {
-    case general
+    case appearance
     case visualization
     case lyrics
+
+    case launchBehaviors
     case performance
 
     var id: Self { self }
 
     var systemSymbol: SFSymbol {
         switch self {
-        case .general: .gear
+        case .appearance: .paintbrushFill
         case .visualization: .waveform
         case .lyrics: .musicNoteList
+        case .launchBehaviors: .airplaneDeparture
         case .performance: .gaugeWithDotsNeedle67percent
         }
     }
 
     var color: Color {
         switch self {
-        case .general: .gray
+        case .appearance: .accent
         case .visualization: .pink
         case .lyrics: .orange
+        case .launchBehaviors: .blue
         case .performance: .green
         }
     }
 
     var name: String {
         switch self {
-        case .general: .init(localized: "General")
+        case .appearance: .init(localized: "Appearance")
         case .visualization: .init(localized: "Visualization")
         case .lyrics: .init(localized: "Lyrics")
+        case .launchBehaviors: .init(localized: "Launch Behaviors")
         case .performance: .init(localized: "Performance")
         }
     }

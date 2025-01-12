@@ -1,5 +1,5 @@
 //
-//  SettingsGeneralDynamicTitleBarControl.swift
+//  SettingsDynamicTitleBarControl.swift
 //  MelodicStamp
 //
 //  Created by KrLite on 2025/1/12.
@@ -8,7 +8,7 @@
 import Defaults
 import SwiftUI
 
-struct SettingsGeneralDynamicTitleBarControl: View {
+struct SettingsDynamicTitleBarControl: View {
     @Default(.isDynamicTitleBarEnabled) var isEnabled
 
     var body: some View {

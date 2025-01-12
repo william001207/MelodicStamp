@@ -32,5 +32,5 @@ struct SettingsSidebarIcon: View {
 }
 
 #Preview {
-    SettingsSidebarIcon(.general)
+    SettingsSidebarIcon(.appearance)
 }

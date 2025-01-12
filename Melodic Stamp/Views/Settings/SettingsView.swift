@@ -10,22 +10,20 @@ import SFSafeSymbols
 import SwiftUI
 
 struct SettingsView: View {
-    @State private var selectedTab: SettingsTab = .general
+    @State private var selectedTab: SettingsTab = .appearance
     @State private var isSidebarVisible: Bool = false
 
     var body: some View {
         AppKitNavigationSplitView {
             List(selection: $selectedTab) {
                 Section {
-                    entry(.general)
-                }
-
-                Section {
+                    entry(.appearance)
                     entry(.visualization)
                     entry(.lyrics)
                 }
 
                 Section {
+                    entry(.launchBehaviors)
                     entry(.performance)
                 }
             }
@@ -34,12 +32,14 @@ struct SettingsView: View {
             Form {
                 Group {
                     switch selectedTab {
-                    case .general:
-                        SettingsGeneralPage()
+                    case .appearance:
+                        SettingsAppearancePage()
                     case .visualization:
                         SettingsVisualizationPage()
                     case .lyrics:
                         SettingsLyricsPage()
+                    case .launchBehaviors:
+                        SettingsLaunchBehaviorsPage()
                     case .performance:
                         SettingsPerformancePage()
                     }
@@ -52,7 +52,7 @@ struct SettingsView: View {
         .frame(minHeight: 500, idealHeight: 778)
         .ignoresSafeArea(.all)
         .toolbar {
-            // Preserves the titleBar style
+            // Preserves the title bar style
             Color.clear
         }
         .background(MakeCustomizable(customization: { window in

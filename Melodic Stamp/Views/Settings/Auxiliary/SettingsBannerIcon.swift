@@ -33,5 +33,5 @@ struct SettingsBannerIcon: View {
 }
 
 #Preview {
-    SettingsBannerIcon(.general)
+    SettingsBannerIcon(.appearance)
 }

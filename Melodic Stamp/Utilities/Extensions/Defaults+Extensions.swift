@@ -48,7 +48,7 @@ extension Defaults.Keys {
     )
     static let miniPlayerBackgroundStyle: Key<Defaults.MiniPlayerBackgroundStyle> = .init(
         "miniPlayerBackgroundStyle",
-        default: .dynamicallyTinted
+        default: .chroma
     )
 
     // MARK: Gradient

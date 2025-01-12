@@ -1,5 +1,5 @@
 //
-//  SettingsLyricsLyricAttachmentsControl.swift
+//  SettingsLyricAttachmentsControl.swift
 //  MelodicStamp
 //
 //  Created by KrLite on 2025/1/12.
@@ -8,7 +8,7 @@
 import Defaults
 import SwiftUI
 
-struct SettingsLyricsLyricAttachmentsControl: View {
+struct SettingsLyricAttachmentsControl: View {
     @Default(.lyricAttachments) private var lyricAttachments
 
     var body: some View {

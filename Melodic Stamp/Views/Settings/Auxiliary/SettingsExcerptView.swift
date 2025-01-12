@@ -46,7 +46,7 @@ struct SettingsExcerptView<Content>: View where Content: View {
 }
 
 #Preview {
-    SettingsExcerptView(.general) {
-        Text("General settings excerpt.")
+    SettingsExcerptView(.appearance) {
+        Text("Appearance settings excerpt.")
     }
 }

@@ -6,6 +6,7 @@
 //
 
 import Combine
+import Defaults
 import SFBAudioEngine
 import SwiftUI
 
@@ -20,6 +21,9 @@ struct ContentView: View {
     @FocusState private var isFocused
 
     @Namespace private var namespace
+
+    @Default(.mainWindowBackgroundStyle) private var mainWindowBackgroundStyle
+    @Default(.miniPlayerBackgroundStyle) private var miniPlayerBackgroundStyle
 
     // MARK: - Fields
 
@@ -169,6 +173,17 @@ struct ContentView: View {
                 floatingWindows.updateTabBarPosition()
                 floatingWindows.updatePlayerPosition()
             }
+            .background {
+                switch mainWindowBackgroundStyle {
+                case .opaque:
+                    OpaqueBackgroundView()
+                case .vibrant:
+                    VibrantBackgroundView()
+                case .ethereal:
+                    EtherealBackgroundView()
+                }
+            }
+            .ignoresSafeArea()
             .frame(minHeight: 600)
             .ignoresSafeArea()
             .onDisappear {
@@ -193,9 +208,17 @@ struct ContentView: View {
             .padding(12)
             .padding(.top, 4)
             .background {
-                VisualEffectView(
-                    material: .hudWindow, blendingMode: .behindWindow
-                )
+                switch miniPlayerBackgroundStyle {
+                case .opaque:
+                    OpaqueBackgroundView()
+                case .vibrant:
+                    VibrantBackgroundView()
+                case .ethereal:
+                    EtherealBackgroundView()
+                case .chroma:
+                    // TODO: Implement this
+                    Color.red
+                }
             }
             .padding(.bottom, -32)
             .ignoresSafeArea()

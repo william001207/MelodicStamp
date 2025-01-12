@@ -35,10 +35,9 @@ struct MainView: View {
                     .inspectorColumnWidth(min: 300, ideal: 400, max: 700)
                     .animation(nil, value: metadataEditor.items) // Remove strange transitions when selection changes
             }
-            .ignoresSafeArea()
             .luminareMinHeight(38)
             .toolbar {
-                // Preserves the titleBar style
+                // Preserves the title bar style
                 Color.clear
             }
             .toolbar {
@@ -67,10 +66,6 @@ struct MainView: View {
                     .ignoresSafeArea()
             }
         }
-        .background {
-            VisualEffectView(material: .headerView, blendingMode: .behindWindow)
-        }
-        .ignoresSafeArea()
     }
 
     @ViewBuilder private func inspector() -> some View {

@@ -196,6 +196,9 @@
     "Appearance" : {
 
     },
+    "Appearance settings excerpt." : {
+
+    },
     "Applies a fading blur and opacity effect to lyrics that are not currently highlighted." : {
 
     },
@@ -244,6 +247,9 @@
           }
         }
       }
+    },
+    "Background Styles" : {
+
     },
     "Band" : {
       "localizations" : {
@@ -476,6 +482,9 @@
     "Dynamic title bar" : {
 
     },
+    "Dynamically Tinted" : {
+
+    },
     "Edit" : {
       "localizations" : {
         "zh-Hans" : {
@@ -531,12 +540,6 @@
           }
         }
       }
-    },
-    "General" : {
-
-    },
-    "General settings excerpt." : {
-
     },
     "Genre" : {
       "localizations" : {
@@ -627,6 +630,9 @@
     "Launch Behaviors" : {
 
     },
+    "Launch behaviors settings excerpt." : {
+
+    },
     "Lead Artist" : {
       "localizations" : {
         "zh-Hans" : {
@@ -710,6 +716,9 @@
     "Lyrics settings excerpt." : {
 
     },
+    "Main window" : {
+
+    },
     "Main Window" : {
       "localizations" : {
         "zh-Hans" : {
@@ -730,18 +739,6 @@
         }
       }
     },
-    "Memorizes playback modes" : {
-
-    },
-    "Memorizes playback positions" : {
-
-    },
-    "Memorizes playback volumes" : {
-
-    },
-    "Memorizes playlists" : {
-
-    },
     "Metadata" : {
       "localizations" : {
         "zh-Hans" : {
@@ -751,6 +748,9 @@
           }
         }
       }
+    },
+    "Mini player" : {
+
     },
     "Mini Player" : {
       "localizations" : {
@@ -857,6 +857,9 @@
           }
         }
       }
+    },
+    "Opaque" : {
+
     },
     "Open File" : {
       "localizations" : {
@@ -1146,10 +1149,16 @@
         }
       }
     },
-    "Restores playback modes for each window after launch." : {
+    "Restores playback modes for each window" : {
 
     },
-    "Restores playlists for each window after launch." : {
+    "Restores playback positions" : {
+
+    },
+    "Restores playback volumes" : {
+
+    },
+    "Restores playlists for each window" : {
 
     },
     "Rewind" : {
@@ -1373,6 +1382,9 @@
           }
         }
       }
+    },
+    "Vibrant" : {
+
     },
     "Virtual" : {
       "localizations" : {
