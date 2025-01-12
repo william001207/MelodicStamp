@@ -14,7 +14,7 @@ struct SettingsDynamicTitleBarControl: View {
     var body: some View {
         Toggle(isOn: $isEnabled) {
             Text("Dynamic title bar")
-            Text("Displays current playing information on the title bar.")
+            Text("Displays the information of the currently playing track on the title bar.")
         }
     }
 }

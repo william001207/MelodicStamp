@@ -20,7 +20,7 @@ class SFBAudioEnginePlayer: NSObject, Player {
     var delegate: (any PlayerDelegate)?
 
     private var player: AudioPlayer
-    private var mutedVolume: CGFloat = .zero
+    private var mutedVolume: CGFloat?
 
     var isPlaying: Bool { isRunning && player.isPlaying }
     var isRunning: Bool { player.engineIsRunning }
@@ -35,7 +35,11 @@ class SFBAudioEnginePlayer: NSObject, Player {
 
     var playbackVolume: CGFloat {
         if isMuted {
-            max(0, min(1, mutedVolume))
+            if let mutedVolume {
+                max(0, min(1, mutedVolume))
+            } else {
+                CGFloat(player.volume)
+            }
         } else {
             max(0, min(1, CGFloat(player.volume)))
         }
@@ -78,14 +82,18 @@ class SFBAudioEnginePlayer: NSObject, Player {
     }
 
     func mute() {
-        // It's important to update `isMuted` later
         mutedVolume = playbackVolume
         seekVolume(to: .zero)
+
+        // It's crucial to update `isMuted` at the very last
         isMuted = true
     }
 
     func unmute() {
+        // It's crucial to update `isMuted` at the very beginning
         isMuted = false
+
+        guard let mutedVolume else { return }
         seekVolume(to: mutedVolume)
     }
 

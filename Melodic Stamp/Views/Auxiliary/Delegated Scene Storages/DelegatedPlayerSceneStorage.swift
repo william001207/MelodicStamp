@@ -88,14 +88,19 @@ struct DelegatedPlayerSceneStorage: View {
 
                 if let url = newValue {
                     player.play(url: url)
-                    player.pause()
+
+                    print("Successfully restored currently playing track to \(url)")
                 }
                 trackState.isReady = false
 
                 // Dependents
-                playbackPositionState.isReady = true
                 playbackVolumeState.isReady = true
                 playbackMutedState.isReady = true
+
+                DispatchQueue.main.async {
+                    player.pause()
+                    playbackPositionState.isReady = true
+                }
             }
     }
 
@@ -114,6 +119,8 @@ struct DelegatedPlayerSceneStorage: View {
 
                 if let mode = newValue {
                     player.playbackMode = mode
+
+                    print("Successfully restored playback mode to \(mode)")
                 }
                 playbackModeState.isReady = false
             }
@@ -129,6 +136,8 @@ struct DelegatedPlayerSceneStorage: View {
 
                 if let isLoopingEnabled = newValue {
                     player.playbackLooping = isLoopingEnabled
+
+                    print("Successfully restored playback looping state to \(isLoopingEnabled)")
                 }
                 playbackLoopingState.isReady = false
             }
@@ -149,6 +158,8 @@ struct DelegatedPlayerSceneStorage: View {
 
                 if let time = newValue {
                     player.time = time
+
+                    print("Successfully restored playback position to \(time)")
                 }
                 playbackPositionState.isReady = false
             }
@@ -169,6 +180,8 @@ struct DelegatedPlayerSceneStorage: View {
 
                 if let volume = newValue {
                     player.volume = volume
+
+                    print("Successfully restored playback volume to \(volume)")
                 }
                 playbackVolumeState.isReady = false
             }
@@ -184,6 +197,8 @@ struct DelegatedPlayerSceneStorage: View {
 
                 if let isMuted = newValue {
                     player.isMuted = isMuted
+
+                    print("Successfully restored playback muted state to \(isMuted)")
                 }
                 playbackMutedState.isReady = false
             }
