@@ -41,9 +41,9 @@ class SFBAudioEnginePlayer: NSObject, Player {
         }
     }
 
-    func play(_ item: Track) {
+    func play(_ track: Track) {
         do {
-            if let decoder = try Self.decoder(for: item) {
+            if let decoder = try Self.decoder(for: track) {
                 try player.play(decoder)
             }
         } catch {
@@ -51,9 +51,9 @@ class SFBAudioEnginePlayer: NSObject, Player {
         }
     }
 
-    func enqueue(_ item: Track) {
+    func enqueue(_ track: Track) {
         do {
-            if let decoder = try Self.decoder(for: item) {
+            if let decoder = try Self.decoder(for: track) {
                 try player.enqueue(decoder)
             }
         } catch {
@@ -150,8 +150,8 @@ class SFBAudioEnginePlayer: NSObject, Player {
 }
 
 extension SFBAudioEnginePlayer {
-    static func decoder(for item: Track, enablesDoP: Bool = false) throws -> PCMDecoding? {
-        let url = item.url
+    static func decoder(for track: Track, enablesDoP: Bool = false) throws -> PCMDecoding? {
+        let url = track.url
         guard url.startAccessingSecurityScopedResource() else { return nil }
         defer { url.stopAccessingSecurityScopedResource() }
 

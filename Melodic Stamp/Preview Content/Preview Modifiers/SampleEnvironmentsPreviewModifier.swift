@@ -28,9 +28,9 @@ struct SampleEnvironmentsPreviewModifier: PreviewModifier {
         let metadataEditor = MetadataEditorModel()
         let visualizer = VisualizerModel()
 
-        player.addToPlaylist(items: [sampleTrack])
+        player.addToPlaylist(tracks: [sampleTrack])
         player.play(track: sampleTrack)
-        metadataEditor.items = [sampleTrack]
+        metadataEditor.tracks = [sampleTrack]
 
         return (
             floatingWindows,

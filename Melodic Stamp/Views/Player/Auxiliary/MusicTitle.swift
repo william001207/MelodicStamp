@@ -34,25 +34,25 @@ struct MusicTitle: View {
     }
 
     var mode: DisplayMode = .comprehensive
-    var item: Track?
+    var track: Track?
 
     var body: some View {
-        if let item {
+        if let track {
             HStack(spacing: 12) {
                 if mode.hasTitle {
                     Group {
-                        if let title = item.metadata[extracting: \.title]?
+                        if let title = track.metadata[extracting: \.title]?
                             .initial, !title.isEmpty {
                             Text(title)
                         } else {
-                            Text(Self.fallbackTitle(for: item))
+                            Text(Self.fallbackTitle(for: track))
                         }
                     }
                     .bold()
                 }
 
                 if mode.hasArtists {
-                    if let artist = item.metadata[extracting: \.artist]?.initial {
+                    if let artist = track.metadata[extracting: \.artist]?.initial {
                         HStack(spacing: 4) {
                             let artists = Metadata.splitArtists(from: artist)
                             ForEach(Array(artists.enumerated()), id: \.offset) {
@@ -81,24 +81,24 @@ struct MusicTitle: View {
         }
     }
 
-    static func fallbackTitle(for item: Track) -> String {
-        Metadata.fallbackTitle(url: item.url)
+    static func fallbackTitle(for track: Track) -> String {
+        Metadata.fallbackTitle(url: track.url)
     }
 
     static func stringifiedTitle(
-        mode: DisplayMode = .comprehensive, for item: Track, separator: String = " "
+        mode: DisplayMode = .comprehensive, for track: Track, separator: String = " "
     ) -> String {
         var components: [String] = []
         if mode.hasTitle {
-            if let title = item.metadata[extracting: \.title]?.initial {
+            if let title = track.metadata[extracting: \.title]?.initial {
                 components.append(title)
             } else {
-                components.append(fallbackTitle(for: item))
+                components.append(fallbackTitle(for: track))
             }
         }
 
         if mode.hasArtists {
-            if let artist = item.metadata[extracting: \.artist]?.initial {
+            if let artist = track.metadata[extracting: \.artist]?.initial {
                 let separator = String(localized: .init(
                     "MusicTitle : (Separator) Stringified Artists",
                     defaultValue: ", ",

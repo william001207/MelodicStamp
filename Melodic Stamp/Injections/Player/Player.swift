@@ -20,8 +20,8 @@ protocol Player {
     var playbackTime: PlaybackTime? { get }
     var playbackVolume: CGFloat { get }
 
-    func play(_ item: Track)
-    func enqueue(_ item: Track)
+    func play(_ track: Track)
+    func enqueue(_ track: Track)
 
     func play()
     func pause()

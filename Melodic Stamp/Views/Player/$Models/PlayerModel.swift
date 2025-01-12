@@ -264,8 +264,8 @@ extension PlayerModel {
     }
 
     func play(url: URL) {
-        if let item = Track(url: url) {
-            play(track: item)
+        if let track = Track(url: url) {
+            play(track: track)
         }
     }
 
@@ -273,16 +273,16 @@ extension PlayerModel {
         for url in urls {
             guard !playlist.contains(where: { $0.url == url }) else { continue }
 
-            if let item = Track(url: url) {
-                addToPlaylist(items: [item])
+            if let track = Track(url: url) {
+                addToPlaylist(tracks: [track])
             }
         }
     }
 
-    func addToPlaylist(items: [Track]) {
-        for item in items {
-            guard !playlist.contains(item) else { continue }
-            playlist.append(item)
+    func addToPlaylist(tracks: [Track]) {
+        for track in tracks {
+            guard !playlist.contains(track) else { continue }
+            playlist.append(track)
         }
     }
 
@@ -302,12 +302,12 @@ extension PlayerModel {
         playlist.move(fromOffsets: indices, toOffset: destination)
     }
 
-    func removeFromPlaylist(items: [Track]) {
-        removeFromPlaylist(urls: items.map(\.url))
+    func removeFromPlaylist(tracks: [Track]) {
+        removeFromPlaylist(urls: tracks.map(\.url))
     }
 
     func removeAll() {
-        removeFromPlaylist(items: playlist)
+        removeFromPlaylist(tracks: playlist)
     }
 
     func play() {

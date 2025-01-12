@@ -109,7 +109,7 @@ struct PlayerView: View {
 
             Group {
                 ShrinkableMarqueeScrollView {
-                    MusicTitle(item: player.track)
+                    MusicTitle(track: player.track)
                 }
                 .animation(.default, value: player.currentIndex)
                 .matchedGeometryEffect(id: PlayerNamespace.title, in: namespace)

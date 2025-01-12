@@ -314,6 +314,9 @@
         }
       }
     },
+    "Chroma" : {
+
+    },
     "Clear" : {
       "localizations" : {
         "zh-Hans" : {
@@ -482,9 +485,6 @@
     "Dynamic title bar" : {
 
     },
-    "Dynamically Tinted" : {
-
-    },
     "Edit" : {
       "localizations" : {
         "zh-Hans" : {
@@ -494,6 +494,9 @@
           }
         }
       }
+    },
+    "Ethereal" : {
+
     },
     "Fading effect" : {
 
@@ -1243,6 +1246,9 @@
           }
         }
       }
+    },
+    "Settings" : {
+
     },
     "Settings…" : {
       "localizations" : {

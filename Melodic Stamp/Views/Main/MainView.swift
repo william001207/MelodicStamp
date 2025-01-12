@@ -24,8 +24,6 @@ struct MainView: View {
     @State private var inspectorLyrics: LyricsModel = .init()
     @State private var displayLyrics: LyricsModel = .init()
 
-    @State private var shouldRefresh: Bool = false
-
     var body: some View {
         content()
             .frame(minWidth: 600)
@@ -33,7 +31,7 @@ struct MainView: View {
                 inspector()
                     .ignoresSafeArea()
                     .inspectorColumnWidth(min: 300, ideal: 400, max: 700)
-                    .animation(nil, value: metadataEditor.items) // Remove strange transitions when selection changes
+                    .animation(nil, value: metadataEditor.tracks) // Remove strange transitions when selection changes
             }
             .luminareMinHeight(38)
             .toolbar {

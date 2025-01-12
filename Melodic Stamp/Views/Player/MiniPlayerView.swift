@@ -263,7 +263,7 @@ struct MiniPlayerView: View {
                 ShrinkableMarqueeScrollView {
                     switch headerControl {
                     case .title:
-                        MusicTitle(item: player.track)
+                        MusicTitle(track: player.track)
                     case .lyrics:
                         ComposedLyricsView()
                             .environment(lyrics)
@@ -566,23 +566,23 @@ struct MiniPlayerView: View {
         }
 
         Menu {
-            ForEach(player.playlist) { item in
+            ForEach(player.playlist) { track in
                 let binding: Binding<Bool> = Binding {
-                    selection.wrappedValue == item
+                    selection.wrappedValue == track
                 } set: { newValue in
                     guard newValue else { return }
-                    selection.wrappedValue = item
+                    selection.wrappedValue = track
                 }
 
                 Toggle(isOn: binding) {
-                    if let thumbnail = item.metadata.menuThumbnail {
+                    if let thumbnail = track.metadata.menuThumbnail {
                         Image(nsImage: thumbnail)
                     }
 
-                    let title = MusicTitle.stringifiedTitle(mode: .title, for: item)
+                    let title = MusicTitle.stringifiedTitle(mode: .title, for: track)
                     Text(title)
 
-                    let subtitle = MusicTitle.stringifiedTitle(mode: .artists, for: item)
+                    let subtitle = MusicTitle.stringifiedTitle(mode: .artists, for: track)
                     Text(subtitle)
                 }
             }

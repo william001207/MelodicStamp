@@ -47,60 +47,59 @@ struct ContentView: View {
     @State private var minWidth: CGFloat?
     @State private var maxWidth: CGFloat?
 
+    // MARK: Scene Storage
+
+//    @SceneStorage(AppSceneStorage.playlistTracks()) private var sceneStoragePlaylistTracks: [URL] = []
+//    @SceneStorage(AppSceneStorage.metadataTracks()) private var sceneStorageMetadataTracks: [URL] = []
+
     // MARK: - Body
 
     var body: some View {
-        Group {
-            switch windowManager.style {
-            case .main:
-                mainView()
-                    .presentedWindowStyle(.titleBar)
-            case .miniPlayer:
-                miniPlayerView()
-                    .presentedWindowStyle(.hiddenTitleBar)
+        CatchWindow { window in
+            Group {
+                switch windowManager.style {
+                case .main:
+                    mainView(window)
+                        .presentedWindowStyle(.titleBar)
+                case .miniPlayer:
+                    miniPlayerView(window)
+                        .presentedWindowStyle(.hiddenTitleBar)
+                }
             }
-        }
-        .background {
-            FileImporters()
-                .allowsHitTesting(false)
-        }
-        .onAppear {
-            floatingWindows.observeFullScreen()
-            isFocused = true
-            resetFocus(in: namespace)
-        }
-        .onChange(of: appearsActive, initial: true) { _, newValue in
-            guard newValue else { return }
-            isFocused = true
-            resetFocus(in: namespace)
-            player.updateOutputDevices()
-        }
-        .onChange(of: windowManager.style, initial: true) { _, newValue in
-            switch newValue {
-            case .main:
-                initializeFloatingWindows()
-                minWidth = 960
-            case .miniPlayer:
-                destroyFloatingWindows()
-                maxWidth = 500
+            .background {
+                FileImporters()
+                    .allowsHitTesting(false)
             }
-            isFocused = true
-            resetFocus(in: namespace)
-        }
-        .onChange(of: minWidth) { _, newValue in
-            guard newValue != nil else { return }
-            DispatchQueue.main.async {
-                minWidth = nil
+            .onAppear {
+                floatingWindows.observeFullScreen()
+                isFocused = true
+                resetFocus(in: namespace)
             }
-        }
-        .onChange(of: maxWidth) { _, newValue in
-            guard newValue != nil else { return }
-            DispatchQueue.main.async {
-                maxWidth = nil
+            .onChange(of: appearsActive, initial: true) { _, newValue in
+                guard newValue else { return }
+                isFocused = true
+                resetFocus(in: namespace)
+                player.updateOutputDevices()
             }
-        }
-        .onReceive(player.visualizationDataPublisher) { fftData in
-            visualizer.normalizeData(fftData: fftData)
+            .onChange(of: windowManager.style, initial: true) { _, _ in
+                isFocused = true
+                resetFocus(in: namespace)
+            }
+            .onChange(of: minWidth) { _, newValue in
+                guard newValue != nil else { return }
+                DispatchQueue.main.async {
+                    minWidth = nil
+                }
+            }
+            .onChange(of: maxWidth) { _, newValue in
+                guard newValue != nil else { return }
+                DispatchQueue.main.async {
+                    maxWidth = nil
+                }
+            }
+            .onReceive(player.visualizationDataPublisher) { fftData in
+                visualizer.normalizeData(fftData: fftData)
+            }
         }
         .frame(minWidth: minWidth, maxWidth: maxWidth)
 
@@ -159,51 +158,53 @@ struct ContentView: View {
 
     // MARK: - Main View
 
-    @ViewBuilder private func mainView() -> some View {
-        CatchWindow { window in
-            MainView(
-                namespace: namespace,
-                isInspectorPresented: $isInspectorPresented,
-                selectedContentTab: $selectedContentTab,
-                selectedInspectorTab: $selectedInspectorTab
-            )
-            .onGeometryChange(for: CGRect.self) { proxy in
-                proxy.frame(in: .global)
-            } action: { _ in
-                floatingWindows.updateTabBarPosition()
-                floatingWindows.updatePlayerPosition()
+    @ViewBuilder private func mainView(_ window: NSWindow? = nil) -> some View {
+        MainView(
+            namespace: namespace,
+            isInspectorPresented: $isInspectorPresented,
+            selectedContentTab: $selectedContentTab,
+            selectedInspectorTab: $selectedInspectorTab
+        )
+        .onGeometryChange(for: CGRect.self) { proxy in
+            proxy.frame(in: .global)
+        } action: { _ in
+            floatingWindows.updateTabBarPosition(in: window)
+            floatingWindows.updatePlayerPosition(in: window)
+        }
+        .background {
+            switch mainWindowBackgroundStyle {
+            case .opaque:
+                OpaqueBackgroundView()
+            case .vibrant:
+                VibrantBackgroundView()
+            case .ethereal:
+                EtherealBackgroundView()
             }
-            .background {
-                switch mainWindowBackgroundStyle {
-                case .opaque:
-                    OpaqueBackgroundView()
-                case .vibrant:
-                    VibrantBackgroundView()
-                case .ethereal:
-                    EtherealBackgroundView()
+        }
+        .ignoresSafeArea()
+        .frame(minHeight: 600)
+        .ignoresSafeArea()
+        .onAppear {
+            minWidth = 960
+
+            DispatchQueue.main.async {
+                initializeFloatingWindows(to: window)
+            }
+        }
+        .onChange(of: appearsActive) { _, newValue in
+            if newValue {
+                DispatchQueue.main.async {
+                    initializeFloatingWindows(to: window)
                 }
-            }
-            .ignoresSafeArea()
-            .frame(minHeight: 600)
-            .ignoresSafeArea()
-            .onDisappear {
+            } else {
                 destroyFloatingWindows(from: window)
-            }
-            .onChange(of: appearsActive) { _, newValue in
-                if newValue {
-                    DispatchQueue.main.async {
-                        initializeFloatingWindows(to: window)
-                    }
-                } else {
-                    destroyFloatingWindows(from: window)
-                }
             }
         }
     }
 
     // MARK: - Mini Player View
 
-    @ViewBuilder private func miniPlayerView() -> some View {
+    @ViewBuilder private func miniPlayerView(_ window: NSWindow? = nil) -> some View {
         MiniPlayerView(namespace: namespace)
             .padding(12)
             .padding(.top, 4)
@@ -224,6 +225,10 @@ struct ContentView: View {
             .ignoresSafeArea()
             .frame(minWidth: 500, idealWidth: 500)
             .fixedSize(horizontal: false, vertical: true)
+            .onAppear {
+                maxWidth = 500
+                destroyFloatingWindows(from: window)
+            }
     }
 
     // MARK: - Functions

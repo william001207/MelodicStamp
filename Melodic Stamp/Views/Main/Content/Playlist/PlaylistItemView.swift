@@ -26,10 +26,10 @@ struct PlayableItemView: View {
                     if isMetadataLoaded {
                         if isPlaying {
                             MarqueeScrollView(animate: false) {
-                                MusicTitle(item: track)
+                                MusicTitle(track: track)
                             }
                         } else {
-                            MusicTitle(item: track)
+                            MusicTitle(track: track)
                         }
                     } else {
                         Text("Loading…")

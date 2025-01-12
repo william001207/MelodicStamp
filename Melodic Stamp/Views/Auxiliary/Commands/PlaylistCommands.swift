@@ -16,9 +16,9 @@ struct PlaylistCommands: Commands {
             Group {
                 if let metadataEditor {
                     Button("Clear Selection") {
-                        metadataEditor.items.removeAll()
+                        metadataEditor.tracks.removeAll()
                     }
-                    .disabled(metadataEditor.items.isEmpty)
+                    .disabled(metadataEditor.tracks.isEmpty)
                 } else {
                     Button("Clear Selection") {}
                         .disabled(true)
@@ -27,16 +27,16 @@ struct PlaylistCommands: Commands {
 
             Group {
                 if let player, let metadataEditor {
-                    if metadataEditor.items.isEmpty {
+                    if metadataEditor.tracks.isEmpty {
                         Button("Remove All") {
-                            player.removeFromPlaylist(items: player.playlist)
-                            metadataEditor.items.removeAll()
+                            player.removeFromPlaylist(tracks: player.playlist)
+                            metadataEditor.tracks.removeAll()
                         }
                         .disabled(player.playlist.isEmpty)
                     } else {
                         Button("Remove from Playlist") {
-                            player.removeFromPlaylist(items: .init(metadataEditor.items))
-                            metadataEditor.items.removeAll()
+                            player.removeFromPlaylist(tracks: .init(metadataEditor.tracks))
+                            metadataEditor.tracks.removeAll()
                         }
                     }
                 } else {
@@ -49,11 +49,11 @@ struct PlaylistCommands: Commands {
             Group {
                 if
                     let player, let metadataEditor,
-                    metadataEditor.items.count == 1,
-                    let item = metadataEditor.items.first {
-                    let title = MusicTitle.stringifiedTitle(mode: .title, for: item)
+                    metadataEditor.tracks.count == 1,
+                    let track = metadataEditor.tracks.first {
+                    let title = MusicTitle.stringifiedTitle(mode: .title, for: track)
                     Button {
-                        player.play(track: item)
+                        player.play(track: track)
                     } label: {
                         if !title.isEmpty {
                             Text("Play \(title)")

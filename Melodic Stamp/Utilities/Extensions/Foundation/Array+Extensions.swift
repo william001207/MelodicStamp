@@ -23,3 +23,23 @@ extension Array {
         return result
     }
 }
+
+extension Array: @retroactive RawRepresentable where Element: Codable {
+    public init?(rawValue: Data) {
+        do {
+            self = try JSONDecoder().decode(Self.self, from: rawValue)
+        } catch {
+            fatalError("Failed to decode \(Self.self) from \(rawValue): \(error)")
+        }
+    }
+
+    public var rawValue: Data {
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = [.prettyPrinted]
+        do {
+            return try encoder.encode(self)
+        } catch {
+            fatalError("Failed to encode \(self): \(error)")
+        }
+    }
+}

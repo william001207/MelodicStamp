@@ -25,10 +25,10 @@ enum MetadataEditingState: Equatable {
 @Observable class MetadataEditorModel: Identifiable {
     let id: UUID = .init()
 
-    var items: Set<Track> = .init()
+    var tracks: Set<Track> = []
 
     var metadatas: Set<Metadata> {
-        Set(items.map(\.metadata))
+        Set(tracks.map(\.metadata))
     }
 
     var isVisible: Bool {

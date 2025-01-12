@@ -43,6 +43,7 @@ import SwiftUI
             name: NSWindow.didExitFullScreenNotification,
             object: NSApp.mainWindow
         )
+
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(windowDidMove),
@@ -53,6 +54,13 @@ import SwiftUI
             self,
             selector: #selector(windowDidResize),
             name: NSWindow.didResizeNotification,
+            object: NSApp.mainWindow
+        )
+
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(windowWillClose),
+            name: NSWindow.willCloseNotification,
             object: NSApp.mainWindow
         )
     }
@@ -205,5 +213,11 @@ extension FloatingWindowsModel {
     @objc func windowDidResize(_: Notification) {
         updateTabBarPosition()
         updatePlayerPosition()
+    }
+
+    @objc func windowWillClose(_ notification: Notification) {
+        guard let window = notification.object as? NSWindow else { return }
+        removeTabBar(from: window)
+        removePlayer(from: window)
     }
 }
