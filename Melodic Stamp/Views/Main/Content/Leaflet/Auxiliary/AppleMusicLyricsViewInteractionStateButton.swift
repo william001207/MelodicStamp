@@ -24,11 +24,9 @@ struct AppleMusicLyricsViewInteractionStateButton: View, Animatable {
     var body: some View {
         AliveButton(isOn: binding) {
             ZStack {
-                Circle()
-                    .foregroundStyle(.background)
-                    .opacity(0.1)
-                    .blendMode(.multiply)
-                    .frame(width: 48)
+                Color.clear
+                    .hoverableBackground(isExplicitlyVisible: true)
+                    .frame(width: 48, height: 48)
                     .overlay {
                         if hasProgressRing {
                             ProgressView(value: max(0, min(1, progress)))
@@ -36,6 +34,7 @@ struct AppleMusicLyricsViewInteractionStateButton: View, Animatable {
                                 .padding(lineWidth / 2)
                         }
                     }
+                    .clipShape(.circle)
 
                 Group {
                     if interactionState.isIsolated {

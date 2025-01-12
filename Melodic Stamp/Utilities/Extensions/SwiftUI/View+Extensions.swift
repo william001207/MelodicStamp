@@ -22,6 +22,10 @@ extension View {
     @ViewBuilder func gradientBackground(_ color: Color = .accent) -> some View {
         modifier(GradientBackgroundModifier(color: color))
     }
+
+    @ViewBuilder func hoverableBackground(isExplicitlyVisible: Bool? = nil) -> some View {
+        modifier(HoverableBackgroundModifier(isExplicitlyVisible: isExplicitlyVisible))
+    }
 }
 
 extension View {

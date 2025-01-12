@@ -32,11 +32,17 @@ struct DisplayLyricLineView: View {
             Group {
                 switch line {
                 case let line as RawLyricLine:
-                    rawLyricLine(line: line, index: index, isHighlighted: isHighlighted)
+                    RawDisplayLyricLineView(line: line)
                 case let line as LRCLyricLine:
-                    lrcLyricLine(line: line, index: index, isHighlighted: isHighlighted)
+                    LRCDisplayLyricLineView(
+                        line: line, isHighlighted: isHighlighted
+                    )
                 case let line as TTMLLyricLine:
-                    ttmlLyricLine(line: line, index: index, isHighlighted: isHighlighted)
+                    TTMLDisplayLyricLineView(
+                        line: line, elapsedTime: elapsedTime,
+                        isHighlighted: isHighlighted,
+                        shouldAnimate: shouldAnimate
+                    )
                 default:
                     EmptyView()
                 }
@@ -44,12 +50,7 @@ struct DisplayLyricLineView: View {
             .padding(8.5)
             .blur(radius: isActive || !shouldFade ? 0 : blurRadius)
             .opacity(isActive || !shouldFade ? 1 : opacity)
-            .background {
-                Rectangle()
-                    .foregroundStyle(.background)
-                    .opacity(isHovering ? 0.1 : 0)
-                    .blendMode(.multiply)
-            }
+            .hoverableBackground()
             .clipShape(.rect(cornerRadius: 12))
             .onHover { hover in
                 isHovering = hover
@@ -64,26 +65,6 @@ struct DisplayLyricLineView: View {
 
     private var isActive: Bool {
         isHighlighted || isHovering || !shouldAnimate
-    }
-
-    @ViewBuilder private func rawLyricLine(line: RawLyricLine, index _: Int, isHighlighted _: Bool) -> some View {
-        Text(line.content)
-            .font(.title)
-            .bold()
-    }
-
-    @ViewBuilder private func lrcLyricLine(line: LRCLyricLine, index _: Int, isHighlighted: Bool) -> some View {
-        LRCDisplayLyricLineView(
-            line: line, isHighlighted: isHighlighted
-        )
-    }
-
-    @ViewBuilder private func ttmlLyricLine(line: TTMLLyricLine, index _: Int, isHighlighted: Bool) -> some View {
-        TTMLDisplayLyricLineView(
-            line: line, elapsedTime: elapsedTime,
-            isHighlighted: isHighlighted,
-            shouldAnimate: shouldAnimate
-        )
     }
 
     private func opacity(for index: Int, in highlightedRange: Range<Int>) -> CGFloat {

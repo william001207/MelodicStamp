@@ -93,14 +93,7 @@ struct LeafletLyricsControlsView: View {
         .font(.title2)
         .padding(.vertical, 12)
         .frame(width: 48)
-        .background {
-            if isHovering {
-                Rectangle()
-                    .foregroundStyle(.background)
-                    .opacity(0.1)
-                    .blendMode(.multiply)
-            }
-        }
+        .hoverableBackground()
         .clipShape(.capsule)
         .onHover { hover in
             isHovering = hover
