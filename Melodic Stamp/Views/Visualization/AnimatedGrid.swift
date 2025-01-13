@@ -19,9 +19,10 @@ extension SIMDColor {
 
 struct AnimatedGrid: View {
     @Environment(PlayerModel.self) private var player
-    @Environment(VisualizerModel.self) private var visualizer
+    @Environment(AudioVisualizerModel.self) private var audioVisualizer
+    @Environment(GradientVisualizerModel.self) private var gradientVisualizer
 
-    var colors: [Color]
+    var hasDynamics: Bool = true
 
     @State private var gradientSpeed: CGFloat = 0.5
 
@@ -33,7 +34,7 @@ struct AnimatedGrid: View {
             let normalizedY = Float(y) / Float(gridHeight - 1)
 
             let baseWeight = (normalizedX + normalizedY) / 1.2
-            let adjustedWeight = baseWeight * Float(gradientSpeed)
+            let adjustedWeight = baseWeight * weightFactor
 
             let finalColors = simdColors.blending { first, second in
                 SIMDColor.lerp(first, second, factor: adjustedWeight)
@@ -59,13 +60,21 @@ struct AnimatedGrid: View {
                 resolutionScale: 0.8
             )
         }
-        .onChange(of: visualizer.normalizedData) { _, newValue in
+        .onChange(of: audioVisualizer.normalizedData) { _, newValue in
             gradientSpeed = newValue
         }
     }
 
+    private var weightFactor: Float {
+        if hasDynamics {
+            Float(gradientSpeed)
+        } else {
+            0.5
+        }
+    }
+
     private var simdColors: [SIMDColor] {
-        colors.map { $0.toSimdFloat3() }
+        gradientVisualizer.dominantColors.map { $0.toSimdFloat3() }
     }
 
     private func generatePlainGrid(size: Int = 4) -> MeshGradientGrid<ControlPoint> {

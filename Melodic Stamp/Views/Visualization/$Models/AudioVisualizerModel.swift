@@ -1,5 +1,5 @@
 //
-//  AudioVisualizationModel.swift
+//  AudioVisualizerModel.swift
 //  MelodicStamp
 //
 //  Created by KrLite on 2025/1/5.
@@ -7,7 +7,7 @@
 
 import Foundation
 
-@Observable final class VisualizerModel {
+@Observable final class AudioVisualizerModel {
     var historyWindowSize = 10
 
     private(set) var normalizedData: CGFloat = 0.5

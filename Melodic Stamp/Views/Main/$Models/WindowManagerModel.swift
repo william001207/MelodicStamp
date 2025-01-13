@@ -24,5 +24,27 @@ enum MelodicStampWindowStyle: String, Equatable, Hashable, Identifiable {
 }
 
 @Observable final class WindowManagerModel {
-    var style: MelodicStampWindowStyle = .main
+    var style: MelodicStampWindowStyle = .main {
+        didSet {
+            switch style {
+            case .main:
+                giveUpAlwaysOnTop()
+            case .miniPlayer:
+                setUpAlwaysOnTop()
+            }
+        }
+    }
+
+    var isAlwaysOnTop: Bool = true
+    var titleVisibility: NSWindow.TitleVisibility = .hidden
+
+    func setUpAlwaysOnTop() {
+        isAlwaysOnTop = true
+        titleVisibility = .hidden
+    }
+
+    func giveUpAlwaysOnTop() {
+        isAlwaysOnTop = false
+        titleVisibility = .visible
+    }
 }

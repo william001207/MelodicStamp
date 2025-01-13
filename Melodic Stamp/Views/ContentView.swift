@@ -33,7 +33,8 @@ struct ContentView: View {
     @State private var player: PlayerModel = .init(SFBAudioEnginePlayer())
     @State private var playerKeyboardControl: PlayerKeyboardControlModel = .init()
     @State private var metadataEditor: MetadataEditorModel = .init()
-    @State private var visualizer: VisualizerModel = .init()
+    @State private var audioVisualizer: AudioVisualizerModel = .init()
+    @State private var gradientVisualizer: GradientVisualizerModel = .init()
 
     // MARK: Sidebar & Inspector
 
@@ -98,10 +99,20 @@ struct ContentView: View {
                 }
             }
 
-            // MARK: Receivers
+            // MARK: Updates
 
             .onReceive(player.visualizationDataPublisher) { fftData in
-                visualizer.normalizeData(fftData: fftData)
+                audioVisualizer.normalizeData(fftData: fftData)
+            }
+            .onChange(of: player.track) { _, newValue in
+                Task {
+                    if let newValue, let attachedPictures = newValue.metadata[extracting: \.attachedPictures]?.current {
+                        let cover = ThumbnailMaker.getCover(from: attachedPictures)?.image
+                        await gradientVisualizer.updateDominantColors(from: cover)
+                    } else {
+                        await gradientVisualizer.updateDominantColors()
+                    }
+                }
             }
         }
         .frame(minWidth: minWidth, maxWidth: maxWidth)
@@ -114,7 +125,8 @@ struct ContentView: View {
         .environment(player)
         .environment(playerKeyboardControl)
         .environment(metadataEditor)
-        .environment(visualizer)
+        .environment(audioVisualizer)
+        .environment(gradientVisualizer)
 
         // MARK: Focus Management
 
@@ -235,8 +247,7 @@ struct ContentView: View {
                 case .ethereal:
                     EtherealBackgroundView()
                 case .chroma:
-                    // TODO: Implement this
-                    Color.red
+                    ChromaBackgroundView(hasDynamics: false)
                 }
             }
             .padding(.bottom, -32)

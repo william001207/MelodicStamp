@@ -16,7 +16,8 @@ struct SampleEnvironmentsPreviewModifier: PreviewModifier {
         player: PlayerModel,
         playerKeyboardControl: PlayerKeyboardControlModel,
         metadataEditor: MetadataEditorModel,
-        visualizer: VisualizerModel
+        audioVisualizer: AudioVisualizerModel,
+        gradientVisualizer: GradientVisualizerModel
     )
 
     static func makeSharedContext() async throws -> Context {
@@ -26,11 +27,15 @@ struct SampleEnvironmentsPreviewModifier: PreviewModifier {
         let player = PlayerModel(BlankPlayer())
         let playerKeyboardControl = PlayerKeyboardControlModel()
         let metadataEditor = MetadataEditorModel()
-        let visualizer = VisualizerModel()
+        let audioVisualizer = AudioVisualizerModel()
+        let gradientVisualizer = GradientVisualizerModel()
 
         player.addToPlaylist(tracks: [sampleTrack])
         player.play(track: sampleTrack)
         metadataEditor.tracks = [sampleTrack]
+
+        let image = NSImage(resource: .templateArtwork)
+        await gradientVisualizer.updateDominantColors(from: image)
 
         return (
             floatingWindows,
@@ -39,7 +44,8 @@ struct SampleEnvironmentsPreviewModifier: PreviewModifier {
             player,
             playerKeyboardControl,
             metadataEditor,
-            visualizer
+            audioVisualizer,
+            gradientVisualizer
         )
     }
 
@@ -51,7 +57,8 @@ struct SampleEnvironmentsPreviewModifier: PreviewModifier {
             .environment(context.player)
             .environment(context.playerKeyboardControl)
             .environment(context.metadataEditor)
-            .environment(context.visualizer)
+            .environment(context.audioVisualizer)
+            .environment(context.gradientVisualizer)
     }
 }
 

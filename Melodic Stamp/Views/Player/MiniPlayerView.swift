@@ -53,7 +53,6 @@ struct MiniPlayerView: View {
     // MARK: Models
 
     @State private var lyrics: LyricsModel = .init()
-    @State private var alwaysOnTop: AlwaysOnTopModel = .init()
 
     // MARK: Controls
 
@@ -74,6 +73,8 @@ struct MiniPlayerView: View {
     // MARK: - Body
 
     var body: some View {
+        @Bindable var windowManager = windowManager
+
         VStack(spacing: 12) {
             header()
                 .padding(.horizontal, 4)
@@ -109,7 +110,7 @@ struct MiniPlayerView: View {
         // MARK: Window Customization
 
         .background(MakeAlwaysOnTop(
-            isAlwaysOnTop: $alwaysOnTop.isAlwaysOnTop, titleVisibility: $alwaysOnTop.titleVisibility
+            isAlwaysOnTop: $windowManager.isAlwaysOnTop, titleVisibility: $windowManager.titleVisibility
         ))
 
         // MARK: Lyrics
@@ -281,16 +282,16 @@ struct MiniPlayerView: View {
 
             // MARK: Pin / Unpin
 
-            if isTitleHovering || alwaysOnTop.isAlwaysOnTop {
+            if isTitleHovering || windowManager.isAlwaysOnTop {
                 AliveButton(
                     enabledStyle: .tertiary, hoveringStyle: .secondary
                 ) {
-                    alwaysOnTop.isAlwaysOnTop.toggle()
+                    windowManager.isAlwaysOnTop.toggle()
                 } label: {
                     Image(systemSymbol: .pinFill)
                         .frame(width: 16, height: 16)
                         .contentTransition(.symbolEffect(.replace))
-                        .aliveHighlight(alwaysOnTop.isAlwaysOnTop)
+                        .aliveHighlight(windowManager.isAlwaysOnTop)
                 }
                 .transition(.blurReplace)
             }
@@ -301,7 +302,6 @@ struct MiniPlayerView: View {
                 AliveButton(
                     enabledStyle: .tertiary, hoveringStyle: .secondary
                 ) {
-                    alwaysOnTop.giveUp()
                     windowManager.style = .main
                 } label: {
                     Image(systemSymbol: .arrowUpLeftAndArrowDownRight)

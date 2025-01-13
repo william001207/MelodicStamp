@@ -32,9 +32,6 @@ struct LeafletView: View {
     @SceneStorage(AppSceneStorage.lyricsTypeSize()) private var typeSize: DynamicTypeSize = Defaults[.lyricsTypeSize]
 
     @State private var interaction: AppleMusicLyricsViewInteractionModel = .init()
-    @State private var dominantColors: [Color] = [
-        .init(hex: 0x929292), .init(hex: 0xFFFFFF), .init(hex: 0x929292)
-    ]
 
     // MARK: - Body
 
@@ -49,11 +46,6 @@ struct LeafletView: View {
 
                         if let cover {
                             coverView(cover)
-                                .onChange(of: player.currentIndex, initial: true) { _, _ in
-                                    Task { @MainActor in
-                                        dominantColors = try await extractDominantColors(from: cover)
-                                    }
-                                }
                         }
 
                         // MARK: Lyrics
@@ -97,7 +89,7 @@ struct LeafletView: View {
             .background {
                 if hasCover {
                     ZStack {
-                        AnimatedGrid(colors: dominantColors)
+                        ChromaBackgroundView()
 
                         Color.black
                             .opacity(0.225)
@@ -115,9 +107,6 @@ struct LeafletView: View {
                         .opacity(0.65)
                         .brightness(-0.075)
                         .blendMode(.multiply)
-                    }
-                    .onAppear {
-                        dominantColors = []
                     }
                 }
             }
@@ -267,18 +256,6 @@ struct LeafletView: View {
                 d[.leading]
             }
         }
-    }
-
-    // MARK: - Functions
-
-    private func extractDominantColors(from image: NSImage) async throws -> [Color] {
-        let colors = try DominantColors.dominantColors(
-            nsImage: image, quality: .fair,
-            algorithm: .CIEDE2000, maxCount: 8,
-            options: [.excludeBlack], sorting: .frequency,
-            deltaColors: 6
-        )
-        return colors.map(Color.init)
     }
 }
 
