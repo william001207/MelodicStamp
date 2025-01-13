@@ -17,7 +17,7 @@ extension Defaults.DynamicTypeSize: @retroactive RawRepresentable {
         guard Self.allCases.indices.contains(rawValue) else { return nil }
         self = Self.allCases[rawValue]
     }
-    
+
     public var rawValue: Int {
         Self.allCases.firstIndex(of: self)!
     }
@@ -26,7 +26,7 @@ extension Defaults.DynamicTypeSize: @retroactive RawRepresentable {
 extension Defaults.DynamicTypeSize: Defaults.Serializable {}
 
 extension Defaults.DynamicTypeSize: DynamicClampable {
-    var range: ClosedRange<DynamicTypeSize> {
+    var dynamicRange: ClosedRange<DynamicTypeSize> {
         Defaults[.lyricsTypeSizes]
     }
 }

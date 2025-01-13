@@ -9,7 +9,7 @@ import SwiftUI
 
 struct DynamicTypeSizeView: View {
     var typeSize: DynamicTypeSize
-    
+
     var body: some View {
         switch typeSize {
         case .xSmall: Text("Extra Small")

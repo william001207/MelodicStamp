@@ -9,7 +9,7 @@ import Foundation
 
 protocol ClampableExpression: Comparable {
     static func clamp(_ value: Self, to: ClosedRange<Self>) -> Self
-    
+
     func clamp(to: ClosedRange<Self>) -> Self
 }
 
@@ -17,7 +17,7 @@ extension ClampableExpression {
     static func clamp(_ value: Self, to range: ClosedRange<Self>) -> Self {
         min(range.upperBound, max(range.lowerBound, value))
     }
-    
+
     func clamp(to range: ClosedRange<Self>) -> Self {
         Self.clamp(self, to: range)
     }
@@ -48,13 +48,13 @@ extension Clampable {
 }
 
 protocol DynamicClampable: ClampableExpression {
-    var range: ClosedRange<Self> { get }
-    
-    var clamped: Self { get }
+    var dynamicRange: ClosedRange<Self> { get }
+
+    var dynamicallyClamped: Self { get }
 }
 
 extension DynamicClampable {
-    var clamped: Self {
-        Self.clamp(self, to: range)
+    var dynamicallyClamped: Self {
+        Self.clamp(self, to: dynamicRange)
     }
 }

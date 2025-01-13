@@ -19,7 +19,7 @@ extension DynamicTypeSize: @retroactive Strideable {
     public func advanced(by n: Int) -> DynamicTypeSize {
         let index = Self.allCases.firstIndex(of: self)!
         let targetIndex = index.advanced(by: n)
-        let clampedTargetIndex = max(Self.allCases.indices.lowerBound, min(Self.allCases.indices.upperBound, targetIndex))
+        let clampedTargetIndex = max(Self.allCases.indices.lowerBound, min(Self.allCases.indices.upperBound - 1, targetIndex))
         return Self.allCases[clampedTargetIndex]
     }
 }
@@ -58,8 +58,15 @@ extension DynamicTypeSize {
         case .xxxLarge: 1.35
         case .accessibility1: 1.5
         case .accessibility2: 1.75
-        case .accessibility3, .accessibility4, .accessibility5: 2
+        case .accessibility3: 2
+        case .accessibility4: 2.1
+        case .accessibility5: 2.2
         default: 1
         }
     }
+}
+
+extension DynamicTypeSize {
+    static var minimum: DynamicTypeSize { allCases.min()! }
+    static var maximum: DynamicTypeSize { allCases.max()! }
 }

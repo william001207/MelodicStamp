@@ -55,6 +55,21 @@
         }
       }
     },
+    "Accessibility 1" : {
+
+    },
+    "Accessibility 2" : {
+
+    },
+    "Accessibility 3" : {
+
+    },
+    "Accessibility 4" : {
+
+    },
+    "Accessibility 5" : {
+
+    },
     "Add Files" : {
       "localizations" : {
         "zh-Hans" : {
@@ -226,6 +241,9 @@
       }
     },
     "Attachments" : {
+
+    },
+    "Available type sizes" : {
 
     },
     "AVB" : {
@@ -511,6 +529,18 @@
     "Ethereal" : {
 
     },
+    "Extra Large" : {
+
+    },
+    "Extra Small" : {
+
+    },
+    "Extra² Large" : {
+
+    },
+    "Extra³ Large" : {
+
+    },
     "Fading effect" : {
 
     },
@@ -643,6 +673,9 @@
     "ISRC" : {
 
     },
+    "Large" : {
+
+    },
     "Launch Behaviors" : {
 
     },
@@ -754,6 +787,9 @@
           }
         }
       }
+    },
+    "Medium" : {
+
     },
     "Metadata" : {
       "localizations" : {
@@ -1283,6 +1319,9 @@
         }
       }
     },
+    "Small" : {
+
+    },
     "Sorting" : {
       "localizations" : {
         "zh-Hans" : {
@@ -1367,6 +1406,9 @@
       }
     },
     "Translation" : {
+
+    },
+    "Type size" : {
 
     },
     "Unknown" : {

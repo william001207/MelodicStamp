@@ -35,7 +35,7 @@ extension Binding {
             intBinding.wrappedValue = TInt(newValue)
         }
     }
-    
+
     static func convert<TFloat, TInt>(_ floatBinding: Binding<TFloat>) -> Binding<TInt> where TFloat: BinaryFloatingPoint, TInt: BinaryInteger {
         Binding<TInt> {
             TInt(floatBinding.wrappedValue)

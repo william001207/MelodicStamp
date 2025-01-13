@@ -27,17 +27,17 @@ extension Defaults.Keys {
         "memorizesPlaybackModes",
         default: true
     )
-    
+
     static let memorizesPlaylists: Key<Bool> = .init(
         "memorizesPlaylists",
         default: true
     )
-    
+
     static let memorizesPlaybackPositions: Key<Bool> = .init(
         "memorizesPlaybackPositions",
         default: true
     )
-    
+
     static let memorizesPlaybackVolumes: Key<Bool> = .init(
         "memorizesPlaybackVolumes",
         default: true
@@ -49,7 +49,7 @@ extension Defaults.Keys {
         "mainWindowBackgroundStyle",
         default: .vibrant
     )
-    
+
     static let miniPlayerBackgroundStyle: Key<Defaults.MiniPlayerBackgroundStyle> = .init(
         "miniPlayerBackgroundStyle",
         default: .chroma
@@ -61,12 +61,12 @@ extension Defaults.Keys {
         "gradientDynamics",
         default: .ternary
     )
-    
+
     static let gradientResolution: Key<Defaults.GradientResolution> = .init(
         "gradientResolution",
         default: .clamp(0.8)
     )
-    
+
     static let gradientFPS: Key<Defaults.GradientFPS> = .init(
         "gradientFPS",
         default: .clamp(120)
@@ -78,17 +78,17 @@ extension Defaults.Keys {
         "isLyricsFadingEffectEnabled",
         default: true
     )
-    
+
     static let lyricAttachments: Key<Defaults.LyricAttachments> = .init(
         "lyricAttachments",
         default: .all
     )
-    
+
     static let lyricsTypeSize: Key<Defaults.DynamicTypeSize> = .init(
         "lyricsTypeSize",
         default: .large
     )
-    
+
     static let lyricsTypeSizes: Key<ClosedRange<Defaults.DynamicTypeSize>> = .init(
         "lyricsTypeSizes",
         default: .small...(.xxLarge)
@@ -100,7 +100,7 @@ extension Defaults.Keys {
         "hidesInspectorInBackground",
         default: false
     )
-    
+
     static let hidesLyricsInBackground: Key<Bool> = .init(
         "hidesLyricsInBackground",
         default: false
