@@ -9,5 +9,5 @@ import SwiftUI
 
 extension EnvironmentValues {
     @Entry var lyricAttachments: LyricAttachments = .all
-    @Entry var lyricTypeSizes: ClosedRange<DynamicTypeSize> = .medium...(.xxLarge)
+    @Entry var lyricTypeSizes: ClosedRange<DynamicTypeSize> = .small...(.xxLarge)
 }

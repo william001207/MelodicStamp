@@ -24,6 +24,10 @@ struct SettingsLyricsPage: View {
             Each can also be configured independently for every window in the leaflet page.
             """)
         }
+        
+        Section {
+            SettingsLyricTypeSizeControl()
+        }
     }
 }
 

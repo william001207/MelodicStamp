@@ -26,3 +26,21 @@ extension Binding {
         .init(unwrapping: binding)
     }
 }
+
+extension Binding {
+    static func convert<TInt, TFloat>(_ intBinding: Binding<TInt>) -> Binding<TFloat> where TInt: BinaryInteger, TFloat: BinaryFloatingPoint {
+        Binding<TFloat> {
+            TFloat(intBinding.wrappedValue)
+        } set: { newValue in
+            intBinding.wrappedValue = TInt(newValue)
+        }
+    }
+    
+    static func convert<TFloat, TInt>(_ floatBinding: Binding<TFloat>) -> Binding<TInt> where TFloat: BinaryFloatingPoint, TInt: BinaryInteger {
+        Binding<TInt> {
+            TInt(floatBinding.wrappedValue)
+        } set: { newValue in
+            floatBinding.wrappedValue = TFloat(newValue)
+        }
+    }
+}
