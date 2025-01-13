@@ -38,8 +38,8 @@ struct ContentView: View {
     // MARK: Sidebar & Inspector
 
     @State private var isInspectorPresented: Bool = false
-    @SceneStorage(AppSceneStorage.contentTab()) private var selectedContentTab: SidebarContentTab = .playlist
-    @SceneStorage(AppSceneStorage.inspectorTab()) private var selectedInspectorTab: SidebarInspectorTab = .commonMetadata
+    @State private var selectedContentTab: SidebarContentTab = .playlist
+    @State private var selectedInspectorTab: SidebarInspectorTab = .commonMetadata
 
     // MARK: Sizing
 
@@ -208,15 +208,11 @@ struct ContentView: View {
         .ignoresSafeArea()
         .onAppear {
             minWidth = 960
-
-            DispatchQueue.main.async {
-                initializeFloatingWindows(to: window)
-            }
         }
         .onDisappear {
             destroyFloatingWindows()
         }
-        .onChange(of: appearsActive) { _, newValue in
+        .onChange(of: appearsActive, initial: true) { _, newValue in
             if newValue {
                 DispatchQueue.main.async {
                     initializeFloatingWindows(to: window)
@@ -268,10 +264,8 @@ struct ContentView: View {
             .environment(floatingWindows)
             .onGeometryChange(for: CGSize.self) { proxy in
                 proxy.size
-            } action: { _ in
-                DispatchQueue.main.async {
-                    floatingWindows.updateTabBarPosition(in: mainWindow)
-                }
+            } action: { newValue in
+                floatingWindows.updateTabBarPosition(size: newValue, in: mainWindow, animate: true)
             }
         }
         floatingWindows.addPlayer(to: mainWindow) {
@@ -282,10 +276,8 @@ struct ContentView: View {
                 .environment(playerKeyboardControl)
                 .onGeometryChange(for: CGSize.self) { proxy in
                     proxy.size
-                } action: { _ in
-                    DispatchQueue.main.async {
-                        floatingWindows.updatePlayerPosition(in: mainWindow)
-                    }
+                } action: { newValue in
+                    floatingWindows.updatePlayerPosition(size: newValue, in: mainWindow, animate: true)
                 }
         }
     }

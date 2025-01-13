@@ -134,7 +134,7 @@ import SwiftUI
         self.playerWindow = nil
     }
 
-    func updateTabBarPosition(window: NSWindow? = nil, in mainWindow: NSWindow? = nil) {
+    func updateTabBarPosition(window: NSWindow? = nil, size: CGSize? = nil, in mainWindow: NSWindow? = nil, animate: Bool = false) {
         guard
             let tabBarWindow = window ?? tabBarWindow,
             let applicationWindow = mainWindow ?? NSApp.keyWindow,
@@ -142,24 +142,26 @@ import SwiftUI
         else { return }
 
         let tabBarFrame = tabBarWindow.frame
+        let tabBarSize = size ?? tabBarFrame.size
         let windowFrame = applicationWindow.frame
         let screenFrame = screen.frame
 
         let leadingX = windowFrame.origin.x - 16 - 48
-        let bottomY = windowFrame.origin.y + (windowFrame.height - tabBarFrame.height) / 2
+        let bottomY = windowFrame.origin.y + (windowFrame.height - tabBarSize.height) / 2
 
         tabBarWindow.setFrame(
             .init(
                 x: max(screenFrame.minX + 8, leadingX),
                 y: bottomY,
-                width: tabBarFrame.width,
-                height: tabBarFrame.height
+                width: tabBarSize.width,
+                height: tabBarSize.height
             ),
-            display: true
+            display: true,
+            animate: animate
         )
     }
 
-    func updatePlayerPosition(window: NSWindow? = nil, in mainWindow: NSWindow? = nil) {
+    func updatePlayerPosition(window: NSWindow? = nil, size: CGSize? = nil, in mainWindow: NSWindow? = nil, animate: Bool = false) {
         guard
             let playerWindow = window ?? playerWindow,
             let applicationWindow = mainWindow ?? NSApp.keyWindow,
@@ -167,20 +169,22 @@ import SwiftUI
         else { return }
 
         let playerFrame = playerWindow.frame
+        let playerSize = size ?? playerFrame.size
         let windowFrame = applicationWindow.frame
         let screenFrame = screen.frame
 
-        let centerX = windowFrame.origin.x + (windowFrame.width - playerFrame.width) / 2
+        let centerX = windowFrame.origin.x + (windowFrame.width - playerSize.width) / 2
         let bottomY = windowFrame.origin.y - 32
 
         playerWindow.setFrame(
             .init(
                 x: centerX,
                 y: max(screenFrame.minY + 8, bottomY),
-                width: playerFrame.width,
-                height: playerFrame.height
+                width: playerSize.width,
+                height: playerSize.height
             ),
-            display: true
+            display: true,
+            animate: animate
         )
     }
 }

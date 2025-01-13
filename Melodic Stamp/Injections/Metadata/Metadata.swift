@@ -419,12 +419,12 @@ extension Metadata {
     }
 
     func update() async throws {
-        defer { url.stopAccessingSecurityScopedResource() }
         guard url.startAccessingSecurityScopedResource() else {
             state = .error(.noReadingPermission)
             load()
             return
         }
+        defer { url.stopAccessingSecurityScopedResource() }
 
         let file = try AudioFile(readingPropertiesAndMetadataFrom: url)
         properties = file.properties
@@ -443,11 +443,11 @@ extension Metadata {
 
     func write() async throws {
         guard state.isEditable, isModified else { return }
-        defer { self.url.stopAccessingSecurityScopedResource() }
         guard url.startAccessingSecurityScopedResource() else {
             state = .error(.noWritingPermission)
             return
         }
+        defer { self.url.stopAccessingSecurityScopedResource() }
 
         state = .saving
         apply()

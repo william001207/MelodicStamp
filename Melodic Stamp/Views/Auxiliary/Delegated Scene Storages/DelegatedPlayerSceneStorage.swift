@@ -18,7 +18,7 @@ struct DelegatedPlayerSceneStorage: View {
 
     // MARK: Storages
 
-    @SceneStorage(AppSceneStorage.playlistURLs()) private var playlistURLs: BookmarkedURLs = []
+    @SceneStorage(AppSceneStorage.playlistURLs()) private var playlistURLs: String?
     @SceneStorage(AppSceneStorage.track()) private var track: URL?
 
     @SceneStorage(AppSceneStorage.playbackMode()) private var playbackMode: PlaybackMode?
@@ -30,7 +30,7 @@ struct DelegatedPlayerSceneStorage: View {
 
     // MARK: States
 
-    @State private var playlistURLsState: DelegatedSceneStorageState<[URL]> = .init()
+    @State private var playlistURLsState: DelegatedSceneStorageState<String?> = .init()
     @State private var trackState: DelegatedSceneStorageState<URL?> = .init()
 
     @State private var playbackModeState: DelegatedSceneStorageState<PlaybackMode?> = .init()
@@ -64,23 +64,28 @@ struct DelegatedPlayerSceneStorage: View {
                 playlistURLsState.value = newValue
             }
             .onChange(of: player.playlist) { _, newValue in
+                playlistURLsState.isReady = false
                 storePlaylistURLs(newValue)
             }
             .onChange(of: playlistURLsState.preparedValue) { _, newValue in
                 guard let newValue else { return }
-                restorePlaylistURLs(newValue)
-                playlistURLsState.isReady = false
 
-                print("Successfully restored \(newValue.count) track(s) into playlist")
+                if let string = newValue {
+                    restorePlaylistURLs(string)
+                    playlistURLsState.isReady = false
 
-                // Dependents
-                trackState.isReady = true
+                    print("Successfully restored playlist tracks")
+
+                    // Dependents
+                    trackState.isReady = true
+                }
             }
 
             .onChange(of: track) { _, newValue in
                 trackState.value = newValue
             }
             .onChange(of: player.track) { _, newValue in
+                trackState.isReady = false
                 track = newValue?.url
             }
             .onChange(of: trackState.preparedValue) { _, newValue in
@@ -90,17 +95,17 @@ struct DelegatedPlayerSceneStorage: View {
                     player.play(url: url)
 
                     print("Successfully restored currently playing track to \(url)")
+
+                    // Dependents
+                    playbackVolumeState.isReady = true
+                    playbackMutedState.isReady = true
+
+                    DispatchQueue.main.async {
+                        player.pause()
+                        playbackPositionState.isReady = true
+                    }
                 }
                 trackState.isReady = false
-
-                // Dependents
-                playbackVolumeState.isReady = true
-                playbackMutedState.isReady = true
-
-                DispatchQueue.main.async {
-                    player.pause()
-                    playbackPositionState.isReady = true
-                }
             }
     }
 
@@ -112,6 +117,7 @@ struct DelegatedPlayerSceneStorage: View {
                 playbackModeState.value = newValue
             }
             .onChange(of: player.playbackMode) { _, newValue in
+                playbackModeState.isReady = false
                 playbackMode = newValue
             }
             .onChange(of: playbackModeState.preparedValue) { _, newValue in
@@ -129,6 +135,7 @@ struct DelegatedPlayerSceneStorage: View {
                 playbackLoopingState.value = newValue
             }
             .onChange(of: player.playbackLooping) { _, newValue in
+                playbackLoopingState.isReady = false
                 playbackLooping = newValue
             }
             .onChange(of: playbackLoopingState.preparedValue) { _, newValue in
@@ -151,6 +158,7 @@ struct DelegatedPlayerSceneStorage: View {
                 playbackPositionState.value = newValue
             }
             .onChange(of: player.time) { _, newValue in
+                playbackPositionState.isReady = false
                 playbackPosition = newValue
             }
             .onChange(of: playbackPositionState.preparedValue) { _, newValue in
@@ -173,6 +181,7 @@ struct DelegatedPlayerSceneStorage: View {
                 playbackVolumeState.value = newValue
             }
             .onChange(of: player.volume) { _, newValue in
+                playbackVolumeState.isReady = false
                 playbackVolume = newValue
             }
             .onChange(of: playbackVolumeState.preparedValue) { _, newValue in
@@ -190,6 +199,7 @@ struct DelegatedPlayerSceneStorage: View {
                 playbackMutedState.value = newValue
             }
             .onChange(of: player.isMuted) { _, newValue in
+                playbackMutedState.isReady = false
                 playbackMuted = newValue
             }
             .onChange(of: playbackMutedState.preparedValue) { _, newValue in
@@ -204,16 +214,38 @@ struct DelegatedPlayerSceneStorage: View {
             }
     }
 
-    private func restorePlaylistURLs(_ urls: [URL]) {
-        guard !urls.isEmpty else { return }
-        player.addToPlaylist(urls: urls)
+    private func restorePlaylistURLs(_ string: String) {
+        guard !string.isEmpty else { return }
+        do {
+            guard let data = Data(base64Encoded: string) else { return }
+            guard let bookmarks = try PropertyListSerialization.propertyList(from: data, options: [], format: nil) as? [Data] else { return }
+
+            try bookmarks.forEach {
+                var isStale = false
+                let url = try URL(resolvingBookmarkData: $0, options: [], bookmarkDataIsStale: &isStale)
+                guard !isStale else { return }
+                player.addToPlaylist(urls: [url])
+            }
+        } catch {
+            fatalError("Failed to decode \(Self.self) from \(string): \(error)")
+        }
     }
 
     private func storePlaylistURLs(_ tracks: [Track]) {
         if !tracks.isEmpty {
-            playlistURLs = tracks.map(\.url)
+            do {
+                let bookmarks: [Data] = try tracks.map(\.url).compactMap { url in
+                    guard url.startAccessingSecurityScopedResource() else { return nil }
+                    defer { url.stopAccessingSecurityScopedResource() }
+                    return try url.bookmarkData(options: [])
+                }
+                let data = try PropertyListSerialization.data(fromPropertyList: bookmarks, format: .binary, options: .zero)
+                playlistURLs = data.base64EncodedString()
+            } catch {
+                fatalError("Failed to encode \(self): \(error)")
+            }
         } else {
-            playlistURLs = []
+            playlistURLs = nil
         }
     }
 }

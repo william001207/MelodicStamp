@@ -18,7 +18,7 @@ struct FloatingTabBarView: View {
     @Binding var selectedContentTab: SidebarContentTab
     @Binding var selectedInspectorTab: SidebarInspectorTab
 
-    @State private var isHovering: Bool = true // Crucial!
+    @State private var isHovering: Bool = true // Avoids glitches on first hover
     @State private var isDragging: Bool = false
     @State private var hoveringTabs: Set<AnyHashable> = []
 
@@ -43,8 +43,7 @@ struct FloatingTabBarView: View {
             }
             .animation(animation, value: selectedContentTab)
         }
-        .onAppear {
-            // Avoid glitches on first hover
+        .task {
             isHovering = false
         }
         .onHover { hover in

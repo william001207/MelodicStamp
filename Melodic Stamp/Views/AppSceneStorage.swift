@@ -8,11 +8,6 @@
 import SwiftUI
 
 enum AppSceneStorage: String, Hashable, Equatable, CaseIterable, Identifiable, Codable {
-    // MARK: Content View
-
-    case contentTab
-    case inspectorTab
-
     // MARK: Player
 
     case playlistURLs
