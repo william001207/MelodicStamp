@@ -38,8 +38,8 @@ extension TTMLLyricLine {
         backgroundLyrics.map(\.content).joined()
     }
 
-    var attachments: LyricAttachments {
-        var attachments: LyricAttachments = []
+    var attachments: LyricsAttachments {
+        var attachments: LyricsAttachments = []
 
         if ![lyrics, backgroundLyrics].flatMap(\.translations).isEmpty {
             attachments.formUnion(.translation)

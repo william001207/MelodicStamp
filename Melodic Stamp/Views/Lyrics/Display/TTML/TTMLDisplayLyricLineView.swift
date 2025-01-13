@@ -10,7 +10,7 @@ import SwiftUI
 
 struct TTMLDisplayLyricLineView: View {
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
-    @Environment(\.lyricAttachments) private var attachments
+    @Environment(\.lyricsAttachments) private var attachments
 
     var line: TTMLLyricLine
     var elapsedTime: TimeInterval

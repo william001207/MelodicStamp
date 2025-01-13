@@ -9,7 +9,7 @@ import SwiftUI
 
 struct LRCDisplayLyricLineView: View {
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
-    @Environment(\.lyricAttachments) private var attachments
+    @Environment(\.lyricsAttachments) private var attachments
 
     var line: LRCLyricLine
     var isHighlighted: Bool = false

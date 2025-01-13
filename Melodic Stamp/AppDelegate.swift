@@ -6,9 +6,11 @@
 //
 
 import AppKit
+import Defaults
 import SwiftUI
 
 class AppDelegate: NSObject, NSApplicationDelegate {
+    // Hacky
     @Environment(\.dismissWindow) private var dismissWindow
 
     func applicationDidFinishLaunching(_: Notification) {
@@ -16,14 +18,18 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         closeAuxiliaryWindows()
     }
 
-    func applicationShouldTerminateAfterLastWindowClosed(_: NSApplication) -> Bool {
-        true
+    func applicationWillTerminate(_: Notification) {
+        closeAuxiliaryWindows()
     }
 
     func application(_: NSApplication, open _: [URL]) {}
 
-    func applicationWillTerminate(_: Notification) {
-        closeAuxiliaryWindows()
+    func applicationShouldTerminateAfterLastWindowClosed(_: NSApplication) -> Bool {
+        true
+    }
+
+    func applicationSupportsSecureRestorableState(_: NSApplication) -> Bool {
+        Defaults.canApplicationRestore
     }
 }
 

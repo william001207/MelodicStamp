@@ -13,7 +13,7 @@ import RegexBuilder
     typealias Line = LRCLyricLine
 
     private(set) var lines: [LRCLyricLine] = []
-    private(set) var attachments: LyricAttachments = []
+    private(set) var attachments: LyricsAttachments = []
     private(set) var metadata: [LyricsMetadata] = []
 
     required init(string: String) throws {

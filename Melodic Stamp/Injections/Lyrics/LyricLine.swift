@@ -13,7 +13,7 @@ protocol LyricLine: Equatable, Hashable, Identifiable {
     var content: String { get }
 
     var isValid: Bool { get }
-    var attachments: LyricAttachments { get }
+    var attachments: LyricsAttachments { get }
 }
 
 extension LyricLine {
@@ -21,5 +21,5 @@ extension LyricLine {
         beginTime != nil || endTime != nil
     }
 
-    var attachments: LyricAttachments { [] }
+    var attachments: LyricsAttachments { [] }
 }

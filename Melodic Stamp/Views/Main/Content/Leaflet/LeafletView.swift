@@ -5,6 +5,7 @@
 //  Created by KrLite on 2024/12/13.
 //
 
+import Defaults
 import DominantColors
 import SwiftUI
 
@@ -20,13 +21,15 @@ struct LeafletView: View {
 
     @FocusState private var isFocused: Bool
 
+    @Default(.lyricsTypeSizes) private var defaultLyricsTypeSizes
+
     // MARK: - Fields
 
     @State private var isShowingLyrics: Bool = true
     @State private var isControlsHovering: Bool = false
 
-    @State private var attachments: LyricAttachments = .all
-    @State private var typeSize: DynamicTypeSize = .large
+    @SceneStorage(AppSceneStorage.lyricsAttachments()) private var attachments: LyricsAttachments = Defaults[.lyricsAttachments]
+    @SceneStorage(AppSceneStorage.lyricsTypeSize()) private var typeSize: DynamicTypeSize = Defaults[.lyricsTypeSize]
 
     @State private var interaction: AppleMusicLyricsViewInteractionModel = .init()
     @State private var dominantColors: [Color] = [
@@ -58,7 +61,7 @@ struct LeafletView: View {
                         if hasLyrics, isShowingLyrics {
                             lyricsView()
                                 .transition(.blurReplace(.downUp))
-                                .environment(\.lyricAttachments, visibleAttachments)
+                                .environment(\.lyricsAttachments, visibleAttachments)
                                 .dynamicTypeSize(typeSize)
                         }
                     }
@@ -79,7 +82,8 @@ struct LeafletView: View {
                                     typeSize: $typeSize
                                 )
                                 .transition(.blurReplace(.downUp))
-                                .environment(\.lyricAttachments, availableAttachments)
+                                .environment(\.lyricsAttachments, availableAttachments)
+                                .environment(\.lyricsTypeSizes, defaultLyricsTypeSizes)
                             }
                         }
                         .padding(12)
@@ -202,11 +206,11 @@ struct LeafletView: View {
         !lyrics.lines.isEmpty
     }
 
-    private var availableAttachments: LyricAttachments {
+    private var availableAttachments: LyricsAttachments {
         lyrics.attachments
     }
 
-    private var visibleAttachments: LyricAttachments {
+    private var visibleAttachments: LyricsAttachments {
         lyrics.attachments.intersection(attachments)
     }
 

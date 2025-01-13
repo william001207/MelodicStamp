@@ -13,7 +13,7 @@ struct DisplayLyricsView: View {
     @Environment(LyricsModel.self) private var lyrics
 
     @Environment(\.luminareAnimation) private var animation
-    @Environment(\.lyricAttachments) private var attachments
+    @Environment(\.lyricsAttachments) private var attachments
 
     @Binding var interactionState: AppleMusicLyricsViewInteractionState
     var onScrolling: ((ScrollPosition, CGPoint) -> ())?

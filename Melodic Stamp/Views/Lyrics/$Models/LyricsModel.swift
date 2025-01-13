@@ -19,7 +19,7 @@ import SwiftSoup
         storage?.parser.lines ?? []
     }
 
-    var attachments: LyricAttachments {
+    var attachments: LyricsAttachments {
         storage?.parser.attachments ?? []
     }
 

@@ -26,7 +26,7 @@ struct SettingsLyricsPage: View {
         }
 
         Section {
-            SettingsLyricTypeSizeControl()
+            SettingsLyricsTypeSizeControl()
         }
     }
 }

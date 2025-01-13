@@ -79,19 +79,19 @@ extension Defaults.Keys {
         default: true
     )
 
-    static let lyricAttachments: Key<Defaults.LyricAttachments> = .init(
-        "lyricAttachments",
+    static let lyricsAttachments: Key<Defaults.LyricsAttachments> = .init(
+        "lyricsAttachments",
         default: .all
-    )
-
-    static let lyricsTypeSize: Key<Defaults.DynamicTypeSize> = .init(
-        "lyricsTypeSize",
-        default: .large
     )
 
     static let lyricsTypeSizes: Key<ClosedRange<Defaults.DynamicTypeSize>> = .init(
         "lyricsTypeSizes",
         default: .small...(.xxLarge)
+    )
+
+    static let lyricsTypeSize: Key<Defaults.DynamicTypeSize> = .init(
+        "lyricsTypeSize",
+        default: .large
     )
 
     // MARK: Performance
@@ -105,4 +105,10 @@ extension Defaults.Keys {
         "hidesLyricsInBackground",
         default: false
     )
+}
+
+extension Defaults {
+    static var canApplicationRestore: Bool {
+        Self[.memorizesPlaylists] || Self[.memorizesPlaybackModes] || Self[.memorizesPlaybackPositions] || Self[.memorizesPlaybackVolumes]
+    }
 }

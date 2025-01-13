@@ -13,7 +13,7 @@ protocol LyricsParser {
     associatedtype Line: LyricLine
 
     var lines: [Line] { get }
-    var attachments: LyricAttachments { get }
+    var attachments: LyricsAttachments { get }
     var metadata: [LyricsMetadata] { get }
 
     init(string: String) throws
@@ -26,7 +26,7 @@ protocol LyricsParser {
 }
 
 extension LyricsParser {
-    var attachments: LyricAttachments { [] }
+    var attachments: LyricsAttachments { [] }
     var metadata: [LyricsMetadata] { [] }
 
     // Do not use sequences, otherwise causing huge performance issues

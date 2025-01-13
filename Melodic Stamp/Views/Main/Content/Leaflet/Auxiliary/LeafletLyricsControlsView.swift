@@ -8,10 +8,10 @@
 import SwiftUI
 
 struct LeafletLyricsControlsView: View {
-    @Environment(\.lyricAttachments) private var availableAttachments
-    @Environment(\.lyricTypeSizes) private var availableTypeSizes
+    @Environment(\.lyricsAttachments) private var availableAttachments
+    @Environment(\.lyricsTypeSizes) private var availableTypeSizes
 
-    @Binding var attachments: LyricAttachments
+    @Binding var attachments: LyricsAttachments
     @Binding var typeSize: DynamicTypeSize
 
     @State private var isHovering: Bool = false
@@ -51,7 +51,7 @@ struct LeafletLyricsControlsView: View {
             // MARK: Type Sizes
 
             if abs(availableTypeSizes.lowerBound.distance(to: availableTypeSizes.upperBound)) > 1 {
-                VStack(spacing: 8) {
+                VStack(spacing: 4) {
                     AliveButton {
                         typeSize -~ availableTypeSizes.lowerBound
                     } label: {
@@ -74,6 +74,7 @@ struct LeafletLyricsControlsView: View {
                                     isSelected ? .primary
                                         : isHovering ? .tertiary : .quaternary
                                 )
+                                .padding(4)
                         }
                     }
 

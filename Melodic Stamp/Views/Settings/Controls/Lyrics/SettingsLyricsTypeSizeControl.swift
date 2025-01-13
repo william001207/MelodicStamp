@@ -1,5 +1,5 @@
 //
-//  SettingsLyricTypeSizeControl.swift
+//  SettingsLyricsTypeSizeControl.swift
 //  MelodicStamp
 //
 //  Created by KrLite on 2025/1/13.
@@ -8,7 +8,7 @@
 import Defaults
 import SwiftUI
 
-struct SettingsLyricTypeSizeControl: View {
+struct SettingsLyricsTypeSizeControl: View {
     @Default(.lyricsTypeSize) private var typeSize
     @Default(.lyricsTypeSizes) private var typeSizes
 
@@ -104,7 +104,7 @@ struct SettingsLyricTypeSizeControl: View {
 #Preview {
     Form {
         Section {
-            SettingsLyricTypeSizeControl()
+            SettingsLyricsTypeSizeControl()
         }
     }
     .formStyle(.grouped)

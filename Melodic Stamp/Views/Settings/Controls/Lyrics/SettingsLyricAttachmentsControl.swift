@@ -9,14 +9,14 @@ import Defaults
 import SwiftUI
 
 struct SettingsLyricAttachmentsControl: View {
-    @Default(.lyricAttachments) private var lyricAttachments
+    @Default(.lyricsAttachments) private var lyricAttachments
 
     var body: some View {
         Toggle("Translation", isOn: binding(of: .translation))
         Toggle("Roman", isOn: binding(of: .roman))
     }
 
-    private func binding(of option: LyricAttachments.Element) -> Binding<Bool> {
+    private func binding(of option: LyricsAttachments.Element) -> Binding<Bool> {
         Binding {
             lyricAttachments.contains(option)
         } set: { newValue in
