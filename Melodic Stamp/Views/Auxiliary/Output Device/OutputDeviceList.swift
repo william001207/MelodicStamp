@@ -30,11 +30,7 @@ struct OutputDeviceList: View {
     }
 
     private var groupedDevices: [AudioDevice.TransportType?: [AudioDevice]] {
-        do {
-            return try .init(grouping: devices) { try $0.transportType }
-        } catch {
-            return [nil: devices]
-        }
+        .init(grouping: devices) { try? $0.transportType }
     }
 
     @ViewBuilder private func deviceList(in devices: [AudioDevice]) -> some View {
