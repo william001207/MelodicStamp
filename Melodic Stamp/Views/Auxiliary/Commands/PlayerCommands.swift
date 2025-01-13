@@ -194,7 +194,7 @@ struct PlayerCommands: Commands {
                         Toggle(isOn: $player.playbackLooping) {
                             Image(systemSymbol: .repeat1)
 
-                            Text("Infinite Loop")
+                            Text("Looping")
                         }
                     }
                     .badge(playbackName)
@@ -208,17 +208,12 @@ struct PlayerCommands: Commands {
 
             if let player {
                 @Bindable var player = player
-                if let binding = ~$player.selectedOutputDevice {
-                    let outputDeviceName = try? binding.wrappedValue.name
+                let outputDeviceName = OutputDeviceView.name(of: player.selectedOutputDevice)
 
-                    Picker("Output Device", selection: binding) {
-                        OutputDeviceList(devices: player.outputDevices)
-                            .onAppear {
-                                player.updateOutputDevices()
-                            }
-                    }
-                    .badge(outputDeviceName)
+                Picker("Output Device", selection: $player.selectedOutputDevice) {
+                    OutputDeviceList(devices: player.outputDevices, defaultSystemDevice: player.defaultSystemOutputDevice)
                 }
+                .badge(outputDeviceName)
             }
         }
     }

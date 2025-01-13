@@ -6,12 +6,37 @@
 //
 
 import CAAudioHardware
+import Defaults
 import SwiftUI
 
 struct OutputDeviceList: View {
+    enum Style {
+        case plain
+        case menu
+    }
+
     var devices: [AudioDevice]
+    var defaultSystemDevice: AudioDevice?
+    var style: Style = .menu
 
     var body: some View {
+        if let defaultSystemDevice {
+            Group {
+                switch style {
+                case .plain:
+                    OutputDeviceView()
+                case .menu:
+                    Button {
+                        // A hack to show a subtitle in a menu row
+                    } label: {
+                        OutputDeviceView()
+                        OutputDeviceView(device: defaultSystemDevice)
+                    }
+                }
+            }
+            .tag(nil as AudioDevice?)
+        }
+
         ForEach(
             groupedDevices
                 .sorted { $0.key?.rawValue ?? 0 < $1.key?.rawValue ?? 0 },

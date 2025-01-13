@@ -105,10 +105,6 @@ struct MiniPlayerView: View {
         .onChange(of: appearsActive, initial: true) { _, newValue in
             isFocused = newValue
         }
-        .background {
-            DelegatedRemainingDurationSceneStorage(shouldUseRemainingDuration: $shouldUseRemainingDuration)
-                .allowsHitTesting(false)
-        }
 
         // MARK: Window Customization
 
@@ -402,6 +398,7 @@ struct MiniPlayerView: View {
                 Menu {
                     OutputDevicePicker(
                         devices: player.outputDevices,
+                        defaultSystemDevice: player.defaultSystemOutputDevice,
                         selection: $player.selectedOutputDevice
                     )
                 } label: {
@@ -409,10 +406,6 @@ struct MiniPlayerView: View {
                 }
                 .buttonStyle(.borderless)
                 .tint(.secondary)
-                .onHover { hover in
-                    guard hover else { return }
-                    player.updateOutputDevices()
-                }
             }
         }
 

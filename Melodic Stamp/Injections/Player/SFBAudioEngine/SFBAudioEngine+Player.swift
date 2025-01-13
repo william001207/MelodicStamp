@@ -139,16 +139,22 @@ class SFBAudioEnginePlayer: NSObject, Player {
             }
     }
 
+    func defaultOutputDevice() throws -> AudioDevice? {
+        try .defaultOutputDevice
+    }
+
+    func defaultSystemOutputDevice() throws -> AudioDevice? {
+        try .defaultSystemOutputDevice
+    }
+
     func selectedOutputDevice() throws -> AudioDevice? {
         let devices = try availableOutputDevices()
+        let deviceID = player.outputDeviceID
 
-        return if
-            let uid = UserDefaults.standard.string(forKey: "deviceUID"),
-            let deviceID = try? AudioSystemObject.instance.deviceID(forUID: uid),
-            let device = devices.first(where: { $0.objectID == deviceID }) {
-            device
+        if let device = devices.first(where: { $0.objectID == deviceID }) {
+            return device
         } else {
-            devices.first
+            return devices.first
         }
     }
 

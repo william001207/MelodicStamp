@@ -60,9 +60,6 @@ struct ContentView: View {
                         .presentedWindowStyle(.hiddenTitleBar)
                 }
             }
-
-            // MARK: Utility views
-
             .background {
                 Group {
                     FileImporters()

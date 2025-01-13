@@ -60,10 +60,6 @@ struct PlayerView: View {
         .padding(.horizontal, 32)
         .padding(.vertical, 24)
         .frame(maxWidth: .infinity)
-        .background {
-            DelegatedRemainingDurationSceneStorage(shouldUseRemainingDuration: $shouldUseRemainingDuration)
-                .allowsHitTesting(false)
-        }
     }
 
     // MARK: - Header
@@ -127,6 +123,7 @@ struct PlayerView: View {
             Menu {
                 OutputDevicePicker(
                     devices: player.outputDevices,
+                    defaultSystemDevice: player.defaultSystemOutputDevice,
                     selection: $player.selectedOutputDevice
                 )
             } label: {
@@ -134,10 +131,6 @@ struct PlayerView: View {
             }
             .buttonStyle(.borderless)
             .tint(.secondary.opacity(0.5))
-            .onHover { hover in
-                guard hover else { return }
-                player.updateOutputDevices()
-            }
 
             // MARK: Expand / Shrink
 

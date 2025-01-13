@@ -10,14 +10,23 @@ import SwiftUI
 
 struct OutputDevicePicker: View {
     var devices: [AudioDevice]
+    var defaultSystemDevice: AudioDevice?
     @Binding var selection: AudioDevice?
 
     var body: some View {
-        if let binding = ~$selection {
-            let name = try? binding.wrappedValue.name
+        Picker(selection: $selection) {
+            OutputDeviceList(devices: devices, defaultSystemDevice: defaultSystemDevice)
+        } label: {
+            if let selection {
+                OutputDeviceView(device: selection)
 
-            Picker(name ?? .init(localized: "Output Device"), selection: binding) {
-                OutputDeviceList(devices: devices)
+                if let type = try? selection.transportType {
+                    AudioDeviceTransportTypeView(type: type)
+                }
+            } else {
+                OutputDeviceView()
+
+                OutputDeviceView(device: defaultSystemDevice)
             }
         }
     }

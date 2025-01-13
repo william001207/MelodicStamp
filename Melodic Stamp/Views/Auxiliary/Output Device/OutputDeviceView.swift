@@ -9,38 +9,32 @@ import CAAudioHardware
 import SwiftUI
 
 struct OutputDeviceView: View {
-    var device: AudioDevice
+    var device: AudioDevice?
 
     var body: some View {
         HStack {
-            if let name {
-                Text(name)
-            } else {
-                Text("Unknown Device")
-            }
+            Text(Self.name(of: device))
         }
     }
 
-    private var name: String? {
-        do {
-            return try device.name
-        } catch {
-            return nil
+    static func name(of device: AudioDevice?) -> String {
+        if let device {
+            do {
+                return try device.name
+            } catch {
+                return .init(localized: "Unknown Device")
+            }
+        } else {
+            return .init(localized: "System Default")
         }
     }
 }
 
 #Preview {
     var device: AudioDevice? {
-        do {
-            return try .defaultInputDevice
-        } catch {
-            return nil
-        }
+        try? .defaultInputDevice
     }
 
-    if let device {
-        OutputDeviceView(device: device)
-            .padding()
-    }
+    OutputDeviceView(device: device)
+        .padding()
 }

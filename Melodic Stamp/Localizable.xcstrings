@@ -653,16 +653,6 @@
         }
       }
     },
-    "Infinite Loop" : {
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "无限循环"
-          }
-        }
-      }
-    },
     "Inspector" : {
       "localizations" : {
         "zh-Hans" : {
@@ -731,6 +721,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "正在加载…"
+          }
+        }
+      }
+    },
+    "Looping" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "单曲循环"
           }
         }
       }
@@ -1341,6 +1341,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "工作"
+          }
+        }
+      }
+    },
+    "System Default" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "系统默认"
           }
         }
       }

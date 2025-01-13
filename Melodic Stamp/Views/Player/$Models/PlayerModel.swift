@@ -24,11 +24,24 @@ import SwiftUI
 
     // Do not use computed variables for the sake of correctly updating view data
     private(set) var outputDevices: [AudioDevice] = []
+    private(set) var defaultOutputDevice: AudioDevice?
+    private(set) var defaultSystemOutputDevice: AudioDevice?
+
+    private(set) var isUsingSystemOutputDevice: Bool = false
+    private var _selectedOutputDevice: AudioDevice?
+
+    // Exposed value, `nil` for system output device
     var selectedOutputDevice: AudioDevice? {
-        didSet {
-            guard let selectedOutputDevice else { return }
-            selectOutputDevice(selectedOutputDevice)
-            updateOutputDevices(refreshingSelected: false)
+        get { isUsingSystemOutputDevice ? nil : _selectedOutputDevice }
+        set {
+            if let newValue {
+                isUsingSystemOutputDevice = false
+                _selectedOutputDevice = newValue
+            } else {
+                isUsingSystemOutputDevice = true
+            }
+
+            updateOutputDevices(forceUpdating: true)
         }
     }
 
@@ -194,7 +207,6 @@ import SwiftUI
         self.player.delegate = self
         setupRemoteTransportControls()
         setupEngine()
-        updateOutputDevices()
 
         timer
             .receive(on: DispatchQueue.main)
@@ -235,6 +247,8 @@ import SwiftUI
                     guard self._isMuted != updated else { break isMuted }
                     self._isMuted = updated
                 }
+
+                self.updateOutputDevices()
             }
             .store(in: &cancellables)
     }
@@ -417,15 +431,25 @@ extension PlayerModel {
         } catch {}
     }
 
-    func updateOutputDevices(refreshingSelected: Bool = true) {
+    func updateOutputDevices(forceUpdating: Bool = false) {
         do {
             outputDevices = try player.availableOutputDevices()
-            print("Updated output device, found \(outputDevices.count)")
+            defaultOutputDevice = try player.defaultOutputDevice()
+            defaultSystemOutputDevice = try player.defaultSystemOutputDevice()
 
-            if refreshingSelected {
-                let selectedOutputDevice = try player.selectedOutputDevice()
-                guard self.selectedOutputDevice != selectedOutputDevice else { return }
-                self.selectedOutputDevice = selectedOutputDevice
+            if isUsingSystemOutputDevice {
+                if let defaultSystemOutputDevice, forceUpdating || defaultSystemOutputDevice != _selectedOutputDevice {
+                    selectOutputDevice(defaultSystemOutputDevice)
+                    _selectedOutputDevice = defaultSystemOutputDevice
+
+                    print("Setting output device to system: \(defaultSystemOutputDevice)")
+                }
+            } else {
+                if let device = _selectedOutputDevice, try forceUpdating || device != player.selectedOutputDevice() {
+                    selectOutputDevice(device)
+
+                    print("Setting output device to \(device)")
+                }
             }
         } catch {}
     }
@@ -527,6 +551,10 @@ extension PlayerModel {
 
         return volume >= 0 && volume <= 1
     }
+}
+
+extension PlayerModel {
+    @objc func handleRouteChange(_: Notification) {}
 }
 
 extension PlayerModel {

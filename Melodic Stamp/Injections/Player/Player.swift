@@ -41,6 +41,9 @@ protocol Player {
     func withEngine(_ block: @escaping (AVAudioEngine) -> ())
 
     func availableOutputDevices() throws -> [AudioDevice]
+    func defaultOutputDevice() throws -> AudioDevice?
+    func defaultSystemOutputDevice() throws -> AudioDevice?
+
     func selectedOutputDevice() throws -> AudioDevice?
     func selectOutputDevice(_ device: AudioDevice) throws
 }
@@ -129,6 +132,14 @@ class BlankPlayer: Player {
 
     func availableOutputDevices() throws -> [AudioDevice] {
         try [.defaultOutputDevice]
+    }
+
+    func defaultOutputDevice() throws -> AudioDevice? {
+        try .defaultOutputDevice
+    }
+
+    func defaultSystemOutputDevice() throws -> AudioDevice? {
+        try .defaultSystemOutputDevice
     }
 
     func selectedOutputDevice() throws -> AudioDevice? {
