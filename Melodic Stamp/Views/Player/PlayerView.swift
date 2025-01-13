@@ -29,7 +29,7 @@ struct PlayerView: View {
     // MARK: Progress Bar
 
     @State private var adjustmentPercentage: CGFloat = .zero
-    @State private var shouldUseRemainingDuration: Bool = false
+    @SceneStorage(AppSceneStorage.shouldUseRemainingDuration()) private var shouldUseRemainingDuration: Bool = false
 
     // MARK: - Body
 

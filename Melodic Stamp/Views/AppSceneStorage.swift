@@ -19,6 +19,8 @@ enum AppSceneStorage: String, Hashable, Equatable, CaseIterable, Identifiable, C
     case playbackPosition
     case playbackVolume
     case playbackMuted
+    
+    case shouldUseRemainingDuration
 
     // MARK: Lyrics
 
