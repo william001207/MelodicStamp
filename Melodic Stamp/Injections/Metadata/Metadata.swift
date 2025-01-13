@@ -16,10 +16,11 @@ import SwiftUI
 @Observable final class Metadata: Identifiable {
     typealias Entry = MetadataEntry
 
-    enum State {
+    enum State: Hashable, Equatable {
         case loading
         case fine
         case saving
+        case error(MetadataError)
 
         var isEditable: Bool {
             switch self {
@@ -38,6 +39,30 @@ import SwiftUI
                 true
             }
         }
+
+        var isProcessed: Bool {
+            switch self {
+            case .loading, .error:
+                false
+            default:
+                true
+            }
+        }
+
+        var error: MetadataError? {
+            switch self {
+            case let .error(error):
+                error
+            default:
+                nil
+            }
+        }
+    }
+
+    enum MetadataError: Error {
+        case invalidURL
+        case noWritingPermission
+        case noReadingPermission
     }
 
     var id: URL { url }
@@ -394,8 +419,12 @@ extension Metadata {
     }
 
     func update() async throws {
-        guard url.startAccessingSecurityScopedResource() else { return }
         defer { url.stopAccessingSecurityScopedResource() }
+        guard url.startAccessingSecurityScopedResource() else {
+            state = .error(.noReadingPermission)
+            load()
+            return
+        }
 
         let file = try AudioFile(readingPropertiesAndMetadataFrom: url)
         properties = file.properties
@@ -414,8 +443,11 @@ extension Metadata {
 
     func write() async throws {
         guard state.isEditable, isModified else { return }
-        guard url.startAccessingSecurityScopedResource() else { return }
         defer { self.url.stopAccessingSecurityScopedResource() }
+        guard url.startAccessingSecurityScopedResource() else {
+            state = .error(.noWritingPermission)
+            return
+        }
 
         state = .saving
         apply()

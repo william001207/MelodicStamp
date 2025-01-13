@@ -18,12 +18,16 @@ struct PlayableItemView: View {
 
     var body: some View {
         HStack(alignment: .center) {
-            let isMetadataLoaded = track.metadata.state.isLoaded
+            let metadataState = track.metadata.state
             let isMetadataModified = track.metadata.isModified
 
             VStack(alignment: .leading, spacing: 2) {
                 HStack {
-                    if isMetadataLoaded {
+                    switch metadataState {
+                    case .loading:
+                        Text("Loading…")
+                            .foregroundStyle(.placeholder)
+                    case .fine, .saving:
                         if isPlaying {
                             MarqueeScrollView(animate: false) {
                                 MusicTitle(track: track)
@@ -31,9 +35,10 @@ struct PlayableItemView: View {
                         } else {
                             MusicTitle(track: track)
                         }
-                    } else {
-                        Text("Loading…")
-                            .foregroundStyle(.placeholder)
+                    case .error:
+                        Text("Encountered Error")
+                            .foregroundStyle(.red)
+                            .bold()
                     }
                 }
                 .font(.title3)
@@ -56,7 +61,7 @@ struct PlayableItemView: View {
                 .frame(height: 12)
             }
             .transition(.blurReplace)
-            .animation(.default.speed(2), value: isMetadataLoaded)
+            .animation(.default.speed(2), value: metadataState)
             .animation(.default.speed(2), value: isMetadataModified)
             .animation(.default.speed(2), value: isPlaying)
 
@@ -65,7 +70,7 @@ struct PlayableItemView: View {
             AliveButton {
                 player.play(track: track)
             } label: {
-                cover(isMetadataLoaded: isMetadataLoaded)
+                cover(isMetadataProcessed: metadataState.isProcessed)
             }
         }
         .padding(.vertical, 10)
@@ -82,9 +87,9 @@ struct PlayableItemView: View {
         player.track == track
     }
 
-    @ViewBuilder private func cover(isMetadataLoaded: Bool) -> some View {
+    @ViewBuilder private func cover(isMetadataProcessed: Bool) -> some View {
         ZStack {
-            if isMetadataLoaded, let image = track.metadata.thumbnail {
+            if isMetadataProcessed, let image = track.metadata.thumbnail {
                 MusicCover(
                     images: [image], hasPlaceholder: false, cornerRadius: 8
                 )
@@ -97,12 +102,12 @@ struct PlayableItemView: View {
                     }
                 }
 
-                if isHovering, isMetadataLoaded {
+                if isHovering, isMetadataProcessed {
                     Image(systemSymbol: .playFill)
                         .foregroundStyle(.white)
                 }
             } else {
-                if isHovering, isMetadataLoaded {
+                if isHovering, isMetadataProcessed {
                     Image(systemSymbol: .playFill)
                         .foregroundStyle(.primary)
                 }

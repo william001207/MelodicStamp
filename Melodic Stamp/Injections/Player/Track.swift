@@ -39,9 +39,3 @@ extension Track: Hashable {
         hasher.combine(id)
     }
 }
-
-extension Track: LuminareSelectionData {
-    var isSelectable: Bool {
-        metadata.state.isLoaded
-    }
-}

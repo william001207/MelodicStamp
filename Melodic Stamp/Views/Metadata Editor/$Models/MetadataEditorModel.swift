@@ -28,7 +28,7 @@ enum MetadataEditingState: Equatable {
     var tracks: Set<Track> = []
 
     var metadatas: Set<Metadata> {
-        Set(tracks.map(\.metadata))
+        Set(tracks.map(\.metadata).filter(\.state.isProcessed))
     }
 
     var isVisible: Bool {

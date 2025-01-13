@@ -46,6 +46,7 @@ struct PlaylistView: View {
                                 contextMenu(for: track)
                             }
                             .redacted(reason: track.metadata.state.isLoaded ? [] : .placeholder)
+                            .selectionDisabled(!track.metadata.state.isProcessed)
                     }
                     .onMove { indices, destination in
                         withAnimation {
