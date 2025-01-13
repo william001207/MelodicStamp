@@ -38,11 +38,6 @@ struct MainView: View {
                 // Preserves the title bar style
                 Color.clear
             }
-            .toolbar {
-                ToolbarItemGroup(placement: .navigation) {
-                    FileToolbar()
-                }
-            }
             .background(MakeCustomizable(customization: { window in
                 window.titlebarAppearsTransparent = true
                 window.titleVisibility = .visible
@@ -54,6 +49,11 @@ struct MainView: View {
             switch selectedContentTab {
             case .playlist:
                 PlaylistView(namespace: namespace)
+                    .toolbar {
+                        ToolbarItemGroup(placement: .navigation) {
+                            FileToolbar()
+                        }
+                    }
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                     .ignoresSafeArea()
                     .morphed()

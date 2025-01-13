@@ -69,7 +69,7 @@ struct MiniPlayerView: View {
     // MARK: Progress Bar
 
     @State private var adjustmentPercentage: CGFloat = .zero
-    @State private var shouldUseRemainingDuration: Bool = true
+    @SceneStorage(AppSceneStorage.shouldUseRemainingDuration()) private var shouldUseRemainingDuration: Bool = true
 
     // MARK: - Body
 
