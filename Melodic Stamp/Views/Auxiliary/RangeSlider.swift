@@ -7,103 +7,40 @@
 
 import SwiftUI
 
-struct RangeSlider<V, Label, MinLabel, MaxLabel>: View where V: Strideable & Comparable & BinaryFloatingPoint, V.Stride: BinaryFloatingPoint, Label: View, MinLabel: View, MaxLabel: View {
+struct RangeSlider<V>: View where V: Strideable & Comparable & BinaryFloatingPoint, V.Stride: BinaryFloatingPoint {
     @Binding var range: ClosedRange<V>
     var availableRange: ClosedRange<V>
     var step: V.Stride
-    @ViewBuilder var label: () -> Label
-    @ViewBuilder var minLabel: () -> MinLabel
-    @ViewBuilder var maxLabel: () -> MaxLabel
     
     @State private var size: CGSize = .zero
-    
     @State private var isLowerRangeHovering: Bool = false
     @State private var isUpperRangeHovering: Bool = false
     
     init(
         range: Binding<ClosedRange<V>>,
         in availableRange: ClosedRange<V>,
-        step: V.Stride = 1,
-        @ViewBuilder label: @escaping () -> Label,
-        @ViewBuilder minimumValueLabel: @escaping () -> MinLabel,
-        @ViewBuilder maximumValueLabel: @escaping () -> MaxLabel
+        step: V.Stride = 1
     ) {
         self._range = range
         self.availableRange = availableRange
         self.step = step
-        self.label = label
-        self.minLabel = minimumValueLabel
-        self.maxLabel = maximumValueLabel
-    }
-    
-    init(
-        range: Binding<ClosedRange<V>>,
-        in availableRange: ClosedRange<V>,
-        step: V.Stride = 1,
-        @ViewBuilder label: @escaping () -> Label
-    ) where MinLabel == EmptyView, MaxLabel == EmptyView {
-        self.init(
-            range: range,
-            in: availableRange,
-            step: step,
-            label: label
-        ) {
-            EmptyView()
-        } maximumValueLabel: {
-            EmptyView()
-        }
-    }
-    
-    init(
-        range: Binding<ClosedRange<V>>,
-        in availableRange: ClosedRange<V>,
-        step: V.Stride = 1
-    ) where Label == EmptyView, MinLabel == EmptyView, MaxLabel == EmptyView {
-        self.init(
-            range: range,
-            in: availableRange,
-            step: step
-        ) {
-            EmptyView()
-        }
     }
     
     var body: some View {
         ZStack(alignment: .center) {
-            Slider(value: .constant(0), in: 0...1, step: 1) {
-                label()
-            } minimumValueLabel: {
-                AnyView(minLabel())
-            } maximumValueLabel: {
-                AnyView(maxLabel())
-            }
-            .allowsHitTesting(false)
-            .opacity(0)
-            .onGeometryChange(for: CGSize.self) { proxy in
-                proxy.size
-            } action: { newValue in
-                size = newValue
-            }
-            
             if hasLowerPart {
                 HStack(spacing: 0) {
-                    Slider(value: lowerValueBinding, in: availableLowerRange, step: step) {
-                        label()
-                    } minimumValueLabel: {
-                        AnyView(minLabel())
-                    } maximumValueLabel: {
-                        AnyView(hasUpperPart ? AnyView(EmptyView()) : AnyView(maxLabel()))
-                    }
-                    .frame(width: compensatedWidth(lowerScale))
-                    .mask(alignment: .trailing) {
-                        HStack(spacing: 0) {
-                            Color.white
-                            
-                            Color.clear
-                                .frame(width: compensatedWidth(centerScale / 2, postCompensated: false))
+                    Slider(value: lowerValueBinding, in: availableLowerRange, step: step)
+                        .frame(width: compensatedWidth(lowerScale))
+                        .mask(alignment: .trailing) {
+                            HStack(spacing: 0) {
+                                Color.white
+                                
+                                Color.clear
+                                    .frame(width: compensatedWidth(centerScale / 2, postCompensated: false))
+                            }
+                            .padding(hasUpperPart ? .all.subtracting(.trailing) : .all, -1)
                         }
-                        .padding(hasUpperPart ? .all.subtracting(.trailing) : .all, -1)
-                    }
                     
                     Spacer(minLength: 0)
                 }
@@ -115,29 +52,26 @@ struct RangeSlider<V, Label, MinLabel, MaxLabel>: View where V: Strideable & Com
                 HStack(spacing: 0) {
                     Spacer(minLength: 0)
                     
-                    Slider(value: upperValueBinding, in: availableUpperRange, step: step) {
-                        if !hasLowerPart {
-                            label()
+                    Slider(value: upperValueBinding, in: availableUpperRange, step: step)
+                        .frame(width: compensatedWidth(upperScale))
+                        .mask(alignment: .leading) {
+                            HStack(spacing: 0) {
+                                Color.clear
+                                    .frame(width: compensatedWidth(centerScale / 2, postCompensated: false))
+                                
+                                Color.white
+                            }
+                            .padding(hasLowerPart ? .all.subtracting(.leading) : .all, -1)
                         }
-                    } minimumValueLabel: {
-                        AnyView(hasLowerPart ? AnyView(EmptyView()) : AnyView(minLabel()))
-                    } maximumValueLabel: {
-                        AnyView(maxLabel())
-                    }
-                    .frame(width: compensatedWidth(upperScale))
-                    .mask(alignment: .leading) {
-                        HStack(spacing: 0) {
-                            Color.clear
-                                .frame(width: compensatedWidth(centerScale / 2, postCompensated: false))
-                            
-                            Color.white
-                        }
-                        .padding(hasLowerPart ? .all.subtracting(.leading) : .all, -1)
-                    }
                 }
                 .zIndex(isUpperRangeHovering ? 1 : 0)
                 .blendMode(!isUpperRangeHovering && isLowerRangeHovering ? .multiply : .normal)
             }
+        }
+        .onGeometryChange(for: CGSize.self) { proxy in
+            proxy.size
+        } action: { newValue in
+            size = newValue
         }
         .onContinuousHover { phase in
             switch phase {
@@ -225,13 +159,7 @@ struct RangeSlider<V, Label, MinLabel, MaxLabel>: View where V: Strideable & Com
 #Preview {
     @Previewable @State var range: ClosedRange<CGFloat> = 2...3
     
-    RangeSlider(range: $range, in: 0...10) {
-        Text("Label")
-    } minimumValueLabel: {
-        Text("Minimum")
-    } maximumValueLabel: {
-        Text("Maximum")
-    }
-    .padding()
-    .background(.blue)
+    RangeSlider(range: $range, in: 0...10)
+        .padding()
+        .background(.blue)
 }

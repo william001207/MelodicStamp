@@ -13,37 +13,37 @@ struct SettingsLyricTypeSizeControl: View {
     @Default(.lyricsTypeSizes) private var typeSizes
     
     var body: some View {
-//        Slider(
-//            value: typeSizeBinding,
-//            in: typeSizesBinding.wrappedValue,
-//            step: 1
-//        ) {
-//            Text("Type size")
-//        } minimumValueLabel: {
-//            DynamicTypeSizeView(typeSize: typeSizes.lowerBound)
-//        } maximumValueLabel: {
-//            DynamicTypeSizeView(typeSize: typeSizes.upperBound)
-//        }
-        Text("")
+        Slider(
+            value: typeSizeBinding,
+            in: typeSizesBinding.wrappedValue,
+            step: 1
+        ) {
+            Text("Type size")
+            DynamicTypeSizeView(typeSize: typeSize)
+        } minimumValueLabel: {
+            DynamicTypeSizeView(typeSize: typeSizes.lowerBound)
+        } maximumValueLabel: {
+            DynamicTypeSizeView(typeSize: typeSizes.upperBound)
+        }
     }
     
-    private var typeSizeBinding: Binding<Int> {
+    private var typeSizeBinding: Binding<Double> {
         Binding {
-            typeSize.rawValue
+            Double(typeSize.rawValue)
         } set: { newValue in
-            guard let typeSize = Defaults.DynamicTypeSize(rawValue: newValue) else { return }
+            guard let typeSize = Defaults.DynamicTypeSize(rawValue: Int(newValue)) else { return }
             
             self.typeSize = typeSize.clamped
         }
     }
     
-    private var typeSizesBinding: Binding<ClosedRange<Int>> {
+    private var typeSizesBinding: Binding<ClosedRange<Double>> {
         Binding {
-            typeSizes.lowerBound.rawValue...typeSizes.upperBound.rawValue
+            Double(typeSizes.lowerBound.rawValue)...Double(typeSizes.upperBound.rawValue)
         } set: { newValue in
             guard
-                let lowerBound = Defaults.DynamicTypeSize(rawValue: newValue.lowerBound),
-                let upperBound = Defaults.DynamicTypeSize(rawValue: newValue.upperBound)
+                let lowerBound = Defaults.DynamicTypeSize(rawValue: Int(newValue.lowerBound)),
+                let upperBound = Defaults.DynamicTypeSize(rawValue: Int(newValue.upperBound))
             else { return }
             
             self.typeSizes = lowerBound...upperBound
@@ -52,6 +52,10 @@ struct SettingsLyricTypeSizeControl: View {
 }
 
 #Preview {
-    SettingsLyricTypeSizeControl()
-        .padding()
+    Form {
+        Section {
+            SettingsLyricTypeSizeControl()
+        }
+    }
+    .formStyle(.grouped)
 }
