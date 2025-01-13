@@ -72,13 +72,14 @@ struct DelegatedPlayerSceneStorage: View {
 
                 if let string = newValue {
                     restorePlaylistURLs(string)
-                    playlistURLsState.isReady = false
 
                     print("Successfully restored playlist tracks")
 
                     // Dependents
                     trackState.isReady = true
                 }
+
+                playlistURLsState.isReady = false
             }
 
             .onChange(of: track) { _, newValue in
@@ -105,6 +106,7 @@ struct DelegatedPlayerSceneStorage: View {
                         playbackPositionState.isReady = true
                     }
                 }
+
                 trackState.isReady = false
             }
     }
@@ -128,6 +130,7 @@ struct DelegatedPlayerSceneStorage: View {
 
                     print("Successfully restored playback mode to \(mode)")
                 }
+
                 playbackModeState.isReady = false
             }
 
@@ -146,6 +149,7 @@ struct DelegatedPlayerSceneStorage: View {
 
                     print("Successfully restored playback looping state to \(isLoopingEnabled)")
                 }
+
                 playbackLoopingState.isReady = false
             }
     }
@@ -169,6 +173,7 @@ struct DelegatedPlayerSceneStorage: View {
 
                     print("Successfully restored playback position to \(time)")
                 }
+
                 playbackPositionState.isReady = false
             }
     }
@@ -192,6 +197,7 @@ struct DelegatedPlayerSceneStorage: View {
 
                     print("Successfully restored playback volume to \(volume)")
                 }
+
                 playbackVolumeState.isReady = false
             }
 
@@ -210,6 +216,7 @@ struct DelegatedPlayerSceneStorage: View {
 
                     print("Successfully restored playback muted state to \(isMuted)")
                 }
+
                 playbackMutedState.isReady = false
             }
     }

@@ -69,7 +69,7 @@ struct MiniPlayerView: View {
     // MARK: Progress Bar
 
     @State private var adjustmentPercentage: CGFloat = .zero
-    @SceneStorage(AppSceneStorage.shouldUseRemainingDuration()) private var shouldUseRemainingDuration: Bool = true
+    @State private var shouldUseRemainingDuration: Bool = true
 
     // MARK: - Body
 
@@ -104,6 +104,10 @@ struct MiniPlayerView: View {
         .focused($isFocused)
         .onChange(of: appearsActive, initial: true) { _, newValue in
             isFocused = newValue
+        }
+        .background {
+            DelegatedRemainingDurationSceneStorage(shouldUseRemainingDuration: $shouldUseRemainingDuration)
+                .allowsHitTesting(false)
         }
 
         // MARK: Window Customization

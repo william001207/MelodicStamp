@@ -29,7 +29,7 @@ struct PlayerView: View {
     // MARK: Progress Bar
 
     @State private var adjustmentPercentage: CGFloat = .zero
-    @SceneStorage(AppSceneStorage.shouldUseRemainingDuration()) private var shouldUseRemainingDuration: Bool = false
+    @State private var shouldUseRemainingDuration: Bool = false
 
     // MARK: - Body
 
@@ -60,6 +60,10 @@ struct PlayerView: View {
         .padding(.horizontal, 32)
         .padding(.vertical, 24)
         .frame(maxWidth: .infinity)
+        .background {
+            DelegatedRemainingDurationSceneStorage(shouldUseRemainingDuration: $shouldUseRemainingDuration)
+                .allowsHitTesting(false)
+        }
     }
 
     // MARK: - Header
