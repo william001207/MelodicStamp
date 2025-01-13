@@ -129,14 +129,15 @@ struct PlayerView: View {
                     devices: player.outputDevices,
                     selection: $player.selectedOutputDevice
                 )
-                .onAppear {
-                    player.updateOutputDevices()
-                }
             } label: {
                 Image(systemSymbol: .airplayaudio)
             }
             .buttonStyle(.borderless)
             .tint(.secondary.opacity(0.5))
+            .onHover { hover in
+                guard hover else { return }
+                player.updateOutputDevices()
+            }
 
             // MARK: Expand / Shrink
 

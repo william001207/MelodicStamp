@@ -404,14 +404,15 @@ struct MiniPlayerView: View {
                         devices: player.outputDevices,
                         selection: $player.selectedOutputDevice
                     )
-                    .onAppear {
-                        player.updateOutputDevices()
-                    }
                 } label: {
                     Image(systemSymbol: .airplayaudio)
                 }
                 .buttonStyle(.borderless)
                 .tint(.secondary)
+                .onHover { hover in
+                    guard hover else { return }
+                    player.updateOutputDevices()
+                }
             }
         }
 
