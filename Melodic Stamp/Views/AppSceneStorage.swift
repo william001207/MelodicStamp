@@ -19,7 +19,7 @@ enum AppSceneStorage: String, Hashable, Equatable, CaseIterable, Identifiable, C
     case playbackPosition
     case playbackVolume
     case playbackMuted
-    
+
     var id: Self { self }
 
     func callAsFunction() -> String { rawValue }

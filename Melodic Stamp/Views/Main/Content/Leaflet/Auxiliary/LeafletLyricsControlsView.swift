@@ -30,7 +30,7 @@ struct LeafletLyricsControlsView: View {
                                 )
                                 .frame(height: 24)
                         }
-                        
+
                         ForEach(availableTypeSizes, id: \.hashValue) { size in
                             let isSelected = typeSize == size
                             AliveButton {
@@ -41,12 +41,12 @@ struct LeafletLyricsControlsView: View {
                                     .scaleEffect(isSelected ? 1.5 : 1)
                                     .foregroundStyle(
                                         isSelected ? .primary
-                                        : isHovering ? .tertiary : .quaternary
+                                            : isHovering ? .tertiary : .quaternary
                                     )
                                     .padding(4)
                             }
                         }
-                        
+
                         AliveButton {
                             typeSize +~ availableTypeSizes.upperBound
                         } label: {

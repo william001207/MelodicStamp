@@ -10,7 +10,7 @@ import SwiftUI
 
 struct TTMLDisplayLyricLineView: View {
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
-    
+
     @Default(.lyricsAttachments) private var attachments
 
     var line: TTMLLyricLine

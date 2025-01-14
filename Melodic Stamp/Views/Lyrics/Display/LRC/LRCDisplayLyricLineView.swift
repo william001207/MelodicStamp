@@ -10,7 +10,7 @@ import SwiftUI
 
 struct LRCDisplayLyricLineView: View {
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
-    
+
     @Default(.lyricsAttachments) private var attachments
 
     var line: LRCLyricLine

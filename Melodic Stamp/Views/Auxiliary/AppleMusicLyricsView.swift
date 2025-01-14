@@ -57,9 +57,9 @@ enum AppleMusicLyricsViewIndicator {
 
 struct AppleMusicLyricsView<Content>: View where Content: View {
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
-    
+
     @Default(.lyricsAttachments) private var attachments
-    
+
     var interactionState: AppleMusicLyricsViewInteractionState = .following
 
     var offset: CGFloat = 50
@@ -88,7 +88,7 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
         ScrollView {
             // Avoids multiple instansializations
             let isInitialized = isInitialized
-            
+
             Spacer()
                 .frame(height: offset)
 
@@ -142,11 +142,11 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
                 scrollToHighlighted()
             }
         }
-        .onChange(of: contentOffsets) { _, newValue in
+        .onChange(of: contentOffsets) { _, _ in
             guard isInitialized else { return }
             animationContentOffsets = contentOffsets
         }
-        .onChange(of: animationContentOffsets) { oldValue, newValue in
+        .onChange(of: animationContentOffsets) { _, newValue in
             if newValue.keys.isEmpty {
                 // Force re-initialize the scroll offset to avoid dangling scrolling
                 scrollOffset = .zero
@@ -184,7 +184,7 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
             scrollPosition.scrollTo(y: value)
         }
     }
-    
+
     private var isInitialized: Bool {
         canLoadLazily && Set(contentOffsets.keys).isSuperset(of: range)
     }
@@ -250,7 +250,7 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
             .animation(.spring, value: animationCompensate)
             .animation(.smooth, value: interactionState.isDelegated)
     }
-    
+
     private func reload() {
         contentOffsets.removeAll()
         animationContentOffsets.removeAll()
