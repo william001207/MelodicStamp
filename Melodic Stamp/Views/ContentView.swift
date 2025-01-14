@@ -81,6 +81,7 @@ struct ContentView: View {
                 isFocused = true
                 resetFocus(in: namespace)
                 player.updateOutputDevices()
+                floatingWindows.observe(window)
             }
             .onChange(of: windowManager.style, initial: true) { _, _ in
                 isFocused = true
@@ -196,12 +197,6 @@ struct ContentView: View {
             selectedContentTab: $selectedContentTab,
             selectedInspectorTab: $selectedInspectorTab
         )
-        .onGeometryChange(for: CGRect.self) { proxy in
-            proxy.frame(in: .global)
-        } action: { _ in
-            floatingWindows.updateTabBarPosition(in: window)
-            floatingWindows.updatePlayerPosition(in: window)
-        }
         .background {
             switch mainWindowBackgroundStyle {
             case .opaque:

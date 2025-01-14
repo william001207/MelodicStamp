@@ -63,8 +63,8 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
     var interactionState: AppleMusicLyricsViewInteractionState = .following
 
     var offset: CGFloat = 50
-    var delay: TimeInterval = 0.1
-    var bounceDelay: TimeInterval = 0.5
+    var delay: TimeInterval = 0.185
+    var bounceDelay: TimeInterval = 0.65
 
     var range: Range<Int>
     var highlightedRange: Range<Int>
@@ -80,16 +80,19 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
     @State private var scrollPosition: ScrollPosition = .init()
     @State private var scrollOffset: CGFloat = .zero
 
+    @State private var canInitialize: Bool = false
     @State private var canLoadLazily: Bool = false
     @State private var contentOffsets: [Int: CGFloat] = [:] // The one to record real offsets
     @State private var animationContentOffsets: [Int: CGFloat] = [:] // The one to trigger real animations
 
     @State private var id = UUID() // Enables to force refresh contents on halfway finished
+    @State private var initializationDispatch: DispatchWorkItem?
 
     var body: some View {
         ScrollView {
             // Avoids multiple instansializations
             let isInitialized = isInitialized
+            let canInitialize = canInitialize
 
             Spacer()
                 .frame(height: offset)
@@ -97,12 +100,13 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
             Spacer()
                 .frame(height: max(0, alignmentCompensate))
 
-            if isInitialized {
+            if isInitialized || !canInitialize {
                 LazyVStack(spacing: 0) {
                     ForEach(range, id: \.self) { index in
                         content(at: index)
                     }
                 }
+                .redacted(reason: !canInitialize ? .placeholder : [])
             } else {
                 // Temporarily force loading all elements
                 VStack(spacing: 0) {
@@ -132,6 +136,19 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
             proxy.size
         } action: { newValue in
             containerSize = newValue
+
+            // Debounce
+            initializationDispatch?.cancel()
+            initializationDispatch = nil
+
+            canInitialize = false
+            reset()
+            let dispatch = DispatchWorkItem {
+                canInitialize = true
+                reset()
+            }
+            initializationDispatch = dispatch
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.35, execute: dispatch)
         }
         .onAppear {
             scrollOffset = .zero
@@ -162,11 +179,11 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
         }
         .onChange(of: attachments) { _, _ in
             // Force reload on attachments change
-            reload()
+            reset()
         }
         .onChange(of: dynamicTypeSize) { _, _ in
             // Force reload on type size change
-            reload()
+            reset()
         }
         .onChange(of: interactionState) { _, _ in
             // Scrolls to highlighted when externally allowed
@@ -255,7 +272,7 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
             .animation(.smooth, value: interactionState.isDelegated)
     }
 
-    private func reload() {
+    private func reset() {
         contentOffsets.removeAll()
         animationContentOffsets.removeAll()
         canLoadLazily = false

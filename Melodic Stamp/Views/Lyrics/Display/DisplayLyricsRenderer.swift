@@ -153,36 +153,38 @@ struct DisplayLyricsRenderer<Animated>: TextRenderer where Animated: AnimatedStr
         do {
             var context = context
 
-            // Premultiplied wave & glow effect for long vowels
             /*
-             wave: do {
-                 if let timeToNearestVowel = timeToVowels.sorted(by: { $0.mark < $1.mark }).first {
-                     let isInRange = timeToNearestVowel.time.contains(time: beginTime)
-                     guard isInRange else { break wave }
+             // Premultiplied wave & glow effect for long vowels
+              wave: do {
+                  if let timeToNearestVowel = timeToVowels.sorted(by: { $0.mark < $1.mark }).first {
+                      let isInRange = timeToNearestVowel.time.contains(time: beginTime)
+                      guard isInRange else { break wave }
 
-                     let waveProgress = bellCurve(timeToNearestVowel.mark, standardDeviation: 0.65)
-                     guard waveProgress > 1e-6 else { break wave }
+                      let waveProgress = bellCurve(timeToNearestVowel.mark, standardDeviation: 0.65)
+                      guard waveProgress > 1e-6 else { break wave }
 
-                     // Scale
-                     let waveAmount = lerp(1, wave, factor: waveProgress)
-                     context.translateBy(x: bounds.width / 2, y: bounds.height / 2)
-                     context.scaleBy(x: waveAmount, y: waveAmount)
-                     context.translateBy(x: -bounds.width / 2, y: -bounds.height / 2)
+                      // Scale
+                      let waveAmount = lerp(1, wave, factor: waveProgress)
+                      context.translateBy(x: bounds.width / 2, y: bounds.height / 2)
+                      context.scaleBy(x: waveAmount, y: waveAmount)
+                      context.translateBy(x: -bounds.width / 2, y: -bounds.height / 2)
 
-                     // Glow
-                     context.addFilter(.shadow(
-                         color: glowColor.opacity(waveProgress),
-                         radius: glowRadius * waveProgress
-                     ))
-                 }
-             }
-             */
+                      // Glow
+                      context.addFilter(.shadow(
+                          color: glowColor.opacity(waveProgress),
+                          radius: glowRadius * waveProgress
+                      ))
+                  }
+              }
+               */
 
             // Unfilled text
             do {
                 var context = context
 
-                context.translateBy(x: 0, y: -liftAmount)
+                /*
+                 context.translateBy(x: 0, y: -liftAmount)
+                  */
                 context.opacity = inactiveOpacity
                 context.draw(slice)
             }
@@ -209,8 +211,10 @@ struct DisplayLyricsRenderer<Animated>: TextRenderer where Animated: AnimatedStr
                     ))
                 }
 
-                // Lift
-                context.translateBy(x: 0, y: -liftAmount)
+                /*
+                 // Lift
+                 context.translateBy(x: 0, y: -liftAmount)
+                  */
 
                 // Brightness
                 context.addFilter(.brightness(brightness * progress))
