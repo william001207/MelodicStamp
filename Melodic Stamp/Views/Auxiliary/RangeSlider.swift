@@ -45,7 +45,6 @@ struct RangeSlider<V>: View where V: Strideable & Comparable & BinaryFloatingPoi
                     Spacer(minLength: 0)
                 }
                 .zIndex(isLowerRangeHovering ? 1 : 0)
-                .blendMode(!isLowerRangeHovering && isUpperRangeHovering ? .multiply : .normal)
             }
 
             if hasUpperPart {
@@ -65,7 +64,6 @@ struct RangeSlider<V>: View where V: Strideable & Comparable & BinaryFloatingPoi
                         }
                 }
                 .zIndex(isUpperRangeHovering ? 1 : 0)
-                .blendMode(!isUpperRangeHovering && isLowerRangeHovering ? .multiply : .normal)
             }
         }
         .onGeometryChange(for: CGSize.self) { proxy in
