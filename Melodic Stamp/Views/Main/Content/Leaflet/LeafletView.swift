@@ -28,8 +28,7 @@ struct LeafletView: View {
     @State private var isShowingLyrics: Bool = true
     @State private var isControlsHovering: Bool = false
 
-    @SceneStorage(AppSceneStorage.lyricsAttachments()) private var attachments: LyricsAttachments = Defaults[.lyricsAttachments]
-    @SceneStorage(AppSceneStorage.lyricsTypeSize()) private var typeSize: DynamicTypeSize = Defaults[.lyricsTypeSize]
+    @State private var typeSize: DynamicTypeSize = Defaults[.lyricsTypeSize]
 
     @State private var interaction: AppleMusicLyricsViewInteractionModel = .init()
 
@@ -53,7 +52,6 @@ struct LeafletView: View {
                         if hasLyrics, isShowingLyrics {
                             lyricsView()
                                 .transition(.blurReplace(.downUp))
-                                .environment(\.lyricsAttachments, visibleAttachments)
                                 .dynamicTypeSize(typeSize)
                         }
                     }
@@ -70,11 +68,9 @@ struct LeafletView: View {
                         Group {
                             if isShowingLyrics {
                                 LeafletLyricsControlsView(
-                                    attachments: $attachments,
                                     typeSize: $typeSize
                                 )
                                 .transition(.blurReplace(.downUp))
-                                .environment(\.lyricsAttachments, availableAttachments)
                                 .environment(\.lyricsTypeSizes, defaultLyricsTypeSizes)
                             }
                         }
@@ -193,14 +189,6 @@ struct LeafletView: View {
 
     private var hasLyrics: Bool {
         !lyrics.lines.isEmpty
-    }
-
-    private var availableAttachments: LyricsAttachments {
-        lyrics.attachments
-    }
-
-    private var visibleAttachments: LyricsAttachments {
-        lyrics.attachments.intersection(attachments)
     }
 
     // MARK: - Cover View

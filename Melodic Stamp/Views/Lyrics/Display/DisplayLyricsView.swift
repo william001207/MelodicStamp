@@ -13,7 +13,6 @@ struct DisplayLyricsView: View {
     @Environment(LyricsModel.self) private var lyrics
 
     @Environment(\.luminareAnimation) private var animation
-    @Environment(\.lyricsAttachments) private var attachments
 
     @Binding var interactionState: AppleMusicLyricsViewInteractionState
     var onScrolling: ((ScrollPosition, CGPoint) -> ())?
@@ -75,7 +74,6 @@ struct DisplayLyricsView: View {
             }
         }
         .animation(.linear, value: elapsedTime) // For time interpolation
-        .animation(.smooth, value: attachments)
     }
 
     private var elapsedTime: CGFloat {

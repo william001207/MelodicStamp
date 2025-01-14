@@ -5,12 +5,13 @@
 //  Created by Xinshao_Air on 2024/12/24.
 //
 
-// import Luminare
+import Defaults
 import SwiftUI
 
 struct TTMLDisplayLyricLineView: View {
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
-    @Environment(\.lyricsAttachments) private var attachments
+    
+    @Default(.lyricsAttachments) private var attachments
 
     var line: TTMLLyricLine
     var elapsedTime: TimeInterval
@@ -55,7 +56,6 @@ struct TTMLDisplayLyricLineView: View {
             }
         }
         .animation(.linear, value: elapsedTime) // For time interpolation
-        .animation(.smooth, value: attachments)
     }
 
     private var textAlignment: TextAlignment {

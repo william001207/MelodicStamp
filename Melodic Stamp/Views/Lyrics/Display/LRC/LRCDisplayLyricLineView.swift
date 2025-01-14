@@ -5,11 +5,13 @@
 //  Created by KrLite on 2025/1/10.
 //
 
+import Defaults
 import SwiftUI
 
 struct LRCDisplayLyricLineView: View {
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
-    @Environment(\.lyricsAttachments) private var attachments
+    
+    @Default(.lyricsAttachments) private var attachments
 
     var line: LRCLyricLine
     var isHighlighted: Bool = false
@@ -32,6 +34,5 @@ struct LRCDisplayLyricLineView: View {
             .frame(maxWidth: .infinity, alignment: .leading)
             .bold()
         }
-        .animation(.smooth, value: attachments)
     }
 }

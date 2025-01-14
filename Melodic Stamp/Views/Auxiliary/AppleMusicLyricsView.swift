@@ -5,6 +5,7 @@
 //  Created by Xinshao_Air on 2024/12/24.
 //
 
+import Defaults
 import SwiftUI
 
 enum AppleMusicLyricsViewAnimationState {
@@ -55,8 +56,9 @@ enum AppleMusicLyricsViewIndicator {
 }
 
 struct AppleMusicLyricsView<Content>: View where Content: View {
-    @Environment(\.lyricsAttachments) private var attachments
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+    
+    @Default(.lyricsAttachments) private var attachments
     
     var interactionState: AppleMusicLyricsViewInteractionState = .following
 
@@ -80,7 +82,7 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
 
     @State private var canLoadLazily: Bool = false
     @State private var contentOffsets: [Int: CGFloat] = [:] // The one to record real offsets
-    @State private var animationContentOffsets: [Int: CGFloat] = [:] // The one used to trigger real animations
+    @State private var animationContentOffsets: [Int: CGFloat] = [:] // The one to trigger real animations
 
     var body: some View {
         ScrollView {
@@ -153,6 +155,10 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
                     scrollToHighlighted()
                 }
             }
+        }
+        .onChange(of: attachments) { _, _ in
+            // Force reload on attachments change
+            reload()
         }
         .onChange(of: dynamicTypeSize) { _, _ in
             // Force reload on type size change
@@ -239,8 +245,6 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
                     }
                 }
             }
-            // Due to implicit view sizing logic in lazy views, content size should never be updated unless highlighted
-            .environment(\.lyricsAttachments, isHighlighted ? attachments : [])
             .animation(.spring(bounce: 0.2).delay(delay), value: animationState)
             .animation(.smooth, value: highlightedRange)
             .animation(.spring, value: animationCompensate)

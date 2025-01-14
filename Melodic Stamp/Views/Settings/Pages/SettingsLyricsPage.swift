@@ -22,6 +22,7 @@ struct SettingsLyricsPage: View {
             Text("""
             The default visibility of components attached to lyric lines.
             Each can also be configured independently for every window in the leaflet page.
+            Due to the lazy layout of lyric lines, these components cannot be adjusted in real time. After adjustments, the layout will always be reset in order to obtain the correct visual effect.
             """)
         }
 
