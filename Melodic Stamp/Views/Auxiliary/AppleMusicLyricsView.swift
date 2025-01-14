@@ -148,18 +148,14 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
             if newValue.keys.isEmpty {
                 // Force re-initialize the scroll offset to avoid dangling scrolling
                 scrollOffset = .zero
-            } else if oldValue.keys.isEmpty {
-                scrollToHighlighted()
             } else {
                 withAnimation(.smooth) {
                     scrollToHighlighted()
                 }
             }
         }
-        .onChange(of: attachments) { _, _ in
-            reload()
-        }
         .onChange(of: dynamicTypeSize) { _, _ in
+            // Force reload on type size change
             reload()
         }
         .onChange(of: interactionState) { _, _ in
@@ -243,6 +239,8 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
                     }
                 }
             }
+            // Due to implicit view sizing logic in lazy views, content size should never be updated unless highlighted
+            .environment(\.lyricsAttachments, isHighlighted ? attachments : [])
             .animation(.spring(bounce: 0.2).delay(delay), value: animationState)
             .animation(.smooth, value: highlightedRange)
             .animation(.spring, value: animationCompensate)
