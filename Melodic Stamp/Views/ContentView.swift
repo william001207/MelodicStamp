@@ -247,7 +247,8 @@ struct ContentView: View {
                 case .ethereal:
                     EtherealBackgroundView()
                 case .chroma:
-                    ChromaBackgroundView(hasDynamics: false)
+                    ChromaBackgroundView()
+                        .overlay(.ultraThinMaterial)
                 }
             }
             .padding(.bottom, -32)
