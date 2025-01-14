@@ -72,6 +72,9 @@ struct LeafletView: View {
                                 )
                                 .transition(.blurReplace(.downUp))
                                 .environment(\.availableTypeSizes, typeSizes)
+                                .onChange(of: typeSizes) { _, _ in
+                                    typeSize = typeSize.dynamicallyClamped
+                                }
                             }
                         }
                         .padding(12)

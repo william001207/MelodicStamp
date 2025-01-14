@@ -63,7 +63,7 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
     var interactionState: AppleMusicLyricsViewInteractionState = .following
 
     var offset: CGFloat = 50
-    var delay: TimeInterval = 0.08
+    var delay: TimeInterval = 0.1
     var bounceDelay: TimeInterval = 0.5
 
     var range: Range<Int>
@@ -83,6 +83,8 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
     @State private var canLoadLazily: Bool = false
     @State private var contentOffsets: [Int: CGFloat] = [:] // The one to record real offsets
     @State private var animationContentOffsets: [Int: CGFloat] = [:] // The one to trigger real animations
+
+    @State private var id = UUID() // Enables to force refresh contents on halfway finished
 
     var body: some View {
         ScrollView {
@@ -111,6 +113,7 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
                 .task {
                     canLoadLazily = true
                 }
+                .id(id)
             }
 
             Spacer()
@@ -215,7 +218,7 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
         }
     }
 
-    private var animationCompensate: CGFloat {
+    private var animationCompensation: CGFloat {
         contentOffsets[max(0, highlightedRange.upperBound - 1)] ?? .zero
     }
 
@@ -224,7 +227,7 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
         let delay = delay(at: index)
         let proportion = proportion(at: index)
 
-        let compensate = interactionState.isDelegated || isIndicatorVisible ? animationCompensate : .zero
+        let compensate = interactionState.isDelegated || isIndicatorVisible ? animationCompensation : .zero
 
         content(index, isHighlighted)
             .onGeometryChange(for: CGSize.self) { proxy in
@@ -246,9 +249,9 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
                     }
                 }
             }
-            .animation(.spring(bounce: 0.2).delay(delay), value: animationState)
+            .animation(.smooth(extraBounce: 0.05).delay(delay), value: animationState)
             .animation(.smooth, value: highlightedRange)
-            .animation(.spring, value: animationCompensate)
+            .animation(.smooth, value: animationCompensation)
             .animation(.smooth, value: interactionState.isDelegated)
     }
 
@@ -256,6 +259,7 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
         contentOffsets.removeAll()
         animationContentOffsets.removeAll()
         canLoadLazily = false
+        id = .init()
     }
 
     private func scrollToHighlighted() {
