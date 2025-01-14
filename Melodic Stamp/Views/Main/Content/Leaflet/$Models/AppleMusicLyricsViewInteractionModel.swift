@@ -38,7 +38,7 @@ import SwiftUI
             hasProgressRing = true
             delegationProgress = .zero
 
-            DispatchQueue.main.async {
+            let dispatch = DispatchWorkItem {
                 withAnimation(.smooth(duration: self.countDownDuration)) {
                     self.delegationProgress = 1
                 }
@@ -49,28 +49,34 @@ import SwiftUI
                 self.dispatch = dispatch
                 DispatchQueue.main.asyncAfter(deadline: .now() + self.countDownDuration, execute: dispatch)
             }
+            self.dispatch = dispatch
+            DispatchQueue.main.async(execute: dispatch)
         case .isolated:
             dispatch?.cancel()
             hasProgressRing = false
             delegationProgress = .zero
 
-            DispatchQueue.main.async {
+            let dispatch = DispatchWorkItem {
                 withAnimation(.smooth) {
                     self.delegationProgress = 1
                 }
             }
+            self.dispatch = dispatch
+            DispatchQueue.main.async(execute: dispatch)
         case .intermediate:
             dispatch?.cancel()
             hasProgressRing = false
             delegationProgress = .zero
 
-            DispatchQueue.main.async {
+            let dispatch = DispatchWorkItem {
                 let dispatch = DispatchWorkItem {
                     self.state = .countingDown
                 }
                 self.dispatch = dispatch
                 DispatchQueue.main.asyncAfter(deadline: .now() + self.countDownDelay, execute: dispatch)
             }
+            self.dispatch = dispatch
+            DispatchQueue.main.async(execute: dispatch)
         }
     }
 }

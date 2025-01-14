@@ -21,14 +21,14 @@ struct LeafletView: View {
 
     @FocusState private var isFocused: Bool
 
-    @Default(.lyricsTypeSizes) private var defaultLyricsTypeSizes
+    @Default(.lyricsTypeSizes) private var typeSizes
 
     // MARK: - Fields
 
     @State private var isShowingLyrics: Bool = true
     @State private var isControlsHovering: Bool = false
 
-    @State private var typeSize: DynamicTypeSize = Defaults[.lyricsTypeSize]
+    @SceneStorage(AppSceneStorage.lyricsTypeSize()) private var typeSize: DynamicTypeSize = Defaults[.lyricsTypeSize]
 
     @State private var interaction: AppleMusicLyricsViewInteractionModel = .init()
 
@@ -71,7 +71,7 @@ struct LeafletView: View {
                                     typeSize: $typeSize
                                 )
                                 .transition(.blurReplace(.downUp))
-                                .environment(\.lyricsTypeSizes, defaultLyricsTypeSizes)
+                                .environment(\.availableTypeSizes, typeSizes)
                             }
                         }
                         .padding(12)

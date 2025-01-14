@@ -131,6 +131,7 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
             containerSize = newValue
         }
         .onAppear {
+            scrollOffset = .zero
             updateAnimationState()
         }
         .onChange(of: isInitialized) { _, newValue in

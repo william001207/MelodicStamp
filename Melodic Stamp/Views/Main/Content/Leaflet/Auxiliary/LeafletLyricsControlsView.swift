@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct LeafletLyricsControlsView: View {
-    @Environment(\.lyricsTypeSizes) private var availableTypeSizes
+    @Environment(\.availableTypeSizes) private var availableTypeSizes
 
     @Binding var typeSize: DynamicTypeSize
 

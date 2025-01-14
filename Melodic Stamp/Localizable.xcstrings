@@ -240,7 +240,7 @@
         }
       }
     },
-    "Attachments" : {
+    "Attachments & Type Size" : {
 
     },
     "Available type sizes" : {
@@ -1355,9 +1355,6 @@
         }
       }
     },
-    "The default visibility of components attached to lyric lines.\nEach can also be configured independently for every window in the leaflet page." : {
-
-    },
     "Thunderbolt" : {
       "localizations" : {
         "zh-Hans" : {
@@ -1477,6 +1474,9 @@
 
     },
     "While playing" : {
+
+    },
+    "While type size can be adjusted independently in the leaflet page, all changes of the below properties will cause a reset in the lyrics view in order to obtain a correct visual effect." : {
 
     },
     "You can use [AMLL TTML Tool](https://steve-xmh.github.io/amll-ttml-tool) to create TTML lyrics through a refined interface." : {
