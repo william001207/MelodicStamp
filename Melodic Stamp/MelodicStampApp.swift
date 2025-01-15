@@ -83,6 +83,7 @@ struct MelodicStampApp: App {
                 }
         }
         .defaultLaunchBehavior(.suppressed)
+        .restorationBehavior(.disabled)
         .windowResizability(.contentSize)
         .windowStyle(.hiddenTitleBar)
         .windowToolbarStyle(.unified)
@@ -98,6 +99,7 @@ struct MelodicStampApp: App {
                 }
         }
         .defaultLaunchBehavior(.suppressed)
+        .restorationBehavior(.disabled)
         .windowResizability(.contentSize)
         .windowToolbarStyle(.unified)
         .windowManagerRole(.associated)

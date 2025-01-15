@@ -10,17 +10,11 @@ import Defaults
 import SwiftUI
 
 class AppDelegate: NSObject, NSApplicationDelegate {
-    // Hacky
-    @Environment(\.dismissWindow) private var dismissWindow
-
     func applicationDidFinishLaunching(_: Notification) {
         NSWindow.allowsAutomaticWindowTabbing = false
-        closeAuxiliaryWindows()
     }
 
-    func applicationWillTerminate(_: Notification) {
-        closeAuxiliaryWindows()
-    }
+    func applicationWillTerminate(_: Notification) {}
 
     func application(_: NSApplication, open _: [URL]) {}
 
@@ -30,13 +24,5 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     func applicationSupportsSecureRestorableState(_: NSApplication) -> Bool {
         Defaults.canApplicationRestore
-    }
-}
-
-extension AppDelegate {
-    private func closeAuxiliaryWindows() {
-        // This emits warnings, but it's OK to ignore
-        dismissWindow(id: WindowID.about.rawValue)
-        dismissWindow(id: WindowID.settings.rawValue)
     }
 }
