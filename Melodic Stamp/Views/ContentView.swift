@@ -55,10 +55,8 @@ struct ContentView: View {
                 switch windowManager.style {
                 case .main:
                     mainView(window)
-                        .presentedWindowStyle(.titleBar)
                 case .miniPlayer:
                     miniPlayerView(window)
-                        .presentedWindowStyle(.hiddenTitleBar)
                 }
             }
             .background {

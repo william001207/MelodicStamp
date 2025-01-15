@@ -107,10 +107,12 @@ struct MiniPlayerView: View {
             isFocused = newValue
         }
 
-        // MARK: Window Customization
+        // MARK: Window Customizations
 
+        .toolbar(removing: .title)
+        .toolbarBackgroundVisibility(.hidden, for: .windowToolbar)
         .background(MakeAlwaysOnTop(
-            isAlwaysOnTop: $windowManager.isAlwaysOnTop, titleVisibility: $windowManager.titleVisibility
+            isAlwaysOnTop: $windowManager.isAlwaysOnTop
         ))
 
         // MARK: Lyrics

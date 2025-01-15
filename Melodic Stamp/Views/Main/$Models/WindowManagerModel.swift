@@ -28,23 +28,12 @@ enum MelodicStampWindowStyle: String, Equatable, Hashable, Identifiable {
         didSet {
             switch style {
             case .main:
-                giveUpAlwaysOnTop()
+                isAlwaysOnTop = false
             case .miniPlayer:
-                setUpAlwaysOnTop()
+                isAlwaysOnTop = true
             }
         }
     }
 
     var isAlwaysOnTop: Bool = true
-    var titleVisibility: NSWindow.TitleVisibility = .hidden
-
-    func setUpAlwaysOnTop() {
-        isAlwaysOnTop = true
-        titleVisibility = .hidden
-    }
-
-    func giveUpAlwaysOnTop() {
-        isAlwaysOnTop = false
-        titleVisibility = .visible
-    }
 }

@@ -34,14 +34,7 @@ struct MainView: View {
                     .animation(nil, value: metadataEditor.tracks) // Remove strange transitions when selection changes
             }
             .luminareMinHeight(38)
-            .toolbar {
-                // Preserves the title bar style
-                Color.clear
-            }
-            .background(MakeCustomizable(customization: { window in
-                window.titlebarAppearsTransparent = true
-                window.titleVisibility = .visible
-            }))
+            .toolbarBackgroundVisibility(.hidden, for: .windowToolbar)
     }
 
     @ViewBuilder private func content() -> some View {
@@ -62,6 +55,7 @@ struct MainView: View {
                     .environment(displayLyrics)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                     .ignoresSafeArea()
+                    .toolbar(removing: .title)
             }
         }
     }

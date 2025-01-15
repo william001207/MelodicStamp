@@ -9,7 +9,6 @@ import SwiftUI
 
 struct MakeAlwaysOnTop: NSViewControllerRepresentable {
     @Binding var isAlwaysOnTop: Bool
-    @Binding var titleVisibility: NSWindow.TitleVisibility
 
     func makeNSViewController(context: Context) -> NSViewController {
         let hostingController = AlwaysOnTopWindowHostingController(rootView: EmptyView())
@@ -21,7 +20,6 @@ struct MakeAlwaysOnTop: NSViewControllerRepresentable {
     func updateNSViewController(_: NSViewController, context: Context) {
         if let hostingController = context.coordinator.hostingController {
             hostingController.isAlwaysOnTop = isAlwaysOnTop
-            hostingController.titleVisibility = titleVisibility
         }
     }
 
@@ -36,25 +34,11 @@ struct MakeAlwaysOnTop: NSViewControllerRepresentable {
 
 class AlwaysOnTopWindowHostingController<Content: View>: NSHostingController<Content> {
     var isAlwaysOnTop: Bool = true
-    var titleVisibility: NSWindow.TitleVisibility = .hidden
 
     override func viewWillLayout() {
         super.viewWillLayout()
 
         guard let window = view.window else { return }
-
-        switch titleVisibility {
-        case .visible:
-            // Handled by SwiftUI
-            break
-        case .hidden:
-            window.titleVisibility = .hidden
-            window.styleMask.insert(.fullSizeContentView)
-            window.titlebarAppearsTransparent = true
-            window.titlebarSeparatorStyle = .none
-        @unknown default:
-            break
-        }
 
         window.level = isAlwaysOnTop ? .floating : .normal
 

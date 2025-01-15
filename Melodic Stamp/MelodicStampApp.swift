@@ -39,6 +39,7 @@ struct MelodicStampApp: App {
         }
         .windowResizability(.contentSize)
         .windowToolbarStyle(.unified)
+        .windowManagerRole(.principal)
         .commands {
             InspectorCommands()
 
@@ -71,7 +72,6 @@ struct MelodicStampApp: App {
 
             WindowCommands()
         }
-        .windowManagerRole(.principal)
 
         Window("About \(Bundle.main.displayName)", id: WindowID.about.rawValue) {
             AboutView()

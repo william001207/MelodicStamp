@@ -94,6 +94,9 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
             let isInitialized = isInitialized
             let canInitialize = canInitialize
 
+            Spacer()
+                .frame(height: containerSize.height / 2)
+
             if isInitialized || !canInitialize {
                 LazyVStack(spacing: 0) {
                     ForEach(range, id: \.self) { index in
@@ -220,12 +223,12 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
     private var alignmentCompensation: CGFloat {
         switch alignment {
         case .top:
-            .zero
+            (containerSize.height - padding) / 2
         case .center:
             if let offset = contentOffsets[highlightedRange.lowerBound] {
-                (containerSize.height - offset - padding) / 2
+                (offset + padding) / 2
             } else {
-                containerSize.height / 2
+                padding / 2
             }
         }
     }
@@ -276,7 +279,7 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
 
     private func scrollToHighlighted() {
         guard interactionState.isDelegated else { return }
-        scrollOffset = max(0, fold(until: highlightedRange.lowerBound) - alignmentCompensation)
+        scrollOffset = max(0, fold(until: highlightedRange.lowerBound) + alignmentCompensation)
     }
 
     private func fold(until index: Int) -> CGFloat {
