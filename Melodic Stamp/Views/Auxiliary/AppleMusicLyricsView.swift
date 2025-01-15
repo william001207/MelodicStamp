@@ -62,7 +62,7 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
 
     var interactionState: AppleMusicLyricsViewInteractionState = .following
 
-    var offset: CGFloat = 50
+    var padding: CGFloat = 50
     var delay: TimeInterval = 0.185
     var bounceDelay: TimeInterval = 0.65
 
@@ -94,12 +94,6 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
             let isInitialized = isInitialized
             let canInitialize = canInitialize
 
-            Spacer()
-                .frame(height: offset)
-
-            Spacer()
-                .frame(height: max(0, alignmentCompensate))
-
             if isInitialized || !canInitialize {
                 LazyVStack(spacing: 0) {
                     ForEach(range, id: \.self) { index in
@@ -121,9 +115,10 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
             }
 
             Spacer()
-                .frame(height: containerSize.height)
+                .frame(height: containerSize.height / 2)
         }
-        .scrollIndicators(.never)
+        .safeAreaPadding(.vertical, padding)
+        .scrollIndicators(interactionState.isDelegated ? .never : .automatic)
         .scrollPosition($scrollPosition)
         .onScrollGeometryChange(for: CGPoint.self) { proxy in
             proxy.contentOffset
@@ -222,13 +217,13 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
         highlightedRange.isEmpty && isIndicatorVisible
     }
 
-    private var alignmentCompensate: CGFloat {
+    private var alignmentCompensation: CGFloat {
         switch alignment {
         case .top:
             .zero
         case .center:
             if let offset = contentOffsets[highlightedRange.lowerBound] {
-                (containerSize.height - offset) / 2
+                (containerSize.height - offset - padding) / 2
             } else {
                 containerSize.height / 2
             }
@@ -281,7 +276,7 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
 
     private func scrollToHighlighted() {
         guard interactionState.isDelegated else { return }
-        scrollOffset = fold(until: highlightedRange.lowerBound)
+        scrollOffset = max(0, fold(until: highlightedRange.lowerBound) - alignmentCompensation)
     }
 
     private func fold(until index: Int) -> CGFloat {
@@ -431,7 +426,7 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
         .padding()
 
         AppleMusicLyricsView(
-            offset: 0,
+            padding: 0,
             range: 0 ..< count,
             highlightedRange: highlightedRange,
             alignment: alignment
