@@ -195,7 +195,7 @@ struct ContentView: View {
             selectedContentTab: $selectedContentTab,
             selectedInspectorTab: $selectedInspectorTab
         )
-        .background {
+        .containerBackground(for: .window) {
             switch mainWindowBackgroundStyle {
             case .opaque:
                 OpaqueBackgroundView()
@@ -207,7 +207,6 @@ struct ContentView: View {
         }
         .ignoresSafeArea()
         .frame(minHeight: 600)
-        .ignoresSafeArea()
         .onAppear {
             minWidth = 960
         }
@@ -229,9 +228,7 @@ struct ContentView: View {
 
     @ViewBuilder private func miniPlayerView(_ window: NSWindow? = nil) -> some View {
         MiniPlayerView(namespace: namespace)
-            .padding(12)
-            .padding(.top, 4)
-            .background {
+            .containerBackground(for: .window) {
                 switch miniPlayerBackgroundStyle {
                 case .opaque:
                     OpaqueBackgroundView()
@@ -242,8 +239,13 @@ struct ContentView: View {
                 case .chroma:
                     ChromaBackgroundView()
                         .overlay(.ultraThinMaterial)
+                        .environment(player)
+                        .environment(audioVisualizer)
+                        .environment(gradientVisualizer)
                 }
             }
+            .padding(12)
+            .padding(.top, 4)
             .padding(.bottom, -32)
             .ignoresSafeArea()
             .frame(minWidth: 500, idealWidth: 500)

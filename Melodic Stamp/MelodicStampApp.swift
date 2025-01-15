@@ -81,6 +81,8 @@ struct MelodicStampApp: App {
                 .onDisappear {
                     isAboutPresented = false
                 }
+                .windowMinimizeBehavior(.disabled)
+                .windowFullScreenBehavior(.disabled)
         }
         .defaultLaunchBehavior(.suppressed)
         .restorationBehavior(.disabled)
@@ -97,6 +99,8 @@ struct MelodicStampApp: App {
                 .onDisappear {
                     isSettingsPresented = false
                 }
+                .windowMinimizeBehavior(.disabled)
+                .windowFullScreenBehavior(.disabled)
         }
         .defaultLaunchBehavior(.suppressed)
         .restorationBehavior(.disabled)
