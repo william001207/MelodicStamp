@@ -78,7 +78,6 @@ struct LeafletView: View {
                     } action: { newValue in
                         innerSize = newValue
                     }
-                    .border(.yellow)
                     .overlay(alignment: .leading) {
                         Group {
                             if hasLyrics, isShowingLyrics {
