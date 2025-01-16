@@ -215,7 +215,7 @@ struct LeafletView: View {
     // MARK: - Cover View
 
     @ViewBuilder private func coverView(_ cover: NSImage) -> some View {
-        AliveButton {
+        AliveButton(scaleFactor: hasLyrics ? 0.85 : 1) {
             if hasLyrics {
                 isShowingLyrics.toggle()
             } else {
@@ -237,7 +237,7 @@ struct LeafletView: View {
         }
         .scaleEffect(player.isPlaying ? 1 : 0.85, anchor: .center)
         .shadow(radius: player.isPlaying ? 20 : 10)
-        .animation(.spring(duration: 0.65, bounce: 0.45, blendDuration: 0.75), value: player.isPlaying)
+        .animation(.spring(duration: 0.65, bounce: 0.45, blendDuration: 0.75).delay(0.25), value: player.isPlaying)
     }
 
     // MARK: - Lyrics View
