@@ -121,7 +121,7 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
                 .frame(height: containerSize.height / 2)
         }
         .safeAreaPadding(.vertical, padding)
-        .scrollIndicators(interactionState.isDelegated ? .never : .automatic)
+        .scrollIndicators(interactionState.isDelegated ? .never : .visible)
         .scrollPosition($scrollPosition)
         .onScrollGeometryChange(for: CGPoint.self) { proxy in
             proxy.contentOffset
@@ -157,7 +157,7 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
             animationContentOffsets = contentOffsets
         }
         .onChange(of: highlightedRange) { _, _ in
-            withAnimation(.bouncy) {
+            withAnimation(.spring(duration: 0.65, bounce: 0.275)) {
                 scrollToHighlighted()
             }
         }
@@ -170,7 +170,7 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
                 // Force re-initialize the scroll offset to avoid dangling scrolling
                 scrollOffset = .zero
             } else {
-                withAnimation(.smooth) {
+                withAnimation(.spring(duration: 0.65, bounce: 0.275)) {
                     scrollToHighlighted()
                 }
             }
@@ -264,9 +264,9 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
                     }
                 }
             }
-            .animation(.smooth(extraBounce: 0.05).delay(delay), value: animationState)
-            .animation(.smooth, value: highlightedRange)
-            .animation(.smooth, value: animationCompensation)
+            .animation(.spring(duration: 0.65, bounce: 0.275).delay(delay), value: animationState)
+            .animation(.spring(duration: 0.55, bounce: 0.15), value: highlightedRange)
+            .animation(.spring(duration: 0.75, bounce: 0.30), value: animationCompensation)
             .animation(.smooth, value: interactionState.isDelegated)
     }
 

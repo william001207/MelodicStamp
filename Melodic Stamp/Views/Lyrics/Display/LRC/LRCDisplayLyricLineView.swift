@@ -22,11 +22,13 @@ struct LRCDisplayLyricLineView: View {
             Group {
                 Text(line.content)
                     .font(.system(size: 24 * dynamicTypeSize.scale))
+                    .brightness(isHighlighted ? 0.5 : 0)
                     .opacity(isHighlighted ? 1.0 : inactiveOpacity)
 
                 if attachments.contains(.translation), let translation = line.translation {
                     Text(translation)
                         .font(.system(size: 14 * dynamicTypeSize.scale))
+                        .brightness(isHighlighted ? 0.5 : 0)
                         .opacity(isHighlighted ? 0.75 : inactiveOpacity)
                 }
             }

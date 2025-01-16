@@ -29,7 +29,8 @@ struct DisplayLyricsView: View {
             if !lines.isEmpty {
                 AppleMusicLyricsView(
                     interactionState: interactionState,
-                    bounceDelay: 0.085,
+                    delay: 0.1,
+                    bounceDelay: 0.175,
                     range: 0 ..< lines.count,
                     highlightedRange: highlightedRange,
                     alignment: .center
