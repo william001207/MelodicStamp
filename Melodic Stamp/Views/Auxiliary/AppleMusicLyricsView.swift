@@ -63,8 +63,8 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
     var interactionState: AppleMusicLyricsViewInteractionState = .following
 
     var padding: CGFloat = 50
-    var delay: TimeInterval = 0.185
-    var bounceDelay: TimeInterval = 0.65
+    var delay: TimeInterval = 0.1
+    var bounceDelay: TimeInterval = 0.175
 
     var range: Range<Int>
     var highlightedRange: Range<Int>
