@@ -1,5 +1,5 @@
 //
-//  SettingsLyricAttachmentsControl.swift
+//  SettingsLyricsAttachmentsControl.swift
 //  MelodicStamp
 //
 //  Created by KrLite on 2025/1/12.
@@ -8,8 +8,8 @@
 import Defaults
 import SwiftUI
 
-struct SettingsLyricAttachmentsControl: View {
-    @Default(.lyricsAttachments) private var lyricAttachments
+struct SettingsLyricsAttachmentsControl: View {
+    @Default(.lyricsAttachments) private var attachments
 
     var body: some View {
         Toggle("Translation", isOn: binding(of: .translation))
@@ -18,12 +18,12 @@ struct SettingsLyricAttachmentsControl: View {
 
     private func binding(of option: LyricsAttachments.Element) -> Binding<Bool> {
         Binding {
-            lyricAttachments.contains(option)
+            attachments.contains(option)
         } set: { newValue in
             if newValue {
-                lyricAttachments.insert(option)
+                attachments.insert(option)
             } else {
-                lyricAttachments.remove(option)
+                attachments.remove(option)
             }
         }
     }

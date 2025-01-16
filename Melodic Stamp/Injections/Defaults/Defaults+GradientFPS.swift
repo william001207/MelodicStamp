@@ -9,9 +9,29 @@ import Defaults
 import Foundation
 
 extension Defaults {
-    typealias GradientFPS = Int
+    struct GradientFPS {
+        var value: Int
+    }
+}
+
+extension Int {
+    init(_ gradientFPS: Defaults.GradientFPS) {
+        self = gradientFPS.value
+    }
+}
+
+extension Defaults.GradientFPS: ExpressibleByIntegerLiteral, Comparable {
+    init(integerLiteral value: IntegerLiteralType) {
+        self.value = value
+    }
+
+    static func < (lhs: Defaults.GradientFPS, rhs: Defaults.GradientFPS) -> Bool {
+        lhs.value < rhs.value
+    }
 }
 
 extension Defaults.GradientFPS: Clampable {
-    static let range: ClosedRange<Int> = 30...120
+    static let range: ClosedRange<Self> = 30...120
 }
+
+extension Defaults.GradientFPS: Codable, Defaults.Serializable {}

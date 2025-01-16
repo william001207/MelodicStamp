@@ -781,6 +781,9 @@
         }
       }
     },
+    "Max lyrics width" : {
+
+    },
     "Media" : {
       "localizations" : {
         "zh-Hans" : {

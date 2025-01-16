@@ -22,9 +22,11 @@ struct LeafletView: View {
     @FocusState private var isFocused: Bool
 
     @Default(.lyricsTypeSizes) private var typeSizes
+    @Default(.lyricsMaxWidth) private var maxWidth
 
     // MARK: - Fields
 
+    @State private var innerSize: CGSize = .zero
     @State private var isShowingLyrics: Bool = true
     @State private var isControlsHovering: Bool = false
 
@@ -40,19 +42,26 @@ struct LeafletView: View {
         } else {
             ZStack {
                 if hasCover || hasLyrics {
-                    HStack(spacing: 50) {
-                        // MARK: Cover
+                    HStack(spacing: 0) {
+                        Spacer(minLength: 0)
 
-                        if let cover {
-                            coverView(cover)
-                        }
+                        HStack(spacing: 50) {
+                            // MARK: Cover
 
-                        // MARK: Lyrics
+                            if let cover {
+                                coverView(cover)
+                            }
 
-                        if hasLyrics, isShowingLyrics {
-                            lyricsView()
-                                .transition(.blurReplace(.downUp))
-                                .dynamicTypeSize(typeSize)
+                            // MARK: Lyrics
+
+                            if hasLyrics, isShowingLyrics {
+                                lyricsView()
+                                    .transition(.blurReplace(.downUp))
+                                    .dynamicTypeSize(typeSize)
+                                    .frame(maxWidth: max(maxWidth.value, innerSize.width / 2))
+                            } else {
+                                Spacer()
+                            }
                         }
                     }
                     .containerRelativeFrame(.horizontal, alignment: .center) { length, axis in
@@ -64,6 +73,12 @@ struct LeafletView: View {
                             return length
                         }
                     }
+                    .onGeometryChange(for: CGSize.self) { proxy in
+                        proxy.size
+                    } action: { newValue in
+                        innerSize = newValue
+                    }
+                    .border(.yellow)
                     .overlay(alignment: .leading) {
                         Group {
                             if hasLyrics, isShowingLyrics {

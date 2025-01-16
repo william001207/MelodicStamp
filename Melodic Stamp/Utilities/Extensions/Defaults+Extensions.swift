@@ -7,6 +7,7 @@
 
 import Defaults
 import Foundation
+import SwiftUI
 
 extension Defaults.Keys {
     // MARK: UI
@@ -18,7 +19,7 @@ extension Defaults.Keys {
 
     // MARK: Behavior
 
-    static let defaultPlaybackMode: Key<Defaults.PlaybackMode> = .init(
+    static let defaultPlaybackMode: Key<PlaybackMode> = .init(
         "defaultPlaybackMode",
         default: .sequential
     )
@@ -79,17 +80,22 @@ extension Defaults.Keys {
         default: true
     )
 
-    static let lyricsAttachments: Key<Defaults.LyricsAttachments> = .init(
+    static let lyricsMaxWidth: Key<Defaults.LyricsMaxWidth> = .init(
+        "lyricsMaxWidth",
+        default: .clamp(1024.0)
+    )
+
+    static let lyricsAttachments: Key<LyricsAttachments> = .init(
         "lyricsAttachments",
         default: .all
     )
 
-    static let lyricsTypeSizes: Key<ClosedRange<Defaults.DynamicTypeSize>> = .init(
+    static let lyricsTypeSizes: Key<ClosedRange<DynamicTypeSize>> = .init(
         "lyricsTypeSizes",
         default: .small...(.xxLarge)
     )
 
-    static let lyricsTypeSize: Key<Defaults.DynamicTypeSize> = .init(
+    static let lyricsTypeSize: Key<DynamicTypeSize> = .init(
         "lyricsTypeSize",
         default: .large
     )

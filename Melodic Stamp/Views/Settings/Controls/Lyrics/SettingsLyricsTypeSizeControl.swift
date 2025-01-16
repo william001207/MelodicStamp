@@ -81,7 +81,7 @@ struct SettingsLyricsTypeSizeControl: View {
         Binding {
             Double(typeSize.rawValue)
         } set: { newValue in
-            guard let typeSize = Defaults.DynamicTypeSize(rawValue: Int(newValue)) else { return }
+            guard let typeSize = DynamicTypeSize(rawValue: Int(newValue)) else { return }
 
             self.typeSize = typeSize.dynamicallyClamped
         }
@@ -92,8 +92,8 @@ struct SettingsLyricsTypeSizeControl: View {
             Double(typeSizes.lowerBound.rawValue)...Double(typeSizes.upperBound.rawValue)
         } set: { newValue in
             guard
-                let lowerBound = Defaults.DynamicTypeSize(rawValue: Int(newValue.lowerBound)),
-                let upperBound = Defaults.DynamicTypeSize(rawValue: Int(newValue.upperBound))
+                let lowerBound = DynamicTypeSize(rawValue: Int(newValue.lowerBound)),
+                let upperBound = DynamicTypeSize(rawValue: Int(newValue.upperBound))
             else { return }
 
             typeSizes = lowerBound...upperBound

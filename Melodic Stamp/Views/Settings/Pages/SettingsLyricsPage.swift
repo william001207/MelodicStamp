@@ -12,11 +12,13 @@ struct SettingsLyricsPage: View {
         SettingsExcerptView(.lyrics, descriptionKey: "Lyrics settings excerpt.")
 
         Section {
-            SettingsLyricFadingEffectControl()
+            SettingsLyricsFadingEffectControl()
+
+            SettingsLyricsMaxWidthControl()
         }
 
         Section {
-            SettingsLyricAttachmentsControl()
+            SettingsLyricsAttachmentsControl()
         } header: {
             Text("Attachments & Type Size")
             Text("""

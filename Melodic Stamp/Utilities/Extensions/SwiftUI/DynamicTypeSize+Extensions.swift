@@ -70,3 +70,14 @@ extension DynamicTypeSize {
     static var minimum: DynamicTypeSize { allCases.min()! }
     static var maximum: DynamicTypeSize { allCases.max()! }
 }
+
+extension DynamicTypeSize: @retroactive RawRepresentable {
+    public init?(rawValue: Int) {
+        guard Self.allCases.indices.contains(rawValue) else { return nil }
+        self = Self.allCases[rawValue]
+    }
+
+    public var rawValue: Int {
+        Self.allCases.firstIndex(of: self)!
+    }
+}
