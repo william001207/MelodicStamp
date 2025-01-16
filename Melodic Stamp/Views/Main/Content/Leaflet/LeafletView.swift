@@ -66,7 +66,7 @@ struct LeafletView: View {
                     }
                     .overlay(alignment: .leading) {
                         Group {
-                            if isShowingLyrics {
+                            if hasLyrics, isShowingLyrics {
                                 LeafletLyricsControlsView(
                                     typeSize: $typeSize
                                 )
