@@ -34,68 +34,74 @@ extension LyricsParser {
         let endIndex = lines.endIndex
         let suspensionThreshold: TimeInterval = 4
 
-        let previous = lines.last {
-            if let beginTime = $0.beginTime {
-                beginTime <= time
-            } else { false }
+        let current = lines.last {
+            guard let beginTime = $0.beginTime else { return false }
+            return beginTime <= time
         }
-        let previousIndex = previous.flatMap(lines.firstIndex)
+        let currentIndex = current.flatMap(lines.firstIndex)
 
-        if let previous, let previousIndex, let beginTime = previous.beginTime {
-            // Has a prefixing line
+        if let current, let currentIndex, let currentBeginTime = current.beginTime {
+            // Has a valid line for highlighting
 
-            if let endTime = previous.endTime {
-                // The prefixing line specifies an ending time
+            // Gets the furthest preceding line that is eligible for highlighting
+            // Equals to the first of the consecutive preceding lines that have ending times greater than current line's begin time
+            let furthestPreceding = lines.reversed()
+                .drop {
+                    guard let beginTime = $0.beginTime else { return true }
+                    return beginTime >= currentBeginTime
+                }
+                .prefix {
+                    guard let endTime = $0.endTime else { return false }
+                    return endTime > currentBeginTime
+                }
+                .first
+            let furthestPrecedingIndex = furthestPreceding.flatMap(lines.firstIndex)
 
-                let reachedEndTime = endTime < time
+            if let currentEndTime = current.endTime {
+                // Current line specifies a valid ending time
+
+                let reachedEndTime = currentEndTime < time
 
                 if reachedEndTime {
-                    // Reached the prefixing line's ending time
+                    // Current line has ended
 
-                    let next = lines.first {
+                    let succeeding = lines.first {
                         if let beginTime = $0.beginTime {
                             beginTime > time
                         } else { false }
                     }
-                    let nextIndex = next.flatMap(lines.firstIndex)
+                    let succeedingIndex = succeeding.flatMap(lines.firstIndex)
 
-                    if let next, let nextIndex {
-                        // Has a suffixing line
+                    if let succeeding, let succeedingIndex {
+                        // Has a valid succeeding line
 
-                        let shouldSuspend = if let beginTime = next.beginTime {
-                            beginTime - endTime >= suspensionThreshold
+                        let shouldSuspend = if let beginTime = succeeding.beginTime {
+                            beginTime - currentEndTime >= suspensionThreshold
                         } else { false }
 
                         return if shouldSuspend {
-                            // Suspend before the suffixing line begins
-                            nextIndex ..< nextIndex
+                            // Suspend before the succeeding line begins
+                            succeedingIndex ..< succeedingIndex
                         } else {
-                            // Present the suffixing line in advance
-                            nextIndex ..< (nextIndex + 1)
+                            // Present the succeeding line in advance
+                            succeedingIndex ..< (succeedingIndex + 1)
                         }
                     } else {
-                        // Has no suffixing lines
+                        // Has no succeeding lines
 
                         return endIndex ..< endIndex
                     }
                 } else {
-                    // Still in the range of the prefixing line
+                    // Still in the range of current line
 
-                    let furthest = lines.first {
-                        if let endTime = $0.endTime {
-                            endTime > beginTime
-                        } else { false }
-                    }
-                    let furthestIndex = furthest.flatMap(lines.firstIndex)
-
-                    return if let furthestIndex {
-                        furthestIndex ..< (previousIndex + 1)
+                    return if let furthestPrecedingIndex {
+                        furthestPrecedingIndex ..< (currentIndex + 1)
                     } else {
-                        previousIndex ..< (previousIndex + 1)
+                        currentIndex ..< (currentIndex + 1)
                     }
                 }
             } else {
-                // The prefixing line specifies no ending times
+                // Current line specifies no ending time
 
                 let next = lines.first {
                     if let beginTime = $0.beginTime {
@@ -105,47 +111,40 @@ extension LyricsParser {
                 let nextIndex = next.flatMap(lines.firstIndex)
 
                 if let nextIndex {
-                    // Has a suffixing line
+                    // Has a valid succeeding line
 
-                    return previousIndex ..< nextIndex
+                    return currentIndex ..< nextIndex
                 } else {
-                    // Has no suffixing lines
+                    // Has no succeeding lines
 
-                    let furthest = lines.first {
-                        if let endTime = $0.endTime {
-                            endTime > beginTime
-                        } else { false }
-                    }
-                    let furthestIndex = furthest.flatMap(lines.firstIndex)
-
-                    return if let furthestIndex {
-                        furthestIndex ..< (previousIndex + 1)
+                    return if let furthestPrecedingIndex {
+                        furthestPrecedingIndex ..< (currentIndex + 1)
                     } else {
-                        previousIndex ..< (previousIndex + 1)
+                        currentIndex ..< (currentIndex + 1)
                     }
                 }
             }
         } else {
-            // Has no prefixing lines
+            // Has no valid lines for highlighting, often indicating the start of a song
 
             let next = lines.first
 
             if let next {
-                // Has a suffixing line
+                // Has a valid succeeding line
 
                 let shouldSuspend = if let beginTime = next.beginTime {
                     beginTime >= suspensionThreshold
                 } else { false }
 
                 return if shouldSuspend {
-                    // Suspend before the suffixing line begins
+                    // Suspend before the succeeding line begins
                     0 ..< 0
                 } else {
-                    // Present the suffixing line in advance
+                    // Present the succeeding line in advance
                     0 ..< 1
                 }
             } else {
-                // Has no suffixing lines
+                // Has no succeeding lines
 
                 return endIndex ..< endIndex
             }
