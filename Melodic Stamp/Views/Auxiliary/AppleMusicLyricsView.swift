@@ -120,7 +120,8 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
             Spacer()
                 .frame(height: containerSize.height / 2)
         }
-        .safeAreaPadding(.vertical, padding)
+        .contentMargins(.vertical, padding, for: .scrollContent)
+        .contentMargins(.horizontal, 12, for: .scrollContent)
         .scrollIndicators(interactionState.isDelegated ? .never : .visible)
         .scrollPosition($scrollPosition)
         .onScrollGeometryChange(for: CGPoint.self) { proxy in

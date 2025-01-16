@@ -27,7 +27,7 @@ struct DisplayLyricLineView: View {
 
         AliveButton(enabledStyle: .white) {
             guard let beginTime = line.beginTime else { return }
-            player.time = beginTime
+            player.time = beginTime + 0.01 // To make sure it's highlighting the current line
         } label: {
             Group {
                 switch line {
