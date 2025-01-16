@@ -153,3 +153,15 @@ extension LRCParser {
         }
     }
 }
+
+extension LRCParser: Equatable {
+    static func == (lhs: LRCParser, rhs: LRCParser) -> Bool {
+        lhs.lines == rhs.lines
+    }
+}
+
+extension LRCParser: Hashable {
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(lines)
+    }
+}

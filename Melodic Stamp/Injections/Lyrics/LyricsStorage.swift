@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum LyricsStorage {
+enum LyricsStorage: Hashable {
     case raw(parser: RawLyricsParser)
     case lrc(parser: LRCParser)
     case ttml(parser: TTMLParser)

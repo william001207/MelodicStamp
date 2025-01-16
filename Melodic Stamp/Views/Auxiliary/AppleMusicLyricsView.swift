@@ -69,6 +69,7 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
     var range: Range<Int>
     var highlightedRange: Range<Int>
     var alignment: AppleMusicLyricsViewAlignment = .top
+    var identifier: AnyHashable?
 
     @ViewBuilder var content: (_ index: Int, _ isHighlighted: Bool) -> Content
     var indicator: (_ index: Int, _ isHighlighted: Bool) -> AppleMusicLyricsViewIndicator
@@ -76,12 +77,11 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
     var onScrolling: ((ScrollPosition, CGPoint) -> ())?
 
     @State private var containerSize: CGSize = .zero
-    @State private var animationState: AppleMusicLyricsViewAnimationState = .intermediate
     @State private var scrollPosition: ScrollPosition = .init()
     @State private var scrollOffset: CGFloat = .zero
 
+    @State private var animationState: AppleMusicLyricsViewAnimationState = .intermediate
     @State private var canInitialize: Bool = false
-    @State private var canLoadLazily: Bool = false
     @State private var contentOffsets: [Int: CGFloat] = [:] // The one to record real offsets
     @State private var animationContentOffsets: [Int: CGFloat] = [:] // The one to trigger real animations
 
@@ -111,9 +111,6 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
                         content(at: index)
                     }
                 }
-                .task {
-                    canLoadLazily = true
-                }
                 .id(id)
             }
 
@@ -141,7 +138,6 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
             initializationDispatch = nil
 
             canInitialize = false
-            reset()
             let dispatch = DispatchWorkItem {
                 canInitialize = true
                 reset()
@@ -149,18 +145,40 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
             initializationDispatch = dispatch
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.35, execute: dispatch)
         }
-        .onAppear {
-            scrollOffset = .zero
-            updateAnimationState()
+        // The code below follows a strict order, do not rearrange arbitrarily
+        .onChange(of: attachments) { _, _ in
+            // Force reset on attachments change
+            reset()
         }
-        .onChange(of: isInitialized) { _, newValue in
-            guard newValue else { return }
-            animationContentOffsets = contentOffsets
+        .onChange(of: dynamicTypeSize) { _, _ in
+            // Force reset on type size change
+            reset()
+        }
+        .onChange(of: identifier, initial: true) { _, _ in
+            // Force reset on external change
+            reset()
+            updateAnimationState()
+            print(0)
+            print(isIndicatorVisible, highlightedRange)
         }
         .onChange(of: highlightedRange) { _, _ in
             withAnimation(.spring(duration: 0.65, bounce: 0.275)) {
                 scrollToHighlighted()
             }
+        }
+        .onChange(of: highlightedRange) { oldValue, newValue in
+            let isLowerBoundChanged = oldValue.lowerBound != newValue.lowerBound
+            let isUpperBoundChanged = oldValue.upperBound != newValue.upperBound
+
+            if isLowerBoundChanged {
+                updateAnimationState()
+            } else if isUpperBoundChanged {
+                pushAnimation()
+            }
+        }
+        .onChange(of: isInitialized) { _, newValue in
+            guard newValue else { return }
+            animationContentOffsets = contentOffsets
         }
         .onChange(of: contentOffsets) { _, _ in
             guard isInitialized else { return }
@@ -176,28 +194,10 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
                 }
             }
         }
-        .onChange(of: attachments) { _, _ in
-            // Force reload on attachments change
-            reset()
-        }
-        .onChange(of: dynamicTypeSize) { _, _ in
-            // Force reload on type size change
-            reset()
-        }
         .onChange(of: interactionState) { _, _ in
             // Scrolls to highlighted when externally allowed
             withAnimation(.smooth) {
                 scrollToHighlighted()
-            }
-        }
-        .onChange(of: highlightedRange, initial: true) { oldValue, newValue in
-            let isLowerBoundChanged = oldValue.lowerBound != newValue.lowerBound
-            let isUpperBoundChanged = oldValue.upperBound != newValue.upperBound
-
-            if isLowerBoundChanged {
-                updateAnimationState()
-            } else if isUpperBoundChanged {
-                pushAnimation()
             }
         }
         .observeAnimation(for: scrollOffset) { value in
@@ -206,7 +206,7 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
     }
 
     private var isInitialized: Bool {
-        canLoadLazily && Set(contentOffsets.keys).isSuperset(of: range)
+        Set(contentOffsets.keys).isSuperset(of: range)
     }
 
     private var isIndicatorVisible: Bool {
@@ -274,7 +274,6 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
     private func reset() {
         contentOffsets.removeAll()
         animationContentOffsets.removeAll()
-        canLoadLazily = false
         id = .init()
     }
 
@@ -297,8 +296,8 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
 
     private func updateAnimationState() {
         guard !reachedEnd else { return }
-
         animationState = .intermediate
+
         DispatchQueue.main.asyncAfter(deadline: .now() + bounceDelay) {
             pushAnimation()
         }

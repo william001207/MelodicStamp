@@ -43,12 +43,14 @@ struct LeafletView: View {
             ZStack {
                 if hasCover || hasLyrics {
                     HStack(spacing: 0) {
-                        Spacer(minLength: 0)
+                        if hasCover {
+                            Spacer(minLength: 0)
+                        }
 
                         HStack(spacing: 50) {
                             // MARK: Cover
 
-                            if let cover {
+                            if hasCover, let cover {
                                 coverView(cover)
                             }
 
@@ -59,9 +61,11 @@ struct LeafletView: View {
                                     .transition(.blurReplace(.downUp))
                                     .dynamicTypeSize(typeSize)
                                     .frame(maxWidth: max(maxWidth.value, innerSize.width / 2))
-                            } else {
-                                Spacer()
                             }
+                        }
+
+                        if !hasLyrics || !isShowingLyrics {
+                            Spacer(minLength: 0)
                         }
                     }
                     .containerRelativeFrame(.horizontal, alignment: .center) { length, axis in

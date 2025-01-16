@@ -135,3 +135,15 @@ import SwiftSoup
         lyrics.findVowels()
     }
 }
+
+extension TTMLParser: Equatable {
+    static func == (lhs: TTMLParser, rhs: TTMLParser) -> Bool {
+        lhs.lines == rhs.lines
+    }
+}
+
+extension TTMLParser: Hashable {
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(lines)
+    }
+}

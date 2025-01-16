@@ -23,7 +23,7 @@ struct DisplayLyricsView: View {
     var body: some View {
         // Avoids multiple instantializations
         let lines = lyrics.lines
-        let highlightedRange = highlightedRange
+        let highlightedRange = lyrics.highlight(at: elapsedTime, in: player.track?.url)
 
         Group {
             if !lines.isEmpty {
@@ -31,7 +31,8 @@ struct DisplayLyricsView: View {
                     interactionState: interactionState,
                     range: 0 ..< lines.count,
                     highlightedRange: highlightedRange,
-                    alignment: .center
+                    alignment: .center,
+                    identifier: lyrics.storage // To make the changes synchronized within the scope of lyrics
                 ) { index, _ in
                     DisplayLyricLineView(
                         line: lines[index], index: index,

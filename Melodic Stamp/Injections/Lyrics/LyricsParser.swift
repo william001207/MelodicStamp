@@ -9,7 +9,7 @@ import Foundation
 
 // MARK: - Lyrics Parser (Protocol)
 
-protocol LyricsParser {
+protocol LyricsParser: Hashable, Equatable {
     associatedtype Line: LyricLine
 
     var lines: [Line] { get }

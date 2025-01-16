@@ -19,3 +19,15 @@ import Foundation
             .map { .init(content: $0) }
     }
 }
+
+extension RawLyricsParser: Equatable {
+    static func == (lhs: RawLyricsParser, rhs: RawLyricsParser) -> Bool {
+        lhs.lines == rhs.lines
+    }
+}
+
+extension RawLyricsParser: Hashable {
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(lines)
+    }
+}
