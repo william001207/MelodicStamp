@@ -20,6 +20,7 @@ struct FileToolbar: View {
                 Image(systemSymbol: .textLineLastAndArrowtriangleForward)
                 Text("In Current Playlist")
             }
+            .keyboardShortcut("o", modifiers: [])
 
             Button {
                 fileManager.emitOpen(style: .replacingCurrentPlaylistOrSelection)
@@ -27,14 +28,14 @@ struct FileToolbar: View {
                 Image(systemSymbol: .textInsert)
                 Text("Replacing Current Playlist")
             }
-
-            Divider()
-
-            Button {
-                fileManager.emitOpen(style: .formingNewPlaylist)
-            } label: {
-                Image(systemSymbol: .textBadgePlus)
-                Text("Forming New Playlist")
+            .keyboardShortcut("o", modifiers: .shift)
+            .modifierKeyAlternate(.option) {
+                Button {
+                    fileManager.emitOpen(style: .formingNewPlaylist)
+                } label: {
+                    Image(systemSymbol: .textBadgePlus)
+                    Text("Forming New Playlist")
+                }
             }
         } label: {
             ToolbarLabel {
@@ -49,6 +50,7 @@ struct FileToolbar: View {
                 Image(systemSymbol: .textLineLastAndArrowtriangleForward)
                 Text("To Current Playlist")
             }
+            .keyboardShortcut("p", modifiers: [])
 
             Button {
                 fileManager.emitAdd(style: .replacingCurrentPlaylistOrSelection)
@@ -56,14 +58,14 @@ struct FileToolbar: View {
                 Image(systemSymbol: .textInsert)
                 Text("Replacing Current Playlist")
             }
-
-            Divider()
-
-            Button {
-                fileManager.emitAdd(style: .formingNewPlaylist)
-            } label: {
-                Image(systemSymbol: .textBadgePlus)
-                Text("Forming New Playlist")
+            .keyboardShortcut("p", modifiers: .shift)
+            .modifierKeyAlternate(.option) {
+                Button {
+                    fileManager.emitAdd(style: .formingNewPlaylist)
+                } label: {
+                    Image(systemSymbol: .textBadgePlus)
+                    Text("Forming New Playlist")
+                }
             }
         } label: {
             ToolbarLabel {

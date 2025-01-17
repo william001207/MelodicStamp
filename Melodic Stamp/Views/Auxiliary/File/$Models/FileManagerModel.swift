@@ -54,7 +54,10 @@ enum FileAdderPresentationStyle {
             player?.removeAll()
             player?.play(url: url)
         case .formingNewPlaylist:
-            openWindow(id: WindowID.content.rawValue, value: TemporaryStorage(urls: Set([url]), shouldPlay: true))
+            openWindow(id: WindowID.content.rawValue, value: TemporaryStorage(
+                urls: Set([url]), shouldPlay: true,
+                initialWindowStyle: .miniPlayer
+            ))
         }
     }
 
@@ -70,7 +73,9 @@ enum FileAdderPresentationStyle {
             player?.removeAll()
             player?.addToPlaylist(urls: urls)
         case .formingNewPlaylist:
-            openWindow(id: WindowID.content.rawValue, value: TemporaryStorage(urls: Set(urls)))
+            openWindow(id: WindowID.content.rawValue, value: TemporaryStorage(
+                urls: Set(urls)
+            ))
         }
     }
 }

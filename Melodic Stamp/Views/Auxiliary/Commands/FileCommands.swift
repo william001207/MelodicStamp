@@ -22,13 +22,11 @@ struct FileCommands: Commands {
                     fileManager?.emitOpen(style: .replacingCurrentPlaylistOrSelection)
                 }
                 .keyboardShortcut("o", modifiers: [.command, .shift])
-
-                Divider()
-
-                Button("Forming New Playlist") {
-                    fileManager?.emitOpen(style: .formingNewPlaylist)
+                .modifierKeyAlternate(.option) {
+                    Button("Forming New Playlist") {
+                        fileManager?.emitOpen(style: .formingNewPlaylist)
+                    }
                 }
-                .keyboardShortcut("o", modifiers: [.command, .shift, .option])
             }
             .disabled(fileManager == nil)
 
@@ -42,13 +40,11 @@ struct FileCommands: Commands {
                     fileManager?.emitAdd(style: .replacingCurrentPlaylistOrSelection)
                 }
                 .keyboardShortcut("p", modifiers: [.command, .shift])
-
-                Divider()
-
-                Button("Forming New Playlist") {
-                    fileManager?.emitAdd(style: .formingNewPlaylist)
+                .modifierKeyAlternate(.option) {
+                    Button("Forming New Playlist") {
+                        fileManager?.emitAdd(style: .formingNewPlaylist)
+                    }
                 }
-                .keyboardShortcut("p", modifiers: [.command, .shift, .option])
             }
             .disabled(fileManager == nil)
         }
