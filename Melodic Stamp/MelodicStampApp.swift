@@ -12,10 +12,12 @@ import UniformTypeIdentifiers
 let organizationURL = URL(string: "https://github.com/Cement-Labs")!
 let repositoryURL = organizationURL.appending(component: "Melodic-Stamp")
 
-enum WindowID: String {
+enum WindowID: String, Equatable, Hashable, CaseIterable, Identifiable, Codable {
     case content
     case about
     case settings
+
+    var id: Self { self }
 }
 
 @main
@@ -33,8 +35,8 @@ struct MelodicStampApp: App {
     @State private var floatingWindows: FloatingWindowsModel = .init()
 
     var body: some Scene {
-        WindowGroup(id: WindowID.content.rawValue, for: TemporaryStorage.self) { $storage in
-            ContentView(storage)
+        WindowGroup(id: WindowID.content.rawValue, for: CreationParameters.self) { $parameters in
+            ContentView(parameters)
                 .environment(floatingWindows)
         }
         .windowResizability(.contentSize)

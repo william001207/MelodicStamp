@@ -49,10 +49,10 @@ struct ContentView: View {
 
     // MARK: - Initializers
 
-    init(_ temporaryStorage: TemporaryStorage?) {
+    init(_ parameters: CreationParameters?) {
         let player = PlayerModel(SFBAudioEnginePlayer())
 
-        self.windowManager = .init(style: temporaryStorage?.initialWindowStyle ?? .main)
+        self.windowManager = .init(style: parameters?.initialWindowStyle ?? .main)
         self.fileManager = .init(player: player)
         self.player = player
         self.playerKeyboardControl = .init(player: player)
@@ -60,11 +60,11 @@ struct ContentView: View {
         self.audioVisualizer = .init()
         self.gradientVisualizer = .init()
 
-        if let temporaryStorage {
-            let urls = Array(temporaryStorage.urls)
+        if let parameters {
+            let urls = Array(parameters.urls)
             player.addToPlaylist(urls: urls)
 
-            if temporaryStorage.shouldPlay, urls.count == 1, let url = urls.first {
+            if parameters.shouldPlay, urls.count == 1, let url = urls.first {
                 player.play(url: url)
             }
         }

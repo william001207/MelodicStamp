@@ -1,5 +1,5 @@
 //
-//  TemporaryStorage.swift
+//  CreationParameters.swift
 //  MelodicStamp
 //
 //  Created by KrLite on 2025/1/17.
@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct TemporaryStorage: Hashable, Codable {
+struct CreationParameters: Hashable, Codable {
     let urls: Set<URL>
     let shouldPlay: Bool
     let initialWindowStyle: MelodicStampWindowStyle
