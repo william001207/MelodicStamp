@@ -8,6 +8,8 @@
 import SwiftUI
 
 @Observable final class PlayerKeyboardControlModel {
+    weak var player: PlayerModel?
+
     var previousSongButtonBounceAnimation: Bool = false
     var nextSongButtonBounceAnimation: Bool = false
     var speakerButtonBounceAnimation: Bool = false
@@ -16,17 +18,21 @@ import SwiftUI
     var progressBarExternalOvershootSign: OvershootSign = .none
     var volumeBarExternalOvershootSign: OvershootSign = .none
 
+    init(player: PlayerModel) {
+        self.player = player
+    }
+
     @discardableResult func handlePlayPause(
-        in player: PlayerModel,
         phase: KeyPress.Phases, modifiers: EventModifiers = []
     ) -> KeyPress.Result {
+        guard let player else { return .ignored }
         guard player.hasCurrentTrack else { return .ignored }
 
         switch phase {
         case .all:
-            handlePlayPause(in: player, phase: .down, modifiers: modifiers)
+            handlePlayPause(phase: .down, modifiers: modifiers)
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                self.handlePlayPause(in: player, phase: .up, modifiers: modifiers)
+                self.handlePlayPause(phase: .up, modifiers: modifiers)
             }
             return .handled
         case .down:
@@ -44,14 +50,14 @@ import SwiftUI
     }
 
     @discardableResult func handleProgressAdjustment(
-        in player: PlayerModel,
         phase: KeyPress.Phases, modifiers: EventModifiers = [], sign: FloatingPointSign
     ) -> KeyPress.Result {
+        guard let player else { return .ignored }
         switch phase {
         case .all:
-            handleProgressAdjustment(in: player, phase: .down, modifiers: modifiers, sign: sign)
+            handleProgressAdjustment(phase: .down, modifiers: modifiers, sign: sign)
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                self.handleProgressAdjustment(in: player, phase: .up, modifiers: modifiers, sign: sign)
+                self.handleProgressAdjustment(phase: .up, modifiers: modifiers, sign: sign)
             }
             return .handled
         case .down, .repeat:
@@ -94,14 +100,14 @@ import SwiftUI
     }
 
     @discardableResult func handleVolumeAdjustment(
-        in player: PlayerModel,
         phase: KeyPress.Phases, modifiers: EventModifiers = [], sign: FloatingPointSign
     ) -> KeyPress.Result {
+        guard let player else { return .ignored }
         switch phase {
         case .all:
-            handleVolumeAdjustment(in: player, phase: .down, modifiers: modifiers, sign: sign)
+            handleVolumeAdjustment(phase: .down, modifiers: modifiers, sign: sign)
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                self.handleVolumeAdjustment(in: player, phase: .up, modifiers: modifiers, sign: sign)
+                self.handleVolumeAdjustment(phase: .up, modifiers: modifiers, sign: sign)
             }
             return .ignored
         case .down, .repeat:

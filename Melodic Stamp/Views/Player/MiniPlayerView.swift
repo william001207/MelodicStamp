@@ -150,7 +150,7 @@ struct MiniPlayerView: View {
         // Handle [space / ⏎] -> toggle play / pause
         .onKeyPress(keys: [.space, .return], phases: .all) { key in
             playerKeyboardControl.handlePlayPause(
-                in: player, phase: key.phase, modifiers: key.modifiers
+                phase: key.phase, modifiers: key.modifiers
             )
         }
 
@@ -161,13 +161,11 @@ struct MiniPlayerView: View {
             return switch activeControl {
             case .progress:
                 playerKeyboardControl.handleProgressAdjustment(
-                    in: player, phase: key.phase, modifiers: key.modifiers,
-                    sign: sign
+                    phase: key.phase, modifiers: key.modifiers, sign: sign
                 )
             case .volume:
                 playerKeyboardControl.handleVolumeAdjustment(
-                    in: player, phase: key.phase, modifiers: key.modifiers,
-                    sign: sign
+                    phase: key.phase, modifiers: key.modifiers, sign: sign
                 )
             }
         }

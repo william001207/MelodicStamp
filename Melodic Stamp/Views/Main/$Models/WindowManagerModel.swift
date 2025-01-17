@@ -7,24 +7,17 @@
 
 import SwiftUI
 
-enum MelodicStampWindowStyle: String, Equatable, Hashable, Identifiable {
+enum MelodicStampWindowStyle: String, Equatable, Hashable, CaseIterable, Identifiable, Codable {
     case main
     case miniPlayer
 
     var id: Self {
         self
     }
-
-    var hasTitleBar: Bool {
-        switch self {
-        case .main: true
-        case .miniPlayer: false
-        }
-    }
 }
 
 @Observable final class WindowManagerModel {
-    var style: MelodicStampWindowStyle = .main {
+    var style: MelodicStampWindowStyle {
         didSet {
             switch style {
             case .main:
@@ -37,6 +30,10 @@ enum MelodicStampWindowStyle: String, Equatable, Hashable, Identifiable {
 
     var isAlwaysOnTop: Bool = false
     private(set) var isInFullScreen: Bool = false
+
+    init(style: MelodicStampWindowStyle = .main) {
+        self.style = style
+    }
 
     func observe(_ window: NSWindow? = nil) {
         NotificationCenter.default.removeObserver(self)

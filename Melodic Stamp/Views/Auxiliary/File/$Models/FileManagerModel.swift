@@ -22,11 +22,17 @@ enum FileAdderPresentationStyle {
 }
 
 @Observable class FileManagerModel {
+    weak var player: PlayerModel?
+
     var isFileOpenerPresented: Bool = false
     private var fileOpenerPresentationStyle: FileOpenerPresentationStyle = .inCurrentPlaylist
 
     var isFileAdderPresented: Bool = false
     private var fileAdderPresentationStyle: FileAdderPresentationStyle = .toCurrentPlaylist
+
+    init(player: PlayerModel) {
+        self.player = player
+    }
 
     func emitOpen(style: FileOpenerPresentationStyle = .inCurrentPlaylist) {
         isFileOpenerPresented = true
@@ -38,31 +44,31 @@ enum FileAdderPresentationStyle {
         fileAdderPresentationStyle = style
     }
 
-    func open(url: URL, using player: PlayerModel, openWindowAction openWindow: OpenWindowAction) {
+    func open(url: URL, openWindow: OpenWindowAction) {
         guard url.startAccessingSecurityScopedResource() else { return }
 
         switch fileOpenerPresentationStyle {
         case .inCurrentPlaylist:
-            player.play(url: url)
+            player?.play(url: url)
         case .replacingCurrentPlaylistOrSelection:
-            player.removeAll()
-            player.play(url: url)
+            player?.removeAll()
+            player?.play(url: url)
         case .formingNewPlaylist:
             openWindow(id: WindowID.content.rawValue, value: TemporaryStorage(urls: Set([url]), shouldPlay: true))
         }
     }
 
-    func add(urls: [URL], to player: PlayerModel, openWindowAction openWindow: OpenWindowAction) {
+    func add(urls: [URL], openWindow: OpenWindowAction) {
         let urls = urls.flatMap { url in
             FileHelper.flatten(contentsOfFolder: url, allowedContentTypes: .init(allowedContentTypes))
         }
 
         switch fileAdderPresentationStyle {
         case .toCurrentPlaylist:
-            player.addToPlaylist(urls: urls)
+            player?.addToPlaylist(urls: urls)
         case .replacingCurrentPlaylistOrSelection:
-            player.removeAll()
-            player.addToPlaylist(urls: urls)
+            player?.removeAll()
+            player?.addToPlaylist(urls: urls)
         case .formingNewPlaylist:
             openWindow(id: WindowID.content.rawValue, value: TemporaryStorage(urls: Set(urls)))
         }

@@ -10,12 +10,18 @@ import Foundation
 struct TemporaryStorage: Hashable, Codable {
     let urls: Set<URL>
     let shouldPlay: Bool
+    let initialWindowStyle: MelodicStampWindowStyle
 
-    init(urls: Set<URL> = [], shouldPlay: Bool = false) {
+    init(
+        urls: Set<URL> = [],
+        shouldPlay: Bool = false,
+        initialWindowStyle: MelodicStampWindowStyle = .main
+    ) {
         let urls = urls.flatMap { url in
             FileHelper.flatten(contentsOfFolder: url, allowedContentTypes: .init(allowedContentTypes))
         }
         self.urls = Set(urls)
         self.shouldPlay = shouldPlay
+        self.initialWindowStyle = initialWindowStyle
     }
 }

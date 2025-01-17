@@ -21,11 +21,12 @@ struct SampleEnvironmentsPreviewModifier: PreviewModifier {
     )
 
     static func makeSharedContext() async throws -> Context {
+        let player = PlayerModel(BlankPlayer())
+
         let floatingWindows = FloatingWindowsModel()
         let windowManager = WindowManagerModel()
-        let fileManager = FileManagerModel()
-        let player = PlayerModel(BlankPlayer())
-        let playerKeyboardControl = PlayerKeyboardControlModel()
+        let fileManager = FileManagerModel(player: player)
+        let playerKeyboardControl = PlayerKeyboardControlModel(player: player)
         let metadataEditor = MetadataEditorModel()
         let audioVisualizer = AudioVisualizerModel()
         let gradientVisualizer = GradientVisualizerModel()

@@ -23,56 +23,46 @@ struct PlayerCommands: Commands {
 
                 Group {
                     Button("Fast Forward") {
-                        guard let player else { return }
                         playerKeyboardControl?.handleProgressAdjustment(
-                            in: player, phase: .all, sign: .plus
+                            phase: .all, sign: .plus
                         )
                     }
                     .keyboardShortcut(.rightArrow, modifiers: .command)
                     .modifierKeyAlternate(.shift) {
                         Button("Fast Forward") {
-                            guard let player else { return }
                             playerKeyboardControl?.handleProgressAdjustment(
-                                in: player, phase: .all, modifiers: .shift,
-                                sign: .plus
+                                phase: .all, modifiers: .shift, sign: .plus
                             )
                         }
                         .badge("×5")
                     }
                     .modifierKeyAlternate(.option) {
                         Button("Fast Forward") {
-                            guard let player else { return }
                             playerKeyboardControl?.handleProgressAdjustment(
-                                in: player, phase: .all, modifiers: .option,
-                                sign: .plus
+                                phase: .all, modifiers: .option, sign: .plus
                             )
                         }
                         .badge("×0.1")
                     }
 
                     Button("Rewind") {
-                        guard let player else { return }
                         playerKeyboardControl?.handleProgressAdjustment(
-                            in: player, phase: .all, sign: .minus
+                            phase: .all, sign: .minus
                         )
                     }
                     .keyboardShortcut(.leftArrow, modifiers: .command)
                     .modifierKeyAlternate(.shift) {
                         Button("Rewind") {
-                            guard let player else { return }
                             playerKeyboardControl?.handleProgressAdjustment(
-                                in: player, phase: .all, modifiers: .shift,
-                                sign: .minus
+                                phase: .all, modifiers: .shift, sign: .minus
                             )
                         }
                         .badge("×5")
                     }
                     .modifierKeyAlternate(.option) {
                         Button("Rewind") {
-                            guard let player else { return }
                             playerKeyboardControl?.handleProgressAdjustment(
-                                in: player, phase: .all, modifiers: .option,
-                                sign: .minus
+                                phase: .all, modifiers: .option, sign: .minus
                             )
                         }
                         .badge("×0.1")
@@ -97,56 +87,46 @@ struct PlayerCommands: Commands {
                     .keyboardShortcut("m", modifiers: [.command, .control])
 
                     Button("Louder") {
-                        guard let player else { return }
                         playerKeyboardControl?.handleVolumeAdjustment(
-                            in: player, phase: .all, sign: .plus
+                            phase: .all, sign: .plus
                         )
                     }
                     .keyboardShortcut(.upArrow, modifiers: .command)
                     .modifierKeyAlternate(.shift) {
                         Button("Louder") {
-                            guard let player else { return }
                             playerKeyboardControl?.handleVolumeAdjustment(
-                                in: player, phase: .all, modifiers: .shift,
-                                sign: .plus
+                                phase: .all, modifiers: .shift, sign: .plus
                             )
                         }
                         .badge("×5")
                     }
                     .modifierKeyAlternate(.option) {
                         Button("Louder") {
-                            guard let player else { return }
                             playerKeyboardControl?.handleVolumeAdjustment(
-                                in: player, phase: .all, modifiers: .option,
-                                sign: .plus
+                                phase: .all, modifiers: .option, sign: .plus
                             )
                         }
                         .badge("×0.1")
                     }
 
                     Button("Quieter") {
-                        guard let player else { return }
                         playerKeyboardControl?.handleVolumeAdjustment(
-                            in: player, phase: .all, sign: .minus
+                            phase: .all, sign: .minus
                         )
                     }
                     .keyboardShortcut(.downArrow, modifiers: .command)
                     .modifierKeyAlternate(.shift) {
                         Button("Quieter") {
-                            guard let player else { return }
                             playerKeyboardControl?.handleVolumeAdjustment(
-                                in: player, phase: .all, modifiers: .shift,
-                                sign: .minus
+                                phase: .all, modifiers: .shift, sign: .minus
                             )
                         }
                         .badge("×5")
                     }
                     .modifierKeyAlternate(.option) {
                         Button("Quieter") {
-                            guard let player else { return }
                             playerKeyboardControl?.handleVolumeAdjustment(
-                                in: player, phase: .all, modifiers: .option,
-                                sign: .minus
+                                phase: .all, modifiers: .option, sign: .minus
                             )
                         }
                         .badge("×0.1")

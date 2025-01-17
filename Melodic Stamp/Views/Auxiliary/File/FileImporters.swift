@@ -9,7 +9,6 @@ import SwiftUI
 
 struct FileImporters: View {
     @Environment(FileManagerModel.self) private var fileManager
-    @Environment(PlayerModel.self) private var player
 
     @Environment(\.openWindow) private var openWindow
 
@@ -23,7 +22,7 @@ struct FileImporters: View {
             ) { result in
                 switch result {
                 case let .success(url):
-                    fileManager.open(url: url, using: player, openWindowAction: openWindow)
+                    fileManager.open(url: url, openWindow: openWindow)
                 case .failure:
                     break
                 }
@@ -37,7 +36,7 @@ struct FileImporters: View {
             ) { result in
                 switch result {
                 case let .success(urls):
-                    fileManager.add(urls: urls, to: player, openWindowAction: openWindow)
+                    fileManager.add(urls: urls, openWindow: openWindow)
                 case .failure:
                     break
                 }

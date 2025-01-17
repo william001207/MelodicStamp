@@ -26,17 +26,15 @@ struct ContentView: View {
 
     // MARK: - Fields
 
-    var temporaryStorage: TemporaryStorage?
-
     // MARK: Models
 
-    @State private var windowManager: WindowManagerModel = .init()
-    @State private var fileManager: FileManagerModel = .init()
-    @State private var player: PlayerModel = .init(SFBAudioEnginePlayer())
-    @State private var playerKeyboardControl: PlayerKeyboardControlModel = .init()
-    @State private var metadataEditor: MetadataEditorModel = .init()
-    @State private var audioVisualizer: AudioVisualizerModel = .init()
-    @State private var gradientVisualizer: GradientVisualizerModel = .init()
+    @State private var windowManager: WindowManagerModel
+    @State private var fileManager: FileManagerModel
+    @State private var player: PlayerModel
+    @State private var playerKeyboardControl: PlayerKeyboardControlModel
+    @State private var metadataEditor: MetadataEditorModel
+    @State private var audioVisualizer: AudioVisualizerModel
+    @State private var gradientVisualizer: GradientVisualizerModel
 
     // MARK: Sidebar & Inspector
 
@@ -48,6 +46,29 @@ struct ContentView: View {
 
     @State private var minWidth: CGFloat?
     @State private var maxWidth: CGFloat?
+
+    // MARK: - Initializers
+
+    init(_ temporaryStorage: TemporaryStorage?) {
+        let player = PlayerModel(SFBAudioEnginePlayer())
+
+        self.windowManager = .init(style: temporaryStorage?.initialWindowStyle ?? .main)
+        self.fileManager = .init(player: player)
+        self.player = player
+        self.playerKeyboardControl = .init(player: player)
+        self.metadataEditor = .init()
+        self.audioVisualizer = .init()
+        self.gradientVisualizer = .init()
+
+        if let temporaryStorage {
+            let urls = Array(temporaryStorage.urls)
+            player.addToPlaylist(urls: urls)
+
+            if temporaryStorage.shouldPlay, urls.count == 1, let url = urls.first {
+                player.play(url: url)
+            }
+        }
+    }
 
     // MARK: - Body
 
@@ -68,17 +89,6 @@ struct ContentView: View {
                     DelegatedPlayerSceneStorage()
                 }
                 .allowsHitTesting(false)
-            }
-
-            // MARK: Storage
-
-            .onAppear {
-                guard let temporaryStorage else { return }
-                let urls = Array(temporaryStorage.urls)
-                player.addToPlaylist(urls: urls)
-                if temporaryStorage.shouldPlay, urls.count == 1, let url = urls.first {
-                    player.play(url: url)
-                }
             }
 
             // MARK: Window Styling

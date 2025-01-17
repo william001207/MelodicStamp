@@ -34,7 +34,7 @@ struct MelodicStampApp: App {
 
     var body: some Scene {
         WindowGroup(id: WindowID.content.rawValue, for: TemporaryStorage.self) { $storage in
-            ContentView(temporaryStorage: storage)
+            ContentView(storage)
                 .environment(floatingWindows)
         }
         .windowResizability(.contentSize)

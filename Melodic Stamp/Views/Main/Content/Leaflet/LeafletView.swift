@@ -175,7 +175,7 @@ struct LeafletView: View {
             // Handle [space / ⏎] -> toggle play / pause
             .onKeyPress(keys: [.space, .return], phases: .all) { key in
                 playerKeyboardControl.handlePlayPause(
-                    in: player, phase: key.phase, modifiers: key.modifiers
+                    phase: key.phase, modifiers: key.modifiers
                 )
             }
 
@@ -184,8 +184,7 @@ struct LeafletView: View {
                 let sign: FloatingPointSign = key.key == .leftArrow ? .minus : .plus
 
                 return playerKeyboardControl.handleProgressAdjustment(
-                    in: player, phase: key.phase, modifiers: key.modifiers,
-                    sign: sign
+                    phase: key.phase, modifiers: key.modifiers, sign: sign
                 )
             }
 
@@ -194,8 +193,7 @@ struct LeafletView: View {
                 let sign: FloatingPointSign = key.key == .leftArrow ? .minus : .plus
 
                 return playerKeyboardControl.handleVolumeAdjustment(
-                    in: player, phase: key.phase, modifiers: key.modifiers,
-                    sign: sign
+                    phase: key.phase, modifiers: key.modifiers, sign: sign
                 )
             }
 
