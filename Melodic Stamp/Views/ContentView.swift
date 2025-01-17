@@ -74,7 +74,11 @@ struct ContentView: View {
 
             .onAppear {
                 guard let temporaryStorage else { return }
-                player.addToPlaylist(urls: Array(temporaryStorage.urls))
+                let urls = Array(temporaryStorage.urls)
+                player.addToPlaylist(urls: urls)
+                if temporaryStorage.shouldPlay, urls.count == 1, let url = urls.first {
+                    player.play(url: url)
+                }
             }
 
             // MARK: Window Styling

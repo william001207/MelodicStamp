@@ -38,7 +38,7 @@ enum FileAdderPresentationStyle {
         fileAdderPresentationStyle = style
     }
 
-    func open(url: URL, using player: PlayerModel) {
+    func open(url: URL, using player: PlayerModel, openWindowAction openWindow: OpenWindowAction) {
         guard url.startAccessingSecurityScopedResource() else { return }
 
         switch fileOpenerPresentationStyle {
@@ -48,11 +48,11 @@ enum FileAdderPresentationStyle {
             player.removeAll()
             player.play(url: url)
         case .formingNewPlaylist:
-            break
+            openWindow(id: WindowID.content.rawValue, value: TemporaryStorage(urls: Set([url]), shouldPlay: true))
         }
     }
 
-    func add(urls: [URL], to player: PlayerModel) {
+    func add(urls: [URL], to player: PlayerModel, openWindowAction openWindow: OpenWindowAction) {
         let urls = urls.flatMap { url in
             FileHelper.flatten(contentsOfFolder: url, allowedContentTypes: .init(allowedContentTypes))
         }
@@ -64,7 +64,7 @@ enum FileAdderPresentationStyle {
             player.removeAll()
             player.addToPlaylist(urls: urls)
         case .formingNewPlaylist:
-            break
+            openWindow(id: WindowID.content.rawValue, value: TemporaryStorage(urls: Set(urls)))
         }
     }
 }

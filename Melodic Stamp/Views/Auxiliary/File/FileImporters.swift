@@ -11,6 +11,8 @@ struct FileImporters: View {
     @Environment(FileManagerModel.self) private var fileManager
     @Environment(PlayerModel.self) private var player
 
+    @Environment(\.openWindow) private var openWindow
+
     var body: some View {
         @Bindable var fileManager = fileManager
 
@@ -21,7 +23,7 @@ struct FileImporters: View {
             ) { result in
                 switch result {
                 case let .success(url):
-                    fileManager.open(url: url, using: player)
+                    fileManager.open(url: url, using: player, openWindowAction: openWindow)
                 case .failure:
                     break
                 }
@@ -35,7 +37,7 @@ struct FileImporters: View {
             ) { result in
                 switch result {
                 case let .success(urls):
-                    fileManager.add(urls: urls, to: player)
+                    fileManager.add(urls: urls, to: player, openWindowAction: openWindow)
                 case .failure:
                     break
                 }
