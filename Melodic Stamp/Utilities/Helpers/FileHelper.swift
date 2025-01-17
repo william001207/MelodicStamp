@@ -10,8 +10,8 @@ import UniformTypeIdentifiers
 
 enum FileHelper {
     static func flatten(contentsOfFolder folderURL: URL, allowedContentTypes: [UTType], isRecursive: Bool = true) -> [URL] {
-        guard folderURL.hasDirectoryPath else { return [folderURL] }
         guard folderURL.startAccessingSecurityScopedResource() else { return [] }
+        guard folderURL.hasDirectoryPath else { return [folderURL] }
 
         let fileManager = FileManager.default
         guard let contents = try? fileManager.contentsOfDirectory(
