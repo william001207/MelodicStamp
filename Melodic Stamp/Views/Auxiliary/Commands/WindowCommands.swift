@@ -15,18 +15,20 @@ struct WindowCommands: Commands {
             if let windowManager {
                 @Bindable var windowManager = windowManager
 
-                switch windowManager.style {
-                case .main:
-                    Button("Mini Player") {
-                        windowManager.style = .miniPlayer
+                Group {
+                    switch windowManager.style {
+                    case .main:
+                        Button("Mini Player") {
+                            windowManager.style = .miniPlayer
+                        }
+                        .disabled(windowManager.isInFullScreen)
+                    case .miniPlayer:
+                        Button("Main Window") {
+                            windowManager.style = .main
+                        }
                     }
-                    .keyboardShortcut("\\", modifiers: .command)
-                case .miniPlayer:
-                    Button("Main Window") {
-                        windowManager.style = .main
-                    }
-                    .keyboardShortcut("\\", modifiers: .command)
                 }
+                .keyboardShortcut("\\", modifiers: .command)
             }
         }
     }
