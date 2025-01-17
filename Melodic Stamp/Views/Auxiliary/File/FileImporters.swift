@@ -17,7 +17,7 @@ struct FileImporters: View {
         Color.clear
             .fileImporter(
                 isPresented: $fileManager.isFileOpenerPresented,
-                allowedContentTypes: allowedContentTypes
+                allowedContentTypes: .init(allowedContentTypes)
             ) { result in
                 switch result {
                 case let .success(url):
@@ -30,7 +30,7 @@ struct FileImporters: View {
         Color.clear
             .fileImporter(
                 isPresented: $fileManager.isFileAdderPresented,
-                allowedContentTypes: allowedContentTypes,
+                allowedContentTypes: .init(allowedContentTypes.union([.folder])),
                 allowsMultipleSelection: true
             ) { result in
                 switch result {

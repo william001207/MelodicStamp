@@ -166,8 +166,6 @@ class SFBAudioEnginePlayer: NSObject, Player {
 extension SFBAudioEnginePlayer {
     static func decoder(for track: Track, enablesDoP: Bool = false) throws -> PCMDecoding? {
         let url = track.url
-        guard url.startAccessingSecurityScopedResource() else { return nil }
-        defer { url.stopAccessingSecurityScopedResource() }
 
         let pathExtension = url.pathExtension.lowercased()
         if AudioDecoder.handlesPaths(withExtension: pathExtension) {

@@ -242,9 +242,7 @@ struct DelegatedPlayerSceneStorage: View {
         if !tracks.isEmpty {
             do {
                 let bookmarks: [Data] = try tracks.map(\.url).compactMap { url in
-                    guard url.startAccessingSecurityScopedResource() else { return nil }
-                    defer { url.stopAccessingSecurityScopedResource() }
-                    return try url.bookmarkData(options: [])
+                    try url.bookmarkData(options: [])
                 }
                 let data = try PropertyListSerialization.data(fromPropertyList: bookmarks, format: .binary, options: .zero)
                 playlistURLs = data.base64EncodedString()
