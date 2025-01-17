@@ -263,7 +263,7 @@ struct LeafletView: View {
                 .environment(gradientVisualizer)
                 .overlay {
                     Color.black
-                        .opacity(0.225)
+                        .opacity(0.175)
                         .blendMode(.multiply)
                 }
         } else {
