@@ -111,6 +111,7 @@ struct MiniPlayerView: View {
 
         .toolbar(removing: .title)
         .toolbarBackgroundVisibility(.hidden, for: .windowToolbar)
+        .windowFullScreenBehavior(.disabled)
         .background(MakeAlwaysOnTop(
             isAlwaysOnTop: $windowManager.isAlwaysOnTop
         ))

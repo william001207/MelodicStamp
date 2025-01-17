@@ -211,24 +211,24 @@ extension FloatingWindowsModel {
         isInFullScreen = true
 
         guard !isVisibilityDelegated else { return }
-        isHidden = true
+        hide()
     }
 
     @objc func windowDidEnterFullScreen(_: Notification) {
         guard !isVisibilityDelegated else { return }
-        isHidden = false
+        show()
     }
 
     @objc func windowWillExitFullScreen(_: Notification) {
         isInFullScreen = false
 
         guard !isVisibilityDelegated else { return }
-        isHidden = true
+        hide()
     }
 
     @objc func windowDidExitFullScreen(_: Notification) {
         guard !isVisibilityDelegated else { return }
-        isHidden = false
+        show()
     }
 
     @objc func windowDidMove(_ notification: Notification) {

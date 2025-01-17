@@ -13,6 +13,7 @@ import SwiftUI
 struct PlayerView: View {
     // MARK: - Environments
 
+    @Environment(FloatingWindowsModel.self) private var floatingWindows
     @Environment(WindowManagerModel.self) private var windowManager
     @Environment(PlayerModel.self) private var player
     @Environment(PlayerKeyboardControlModel.self) private var playerKeyboardControl
@@ -134,18 +135,20 @@ struct PlayerView: View {
 
             // MARK: Expand / Shrink
 
-            AliveButton(
-                enabledStyle: .tertiary, hoveringStyle: .secondary
-            ) {
-                windowManager.style = .miniPlayer
-            } label: {
-                Image(systemSymbol: .arrowDownRightAndArrowUpLeft)
-                    .font(.headline)
-                    .frame(width: 20)
+            if !floatingWindows.isInFullScreen {
+                AliveButton(
+                    enabledStyle: .tertiary, hoveringStyle: .secondary
+                ) {
+                    windowManager.style = .miniPlayer
+                } label: {
+                    Image(systemSymbol: .arrowDownRightAndArrowUpLeft)
+                        .font(.headline)
+                        .frame(width: 20)
+                }
+                .matchedGeometryEffect(
+                    id: PlayerNamespace.expandShrinkButton, in: namespace
+                )
             }
-            .matchedGeometryEffect(
-                id: PlayerNamespace.expandShrinkButton, in: namespace
-            )
         }
         .frame(height: 20)
     }
