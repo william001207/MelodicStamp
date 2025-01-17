@@ -15,11 +15,15 @@ import SwiftUI
         didSet {
             if isHidden {
                 hide()
+                isVisibilityDelegated = true
             } else {
                 show()
+                isVisibilityDelegated = false
             }
         }
     }
+
+    private var isVisibilityDelegated: Bool = false
 
     var tabBarWindow: NSWindow?
     var playerWindow: NSWindow?
@@ -104,6 +108,7 @@ import SwiftUI
         DispatchQueue.main.async {
             applicationWindow.addChildWindow(floatingWindow, ordered: .above)
             self.updateTabBarPosition(window: floatingWindow, in: applicationWindow)
+            self.isHidden = false
         }
     }
 
@@ -126,6 +131,7 @@ import SwiftUI
         DispatchQueue.main.async {
             applicationWindow.addChildWindow(floatingWindow, ordered: .above)
             self.updatePlayerPosition(window: floatingWindow, in: applicationWindow)
+            self.isHidden = false
         }
     }
 
@@ -203,19 +209,25 @@ import SwiftUI
 extension FloatingWindowsModel {
     @objc func windowWillEnterFullScreen(_: Notification) {
         isInFullScreen = true
+
+        guard !isVisibilityDelegated else { return }
         isHidden = true
     }
 
     @objc func windowDidEnterFullScreen(_: Notification) {
+        guard !isVisibilityDelegated else { return }
         isHidden = false
     }
 
     @objc func windowWillExitFullScreen(_: Notification) {
         isInFullScreen = false
+
+        guard !isVisibilityDelegated else { return }
         isHidden = true
     }
 
     @objc func windowDidExitFullScreen(_: Notification) {
+        guard !isVisibilityDelegated else { return }
         isHidden = false
     }
 

@@ -12,6 +12,7 @@ import SwiftUI
 struct LeafletView: View {
     // MARK: - Environments
 
+    @Environment(FloatingWindowsModel.self) private var floatingWindows
     @Environment(PlayerKeyboardControlModel.self) private var playerKeyboardControl
     @Environment(PlayerModel.self) private var player
     @Environment(MetadataEditorModel.self) private var metadataEditor
@@ -37,6 +38,8 @@ struct LeafletView: View {
     // MARK: - Body
 
     var body: some View {
+        @Bindable var floatingWindows = floatingWindows
+
         if !player.hasCurrentTrack {
             ExcerptView(tab: SidebarContentTab.leaflet)
         } else {
@@ -86,6 +89,7 @@ struct LeafletView: View {
                         Group {
                             if hasLyrics, isShowingLyrics {
                                 LeafletLyricsControlsView(
+                                    isHidden: $floatingWindows.isHidden,
                                     typeSize: $typeSize
                                 )
                                 .transition(.blurReplace(.downUp))
