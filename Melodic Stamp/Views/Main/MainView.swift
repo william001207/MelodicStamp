@@ -10,6 +10,7 @@ import Luminare
 import SwiftUI
 
 struct MainView: View {
+    @Environment(WindowManagerModel.self) private var windowManager
     @Environment(FileManagerModel.self) private var fileManager
     @Environment(PlayerModel.self) private var player
     @Environment(MetadataEditorModel.self) private var metadataEditor
@@ -52,7 +53,7 @@ struct MainView: View {
                     }
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                     .ignoresSafeArea()
-                    .morphed()
+                    .morphed(isActive: !windowManager.isInFullScreen)
             case .leaflet:
                 LeafletView()
                     .environment(displayLyrics)

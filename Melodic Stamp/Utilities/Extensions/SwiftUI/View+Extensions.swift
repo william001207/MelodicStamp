@@ -30,24 +30,28 @@ extension View {
 
 extension View {
     /// A predefined morphed effect for windows with large title bars and floating players.
-    @ViewBuilder func morphed() -> some View {
-        morphed(
-            insets: .init(bottom: .fixed(length: 64).mirrored),
-            LinearGradient(
-                colors: [.white, .black],
-                startPoint: .top,
-                endPoint: .bottom
+    @ViewBuilder func morphed(isActive: Bool = true) -> some View {
+        if isActive {
+            morphed(
+                insets: .init(bottom: .fixed(length: 64).mirrored),
+                LinearGradient(
+                    colors: [.white, .black],
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
             )
-        )
-        .ignoresSafeArea()
-        .morphed(
-            insets: .init(top: .fixed(length: 94).mirrored),
-            LinearGradient(
-                colors: [.white, .black],
-                startPoint: .bottom,
-                endPoint: .top
+            .ignoresSafeArea()
+            .morphed(
+                insets: .init(top: .fixed(length: 94).mirrored),
+                LinearGradient(
+                    colors: [.white, .black],
+                    startPoint: .bottom,
+                    endPoint: .top
+                )
             )
-        )
-        .ignoresSafeArea()
+            .ignoresSafeArea()
+        } else {
+            self
+        }
     }
 }
