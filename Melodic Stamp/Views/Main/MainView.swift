@@ -81,6 +81,8 @@ struct MainView: View {
                 InspectorLyricsView()
                     .toolbar {
                         if isInspectorPresented {
+                            EditorToolbar()
+
                             LyricsToolbar()
                         }
                     }

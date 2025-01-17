@@ -14,31 +14,30 @@ struct LyricsToolbar: View {
     @State private var isInfoPopoverPresented: Bool = false
 
     var body: some View {
-        if metadataEditor.isVisible {
-            LabeledTextEditor(
-                entries: metadataEditor[extracting: \.lyrics],
-                layout: .button
-            ) {
-                ToolbarLabel {
-                    Image(systemSymbol: .pencilLine)
-                    Text("Edit")
-                }
-                .monospaced(false)
-            } info: {
-                AliveButton {
-                    isInfoPopoverPresented.toggle()
-                } label: {
-                    Image(systemSymbol: .info)
-                        .luminarePopover {
-                            Text("""
-                            You can use [AMLL TTML Tool](https://steve-xmh.github.io/amll-ttml-tool) to create TTML lyrics through a refined interface.
-                            """)
-                            .padding()
-                        }
-                }
-                .monospaced(false)
+        LabeledTextEditor(
+            entries: metadataEditor[extracting: \.lyrics],
+            layout: .button
+        ) {
+            ToolbarLabel {
+                Image(systemSymbol: .pencilLine)
+                Text("Edit")
             }
-            .monospaced()
+            .monospaced(false)
+        } info: {
+            AliveButton {
+                isInfoPopoverPresented.toggle()
+            } label: {
+                Image(systemSymbol: .info)
+                    .luminarePopover {
+                        Text("""
+                        You can use [AMLL TTML Tool](https://steve-xmh.github.io/amll-ttml-tool) to create TTML lyrics through a refined interface.
+                        """)
+                        .padding()
+                    }
+            }
+            .monospaced(false)
         }
+        .monospaced()
+        .disabled(!metadataEditor.isVisible)
     }
 }
