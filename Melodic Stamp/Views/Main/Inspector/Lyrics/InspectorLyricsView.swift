@@ -12,41 +12,35 @@ struct InspectorLyricsView: View {
     @Environment(MetadataEditorModel.self) private var metadataEditor
     @Environment(LyricsModel.self) private var lyrics
 
-    @Environment(\.appearsActive) private var appearsActive
-
     var body: some View {
         // Avoids multiple instantializations
         let lines = lyrics.lines
 
         // Use ZStack to avoid reinstantializing toolbar content
         ZStack {
-            if appearsActive {
-                switch entries.type {
-                case .none, .varied:
-                    ExcerptView(tab: SidebarInspectorTab.lyrics)
-                case .identical:
-                    ScrollView {
-                        // Don't apply `.contentMargins()`, otherwise causing `LazyVStack` related glitches
-                        LazyVStack(alignment: alignment, spacing: 10) {
-                            ForEach(Array(lines.enumerated()), id: \.offset) { index, line in
-                                lyricLine(line: line, index: index)
-                            }
-                            .textSelection(.enabled)
-                        }
-                        .padding(.horizontal)
-                        .safeAreaPadding(.top, 64)
-                        .safeAreaPadding(.bottom, 94)
-
-                        Spacer()
-                            .frame(height: 150)
-                    }
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .scrollContentBackground(.hidden)
-                    .contentMargins(.top, 64, for: .scrollIndicators)
-                    .contentMargins(.bottom, 94, for: .scrollIndicators)
-                }
-            } else {
+            switch entries.type {
+            case .none, .varied:
                 ExcerptView(tab: SidebarInspectorTab.lyrics)
+            case .identical:
+                ScrollView {
+                    // Don't apply `.contentMargins()`, otherwise causing `LazyVStack` related glitches
+                    LazyVStack(alignment: alignment, spacing: 10) {
+                        ForEach(Array(lines.enumerated()), id: \.offset) { index, line in
+                            lyricLine(line: line, index: index)
+                        }
+                        .textSelection(.enabled)
+                    }
+                    .padding(.horizontal)
+                    .safeAreaPadding(.top, 64)
+                    .safeAreaPadding(.bottom, 94)
+
+                    Spacer()
+                        .frame(height: 150)
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .scrollContentBackground(.hidden)
+                .contentMargins(.top, 64, for: .scrollIndicators)
+                .contentMargins(.bottom, 94, for: .scrollIndicators)
             }
         }
         .onChange(of: entries, initial: true) { _, _ in

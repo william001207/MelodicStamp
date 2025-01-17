@@ -26,6 +26,7 @@ struct LeafletView: View {
 
     @Default(.lyricsTypeSizes) private var typeSizes
     @Default(.lyricsMaxWidth) private var maxWidth
+    @Default(.hidesLyricsWhileInactive) private var hidesLyricsWhileInactive
 
     // MARK: - Fields
 
@@ -46,7 +47,8 @@ struct LeafletView: View {
             ExcerptView(tab: SidebarContentTab.leaflet)
         } else {
             ZStack {
-                if hasCover || hasLyrics {
+                let canRenderLyrics = !hidesLyricsWhileInactive || appearsActive
+                if canRenderLyrics, hasCover || hasLyrics {
                     HStack(spacing: 0) {
                         if hasCover {
                             Spacer(minLength: 0)
@@ -106,35 +108,14 @@ struct LeafletView: View {
                             d[.trailing]
                         }
                     }
+                } else {
+                    // Stops rendering lyrics
+                    Color.clear
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
             .containerBackground(for: .window) {
-                if hasCover {
-                    ChromaBackgroundView()
-                        .environment(player)
-                        .environment(audioVisualizer)
-                        .environment(gradientVisualizer)
-                        .overlay {
-                            Color.black
-                                .opacity(0.225)
-                                .blendMode(.multiply)
-                        }
-                } else {
-                    ZStack {
-                        Rectangle()
-                            .fill(.ultraThinMaterial)
-                            .opacity(0.5)
-
-                        LinearGradient(
-                            colors: [.clear, .accent],
-                            startPoint: .top, endPoint: .bottom
-                        )
-                        .opacity(0.65)
-                        .brightness(-0.075)
-                        .blendMode(.multiply)
-                    }
-                }
+                windowBackgroundView()
             }
             .animation(.bouncy, value: hasLyrics)
             .animation(.bouncy, value: isShowingLyrics)
@@ -270,6 +251,36 @@ struct LeafletView: View {
             .padding(12)
             .alignmentGuide(.trailing) { d in
                 d[.leading]
+            }
+        }
+    }
+
+    // MARK: - Window Background
+
+    @ViewBuilder private func windowBackgroundView() -> some View {
+        if hasCover {
+            ChromaBackgroundView()
+                .environment(player)
+                .environment(audioVisualizer)
+                .environment(gradientVisualizer)
+                .overlay {
+                    Color.black
+                        .opacity(0.225)
+                        .blendMode(.multiply)
+                }
+        } else {
+            ZStack {
+                Rectangle()
+                    .fill(.ultraThinMaterial)
+                    .opacity(0.5)
+
+                LinearGradient(
+                    colors: [.clear, .accent],
+                    startPoint: .top, endPoint: .bottom
+                )
+                .opacity(0.65)
+                .brightness(-0.075)
+                .blendMode(.multiply)
             }
         }
     }

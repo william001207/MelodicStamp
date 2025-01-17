@@ -16,6 +16,12 @@ struct SettingsPerformancePage: View {
 
             SettingsGradientResolutionControl()
         }
+
+        Section("While \(Bundle.main.displayName) is Inactive") {
+            SettingsHidesInspectorWhileInactiveControl()
+
+            SettingsHidesLyricsWhileInactiveControl()
+        }
     }
 }
 

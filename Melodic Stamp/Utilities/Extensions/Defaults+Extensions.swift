@@ -107,13 +107,13 @@ extension Defaults.Keys {
 
     // MARK: Performance
 
-    static let hidesInspectorInBackground: Key<Bool> = .init(
-        "hidesInspectorInBackground",
+    static let hidesInspectorWhileInactive: Key<Bool> = .init(
+        "hidesInspectorWhileInactive",
         default: false
     )
 
-    static let hidesLyricsInBackground: Key<Bool> = .init(
-        "hidesLyricsInBackground",
+    static let hidesLyricsWhileInactive: Key<Bool> = .init(
+        "hidesLyricsWhileInactive",
         default: false
     )
 }

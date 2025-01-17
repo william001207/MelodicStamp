@@ -5,6 +5,7 @@
 //  Created by Xinshao_Air on 2024/11/22.
 //
 
+import Defaults
 import Luminare
 import SwiftUI
 
@@ -13,7 +14,9 @@ struct MainView: View {
     @Environment(PlayerModel.self) private var player
     @Environment(MetadataEditorModel.self) private var metadataEditor
 
-    @Environment(\.appearsActive) private var isActive
+    @Environment(\.appearsActive) private var appearsActive
+
+    @Default(.hidesInspectorWhileInactive) private var hidesInspectorWhileInactive
 
     var namespace: Namespace.ID
 
@@ -62,32 +65,37 @@ struct MainView: View {
 
     @ViewBuilder private func inspector() -> some View {
         Group {
-            switch selectedInspectorTab {
-            case .commonMetadata:
-                InspectorCommonMetadataView()
-                    .toolbar {
-                        if isInspectorPresented {
-                            EditorToolbar()
+            if !hidesInspectorWhileInactive || appearsActive {
+                switch selectedInspectorTab {
+                case .commonMetadata:
+                    InspectorCommonMetadataView()
+                        .toolbar {
+                            if isInspectorPresented {
+                                EditorToolbar()
+                            }
                         }
-                    }
-            case .advancedMetadata:
-                InspectorAdvancedMetadataView()
-                    .toolbar {
-                        if isInspectorPresented {
-                            EditorToolbar()
+                case .advancedMetadata:
+                    InspectorAdvancedMetadataView()
+                        .toolbar {
+                            if isInspectorPresented {
+                                EditorToolbar()
+                            }
                         }
-                    }
-            case .lyrics:
-                InspectorLyricsView()
-                    .toolbar {
-                        if isInspectorPresented {
-                            EditorToolbar()
+                case .lyrics:
+                    InspectorLyricsView()
+                        .toolbar {
+                            if isInspectorPresented {
+                                EditorToolbar()
 
-                            LyricsToolbar()
+                                LyricsToolbar()
+                            }
                         }
-                    }
-            case .analytics:
-                InspectorAnalyticsView()
+                case .analytics:
+                    InspectorAnalyticsView()
+                }
+            } else {
+                // Stops rendering inspector
+                Color.clear
             }
         }
         .environment(inspectorLyrics)
