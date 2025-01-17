@@ -51,7 +51,7 @@ extension LyricsParser {
                     return beginTime >= currentBeginTime
                 }
                 .prefix {
-                    guard let endTime = $0.endTime else { return false }
+                    guard let endTime = $0.condensedEndTime else { return false }
                     return endTime > currentBeginTime
                 }
                 .first

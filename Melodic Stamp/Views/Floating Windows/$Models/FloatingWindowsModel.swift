@@ -9,7 +9,17 @@ import AppKit
 import SwiftUI
 
 @MainActor @Observable final class FloatingWindowsModel {
-    private var isInFullScreen: Bool = false
+    private(set) var isInFullScreen: Bool = false
+
+    var isHidden: Bool = false {
+        didSet {
+            if isHidden {
+                hide()
+            } else {
+                show()
+            }
+        }
+    }
 
     var tabBarWindow: NSWindow?
     var playerWindow: NSWindow?
@@ -65,12 +75,12 @@ import SwiftUI
         )
     }
 
-    func show() {
+    private func show() {
         tabBarWindow?.animator().alphaValue = 1
         playerWindow?.animator().alphaValue = 1
     }
 
-    func hide() {
+    private func hide() {
         tabBarWindow?.animator().alphaValue = 0
         playerWindow?.animator().alphaValue = 0
     }
@@ -193,20 +203,20 @@ import SwiftUI
 extension FloatingWindowsModel {
     @objc func windowWillEnterFullScreen(_: Notification) {
         isInFullScreen = true
-        hide()
+        isHidden = true
     }
 
     @objc func windowDidEnterFullScreen(_: Notification) {
-        show()
+        isHidden = false
     }
 
     @objc func windowWillExitFullScreen(_: Notification) {
         isInFullScreen = false
-        hide()
+        isHidden = true
     }
 
     @objc func windowDidExitFullScreen(_: Notification) {
-        show()
+        isHidden = false
     }
 
     @objc func windowDidMove(_ notification: Notification) {

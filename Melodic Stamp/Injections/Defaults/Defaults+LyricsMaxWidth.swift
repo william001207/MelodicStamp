@@ -32,7 +32,7 @@ extension Defaults.LyricsMaxWidth: ExpressibleByFloatLiteral, Comparable {
 
 extension Defaults.LyricsMaxWidth: Clampable {
     static var range: ClosedRange<Self> {
-        128.0...2048.0
+        128.0...4096.0
     }
 }
 

@@ -82,7 +82,7 @@ extension Defaults.Keys {
 
     static let lyricsMaxWidth: Key<Defaults.LyricsMaxWidth> = .init(
         "lyricsMaxWidth",
-        default: .clamp(300.0)
+        default: .clamp(512.0)
     )
 
     static let lyricsAttachments: Key<LyricsAttachments> = .init(
