@@ -17,23 +17,26 @@ struct LeafletLyricsControlsView: View {
 
     var body: some View {
         Group {
-            if abs(availableTypeSizes.lowerBound.distance(to: availableTypeSizes.upperBound)) > 1 {
-                VStack(spacing: 12) {
-                    // Sadly we can't add toggles for lyrics attachments here, as it will trigger implicit view resizing and cause the whole lyrics to misalign
-                    // See commits before c4e3d8b067a7bc72868d1f8ff2e3e9742bd4c138
+            VStack(spacing: 12) {
+                // Sadly we can't add toggles for lyrics attachments here, as it will trigger implicit view resizing and cause the whole lyrics to misalign
+                // See commits before c4e3d8b067a7bc72868d1f8ff2e3e9742bd4c138
 
-                    AliveButton {
-                        isHidden.toggle()
-                    } label: {
-                        Image(systemSymbol: isHidden ? .eyeSlash : .eye)
-                            .foregroundStyle(
-                                !isHidden ? .primary
-                                    : isHovering ? .tertiary : .quaternary
-                            )
-                            .frame(height: 24)
-                            .contentTransition(.symbolEffect(.replace))
-                    }
+                AliveButton {
+                    isHidden.toggle()
+                } label: {
+                    Image(systemSymbol: isHidden ? .eyeSlash : .eye)
+                        .foregroundStyle(
+                            !isHidden ? .primary
+                                : isHovering ? .tertiary : .quaternary
+                        )
+                        .frame(height: 24)
+                        .contentTransition(.symbolEffect(.replace))
+                }
+                .onDisappear {
+                    isHidden = false
+                }
 
+                if abs(availableTypeSizes.lowerBound.distance(to: availableTypeSizes.upperBound)) > 1 {
                     VStack(spacing: 4) {
                         AliveButton {
                             typeSize -~ availableTypeSizes.lowerBound

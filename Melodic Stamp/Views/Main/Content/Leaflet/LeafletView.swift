@@ -17,6 +17,8 @@ struct LeafletView: View {
     @Environment(PlayerModel.self) private var player
     @Environment(MetadataEditorModel.self) private var metadataEditor
     @Environment(LyricsModel.self) private var lyrics
+    @Environment(AudioVisualizerModel.self) private var audioVisualizer
+    @Environment(GradientVisualizerModel.self) private var gradientVisualizer
 
     @Environment(\.appearsActive) private var appearsActive
 
@@ -107,14 +109,17 @@ struct LeafletView: View {
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
-            .background {
+            .containerBackground(for: .window) {
                 if hasCover {
-                    ZStack {
-                        ChromaBackgroundView()
-
-                        Color.black
-                            .opacity(0.225)
-                    }
+                    ChromaBackgroundView()
+                        .environment(player)
+                        .environment(audioVisualizer)
+                        .environment(gradientVisualizer)
+                        .overlay {
+                            Color.black
+                                .opacity(0.225)
+                                .blendMode(.multiply)
+                        }
                 } else {
                     ZStack {
                         Rectangle()

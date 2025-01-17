@@ -211,13 +211,17 @@ struct ContentView: View {
             selectedInspectorTab: $selectedInspectorTab
         )
         .containerBackground(for: .window) {
-            switch mainWindowBackgroundStyle {
-            case .opaque:
+            if windowManager.isInFullScreen {
                 OpaqueBackgroundView()
-            case .vibrant:
-                VibrantBackgroundView()
-            case .ethereal:
-                EtherealBackgroundView()
+            } else {
+                switch mainWindowBackgroundStyle {
+                case .opaque:
+                    OpaqueBackgroundView()
+                case .vibrant:
+                    VibrantBackgroundView()
+                case .ethereal:
+                    EtherealBackgroundView()
+                }
             }
         }
         .ignoresSafeArea()
