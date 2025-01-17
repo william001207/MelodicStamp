@@ -5,6 +5,7 @@
 //  Created by Xinshao_Air on 2024/12/26.
 //
 
+import Defaults
 import MeshGradient
 import MeshGradientCHeaders
 import SwiftUI
@@ -22,6 +23,11 @@ struct AnimatedGrid: View {
     @Environment(AudioVisualizerModel.self) private var audioVisualizer
     @Environment(GradientVisualizerModel.self) private var gradientVisualizer
 
+    @Default(.gradientDynamics) private var dynamics
+    @Default(.isGradientAnimateWithAudioEnabled) private var isAnimateWithAudioEnabled
+    @Default(.gradientResolution) private var resolution
+    @Default(.gradientFPS) private var fps
+
     var hasDynamics: Bool = true
 
     @State private var gradientSpeed: CGFloat = 0.5
@@ -35,8 +41,9 @@ struct AnimatedGrid: View {
 
             let baseWeight = (normalizedX + normalizedY) / 1.2
             let adjustedWeight = baseWeight * weightFactor
+            let availableColors = Array(simdColors.prefix(upTo: dynamics.count))
 
-            let finalColors = simdColors.blending { first, second in
+            let finalColors = availableColors.blending { first, second in
                 SIMDColor.lerp(first, second, factor: adjustedWeight)
             }
 
@@ -47,18 +54,31 @@ struct AnimatedGrid: View {
 
     var body: some View {
         VStack {
-            MeshGradient(
-                initialGrid: generatePlainGrid(),
-                animatorConfiguration: .init(
-                    framesPerSecond: 120,
-                    locationAnimationSpeedRange: 4...5,
-                    tangentAnimationSpeedRange: 4...5,
-                    colorAnimationSpeedRange: 0.2...0.25,
-                    meshRandomizer: randomizer
-                ),
-                grainAlpha: 0,
-                resolutionScale: 0.8
-            )
+            switch dynamics {
+            case .plain:
+                gradientVisualizer.dominantColors.first ?? .clear
+            default:
+                if isAnimateWithAudioEnabled {
+                    MeshGradient(
+                        initialGrid: generatePlainGrid(),
+                        animatorConfiguration: .init(
+                            framesPerSecond: Int(fps),
+                            locationAnimationSpeedRange: 4...5,
+                            tangentAnimationSpeedRange: 4...5,
+                            colorAnimationSpeedRange: 0.2...0.25,
+                            meshRandomizer: randomizer
+                        ),
+                        grainAlpha: 0,
+                        resolutionScale: Double(resolution)
+                    )
+                } else {
+                    MeshGradient(
+                        grid: generatePlainGrid(),
+                        grainAlpha: 0,
+                        resolutionScale: Double(resolution)
+                    )
+                }
+            }
         }
         .onChange(of: audioVisualizer.normalizedData) { _, newValue in
             gradientSpeed = newValue

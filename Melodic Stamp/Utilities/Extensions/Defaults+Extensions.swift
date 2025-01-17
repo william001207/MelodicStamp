@@ -63,6 +63,11 @@ extension Defaults.Keys {
         default: .ternary
     )
 
+    static let isGradientAnimateWithAudioEnabled: Key<Bool> = .init(
+        "isGradientAnimateWithAudioEnabled",
+        default: true
+    )
+
     static let gradientResolution: Key<Defaults.GradientResolution> = .init(
         "gradientResolution",
         default: .clamp(0.8)

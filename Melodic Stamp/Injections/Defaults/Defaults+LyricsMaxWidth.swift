@@ -10,13 +10,19 @@ import Foundation
 
 extension Defaults {
     struct LyricsMaxWidth {
-        var value: Double
+        var value: Double {
+            didSet {
+                let clamped = clamped.value
+                guard value != clamped else { return }
+                value = clamped
+            }
+        }
     }
 }
 
 extension Double {
     init(_ lyricsMaxWidth: Defaults.LyricsMaxWidth) {
-        self = lyricsMaxWidth.value
+        self = lyricsMaxWidth.clamped.value
     }
 }
 

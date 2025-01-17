@@ -10,13 +10,19 @@ import Foundation
 
 extension Defaults {
     struct GradientFPS {
-        var value: Int
+        var value: Int {
+            didSet {
+                let clamped = clamped.value
+                guard value != clamped else { return }
+                value = clamped
+            }
+        }
     }
 }
 
 extension Int {
     init(_ gradientFPS: Defaults.GradientFPS) {
-        self = gradientFPS.value
+        self = gradientFPS.clamped.value
     }
 }
 

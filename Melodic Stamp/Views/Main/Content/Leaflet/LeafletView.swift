@@ -63,7 +63,7 @@ struct LeafletView: View {
                                 lyricsView()
                                     .transition(.blurReplace(.downUp))
                                     .dynamicTypeSize(typeSize)
-                                    .frame(maxWidth: max(maxWidth.value, innerSize.width / 2))
+                                    .frame(maxWidth: max(Double(maxWidth), innerSize.width / 2))
                             }
                         }
 

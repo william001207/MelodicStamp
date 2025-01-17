@@ -193,6 +193,9 @@
         }
       }
     },
+    "Animates gradient with audio" : {
+
+    },
     "App: (Subtitle) Songs" : {
       "comment" : "The subtitle displayed when there are songs in the playlist and nothing is playing",
       "extractionState" : "extracted_with_value",
@@ -291,6 +294,9 @@
           }
         }
       }
+    },
+    "Binary" : {
+
     },
     "Bluetooth" : {
       "localizations" : {
@@ -606,6 +612,15 @@
           }
         }
       }
+    },
+    "Gradient dynamics" : {
+
+    },
+    "Gradient FPS" : {
+
+    },
+    "Gradient Resolution" : {
+
     },
     "Grant a Value" : {
       "localizations" : {
@@ -1016,6 +1031,9 @@
         }
       }
     },
+    "Plain" : {
+
+    },
     "Play" : {
       "localizations" : {
         "zh-Hans" : {
@@ -1105,6 +1123,9 @@
           }
         }
       }
+    },
+    "Quaternion" : {
+
     },
     "Quieter" : {
       "localizations" : {
@@ -1363,6 +1384,9 @@
           }
         }
       }
+    },
+    "Ternary" : {
+
     },
     "Thunderbolt" : {
       "localizations" : {

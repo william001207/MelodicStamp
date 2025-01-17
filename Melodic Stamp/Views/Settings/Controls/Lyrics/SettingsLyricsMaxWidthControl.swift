@@ -19,7 +19,7 @@ struct SettingsLyricsMaxWidthControl: View {
             Text("Max lyrics width")
             TextField(
                 value: $maxWidth.value,
-                format: .number.precision(.integerAndFractionLength(integerLimits: 0..., fractionLimits: ...2))
+                format: .number.precision(.integerAndFractionLength(integerLimits: 1..., fractionLimits: 1...2))
             ) {
                 EmptyView()
             }

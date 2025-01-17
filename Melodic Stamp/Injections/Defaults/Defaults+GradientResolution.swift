@@ -10,13 +10,19 @@ import Foundation
 
 extension Defaults {
     struct GradientResolution {
-        var value: Double
+        var value: Double {
+            didSet {
+                let clamped = clamped.value
+                guard value != clamped else { return }
+                value = clamped
+            }
+        }
     }
 }
 
 extension Double {
     init(_ gradientResolution: Defaults.GradientResolution) {
-        self = gradientResolution.value
+        self = gradientResolution.clamped.value
     }
 }
 
@@ -31,7 +37,7 @@ extension Defaults.GradientResolution: ExpressibleByFloatLiteral, Comparable {
 }
 
 extension Defaults.GradientResolution: Clampable {
-    static let range: ClosedRange<Self> = 0.0...1.0
+    static let range: ClosedRange<Self> = 0.5...1.0
 }
 
 extension Defaults.GradientResolution: Codable, Defaults.Serializable {}

@@ -10,6 +10,12 @@ import SwiftUI
 struct SettingsPerformancePage: View {
     var body: some View {
         SettingsExcerptView(.performance, descriptionKey: "Performance settings excerpt.")
+
+        Section {
+            SettingsGradientFPSControl()
+
+            SettingsGradientResolutionControl()
+        }
     }
 }
 

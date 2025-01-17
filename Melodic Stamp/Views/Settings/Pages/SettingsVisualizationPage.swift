@@ -10,6 +10,10 @@ import SwiftUI
 struct SettingsVisualizationPage: View {
     var body: some View {
         SettingsExcerptView(.visualization, descriptionKey: "Visualization settings excerpt.")
+
+        Section {
+            SettingsGradientDynamicsControl()
+        }
     }
 }
 
