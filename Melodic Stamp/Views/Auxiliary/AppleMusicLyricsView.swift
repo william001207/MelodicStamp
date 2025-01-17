@@ -295,7 +295,7 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
         guard interactionState.isDelegated else { return }
         scrollOffset = max(0, fold(until: highlightedRange.lowerBound) + alignmentCompensation)
     }
-    
+
     private func jumpToHighlighted() {
         scrollPosition.scrollTo(id: max(0, min(range.upperBound - 1, highlightedRange.lowerBound)))
     }
