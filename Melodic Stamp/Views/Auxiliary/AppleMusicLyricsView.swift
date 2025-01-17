@@ -87,6 +87,7 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
 
     @State private var id = UUID() // Enables to force refresh contents on halfway finished
     @State private var initializationDispatch: DispatchWorkItem?
+    @State private var shouldForceUpdateScrollOffset: Bool = false
 
     var body: some View {
         ScrollView {
@@ -124,9 +125,12 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
         .onScrollGeometryChange(for: CGPoint.self) { proxy in
             proxy.contentOffset
         } action: { _, newValue in
-            guard scrollPosition.isPositionedByUser else { return }
-            scrollOffset = newValue.y
-            onScrolling?(scrollPosition, newValue)
+            if scrollPosition.isPositionedByUser {
+                scrollOffset = newValue.y
+                onScrolling?(scrollPosition, newValue)
+            } else if shouldForceUpdateScrollOffset {
+                scrollOffset = newValue.y
+            }
         }
         .onGeometryChange(for: CGSize.self) { proxy in
             proxy.size
@@ -158,8 +162,6 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
             // Force reset on external change
             reset()
             updateAnimationState()
-            print(0)
-            print(isIndicatorVisible, highlightedRange)
         }
         .onChange(of: highlightedRange) { _, _ in
             withAnimation(.spring(duration: 0.65, bounce: 0.275)) {
@@ -184,13 +186,25 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
             guard isInitialized else { return }
             animationContentOffsets = contentOffsets
         }
-        .onChange(of: animationContentOffsets) { _, newValue in
+        .onChange(of: animationContentOffsets) { oldValue, newValue in
             if newValue.keys.isEmpty {
                 // Force re-initialize the scroll offset to avoid dangling scrolling
                 scrollOffset = .zero
             } else {
-                withAnimation(.spring(duration: 0.65, bounce: 0.275)) {
-                    scrollToHighlighted()
+                if oldValue.keys.isEmpty {
+                    shouldForceUpdateScrollOffset = true
+                    withAnimation {
+                        jumpToHighlighted()
+                    } completion: {
+                        shouldForceUpdateScrollOffset = false
+                        withAnimation {
+                            scrollToHighlighted()
+                        }
+                    }
+                } else {
+                    withAnimation(.spring(duration: 0.65, bounce: 0.275)) {
+                        scrollToHighlighted()
+                    }
                 }
             }
         }
@@ -239,7 +253,7 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
     }
 
     @ViewBuilder private func content(at index: Int) -> some View {
-        let isHighlighted = highlightedRange.contains(index)
+        let isHighlighted = isInitialized && highlightedRange.contains(index)
         let delay = delay(at: index)
         let proportion = proportion(at: index)
 
@@ -280,6 +294,10 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
     private func scrollToHighlighted() {
         guard interactionState.isDelegated else { return }
         scrollOffset = max(0, fold(until: highlightedRange.lowerBound) + alignmentCompensation)
+    }
+    
+    private func jumpToHighlighted() {
+        scrollPosition.scrollTo(id: max(0, min(range.upperBound - 1, highlightedRange.lowerBound)))
     }
 
     private func fold(until index: Int) -> CGFloat {
