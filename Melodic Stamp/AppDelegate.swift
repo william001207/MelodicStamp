@@ -10,13 +10,18 @@ import Defaults
 import SwiftUI
 
 class AppDelegate: NSObject, NSApplicationDelegate {
+    // Hacky but works
+    @Environment(\.openWindow) private var openWindow
+
     func applicationDidFinishLaunching(_: Notification) {
         NSWindow.allowsAutomaticWindowTabbing = false
     }
 
     func applicationWillTerminate(_: Notification) {}
 
-    func application(_: NSApplication, open _: [URL]) {}
+    func application(_: NSApplication, open urls: [URL]) {
+        openWindow(id: WindowID.content.rawValue, value: TemporaryStorage(urls: Set(urls)))
+    }
 
     func applicationShouldTerminateAfterLastWindowClosed(_: NSApplication) -> Bool {
         true

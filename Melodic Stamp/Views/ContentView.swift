@@ -26,6 +26,8 @@ struct ContentView: View {
 
     // MARK: - Fields
 
+    var temporaryStorage: TemporaryStorage?
+
     // MARK: Models
 
     @State private var windowManager: WindowManagerModel = .init()
@@ -66,6 +68,13 @@ struct ContentView: View {
                     DelegatedPlayerSceneStorage()
                 }
                 .allowsHitTesting(false)
+            }
+
+            // MARK: Storage
+
+            .onAppear {
+                guard let temporaryStorage else { return }
+                player.addToPlaylist(urls: Array(temporaryStorage.urls))
             }
 
             // MARK: Window Styling

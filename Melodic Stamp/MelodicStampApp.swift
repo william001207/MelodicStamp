@@ -33,13 +33,14 @@ struct MelodicStampApp: App {
     @State private var floatingWindows: FloatingWindowsModel = .init()
 
     var body: some Scene {
-        WindowGroup(id: "content") {
-            ContentView()
+        WindowGroup(id: WindowID.content.rawValue, for: TemporaryStorage.self) { $storage in
+            ContentView(temporaryStorage: storage)
                 .environment(floatingWindows)
         }
         .windowResizability(.contentSize)
         .windowToolbarStyle(.unified)
         .windowManagerRole(.principal)
+        .handlesExternalEvents(matching: []) // Crucial for handling custom external events in `AppDelegate`
         .commands {
             InspectorCommands()
 
@@ -90,6 +91,7 @@ struct MelodicStampApp: App {
         .windowStyle(.hiddenTitleBar)
         .windowToolbarStyle(.unified)
         .windowManagerRole(.associated)
+        .handlesExternalEvents(matching: []) // Crucial for handling custom external events in `AppDelegate`
 
         Window("Settings", id: WindowID.settings.rawValue) {
             SettingsView()
@@ -107,6 +109,7 @@ struct MelodicStampApp: App {
         .windowResizability(.contentSize)
         .windowToolbarStyle(.unified)
         .windowManagerRole(.associated)
+        .handlesExternalEvents(matching: []) // Crucial for handling custom external events in `AppDelegate`
     }
 }
 
