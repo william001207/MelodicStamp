@@ -60,7 +60,7 @@ import SwiftUI
     }
 
     enum MetadataError: Error {
-        case invalidURL
+        case invalidState
         case noWritingPermission
         case noReadingPermission
     }
@@ -123,7 +123,11 @@ import SwiftUI
         self.url = url
 
         Task {
-            try await self.update()
+            do {
+                try await self.update()
+            } catch let error as MetadataError {
+                state = .error(error)
+            }
         }
     }
 
@@ -418,8 +422,11 @@ extension Metadata {
         }
     }
 
-    func update() async throws {
-        let file = try AudioFile(readingPropertiesAndMetadataFrom: url)
+    func update() async throws(MetadataError) {
+        guard let file = try? AudioFile(readingPropertiesAndMetadataFrom: url) else {
+            throw .noReadingPermission
+        }
+        
         properties = file.properties
         load(from: file.metadata)
 
@@ -431,27 +438,40 @@ extension Metadata {
         }
 
         state = .fine
-        await generateThumbnail()
+        
+        Task {
+            await generateThumbnail()
+            updateNowPlayingInfo()
+        }
     }
 
-    func write() async throws {
-        guard state.isEditable, isModified else { return }
+    func write() async throws(MetadataError) {
+        guard state.isEditable, isModified else {
+            throw .invalidState
+        }
 
         state = .saving
         apply()
         print("Started writing metadata to \(url)")
 
-        let file = try AudioFile(url: url)
+        guard let file = try? AudioFile(url: url) else {
+            throw .noWritingPermission
+        }
+        
         file.metadata = pack()
 
-        if file.metadata.comment != nil {
-            try file.writeMetadata()
-        } else {
-            // This is crucial for `.flac` file types
-            // In these files, if all fields except `attachedPictures` field are `nil`, audio decoding will encounter great issues after writing metadata
-            // so hereby always providing an empty `comment` if it is `nil`
-            file.metadata.comment = ""
-            try file.writeMetadata()
+        do {
+            if file.metadata.comment != nil {
+                try file.writeMetadata()
+            } else {
+                // This is crucial for `.flac` file types
+                // In these files, if all fields except `attachedPictures` field are `nil`, audio decoding will encounter great issues after writing metadata
+                // so hereby always providing an empty `comment` if it is `nil`
+                file.metadata.comment = ""
+                try file.writeMetadata()
+            }
+        } catch {
+            throw .noWritingPermission
         }
 
         state = .fine

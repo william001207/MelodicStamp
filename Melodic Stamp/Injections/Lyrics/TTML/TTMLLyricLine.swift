@@ -23,11 +23,11 @@ struct TTMLLyricLine: LyricLine {
 
 extension TTMLLyricLine {
     var beginTime: TimeInterval? {
-        [lyrics, backgroundLyrics].compactMap(\.beginTime).min()
+        lyrics.beginTime
     }
 
     var endTime: TimeInterval? {
-        [lyrics, backgroundLyrics].compactMap(\.endTime).max()
+        lyrics.endTime
     }
 
     var content: String {
