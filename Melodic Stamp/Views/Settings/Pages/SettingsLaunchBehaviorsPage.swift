@@ -9,7 +9,10 @@ import SwiftUI
 
 struct SettingsLaunchBehaviorsPage: View {
     var body: some View {
-        SettingsExcerptView(.launchBehaviors, descriptionKey: "Launch behaviors settings excerpt.")
+        SettingsExcerptView(
+            .launchBehaviors,
+            descriptionKey: "Control what \(Bundle.main.displayName) should do when launching from a previous interruption."
+        )
 
         Section {
             SettingsPlaybackModeMemorizationControl()

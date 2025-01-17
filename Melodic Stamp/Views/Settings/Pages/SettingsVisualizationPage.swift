@@ -9,7 +9,10 @@ import SwiftUI
 
 struct SettingsVisualizationPage: View {
     var body: some View {
-        SettingsExcerptView(.visualization, descriptionKey: "Visualization settings excerpt.")
+        SettingsExcerptView(
+            .visualization,
+            descriptionKey: "Tweak \(Bundle.main.displayName)'s audio visualization experience to the fullest."
+        )
 
         Section {
             SettingsGradientDynamicsControl()

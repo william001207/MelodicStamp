@@ -9,7 +9,10 @@ import SwiftUI
 
 struct SettingsLyricsPage: View {
     var body: some View {
-        SettingsExcerptView(.lyrics, descriptionKey: "Lyrics settings excerpt.")
+        SettingsExcerptView(
+            .lyrics,
+            descriptionKey: "Customize how lyrics are displayed in the leaflet page."
+        )
 
         Section {
             SettingsLyricsFadingEffectControl()
@@ -22,7 +25,7 @@ struct SettingsLyricsPage: View {
         } header: {
             Text("Attachments & Type Size")
             Text("""
-            While type size can be adjusted independently in the leaflet page, all changes of the below properties will cause a reset in the lyrics view in order to obtain a correct visual effect.
+            While type size can be adjusted independently in the leaflet page, all changes of the below properties including type size will cause a reset in the lyrics view in order to obtain a correct visual effect.
             """)
         }
 

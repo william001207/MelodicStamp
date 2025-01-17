@@ -9,7 +9,10 @@ import SwiftUI
 
 struct SettingsPerformancePage: View {
     var body: some View {
-        SettingsExcerptView(.performance, descriptionKey: "Performance settings excerpt.")
+        SettingsExcerptView(
+            .performance,
+            descriptionKey: "Adjust \(Bundle.main.displayName)'s performance to meet your hardware's needs."
+        )
 
         Section {
             SettingsGradientFPSControl()

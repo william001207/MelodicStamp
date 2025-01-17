@@ -2,10 +2,17 @@
   "sourceLanguage" : "en",
   "strings" : {
     "--:--" : {
-
+      "shouldTranslate" : false
     },
     "#%lld" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "#%lld"
+          }
+        }
+      }
     },
     "%lld words" : {
       "localizations" : {
@@ -18,10 +25,24 @@
       }
     },
     "×0.1" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "0.1倍速"
+          }
+        }
+      }
     },
     "×5" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "5倍速"
+          }
+        }
+      }
     },
     "About %@" : {
       "localizations" : {
@@ -41,6 +62,12 @@
             "state" : "new",
             "value" : "Preview"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Preview"
+          }
         }
       }
     },
@@ -53,22 +80,58 @@
             "value" : "%1$@ (%2$@)"
           }
         }
-      }
+      },
+      "shouldTranslate" : false
     },
     "Accessibility 1" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "一级辅助功能"
+          }
+        }
+      }
     },
     "Accessibility 2" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "二级辅助功能"
+          }
+        }
+      }
     },
     "Accessibility 3" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "三级辅助功能"
+          }
+        }
+      }
     },
     "Accessibility 4" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "四级辅助功能"
+          }
+        }
+      }
     },
     "Accessibility 5" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "五级辅助功能"
+          }
+        }
+      }
     },
     "Add Files" : {
       "localizations" : {
@@ -86,6 +149,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "添加文件"
+          }
+        }
+      }
+    },
+    "Adjust %@'s performance to meet your hardware's needs." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "调整%@的性能以满足你的硬件需求。"
           }
         }
       }
@@ -181,7 +254,14 @@
       }
     },
     "Always" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "永远"
+          }
+        }
+      }
     },
     "Analytics" : {
       "localizations" : {
@@ -194,7 +274,14 @@
       }
     },
     "Animates gradient with audio" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "随着音频律动改变渐变色"
+          }
+        }
+      }
     },
     "App: (Subtitle) Songs" : {
       "comment" : "The subtitle displayed when there are songs in the playlist and nothing is playing",
@@ -215,13 +302,24 @@
       }
     },
     "Appearance" : {
-
-    },
-    "Appearance settings excerpt." : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "外观"
+          }
+        }
+      }
     },
     "Applies a fading blur and opacity effect to lyrics that are not currently highlighted." : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "向未高亮的歌词应用渐隐的模糊和透明度效果。"
+          }
+        }
+      }
     },
     "Artist" : {
       "localizations" : {
@@ -244,13 +342,34 @@
       }
     },
     "Attachments & Type Size" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "附件和字体大小"
+          }
+        }
+      }
     },
     "Available type sizes" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "可选字体大小"
+          }
+        }
+      }
     },
     "AVB" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "AVB"
+          }
+        }
+      }
     },
     "Back Cover" : {
       "localizations" : {
@@ -273,7 +392,14 @@
       }
     },
     "Background Styles" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "背景样式"
+          }
+        }
+      }
     },
     "Band" : {
       "localizations" : {
@@ -296,7 +422,14 @@
       }
     },
     "Binary" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "双色"
+          }
+        }
+      }
     },
     "Bluetooth" : {
       "localizations" : {
@@ -319,7 +452,14 @@
       }
     },
     "BPM" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "拍每分钟"
+          }
+        }
+      }
     },
     "Built-in" : {
       "localizations" : {
@@ -342,7 +482,14 @@
       }
     },
     "Chroma" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "光谱"
+          }
+        }
+      }
     },
     "Clear" : {
       "localizations" : {
@@ -375,7 +522,14 @@
       }
     },
     "Coloured Fish" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "彩色鱼"
+          }
+        }
+      }
     },
     "Comment" : {
       "localizations" : {
@@ -457,8 +611,25 @@
         }
       }
     },
+    "Control what %@ should do when launching from a previous interruption." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "控制%@在打断后再次启动时的行为。"
+          }
+        }
+      }
+    },
     "Copied to clipboard!" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已复制到剪贴板！"
+          }
+        }
+      }
     },
     "Copyright" : {
       "localizations" : {
@@ -470,8 +641,35 @@
         }
       }
     },
+    "Customize how lyrics are displayed in the leaflet page." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "自定义传单页面的歌词显示样式。"
+          }
+        }
+      }
+    },
+    "Decorate %@ as you like." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "随心装饰%@。"
+          }
+        }
+      }
+    },
     "Default playback mode" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "默认播放模式"
+          }
+        }
+      }
     },
     "Discs" : {
       "localizations" : {
@@ -494,10 +692,24 @@
       }
     },
     "DisplayPort" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DisplayPort"
+          }
+        }
+      }
     },
     "Displays the information of the currently playing track as window title." : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "将正在播放的歌曲信息用作窗口标题。"
+          }
+        }
+      }
     },
     "During Performance" : {
       "localizations" : {
@@ -520,7 +732,14 @@
       }
     },
     "Dynamic title bar" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "动态标题栏"
+          }
+        }
+      }
     },
     "Edit" : {
       "localizations" : {
@@ -533,22 +752,64 @@
       }
     },
     "Ethereal" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "超现实"
+          }
+        }
+      }
     },
     "Extra Large" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "超大"
+          }
+        }
+      }
     },
     "Extra Small" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "超小"
+          }
+        }
+      }
     },
     "Extra² Large" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "超大²"
+          }
+        }
+      }
     },
     "Extra³ Large" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "超大³"
+          }
+        }
+      }
     },
     "Fading effect" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "渐隐效果"
+          }
+        }
+      }
     },
     "Fast Forward" : {
       "localizations" : {
@@ -571,7 +832,14 @@
       }
     },
     "FireWire" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "FireWire"
+          }
+        }
+      }
     },
     "Forming New Playlist" : {
       "localizations" : {
@@ -614,13 +882,34 @@
       }
     },
     "Gradient dynamics" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "渐变色动态模式"
+          }
+        }
+      }
     },
     "Gradient FPS" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "渐变色帧率"
+          }
+        }
+      }
     },
     "Gradient Resolution" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "渐变色分辨率"
+          }
+        }
+      }
     },
     "Grant a Value" : {
       "localizations" : {
@@ -633,7 +922,14 @@
       }
     },
     "HDMI" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "HDMI"
+          }
+        }
+      }
     },
     "Hide" : {
       "localizations" : {
@@ -676,19 +972,44 @@
       }
     },
     "Invalid State" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "无效状态"
+          }
+        }
+      }
     },
     "ISRC" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ISRC"
+          }
+        }
+      }
     },
     "Large" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "大"
+          }
+        }
+      }
     },
     "Launch Behaviors" : {
-
-    },
-    "Launch behaviors settings excerpt." : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "启动行为"
+          }
+        }
+      }
     },
     "Lead Artist" : {
       "localizations" : {
@@ -780,11 +1101,15 @@
         }
       }
     },
-    "Lyrics settings excerpt." : {
-
-    },
     "Main window" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "主窗口"
+          }
+        }
+      }
     },
     "Main Window" : {
       "localizations" : {
@@ -797,7 +1122,14 @@
       }
     },
     "Max lyrics width" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "最大歌词宽度"
+          }
+        }
+      }
     },
     "Media" : {
       "localizations" : {
@@ -810,7 +1142,14 @@
       }
     },
     "Medium" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "中"
+          }
+        }
+      }
     },
     "Metadata" : {
       "localizations" : {
@@ -823,7 +1162,14 @@
       }
     },
     "Mini player" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "小播放器"
+          }
+        }
+      }
     },
     "Mini Player" : {
       "localizations" : {
@@ -866,7 +1212,14 @@
       }
     },
     "Music Brainz" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Music Brainz"
+          }
+        }
+      }
     },
     "MusicTitle : (Separator) Stringified Artists" : {
       "comment" : "The separator between artists in a stringified title",
@@ -895,6 +1248,12 @@
             "state" : "new",
             "value" : "·"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "·"
+          }
         }
       }
     },
@@ -909,7 +1268,14 @@
       }
     },
     "Never" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "从不"
+          }
+        }
+      }
     },
     "Next Track" : {
       "localizations" : {
@@ -922,13 +1288,34 @@
       }
     },
     "No Reading Permission" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "无读取权限"
+          }
+        }
+      }
     },
     "No Writing Permission" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "无写入权限"
+          }
+        }
+      }
     },
     "No." : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No."
+          }
+        }
+      }
     },
     "Nothing to Play" : {
       "localizations" : {
@@ -941,7 +1328,14 @@
       }
     },
     "Opaque" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "不透明"
+          }
+        }
+      }
     },
     "Open File" : {
       "localizations" : {
@@ -964,7 +1358,14 @@
       }
     },
     "Open sourced on GitHub" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "开源于GitHub"
+          }
+        }
+      }
     },
     "Other" : {
       "localizations" : {
@@ -997,10 +1398,10 @@
       }
     },
     "Parse Lyrics" : {
-
+      "shouldTranslate" : false
     },
     "Paste TTML lyrics above..." : {
-
+      "shouldTranslate" : false
     },
     "Pause" : {
       "localizations" : {
@@ -1013,13 +1414,24 @@
       }
     },
     "PCI" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PCI"
+          }
+        }
+      }
     },
     "Performance" : {
-
-    },
-    "Performance settings excerpt." : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "性能"
+          }
+        }
+      }
     },
     "Pictures" : {
       "localizations" : {
@@ -1032,7 +1444,14 @@
       }
     },
     "Plain" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "单色"
+          }
+        }
+      }
     },
     "Play" : {
       "localizations" : {
@@ -1125,7 +1544,14 @@
       }
     },
     "Quaternion" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "四色"
+          }
+        }
+      }
     },
     "Quieter" : {
       "localizations" : {
@@ -1228,16 +1654,44 @@
       }
     },
     "Restores playback modes for each window" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "为每个窗口恢复播放模式"
+          }
+        }
+      }
     },
     "Restores playback positions" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "恢复进度"
+          }
+        }
+      }
     },
     "Restores playback volumes" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "恢复音量"
+          }
+        }
+      }
     },
     "Restores playlists for each window" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "为每个窗口恢复播放列表"
+          }
+        }
+      }
     },
     "Rewind" : {
       "localizations" : {
@@ -1250,7 +1704,14 @@
       }
     },
     "Roman" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "罗马音"
+          }
+        }
+      }
     },
     "Save" : {
       "localizations" : {
@@ -1353,7 +1814,14 @@
       }
     },
     "Small" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "小"
+          }
+        }
+      }
     },
     "Sorting" : {
       "localizations" : {
@@ -1376,7 +1844,14 @@
       }
     },
     "Stops rendering inspector" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "停止渲染检视器"
+          }
+        }
+      }
     },
     "System Default" : {
       "localizations" : {
@@ -1389,7 +1864,14 @@
       }
     },
     "Ternary" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "三色"
+          }
+        }
+      }
     },
     "Thunderbolt" : {
       "localizations" : {
@@ -1452,10 +1934,34 @@
       }
     },
     "Translation" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "翻译"
+          }
+        }
+      }
+    },
+    "Tweak %@'s audio visualization experience to the fullest." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "调整%@的音频可视化以获得最佳体验。"
+          }
+        }
+      }
     },
     "Type size" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "文字大小"
+          }
+        }
+      }
     },
     "Unknown" : {
       "localizations" : {
@@ -1478,7 +1984,14 @@
       }
     },
     "USB" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "USB"
+          }
+        }
+      }
     },
     "Version" : {
       "localizations" : {
@@ -1491,7 +2004,14 @@
       }
     },
     "Vibrant" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "半透明"
+          }
+        }
+      }
     },
     "Virtual" : {
       "localizations" : {
@@ -1504,19 +2024,44 @@
       }
     },
     "Visualization" : {
-
-    },
-    "Visualization settings excerpt." : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "可视化"
+          }
+        }
+      }
     },
     "While %@ is Inactive" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@在后台时"
+          }
+        }
+      }
     },
     "While playing" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "播放时"
+          }
+        }
+      }
     },
-    "While type size can be adjusted independently in the leaflet page, all changes of the below properties will cause a reset in the lyrics view in order to obtain a correct visual effect." : {
-
+    "While type size can be adjusted independently in the leaflet page, all changes of the below properties including type size will cause a reset in the lyrics view in order to obtain a correct visual effect." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "尽管文字大小可以在传单页面中单独调整，但对包含文字大小在内的以下属性进行的任何调整都会强制触发歌词视图的重置，以保证视觉效果的准确性。"
+          }
+        }
+      }
     },
     "You can use [AMLL TTML Tool](https://steve-xmh.github.io/amll-ttml-tool) to create TTML lyrics through a refined interface." : {
       "localizations" : {

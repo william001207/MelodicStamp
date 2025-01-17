@@ -10,7 +10,10 @@ import SwiftUI
 
 struct SettingsAppearancePage: View {
     var body: some View {
-        SettingsExcerptView(.appearance, descriptionKey: "Appearance settings excerpt.")
+        SettingsExcerptView(
+            .appearance,
+            descriptionKey: "Decorate \(Bundle.main.displayName) as you like."
+        )
 
         Section {
             SettingsDynamicTitleBarControl()
