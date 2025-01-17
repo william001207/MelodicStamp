@@ -111,11 +111,6 @@ extension Defaults.Keys {
         "hidesInspectorWhileInactive",
         default: false
     )
-
-    static let hidesLyricsWhileInactive: Key<Bool> = .init(
-        "hidesLyricsWhileInactive",
-        default: false
-    )
 }
 
 extension Defaults {

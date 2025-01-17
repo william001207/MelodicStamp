@@ -19,8 +19,6 @@ struct SettingsPerformancePage: View {
 
         Section("While \(Bundle.main.displayName) is Inactive") {
             SettingsHidesInspectorWhileInactiveControl()
-
-            SettingsHidesLyricsWhileInactiveControl()
         }
     }
 }

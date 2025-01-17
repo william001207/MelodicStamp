@@ -5,10 +5,13 @@
 //  Created by KrLite on 2025/1/3.
 //
 
+import Defaults
 import SwiftUI
 
 struct DisplayLyricLineView: View {
     @Environment(PlayerModel.self) private var player
+
+    @Default(.isLyricsFadingEffectEnabled) private var isLyricsFadingEffectEnabled
 
     var line: any LyricLine
     var index: Int
@@ -22,6 +25,8 @@ struct DisplayLyricLineView: View {
     var body: some View {
         // Avoids multiple instantializations
         let isActive = isActive
+        let hasFadingEffect = isLyricsFadingEffectEnabled && shouldFade && !isActive
+
         let blurRadius = blurRadius(for: index, in: highlightedRange)
         let opacity = opacity(for: index, in: highlightedRange)
 
@@ -48,14 +53,14 @@ struct DisplayLyricLineView: View {
                 }
             }
             .padding(8.5)
-            .blur(radius: isActive || !shouldFade ? 0 : blurRadius)
-            .opacity(isActive || !shouldFade ? 1 : opacity)
+            .blur(radius: hasFadingEffect ? blurRadius : 0)
+            .opacity(hasFadingEffect ? opacity : 1)
             .hoverableBackground()
             .clipShape(.rect(cornerRadius: 12))
             .onHover { hover in
                 isHovering = hover
             }
-            .animation(.smooth(duration: 0.25), value: isHovering)
+            .animation(.smooth(duration: 0.25), value: hasFadingEffect)
         }
     }
 

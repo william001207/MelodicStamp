@@ -26,7 +26,6 @@ struct LeafletView: View {
 
     @Default(.lyricsTypeSizes) private var typeSizes
     @Default(.lyricsMaxWidth) private var maxWidth
-    @Default(.hidesLyricsWhileInactive) private var hidesLyricsWhileInactive
 
     // MARK: - Fields
 
@@ -47,8 +46,7 @@ struct LeafletView: View {
             ExcerptView(tab: SidebarContentTab.leaflet)
         } else {
             ZStack {
-                let canRenderLyrics = !hidesLyricsWhileInactive || appearsActive
-                if canRenderLyrics, hasCover || hasLyrics {
+                if hasCover || hasLyrics {
                     HStack(spacing: 0) {
                         if hasCover {
                             Spacer(minLength: 0)
