@@ -13,7 +13,6 @@ import SwiftUI
 struct PlayerView: View {
     // MARK: - Environments
 
-    @Environment(FloatingWindowsModel.self) private var floatingWindows
     @Environment(WindowManagerModel.self) private var windowManager
     @Environment(PlayerModel.self) private var player
     @Environment(PlayerKeyboardControlModel.self) private var playerKeyboardControl
@@ -135,7 +134,7 @@ struct PlayerView: View {
 
             // MARK: Expand / Shrink
 
-            if !floatingWindows.isInFullScreen {
+            if !windowManager.isInFullScreen {
                 AliveButton(
                     enabledStyle: .tertiary, hoveringStyle: .secondary
                 ) {

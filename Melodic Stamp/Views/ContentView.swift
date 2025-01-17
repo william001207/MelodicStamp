@@ -91,8 +91,10 @@ struct ContentView: View {
                 guard newValue else { return }
                 isFocused = true
                 resetFocus(in: namespace)
+
                 player.updateOutputDevices()
                 floatingWindows.observe(window)
+                windowManager.observe(window)
             }
             .onChange(of: windowManager.style, initial: true) { _, _ in
                 isFocused = true

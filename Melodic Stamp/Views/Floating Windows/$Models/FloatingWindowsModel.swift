@@ -9,7 +9,7 @@ import AppKit
 import SwiftUI
 
 @MainActor @Observable final class FloatingWindowsModel {
-    private(set) var isInFullScreen: Bool = false
+    private var isInFullScreen: Bool = false
 
     var isHidden: Bool = false {
         didSet {
@@ -33,8 +33,9 @@ import SwiftUI
 
     func observe(_ window: NSWindow? = nil) {
         NotificationCenter.default.removeObserver(self)
-
         guard let window else { return }
+
+        isInFullScreen = window.isInFullScreen
 
         NotificationCenter.default.addObserver(
             self,

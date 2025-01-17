@@ -35,5 +35,37 @@ enum MelodicStampWindowStyle: String, Equatable, Hashable, Identifiable {
         }
     }
 
-    var isAlwaysOnTop: Bool = true
+    var isAlwaysOnTop: Bool = false
+    private(set) var isInFullScreen: Bool = false
+
+    func observe(_ window: NSWindow? = nil) {
+        NotificationCenter.default.removeObserver(self)
+        guard let window else { return }
+
+        isInFullScreen = window.isInFullScreen
+
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(windowDidEnterFullScreen),
+            name: NSWindow.didEnterFullScreenNotification,
+            object: window
+        )
+
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(windowDidExitFullScreen),
+            name: NSWindow.didExitFullScreenNotification,
+            object: window
+        )
+    }
+}
+
+extension WindowManagerModel {
+    @objc func windowDidEnterFullScreen() {
+        isInFullScreen = true
+    }
+
+    @objc func windowDidExitFullScreen() {
+        isInFullScreen = false
+    }
 }
