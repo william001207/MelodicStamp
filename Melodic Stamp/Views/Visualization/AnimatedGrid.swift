@@ -33,23 +33,44 @@ struct AnimatedGrid: View {
     @State private var gradientSpeed: CGFloat = 0.5
 
     private var randomizer: MeshRandomizer {
-        .init(colorRandomizer: { color, _, x, y, gridWidth, gridHeight in
-            guard !simdColors.isEmpty else { return }
+        if isAnimateWithAudioEnabled {
+            .init(
+                colorRandomizer: { color, _, x, y, gridWidth, gridHeight in
+                    guard !availableColors.isEmpty else { return }
 
-            let normalizedX = Float(x) / Float(gridWidth - 1)
-            let normalizedY = Float(y) / Float(gridHeight - 1)
+                    let normalizedX = Float(x) / Float(gridWidth - 1)
+                    let normalizedY = Float(y) / Float(gridHeight - 1)
 
-            let baseWeight = (normalizedX + normalizedY) / 1.2
-            let adjustedWeight = baseWeight * weightFactor
-            let availableColors = Array(simdColors.prefix(upTo: dynamics.count))
+                    let baseWeight = (normalizedX + normalizedY) / 1.2
+                    let adjustedWeight = baseWeight * weightFactor
 
-            let finalColors = availableColors.blending { first, second in
-                SIMDColor.lerp(first, second, factor: adjustedWeight)
-            }
+                    let finalColors = availableColors.blending { first, second in
+                        SIMDColor.lerp(first, second, factor: adjustedWeight)
+                    }
 
-            let index = (x + y) % finalColors.count
-            color = finalColors[index]
-        })
+                    let index = (x + y) % finalColors.count
+                    color = finalColors[index]
+                }
+            )
+        } else {
+            .init(
+                colorRandomizer: { color, _, x, y, gridWidth, gridHeight in
+                    guard !availableColors.isEmpty else { return }
+
+                    let normalizedX = Float(x) / Float(gridWidth - 1)
+                    let normalizedY = Float(y) / Float(gridHeight - 1)
+
+                    let baseWeight = (normalizedX + normalizedY) / 1.2
+
+                    let finalColors = availableColors.blending { first, second in
+                        SIMDColor.lerp(first, second, factor: baseWeight)
+                    }
+
+                    let index = (x + y) % finalColors.count
+                    color = finalColors[index]
+                }
+            )
+        }
     }
 
     var body: some View {
@@ -58,26 +79,18 @@ struct AnimatedGrid: View {
             case .plain:
                 gradientVisualizer.dominantColors.first ?? .clear
             default:
-                if isAnimateWithAudioEnabled {
-                    MeshGradient(
-                        initialGrid: generatePlainGrid(),
-                        animatorConfiguration: .init(
-                            framesPerSecond: Int(fps),
-                            locationAnimationSpeedRange: 4...5,
-                            tangentAnimationSpeedRange: 4...5,
-                            colorAnimationSpeedRange: 0.2...0.25,
-                            meshRandomizer: randomizer
-                        ),
-                        grainAlpha: 0,
-                        resolutionScale: Double(resolution)
-                    )
-                } else {
-                    MeshGradient(
-                        grid: generatePlainGrid(),
-                        grainAlpha: 0,
-                        resolutionScale: Double(resolution)
-                    )
-                }
+                MeshGradient(
+                    initialGrid: generatePlainGrid(),
+                    animatorConfiguration: .init(
+                        framesPerSecond: Int(fps),
+                        locationAnimationSpeedRange: 4...5,
+                        tangentAnimationSpeedRange: 4...5,
+                        colorAnimationSpeedRange: 0.2...0.25,
+                        meshRandomizer: randomizer
+                    ),
+                    grainAlpha: 0,
+                    resolutionScale: Double(resolution)
+                )
             }
         }
         .onChange(of: audioVisualizer.normalizedData) { _, newValue in
@@ -95,6 +108,14 @@ struct AnimatedGrid: View {
 
     private var simdColors: [SIMDColor] {
         gradientVisualizer.dominantColors.map { $0.toSimdFloat3() }
+    }
+
+    private var availableColorCount: Int {
+        min(simdColors.count, dynamics.count)
+    }
+
+    private var availableColors: [SIMDColor] {
+        Array(simdColors.prefix(upTo: availableColorCount))
     }
 
     private func generatePlainGrid(size: Int = 4) -> MeshGradientGrid<ControlPoint> {
