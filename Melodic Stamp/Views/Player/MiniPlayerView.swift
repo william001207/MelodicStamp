@@ -596,8 +596,10 @@ struct MiniPlayerView: View {
     }
 }
 
-#Preview(traits: .modifier(SampleEnvironmentsPreviewModifier())) {
-    @Previewable @Namespace var namespace
+#if DEBUG
+    #Preview(traits: .modifier(SampleEnvironmentsPreviewModifier())) {
+        @Previewable @Namespace var namespace
 
-    MiniPlayerView(namespace: namespace)
-}
+        MiniPlayerView(namespace: namespace)
+    }
+#endif

@@ -106,16 +106,18 @@ struct MainView: View {
     }
 }
 
-#Preview(traits: .modifier(SampleEnvironmentsPreviewModifier())) {
-    @Previewable @Namespace var namespace
-    @Previewable @State var isInspectorPresented = true
-    @Previewable @State var selectedContentTab: SidebarContentTab = .playlist
-    @Previewable @State var selectedInspectorTab: SidebarInspectorTab = .commonMetadata
+#if DEBUG
+    #Preview(traits: .modifier(SampleEnvironmentsPreviewModifier())) {
+        @Previewable @Namespace var namespace
+        @Previewable @State var isInspectorPresented = true
+        @Previewable @State var selectedContentTab: SidebarContentTab = .playlist
+        @Previewable @State var selectedInspectorTab: SidebarInspectorTab = .commonMetadata
 
-    MainView(
-        namespace: namespace,
-        isInspectorPresented: $isInspectorPresented,
-        selectedContentTab: $selectedContentTab,
-        selectedInspectorTab: $selectedInspectorTab
-    )
-}
+        MainView(
+            namespace: namespace,
+            isInspectorPresented: $isInspectorPresented,
+            selectedContentTab: $selectedContentTab,
+            selectedInspectorTab: $selectedInspectorTab
+        )
+    }
+#endif

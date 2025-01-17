@@ -322,8 +322,10 @@ struct PlayerView: View {
     }
 }
 
-#Preview(traits: .modifier(SampleEnvironmentsPreviewModifier())) {
-    @Previewable @Namespace var namespace
+#if DEBUG
+    #Preview(traits: .modifier(SampleEnvironmentsPreviewModifier())) {
+        @Previewable @Namespace var namespace
 
-    PlayerView(namespace: namespace)
-}
+        PlayerView(namespace: namespace)
+    }
+#endif

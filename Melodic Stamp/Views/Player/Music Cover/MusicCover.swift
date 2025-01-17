@@ -45,7 +45,9 @@ struct MusicCover: View {
     }
 }
 
-#Preview {
-    MusicCover(images: [.templateArtwork], cornerRadius: 12)
-        .scaleEffect(0.85, anchor: .center)
-}
+#if DEBUG
+    #Preview {
+        MusicCover(images: [.templateArtwork], cornerRadius: 12)
+            .scaleEffect(0.85, anchor: .center)
+    }
+#endif

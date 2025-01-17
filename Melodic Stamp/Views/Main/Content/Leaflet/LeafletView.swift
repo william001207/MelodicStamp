@@ -284,9 +284,11 @@ struct LeafletView: View {
     }
 }
 
-#Preview(traits: .modifier(SampleEnvironmentsPreviewModifier())) {
-    @Previewable @State var lyrics: LyricsModel = .init()
+#if DEBUG
+    #Preview(traits: .modifier(SampleEnvironmentsPreviewModifier())) {
+        @Previewable @State var lyrics: LyricsModel = .init()
 
-    LeafletView()
-        .environment(lyrics)
-}
+        LeafletView()
+            .environment(lyrics)
+    }
+#endif
