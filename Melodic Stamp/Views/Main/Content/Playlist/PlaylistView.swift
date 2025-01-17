@@ -204,7 +204,7 @@ struct PlaylistView: View {
     // MARK: - Item View
 
     @ViewBuilder private func itemView(for track: Track) -> some View {
-        PlayableItemView(
+        TrackView(
             track: track,
             isSelected: metadataEditor.tracks.contains(track)
         )

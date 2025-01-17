@@ -1,5 +1,5 @@
 //
-//  PlaylistItemView.swift
+//  TrackView.swift
 //  MelodicStamp
 //
 //  Created by KrLite on 2024/11/23.
@@ -8,7 +8,7 @@
 import CSFBAudioEngine
 import SwiftUI
 
-struct PlayableItemView: View {
+struct TrackView: View {
     @Environment(PlayerModel.self) private var player
 
     var track: Track
@@ -35,10 +35,19 @@ struct PlayableItemView: View {
                         } else {
                             MusicTitle(track: track)
                         }
-                    case .error:
-                        Text("Encountered Error")
-                            .foregroundStyle(.red)
-                            .bold()
+                    case let .error(error):
+                        Group {
+                            switch error {
+                            case .invalidState:
+                                Text("Invalid State")
+                            case .noWritingPermission:
+                                Text("No Writing Permission")
+                            case .noReadingPermission:
+                                Text("No Reading Permission")
+                            }
+                        }
+                        .foregroundStyle(.red)
+                        .bold()
                     }
                 }
                 .font(.title3)

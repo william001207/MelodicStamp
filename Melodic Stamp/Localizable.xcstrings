@@ -526,9 +526,6 @@
         }
       }
     },
-    "Encountered Error" : {
-
-    },
     "Ethereal" : {
 
     },
@@ -662,6 +659,9 @@
           }
         }
       }
+    },
+    "Invalid State" : {
+
     },
     "ISRC" : {
 
@@ -905,6 +905,12 @@
           }
         }
       }
+    },
+    "No Reading Permission" : {
+
+    },
+    "No Writing Permission" : {
+
     },
     "No." : {
 

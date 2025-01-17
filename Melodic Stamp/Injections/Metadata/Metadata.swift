@@ -426,7 +426,7 @@ extension Metadata {
         guard let file = try? AudioFile(readingPropertiesAndMetadataFrom: url) else {
             throw .noReadingPermission
         }
-        
+
         properties = file.properties
         load(from: file.metadata)
 
@@ -438,7 +438,7 @@ extension Metadata {
         }
 
         state = .fine
-        
+
         Task {
             await generateThumbnail()
             updateNowPlayingInfo()
@@ -457,7 +457,7 @@ extension Metadata {
         guard let file = try? AudioFile(url: url) else {
             throw .noWritingPermission
         }
-        
+
         file.metadata = pack()
 
         do {
