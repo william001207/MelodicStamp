@@ -218,12 +218,6 @@ extension SFBAudioEnginePlayer: AudioPlayer.Delegate {
         }
     }
 
-    func audioPlayer(_ audioPlayer: AudioPlayer, audioWillEndAt hostTime: UInt64) {
-        if let delegate = delegate as? AudioPlayer.Delegate {
-            delegate.audioPlayer?(audioPlayer, audioWillEndAt: hostTime)
-        }
-    }
-
     func audioPlayer(_ audioPlayer: AudioPlayer, renderingWillStart decoder: any PCMDecoding, at hostTime: UInt64) {
         if let delegate = delegate as? AudioPlayer.Delegate {
             delegate.audioPlayer?(audioPlayer, renderingWillStart: decoder, at: hostTime)
@@ -236,21 +230,21 @@ extension SFBAudioEnginePlayer: AudioPlayer.Delegate {
         }
     }
 
-    func audioPlayer(_ audioPlayer: AudioPlayer, decodingCanceled decoder: any PCMDecoding, partiallyRendered: Bool) {
+    func audioPlayer(_ audioPlayer: AudioPlayer, decoderCanceled decoder: any PCMDecoding, framesRendered: AVAudioFramePosition) {
         if let delegate = delegate as? AudioPlayer.Delegate {
-            delegate.audioPlayer?(audioPlayer, decodingCanceled: decoder, partiallyRendered: partiallyRendered)
+            delegate.audioPlayer?(audioPlayer, decoderCanceled: decoder, framesRendered: framesRendered)
         }
     }
 
-    func audioPlayerNowPlayingChanged(_ audioPlayer: AudioPlayer) {
+    func audioPlayer(_ audioPlayer: AudioPlayer, nowPlayingChanged nowPlaying: (any PCMDecoding)?) {
         if let delegate = delegate as? AudioPlayer.Delegate {
-            delegate.audioPlayerNowPlayingChanged?(audioPlayer)
+            delegate.audioPlayer?(audioPlayer, nowPlayingChanged: nowPlaying)
         }
     }
 
-    func audioPlayerPlaybackStateChanged(_ audioPlayer: AudioPlayer) {
+    func audioPlayer(_ audioPlayer: AudioPlayer, playbackStateChanged playbackState: AudioPlayer.PlaybackState) {
         if let delegate = delegate as? AudioPlayer.Delegate {
-            delegate.audioPlayerPlaybackStateChanged?(audioPlayer)
+            delegate.audioPlayer?(audioPlayer, playbackStateChanged: playbackState)
         }
     }
 

@@ -51,7 +51,7 @@ struct MainView: View {
                     }
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                     .ignoresSafeArea()
-                    .morphed(isActive: !windowManager.isInFullScreen)
+                    .morphed(isActive: appearsActive && !windowManager.isInFullScreen)
             case .leaflet:
                 LeafletView()
                     .environment(displayLyrics)
@@ -95,7 +95,7 @@ struct MainView: View {
         .environment(inspectorLyrics)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .ignoresSafeArea()
-        .morphed()
+        .morphed(isActive: appearsActive && !windowManager.isInFullScreen)
         .ignoresSafeArea()
     }
 }

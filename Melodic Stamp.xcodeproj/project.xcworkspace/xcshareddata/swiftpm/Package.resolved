@@ -124,7 +124,7 @@
       "location" : "https://github.com/Cement-Labs/Luminare",
       "state" : {
         "branch" : "main",
-        "revision" : "40184d02eb4aeaf195b9b75ab2fdfd8e2e8d0825"
+        "revision" : "a2b0f001d66bbd134e1620eac030e0bab92a2bee"
       }
     },
     {
@@ -142,7 +142,7 @@
       "location" : "https://github.com/Cement-Labs/Morphed",
       "state" : {
         "branch" : "main",
-        "revision" : "ed119ee5872acb5353a3a4a3f140960eb9137ec8"
+        "revision" : "b1a0e4398f08514741d4aa20cb29056b0be71c6a"
       }
     },
     {
@@ -186,8 +186,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/sbooth/SFBAudioEngine",
       "state" : {
-        "revision" : "02872582463f3d2567664bc3b9594cefb5cd45dc",
-        "version" : "0.5.0"
+        "revision" : "02fa6a4d8fe1195ed81f7d65fb000cac3f3e4f1a",
+        "version" : "0.6.0"
       }
     },
     {
