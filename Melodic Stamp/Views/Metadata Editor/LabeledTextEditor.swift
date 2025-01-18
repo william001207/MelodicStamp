@@ -192,6 +192,7 @@ struct LabeledTextEditor<Label, Info, V>: View where Label: View, Info: View, V:
                 switch result {
                 case let .success(success):
                     guard success.startAccessingSecurityScopedResource() else { break }
+                    defer { success.stopAccessingSecurityScopedResource() }
 
                     do {
                         let content = try String(contentsOf: success, encoding: .utf8)

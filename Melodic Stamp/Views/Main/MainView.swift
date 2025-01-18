@@ -66,37 +66,32 @@ struct MainView: View {
 
     @ViewBuilder private func inspector() -> some View {
         Group {
-            if !hidesInspectorWhileInactive || appearsActive {
-                switch selectedInspectorTab {
-                case .commonMetadata:
-                    InspectorCommonMetadataView()
-                        .toolbar {
-                            if isInspectorPresented {
-                                EditorToolbar()
-                            }
+            switch selectedInspectorTab {
+            case .commonMetadata:
+                InspectorCommonMetadataView()
+                    .toolbar {
+                        if isInspectorPresented {
+                            EditorToolbar()
                         }
-                case .advancedMetadata:
-                    InspectorAdvancedMetadataView()
-                        .toolbar {
-                            if isInspectorPresented {
-                                EditorToolbar()
-                            }
+                    }
+            case .advancedMetadata:
+                InspectorAdvancedMetadataView()
+                    .toolbar {
+                        if isInspectorPresented {
+                            EditorToolbar()
                         }
-                case .lyrics:
-                    InspectorLyricsView()
-                        .toolbar {
-                            if isInspectorPresented {
-                                EditorToolbar()
-
-                                LyricsToolbar()
-                            }
+                    }
+            case .lyrics:
+                InspectorLyricsView()
+                    .toolbar {
+                        if isInspectorPresented {
+                            EditorToolbar()
+                            
+                            LyricsToolbar()
                         }
-                case .analytics:
-                    InspectorAnalyticsView()
-                }
-            } else {
-                // Stops rendering inspector
-                Color.clear
+                    }
+            case .analytics:
+                InspectorAnalyticsView()
             }
         }
         .environment(inspectorLyrics)
