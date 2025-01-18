@@ -16,7 +16,7 @@ struct FloatingPlayerView: View {
 
             PlayerView(namespace: namespace)
         }
-        .frame(width: 800, height: 100)
+        .frame(height: 100)
         .clipShape(.rect(cornerRadius: 25))
     }
 }

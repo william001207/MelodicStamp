@@ -191,14 +191,16 @@ import SwiftUI
         let windowFrame = applicationWindow.frame
         let screenFrame = screen.frame
 
-        let centerX = windowFrame.origin.x + (windowFrame.width - playerSize.width) / 2
+        let idealWidth: CGFloat = min(800, windowFrame.width - 2 * 12)
+
+        let centerX = windowFrame.origin.x + (windowFrame.width - idealWidth) / 2
         let bottomY = windowFrame.origin.y - 32
 
         playerWindow.setFrame(
             .init(
                 x: centerX,
                 y: max(screenFrame.minY + 8, bottomY),
-                width: playerSize.width,
+                width: idealWidth,
                 height: playerSize.height
             ),
             display: true,
