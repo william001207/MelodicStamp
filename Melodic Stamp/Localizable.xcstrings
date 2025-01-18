@@ -83,61 +83,6 @@
       },
       "shouldTranslate" : false
     },
-    "Accessibility 1" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "一级辅助功能"
-          }
-        }
-      }
-    },
-    "Accessibility 2" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "二级辅助功能"
-          }
-        }
-      }
-    },
-    "Accessibility 3" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "三级辅助功能"
-          }
-        }
-      }
-    },
-    "Accessibility 4" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "四级辅助功能"
-          }
-        }
-      }
-    },
-    "Accessibility 5" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "五级辅助功能"
-          }
-        }
-      }
-    },
     "Add Files" : {
       "localizations" : {
         "zh-Hans" : {
@@ -174,28 +119,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "附加信息"
-          }
-        }
-      }
-    },
-    "Aggregate" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "融合"
-          }
-        }
-      }
-    },
-    "AirPlay" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "隔空播放"
           }
         }
       }
@@ -366,6 +289,12 @@
             "state" : "new",
             "value" : "Aggregate"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "集成"
+          }
         }
       }
     },
@@ -377,6 +306,12 @@
             "state" : "new",
             "value" : "AirPlay"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "隔空播放"
+          }
         }
       }
     },
@@ -386,6 +321,12 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
+            "value" : "AVB"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
             "value" : "AVB"
           }
         }
@@ -399,6 +340,12 @@
             "state" : "new",
             "value" : "Bluetooth"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "蓝牙"
+          }
         }
       }
     },
@@ -409,6 +356,12 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "Bluetooth (Low Energy)"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "蓝牙（低功耗）"
           }
         }
       }
@@ -421,6 +374,12 @@
             "state" : "new",
             "value" : "Built-in"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "内置"
+          }
         }
       }
     },
@@ -431,6 +390,12 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "Continuity Capture (Wired)"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "连续互通捕捉（有线）"
           }
         }
       }
@@ -443,6 +408,12 @@
             "state" : "new",
             "value" : "Continuity Capture (Wireless)"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "连续互通捕捉（无线）"
+          }
         }
       }
     },
@@ -452,6 +423,12 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
+            "value" : "DisplayPort"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
             "value" : "DisplayPort"
           }
         }
@@ -465,6 +442,12 @@
             "state" : "new",
             "value" : "FireWire"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "FireWire"
+          }
         }
       }
     },
@@ -474,6 +457,12 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
+            "value" : "HDMI"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
             "value" : "HDMI"
           }
         }
@@ -487,6 +476,12 @@
             "state" : "new",
             "value" : "PCI"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PCI"
+          }
         }
       }
     },
@@ -497,6 +492,12 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "Thunderbolt"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "雷电"
           }
         }
       }
@@ -509,6 +510,12 @@
             "state" : "new",
             "value" : "Unknown"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "未知"
+          }
         }
       }
     },
@@ -518,6 +525,12 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
+            "value" : "USB"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
             "value" : "USB"
           }
         }
@@ -531,6 +544,12 @@
             "state" : "new",
             "value" : "Virtual"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "虚拟"
+          }
         }
       }
     },
@@ -540,17 +559,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "可选字体大小"
-          }
-        }
-      }
-    },
-    "AVB" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "AVB"
           }
         }
       }
@@ -615,45 +623,12 @@
         }
       }
     },
-    "Bluetooth" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "蓝牙"
-          }
-        }
-      }
-    },
-    "Bluetooth (Low Energy)" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "蓝牙（低功耗）"
-          }
-        }
-      }
-    },
     "BPM" : {
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "拍每分钟"
-          }
-        }
-      }
-    },
-    "Built-in" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "内置"
           }
         }
       }
@@ -778,28 +753,6 @@
         }
       }
     },
-    "Continuity Capture (Wired)" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "连续互通捕捉（有线）"
-          }
-        }
-      }
-    },
-    "Continuity Capture (Wireless)" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "连续互通捕捉（无线）"
-          }
-        }
-      }
-    },
     "Control what %@ should do when launching from a previous interruption." : {
       "localizations" : {
         "zh-Hans" : {
@@ -880,17 +833,6 @@
         }
       }
     },
-    "DisplayPort" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "DisplayPort"
-          }
-        }
-      }
-    },
     "Displays the information of the currently playing track as window title." : {
       "localizations" : {
         "zh-Hans" : {
@@ -939,6 +881,12 @@
             "state" : "new",
             "value" : "Accessibility 1"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "一级辅助功能"
+          }
         }
       }
     },
@@ -949,6 +897,12 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "Accessibility 2"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "二级辅助功能"
           }
         }
       }
@@ -961,6 +915,12 @@
             "state" : "new",
             "value" : "Accessibility 3"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "三级辅助功能"
+          }
         }
       }
     },
@@ -971,6 +931,12 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "Accessibility 4"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "四级辅助功能"
           }
         }
       }
@@ -983,6 +949,12 @@
             "state" : "new",
             "value" : "Accessibility 5"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "五级辅助功能"
+          }
         }
       }
     },
@@ -993,6 +965,12 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "Large"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "大"
           }
         }
       }
@@ -1005,6 +983,12 @@
             "state" : "new",
             "value" : "Medium"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "中"
+          }
         }
       }
     },
@@ -1015,6 +999,12 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "Small"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "小"
           }
         }
       }
@@ -1027,6 +1017,12 @@
             "state" : "new",
             "value" : "Unknown"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "未知"
+          }
         }
       }
     },
@@ -1037,6 +1033,12 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "Extra Large"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "超大"
           }
         }
       }
@@ -1049,6 +1051,12 @@
             "state" : "new",
             "value" : "Extra Small"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "超小"
+          }
         }
       }
     },
@@ -1060,6 +1068,12 @@
             "state" : "new",
             "value" : "Extra² Large"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "超大²"
+          }
         }
       }
     },
@@ -1070,6 +1084,12 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "Extra³ Large"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "超大³"
           }
         }
       }
@@ -1090,50 +1110,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "超现实"
-          }
-        }
-      }
-    },
-    "Extra Large" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "超大"
-          }
-        }
-      }
-    },
-    "Extra Small" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "超小"
-          }
-        }
-      }
-    },
-    "Extra² Large" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "超大²"
-          }
-        }
-      }
-    },
-    "Extra³ Large" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "超大³"
           }
         }
       }
@@ -1164,17 +1140,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "文件图标"
-          }
-        }
-      }
-    },
-    "FireWire" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "FireWire"
           }
         }
       }
@@ -1259,17 +1224,6 @@
         }
       }
     },
-    "HDMI" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "HDMI"
-          }
-        }
-      }
-    },
     "Hide" : {
       "localizations" : {
         "zh-Hans" : {
@@ -1326,17 +1280,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ISRC"
-          }
-        }
-      }
-    },
-    "Large" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "大"
           }
         }
       }
@@ -1477,17 +1420,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "媒体"
-          }
-        }
-      }
-    },
-    "Medium" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "中"
           }
         }
       }
@@ -1746,6 +1678,12 @@
             "state" : "new",
             "value" : "System Default"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "系统默认"
+          }
         }
       }
     },
@@ -1756,6 +1694,12 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "Unknown Device"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "未知设备"
           }
         }
       }
@@ -1772,17 +1716,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "暂停"
-          }
-        }
-      }
-    },
-    "PCI" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "PCI"
           }
         }
       }
@@ -2177,17 +2110,6 @@
         }
       }
     },
-    "Small" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "小"
-          }
-        }
-      }
-    },
     "Sorting" : {
       "localizations" : {
         "zh-Hans" : {
@@ -2208,34 +2130,12 @@
         }
       }
     },
-    "System Default" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "系统默认"
-          }
-        }
-      }
-    },
     "Ternary" : {
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "三色"
-          }
-        }
-      }
-    },
-    "Thunderbolt" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "雷电"
           }
         }
       }
@@ -2320,39 +2220,6 @@
         }
       }
     },
-    "Unknown" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "未知"
-          }
-        }
-      }
-    },
-    "Unknown Device" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "未知设备"
-          }
-        }
-      }
-    },
-    "USB" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "USB"
-          }
-        }
-      }
-    },
     "Version" : {
       "localizations" : {
         "zh-Hans" : {
@@ -2369,17 +2236,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "半透明"
-          }
-        }
-      }
-    },
-    "Virtual" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "虚拟"
           }
         }
       }
