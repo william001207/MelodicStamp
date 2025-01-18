@@ -73,6 +73,7 @@ enum FileAdderPresentationStyle {
             player?.removeAll()
             player?.addToPlaylist(urls: urls)
         case .formingNewPlaylist:
+            print(urls)
             openWindow(id: WindowID.content.rawValue, value: CreationParameters(
                 urls: Set(urls)
             ))
