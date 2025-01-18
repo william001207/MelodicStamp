@@ -48,7 +48,7 @@ struct AboutView: View {
                             let hasBuild = !build.isEmpty
 
                             let combined: String = if hasBuild {
-                                .init(localized: .init(
+                                String(localized: .init(
                                     "About: Version Template",
                                     defaultValue: "\(version) (\(build))"
                                 ))
@@ -92,7 +92,7 @@ struct AboutView: View {
     }
 
     private var previewBadge: String {
-        .init(localized: .init("About: Preview", defaultValue: "Preview"))
+        String(localized: .init("About: Preview", defaultValue: "Preview"))
     }
 
     @ViewBuilder private func appIcon() -> some View {

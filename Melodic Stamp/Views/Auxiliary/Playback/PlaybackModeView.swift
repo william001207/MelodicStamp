@@ -22,11 +22,11 @@ struct PlaybackModeView: View {
     static func name(of mode: PlaybackMode) -> String {
         switch mode {
         case .sequential:
-            .init(localized: "Sequential")
+            String(localized: "Sequential")
         case .loop:
-            .init(localized: "Sequential Loop")
+            String(localized: "Sequential Loop")
         case .shuffle:
-            .init(localized: "Shuffle")
+            String(localized: "Shuffle")
         }
     }
 }

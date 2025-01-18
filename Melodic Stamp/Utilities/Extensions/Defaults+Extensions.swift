@@ -104,13 +104,6 @@ extension Defaults.Keys {
         "lyricsTypeSize",
         default: .large
     )
-
-    // MARK: Performance
-
-    static let hidesInspectorWhileInactive: Key<Bool> = .init(
-        "hidesInspectorWhileInactive",
-        default: false
-    )
 }
 
 extension Defaults {

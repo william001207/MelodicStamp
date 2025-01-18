@@ -190,12 +190,12 @@ struct LabeledTextEditor<Label, Info, V>: View where Label: View, Info: View, V:
                 allowedContentTypes: allowedFileTypes
             ) { result in
                 switch result {
-                case let .success(success):
-                    guard success.startAccessingSecurityScopedResource() else { break }
-                    defer { success.stopAccessingSecurityScopedResource() }
+                case let .success(url):
+                    guard url.startAccessingSecurityScopedResource() else { break }
+                    defer { url.stopAccessingSecurityScopedResource() }
 
                     do {
-                        let content = try String(contentsOf: success, encoding: .utf8)
+                        let content = try String(contentsOf: url, encoding: .utf8)
                         entries.setAll { V.wrappingUpdate($0, with: content) }
                     } catch {
                         break

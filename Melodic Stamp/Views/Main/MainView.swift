@@ -17,8 +17,6 @@ struct MainView: View {
 
     @Environment(\.appearsActive) private var appearsActive
 
-    @Default(.hidesInspectorWhileInactive) private var hidesInspectorWhileInactive
-
     var namespace: Namespace.ID
 
     @Binding var isInspectorPresented: Bool
@@ -86,7 +84,7 @@ struct MainView: View {
                     .toolbar {
                         if isInspectorPresented {
                             EditorToolbar()
-                            
+
                             LyricsToolbar()
                         }
                     }

@@ -84,6 +84,7 @@
       "shouldTranslate" : false
     },
     "Accessibility 1" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -94,6 +95,7 @@
       }
     },
     "Accessibility 2" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -104,6 +106,7 @@
       }
     },
     "Accessibility 3" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -114,6 +117,7 @@
       }
     },
     "Accessibility 4" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -124,6 +128,7 @@
       }
     },
     "Accessibility 5" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -174,6 +179,7 @@
       }
     },
     "Aggregate" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -184,6 +190,7 @@
       }
     },
     "AirPlay" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -351,6 +358,182 @@
         }
       }
     },
+    "Audio Device: (Transport Type) Aggregate" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Aggregate"
+          }
+        }
+      }
+    },
+    "Audio Device: (Transport Type) AirPlay" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "AirPlay"
+          }
+        }
+      }
+    },
+    "Audio Device: (Transport Type) AVB" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "AVB"
+          }
+        }
+      }
+    },
+    "Audio Device: (Transport Type) Bluetooth" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Bluetooth"
+          }
+        }
+      }
+    },
+    "Audio Device: (Transport Type) Bluetooth (Low Energy)" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Bluetooth (Low Energy)"
+          }
+        }
+      }
+    },
+    "Audio Device: (Transport Type) Built-in" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Built-in"
+          }
+        }
+      }
+    },
+    "Audio Device: (Transport Type) Continuity Capture (Wired)" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Continuity Capture (Wired)"
+          }
+        }
+      }
+    },
+    "Audio Device: (Transport Type) Continuity Capture (Wireless)" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Continuity Capture (Wireless)"
+          }
+        }
+      }
+    },
+    "Audio Device: (Transport Type) DisplayPort" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "DisplayPort"
+          }
+        }
+      }
+    },
+    "Audio Device: (Transport Type) FireWire" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "FireWire"
+          }
+        }
+      }
+    },
+    "Audio Device: (Transport Type) HDMI" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "HDMI"
+          }
+        }
+      }
+    },
+    "Audio Device: (Transport Type) PCI" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "PCI"
+          }
+        }
+      }
+    },
+    "Audio Device: (Transport Type) Thunderbolt" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Thunderbolt"
+          }
+        }
+      }
+    },
+    "Audio Device: (Transport Type) Unknown" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Unknown"
+          }
+        }
+      }
+    },
+    "Audio Device: (Transport Type) USB" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "USB"
+          }
+        }
+      }
+    },
+    "Audio Device: (Transport Type) Virtual" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Virtual"
+          }
+        }
+      }
+    },
     "Available type sizes" : {
       "localizations" : {
         "zh-Hans" : {
@@ -362,6 +545,7 @@
       }
     },
     "AVB" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -432,6 +616,7 @@
       }
     },
     "Bluetooth" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -442,6 +627,7 @@
       }
     },
     "Bluetooth (Low Energy)" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -462,6 +648,7 @@
       }
     },
     "Built-in" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -592,6 +779,7 @@
       }
     },
     "Continuity Capture (Wired)" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -602,6 +790,7 @@
       }
     },
     "Continuity Capture (Wireless)" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -692,6 +881,7 @@
       }
     },
     "DisplayPort" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -741,6 +931,149 @@
         }
       }
     },
+    "Dynamic Type Size: Accessibility 1" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Accessibility 1"
+          }
+        }
+      }
+    },
+    "Dynamic Type Size: Accessibility 2" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Accessibility 2"
+          }
+        }
+      }
+    },
+    "Dynamic Type Size: Accessibility 3" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Accessibility 3"
+          }
+        }
+      }
+    },
+    "Dynamic Type Size: Accessibility 4" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Accessibility 4"
+          }
+        }
+      }
+    },
+    "Dynamic Type Size: Accessibility 5" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Accessibility 5"
+          }
+        }
+      }
+    },
+    "Dynamic Type Size: Large" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Large"
+          }
+        }
+      }
+    },
+    "Dynamic Type Size: Medium" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Medium"
+          }
+        }
+      }
+    },
+    "Dynamic Type Size: Small" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Small"
+          }
+        }
+      }
+    },
+    "Dynamic Type Size: Unknown" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Unknown"
+          }
+        }
+      }
+    },
+    "Dynamic Type Size: X Large" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Extra Large"
+          }
+        }
+      }
+    },
+    "Dynamic Type Size: X Small" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Extra Small"
+          }
+        }
+      }
+    },
+    "Dynamic Type Size: XX Large" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Extra² Large"
+          }
+        }
+      }
+    },
+    "Dynamic Type Size: XXX Large" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Extra³ Large"
+          }
+        }
+      }
+    },
     "Edit" : {
       "localizations" : {
         "zh-Hans" : {
@@ -762,6 +1095,7 @@
       }
     },
     "Extra Large" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -772,6 +1106,7 @@
       }
     },
     "Extra Small" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -782,6 +1117,7 @@
       }
     },
     "Extra² Large" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -792,6 +1128,7 @@
       }
     },
     "Extra³ Large" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -832,6 +1169,7 @@
       }
     },
     "FireWire" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -922,6 +1260,7 @@
       }
     },
     "HDMI" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -992,6 +1331,7 @@
       }
     },
     "Large" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -1142,6 +1482,7 @@
       }
     },
     "Medium" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -1397,6 +1738,28 @@
         }
       }
     },
+    "Output Device: System" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "System Default"
+          }
+        }
+      }
+    },
+    "Output Device: Unknown" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Unknown Device"
+          }
+        }
+      }
+    },
     "Parse Lyrics" : {
       "shouldTranslate" : false
     },
@@ -1414,6 +1777,7 @@
       }
     },
     "PCI" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -1814,6 +2178,7 @@
       }
     },
     "Small" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -1843,17 +2208,8 @@
         }
       }
     },
-    "Stops rendering inspector" : {
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "停止渲染检视器"
-          }
-        }
-      }
-    },
     "System Default" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -1874,6 +2230,7 @@
       }
     },
     "Thunderbolt" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -1964,6 +2321,7 @@
       }
     },
     "Unknown" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -1974,6 +2332,7 @@
       }
     },
     "Unknown Device" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -1984,6 +2343,7 @@
       }
     },
     "USB" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -2014,6 +2374,7 @@
       }
     },
     "Virtual" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -2029,16 +2390,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "可视化"
-          }
-        }
-      }
-    },
-    "While %@ is Inactive" : {
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@在后台时"
           }
         }
       }

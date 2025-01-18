@@ -17,9 +17,9 @@ enum SidebarContentTab: String, SidebarTab, CaseIterable, Codable {
     var title: String {
         switch self {
         case .playlist:
-            .init(localized: "Playlist")
+            String(localized: "Playlist")
         case .leaflet:
-            .init(localized: "Leaflet")
+            String(localized: "Leaflet")
         }
     }
 

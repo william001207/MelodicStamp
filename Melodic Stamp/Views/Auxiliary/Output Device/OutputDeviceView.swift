@@ -22,10 +22,10 @@ struct OutputDeviceView: View {
             do {
                 return try device.name
             } catch {
-                return .init(localized: "Unknown Device")
+                return String(localized: .init("Output Device: Unknown", defaultValue: "Unknown Device"))
             }
         } else {
-            return .init(localized: "System Default")
+            return String(localized: .init("Output Device: System", defaultValue: "System Default"))
         }
     }
 }

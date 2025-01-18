@@ -19,13 +19,13 @@ enum SidebarInspectorTab: String, SidebarTab, CaseIterable, Codable {
     var title: String {
         switch self {
         case .commonMetadata:
-            .init(localized: "Common")
+            String(localized: "Common")
         case .advancedMetadata:
-            .init(localized: "Advanced")
+            String(localized: "Advanced")
         case .lyrics:
-            .init(localized: "Lyrics")
+            String(localized: "Lyrics")
         case .analytics:
-            .init(localized: "Analytics")
+            String(localized: "Analytics")
         }
     }
 

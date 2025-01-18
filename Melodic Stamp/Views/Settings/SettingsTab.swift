@@ -41,11 +41,11 @@ enum SettingsTab: Hashable, Equatable, Identifiable, CaseIterable {
 
     var name: String {
         switch self {
-        case .appearance: .init(localized: "Appearance")
-        case .visualization: .init(localized: "Visualization")
-        case .lyrics: .init(localized: "Lyrics")
-        case .launchBehaviors: .init(localized: "Launch Behaviors")
-        case .performance: .init(localized: "Performance")
+        case .appearance: String(localized: "Appearance")
+        case .visualization: String(localized: "Visualization")
+        case .lyrics: String(localized: "Lyrics")
+        case .launchBehaviors: String(localized: "Launch Behaviors")
+        case .performance: String(localized: "Performance")
         }
     }
 }
