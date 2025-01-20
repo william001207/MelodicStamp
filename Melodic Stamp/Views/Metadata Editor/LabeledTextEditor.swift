@@ -44,7 +44,7 @@ struct LabeledTextEditor<Label, Info, V>: View where Label: View, Info: View, V:
         entries: Entries,
         layout: LabeledTextEditorLayout = .field,
         style: LabeledTextEditorStyle = .regular,
-        allowedFileTypes: [UTType] = [.text],
+        allowedFileTypes: [UTType] = [.text, .ttml],
         @ViewBuilder label: @escaping () -> Label,
         @ViewBuilder info: @escaping () -> Info
     ) {
@@ -60,7 +60,7 @@ struct LabeledTextEditor<Label, Info, V>: View where Label: View, Info: View, V:
         entries: Entries,
         layout: LabeledTextEditorLayout = .field,
         style: LabeledTextEditorStyle = .regular,
-        allowedFileTypes: [UTType] = [.text],
+        allowedFileTypes: [UTType] = [.text, .ttml],
         @ViewBuilder label: @escaping () -> Label
     ) where Info == EmptyView {
         self.init(
@@ -79,7 +79,7 @@ struct LabeledTextEditor<Label, Info, V>: View where Label: View, Info: View, V:
         entries: Entries,
         layout: LabeledTextEditorLayout = .field,
         style: LabeledTextEditorStyle = .regular,
-        allowedFileTypes: [UTType] = [.text],
+        allowedFileTypes: [UTType] = [.text, .ttml],
         @ViewBuilder info: @escaping () -> Info
     ) where Label == Text {
         self.init(entries: entries, layout: layout, style: style, allowedFileTypes: allowedFileTypes) {
@@ -94,7 +94,7 @@ struct LabeledTextEditor<Label, Info, V>: View where Label: View, Info: View, V:
         entries: Entries,
         layout: LabeledTextEditorLayout = .field,
         style: LabeledTextEditorStyle = .regular,
-        allowedFileTypes: [UTType] = [.text]
+        allowedFileTypes: [UTType] = [.text, .ttml]
     ) where Label == Text, Info == EmptyView {
         self.init(key, entries: entries, layout: layout, style: style, allowedFileTypes: allowedFileTypes) {
             EmptyView()

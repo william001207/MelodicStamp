@@ -10,4 +10,5 @@ import UniformTypeIdentifiers
 
 extension UTType {
     static let ogg = UTType(importedAs: "public.ogg")
+    static let ttml = UTType(importedAs: "public.text.xml")
 }
