@@ -12,18 +12,33 @@ struct SettingsAboutDeveloper: View {
     var body: some View {
         List {
             HStack {
-                Image("KrLite")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 32, height: 32)
-                    .clipShape(.rect(cornerRadius: 16))
-                    .padding(.vertical, 6)
+                AsyncImage(url: URL(string: "https://avatars.githubusercontent.com/u/68179735?s=128&v=4")) { phase in
+                    switch phase {
+                    case .empty:
+                        ProgressView()
+                            .frame(width: 32, height: 32)
+
+                    case let .success(image):
+                        image
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 32, height: 32)
+                            .clipShape(.rect(cornerRadius: 16))
+
+                    case .failure:
+                        EmptyView()
+
+                    @unknown default:
+                        EmptyView()
+                    }
+                }
+                .padding(.vertical, 6)
 
                 VStack(alignment: .leading) {
                     Group {
                         Text("KrLite")
                             .bold()
-                        Text("Design and development.")
+                        Text("Planning, design and development.")
                             .foregroundStyle(.secondary)
                     }
                     .font(.subheadline)
@@ -31,12 +46,27 @@ struct SettingsAboutDeveloper: View {
             }
 
             HStack {
-                Image("Xinshao")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 32, height: 32)
-                    .clipShape(.rect(cornerRadius: 16))
-                    .padding(.vertical, 6)
+                AsyncImage(url: URL(string: "https://avatars.githubusercontent.com/u/96913885?s=128&v=4")) { phase in
+                    switch phase {
+                    case .empty:
+                        ProgressView()
+                            .frame(width: 32, height: 32)
+
+                    case let .success(image):
+                        image
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 32, height: 32)
+                            .clipShape(.rect(cornerRadius: 16))
+
+                    case .failure:
+                        EmptyView()
+
+                    @unknown default:
+                        EmptyView()
+                    }
+                }
+                .padding(.vertical, 6)
 
                 VStack(alignment: .leading) {
                     Group {

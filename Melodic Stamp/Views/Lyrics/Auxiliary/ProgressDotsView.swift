@@ -15,7 +15,6 @@ struct ProgressDotsContainerView: View {
     @State private var isVisible: Bool = true
 
     var body: some View {
-        // Avoids multiple instantializations
         let isVisible = isVisible
 
         VStack {
@@ -118,7 +117,6 @@ struct ProgressDotView: View {
             .fill(Color.white.opacity(0.25 + 0.75 * activationProgress))
             .frame(width: 10, height: 10)
             .scaleEffect(scale)
-            // .offset(y: offset)
             .brightness(brightnessAdjustment)
             .onAppear {
                 withAnimation(Animation.smooth(duration: 1.5).repeatForever(autoreverses: true)) {

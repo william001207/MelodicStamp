@@ -818,16 +818,6 @@
         }
       }
     },
-    "Design and development." : {
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "设计和开发。"
-          }
-        }
-      }
-    },
     "Design, testing and development support." : {
       "localizations" : {
         "zh-Hans" : {
@@ -1821,6 +1811,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "单色"
+          }
+        }
+      }
+    },
+    "Planning, design and development." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "策划, 设计和开发。"
           }
         }
       }

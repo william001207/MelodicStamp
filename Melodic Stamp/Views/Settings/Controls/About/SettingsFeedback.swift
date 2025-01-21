@@ -17,14 +17,16 @@ struct SettingsFeedback: View {
                     openURL(url)
                 }
             }
-            .buttonStyle(.link)
+            .buttonStyle(.bordered)
+            .frame(maxWidth: .infinity, alignment: .leading)
 
             Button("Join the group chat") {
                 if let url = URL(string: "https://qm.qq.com/q/txBDJxnw4i") {
                     openURL(url)
                 }
             }
-            .buttonStyle(.link)
+            .buttonStyle(.bordered)
+            .frame(maxWidth: .infinity, alignment: .trailing)
         }
     }
 }
