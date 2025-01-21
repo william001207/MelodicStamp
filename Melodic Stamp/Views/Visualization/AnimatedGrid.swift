@@ -29,7 +29,7 @@ struct AnimatedGrid: View {
     @Default(.gradientFPS) private var fps
 
     var hasDynamics: Bool = true
-    
+
     @State private var normalizedData: Float = 0.0
 
     private var randomizer: MeshRandomizer {
@@ -72,10 +72,10 @@ struct AnimatedGrid: View {
                     resolutionScale: Double(resolution)
                 )
                 /*
-                VStack(alignment: .leading) {
-                    AudioVisualizer()
-                }
-                */
+                 VStack(alignment: .leading) {
+                     AudioVisualizer()
+                 }
+                 */
             }
         }
         .onReceive(player.visualizationDataPublisher) { fftData in

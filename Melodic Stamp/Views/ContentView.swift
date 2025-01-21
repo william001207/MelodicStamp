@@ -124,6 +124,7 @@ struct ContentView: View {
             }
 
             // MARK: Updates
+
             .onChange(of: player.track) { _, newValue in
                 Task {
                     if let newValue, let attachedPictures = newValue.metadata[extracting: \.attachedPictures]?.current {

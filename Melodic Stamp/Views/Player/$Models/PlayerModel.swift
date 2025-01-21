@@ -370,22 +370,22 @@ extension PlayerModel {
 
     private func setupEngine() {
         /*
-        player.withEngine { [weak self] engine in
-            guard let self else { return }
+         player.withEngine { [weak self] engine in
+             guard let self else { return }
 
-            // Audio visualization
-            let inputNode = engine.mainMixerNode
-            let bus = 0
+             // Audio visualization
+             let inputNode = engine.mainMixerNode
+             let bus = 0
 
-            let format = inputNode.outputFormat(forBus: bus)
-            let sampleRate = format.sampleRate
+             let format = inputNode.outputFormat(forBus: bus)
+             let sampleRate = format.sampleRate
 
-            inputNode.installTap(onBus: bus, bufferSize: 1024, format: format) { buffer, _ in
-                self.analyzer = RealtimeAnalyzer(fftSize: 1024)
-                self.processAudioBuffer(buffer, sampleRate: Float(sampleRate))
-            }
-        }
-        */
+             inputNode.installTap(onBus: bus, bufferSize: 1024, format: format) { buffer, _ in
+                 self.analyzer = RealtimeAnalyzer(fftSize: 1024)
+                 self.processAudioBuffer(buffer, sampleRate: Float(sampleRate))
+             }
+         }
+         */
 
         player.withEngine { [weak self] engine in
             guard let self else { return }
@@ -396,18 +396,18 @@ extension PlayerModel {
             let format = inputNode.outputFormat(forBus: bus)
             let bufferSize = 2048
 
-            self.analyzer = RealtimeAnalyzer(fftSize: bufferSize)
+            analyzer = RealtimeAnalyzer(fftSize: bufferSize)
 
             inputNode.removeTap(onBus: bus)
 
-            inputNode.installTap(onBus: bus, bufferSize: AVAudioFrameCount(bufferSize), format: format) { [weak self] buffer, when in
+            inputNode.installTap(onBus: bus, bufferSize: AVAudioFrameCount(bufferSize), format: format) { [weak self] buffer, _ in
                 guard let strongSelf = self else { return }
                 if !strongSelf.player.isPlaying { return }
 
                 buffer.frameLength = AVAudioFrameCount(bufferSize)
 
                 let spectra = strongSelf.analyzer.analyse(with: buffer)
-                
+
                 Task { @MainActor in
                     strongSelf.visualizationDataSubject.send(spectra)
                 }
@@ -418,46 +418,46 @@ extension PlayerModel {
 
 extension PlayerModel {
     /*
-        func analyzeFiles(urls: [URL]) {
-            do {
-                let rg = try ReplayGainAnalyzer.analyzeAlbum(urls)
-                os_log("Album gain %.2f dB, peak %.8f; Tracks: [%{public}@]", log: OSLog.default, type: .info, rg.0.gain, rg.0.peak, rg.1.map { url, replayGain in
-                    String(format: "\"%@\" gain %.2f dB, peak %.8f", FileManager.default.displayName(atPath: url.lastPathComponent), replayGain.gain, replayGain.peak)
-                }.joined(separator: ", "))
-                // TODO: Notice user we're done
-            } catch {}
-        }
+         func analyzeFiles(urls: [URL]) {
+             do {
+                 let rg = try ReplayGainAnalyzer.analyzeAlbum(urls)
+                 os_log("Album gain %.2f dB, peak %.8f; Tracks: [%{public}@]", log: OSLog.default, type: .info, rg.0.gain, rg.0.peak, rg.1.map { url, replayGain in
+                     String(format: "\"%@\" gain %.2f dB, peak %.8f", FileManager.default.displayName(atPath: url.lastPathComponent), replayGain.gain, replayGain.peak)
+                 }.joined(separator: ", "))
+                 // TODO: Notice user we're done
+             } catch {}
+         }
 
-        func exportWAVEFile(url: URL) {
-            let destURL = url.deletingPathExtension().appendingPathExtension("wav")
-            if FileManager.default.fileExists(atPath: destURL.path) {
-                // TODO: Handle this
-                return
-            }
-    
-            do {
-                try AudioConverter.convert(url, to: destURL)
-                try? AudioFile.copyMetadata(from: url, to: destURL)
-            } catch {
-                try? FileManager.default.trashItem(at: destURL, resultingItemURL: nil)
-    
-            }
-        }
+         func exportWAVEFile(url: URL) {
+             let destURL = url.deletingPathExtension().appendingPathExtension("wav")
+             if FileManager.default.fileExists(atPath: destURL.path) {
+                 // TODO: Handle this
+                 return
+             }
 
-    private func processAudioBuffer(_ buffer: AVAudioPCMBuffer, sampleRate: Float) {
-        guard let channelData = buffer.floatChannelData else { return }
+             do {
+                 try AudioConverter.convert(url, to: destURL)
+                 try? AudioFile.copyMetadata(from: url, to: destURL)
+             } catch {
+                 try? FileManager.default.trashItem(at: destURL, resultingItemURL: nil)
 
-        let channelDataPointer = channelData[0]
-        let frameLength = Int(buffer.frameLength)
+             }
+         }
 
-        audioDataBuffer = Array(UnsafeBufferPointer(start: channelDataPointer, count: frameLength)).map(CGFloat.init)
+     private func processAudioBuffer(_ buffer: AVAudioPCMBuffer, sampleRate: Float) {
+         guard let channelData = buffer.floatChannelData else { return }
 
-        Task { @MainActor in
-            let fftMagnitudes = await FFTHelper.perform(audioDataBuffer.map(Float.init), sampleRate: sampleRate)
-            self.visualizationDataSubject.send(fftMagnitudes.map(CGFloat.init))
-        }
-    }
-    */
+         let channelDataPointer = channelData[0]
+         let frameLength = Int(buffer.frameLength)
+
+         audioDataBuffer = Array(UnsafeBufferPointer(start: channelDataPointer, count: frameLength)).map(CGFloat.init)
+
+         Task { @MainActor in
+             let fftMagnitudes = await FFTHelper.perform(audioDataBuffer.map(Float.init), sampleRate: sampleRate)
+             self.visualizationDataSubject.send(fftMagnitudes.map(CGFloat.init))
+         }
+     }
+     */
 
     private func selectOutputDevice(_ device: AudioDevice) {
         do {
