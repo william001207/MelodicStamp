@@ -136,7 +136,7 @@ struct ContentView: View {
                 }
             }
             .onReceive(player.visualizationDataPublisher) { buffer in
-                audioVisualizer.updateDate(from: buffer)
+                audioVisualizer.updateData(from: buffer)
             }
         }
         .frame(minWidth: minWidth, maxWidth: maxWidth)
