@@ -75,7 +75,7 @@ struct AnimatedGrid: View {
 
     private var weightFactor: Float {
         if isAnimateWithAudioEnabled, hasDynamics {
-            audioVisualizer.average
+            2 * pow(audioVisualizer.average, 1 / 5)
         } else {
             0.5
         }
