@@ -28,13 +28,13 @@ struct AboutView: View {
 
                     VStack(alignment: .leading, spacing: 4) {
                         AliveButton {
-                            openURL(organizationURL)
+                            openURL(.organization)
                         } label: {
                             Text(Bundle.main.copyright)
                         }
 
                         AliveButton {
-                            openURL(repositoryURL)
+                            openURL(.repository)
                         } label: {
                             HStack {
                                 Text("Open sourced on GitHub")

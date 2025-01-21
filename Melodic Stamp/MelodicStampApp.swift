@@ -9,9 +9,6 @@ import CSFBAudioEngine
 import SwiftUI
 import UniformTypeIdentifiers
 
-let organizationURL = URL(string: "https://github.com/Cement-Labs")!
-let repositoryURL = organizationURL.appending(component: "Melodic-Stamp")
-
 enum WindowID: String, Equatable, Hashable, CaseIterable, Identifiable, Codable {
     case content
     case about

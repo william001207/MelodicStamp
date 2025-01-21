@@ -718,6 +718,16 @@
         }
       }
     },
+    "Communicate directly with us." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "直接与我们沟通。"
+          }
+        }
+      }
+    },
     "Compilation" : {
       "localizations" : {
         "zh-Hans" : {
@@ -754,6 +764,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "指挥家"
+          }
+        }
+      }
+    },
+    "Contributors" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "贡献者"
           }
         }
       }
@@ -818,22 +838,12 @@
         }
       }
     },
-    "Design, testing and development support." : {
+    "Design, test, and development support." : {
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "设计, 测试和开发支持。"
-          }
-        }
-      }
-    },
-    "Developer" : {
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "开发者"
+            "value" : "设计、测试和开发支持。"
           }
         }
       }
@@ -1169,16 +1179,6 @@
         }
       }
     },
-    "Feedback on issues and provide suggestions." : {
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "反馈问题和提供建议。"
-          }
-        }
-      }
-    },
     "File Icon" : {
       "localizations" : {
         "zh-Hans" : {
@@ -1325,26 +1325,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ISRC"
-          }
-        }
-      }
-    },
-    "Join the group chat" : {
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "加入群聊"
-          }
-        }
-      }
-    },
-    "KrLite" : {
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "KrLite"
           }
         }
       }
@@ -1705,6 +1685,16 @@
         }
       }
     },
+    "Organization, design, and development." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "策划、设计和开发。"
+          }
+        }
+      }
+    },
     "Other" : {
       "localizations" : {
         "zh-Hans" : {
@@ -1811,16 +1801,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "单色"
-          }
-        }
-      }
-    },
-    "Planning, design and development." : {
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "策划, 设计和开发。"
           }
         }
       }
@@ -2175,12 +2155,12 @@
         }
       }
     },
-    "Share your feedback on our GitHub page! Whether you find a bug or want to suggest a new feature, feel free to speak up." : {
+    "Share your feedback on our GitHub page! Whether you find a bug or want to suggest a new feature, feel free to speak up. [Join our QQ Group Chat…](https://qm.qq.com/q/txBDJxnw4i)" : {
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "在我们的 GitHub 页面分享你的反馈！无论你发现一个程序缺陷还是想要建议一个新功能，都可以畅所欲言。"
+            "value" : "在我们的GitHub页面上分享你的反馈！无论你发现了漏洞还是想建议新功能，都请畅所欲言。[加入QQ群聊…](https://qm.qq.com/q/txBDJxnw4i)"
           }
         }
       }
@@ -2211,6 +2191,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "工作"
+          }
+        }
+      }
+    },
+    "Submit an Issue" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "报告问题"
           }
         }
       }
@@ -2335,12 +2325,12 @@
         }
       }
     },
-    "We completed this app during our break time. Currently, it is not perfect and we look forward to the addition of more contributors." : {
+    "We developed this app in our spare time. We are looking forward to your participation in bringing %@ to perfection!" : {
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "我们在休息时间完成了这个应用程序。目前，它并不完美，我们期待有更多的贡献者加入。"
+            "value" : "我们利用空闲时间开发了这款软件。如果你希望和我们一起将%@打磨至完美，随时欢迎！"
           }
         }
       }
@@ -2361,16 +2351,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "尽管文字大小可以在传单页面中单独调整，但对包含文字大小在内的以下属性进行的任何调整都会强制触发歌词视图的重置，以保证视觉效果的准确性。"
-          }
-        }
-      }
-    },
-    "Xinshao" : {
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "芯梢"
           }
         }
       }

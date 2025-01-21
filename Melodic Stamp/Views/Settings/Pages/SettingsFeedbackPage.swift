@@ -8,28 +8,35 @@
 import SwiftUI
 
 struct SettingsFeedbackPage: View {
+    @Environment(\.openURL) private var openURL
+
     var body: some View {
         SettingsExcerptView(
             .feedback,
-            descriptionKey: "Feedback on issues and provide suggestions."
+            descriptionKey: "Communicate directly with us."
         )
 
         Section {
-            SettingsAboutDeveloper()
+            SettingsContributorsControl()
         } header: {
-            Text("Developer")
+            Text("Contributors")
             Text("""
-            We completed this app during our break time. Currently, it is not perfect and we look forward to the addition of more contributors.
+            We developed this app in our spare time. We are looking forward to your participation in bringing \(Bundle.main.displayName) to perfection!
             """)
         }
 
         Section {
-            SettingsFeedback()
+            Text("""
+            Share your feedback on our GitHub page! Whether you find a bug or want to suggest a new feature, feel free to speak up. [Join our QQ Group Chat…](https://qm.qq.com/q/txBDJxnw4i)
+            """)
+            .font(.caption)
+            .foregroundStyle(.secondary)
         } header: {
             Text("Feedback")
-            Text("""
-            Share your feedback on our GitHub page! Whether you find a bug or want to suggest a new feature, feel free to speak up.
-            """)
+        } footer: {
+            Button("Submit an Issue") {
+                openURL(.repository.appending(component: "issues"))
+            }
         }
     }
 }
