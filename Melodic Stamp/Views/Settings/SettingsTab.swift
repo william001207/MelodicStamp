@@ -17,6 +17,8 @@ enum SettingsTab: Hashable, Equatable, Identifiable, CaseIterable {
     case launchBehaviors
     case performance
 
+    case feedback
+
     var id: Self { self }
 
     var systemSymbol: SFSymbol {
@@ -26,6 +28,7 @@ enum SettingsTab: Hashable, Equatable, Identifiable, CaseIterable {
         case .lyrics: .musicNoteList
         case .launchBehaviors: .airplaneDeparture
         case .performance: .gaugeWithDotsNeedle67percent
+        case .feedback: .infoBubble
         }
     }
 
@@ -36,6 +39,7 @@ enum SettingsTab: Hashable, Equatable, Identifiable, CaseIterable {
         case .lyrics: .orange
         case .launchBehaviors: .blue
         case .performance: .green
+        case .feedback: .gray
         }
     }
 
@@ -46,6 +50,7 @@ enum SettingsTab: Hashable, Equatable, Identifiable, CaseIterable {
         case .lyrics: String(localized: "Lyrics")
         case .launchBehaviors: String(localized: "Launch Behaviors")
         case .performance: String(localized: "Performance")
+        case .feedback: String(localized: "Feedback")
         }
     }
 }

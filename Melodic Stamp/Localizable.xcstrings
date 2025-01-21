@@ -55,7 +55,7 @@
       }
     },
     "About: Preview" : {
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -79,9 +79,14 @@
             "state" : "new",
             "value" : "%1$@ (%2$@)"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ （%2$@）"
+          }
         }
-      },
-      "shouldTranslate" : false
+      }
     },
     "Add Files" : {
       "localizations" : {
@@ -813,6 +818,36 @@
         }
       }
     },
+    "Design and development." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "设计和开发。"
+          }
+        }
+      }
+    },
+    "Design, testing and development support." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "设计, 测试和开发支持。"
+          }
+        }
+      }
+    },
+    "Developer" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "开发者"
+          }
+        }
+      }
+    },
     "Discs" : {
       "localizations" : {
         "zh-Hans" : {
@@ -1134,6 +1169,26 @@
         }
       }
     },
+    "Feedback" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "反馈问题"
+          }
+        }
+      }
+    },
+    "Feedback on issues and provide suggestions." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "反馈问题和提供建议。"
+          }
+        }
+      }
+    },
     "File Icon" : {
       "localizations" : {
         "zh-Hans" : {
@@ -1280,6 +1335,26 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ISRC"
+          }
+        }
+      }
+    },
+    "Join the group chat" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "加入群聊"
+          }
+        }
+      }
+    },
+    "KrLite" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "KrLite"
           }
         }
       }
@@ -2100,6 +2175,16 @@
         }
       }
     },
+    "Share your feedback on our GitHub page! Whether you find a bug or want to suggest a new feature, feel free to speak up." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "在我们的 GitHub 页面分享你的反馈！无论你发现一个程序缺陷还是想要建议一个新功能，都可以畅所欲言。"
+          }
+        }
+      }
+    },
     "Shuffle" : {
       "localizations" : {
         "zh-Hans" : {
@@ -2250,6 +2335,16 @@
         }
       }
     },
+    "We completed this app during our break time. Currently, it is not perfect and we look forward to the addition of more contributors." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "我们在休息时间完成了这个应用程序。目前，它并不完美，我们期待有更多的贡献者加入。"
+          }
+        }
+      }
+    },
     "While playing" : {
       "localizations" : {
         "zh-Hans" : {
@@ -2266,6 +2361,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "尽管文字大小可以在传单页面中单独调整，但对包含文字大小在内的以下属性进行的任何调整都会强制触发歌词视图的重置，以保证视觉效果的准确性。"
+          }
+        }
+      }
+    },
+    "Xinshao" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "芯梢"
           }
         }
       }

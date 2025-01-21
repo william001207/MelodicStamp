@@ -26,6 +26,10 @@ struct SettingsView: View {
                     entry(.launchBehaviors)
                     entry(.performance)
                 }
+
+                Section {
+                    entry(.feedback)
+                }
             }
             .listStyle(.sidebar)
         } detail: {
@@ -42,6 +46,8 @@ struct SettingsView: View {
                         SettingsLaunchBehaviorsPage()
                     case .performance:
                         SettingsPerformancePage()
+                    case .feedback:
+                        SettingsFeedbackPage()
                     }
                 }
                 .navigationTitle(Text(selectedTab.name))
