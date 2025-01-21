@@ -124,10 +124,6 @@ struct ContentView: View {
             }
 
             // MARK: Updates
-
-            .onReceive(player.visualizationDataPublisher) { fftData in
-                audioVisualizer.normalizeData(fftData: fftData)
-            }
             .onChange(of: player.track) { _, newValue in
                 Task {
                     if let newValue, let attachedPictures = newValue.metadata[extracting: \.attachedPictures]?.current {

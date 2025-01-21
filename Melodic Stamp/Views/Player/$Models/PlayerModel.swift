@@ -30,6 +30,8 @@ import SwiftUI
     private(set) var isUsingSystemOutputDevice: Bool = false
     private var _selectedOutputDevice: AudioDevice?
 
+    private var analyzer: RealtimeAnalyzer!
+
     // Exposed value, `nil` for system output device
     var selectedOutputDevice: AudioDevice? {
         get { isUsingSystemOutputDevice ? nil : _selectedOutputDevice }
@@ -50,8 +52,8 @@ import SwiftUI
     private var cancellables = Set<AnyCancellable>()
     private let timer = TimerPublisher(interval: 0.1)
 
-    private var visualizationDataSubject = PassthroughSubject<[CGFloat], Never>()
-    var visualizationDataPublisher: AnyPublisher<[CGFloat], Never> { visualizationDataSubject.eraseToAnyPublisher() }
+    private var visualizationDataSubject = PassthroughSubject<[[Float]], Never>()
+    var visualizationDataPublisher: AnyPublisher<[[Float]], Never> { visualizationDataSubject.eraseToAnyPublisher() }
 
     // MARK: Playlist & Playback
 
@@ -367,6 +369,7 @@ extension PlayerModel {
     }
 
     private func setupEngine() {
+        /*
         player.withEngine { [weak self] engine in
             guard let self else { return }
 
@@ -378,38 +381,68 @@ extension PlayerModel {
             let sampleRate = format.sampleRate
 
             inputNode.installTap(onBus: bus, bufferSize: 1024, format: format) { buffer, _ in
+                self.analyzer = RealtimeAnalyzer(fftSize: 1024)
                 self.processAudioBuffer(buffer, sampleRate: Float(sampleRate))
+            }
+        }
+        */
+
+        player.withEngine { [weak self] engine in
+            guard let self else { return }
+
+            // Audio visualization
+            let inputNode = engine.mainMixerNode
+            let bus = 0
+            let format = inputNode.outputFormat(forBus: bus)
+            let bufferSize = 2048
+
+            self.analyzer = RealtimeAnalyzer(fftSize: bufferSize)
+
+            inputNode.removeTap(onBus: bus)
+
+            inputNode.installTap(onBus: bus, bufferSize: AVAudioFrameCount(bufferSize), format: format) { [weak self] buffer, when in
+                guard let strongSelf = self else { return }
+                if !strongSelf.player.isPlaying { return }
+
+                buffer.frameLength = AVAudioFrameCount(bufferSize)
+
+                let spectra = strongSelf.analyzer.analyse(with: buffer)
+                
+                Task { @MainActor in
+                    strongSelf.visualizationDataSubject.send(spectra)
+                }
             }
         }
     }
 }
 
 extension PlayerModel {
-    //    func analyzeFiles(urls: [URL]) {
-    //        do {
-    //            let rg = try ReplayGainAnalyzer.analyzeAlbum(urls)
-    //            os_log("Album gain %.2f dB, peak %.8f; Tracks: [%{public}@]", log: OSLog.default, type: .info, rg.0.gain, rg.0.peak, rg.1.map { url, replayGain in
-    //                String(format: "\"%@\" gain %.2f dB, peak %.8f", FileManager.default.displayName(atPath: url.lastPathComponent), replayGain.gain, replayGain.peak)
-    //            }.joined(separator: ", "))
-    //            // TODO: Notice user we're done
-    //        } catch {}
-    //    }
+    /*
+        func analyzeFiles(urls: [URL]) {
+            do {
+                let rg = try ReplayGainAnalyzer.analyzeAlbum(urls)
+                os_log("Album gain %.2f dB, peak %.8f; Tracks: [%{public}@]", log: OSLog.default, type: .info, rg.0.gain, rg.0.peak, rg.1.map { url, replayGain in
+                    String(format: "\"%@\" gain %.2f dB, peak %.8f", FileManager.default.displayName(atPath: url.lastPathComponent), replayGain.gain, replayGain.peak)
+                }.joined(separator: ", "))
+                // TODO: Notice user we're done
+            } catch {}
+        }
 
-    //    func exportWAVEFile(url: URL) {
-    //        let destURL = url.deletingPathExtension().appendingPathExtension("wav")
-    //        if FileManager.default.fileExists(atPath: destURL.path) {
-    //            // TODO: Handle this
-    //            return
-    //        }
-    //
-    //        do {
-    //            try AudioConverter.convert(url, to: destURL)
-    //            try? AudioFile.copyMetadata(from: url, to: destURL)
-    //        } catch {
-    //            try? FileManager.default.trashItem(at: destURL, resultingItemURL: nil)
-    //
-    //        }
-    //    }
+        func exportWAVEFile(url: URL) {
+            let destURL = url.deletingPathExtension().appendingPathExtension("wav")
+            if FileManager.default.fileExists(atPath: destURL.path) {
+                // TODO: Handle this
+                return
+            }
+    
+            do {
+                try AudioConverter.convert(url, to: destURL)
+                try? AudioFile.copyMetadata(from: url, to: destURL)
+            } catch {
+                try? FileManager.default.trashItem(at: destURL, resultingItemURL: nil)
+    
+            }
+        }
 
     private func processAudioBuffer(_ buffer: AVAudioPCMBuffer, sampleRate: Float) {
         guard let channelData = buffer.floatChannelData else { return }
@@ -424,6 +457,7 @@ extension PlayerModel {
             self.visualizationDataSubject.send(fftMagnitudes.map(CGFloat.init))
         }
     }
+    */
 
     private func selectOutputDevice(_ device: AudioDevice) {
         do {

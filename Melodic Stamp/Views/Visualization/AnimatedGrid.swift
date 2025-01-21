@@ -29,6 +29,8 @@ struct AnimatedGrid: View {
     @Default(.gradientFPS) private var fps
 
     var hasDynamics: Bool = true
+    
+    @State private var normalizedData: Float = 0.0
 
     private var randomizer: MeshRandomizer {
         .init(
@@ -52,7 +54,7 @@ struct AnimatedGrid: View {
     }
 
     var body: some View {
-        VStack {
+        ZStack {
             switch dynamics {
             case .plain:
                 gradientVisualizer.dominantColors.first ?? .clear
@@ -69,13 +71,21 @@ struct AnimatedGrid: View {
                     grainAlpha: 0,
                     resolutionScale: Double(resolution)
                 )
+                /*
+                VStack(alignment: .leading) {
+                    AudioVisualizer()
+                }
+                */
             }
+        }
+        .onReceive(player.visualizationDataPublisher) { fftData in
+            normalizedData = audioVisualizer.normalizeData(fftData)
         }
     }
 
     private var weightFactor: Float {
         if isAnimateWithAudioEnabled, hasDynamics {
-            Float(audioVisualizer.normalizedData)
+            normalizedData
         } else {
             0.5
         }

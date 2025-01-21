@@ -9,11 +9,11 @@ import Foundation
 
 @Observable final class AudioVisualizerModel {
     var historyWindowSize = 10
-
-    private(set) var normalizedData: CGFloat = 0.5
+    
+    private(set) var normalizedData: [[Float]] = [[]]
     private(set) var maxHistories: [CGFloat] = []
     private(set) var minHistories: [CGFloat] = []
-
+/*
     func normalizeData(fftData: [CGFloat]) {
         let epsilon: CGFloat = 1e-6
 
@@ -46,6 +46,19 @@ import Foundation
         normalizedData = data.normalized
         updateHistories(min: data.min, max: data.max)
     }
+*/
+    func normalizeData(_ data: [[Float]]) -> Float {
+        let flatData = data.flatMap { $0 }
+
+        let sum = flatData.reduce(0, +)
+        let average = sum / Float(flatData.count)
+
+        let normalizedValue = min(max(average / 1, 0), 1)
+        
+        let finalValue = 10 * normalizedValue + 0.1
+        
+        return finalValue
+    }
 
     private func updateHistories(min: CGFloat, max: CGFloat) {
         guard historyWindowSize > 0 else { return }
@@ -60,5 +73,12 @@ import Foundation
 
         minHistories.append(min)
         maxHistories.append(max)
+    }
+}
+
+extension Array where Element == Float {
+    func minMax() -> (min: Float, max: Float)? {
+        guard let min = self.min(), let max = self.max() else { return nil }
+        return (min, max)
     }
 }
