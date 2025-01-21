@@ -18,6 +18,8 @@ import SwiftUI
 // MARK: - Fields
 
 @Observable final class PlayerModel: NSObject {
+    static let bufferSize: AVAudioFrameCount = 2048
+
     // MARK: Player
 
     private var player: any Player
@@ -52,8 +54,8 @@ import SwiftUI
     private var cancellables = Set<AnyCancellable>()
     private let timer = TimerPublisher(interval: 0.1)
 
-    private var visualizationDataSubject = PassthroughSubject<[[Float]], Never>()
-    var visualizationDataPublisher: AnyPublisher<[[Float]], Never> { visualizationDataSubject.eraseToAnyPublisher() }
+    private var visualizationDataSubject = PassthroughSubject<AVAudioPCMBuffer, Never>()
+    var visualizationDataPublisher: AnyPublisher<AVAudioPCMBuffer, Never> { visualizationDataSubject.eraseToAnyPublisher() }
 
     // MARK: Playlist & Playback
 
@@ -65,10 +67,6 @@ import SwiftUI
 
     private(set) var playbackTime: PlaybackTime?
     var unwrappedPlaybackTime: PlaybackTime { playbackTime ?? .init() }
-
-    // MARK: FFT
-
-    private var audioDataBuffer: [CGFloat] = []
 
     // MARK: Responsive
 
@@ -369,24 +367,6 @@ extension PlayerModel {
     }
 
     private func setupEngine() {
-        /*
-         player.withEngine { [weak self] engine in
-             guard let self else { return }
-
-             // Audio visualization
-             let inputNode = engine.mainMixerNode
-             let bus = 0
-
-             let format = inputNode.outputFormat(forBus: bus)
-             let sampleRate = format.sampleRate
-
-             inputNode.installTap(onBus: bus, bufferSize: 1024, format: format) { buffer, _ in
-                 self.analyzer = RealtimeAnalyzer(fftSize: 1024)
-                 self.processAudioBuffer(buffer, sampleRate: Float(sampleRate))
-             }
-         }
-         */
-
         player.withEngine { [weak self] engine in
             guard let self else { return }
 
@@ -394,22 +374,15 @@ extension PlayerModel {
             let inputNode = engine.mainMixerNode
             let bus = 0
             let format = inputNode.outputFormat(forBus: bus)
-            let bufferSize = 2048
-
-            analyzer = RealtimeAnalyzer(fftSize: bufferSize)
 
             inputNode.removeTap(onBus: bus)
-
-            inputNode.installTap(onBus: bus, bufferSize: AVAudioFrameCount(bufferSize), format: format) { [weak self] buffer, _ in
+            inputNode.installTap(onBus: bus, bufferSize: Self.bufferSize, format: format) { [weak self] buffer, _ in
                 guard let strongSelf = self else { return }
-                if !strongSelf.player.isPlaying { return }
+                guard strongSelf.player.isPlaying else { return }
 
-                buffer.frameLength = AVAudioFrameCount(bufferSize)
-
-                let spectra = strongSelf.analyzer.analyse(with: buffer)
-
+                buffer.frameLength = Self.bufferSize
                 Task { @MainActor in
-                    strongSelf.visualizationDataSubject.send(spectra)
+                    strongSelf.visualizationDataSubject.send(buffer)
                 }
             }
         }
@@ -443,20 +416,6 @@ extension PlayerModel {
 
              }
          }
-
-     private func processAudioBuffer(_ buffer: AVAudioPCMBuffer, sampleRate: Float) {
-         guard let channelData = buffer.floatChannelData else { return }
-
-         let channelDataPointer = channelData[0]
-         let frameLength = Int(buffer.frameLength)
-
-         audioDataBuffer = Array(UnsafeBufferPointer(start: channelDataPointer, count: frameLength)).map(CGFloat.init)
-
-         Task { @MainActor in
-             let fftMagnitudes = await FFTHelper.perform(audioDataBuffer.map(Float.init), sampleRate: sampleRate)
-             self.visualizationDataSubject.send(fftMagnitudes.map(CGFloat.init))
-         }
-     }
      */
 
     private func selectOutputDevice(_ device: AudioDevice) {

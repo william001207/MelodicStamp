@@ -1,5 +1,5 @@
 //
-//  SpectrumMiniView.swift
+//  SpectrumView.swift
 //  Melodic Stamp
 //
 //  Created by Xinshao_Air on 2025/1/21.
@@ -7,8 +7,8 @@
 
 import SwiftUI
 
-struct SpectrumMiniView: View {
-    var spectra: [[Float]]?
+struct SpectrumView: View {
+    var spectra: [[Float]]
 
     var barWidth: CGFloat = 2.0
     var space: CGFloat = 2.0
@@ -19,22 +19,23 @@ struct SpectrumMiniView: View {
         VStack(alignment: .center) {
             GeometryReader { geometry in
                 HStack(spacing: space) {
-                    if let leftSpectra = spectra?.first {
+                    if let leftSpectra = spectra.first {
                         let sortedLeft = leftSpectra.sorted()
                         HStack(spacing: space) {
                             ForEach(0 ..< 3, id: \.self) { index in
                                 let amplitude = averageAmplitude(for: sortedLeft, index: index, totalBars: 3)
-                                SpectrumBar(amplitude: amplitude, bounds: geometry.size)
+                                bar(amplitude: amplitude, bounds: geometry.size)
                                     .frame(width: barWidth)
                             }
                         }
                     }
-                    if let rightSpectra = spectra?.last {
+
+                    if let rightSpectra = spectra.last {
                         let sortedRight = Array(rightSpectra.sorted().reversed())
                         HStack(spacing: space) {
                             ForEach(0 ..< 3, id: \.self) { index in
                                 let amplitude = averageAmplitude(for: sortedRight, index: index, totalBars: 3)
-                                SpectrumBar(amplitude: amplitude, bounds: geometry.size)
+                                bar(amplitude: amplitude, bounds: geometry.size)
                                     .frame(width: barWidth)
                             }
                         }
@@ -42,6 +43,18 @@ struct SpectrumMiniView: View {
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
             }
+        }
+    }
+
+    @ViewBuilder private func bar(amplitude: Float, bounds: CGSize) -> some View {
+        VStack {
+            let barHeight = translateAmplitudeToYPosition(amplitude: amplitude, bounds: bounds)
+
+            Rectangle()
+                .fill(Color.black.opacity(0.45))
+                .frame(height: barHeight)
+                .cornerRadius(8)
+                .animation(.easeInOut(duration: 0.15), value: barHeight)
         }
     }
 
@@ -57,23 +70,6 @@ struct SpectrumMiniView: View {
         let adjustedHeight = average * 5.0
         return adjustedHeight
     }
-}
-
-struct SpectrumBar: View {
-    var amplitude: Float
-    var bounds: CGSize
-
-    var body: some View {
-        VStack {
-            let barHeight = translateAmplitudeToYPosition(amplitude: amplitude, bounds: bounds)
-
-            Rectangle()
-                .fill(Color.black.opacity(0.45))
-                .frame(height: barHeight)
-                .cornerRadius(8)
-                .animation(.easeInOut(duration: 0.15), value: barHeight)
-        }
-    }
 
     private func translateAmplitudeToYPosition(amplitude: Float, bounds: CGSize) -> CGFloat {
         let maxHeight = bounds.height
@@ -85,7 +81,7 @@ struct SpectrumBar: View {
 
 #Preview {
     VStack {
-        SpectrumMiniView(spectra: [
+        SpectrumView(spectra: [
             [0.1, 0.3, 0.5, 0.7, 0.9, 0.2, 0.5, 0.8, 0.3, 0.6],
             [0.9, 0.7, 0.5, 0.3, 0.1, 0.8, 0.6, 0.4, 0.2, 0.5]
         ])

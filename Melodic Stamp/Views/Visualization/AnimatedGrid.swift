@@ -30,8 +30,6 @@ struct AnimatedGrid: View {
 
     var hasDynamics: Bool = true
 
-    @State private var normalizedData: Float = 0.0
-
     private var randomizer: MeshRandomizer {
         .init(
             colorRandomizer: { color, _, x, y, gridWidth, gridHeight in
@@ -71,21 +69,13 @@ struct AnimatedGrid: View {
                     grainAlpha: 0,
                     resolutionScale: Double(resolution)
                 )
-                /*
-                 VStack(alignment: .leading) {
-                     AudioVisualizer()
-                 }
-                 */
             }
-        }
-        .onReceive(player.visualizationDataPublisher) { fftData in
-            normalizedData = audioVisualizer.normalizeData(fftData)
         }
     }
 
     private var weightFactor: Float {
         if isAnimateWithAudioEnabled, hasDynamics {
-            normalizedData
+            audioVisualizer.average
         } else {
             0.5
         }

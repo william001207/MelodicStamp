@@ -20,12 +20,12 @@ class RealtimeAnalyzer {
     private lazy var bands: [(lowerFrequency: Float, upperFrequency: Float)] = {
         var bands = [(lowerFrequency: Float, upperFrequency: Float)]()
 
-        // 1: Determine the growth factor according to the start and end spectrum and the number of frequency bands: 2^n.
+        // 1: Determine the growth factor according to the start and end spectrum and the number of frequency bands: 2^n
 
         let n = log2(endFrequency / startFrequency) / Float(frequencyBands)
         var nextBand: (lowerFrequency: Float, upperFrequency: Float) = (startFrequency, 0)
         for i in 1...frequencyBands {
-            // 2: The upper frequency point of a frequency band is 2^n times the lower frequency point.
+            // 2: The upper frequency point of a frequency band is 2^n times the lower frequency point
 
             let highFrequency = nextBand.lowerFrequency * powf(2, n)
             nextBand.upperFrequency = i == frequencyBands ? endFrequency : highFrequency
@@ -51,7 +51,7 @@ class RealtimeAnalyzer {
         vDSP_destroy_fftsetup(fftSetup)
     }
 
-    func analyse(with buffer: AVAudioPCMBuffer) -> [[Float]] {
+    func analyze(with buffer: AVAudioPCMBuffer) -> [[Float]] {
         let channelsAmplitudes = fft(buffer)
         let aWeights = createFrequencyWeights()
         if spectrumBuffer.isEmpty {
@@ -78,45 +78,60 @@ class RealtimeAnalyzer {
         var amplitudes = [[Float]]()
         guard let floatChannelData = buffer.floatChannelData else { return amplitudes }
 
-        // 1: Extract sample data from the buffer.
+        // 1: Extract sample data from the buffer
         var channels: UnsafePointer<UnsafeMutablePointer<Float>> = floatChannelData
         let channelCount = Int(buffer.format.channelCount)
         let isInterleaved = buffer.format.isInterleaved
 
         if isInterleaved {
-            // deinterleave
+            // Deinterleave
             let interleavedData = UnsafeBufferPointer(start: floatChannelData[0], count: fftSize * channelCount)
             var channelsTemp: [UnsafeMutablePointer<Float>] = []
+
             for i in 0 ..< channelCount {
                 var channelData = stride(from: i, to: interleavedData.count, by: channelCount).map { interleavedData[$0] }
-                channelsTemp.append(UnsafeMutablePointer(&channelData))
+                channelData.withUnsafeMutableBufferPointer { ptr in
+                    channelsTemp.append(ptr.baseAddress!)
+                }
             }
-            channels = UnsafePointer(channelsTemp)
+
+            channelsTemp.withUnsafeBufferPointer { ptr in
+                channels = ptr.baseAddress!
+            }
         }
 
         for i in 0 ..< channelCount {
             let channel = channels[i]
-            // 2: Add a Hanning window.
+            // 2: Add a Hanning window
             var window = [Float](repeating: 0, count: Int(fftSize))
             vDSP_hann_window(&window, vDSP_Length(fftSize), Int32(vDSP_HANN_NORM))
             vDSP_vmul(channel, 1, window, 1, channel, 1, vDSP_Length(fftSize))
 
-            // 3: Package the real numbers into the complex numbers fftInOut required by FFT. It is both input and output.
+            // 3: Package the real numbers into the complex numbers fftInOut required by FFT
+            // It is both input and output
+            var fftInOut: DSPSplitComplex!
             var realp = [Float](repeating: 0.0, count: Int(fftSize / 2))
-            var imagp = [Float](repeating: 0.0, count: Int(fftSize / 2))
-            var fftInOut = DSPSplitComplex(realp: &realp, imagp: &imagp)
+            realp.withUnsafeMutableBufferPointer { realpPtr in
+                var imagp = [Float](repeating: 0.0, count: Int(fftSize / 2))
+                imagp.withUnsafeMutableBufferPointer { imagpPtr in
+                    fftInOut = DSPSplitComplex(realp: realpPtr.baseAddress!, imagp: imagpPtr.baseAddress!)
+                }
+            }
+
             channel.withMemoryRebound(to: DSPComplex.self, capacity: fftSize) { typeConvertedTransferBuffer in
                 vDSP_ctoz(typeConvertedTransferBuffer, 2, &fftInOut, 1, vDSP_Length(fftSize / 2))
             }
 
-            // 4: Perform FFT.
+            // 4: Perform FFT
             vDSP_fft_zrip(fftSetup!, &fftInOut, 1, vDSP_Length(round(log2(Double(fftSize)))), FFTDirection(FFT_FORWARD))
 
-            // 5: Adjust the FFT result and calculate the amplitude.
+            // 5: Adjust the FFT result and calculate the amplitude
             fftInOut.imagp[0] = 0
+
             let fftNormFactor = Float(1.0 / Float(fftSize))
             vDSP_vsmul(fftInOut.realp, 1, [fftNormFactor], fftInOut.realp, 1, vDSP_Length(fftSize / 2))
             vDSP_vsmul(fftInOut.imagp, 1, [fftNormFactor], fftInOut.imagp, 1, vDSP_Length(fftSize / 2))
+
             var channelAmplitudes = [Float](repeating: 0.0, count: Int(fftSize / 2))
             vDSP_zvabs(&fftInOut, 1, &channelAmplitudes, 1, vDSP_Length(fftSize / 2))
             channelAmplitudes[0] = channelAmplitudes[0] / 2

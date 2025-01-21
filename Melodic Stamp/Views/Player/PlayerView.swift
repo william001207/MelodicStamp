@@ -120,9 +120,6 @@ struct PlayerView: View {
 
             // MARK: Output Device
 
-            AudioVisualizerMini()
-                .frame(width: 10, height: 10, alignment: .center)
-
             Menu {
                 OutputDevicePicker(
                     devices: player.outputDevices,
