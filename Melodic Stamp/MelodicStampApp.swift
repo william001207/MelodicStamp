@@ -12,7 +12,6 @@ import UniformTypeIdentifiers
 enum WindowID: String, Equatable, Hashable, CaseIterable, Identifiable, Codable {
     case content
     case about
-    case settings
 
     var id: Self { self }
 }
@@ -26,10 +25,9 @@ struct MelodicStampApp: App {
 
     @FocusedValue(\.windowManager) private var windowManager
 
-    @State private var isAboutPresented: Bool = false
-    @State private var isSettingsPresented: Bool = false
-
     @State private var floatingWindows: FloatingWindowsModel = .init()
+
+    @State private var isAboutWindowPresented: Bool = false
 
     var body: some Scene {
         WindowGroup(id: WindowID.content.rawValue, for: CreationParameters.self) { $parameters in
@@ -45,21 +43,12 @@ struct MelodicStampApp: App {
 
             CommandGroup(replacing: .appInfo) {
                 Button("About \(Bundle.main.displayName)") {
-                    if isAboutPresented {
+                    if isAboutWindowPresented {
                         dismissWindow(id: WindowID.about.rawValue)
                     } else {
                         openWindow(id: WindowID.about.rawValue)
                     }
                 }
-
-                Button("Settings…") {
-                    if isSettingsPresented {
-                        dismissWindow(id: WindowID.settings.rawValue)
-                    } else {
-                        openWindow(id: WindowID.settings.rawValue)
-                    }
-                }
-                .keyboardShortcut(",", modifiers: .command)
             }
 
             FileCommands()
@@ -76,10 +65,10 @@ struct MelodicStampApp: App {
         Window("About \(Bundle.main.displayName)", id: WindowID.about.rawValue) {
             AboutView()
                 .onAppear {
-                    isAboutPresented = true
+                    isAboutWindowPresented = true
                 }
                 .onDisappear {
-                    isAboutPresented = false
+                    isAboutWindowPresented = false
                 }
                 .windowMinimizeBehavior(.disabled)
                 .windowFullScreenBehavior(.disabled)
@@ -92,20 +81,11 @@ struct MelodicStampApp: App {
         .windowManagerRole(.associated)
         .handlesExternalEvents(matching: []) // Crucial for handling custom external events in `AppDelegate`
 
-        Window("Settings", id: WindowID.settings.rawValue) {
+        Settings {
             SettingsView()
-                .onAppear {
-                    isSettingsPresented = true
-                }
-                .onDisappear {
-                    isSettingsPresented = false
-                }
                 .windowMinimizeBehavior(.disabled)
                 .windowFullScreenBehavior(.disabled)
         }
-        .defaultLaunchBehavior(.suppressed)
-        .restorationBehavior(.disabled)
-        .windowResizability(.contentSize)
         .windowToolbarStyle(.unified)
         .windowManagerRole(.associated)
         .handlesExternalEvents(matching: []) // Crucial for handling custom external events in `AppDelegate`

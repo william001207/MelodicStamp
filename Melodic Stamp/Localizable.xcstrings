@@ -2135,26 +2135,6 @@
         }
       }
     },
-    "Settings" : {
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "设置"
-          }
-        }
-      }
-    },
-    "Settings…" : {
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "设置…"
-          }
-        }
-      }
-    },
     "Share your feedback on our GitHub page! Whether you find a bug or want to suggest a new feature, feel free to speak up. [Join our QQ Group Chat…](https://qm.qq.com/q/txBDJxnw4i)" : {
       "localizations" : {
         "zh-Hans" : {
