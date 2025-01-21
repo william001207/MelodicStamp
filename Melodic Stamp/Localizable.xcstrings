@@ -14,9 +14,6 @@
         }
       }
     },
-    "%f" : {
-
-    },
     "%lld words" : {
       "localizations" : {
         "zh-Hans" : {
