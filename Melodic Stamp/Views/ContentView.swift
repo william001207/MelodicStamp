@@ -138,6 +138,10 @@ struct ContentView: View {
             .onReceive(player.visualizationDataPublisher) { buffer in
                 audioVisualizer.updateData(from: buffer)
             }
+            .onChange(of: player.isPlaying) { _, newValue in
+                guard !newValue else { return }
+                audioVisualizer.clearData()
+            }
         }
         .frame(minWidth: minWidth, maxWidth: maxWidth)
 

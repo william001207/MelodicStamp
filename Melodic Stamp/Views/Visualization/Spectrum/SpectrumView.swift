@@ -10,18 +10,16 @@ import SwiftUI
 struct SpectrumView: View {
     var spectra: [[Float]]
     var barWidth: CGFloat = 2
+    var leftChannelCount: Int = 3
+    var rightChannelCount: Int = 3
 
     @State private var containerSize: CGSize = .zero
 
     var body: some View {
         HStack(spacing: 0) {
-            if let leftSpectra = spectra.first {
-                spectrum(sorted: leftSpectra.sorted())
-            }
+            spectrum(sorted: leftSpectra.sorted(), count: leftChannelCount)
 
-            if let rightSpectra = spectra.last {
-                spectrum(sorted: rightSpectra.sorted().reversed())
-            }
+            spectrum(sorted: rightSpectra.sorted().reversed(), count: rightChannelCount)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
         .onGeometryChange(for: CGSize.self) { proxy in
@@ -31,10 +29,26 @@ struct SpectrumView: View {
         }
     }
 
-    @ViewBuilder private func spectrum(sorted: [Float]) -> some View {
+    private var leftSpectra: [Float] {
+        if let firstSpectra = spectra.first {
+            firstSpectra.padded(toCount: leftChannelCount, with: .zero)
+        } else {
+            Array(repeating: .zero, count: leftChannelCount)
+        }
+    }
+
+    private var rightSpectra: [Float] {
+        if spectra.count > 1, let lastSpectra = spectra.last {
+            lastSpectra.padded(toCount: rightChannelCount, with: .zero)
+        } else {
+            Array(repeating: .zero, count: rightChannelCount)
+        }
+    }
+
+    @ViewBuilder private func spectrum(sorted: [Float], count: Int) -> some View {
         HStack(spacing: 0) {
-            ForEach(0 ..< 3, id: \.self) { index in
-                let amplitude = averageAmplitude(in: sorted, index: index, count: 3)
+            ForEach(0 ..< count, id: \.self) { index in
+                let amplitude = averageAmplitude(in: sorted, index: index, count: count)
                 bar(amplitude: amplitude)
                     .frame(maxWidth: .infinity)
             }
@@ -81,4 +95,9 @@ struct SpectrumView: View {
     .border(.blue)
     .frame(width: 100, height: 100)
     .padding()
+}
+
+#Preview {
+    SpectrumView(spectra: [[]], leftChannelCount: 5, rightChannelCount: 5)
+        .padding()
 }

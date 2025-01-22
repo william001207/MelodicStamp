@@ -22,4 +22,11 @@ extension Array {
 
         return result
     }
+
+    func padded(toCount count: Int, with element: Element) -> [Element] {
+        if self.count >= count {
+            return self
+        }
+        return self + Array(repeating: element, count: count - self.count)
+    }
 }

@@ -52,8 +52,8 @@ import SwiftUI
     private var cancellables = Set<AnyCancellable>()
     private let timer = TimerPublisher(interval: 0.1)
 
-    private var visualizationDataSubject = PassthroughSubject<AVAudioPCMBuffer, Never>()
-    var visualizationDataPublisher: AnyPublisher<AVAudioPCMBuffer, Never> { visualizationDataSubject.eraseToAnyPublisher() }
+    private var visualizationDataSubject = PassthroughSubject<AVAudioPCMBuffer?, Never>()
+    var visualizationDataPublisher: AnyPublisher<AVAudioPCMBuffer?, Never> { visualizationDataSubject.eraseToAnyPublisher() }
 
     // MARK: Playlist & Playback
 

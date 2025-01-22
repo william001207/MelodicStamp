@@ -13,11 +13,23 @@ import Foundation
 
     private(set) var data: [[Float]] = [[]]
     private(set) var normalizedData: [[Float]] = [[]]
-    private(set) var average: Float = 0.5
+    private(set) var average: Float = .zero
 
-    func updateData(from buffer: AVAudioPCMBuffer) {
+    func updateData(from buffer: AVAudioPCMBuffer?) {
+        guard let buffer else {
+            // Clear all data to zero
+            clearData()
+            return
+        }
+
         data = analyzer.analyze(with: buffer)
         normalizedData = data.map(\.normalized)
         average = normalizedData.flatMap(\.self).reduce(0, +) / Float(normalizedData.count)
+    }
+
+    func clearData() {
+        data = [[]]
+        normalizedData = [[]]
+        average = .zero
     }
 }
