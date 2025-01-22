@@ -459,7 +459,7 @@ extension PlayerModel: PlayerDelegate {
 }
 
 extension PlayerModel: AudioPlayer.Delegate {
-    func audioPlayerNowPlayingChanged(_ audioPlayer: AudioPlayer) {
+    func audioPlayer(_ audioPlayer: AudioPlayer, nowPlayingChanged _: (any PCMDecoding)?) {
         DispatchQueue.main.async {
             // Updates track, otherwise keeps it
             if let nowPlayingDecoder = audioPlayer.nowPlaying,
@@ -474,7 +474,7 @@ extension PlayerModel: AudioPlayer.Delegate {
         }
     }
 
-    func audioPlayerPlaybackStateChanged(_: AudioPlayer) {
+    func audioPlayer(_: AudioPlayer, playbackStateChanged _: AudioPlayer.PlaybackState) {
         DispatchQueue.main.async {
             self.updateNowPlayingState()
             self.updateNowPlayingInfo()
