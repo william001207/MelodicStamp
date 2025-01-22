@@ -11,13 +11,13 @@ using namespace metal;
 
 [[stitchable]] half4 w(float2 p, SwiftUI::Layer a, float2 l, float2 v) {
     // Compute the motion vector with a falloff based on distance
-    float2 m = -v * pow(clamp(1 - length(l - p) / 190, 0.0, 1.0), 2) * 1.5;
+    float2 m = -v * pow(clamp(1 - length(l - p) / 190, 0.0, 1.0), 2) * 0.45;
     
     half3 c = 0; // Initialize the color accumulator to zero
     
     // Loop to sample colors and accumulate
     for (float i = 0; i < 10; i++) {
-        float s = 0.175 + 0.005 * i; // Increasing spread factor
+        float s = 0.200 + 0.005 * i; // Increasing spread factor
         
         // Accumulate sampled colors from texture a at various offsets
         c += half3(

@@ -63,7 +63,7 @@ struct MelodicStampApp: App {
         }
 
         Window("About \(Bundle.main.displayName)", id: WindowID.about.rawValue) {
-            AboutView()
+            AboutViewPreview()
                 .onAppear {
                     isAboutWindowPresented = true
                 }
@@ -72,6 +72,7 @@ struct MelodicStampApp: App {
                 }
                 .windowMinimizeBehavior(.disabled)
                 .windowFullScreenBehavior(.disabled)
+                .safeAreaPadding(.top, 0)
         }
         .defaultLaunchBehavior(.suppressed)
         .restorationBehavior(.disabled)

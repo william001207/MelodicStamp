@@ -1,6 +1,12 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "\nOpen Sourced On GitHub\n" : {
+      "shouldTranslate" : false
+    },
+    " Labs\n" : {
+      "shouldTranslate" : false
+    },
     "--:--" : {
       "shouldTranslate" : false
     },
@@ -14,6 +20,20 @@
         }
       }
     },
+    "%@\n\n" : {
+      "shouldTranslate" : false
+    },
+    "%@ (%@)" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ (%2$@)"
+          }
+        }
+      },
+      "shouldTranslate" : false
+    },
     "%lld words" : {
       "localizations" : {
         "zh-Hans" : {
@@ -23,6 +43,9 @@
           }
         }
       }
+    },
+    "© 2024 → Future" : {
+      "shouldTranslate" : false
     },
     "×0.1" : {
       "localizations" : {
@@ -67,23 +90,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Preview"
-          }
-        }
-      }
-    },
-    "About: Version Template" : {
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "%1$@ (%2$@)"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$@（%2$@）"
           }
         }
       }
@@ -647,6 +653,9 @@
           }
         }
       }
+    },
+    "Cement" : {
+      "shouldTranslate" : false
     },
     "Chroma" : {
       "localizations" : {
@@ -1469,6 +1478,9 @@
         }
       }
     },
+    "Melodic Stamp " : {
+      "shouldTranslate" : false
+    },
     "Metadata" : {
       "localizations" : {
         "zh-Hans" : {
@@ -1874,6 +1886,12 @@
           }
         }
       }
+    },
+    "Preview" : {
+      "shouldTranslate" : false
+    },
+    "Preview\n" : {
+      "shouldTranslate" : false
     },
     "Previous Track" : {
       "localizations" : {

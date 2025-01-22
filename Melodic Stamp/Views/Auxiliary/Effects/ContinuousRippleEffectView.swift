@@ -25,7 +25,10 @@ struct ContinuousRippleEffectView<Content>: View where Content: View {
         content()
             .visualEffect { content, _ in
                 content.layerEffect(
-                    ShaderLibrary.w(.float2(dragLocation), .float2(dragVelocity)),
+                    ShaderLibrary.w(
+                        .float2(dragLocation),
+                        .float2(dragVelocity)
+                    ),
                     maxSampleOffset: .init(width: 600, height: 600)
                 )
             }
@@ -38,10 +41,12 @@ struct ContinuousRippleEffectView<Content>: View where Content: View {
                 .onEnded { _ in
                     timer?.invalidate()
                     timer = Timer.scheduledTimer(withTimeInterval: 0.016, repeats: true) { timer in
-                        self.dragVelocity.width *= 0.75
-                        self.dragVelocity.height *= 0.75
+                        // Apply exponential deceleration for smoother stop
+                        self.dragVelocity.width *= 0.85
+                        self.dragVelocity.height *= 0.85
 
-                        if abs(self.dragVelocity.width) < 0.1, abs(self.dragVelocity.height) < 0.1 {
+                        // Stop the timer when velocity is very low
+                        if abs(self.dragVelocity.width) < 0.01, abs(self.dragVelocity.height) < 0.01 {
                             self.dragVelocity = .zero
                             timer.invalidate()
                         }
