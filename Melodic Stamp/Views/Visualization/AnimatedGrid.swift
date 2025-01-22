@@ -91,7 +91,7 @@ struct AnimatedGrid: View {
     }
 
     private var simdColors: [SIMDColor] {
-        gradientVisualizer.prefixedDomainantColors(upTo: dynamics.count).map { $0.toSimdFloat3() }
+        gradientVisualizer.prefixedDominantColorsWithFallback(upTo: dynamics.count).map { $0.toSimdFloat3() }
     }
 
     private func updateAverage(_ average: Float) {

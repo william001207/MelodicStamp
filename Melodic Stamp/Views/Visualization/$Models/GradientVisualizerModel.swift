@@ -13,7 +13,11 @@ import SwiftUI
     static let fallbackDominantColors: [Color] = [
         .init(hex: 0x929292), .init(hex: 0xFFFFFF), .init(hex: 0x929292)
     ]
-    private(set) var dominantColors: [Color] = GradientVisualizerModel.fallbackDominantColors
+    private(set) var dominantColors: [Color] = []
+
+    var dominantColorsWithFallback: [Color] {
+        dominantColors.isEmpty ? GradientVisualizerModel.fallbackDominantColors : dominantColors
+    }
 
     static func extractDominantColors(from image: NSImage) async throws -> [Color] {
         let colors = try DominantColors.dominantColors(
@@ -30,15 +34,20 @@ import SwiftUI
             do {
                 dominantColors = try await GradientVisualizerModel.extractDominantColors(from: image)
             } catch {
-                dominantColors = Self.fallbackDominantColors
+                dominantColors = []
             }
         } else {
-            dominantColors = Self.fallbackDominantColors
+            dominantColors = []
         }
     }
 
-    func prefixedDomainantColors(upTo count: Int) -> [Color] {
+    func prefixedDominantColors(upTo count: Int) -> [Color] {
         let limitedCount = max(0, min(count, dominantColors.count))
         return Array(dominantColors.prefix(upTo: limitedCount))
+    }
+
+    func prefixedDominantColorsWithFallback(upTo count: Int) -> [Color] {
+        let limitedCount = max(0, min(count, dominantColorsWithFallback.count))
+        return Array(dominantColorsWithFallback.prefix(upTo: limitedCount))
     }
 }

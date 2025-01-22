@@ -15,14 +15,22 @@ struct TinyBinaryChannelVisualizerView: View {
     @Default(.gradientDynamics) private var gradientDynamics
 
     var body: some View {
-        LinearGradient(
-            colors: gradientVisualizer.prefixedDomainantColors(upTo: gradientDynamics.count),
-            startPoint: .leading, endPoint: .trailing
-        )
-        .mask {
-            SpectrumView(spectra: audioVisualizer.normalizedData)
-                .foregroundStyle(.white)
-                .animation(.smooth(duration: 0.2), value: audioVisualizer.normalizedData)
+        colors()
+            .mask {
+                SpectrumView(spectra: audioVisualizer.normalizedData)
+                    .foregroundStyle(.white)
+                    .animation(.smooth(duration: 0.2), value: audioVisualizer.normalizedData)
+            }
+    }
+
+    @ViewBuilder private func colors() -> some View {
+        if gradientVisualizer.dominantColors.isEmpty {
+            Color.primary
+        } else {
+            LinearGradient(
+                colors: gradientVisualizer.prefixedDominantColors(upTo: gradientDynamics.count),
+                startPoint: .leading, endPoint: .trailing
+            )
         }
     }
 }
