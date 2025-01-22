@@ -26,6 +26,10 @@ extension View {
     @ViewBuilder func hoverableBackground(isExplicitlyVisible: Bool? = nil) -> some View {
         modifier(HoverableBackgroundModifier(isExplicitlyVisible: isExplicitlyVisible))
     }
+
+    @ViewBuilder func dragEffect(alpha: CGFloat = 0.2) -> some View {
+        modifier(DragEffectModifier(alpha: alpha))
+    }
 }
 
 extension View {

@@ -51,6 +51,16 @@ struct DragEffectView<Content>: View where Content: View {
     }
 }
 
+struct DragEffectModifier: ViewModifier {
+    var alpha: CGFloat = 0.2
+
+    func body(content: Content) -> some View {
+        DragEffectView(alpha: alpha) {
+            content
+        }
+    }
+}
+
 #if DEBUG
     #Preview {
         DragEffectView {
