@@ -1,5 +1,5 @@
 //
-//  DragEffect.metal
+//  ContinuousRipple.metal
 //  Melodic Stamp
 //
 //  Created by Xinshao_Air on 2024/12/3.

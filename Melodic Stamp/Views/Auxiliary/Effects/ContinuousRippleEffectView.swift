@@ -1,5 +1,5 @@
 //
-//  DragEffectView.swift
+//  ContinuousRippleEffectView.swift
 //  Melodic Stamp
 //
 //  Created by KrLite on 2025/1/22.
@@ -8,7 +8,7 @@
 import Metal
 import SwiftUI
 
-struct DragEffectView<Content>: View where Content: View {
+struct ContinuousRippleEffectView<Content>: View where Content: View {
     var alpha: CGFloat = 0.2
     @ViewBuilder var content: () -> Content
 
@@ -51,11 +51,11 @@ struct DragEffectView<Content>: View where Content: View {
     }
 }
 
-struct DragEffectModifier: ViewModifier {
+struct ContinuousRippleEffectModifier: ViewModifier {
     var alpha: CGFloat = 0.2
 
     func body(content: Content) -> some View {
-        DragEffectView(alpha: alpha) {
+        ContinuousRippleEffectView(alpha: alpha) {
             content
         }
     }
@@ -63,7 +63,7 @@ struct DragEffectModifier: ViewModifier {
 
 #if DEBUG
     #Preview {
-        DragEffectView {
+        ContinuousRippleEffectView {
             Image(.templateArtwork)
                 .resizable()
                 .scaledToFit()

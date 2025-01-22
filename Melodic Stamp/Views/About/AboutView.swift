@@ -15,75 +15,75 @@ struct AboutView: View {
     @State private var isVersionCopied: Bool = false
 
     var body: some View {
-        ZStack {
-            gradient()
+        HStack(spacing: 25) {
+            appIcon()
+                .shadow(radius: 24)
+                .padding(8)
 
-            HStack(spacing: 25) {
-                appIcon()
-                    .shadow(radius: 24)
-                    .padding(8)
+            VStack(alignment: .leading, spacing: 17.5) {
+                title()
 
-                VStack(alignment: .leading, spacing: 17.5) {
-                    title()
+                VStack(alignment: .leading, spacing: 4) {
+                    AliveButton {
+                        openURL(.organization)
+                    } label: {
+                        Text(Bundle.main.copyright)
+                    }
 
-                    VStack(alignment: .leading, spacing: 4) {
-                        AliveButton {
-                            openURL(.organization)
-                        } label: {
-                            Text(Bundle.main.copyright)
+                    AliveButton {
+                        openURL(.repository)
+                    } label: {
+                        HStack {
+                            Text("Open sourced on GitHub")
+                        }
+                        .font(.caption)
+                        .foregroundStyle(.tertiary)
+                    }
+
+                    if let version = Bundle.main.appVersion {
+                        let build = Bundle.main.appBuild.flatMap(String.init) ?? ""
+                        let hasBuild = !build.isEmpty
+
+                        let combined: String = if hasBuild {
+                            String(localized: .init(
+                                "About: Version Template",
+                                defaultValue: "\(version) (\(build))"
+                            ))
+                        } else {
+                            version
                         }
 
                         AliveButton {
-                            openURL(.repository)
+                            NSPasteboard.general.setString(combined, forType: .string)
+
+                            isVersionCopied = true
+                            withAnimation(.default.delay(1.5)) {
+                                isVersionCopied = false
+                            }
                         } label: {
                             HStack {
-                                Text("Open sourced on GitHub")
+                                if isVersionCopied {
+                                    Text("Copied to clipboard!")
+                                } else {
+                                    Text("Version")
+
+                                    Text(combined)
+                                        .monospaced()
+                                }
                             }
                             .font(.caption)
                             .foregroundStyle(.tertiary)
                         }
-
-                        if let version = Bundle.main.appVersion {
-                            let build = Bundle.main.appBuild.flatMap(String.init) ?? ""
-                            let hasBuild = !build.isEmpty
-
-                            let combined: String = if hasBuild {
-                                String(localized: .init(
-                                    "About: Version Template",
-                                    defaultValue: "\(version) (\(build))"
-                                ))
-                            } else {
-                                version
-                            }
-
-                            AliveButton {
-                                NSPasteboard.general.setString(combined, forType: .string)
-
-                                isVersionCopied = true
-                                withAnimation(.default.delay(1.5)) {
-                                    isVersionCopied = false
-                                }
-                            } label: {
-                                HStack {
-                                    if isVersionCopied {
-                                        Text("Copied to clipboard!")
-                                    } else {
-                                        Text("Version")
-
-                                        Text(combined)
-                                            .monospaced()
-                                    }
-                                }
-                                .font(.caption)
-                                .foregroundStyle(.tertiary)
-                            }
-                        }
                     }
                 }
             }
-            .padding(.horizontal, 25)
-            .padding(100)
         }
+        .containerBackground(for: .window) {
+            gradient()
+                .continuousRippleEffect()
+        }
+        .padding(.horizontal, 25)
+        .padding(100)
         .ignoresSafeArea()
         .padding(.bottom, -28)
         .fixedSize()
