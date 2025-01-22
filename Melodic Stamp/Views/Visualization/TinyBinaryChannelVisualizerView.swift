@@ -35,8 +35,10 @@ struct TinyBinaryChannelVisualizerView: View {
     }
 }
 
-#Preview(traits: .modifier(SampleEnvironmentsPreviewModifier())) {
-    TinyBinaryChannelVisualizerView()
-        .frame(width: 20, height: 20)
-        .padding()
-}
+#if DEBUG
+    #Preview(traits: .modifier(SampleEnvironmentsPreviewModifier())) {
+        TinyBinaryChannelVisualizerView()
+            .frame(width: 20, height: 20)
+            .padding()
+    }
+#endif
