@@ -14,13 +14,15 @@ struct SpectrumView: View {
     @State private var containerSize: CGSize = .zero
 
     var body: some View {
-        HStack {
+        HStack(spacing: barWidth) {
             if let leftSpectra = spectra.first {
-                spectrum(sorted: leftSpectra)
+                let sortedLeft = leftSpectra.sorted()
+                spectrum(sorted: sortedLeft)
             }
 
             if let rightSpectra = spectra.last {
-                spectrum(sorted: rightSpectra)
+                let sortedRight = Array(rightSpectra.sorted().reversed())
+                spectrum(sorted: sortedRight)
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
@@ -32,7 +34,7 @@ struct SpectrumView: View {
     }
 
     @ViewBuilder private func spectrum(sorted: [Float]) -> some View {
-        HStack {
+        HStack(spacing: barWidth) {
             ForEach(0 ..< 3, id: \.self) { index in
                 let amplitude = averageAmplitude(in: sorted, index: index, count: 3)
                 bar(amplitude: amplitude)
@@ -46,8 +48,9 @@ struct SpectrumView: View {
             let height = height(ofAmplitude: amplitude)
 
             Capsule()
+                .fill(Color.primary.opacity(0.3))
                 .frame(width: barWidth, height: height)
-                .animation(.easeInOut(duration: 0.15), value: height)
+                .animation(.smooth(duration: 0.2), value: height)
         }
     }
 
@@ -75,4 +78,20 @@ struct SpectrumView: View {
     .border(.blue)
     .frame(width: 100, height: 100)
     .padding()
+}
+
+struct AudioVisualizerMiniView: View {
+    @Environment(PlayerModel.self) private var player
+    @Environment(AudioVisualizerModel.self) private var audioVisualizer
+
+    let maxMagnitude: CGFloat = 10
+
+    @State private var frequencyData: [[Float]] = []
+
+    var body: some View {
+        VStack(alignment: .center) {
+            SpectrumView(spectra: audioVisualizer.normalizedData)
+                .frame(width: 20, height: 20, alignment: .center)
+        }
+    }
 }

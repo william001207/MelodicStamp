@@ -303,6 +303,7 @@ struct ContentView: View {
         }
         floatingWindows.addPlayer(to: mainWindow) {
             FloatingPlayerView()
+                .environment(audioVisualizer)
                 .environment(floatingWindows)
                 .environment(windowManager)
                 .environment(player)

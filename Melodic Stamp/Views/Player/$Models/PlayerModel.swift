@@ -32,8 +32,6 @@ import SwiftUI
     private(set) var isUsingSystemOutputDevice: Bool = false
     private var _selectedOutputDevice: AudioDevice?
 
-    private var analyzer: RealtimeAnalyzer!
-
     // Exposed value, `nil` for system output device
     var selectedOutputDevice: AudioDevice? {
         get { isUsingSystemOutputDevice ? nil : _selectedOutputDevice }

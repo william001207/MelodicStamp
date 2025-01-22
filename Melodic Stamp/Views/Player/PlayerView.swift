@@ -16,6 +16,7 @@ struct PlayerView: View {
     @Environment(WindowManagerModel.self) private var windowManager
     @Environment(PlayerModel.self) private var player
     @Environment(PlayerKeyboardControlModel.self) private var playerKeyboardControl
+    @Environment(AudioVisualizerModel.self) private var audioVisualizer
 
     // MARK: - Fields
 
@@ -117,6 +118,8 @@ struct PlayerView: View {
             .padding(.bottom, 2)
 
             Spacer()
+
+            AudioVisualizerMiniView()
 
             // MARK: Output Device
 
