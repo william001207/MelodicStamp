@@ -9,13 +9,11 @@ import Accelerate
 import CAAudioHardware
 import Combine
 import Defaults
-import MediaPlayer
 import os.log
 import SFBAudioEngine
-import SFSafeSymbols
 import SwiftUI
 
-// MARK: - Fields
+// MARK: - Definition
 
 @Observable final class PlayerModel: NSObject {
     static let bufferSize: AVAudioFrameCount = 2048
@@ -23,6 +21,8 @@ import SwiftUI
     // MARK: Player
 
     private var player: any Player
+
+    // MARK: Output Devices
 
     // Do not use computed variables for the sake of correctly updating view data
     private(set) var outputDevices: [AudioDevice] = []
@@ -66,7 +66,7 @@ import SwiftUI
     private(set) var playbackTime: PlaybackTime?
     var unwrappedPlaybackTime: PlaybackTime { playbackTime ?? .init() }
 
-    // MARK: Responsive
+    // MARK: Responsive Fields
 
     var progress: CGFloat {
         get {
@@ -135,6 +135,8 @@ import SwiftUI
         isRunning && hasCurrentTrack
     }
 
+    // MARK: Tracks & Indices
+
     var nextTrack: Track? {
         guard let nextIndex else { return nil }
         return playlist[nextIndex]
@@ -193,6 +195,8 @@ import SwiftUI
             return randomIndex()
         }
     }
+
+    // MARK: Initializers
 
     init(_ player: some Player) {
         self.player = player
@@ -262,6 +266,8 @@ extension PlayerModel {
         }
     }
 
+    // MARK: Play
+
     func play(track: Track) {
         addToPlaylist(urls: [track.url])
 
@@ -276,6 +282,8 @@ extension PlayerModel {
             play(track: track)
         }
     }
+
+    // MARK: Playlist
 
     func addToPlaylist(urls: [URL]) {
         for url in urls {
@@ -306,17 +314,19 @@ extension PlayerModel {
         }
     }
 
-    func movePlaylist(fromOffsets indices: IndexSet, toOffset destination: Int) {
-        playlist.move(fromOffsets: indices, toOffset: destination)
-    }
-
     func removeFromPlaylist(tracks: [Track]) {
         removeFromPlaylist(urls: tracks.map(\.url))
+    }
+
+    func movePlaylist(fromOffsets indices: IndexSet, toOffset destination: Int) {
+        playlist.move(fromOffsets: indices, toOffset: destination)
     }
 
     func removeAll() {
         removeFromPlaylist(tracks: playlist)
     }
+
+    // MARK: Convenient Functions
 
     func play() {
         if isRunning {
@@ -360,6 +370,8 @@ extension PlayerModel {
         play(track: playlist[previousIndex])
     }
 
+    // MARK: Engine
+
     private func setupEngine() {
         player.withEngine { [weak self] engine in
             guard let self else { return }
@@ -382,6 +394,8 @@ extension PlayerModel {
         }
     }
 }
+
+// MARK: - Auxiliary Functions
 
 extension PlayerModel {
     /*
@@ -411,6 +425,8 @@ extension PlayerModel {
              }
          }
      */
+
+    // MARK: Output Devices
 
     private func selectOutputDevice(_ device: AudioDevice) {
         do {
@@ -442,6 +458,8 @@ extension PlayerModel {
     }
 }
 
+// MARK: - Delegates
+
 extension PlayerModel: PlayerDelegate {
     func playerDidFinishPlaying(_: some Melodic_Stamp.Player) {
         DispatchQueue.main.async {
@@ -459,11 +477,11 @@ extension PlayerModel: PlayerDelegate {
 }
 
 extension PlayerModel: AudioPlayer.Delegate {
-    func audioPlayer(_ audioPlayer: AudioPlayer, nowPlayingChanged _: (any PCMDecoding)?) {
+    func audioPlayer(_: AudioPlayer, nowPlayingChanged nowPlaying: (any PCMDecoding)?) {
         DispatchQueue.main.async {
             // Updates track, otherwise keeps it
-            if let nowPlayingDecoder = audioPlayer.nowPlaying,
-               let audioDecoder = nowPlayingDecoder as? AudioDecoder,
+            if let nowPlaying,
+               let audioDecoder = nowPlaying as? AudioDecoder,
                let url = audioDecoder.inputSource.url {
                 self.track = self.playlist.first { $0.url == url }
             }
@@ -485,177 +503,5 @@ extension PlayerModel: AudioPlayer.Delegate {
     func audioPlayer(_: AudioPlayer, encounteredError error: Error) {
         stop()
         print(error)
-    }
-}
-
-extension PlayerModel {
-    var speakerImage: Image {
-        if isMuted {
-            Image(systemSymbol: .speakerSlashFill)
-        } else {
-            Image(systemSymbol: .speakerWave3Fill, variableValue: volume)
-        }
-    }
-
-    var playPauseImage: Image {
-        if isPlayable, isPlaying {
-            Image(systemSymbol: .pauseFill)
-        } else {
-            Image(systemSymbol: .playFill)
-        }
-    }
-
-    @discardableResult func adjustProgress(delta: CGFloat = 0.01, multiplier: CGFloat = 1, sign: FloatingPointSign = .plus) -> Bool {
-        let adjustedMultiplier = switch sign {
-        case .plus:
-            multiplier
-        case .minus:
-            -multiplier
-        }
-        let progress = progress + delta * adjustedMultiplier
-        self.progress = progress
-
-        return progress >= 0 && progress <= 1
-    }
-
-    @discardableResult func adjustTime(delta: TimeInterval = 1, multiplier: CGFloat = 1, sign: FloatingPointSign = .plus) -> Bool {
-        guard unwrappedPlaybackTime.duration > .zero else { return false }
-        return adjustProgress(
-            delta: delta / TimeInterval(unwrappedPlaybackTime.duration),
-            multiplier: multiplier, sign: sign
-        )
-    }
-
-    @discardableResult func adjustVolume(delta: CGFloat = 0.01, multiplier: CGFloat = 1, sign: FloatingPointSign = .plus) -> Bool {
-        let multiplier = switch sign {
-        case .plus:
-            multiplier
-        case .minus:
-            -multiplier
-        }
-        let volume = volume + delta * multiplier
-        self.volume = volume
-
-        return volume >= 0 && volume <= 1
-    }
-}
-
-extension PlayerModel {
-    @objc func handleRouteChange(_: Notification) {}
-}
-
-extension PlayerModel {
-    func updateNowPlayingState() {
-        let infoCenter = MPNowPlayingInfoCenter.default()
-
-        infoCenter.playbackState = if isPlayable {
-            isPlaying ? .playing : .paused
-        } else {
-            .stopped
-        }
-    }
-
-    func updateNowPlayingInfo() {
-        let infoCenter = MPNowPlayingInfoCenter.default()
-        var info = infoCenter.nowPlayingInfo ?? .init()
-
-        if isPlayable {
-            info[MPMediaItemPropertyPlaybackDuration] = TimeInterval(unwrappedPlaybackTime.duration)
-            info[MPNowPlayingInfoPropertyElapsedPlaybackTime] = unwrappedPlaybackTime.elapsed
-        } else {
-            info[MPMediaItemPropertyPlaybackDuration] = nil
-            info[MPNowPlayingInfoPropertyElapsedPlaybackTime] = nil
-        }
-
-        infoCenter.nowPlayingInfo = info
-    }
-
-    func updateNowPlayingMetadataInfo() {
-        if let track {
-            track.metadata.updateNowPlayingInfo()
-        } else {
-            Metadata.resetNowPlayingInfo()
-        }
-    }
-
-    func setupRemoteTransportControls() {
-        let commandCenter = MPRemoteCommandCenter.shared()
-
-        // Play
-        commandCenter.playCommand.addTarget { [unowned self] _ in
-            guard isPlayable else { return .noActionableNowPlayingItem }
-
-            if isPlaying {
-                return .commandFailed
-            } else {
-                play()
-                return .success
-            }
-        }
-
-        // Pause
-        commandCenter.pauseCommand.addTarget { [unowned self] _ in
-            guard isPlayable else { return .noActionableNowPlayingItem }
-
-            if !isPlaying {
-                return .commandFailed
-            } else {
-                pause()
-                return .success
-            }
-        }
-
-        // Toggle play pause
-        commandCenter.togglePlayPauseCommand.addTarget { [unowned self] _ in
-            guard isPlayable else { return .noActionableNowPlayingItem }
-
-            togglePlayPause()
-            return .success
-        }
-
-        // Skip forward
-        commandCenter.skipForwardCommand.preferredIntervals = [1.0, 5.0, 15.0]
-        commandCenter.skipForwardCommand.addTarget { [unowned self] event in
-            guard isPlayable else { return .noActionableNowPlayingItem }
-            guard let event = event as? MPSkipIntervalCommandEvent else { return .commandFailed }
-
-            adjustTime(delta: event.interval, sign: .plus)
-            return .success
-        }
-
-        // Skip backward
-        commandCenter.skipBackwardCommand.preferredIntervals = [1.0, 5.0, 15.0]
-        commandCenter.skipBackwardCommand.addTarget { [unowned self] event in
-            guard isPlayable else { return .noActionableNowPlayingItem }
-            guard let event = event as? MPSkipIntervalCommandEvent else { return .commandFailed }
-
-            adjustTime(delta: event.interval, sign: .minus)
-            return .success
-        }
-
-        // Seek
-        commandCenter.changePlaybackPositionCommand.addTarget { [unowned self] event in
-            guard isPlayable else { return .noActionableNowPlayingItem }
-            guard let event = event as? MPChangePlaybackPositionCommandEvent else { return .commandFailed }
-
-            progress = event.positionTime / TimeInterval(unwrappedPlaybackTime.duration)
-            return .success
-        }
-
-        // Next track
-        commandCenter.nextTrackCommand.addTarget { [unowned self] _ in
-            guard hasNextTrack else { return .noSuchContent }
-
-            playNextTrack()
-            return .success
-        }
-
-        // Previous track
-        commandCenter.previousTrackCommand.addTarget { [unowned self] _ in
-            guard hasPreviousTrack else { return .noSuchContent }
-
-            playPreviousTrack()
-            return .success
-        }
     }
 }
