@@ -11,9 +11,10 @@ import Luminare
 import SwiftUI
 
 @Observable final class Track: Identifiable {
-    let id = UUID()
     let url: URL
     var metadata: Metadata
+
+    var id: URL { url }
 
     init?(url: URL) {
         self.url = url
