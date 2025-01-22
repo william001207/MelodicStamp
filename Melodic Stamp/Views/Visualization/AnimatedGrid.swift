@@ -23,15 +23,15 @@ struct AnimatedGrid: View {
     @Environment(AudioVisualizerModel.self) private var audioVisualizer
     @Environment(GradientVisualizerModel.self) private var gradientVisualizer
 
-    @State private var minAverage: Float = 0.0
-    @State private var maxAverage: Float = 0.0
-
     @Default(.gradientDynamics) private var dynamics
     @Default(.isGradientAnimateWithAudioEnabled) private var isAnimateWithAudioEnabled
     @Default(.gradientResolution) private var resolution
     @Default(.gradientFPS) private var fps
 
     var hasDynamics: Bool = true
+
+    @State private var minAverage: Float = .zero
+    @State private var maxAverage: Float = .zero
 
     private var randomizer: MeshRandomizer {
         .init(
@@ -41,7 +41,7 @@ struct AnimatedGrid: View {
                 let normalizedX = Float(x) / Float(gridWidth - 1)
                 let normalizedY = Float(y) / Float(gridHeight - 1)
 
-                let baseWeight = (normalizedX + normalizedY) / 1.0
+                let baseWeight = normalizedX + normalizedY
                 let adjustedWeight = baseWeight * weightFactor
 
                 let finalColors = availableColors.blending { first, second in

@@ -119,8 +119,6 @@ struct PlayerView: View {
 
             Spacer()
 
-            AudioVisualizerMiniView()
-
             // MARK: Output Device
 
             Menu {
