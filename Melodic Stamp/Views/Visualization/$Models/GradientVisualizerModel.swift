@@ -36,4 +36,9 @@ import SwiftUI
             dominantColors = Self.fallbackDominantColors
         }
     }
+
+    func prefixedDomainantColors(upTo count: Int) -> [Color] {
+        let limitedCount = max(0, min(count, dominantColors.count))
+        return Array(dominantColors.prefix(upTo: limitedCount))
+    }
 }

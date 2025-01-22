@@ -124,7 +124,7 @@ import SwiftUI
 
         Task {
             do {
-                try await self.update()
+                try await update()
             } catch let error as MetadataError {
                 state = .error(error)
             }
@@ -135,6 +135,10 @@ import SwiftUI
         self.state = .fine
         self.url = url
         load(from: metadata)
+
+        Task {
+            await generateThumbnail()
+        }
     }
 
     fileprivate var restorables: [any Restorable] {

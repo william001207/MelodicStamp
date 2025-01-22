@@ -135,64 +135,60 @@ import SwiftUI
         isRunning && hasCurrentTrack
     }
 
+    var nextTrack: Track? {
+        guard let nextIndex else { return nil }
+        return playlist[nextIndex]
+    }
+
+    var previousTrack: Track? {
+        guard let previousIndex else { return nil }
+        return playlist[previousIndex]
+    }
+
     var hasCurrentTrack: Bool {
         track != nil
     }
 
     var hasNextTrack: Bool {
-        guard track != nil else { return false }
-
-        switch playbackMode {
-        case .sequential:
-            guard let currentIndex else { return false }
-            return currentIndex < playlist.count - 1
-        case .loop, .shuffle:
-            return !playlist.isEmpty
-        }
+        nextTrack != nil
     }
 
     var hasPreviousTrack: Bool {
-        guard track != nil else { return false }
-
-        switch playbackMode {
-        case .sequential:
-            guard let currentIndex else { return false }
-            return currentIndex > 0
-        case .loop, .shuffle:
-            return !playlist.isEmpty
-        }
+        previousTrack != nil
     }
 
-    var currentIndex: Int? {
+    private var index: Int? {
         guard let track else { return nil }
         return playlist.firstIndex(of: track)
     }
 
-    var nextIndex: Int? {
-        guard hasNextTrack else { return nil }
-
+    private var nextIndex: Int? {
         switch playbackMode {
         case .sequential:
-            guard let currentIndex else { return nil }
-            return currentIndex + 1
+            guard let index else { return nil }
+            let nextIndex = index + 1
+
+            guard nextIndex < playlist.endIndex else { return nil }
+            return nextIndex
         case .loop:
-            guard let currentIndex else { return nil }
-            return (currentIndex + 1) % playlist.count
+            guard let index else { return nil }
+            return (index + 1) % playlist.count
         case .shuffle:
             return randomIndex()
         }
     }
 
-    var previousIndex: Int? {
-        guard hasPreviousTrack else { return nil }
-
+    private var previousIndex: Int? {
         switch playbackMode {
         case .sequential:
-            guard let currentIndex else { return nil }
-            return currentIndex - 1
+            guard let index else { return nil }
+            let previousIndex = index - 1
+
+            guard previousIndex >= 0 else { return nil }
+            return previousIndex
         case .loop:
-            guard let currentIndex else { return nil }
-            return (currentIndex + playlist.count - 1) % playlist.count
+            guard let index else { return nil }
+            return (index + playlist.count - 1) % playlist.count
         case .shuffle:
             return randomIndex()
         }
@@ -346,7 +342,7 @@ extension PlayerModel {
         player.togglePlaying()
     }
 
-    func nextTrack() {
+    func playNextTrack() {
         guard let nextIndex else {
             stop()
             return
@@ -355,7 +351,7 @@ extension PlayerModel {
         play(track: playlist[nextIndex])
     }
 
-    func previousTrack() {
+    func playPreviousTrack() {
         guard let previousIndex else {
             stop()
             return
@@ -456,7 +452,7 @@ extension PlayerModel: PlayerDelegate {
                 }
             } else {
                 // Jumps to next track
-                self.nextTrack()
+                self.playNextTrack()
             }
         }
     }
@@ -650,7 +646,7 @@ extension PlayerModel {
         commandCenter.nextTrackCommand.addTarget { [unowned self] _ in
             guard hasNextTrack else { return .noSuchContent }
 
-            nextTrack()
+            playNextTrack()
             return .success
         }
 
@@ -658,7 +654,7 @@ extension PlayerModel {
         commandCenter.previousTrackCommand.addTarget { [unowned self] _ in
             guard hasPreviousTrack else { return .noSuchContent }
 
-            previousTrack()
+            playPreviousTrack()
             return .success
         }
     }

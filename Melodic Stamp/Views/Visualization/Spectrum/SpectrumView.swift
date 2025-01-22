@@ -46,7 +46,6 @@ struct SpectrumView: View {
             let height = height(ofAmplitude: amplitude)
 
             Capsule()
-                .fill(Color.primary.opacity(0.3))
                 .frame(width: barWidth, height: height)
         }
     }
@@ -68,10 +67,17 @@ struct SpectrumView: View {
 }
 
 #Preview {
-    SpectrumView(spectra: [
-        [0.1, 0.3, 0.5, 0.7, 0.9, 0.2, 0.5, 0.8, 0.3, 0.6],
-        [0.9, 0.7, 0.5, 0.3, 0.1, 0.8, 0.6, 0.4, 0.2, 0.5]
-    ])
+    LinearGradient(
+        colors: [.red, .green, .blue],
+        startPoint: .leading, endPoint: .trailing
+    )
+    .mask {
+        SpectrumView(spectra: [
+            [0.1, 0.3, 0.5, 0.7, 0.9, 0.2, 0.5, 0.8, 0.3, 0.6],
+            [0.9, 0.7, 0.5, 0.3, 0.1, 0.8, 0.6, 0.4, 0.2, 0.5]
+        ])
+        .foregroundStyle(.white)
+    }
     .border(.blue)
     .frame(width: 100, height: 100)
     .padding()

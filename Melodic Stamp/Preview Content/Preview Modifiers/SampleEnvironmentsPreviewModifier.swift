@@ -73,6 +73,8 @@ import SwiftUI
             let metadata = AudioMetadata()
 
             metadata.attachPicture(NSImage.templateArtwork.attachedPicture(of: .other)!)
+            metadata.title = "A Song"
+            metadata.artist = "Artist 1/Artist 2"
             metadata.lyrics = sampleLyrics
 
             return .init(url: sampleURL, from: metadata)

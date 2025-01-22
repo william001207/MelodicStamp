@@ -140,7 +140,7 @@ struct MiniPlayerView: View {
         // MARK: Observations
 
         // Regain progress control on new track
-        .onChange(of: player.currentIndex) { _, newValue in
+        .onChange(of: player.track) { _, newValue in
             guard newValue != nil else { return }
             activeControl = .progress
         }
@@ -271,7 +271,7 @@ struct MiniPlayerView: View {
                             .environment(lyrics)
                     }
                 }
-                .animation(.default, value: player.currentIndex)
+                .animation(.default, value: player.track)
                 .matchedGeometryEffect(id: PlayerNamespace.title, in: namespace)
                 .padding(.bottom, 2)
             }
@@ -324,7 +324,7 @@ struct MiniPlayerView: View {
                 // MARK: Previous Track
 
                 AliveButton {
-                    player.previousTrack()
+                    player.playPreviousTrack()
                     playerKeyboardControl.previousSongButtonBounceAnimation
                         .toggle()
                 } label: {
@@ -364,7 +364,7 @@ struct MiniPlayerView: View {
                 // MARK: Next Track
 
                 AliveButton {
-                    player.nextTrack()
+                    player.playNextTrack()
                     playerKeyboardControl.nextSongButtonBounceAnimation.toggle()
                 } label: {
                     Image(systemSymbol: .forwardFill)

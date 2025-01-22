@@ -112,8 +112,13 @@ struct PlayerView: View {
                 ShrinkableMarqueeScrollView {
                     MusicTitle(track: player.track)
                 }
-                .animation(.default, value: player.currentIndex)
+                .animation(.default, value: player.track)
                 .matchedGeometryEffect(id: PlayerNamespace.title, in: namespace)
+
+                if player.hasCurrentTrack {
+                    TinyBinaryChannelVisualizerView()
+                        .frame(width: 20)
+                }
             }
             .padding(.bottom, 2)
 
@@ -160,7 +165,7 @@ struct PlayerView: View {
             // MARK: Previous Track
 
             AliveButton {
-                player.previousTrack()
+                player.playPreviousTrack()
                 playerKeyboardControl.previousSongButtonBounceAnimation.toggle()
             } label: {
                 Image(systemSymbol: .backwardFill)
@@ -198,7 +203,7 @@ struct PlayerView: View {
             // MARK: Next Track
 
             AliveButton {
-                player.nextTrack()
+                player.playNextTrack()
                 playerKeyboardControl.nextSongButtonBounceAnimation.toggle()
             } label: {
                 Image(systemSymbol: .forwardFill)

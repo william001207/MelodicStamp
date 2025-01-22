@@ -66,10 +66,10 @@ import SwiftUI
             if modifiers.contains(.command) {
                 switch sign {
                 case .plus:
-                    player.nextTrack()
+                    player.playNextTrack()
                     nextSongButtonBounceAnimation.toggle()
                 case .minus:
-                    player.previousTrack()
+                    player.playPreviousTrack()
                     previousSongButtonBounceAnimation.toggle()
                 }
 

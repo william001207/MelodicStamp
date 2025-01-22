@@ -138,13 +138,13 @@ struct PlayerCommands: Commands {
 
                 Group {
                     Button("Next Track") {
-                        player?.nextTrack()
+                        player?.playNextTrack()
                     }
                     .keyboardShortcut(.rightArrow, modifiers: [.command, .control])
                     .disabled(!hasNextTrack)
 
                     Button("Previous Track") {
-                        player?.previousTrack()
+                        player?.playPreviousTrack()
                     }
                     .keyboardShortcut(.leftArrow, modifiers: [.command, .control])
                     .disabled(!hasPreviousTrack)

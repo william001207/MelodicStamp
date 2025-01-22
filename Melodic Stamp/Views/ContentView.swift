@@ -294,25 +294,28 @@ struct ContentView: View {
                 selectedContentTab: $selectedContentTab,
                 selectedInspectorTab: $selectedInspectorTab
             )
-            .environment(floatingWindows)
             .onGeometryChange(for: CGSize.self) { proxy in
                 proxy.size
             } action: { newValue in
                 floatingWindows.updateTabBarPosition(size: newValue, in: mainWindow, animate: true)
             }
+            .environment(floatingWindows)
         }
         floatingWindows.addPlayer(to: mainWindow) {
             FloatingPlayerView()
-                .environment(audioVisualizer)
-                .environment(floatingWindows)
-                .environment(windowManager)
-                .environment(player)
-                .environment(playerKeyboardControl)
                 .onGeometryChange(for: CGSize.self) { proxy in
                     proxy.size
                 } action: { newValue in
                     floatingWindows.updatePlayerPosition(size: newValue, in: mainWindow, animate: true)
                 }
+                .environment(floatingWindows)
+                .environment(windowManager)
+                .environment(fileManager)
+                .environment(player)
+                .environment(playerKeyboardControl)
+                .environment(metadataEditor)
+                .environment(audioVisualizer)
+                .environment(gradientVisualizer)
         }
     }
 

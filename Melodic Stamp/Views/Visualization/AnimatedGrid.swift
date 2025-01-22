@@ -36,7 +36,7 @@ struct AnimatedGrid: View {
     private var randomizer: MeshRandomizer {
         .init(
             colorRandomizer: { color, _, x, y, gridWidth, gridHeight in
-                guard !availableColors.isEmpty else { return }
+                guard !simdColors.isEmpty else { return }
 
                 let normalizedX = Float(x) / Float(gridWidth - 1)
                 let normalizedY = Float(y) / Float(gridHeight - 1)
@@ -44,7 +44,7 @@ struct AnimatedGrid: View {
                 let baseWeight = normalizedX + normalizedY
                 let adjustedWeight = baseWeight * weightFactor
 
-                let finalColors = availableColors.blending { first, second in
+                let finalColors = simdColors.blending { first, second in
                     SIMDColor.lerp(first, second, factor: adjustedWeight)
                 }
 
@@ -91,15 +91,7 @@ struct AnimatedGrid: View {
     }
 
     private var simdColors: [SIMDColor] {
-        gradientVisualizer.dominantColors.map { $0.toSimdFloat3() }
-    }
-
-    private var availableColorCount: Int {
-        min(simdColors.count, dynamics.count)
-    }
-
-    private var availableColors: [SIMDColor] {
-        Array(simdColors.prefix(upTo: availableColorCount))
+        gradientVisualizer.prefixedDomainantColors(upTo: dynamics.count).map { $0.toSimdFloat3() }
     }
 
     private func updateAverage(_ average: Float) {
