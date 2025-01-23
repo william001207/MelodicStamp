@@ -15,14 +15,14 @@ struct AlternativeAboutView: View {
 
         VStack {
             ContinuousRippleEffectView {
-                Text("Melodic Stamp ")
+                Text(verbatim: "Melodic Stamp ")
                     .fontDesign(.serif)
                     .font(.title)
                     .bold()
 
                     +
 
-                    Text("Preview\n")
+                    Text(verbatim: "Preview\n")
                     .foregroundStyle(Color.white.opacity(0.45))
                     .fontDesign(.serif)
                     .font(.title)
@@ -30,30 +30,30 @@ struct AlternativeAboutView: View {
 
                     +
 
-                    Text("\nOpen Sourced On GitHub\n")
+                    Text(verbatim: "\nOpen Sourced On GitHub\n")
                     .fontDesign(.monospaced)
                     .font(.subheadline)
 
                     +
 
-                    Text("\(combined)\n\n")
+                    Text(verbatim: "\(combined)\n\n")
                     .foregroundStyle(Color.white.opacity(0.45))
                     .fontDesign(.monospaced)
                     .font(.subheadline)
 
                     +
 
-                    Text("Cement")
+                    Text(verbatim: "Cement")
                     .font(.custom("SFPro-ExpandedLight", size: 12))
 
                     +
 
-                    Text(" Labs\n")
+                    Text(verbatim: " Labs\n")
                     .font(.custom("SFPro-CompressedLight", size: 12))
 
                     +
 
-                    Text("© 2024 → Future")
+                    Text(verbatim: "© 2024 → Future")
                     .foregroundStyle(Color.white.opacity(0.45))
                     .font(.custom("SFPro-CompressedLight", size: 12))
             }

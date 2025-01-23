@@ -28,7 +28,18 @@ struct AboutView: View {
                     AliveButton {
                         openURL(.organization)
                     } label: {
-                        Text(Bundle.main.copyright)
+                        HStack(alignment: .center, spacing: 12) {
+                            Text(copyrightText)
+                                .fontWidth(.expanded)
+                                .bold()
+
+                            Image(.logo)
+                                .resizable()
+                                .scaledToFill()
+                                .padding(.vertical, 1.5)
+                                .frame(height: .preferredPointSize(forTextStyle: .body))
+                        }
+                        .fixedSize()
                     }
 
                     AliveButton {
@@ -41,49 +52,7 @@ struct AboutView: View {
                         .foregroundStyle(.tertiary)
                     }
 
-                    if let version = Bundle.main.appVersion {
-                        let build = Bundle.main.appBuild.flatMap(String.init) ?? ""
-                        let hasBuild = !build.isEmpty
-
-                        let combined: String = if hasBuild {
-                            String(localized: .init(
-                                "About: Version Template",
-                                defaultValue: "\(version) (\(build))"
-                            ))
-                        } else {
-                            version
-                        }
-
-                        AliveButton {
-                            NSPasteboard.general.setString(combined, forType: .string)
-
-                            copyVersionDispatch?.cancel()
-                            withAnimation {
-                                isVersionCopied = true
-                            }
-
-                            let dispatch = DispatchWorkItem {
-                                withAnimation {
-                                    isVersionCopied = false
-                                }
-                            }
-                            copyVersionDispatch = dispatch
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5, execute: dispatch)
-                        } label: {
-                            HStack {
-                                if isVersionCopied {
-                                    Text("Copied to clipboard!")
-                                } else {
-                                    Text("Version")
-
-                                    Text(combined)
-                                        .monospaced()
-                                }
-                            }
-                            .font(.caption)
-                            .foregroundStyle(.tertiary)
-                        }
-                    }
+                    version()
                 }
             }
         }
@@ -100,8 +69,16 @@ struct AboutView: View {
         .preferredColorScheme(.light)
     }
 
-    private var previewBadge: String {
+    private var appNameText: String {
+        String(localized: .init("About: Application Name", defaultValue: "Melodic Stamp"))
+    }
+
+    private var previewText: String {
         String(localized: .init("About: Preview", defaultValue: "Preview"))
+    }
+
+    private var copyrightText: String {
+        String(localized: .init("About: Copyright", defaultValue: "© 2024→Future"))
     }
 
     @ViewBuilder private func appIcon() -> some View {
@@ -113,15 +90,63 @@ struct AboutView: View {
 
     @ViewBuilder private func title() -> some View {
         HStack {
-            Text(Bundle.main.displayName)
-                .fontWeight(.heavy)
+            Text(appNameText)
+                .fontWeight(.black)
 
-            Text(previewBadge)
-                .fontWeight(.ultraLight)
-                .italic()
+            Text(previewText)
+                .fontWeight(.thin)
+                .foregroundStyle(.tertiary)
         }
         .font(.title)
-        .fontDesign(.serif)
+        .fontWidth(.expanded)
+    }
+
+    @ViewBuilder private func version() -> some View {
+        if let version = Bundle.main.appVersion {
+            let build = Bundle.main.appBuild.flatMap(String.init) ?? ""
+            let hasBuild = !build.isEmpty
+
+            let combined: String = if hasBuild {
+                String(localized: .init(
+                    "About: Version Template",
+                    defaultValue: "\(version) (\(build))"
+                ))
+            } else {
+                version
+            }
+
+            AliveButton {
+                NSPasteboard.general.setString(combined, forType: .string)
+
+                copyVersionDispatch?.cancel()
+                withAnimation {
+                    isVersionCopied = true
+                }
+
+                let dispatch = DispatchWorkItem {
+                    withAnimation {
+                        isVersionCopied = false
+                    }
+                }
+                copyVersionDispatch = dispatch
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.5, execute: dispatch)
+            } label: {
+                Group {
+                    if isVersionCopied {
+                        Text("Copied to clipboard!")
+                    } else {
+                        HStack(spacing: 12) {
+                            Text("Version")
+
+                            Text(combined)
+                                .monospaced()
+                        }
+                    }
+                }
+                .font(.caption)
+                .foregroundStyle(.tertiary)
+            }
+        }
     }
 
     @ViewBuilder private func gradient() -> some View {
