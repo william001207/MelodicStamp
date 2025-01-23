@@ -1,5 +1,5 @@
 //
-//  AboutViewPreview.swift
+//  AlternativeAboutView.swift
 //  Melodic Stamp
 //
 //  Created by Xinshao_Air on 2025/1/22.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct AboutViewPreview: View {
+struct AlternativeAboutView: View {
     var body: some View {
         let version = Bundle.main.appVersion
         let build = Bundle.main.appBuild.flatMap(String.init)
@@ -67,5 +67,5 @@ struct AboutViewPreview: View {
 }
 
 #Preview {
-    AboutViewPreview()
+    AlternativeAboutView()
 }

@@ -63,7 +63,7 @@ struct MelodicStampApp: App {
         }
 
         Window("About \(Bundle.main.displayName)", id: WindowID.about.rawValue) {
-            AboutViewPreview()
+            AboutView()
                 .onAppear {
                     isAboutWindowPresented = true
                 }
