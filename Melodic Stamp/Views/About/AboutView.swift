@@ -28,7 +28,7 @@ struct AboutView: View {
                     AliveButton {
                         openURL(.organization)
                     } label: {
-                        HStack(alignment: .center, spacing: 12) {
+                        HStack(alignment: .firstTextBaseline, spacing: 12) {
                             Text(copyrightText)
                                 .fontWidth(.expanded)
                                 .bold()
@@ -36,7 +36,9 @@ struct AboutView: View {
                             Image(.logo)
                                 .resizable()
                                 .scaledToFill()
-                                .padding(.vertical, 1.5)
+                                .padding(.vertical, 0.5)
+                                .padding(.top, 3)
+                                .padding(.bottom, -1)
                                 .frame(height: .preferredPointSize(forTextStyle: .body))
                         }
                         .fixedSize()
