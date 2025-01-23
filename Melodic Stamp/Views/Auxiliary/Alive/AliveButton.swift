@@ -130,6 +130,10 @@ struct AliveButton<Label>: View where Label: View {
                 guard let isOn else { return }
                 isActive = isOn.wrappedValue
             }
+            .onChange(of: isOn?.wrappedValue ?? false) { _, newValue in
+                isActive = newValue
+                isPressing = false
+            }
             .gesture(DragGesture(minimumDistance: 0)
                 .onChanged { gesture in
                     guard isEnabled else { return }
@@ -229,6 +233,8 @@ struct AliveButton<Label>: View where Label: View {
             Image(systemSymbol: .appleLogo)
                 .imageScale(.large)
         }
+
+        Toggle("External", isOn: $isOn)
     }
     .padding()
 }

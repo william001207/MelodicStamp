@@ -24,6 +24,8 @@ struct LeafletView: View {
 
     @FocusState private var isFocused: Bool
 
+    @Namespace private var namespace
+
     @Default(.lyricsTypeSizes) private var typeSizes
     @Default(.lyricsMaxWidth) private var maxWidth
 
@@ -201,18 +203,31 @@ struct LeafletView: View {
     // MARK: - Cover View
 
     @ViewBuilder private func coverView(_ cover: NSImage) -> some View {
-        AliveButton(scaleFactor: hasLyrics ? 0.85 : 1) {
+        @Bindable var player = player
+
+        Group {
             if hasLyrics {
-                isShowingLyrics.toggle()
+                AliveButton {
+                    isShowingLyrics.toggle()
+                } label: {
+                    MusicCover(
+                        images: [cover], hasPlaceholder: true,
+                        cornerRadius: 12
+                    )
+                    .motionCard()
+                }
+                .scaleEffect(player.isPlaying ? 1 : 0.85, anchor: .center)
             } else {
-                player.isPlaying.toggle()
+                AliveButton(isOn: $player.isPlaying) {
+                    MusicCover(
+                        images: [cover], hasPlaceholder: true,
+                        cornerRadius: 12
+                    )
+                    .motionCard()
+                }
             }
-        } label: {
-            MusicCover(
-                images: [cover], hasPlaceholder: true,
-                cornerRadius: 12
-            )
         }
+        .matchedGeometryEffect(id: "cover", in: namespace)
         .containerRelativeFrame(.vertical, alignment: .center) { length, axis in
             switch axis {
             case .horizontal:
@@ -221,7 +236,6 @@ struct LeafletView: View {
                 min(500, length * 0.5)
             }
         }
-        .scaleEffect(player.isPlaying ? 1 : 0.85, anchor: .center)
         .shadow(radius: player.isPlaying ? 20 : 10)
         .animation(.spring(duration: 0.65, bounce: 0.45, blendDuration: 0.75).delay(0.25), value: player.isPlaying)
     }

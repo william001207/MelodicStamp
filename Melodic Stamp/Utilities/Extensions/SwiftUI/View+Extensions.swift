@@ -30,6 +30,18 @@ extension View {
     @ViewBuilder func continuousRippleEffect(alpha: CGFloat = 0.2) -> some View {
         modifier(ContinuousRippleEffectModifier(alpha: alpha))
     }
+
+    @ViewBuilder func motionCard(
+        scale: CGFloat = 1.065, angle: Angle = .degrees(10),
+        shadowColor: Color = .black.opacity(0.45), shadowRadius: CGFloat = 25,
+        glintColor: Color = .white.opacity(0.1), glintRadius: CGFloat = 50
+    ) -> some View {
+        modifier(MotionCardModifier(
+            scale: scale, angle: angle,
+            shadowColor: shadowColor, shadowRadius: shadowRadius,
+            glintColor: glintColor, glintRadius: glintRadius
+        ))
+    }
 }
 
 extension View {
