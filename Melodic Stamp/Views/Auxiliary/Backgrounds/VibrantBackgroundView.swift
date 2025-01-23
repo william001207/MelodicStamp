@@ -8,8 +8,12 @@
 import SwiftUI
 
 struct VibrantBackgroundView: View {
+    var state: NSVisualEffectView.State = .followsWindowActiveState
+    var isEmphasized: Bool = true
+
     var body: some View {
-        VisualEffectView(material: .headerView, blendingMode: .behindWindow)
+        VisualEffectView(material: .menu, blendingMode: .behindWindow, state: state, isEmphasized: isEmphasized)
+            .overlay(.thinMaterial)
     }
 }
 

@@ -11,12 +11,12 @@ struct FloatingPlayerView: View {
     @Namespace private var namespace
 
     var body: some View {
-        ZStack {
-            VisualEffectView(material: .popover, blendingMode: .behindWindow)
-
-            PlayerView(namespace: namespace)
-        }
-        .frame(height: 100)
-        .clipShape(.rect(cornerRadius: 25))
+        PlayerView(namespace: namespace)
+            .background {
+                // Do not use `.background(:)` otherwise causing temporary vibrancy lost
+                VisualEffectView(material: .popover, blendingMode: .behindWindow, state: .active)
+            }
+            .frame(height: 100)
+            .clipShape(.rect(cornerRadius: 25))
     }
 }

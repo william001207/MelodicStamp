@@ -11,7 +11,7 @@ import SwiftUI
 struct VisualEffectView: NSViewRepresentable {
     var material: NSVisualEffectView.Material
     var blendingMode: NSVisualEffectView.BlendingMode
-    var state: NSVisualEffectView.State = .active
+    var state: NSVisualEffectView.State = .followsWindowActiveState
     var isEmphasized: Bool = true
 
     func makeNSView(context _: Context) -> NSVisualEffectView {

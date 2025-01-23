@@ -8,8 +8,11 @@
 import SwiftUI
 
 struct OpaqueBackgroundView: View {
+    var state: NSVisualEffectView.State = .followsWindowActiveState
+    var isEmphasized: Bool = true
+
     var body: some View {
-        VisualEffectView(material: .contentBackground, blendingMode: .behindWindow)
+        VisualEffectView(material: .contentBackground, blendingMode: .behindWindow, state: state, isEmphasized: isEmphasized)
     }
 }
 

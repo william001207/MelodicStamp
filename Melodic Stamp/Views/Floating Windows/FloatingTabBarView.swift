@@ -23,26 +23,26 @@ struct FloatingTabBarView: View {
     @State private var hoveringTabs: Set<AnyHashable> = []
 
     var body: some View {
-        ZStack {
-            VisualEffectView(material: .popover, blendingMode: .behindWindow)
-
-            VStack(alignment: .leading, spacing: 0) {
-                Group {
-                    ForEach(SidebarContentTab.allCases) { tab in
-                        contentTab(for: tab)
-                    }
-
-                    sectionLabel("Inspector")
-
-                    ForEach(selectedContentTab.inspectors) { tab in
-                        inspectorTab(for: tab)
-                    }
+        VStack(alignment: .leading, spacing: 0) {
+            Group {
+                ForEach(SidebarContentTab.allCases) { tab in
+                    contentTab(for: tab)
                 }
-                .padding(4)
-                .transition(.blurReplace)
+
+                sectionLabel("Inspector")
+
+                ForEach(selectedContentTab.inspectors) { tab in
+                    inspectorTab(for: tab)
+                }
             }
-            .animation(animation, value: selectedContentTab)
+            .padding(4)
+            .transition(.blurReplace)
         }
+        .background {
+            // Do not use `.background(:)` otherwise causing temporary vibrancy lost
+            VisualEffectView(material: .popover, blendingMode: .behindWindow, state: .active)
+        }
+        .animation(animation, value: selectedContentTab)
         .task {
             isHovering = false
         }
