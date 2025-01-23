@@ -45,12 +45,6 @@ struct MotionCard<Content>: View where Content: View {
                 normalizedAngle,
                 axis: (x: translation.y, y: -translation.x, z: 0)
             )
-            .shadow(
-                color: shadowColor.opacity(isHovering ? 1 : 0),
-                radius: isHovering ? shadowRadius : 0
-            )
-            .animation(.smooth(duration: 0.45), value: isHovering)
-            .animation(.smooth(duration: 0.45), value: translation)
             // Coordinating:
             // 0 --> +x
             // |
@@ -65,6 +59,12 @@ struct MotionCard<Content>: View where Content: View {
                     isHovering = false
                 }
             }
+            .shadow(
+                color: shadowColor.opacity(isHovering ? 1 : 0),
+                radius: isHovering ? shadowRadius : 0
+            )
+            .animation(.smooth(duration: 0.45), value: isHovering)
+            .animation(.smooth(duration: 0.45), value: translation)
     }
 
     private var center: CGPoint {
