@@ -44,7 +44,7 @@ extension LyricsParser {
             // Has a valid line for highlighting
 
             // Gets the furthest preceding line that is eligible for highlighting
-            // Equals to the first of the consecutive preceding lines that have ending times greater than current line's begin time
+            // Equals to the first of the consecutive preceding lines that have ending times greater than current line's beginning time
             let furthestPreceding = lines.reversed()
                 .drop {
                     guard let beginTime = $0.beginTime else { return true }

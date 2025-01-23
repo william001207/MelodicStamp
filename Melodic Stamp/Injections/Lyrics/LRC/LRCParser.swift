@@ -80,10 +80,10 @@ import RegexBuilder
 
                     // Parses timestamp
                     if line.beginTime == nil {
-                        // Saves as start time
+                        // Saves as beginning time
                         line.beginTime = time
                     } else if line.endTime == nil {
-                        // Saves as end time
+                        // Saves as ending time
                         line.endTime = time
                     }
                 }

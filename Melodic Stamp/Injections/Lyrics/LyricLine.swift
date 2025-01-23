@@ -8,12 +8,17 @@
 import Foundation
 
 protocol LyricLine: Equatable, Hashable, Identifiable {
+    /// The most tolerant beginning time, which should cover the widest time range where this line is eligible for displaying.
     var beginTime: TimeInterval? { get }
+    /// The most tolerant ending time, which should cover the widest time range where this line is eligible for displaying.
     var endTime: TimeInterval? { get }
 
+    /// The most condensed beginning time, typically used for identifying whether this line is eligible for highlighting.
     var condensedBeginTime: TimeInterval? { get }
+    /// The most condensed ending time, typically used for identifying whether this line is eligible for highlighting.
     var condensedEndTime: TimeInterval? { get }
 
+    /// The ``String`` content for this line, which can be lossy yet descriptive.
     var content: String { get }
 
     var isValid: Bool { get }
