@@ -40,7 +40,7 @@ extension LyricsParser {
         }
         let currentIndex = current.flatMap(lines.firstIndex)
 
-        if let current, let currentIndex, let currentBeginTime = current.beginTime {
+        if let current, let currentIndex, let currentBeginTime = current.condensedBeginTime {
             // Has a valid line for highlighting
 
             // Gets the furthest preceding line that is eligible for highlighting

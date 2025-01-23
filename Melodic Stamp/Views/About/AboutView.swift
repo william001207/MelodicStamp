@@ -13,6 +13,7 @@ struct AboutView: View {
     @Environment(\.openURL) private var openURL
 
     @State private var isVersionCopied: Bool = false
+    @State private var copyVersionDispatch: DispatchWorkItem?
 
     var body: some View {
         HStack(spacing: 25) {
@@ -56,10 +57,18 @@ struct AboutView: View {
                         AliveButton {
                             NSPasteboard.general.setString(combined, forType: .string)
 
-                            isVersionCopied = true
-                            withAnimation(.default.delay(1.5)) {
-                                isVersionCopied = false
+                            copyVersionDispatch?.cancel()
+                            withAnimation {
+                                isVersionCopied = true
                             }
+
+                            let dispatch = DispatchWorkItem {
+                                withAnimation {
+                                    isVersionCopied = false
+                                }
+                            }
+                            copyVersionDispatch = dispatch
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5, execute: dispatch)
                         } label: {
                             HStack {
                                 if isVersionCopied {
