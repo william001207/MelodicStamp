@@ -385,14 +385,14 @@ private extension Metadata {
 
 extension Metadata: Modifiable {
     var isModified: Bool {
-        guard state.isLoaded else { return false }
+        guard state.isProcessed else { return false }
         return restorables.contains(where: \.isModified)
     }
 }
 
 extension Metadata {
     func restore() {
-        guard state.isLoaded else { return }
+        guard state.isProcessed else { return }
         for var restorable in self.restorables {
             restorable.restore()
         }
@@ -403,7 +403,7 @@ extension Metadata {
     }
 
     func apply() {
-        guard state.isLoaded else { return }
+        guard state.isProcessed else { return }
         for var restorable in self.restorables {
             restorable.apply()
         }
@@ -415,7 +415,7 @@ extension Metadata {
     }
 
     func generateThumbnail() async {
-        guard state.isLoaded else {
+        guard state.isProcessed else {
             thumbnail = nil
             return
         }
@@ -484,7 +484,7 @@ extension Metadata {
 
     func poll<V>(for keyPath: WritableKeyPath<Metadata, Entry<V>>) async -> MetadataBatchEditingEntry<V> {
         print("Started polling metadata for \(keyPath)")
-        while !state.isLoaded {
+        while !state.isProcessed {
             try? await Task.sleep(for: .milliseconds(100))
         }
 
@@ -499,7 +499,7 @@ extension Metadata {
 
     subscript<V>(extracting keyPath: WritableKeyPath<Metadata, Entry<V>>)
         -> MetadataBatchEditingEntry<V>? {
-        guard state.isLoaded else { return nil }
+        guard state.isProcessed else { return nil }
         return .init(keyPath: keyPath, metadata: self)
     }
 }
@@ -533,7 +533,7 @@ extension Metadata {
         let infoCenter = MPNowPlayingInfoCenter.default()
         var info = infoCenter.nowPlayingInfo ?? .init()
 
-        if state.isLoaded {
+        if state.isProcessed {
             updateNowPlayingInfo(for: &info)
         } else {
             Self.resetNowPlayingInfo(for: &info)
@@ -543,7 +543,7 @@ extension Metadata {
     }
 
     func updateNowPlayingInfo(for dict: inout [String: Any]) {
-        guard state.isLoaded else {
+        guard state.isProcessed else {
             return Self.resetNowPlayingInfo(for: &dict)
         }
 
