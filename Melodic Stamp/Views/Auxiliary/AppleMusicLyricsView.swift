@@ -133,10 +133,9 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
                 // Force reset on external change
                 resetScrolling(in: proxy)
             }
-            .onChange(of: interactionState) { _, _ in
-                withAnimation {
-                    resetScrolling(in: proxy)
-                }
+            .onChange(of: interactionState) { _, newValue in
+                guard newValue.isDelegated else { return }
+                resetScrolling(in: proxy)
             }
             .onChange(of: highlightedRange) { oldValue, newValue in
                 let isLowerBoundJumped = abs(newValue.lowerBound - oldValue.lowerBound) > 1
@@ -144,9 +143,7 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
                 let isJumped = newValue.lowerBound < oldValue.lowerBound || (isLowerBoundJumped && isUpperBoundJumped)
 
                 if isJumped {
-                    withAnimation {
-                        resetScrolling(in: proxy)
-                    }
+                    resetScrolling(in: proxy)
                 } else {
                     withAnimation(.spring(duration: 0.65, bounce: 0.275)) {
                         scrollToHighlighted()
@@ -182,6 +179,7 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
                 }
             }
             .observeAnimation(for: scrollOffset) { value in
+                guard interactionState.isDelegated else { return }
                 scrollPosition.scrollTo(y: value)
             }
         }
@@ -261,18 +259,20 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
         let index = max(0, min(range.upperBound - 1, highlightedRange.lowerBound))
         origin.index = index
 
-        proxy.scrollTo(index, anchor: .center)
-        print("Reset: \(origin)")
+        DispatchQueue.main.async {
+            proxy.scrollTo(index, anchor: alignment.unitPoint)
+            print("Reset: \(origin)")
+        }
     }
 
     private func scrollToHighlighted() {
-        guard interactionState.isDelegated, origin.isInitialized else { return }
+        guard origin.isInitialized else { return }
 
         let compensation: CGFloat = if let offset = contentOffsets[origin.index] {
             -offset / 2
         } else { .zero }
         let offset = fold(until: highlightedRange.lowerBound)
-        scrollOffset = max(0, origin.offset + offset + compensation)
+        scrollOffset = max(0, origin.offset + offset + compensation + alignmentCompensation)
         print("Scrolled to highlighted: \(offset)")
     }
 
