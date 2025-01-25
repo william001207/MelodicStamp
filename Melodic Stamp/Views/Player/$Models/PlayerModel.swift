@@ -16,6 +16,7 @@ import SwiftUI
 // MARK: - Definition
 
 @Observable final class PlayerModel: NSObject {
+    static let interval: TimeInterval = 0.1
     static let bufferSize: AVAudioFrameCount = 2048
 
     // MARK: Player
@@ -50,7 +51,7 @@ import SwiftUI
     // MARK: Publishers
 
     private var cancellables = Set<AnyCancellable>()
-    private let timer = TimerPublisher(interval: 0.1)
+    private let timer = TimerPublisher(interval: PlayerModel.interval)
 
     private var visualizationDataSubject = PassthroughSubject<AVAudioPCMBuffer?, Never>()
     var visualizationDataPublisher: AnyPublisher<AVAudioPCMBuffer?, Never> { visualizationDataSubject.eraseToAnyPublisher() }

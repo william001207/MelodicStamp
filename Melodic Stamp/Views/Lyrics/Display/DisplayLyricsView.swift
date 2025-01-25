@@ -89,7 +89,7 @@ struct DisplayLyricsView: View {
                 isHovering = hover
             }
         }
-        .animation(.linear, value: elapsedTime) // For time interpolation
+        .animation(.linear(duration: PlayerModel.interval), value: elapsedTime) // For time interpolation
     }
 
     private var identifier: Identifier {

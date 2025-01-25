@@ -27,8 +27,8 @@ extension View {
         modifier(HoverableBackgroundModifier(isExplicitlyVisible: isExplicitlyVisible))
     }
 
-    @ViewBuilder func continuousRippleEffect(alpha: CGFloat = 0.2) -> some View {
-        modifier(ContinuousRippleEffectModifier(alpha: alpha))
+    @ViewBuilder func continuousRippleEffect(lerpFactor: CGFloat = 0.2) -> some View {
+        modifier(ContinuousRippleEffectModifier(lerpFactor: lerpFactor))
     }
 
     @ViewBuilder func motionCard(
