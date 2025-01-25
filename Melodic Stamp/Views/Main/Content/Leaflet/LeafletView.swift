@@ -214,7 +214,7 @@ struct LeafletView: View {
                         images: [cover], hasPlaceholder: true,
                         cornerRadius: 12
                     )
-                    .motionCard()
+                    .motionCard(scale: 1.02, angle: .degrees(5))
                 }
                 .scaleEffect(player.isPlaying ? 1 : 0.85, anchor: .center)
             } else {

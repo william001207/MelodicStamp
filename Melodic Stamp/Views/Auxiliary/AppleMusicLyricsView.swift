@@ -16,6 +16,13 @@ enum AppleMusicLyricsViewAnimationState {
 enum AppleMusicLyricsViewAlignment {
     case top
     case center
+
+    var unitPoint: UnitPoint {
+        switch self {
+        case .top: .top
+        case .center: .center
+        }
+    }
 }
 
 enum AppleMusicLyricsViewInteractionState {
@@ -55,6 +62,8 @@ enum AppleMusicLyricsViewIndicator {
     }
 }
 
+// MARK: Apple Music Lyrics View
+
 struct AppleMusicLyricsView<Content>: View where Content: View {
     struct Origin {
         var offset: CGFloat
@@ -64,9 +73,7 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
         static var zero: Self { .init(offset: .zero, index: .zero) }
     }
 
-    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
-
-    @Default(.lyricsAttachments) private var attachments
+    // MARK: Fields
 
     var interactionState: AppleMusicLyricsViewInteractionState = .following
 
@@ -88,9 +95,13 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
     @State private var scrollPosition: ScrollPosition = .init()
     @State private var scrollOffset: CGFloat = .zero
 
-    @State private var animationState: AppleMusicLyricsViewAnimationState = .intermediate
+    @State private var animationState: AppleMusicLyricsViewAnimationState = .pushed
     @State private var contentOffsets: [Int: CGFloat] = [:]
     @State private var origin: Origin = .zero
+
+    @State private var animationStateDispatch: DispatchWorkItem?
+
+    // MARK: Body
 
     var body: some View {
         ScrollViewReader { proxy in
@@ -111,42 +122,40 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
             .contentMargins(.horizontal, 12, for: .scrollContent)
             .scrollIndicators(interactionState.isDelegated ? .never : .visible)
             .scrollPosition($scrollPosition)
-            .onScrollGeometryChange(for: CGPoint.self) { proxy in
-                proxy.contentOffset
-            } action: { _, newValue in
-                if !origin.isInitialized {
-                    scrollOffset = newValue.y
-                    origin.offset = newValue.y
-                    origin.isInitialized = true
-                    print(newValue.y)
-                }
-
-                if scrollPosition.isPositionedByUser {
-                    scrollOffset = newValue.y
-                    onScrolling?(scrollPosition, newValue)
-                }
-            }
+            // The code below follows a strict order, do not rearrange arbitrarily
             .onGeometryChange(for: CGSize.self) { proxy in
                 proxy.size
             } action: { newValue in
                 containerSize = newValue
-            }
-            // The code below follows a strict order, do not rearrange arbitrarily
-            .onChange(of: identifier, initial: true) { _, _ in
-                // Force reset on external change
-                updateAnimationState()
                 resetScrolling(in: proxy)
             }
-            .onChange(of: highlightedRange) { _, _ in
-                withAnimation(.spring(duration: 0.65, bounce: 0.275)) {
-                    scrollToHighlighted()
+            .onChange(of: identifier, initial: true) { _, _ in
+                // Force reset on external change
+//                updateAnimationState()
+                resetScrolling(in: proxy)
+            }
+            .onChange(of: interactionState) { _, _ in
+                withAnimation {
+                    resetScrolling(in: proxy)
                 }
             }
             .onChange(of: highlightedRange) { oldValue, newValue in
+                let isJumped = newValue.lowerBound < oldValue.lowerBound || abs(newValue.lowerBound - oldValue.lowerBound) > 1
+                if isJumped {
+                    withAnimation {
+                        resetScrolling(in: proxy)
+                    }
+                } else {
+                    withAnimation(.spring(duration: 0.65, bounce: 0.275)) {
+//                        scrollToHighlighted()
+                    }
+                }
+            }
+            .onChange(of: highlightedRange, initial: true) { oldValue, newValue in
                 let isLowerBoundChanged = oldValue.lowerBound != newValue.lowerBound
                 let isUpperBoundChanged = oldValue.upperBound != newValue.upperBound
 
-                if isLowerBoundChanged {
+                if isLowerBoundChanged, canPauseAnimation {
                     updateAnimationState()
                 } else if isUpperBoundChanged {
                     pushAnimation()
@@ -154,13 +163,20 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
             }
             .onChange(of: contentOffsets) { _, _ in
                 withAnimation(.spring(duration: 0.65, bounce: 0.275)) {
-                    scrollToHighlighted()
+//                    scrollToHighlighted()
                 }
             }
-            .onChange(of: interactionState) { _, _ in
-                // Scrolls to highlighted when externally allowed
-                withAnimation(.smooth) {
-                    scrollToHighlighted()
+            .onScrollGeometryChange(for: CGPoint.self) { proxy in
+                proxy.contentOffset
+            } action: { _, newValue in
+                if !origin.isInitialized {
+                    scrollOffset = newValue.y
+                    origin.offset = newValue.y
+                    origin.isInitialized = true
+                    print("Initialized: \(newValue.y)")
+                } else if scrollPosition.isPositionedByUser {
+                    scrollOffset = newValue.y
+                    onScrolling?(scrollPosition, newValue)
                 }
             }
             .observeAnimation(for: scrollOffset) { value in
@@ -170,7 +186,8 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
     }
 
     private var isIndicatorVisible: Bool {
-        indicator(highlightedRange.lowerBound, true).isVisible
+        guard highlightedRange.lowerBound >= 0 else { return false }
+        return indicator(highlightedRange.lowerBound, true).isVisible
     }
 
     private var reachedEnd: Bool {
@@ -231,16 +248,24 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
             .animation(.smooth, value: interactionState.isDelegated)
     }
 
+    // MARK: Funcitons
+
     private func resetScrolling(in proxy: ScrollViewProxy) {
         guard interactionState.isDelegated else { return }
         origin.isInitialized = false
+
         let index = max(0, min(range.upperBound - 1, highlightedRange.lowerBound))
+        origin.index = index
+
         proxy.scrollTo(index, anchor: .center)
+        print("Reset: \(origin)")
     }
 
     private func scrollToHighlighted() {
-        guard interactionState.isDelegated else { return }
-        scrollOffset = max(0, origin.offset + fold(until: highlightedRange.lowerBound) + alignmentCompensation)
+        guard interactionState.isDelegated, origin.isInitialized else { return }
+        let offset = fold(until: highlightedRange.lowerBound)
+        scrollOffset = max(0, origin.offset + offset + alignmentCompensation)
+        print("Scrolled to highlighted: \(offset)")
     }
 
     private func fold(until index: Int) -> CGFloat {
@@ -252,11 +277,14 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
 
     private func updateAnimationState() {
         guard !reachedEnd else { return }
+        animationStateDispatch?.cancel()
         animationState = .intermediate
 
-        DispatchQueue.main.asyncAfter(deadline: .now() + bounceDelay) {
+        let dispatch = DispatchWorkItem {
             pushAnimation()
         }
+        animationStateDispatch = dispatch
+        DispatchQueue.main.asyncAfter(deadline: .now() + bounceDelay, execute: dispatch)
     }
 
     private func pushAnimation() {
@@ -282,6 +310,8 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
         }
     }
 }
+
+// MARK: - Preview
 
 #Preview {
     @Previewable @State var highlightedRange: Range<Int> = 0 ..< 1

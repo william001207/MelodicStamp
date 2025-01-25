@@ -5,14 +5,30 @@
 //  Created by Xinshao_Air on 2024/12/24.
 //
 
+import Defaults
 import Luminare
 import SwiftUI
 
 struct DisplayLyricsView: View {
+    struct Identifier: Hashable {
+        var storageHashValue: Int?
+        var typeSizeHashValue: Int?
+        var attachmentsHashValue: Int?
+
+        func hash(into hasher: inout Hasher) {
+            hasher.combine(storageHashValue)
+            hasher.combine(typeSizeHashValue)
+            hasher.combine(attachmentsHashValue)
+        }
+    }
+
     @Environment(PlayerModel.self) private var player
     @Environment(LyricsModel.self) private var lyrics
 
     @Environment(\.luminareAnimation) private var animation
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+
+    @Default(.lyricsAttachments) private var attachments
 
     @Binding var interactionState: AppleMusicLyricsViewInteractionState
     var onScrolling: ((ScrollPosition, CGPoint) -> ())?
@@ -32,7 +48,7 @@ struct DisplayLyricsView: View {
                     range: 0 ..< lines.count,
                     highlightedRange: highlightedRange,
                     alignment: .center,
-                    identifier: lyrics.storage // To make the changes synchronized within the scope of lyrics
+                    identifier: identifier // To make the changes synchronized within the scope of lyrics
                 ) { index, _ in
                     DisplayLyricLineView(
                         line: lines[index], index: index,
@@ -74,6 +90,14 @@ struct DisplayLyricsView: View {
             }
         }
         .animation(.linear, value: elapsedTime) // For time interpolation
+    }
+
+    private var identifier: Identifier {
+        .init(
+            storageHashValue: lyrics.storage?.hashValue,
+            typeSizeHashValue: dynamicTypeSize.hashValue,
+            attachmentsHashValue: attachments.hashValue
+        )
     }
 
     private var elapsedTime: CGFloat {
