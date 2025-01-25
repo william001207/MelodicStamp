@@ -5,6 +5,7 @@
 //  Created by KrLite on 2024/11/24.
 //
 
+import Combine
 @preconcurrency import CSFBAudioEngine
 import MediaPlayer
 import SwiftUI
@@ -118,17 +119,23 @@ enum MetadataError: Error {
 
     var additional: Entry<AdditionalMetadata?>!
 
+    private var applySubject = PassthroughSubject<(), Never>()
+    var applyPublisher: AnyPublisher<(), Never> {
+        applySubject.eraseToAnyPublisher()
+    }
+
+    private var restoreSubject = PassthroughSubject<(), Never>()
+    var restorePublisher: AnyPublisher<(), Never> {
+        restoreSubject.eraseToAnyPublisher()
+    }
+
     init?(url: URL) {
         self.properties = .init()
         self.state = .loading
         self.url = url
 
         Task {
-            do {
-                try await update()
-            } catch let error as MetadataError {
-                state = .error(error)
-            }
+            try await update()
         }
     }
 
@@ -405,6 +412,10 @@ extension Metadata {
             }
         }
 
+        Task { @MainActor in
+            restoreSubject.send()
+        }
+
         Task {
             await generateThumbnail()
         }
@@ -418,9 +429,12 @@ extension Metadata {
             }
         }
 
+        Task { @MainActor in
+            applySubject.send()
+        }
+
         Task {
             await generateThumbnail()
-            updateNowPlayingInfo()
         }
     }
 
@@ -438,6 +452,7 @@ extension Metadata {
 
     func update() async throws(MetadataError) {
         guard let file = try? AudioFile(readingPropertiesAndMetadataFrom: url) else {
+            await updateState(to: .error(.noReadingPermission))
             throw .noReadingPermission
         }
 
@@ -455,13 +470,17 @@ extension Metadata {
 
         Task {
             await generateThumbnail()
-            updateNowPlayingInfo()
         }
     }
 
     func write() async throws(MetadataError) {
         guard state.isEditable, isModified else {
+            await updateState(to: .error(.invalidState))
             throw .invalidState
+        }
+        guard !url.isFileReadOnly else {
+            await updateState(to: .error(.noWritingPermission))
+            throw .noWritingPermission
         }
 
         await updateState(to: .saving)
@@ -469,6 +488,7 @@ extension Metadata {
         print("Started writing metadata to \(url)")
 
         guard let file = try? AudioFile(url: url) else {
+            await updateState(to: .error(.noWritingPermission))
             throw .noWritingPermission
         }
 
@@ -485,6 +505,7 @@ extension Metadata {
                 try file.writeMetadata()
             }
         } catch {
+            await updateState(to: .error(.noWritingPermission))
             throw .noWritingPermission
         }
 
@@ -529,7 +550,7 @@ extension Metadata: Hashable {
 }
 
 extension Metadata {
-    static func fallbackTitle(url: URL) -> String {
+    static func fallbackTitle(for url: URL) -> String {
         String(url.lastPathComponent.dropLast(url.pathExtension.count + 1))
     }
 
@@ -557,7 +578,12 @@ extension Metadata {
         .flatMap(\.image)
         .map(\.mediaItemArtwork)
 
-        dict[MPMediaItemPropertyTitle] = title.initial ?? Self.fallbackTitle(url: url)
+        dict[MPMediaItemPropertyTitle] = if let title = title.initial, !title.isEmpty {
+            title
+        } else {
+            Self.fallbackTitle(for: url)
+        }
+
         dict[MPMediaItemPropertyArtist] = artist.initial
         dict[MPMediaItemPropertyComposer] = composer.initial
         dict[MPMediaItemPropertyGenre] = genre.initial

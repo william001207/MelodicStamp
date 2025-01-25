@@ -68,7 +68,7 @@ struct MusicTitle: View {
     }
 
     static func fallbackTitle(for track: Track) -> String {
-        Metadata.fallbackTitle(url: track.url)
+        Metadata.fallbackTitle(for: track.url)
     }
 
     static func stringifiedTitle(

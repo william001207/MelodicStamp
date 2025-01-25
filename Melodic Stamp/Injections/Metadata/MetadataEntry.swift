@@ -107,14 +107,14 @@ extension MetadataEntry: Equatable {
     }
 
     func projectedUnwrappedValue<Wrapped>() -> Binding<Wrapped>? where V == Wrapped? {
-        if current == nil {
-            nil
-        } else {
+        if let current {
             Binding {
-                self.current!
+                current
             } set: { newValue in
                 self.current = newValue
             }
+        } else {
+            nil
         }
     }
 
@@ -165,10 +165,14 @@ extension MetadataBatchEditingEntry: Equatable {
         case .none, .varied:
             nil
         case .identical:
-            Binding {
-                self.map(\.current).first!
-            } set: { newValue in
-                self.setAll(newValue)
+            if let current = map(\.current).first {
+                Binding {
+                    current
+                } set: { newValue in
+                    self.setAll(newValue)
+                }
+            } else {
+                nil
             }
         }
     }
@@ -178,7 +182,7 @@ extension MetadataBatchEditingEntry: Equatable {
         case .none, .varied:
             nil
         case .identical:
-            if let current = map(\.current).first! {
+            if let current = map(\.current).first, let current {
                 Binding {
                     current
                 } set: { newValue in

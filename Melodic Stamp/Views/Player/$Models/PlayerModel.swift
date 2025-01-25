@@ -65,6 +65,7 @@ import SwiftUI
     var playbackMode: PlaybackMode = Defaults[.defaultPlaybackMode]
     var playbackLooping: Bool = false
 
+    private(set) var playbackState: PlaybackState = .stopped
     private(set) var playbackTime: PlaybackTime?
     var unwrappedPlaybackTime: PlaybackTime { playbackTime ?? .init() }
 
@@ -77,7 +78,8 @@ import SwiftUI
 
         set {
             player.seekProgress(to: newValue)
-            updateNowPlayingInfo()
+            updatePlaybackState()
+            updateNowPlayingInfo(with: playbackState)
         }
     }
 
@@ -88,7 +90,8 @@ import SwiftUI
 
         set {
             player.seekTime(to: newValue)
-            updateNowPlayingInfo()
+            updatePlaybackState()
+            updateNowPlayingInfo(with: playbackState)
         }
     }
 
@@ -211,42 +214,12 @@ import SwiftUI
         timer
             .receive(on: DispatchQueue.main)
             .sink { _ in
-                playbackTime: do {
-                    if let updated = player.playbackTime {
-                        guard self.playbackTime != updated else { break playbackTime }
-                        self.playbackTime = updated
-                    } else {
-                        self.playbackTime = nil
-                    }
-                }
-
-                volume: do {
-                    let updated = player.playbackVolume
-
-                    guard self._volume != updated else { break volume }
-                    self._volume = updated
-                }
-
-                isPlaying: do {
-                    let updated = player.isPlaying
-
-                    guard self._isPlaying != updated else { break isPlaying }
-                    self._isPlaying = updated
-                }
-
-                isRunning: do {
-                    let updated = player.isRunning
-
-                    guard self.isRunning != updated else { break isRunning }
-                    self.isRunning = updated
-                }
-
-                isMuted: do {
-                    let updated = player.isMuted
-
-                    guard self._isMuted != updated else { break isMuted }
-                    self._isMuted = updated
-                }
+                self.updateRunning()
+                self.updatePlaying()
+                self.updatePlaybackState()
+                self.updatePlaybackTime()
+                self.updateVolume()
+                self.updateMuted()
 
                 self.updateOutputDevices()
             }
@@ -255,6 +228,51 @@ import SwiftUI
 }
 
 // MARK: - Functions
+
+extension PlayerModel {
+    private func updateRunning() {
+        let updated = player.isRunning
+
+        guard isRunning != updated else { return }
+        isRunning = updated
+    }
+
+    private func updatePlaying() {
+        let updated = player.isPlaying
+
+        guard _isPlaying != updated else { return }
+        _isPlaying = updated
+    }
+
+    private func updatePlaybackState() {
+        let updated = player.playbackState
+        guard playbackState != updated else { return }
+        playbackState = updated
+    }
+
+    private func updatePlaybackTime() {
+        if let updated = player.playbackTime {
+            guard playbackTime != updated else { return }
+            playbackTime = updated
+        } else {
+            playbackTime = nil
+        }
+    }
+
+    private func updateVolume() {
+        let updated = player.playbackVolume
+
+        guard _volume != updated else { return }
+        _volume = updated
+    }
+
+    private func updateMuted() {
+        let updated = player.isMuted
+
+        guard _isMuted != updated else { return }
+        _isMuted = updated
+    }
+}
 
 extension PlayerModel {
     func randomIndex() -> Int? {
@@ -482,25 +500,27 @@ extension PlayerModel: PlayerDelegate {
 
 extension PlayerModel: AudioPlayer.Delegate {
     func audioPlayer(_: AudioPlayer, nowPlayingChanged nowPlaying: (any PCMDecoding)?) {
-        DispatchQueue.main.async {
+        Task { @MainActor in
             // Updates track, otherwise keeps it
             if let nowPlaying,
                let audioDecoder = nowPlaying as? AudioDecoder,
                let url = audioDecoder.inputSource.url {
-                self.track = self.playlist.first { $0.url == url }
+                track = playlist.first { $0.url == url }
             }
 
-            self.updateNowPlayingState()
-            self.updateNowPlayingInfo()
-            self.updateNowPlayingMetadataInfo()
+            updatePlaybackState()
+            updateNowPlayingMetadataInfo(to: track)
+            updateNowPlayingState(with: playbackState)
+            updateNowPlayingInfo(with: playbackState)
         }
     }
 
-    func audioPlayer(_: AudioPlayer, playbackStateChanged _: AudioPlayer.PlaybackState) {
-        DispatchQueue.main.async {
-            self.updateNowPlayingState()
-            self.updateNowPlayingInfo()
-            self.updateNowPlayingMetadataInfo()
+    func audioPlayer(_: AudioPlayer, playbackStateChanged playbackState: AudioPlayer.PlaybackState) {
+        Task { @MainActor in
+            updatePlaybackState()
+            updateNowPlayingMetadataInfo(to: track)
+            updateNowPlayingState(with: .init(playbackState))
+            updateNowPlayingInfo(with: .init(playbackState))
         }
     }
 

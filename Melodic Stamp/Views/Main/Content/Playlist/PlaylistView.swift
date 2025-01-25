@@ -264,7 +264,6 @@ struct PlaylistView: View {
             isSelected: metadataEditor.tracks.contains(track)
         )
         .redacted(reason: track.metadata.state.isLoaded ? [] : .placeholder)
-        .selectionDisabled(!track.metadata.state.isProcessed)
         .contextMenu {
             contextMenu(for: track)
         }

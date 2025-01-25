@@ -128,6 +128,10 @@ struct TrackView: View {
         .onDisappear {
             EventMonitorManager.shared.removeMonitor(for: track)
         }
+        .onReceive(track.metadata.applyPublisher) { _ in
+            guard isCurrentTrack else { return }
+            track.metadata.updateNowPlayingInfo()
+        }
     }
 
     private var opacity: CGFloat {

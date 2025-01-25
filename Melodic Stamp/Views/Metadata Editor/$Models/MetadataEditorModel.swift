@@ -36,7 +36,7 @@ enum MetadataEditingState: Equatable {
     }
 
     var state: MetadataEditingState {
-        let states = metadatas.map(\.state)
+        let states = metadatas.map(\.state).filter(\.isProcessed)
         return if states.allSatisfy(\.isEditable) {
             .fine
         } else if states.allSatisfy({ !$0.isEditable }) {
