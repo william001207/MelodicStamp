@@ -119,7 +119,7 @@ struct PlaylistView: View {
     }
 
     private var canLocate: Bool {
-        player.hasCurrentTrack || metadataEditor.isVisible
+        player.hasCurrentTrack
     }
 
     private var canRemove: Bool {
@@ -343,7 +343,7 @@ struct PlaylistView: View {
 
     @discardableResult private func handleLocate(in proxy: ScrollViewProxy) -> Bool {
         guard canLocate else { return false }
-        guard let track = player.track ?? metadataEditor.tracks.first else { return false }
+        guard let track = player.track else { return false }
         withAnimation {
             proxy.scrollTo(track, anchor: .top)
         }
