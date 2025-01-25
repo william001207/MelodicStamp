@@ -13,6 +13,7 @@ import SwiftUI
 struct PlaylistView: View {
     // MARK: - Environments
 
+    @Environment(PlayerKeyboardControlModel.self) private var playerKeyboardControl
     @Environment(PlayerModel.self) private var player
     @Environment(MetadataEditorModel.self) private var metadataEditor
 
@@ -61,6 +62,7 @@ struct PlaylistView: View {
 
                     // MARK: Keyboard Handlers
 
+                    // Handle [escape] -> clear selection
                     .onKeyPress(.escape) {
                         if handleEscape() {
                             .handled
@@ -68,6 +70,8 @@ struct PlaylistView: View {
                             .ignored
                         }
                     }
+
+                    // Handle [􁂒] -> remove selection
                     .onKeyPress(.deleteForward) {
                         if handleRemove(tracks: .init(metadataEditor.tracks)) {
                             .handled
@@ -75,6 +79,8 @@ struct PlaylistView: View {
                             .ignored
                         }
                     }
+
+                    // Handle [⏎] -> play
                     .onKeyPress(.return) {
                         if metadataEditor.tracks.count == 1, let track = metadataEditor.tracks.first {
                             player.play(track: track)
@@ -82,6 +88,37 @@ struct PlaylistView: View {
                         } else {
                             return .ignored
                         }
+                    }
+
+                    // Handle [space] -> toggle play / pause
+                    .onKeyPress(keys: [.space], phases: .all) { key in
+                        playerKeyboardControl.handlePlayPause(
+                            phase: key.phase, modifiers: key.modifiers
+                        )
+                    }
+
+                    // Handle [← / →] -> adjust progress
+                    .onKeyPress(keys: [.leftArrow, .rightArrow], phases: .all) { key in
+                        let sign: FloatingPointSign = key.key == .leftArrow ? .minus : .plus
+
+                        return playerKeyboardControl.handleProgressAdjustment(
+                            phase: key.phase, modifiers: key.modifiers, sign: sign
+                        )
+                    }
+
+                    // Handle [↑ / ↓] -> adjust volume
+                    .onKeyPress(keys: [.leftArrow, .rightArrow], phases: .all) { key in
+                        let sign: FloatingPointSign = key.key == .leftArrow ? .minus : .plus
+
+                        return playerKeyboardControl.handleVolumeAdjustment(
+                            phase: key.phase, modifiers: key.modifiers, sign: sign
+                        )
+                    }
+
+                    // Handle [m] -> toggle muted
+                    .onKeyPress(keys: ["m"], phases: .down) { _ in
+                        player.isMuted.toggle()
+                        return .handled
                     }
                 }
             }
