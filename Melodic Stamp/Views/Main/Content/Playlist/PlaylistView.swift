@@ -29,94 +29,97 @@ struct PlaylistView: View {
     var body: some View {
         @Bindable var metadataEditor = metadataEditor
 
-        Group {
-            if player.isPlaylistEmpty {
-                ExcerptView(tab: SidebarContentTab.playlist)
-            } else {
-                // MARK: List
+        // `ScrollPosition` isn't working for `List`
+        ScrollViewReader { proxy in
+            Group {
+                if player.isPlaylistEmpty {
+                    ExcerptView(tab: SidebarContentTab.playlist)
+                } else {
+                    // MARK: List
 
-                List(selection: $metadataEditor.tracks) {
-                    // This is much more stable than `.contentMargins()`
-                    Spacer()
-                        .frame(height: minHeight)
-                        .listRowSeparator(.hidden)
+                    List(selection: $metadataEditor.tracks) {
+                        // This is much more stable than `.contentMargins()`
+                        Spacer()
+                            .frame(height: minHeight)
+                            .listRowSeparator(.hidden)
 
-                    ForEach(player.playlist, id: \.self) { track in
-                        itemView(for: track)
-                            .contextMenu {
-                                contextMenu(for: track)
+                        ForEach(player.playlist, id: \.self) { track in
+                            itemView(for: track)
+                                .id(track)
+                        }
+                        .onMove { indices, destination in
+                            withAnimation {
+                                player.movePlaylist(fromOffsets: indices, toOffset: destination)
                             }
-                            .redacted(reason: track.metadata.state.isLoaded ? [] : .placeholder)
-                            .selectionDisabled(!track.metadata.state.isProcessed)
+                        }
+                        .transition(.slide)
                     }
-                    .onMove { indices, destination in
-                        withAnimation {
-                            player.movePlaylist(fromOffsets: indices, toOffset: destination)
+                    .scrollClipDisabled()
+                    .scrollContentBackground(.hidden)
+                    .animation(.default, value: player.playlist)
+                    .animation(.default, value: metadataEditor.tracks)
+
+                    // MARK: Keyboard Handlers
+
+                    .onKeyPress(.escape) {
+                        if handleEscape() {
+                            .handled
+                        } else {
+                            .ignored
                         }
                     }
-                    .transition(.slide)
-                }
-                .scrollClipDisabled()
-                .scrollContentBackground(.hidden)
-                .animation(.default, value: player.playlist)
-                .animation(.default, value: metadataEditor.tracks)
-
-                // MARK: Keyboard Handlers
-
-                .onKeyPress(.escape) {
-                    if handleEscape() {
-                        .handled
-                    } else {
-                        .ignored
+                    .onKeyPress(.deleteForward) {
+                        if handleRemove(tracks: .init(metadataEditor.tracks)) {
+                            .handled
+                        } else {
+                            .ignored
+                        }
                     }
-                }
-                .onKeyPress(.deleteForward) {
-                    if handleRemove(tracks: .init(metadataEditor.tracks)) {
-                        .handled
-                    } else {
-                        .ignored
-                    }
-                }
-                .onKeyPress(.return) {
-                    if metadataEditor.tracks.count == 1, let track = metadataEditor.tracks.first {
-                        player.play(track: track)
-                        return .handled
-                    } else {
-                        return .ignored
+                    .onKeyPress(.return) {
+                        if metadataEditor.tracks.count == 1, let track = metadataEditor.tracks.first {
+                            player.play(track: track)
+                            return .handled
+                        } else {
+                            return .ignored
+                        }
                     }
                 }
             }
-        }
-        .overlay(alignment: .top) {
-            // MARK: Controls
+            .overlay(alignment: .top) {
+                // MARK: Controls
 
-            HStack(spacing: 0) {
-                Group {
-                    LuminareSection(hasPadding: false) {
-                        leadingActions()
-                            .frame(height: minHeight)
+                HStack(spacing: 0) {
+                    Group {
+                        LuminareSection(hasPadding: false) {
+                            leadingActions(in: proxy)
+                                .frame(height: minHeight)
+                        }
+
+                        Spacer()
+
+                        LuminareSection(hasPadding: false) {
+                            trailingActions(in: proxy)
+                                .frame(height: minHeight)
+                        }
                     }
-
-                    Spacer()
-
-                    LuminareSection(hasPadding: false) {
-                        trailingActions()
-                            .frame(height: minHeight)
-                    }
+                    .luminareBordered(false)
+                    .luminareButtonMaterial(.thin)
+                    .luminareSectionMasked(true)
+                    .luminareSectionMaxWidth(nil)
+                    .shadow(color: .black.opacity(0.2), radius: 15)
                 }
-                .luminareBordered(false)
-                .luminareButtonMaterial(.thin)
-                .luminareSectionMasked(true)
-                .luminareSectionMaxWidth(nil)
-                .shadow(color: .black.opacity(0.25), radius: 32)
+                .padding(.horizontal)
+                .padding(.top, 8)
             }
-            .padding(.horizontal)
-            .padding(.top, 8)
         }
     }
 
     private var canEscape: Bool {
-        !metadataEditor.tracks.isEmpty
+        metadataEditor.isVisible
+    }
+
+    private var canLocate: Bool {
+        player.hasCurrentTrack || metadataEditor.isVisible
     }
 
     private var canRemove: Bool {
@@ -125,7 +128,7 @@ struct PlaylistView: View {
 
     // MARK: - Leading Actions
 
-    @ViewBuilder private func leadingActions() -> some View {
+    @ViewBuilder private func leadingActions(in proxy: ScrollViewProxy) -> some View {
         HStack(spacing: 2) {
             // MARK: Clear Selection
 
@@ -138,13 +141,24 @@ struct PlaylistView: View {
             .aspectRatio(1 / 1, contentMode: .fit)
             .disabled(!canEscape)
 
+            // MARK: Locate Selection
+
+            Button {
+                handleLocate(in: proxy)
+            } label: {
+                Image(systemSymbol: .scope)
+                    .padding()
+            }
+            .aspectRatio(1 / 1, contentMode: .fit)
+            .disabled(!canLocate)
+
             // MARK: Remove Selection from Playlist / Remove All
 
             Button(role: .destructive) {
-                if metadataEditor.tracks.isEmpty {
-                    handleRemove(tracks: player.playlist)
-                } else {
+                if canEscape {
                     handleRemove(tracks: .init(metadataEditor.tracks))
+                } else {
+                    handleRemove(tracks: player.playlist)
                 }
 
                 resetFocus(in: namespace) // Must regain focus due to unknown reasons
@@ -152,7 +166,7 @@ struct PlaylistView: View {
                 HStack {
                     Image(systemSymbol: .trashFill)
 
-                    if !canRemove || metadataEditor.tracks.isEmpty {
+                    if !canRemove || !canEscape {
                         Text("Clear Playlist")
                     } else {
                         Text("Remove from Playlist")
@@ -162,6 +176,7 @@ struct PlaylistView: View {
                 .padding(.vertical, 8)
             }
             .buttonStyle(.luminareProminent)
+            .foregroundStyle(.red)
             .fixedSize(horizontal: true, vertical: false)
             .disabled(!canRemove)
         }
@@ -170,7 +185,7 @@ struct PlaylistView: View {
 
     // MARK: - Trailing Actions
 
-    @ViewBuilder private func trailingActions() -> some View {
+    @ViewBuilder private func trailingActions(in _: ScrollViewProxy) -> some View {
         HStack(spacing: 2) {
             // MARK: Playback Mode
 
@@ -202,54 +217,65 @@ struct PlaylistView: View {
     // MARK: - Item View
 
     @ViewBuilder private func itemView(for track: Track) -> some View {
+        let isProcessed = track.metadata.state.isProcessed
+
         TrackView(
             track: track,
             isSelected: metadataEditor.tracks.contains(track)
         )
+        .redacted(reason: track.metadata.state.isLoaded ? [] : .placeholder)
+        .selectionDisabled(!track.metadata.state.isProcessed)
+        .contextMenu {
+            contextMenu(for: track)
+        }
         .swipeActions {
-            // MARK: Play
+            if isProcessed {
+                // MARK: Play
 
-            Button {
-                player.play(track: track)
-            } label: {
-                Image(systemSymbol: .play)
+                Button {
+                    player.play(track: track)
+                } label: {
+                    Image(systemSymbol: .play)
+                }
+                .tint(.accent)
+
+                // MARK: Remove from Playlist
+
+                Button(role: .destructive) {
+                    handleRemove(tracks: [track])
+                } label: {
+                    Image(systemSymbol: .trash)
+                }
+                .tint(.red)
             }
-            .tint(.accent)
-
-            // MARK: Remove from Playlist
-
-            Button(role: .destructive) {
-                handleRemove(tracks: [track])
-            } label: {
-                Image(systemSymbol: .trash)
-            }
-            .tint(.red)
         }
         .swipeActions(edge: .leading) {
-            // MARK: Save Metadata
+            if isProcessed {
+                // MARK: Save Metadata
 
-            if track.metadata.isModified {
-                Button {
-                    Task {
-                        try await track.metadata.write()
+                if track.metadata.isModified {
+                    Button {
+                        Task {
+                            try await track.metadata.write()
+                        }
+                    } label: {
+                        Image(systemSymbol: .trayAndArrowDown)
+                        Text("Save Metadata")
                     }
-                } label: {
-                    Image(systemSymbol: .trayAndArrowDown)
-                    Text("Save Metadata")
+                    .tint(.green)
                 }
-                .tint(.green)
-            }
 
-            // MARK: Restore Metadata
+                // MARK: Restore Metadata
 
-            if track.metadata.isModified {
-                Button {
-                    track.metadata.restore()
-                } label: {
-                    Image(systemSymbol: .arrowUturnLeft)
-                    Text("Restore Metadata")
+                if track.metadata.isModified {
+                    Button {
+                        track.metadata.restore()
+                    } label: {
+                        Image(systemSymbol: .arrowUturnLeft)
+                        Text("Restore Metadata")
+                    }
+                    .tint(.gray)
                 }
-                .tint(.gray)
             }
         }
     }
@@ -257,6 +283,9 @@ struct PlaylistView: View {
     // MARK: - Context Menu
 
     @ViewBuilder private func contextMenu(for track: Track) -> some View {
+        let isProcessed = track.metadata.state.isProcessed
+        let isEditable = track.metadata.state.isEditable
+
         // MARK: Play
 
         Button {
@@ -269,15 +298,16 @@ struct PlaylistView: View {
                 Text("Play")
             }
         }
+        .disabled(!isProcessed)
         .keyboardShortcut(.return, modifiers: [])
 
         // MARK: Remove from Playlist
 
         Button("Remove from Playlist") {
-            if metadataEditor.tracks.isEmpty {
-                handleRemove(tracks: [track])
-            } else {
+            if metadataEditor.isVisible {
                 handleRemove(tracks: .init(metadataEditor.tracks))
+            } else {
+                handleRemove(tracks: [track])
             }
         }
         .keyboardShortcut(.deleteForward, modifiers: [])
@@ -291,7 +321,7 @@ struct PlaylistView: View {
                 try await track.metadata.write()
             }
         }
-        .disabled(!track.metadata.isModified)
+        .disabled(!isEditable || !track.metadata.isModified)
         .keyboardShortcut("s", modifiers: .command)
 
         // MARK: Restore Metadata
@@ -299,7 +329,7 @@ struct PlaylistView: View {
         Button("Restore Metadata") {
             track.metadata.restore()
         }
-        .disabled(!track.metadata.isModified)
+        .disabled(!isEditable || !track.metadata.isModified)
         .keyboardShortcut("r", modifiers: .command)
     }
 
@@ -308,6 +338,15 @@ struct PlaylistView: View {
     @discardableResult private func handleEscape() -> Bool {
         guard canEscape else { return false }
         metadataEditor.tracks.removeAll()
+        return true
+    }
+
+    @discardableResult private func handleLocate(in proxy: ScrollViewProxy) -> Bool {
+        guard canLocate else { return false }
+        guard let track = player.track ?? metadataEditor.tracks.first else { return false }
+        withAnimation {
+            proxy.scrollTo(track, anchor: .top)
+        }
         return true
     }
 

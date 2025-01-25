@@ -28,7 +28,7 @@ struct TrackView: View {
                         Text("Loading…")
                             .foregroundStyle(.placeholder)
                     case .fine, .saving:
-                        if isPlaying {
+                        if isCurrentTrack {
                             MarqueeScrollView(animate: false) {
                                 MusicTitle(track: track)
                             }
@@ -52,7 +52,7 @@ struct TrackView: View {
                 }
                 .font(.title3)
                 .frame(height: 24)
-                .opacity(!player.isPlayable || isPlaying ? 1 : 0.5)
+                .opacity(opacity)
 
                 HStack(alignment: .center, spacing: 4) {
                     if isMetadataModified {
@@ -72,7 +72,7 @@ struct TrackView: View {
             .transition(.blurReplace)
             .animation(.default.speed(2), value: metadataState)
             .animation(.default.speed(2), value: isMetadataModified)
-            .animation(.default.speed(2), value: isPlaying)
+            .animation(.default.speed(2), value: opacity)
 
             Spacer()
 
@@ -82,9 +82,8 @@ struct TrackView: View {
                 cover(isMetadataProcessed: metadataState.isProcessed)
             }
         }
-        .padding(.vertical, 10)
-        .padding(.leading, 12)
-        .padding(.trailing, 8)
+        .padding(6)
+        .padding(.trailing, -1)
         .onHover { hover in
             withAnimation(.default.speed(5)) {
                 isHovering = hover
@@ -92,7 +91,23 @@ struct TrackView: View {
         }
     }
 
-    private var isPlaying: Bool {
+    private var opacity: CGFloat {
+        if player.isPlayable {
+            if isCurrentTrack {
+                1
+            } else {
+                if player.isPlaying {
+                    0.45
+                } else {
+                    0.65
+                }
+            }
+        } else {
+            1
+        }
+    }
+
+    private var isCurrentTrack: Bool {
         player.track == track
     }
 
@@ -100,7 +115,7 @@ struct TrackView: View {
         ZStack {
             if isMetadataProcessed, let image = track.metadata.thumbnail {
                 MusicCover(
-                    images: [image], hasPlaceholder: false, cornerRadius: 8
+                    images: [image], hasPlaceholder: false, cornerRadius: 4
                 )
                 .overlay {
                     if isHovering {
@@ -122,7 +137,7 @@ struct TrackView: View {
                 }
             }
         }
-        .clipShape(.rect(cornerRadius: 8))
+        .clipShape(.rect(cornerRadius: 4))
         .frame(width: 50, height: 50)
         .font(.title3)
         .contentTransition(.symbolEffect(.replace))

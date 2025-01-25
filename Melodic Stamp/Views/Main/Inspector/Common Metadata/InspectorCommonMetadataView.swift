@@ -96,6 +96,7 @@ struct InspectorCommonMetadataView: View {
                         .padding()
                     }
                     .buttonStyle(.luminareProminent)
+                    .foregroundStyle(.red)
                     .fixedSize(horizontal: true, vertical: false)
                     .disabled(types.isEmpty)
 
@@ -158,7 +159,7 @@ struct InspectorCommonMetadataView: View {
             .luminareButtonMaterial(.thin)
             .luminareSectionMasked(true)
             .luminareSectionMaxWidth(nil)
-            .shadow(color: .black.opacity(0.25), radius: 32)
+            .shadow(color: .black.opacity(0.2), radius: 15)
         }
     }
 
