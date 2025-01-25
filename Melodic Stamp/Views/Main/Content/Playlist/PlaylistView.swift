@@ -47,6 +47,9 @@ struct PlaylistView: View {
                         ForEach(player.playlist, id: \.self) { track in
                             itemView(for: track)
                                 .id(track)
+                                .draggable(track) {
+                                    TrackPreview(track: track)
+                                }
                         }
                         .onMove { indices, destination in
                             withAnimation {
@@ -382,7 +385,7 @@ struct PlaylistView: View {
         guard canLocate else { return false }
         guard let track = player.track else { return false }
         withAnimation {
-            proxy.scrollTo(track, anchor: .top)
+            proxy.scrollTo(track, anchor: .center)
         }
         return true
     }

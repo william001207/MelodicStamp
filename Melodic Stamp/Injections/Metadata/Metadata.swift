@@ -9,6 +9,12 @@
 import MediaPlayer
 import SwiftUI
 
+enum MetadataError: Error {
+    case invalidState
+    case noWritingPermission
+    case noReadingPermission
+}
+
 // MARK: - Metadata
 
 // MARK: Definition
@@ -57,12 +63,6 @@ import SwiftUI
                 nil
             }
         }
-    }
-
-    enum MetadataError: Error {
-        case invalidState
-        case noWritingPermission
-        case noReadingPermission
     }
 
     var id: URL { url }
@@ -513,12 +513,6 @@ extension Metadata {
 }
 
 // MARK: Extensions
-
-extension Metadata {
-    static func splitArtists(from artist: String) -> [Substring] {
-        artist.split(separator: /[\/,]\s*/)
-    }
-}
 
 extension Metadata: Equatable {
     static func == (lhs: Metadata, rhs: Metadata) -> Bool {

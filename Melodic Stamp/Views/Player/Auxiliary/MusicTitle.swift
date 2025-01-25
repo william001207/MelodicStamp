@@ -8,38 +8,25 @@
 import CSFBAudioEngine
 import SwiftUI
 
-struct MusicTitle: View {
-    enum DisplayMode {
-        case comprehensive
-        case title
-        case artists
+struct MusicTitleDisplayMode: OptionSet {
+    let rawValue: Int
 
-        var hasTitle: Bool {
-            switch self {
-            case .artists:
-                false
-            default:
-                true
-            }
-        }
+    static let title = MusicTitleDisplayMode(rawValue: 1 << 0)
+    static let artists = MusicTitleDisplayMode(rawValue: 1 << 1)
 
-        var hasArtists: Bool {
-            switch self {
-            case .title:
-                false
-            default:
-                true
-            }
-        }
+    static var all: MusicTitleDisplayMode {
+        [.title, .artists]
     }
+}
 
-    var mode: DisplayMode = .comprehensive
+struct MusicTitle: View {
+    var mode: MusicTitleDisplayMode = .all
     var track: Track?
 
     var body: some View {
         if let track {
             HStack(spacing: 12) {
-                if mode.hasTitle {
+                if mode.contains(.title) {
                     Group {
                         if let title = track.metadata[extracting: \.title]?
                             .initial, !title.isEmpty {
@@ -51,10 +38,9 @@ struct MusicTitle: View {
                     .bold()
                 }
 
-                if mode.hasArtists {
-                    if let artist = track.metadata[extracting: \.artist]?.initial {
+                if mode.contains(.artists) {
+                    if let artists = track.metadata[extracting: \.artist]?.initial?.splittingArtists {
                         HStack(spacing: 4) {
-                            let artists = Metadata.splitArtists(from: artist)
                             ForEach(Array(artists.enumerated()), id: \.offset) {
                                 offset, composer in
                                 if offset > 0 {
@@ -86,10 +72,10 @@ struct MusicTitle: View {
     }
 
     static func stringifiedTitle(
-        mode: DisplayMode = .comprehensive, for track: Track, separator: String = " "
+        mode: MusicTitleDisplayMode = .all, for track: Track, separator: String = " "
     ) -> String {
         var components: [String] = []
-        if mode.hasTitle {
+        if mode.contains(.title) {
             if let title = track.metadata[extracting: \.title]?.initial {
                 components.append(title)
             } else {
@@ -97,14 +83,14 @@ struct MusicTitle: View {
             }
         }
 
-        if mode.hasArtists {
-            if let artist = track.metadata[extracting: \.artist]?.initial {
+        if mode.contains(.artists) {
+            if let artists = track.metadata[extracting: \.artist]?.initial?.splittingArtists {
                 let separator = String(localized: .init(
                     "MusicTitle : (Separator) Stringified Artists",
                     defaultValue: ", ",
                     comment: "The separator between artists in a stringified title"
                 ))
-                components.append(Metadata.splitArtists(from: artist).joined(separator: separator))
+                components.append(artists.joined(separator: separator))
             }
         }
         return components.joined(separator: separator)

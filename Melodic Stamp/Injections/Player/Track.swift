@@ -40,3 +40,24 @@ extension Track: Hashable {
         hasher.combine(id)
     }
 }
+
+extension Track: Transferable {
+    enum TransferableError: Error {
+        case invalidURL
+        case failedToReadURL
+        case failedToCreateTrack
+    }
+
+    static var transferRepresentation: some TransferRepresentation {
+        DataRepresentation(contentType: .fileURL) { track in
+            print(track.url)
+            return track.url.dataRepresentation
+        } importing: { data in
+            guard let url = URL(dataRepresentation: data, relativeTo: nil) else { throw TransferableError.invalidURL }
+            guard url.startAccessingSecurityScopedResource() else { throw TransferableError.failedToReadURL }
+
+            guard let track = Track(url: url) else { throw TransferableError.failedToCreateTrack }
+            return track
+        }
+    }
+}

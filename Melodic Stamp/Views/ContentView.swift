@@ -82,6 +82,10 @@ struct ContentView: View {
                     miniPlayerView(window)
                 }
             }
+            .dropDestination(for: Track.self) { items, _ in
+                player.addToPlaylist(tracks: items)
+                return true
+            }
             .background {
                 Group {
                     FileImporters()

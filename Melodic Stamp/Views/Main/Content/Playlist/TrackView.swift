@@ -15,9 +15,8 @@ struct TrackView: View {
     var isSelected: Bool
 
     @State private var isHovering: Bool = false
+    @State private var isAboutToDoubleClick: Bool = false
     @State private var cancelDoubleClickDispatch: DispatchWorkItem?
-
-    private let id = UUID()
 
     var body: some View {
         HStack(alignment: .center) {
@@ -94,20 +93,21 @@ struct TrackView: View {
         }
         .onAppear {
             EventMonitorManager.shared.addLocalMonitor(
-                for: id,
+                for: track,
                 matching: [.leftMouseDown]
             ) { event in
                 guard isHovering else { return event }
 
-                if let cancelDoubleClickDispatch {
+                if isAboutToDoubleClick {
                     // Double click!
-                    cancelDoubleClickDispatch.cancel()
-                    self.cancelDoubleClickDispatch = nil
+                    cancelDoubleClickDispatch?.cancel()
+                    isAboutToDoubleClick = false
                     player.play(track: track)
                 } else {
                     let dispatch = DispatchWorkItem {
-                        cancelDoubleClickDispatch = nil
+                        isAboutToDoubleClick = false
                     }
+                    isAboutToDoubleClick = true
                     cancelDoubleClickDispatch = dispatch
                     DispatchQueue.main.asyncAfter(deadline: .now() + NSEvent.doubleClickInterval, execute: dispatch)
                 }
@@ -116,12 +116,14 @@ struct TrackView: View {
             }
         }
         .onDisappear {
-            EventMonitorManager.shared.removeMonitor(for: id)
+            EventMonitorManager.shared.removeMonitor(for: track)
         }
     }
 
     private var opacity: CGFloat {
-        if player.isPlayable {
+        if isSelected {
+            1
+        } else if player.isPlayable {
             if isCurrentTrack {
                 1
             } else {
@@ -142,9 +144,9 @@ struct TrackView: View {
 
     @ViewBuilder private func cover(isMetadataProcessed: Bool) -> some View {
         ZStack {
-            if isMetadataProcessed, let image = track.metadata.thumbnail {
+            if isMetadataProcessed, let thumbnail = track.metadata.thumbnail {
                 MusicCover(
-                    images: [image], hasPlaceholder: false, cornerRadius: 4
+                    images: [thumbnail], hasPlaceholder: false, cornerRadius: 4
                 )
                 .overlay {
                     if isHovering {
