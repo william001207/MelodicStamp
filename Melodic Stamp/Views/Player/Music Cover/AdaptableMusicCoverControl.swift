@@ -25,39 +25,45 @@ struct AdaptableMusicCoverControl: View {
     @State private var isHeaderHovering: Bool = false
 
     var body: some View {
-        Group {
-            AliveButton {
-                isImagePickerPresented = true
-            } label: {
-                image()
-                    .padding(.horizontal, 16)
-            }
-            .fileImporter(
-                isPresented: $isImagePickerPresented,
-                allowedContentTypes: AttachedPicturesHandlerModel
-                    .allowedContentTypes
-            ) { result in
-                switch result {
-                case let .success(url):
-                    guard url.startAccessingSecurityScopedResource() else { break }
-                    defer { url.stopAccessingSecurityScopedResource() }
+        AliveButton {
+            isImagePickerPresented = true
+        } label: {
+            image()
+                .motionCard(scale: 1.02, angle: .degrees(3.5), shadowColor: .black.opacity(0.1), shadowRadius: 10)
+                .padding(.horizontal, 16)
+        }
+        .fileImporter(
+            isPresented: $isImagePickerPresented,
+            allowedContentTypes: AttachedPicturesHandlerModel
+                .allowedContentTypes
+        ) { result in
+            switch result {
+            case let .success(url):
+                guard url.startAccessingSecurityScopedResource() else { break }
+                defer { url.stopAccessingSecurityScopedResource() }
 
-                    guard
-                        let image = NSImage(contentsOf: url),
-                        let attachedPicture = image.attachedPicture(of: type)
-                    else { break }
+                guard
+                    let image = NSImage(contentsOf: url),
+                    let attachedPicture = image.attachedPicture(of: type)
+                else { break }
 
-                    attachedPicturesHandler.replace(
-                        [attachedPicture], entries: entries,
-                        undoManager: undoManager
-                    )
-                case .failure:
-                    break
-                }
+                attachedPicturesHandler.replace(
+                    [attachedPicture], entries: entries,
+                    undoManager: undoManager
+                )
+            case .failure:
+                break
             }
         }
+        .shadow(color: .black.opacity(0.1), radius: 5)
         .padding(.top, 8)
         .overlay(alignment: .top, content: header)
+    }
+
+    private var isModified: Bool {
+        attachedPicturesHandler.isModified(
+            of: [type], entries: entries
+        )
     }
 
     @ViewBuilder private func header() -> some View {
@@ -124,27 +130,21 @@ struct AdaptableMusicCoverControl: View {
     }
 
     @ViewBuilder private func image() -> some View {
-        if let binding = entries.projectedValue {
-            let attachedPictures: [AttachedPicture] = .init(
-                binding.wrappedValue)
+        let images: [NSImage] = if let binding = entries.projectedValue {
+            [AttachedPicture](binding.wrappedValue)
+                .filter { $0.type == type }
+                .compactMap(\.image)
+        } else { [] }
 
-            let images =
-                attachedPictures
-                    .filter { $0.type == type }
-                    .compactMap(\.image)
-
-            MusicCover(images: images, cornerRadius: 8)
-                .background {
-                    if attachedPicturesHandler.isModified(
-                        of: [type], entries: entries
-                    ) {
-                        RoundedRectangle(cornerRadius: 8)
-                            .stroke(.tint, lineWidth: 8)
-                    }
+        MusicCover(images: images, cornerRadius: 8)
+            .overlay {
+                if isModified {
+                    RoundedRectangle(cornerRadius: 8)
+                        .fill(.clear)
+                        .stroke(.tint, lineWidth: 4)
                 }
-        } else {
-            MusicCover(images: [], cornerRadius: 8)
-        }
+            }
+            .clipShape(.rect(cornerRadius: 8))
     }
 
     private func registerUndo(_ oldValue: Set<AttachedPicture>, for entries: Entries) {

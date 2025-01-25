@@ -21,8 +21,8 @@ protocol Restorable: Equatable, Modifiable {
     var current: V { get set }
     var initial: V { get set }
 
-    mutating func restore()
-    mutating func apply()
+    @MainActor mutating func restore()
+    @MainActor mutating func apply()
 }
 
 extension Restorable {
@@ -30,11 +30,11 @@ extension Restorable {
         current != initial
     }
 
-    mutating func restore() {
+    @MainActor mutating func restore() {
         current = initial
     }
 
-    mutating func apply() {
+    @MainActor mutating func apply() {
         initial = current
     }
 }
@@ -66,8 +66,7 @@ extension MetadataEntry: Equatable {
 
 // MARK: - Metadata Batch Editing Entry
 
-@Observable
-final class MetadataBatchEditingEntry<V: Hashable & Equatable>: Identifiable {
+@Observable final class MetadataBatchEditingEntry<V: Hashable & Equatable>: Identifiable {
     typealias Entry = MetadataEntry
     typealias EntryKeyPath = WritableKeyPath<Metadata, Entry<V>>
 

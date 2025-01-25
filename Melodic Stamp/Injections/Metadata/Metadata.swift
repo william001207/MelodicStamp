@@ -398,7 +398,9 @@ extension Metadata {
     func restore() {
         guard state.isProcessed else { return }
         for var restorable in self.restorables {
-            restorable.restore()
+            Task { @MainActor in
+                restorable.restore()
+            }
         }
 
         Task {
@@ -409,7 +411,9 @@ extension Metadata {
     func apply() {
         guard state.isProcessed else { return }
         for var restorable in self.restorables {
-            restorable.apply()
+            Task { @MainActor in
+                restorable.apply()
+            }
         }
 
         Task {

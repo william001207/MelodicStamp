@@ -36,6 +36,7 @@ struct PlaylistView: View {
                 // MARK: List
 
                 List(selection: $metadataEditor.tracks) {
+                    // This is much more stable than `.contentMargins()`
                     Spacer()
                         .frame(height: minHeight)
                         .listRowSeparator(.hidden)
