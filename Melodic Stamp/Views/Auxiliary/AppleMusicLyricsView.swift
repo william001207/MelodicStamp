@@ -314,7 +314,7 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
             return 0
         case .pushed:
             guard index >= highlightedRange.upperBound else { return 0 }
-            return CGFloat(index - highlightedRange.upperBound) * delay
+            return CGFloat(index - (highlightedRange.upperBound - 1)) * delay
         }
     }
 }
