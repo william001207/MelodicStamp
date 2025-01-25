@@ -55,7 +55,6 @@ struct TTMLDisplayLyricLineView: View {
                 }
             }
         }
-        .animation(.linear, value: elapsedTime) // For time interpolation
     }
 
     private var textAlignment: TextAlignment {

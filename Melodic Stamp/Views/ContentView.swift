@@ -238,8 +238,6 @@ struct ContentView: View {
                 }
             }
         }
-        .ignoresSafeArea()
-        .frame(minHeight: 600)
         .onAppear {
             minWidth = 960
         }

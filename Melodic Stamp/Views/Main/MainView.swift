@@ -36,7 +36,6 @@ struct MainView: View {
                     .animation(nil, value: metadataEditor.tracks) // Remove strange transitions when selection changes
             }
             .luminareMinHeight(38)
-            .toolbarBackgroundVisibility(.hidden, for: .windowToolbar)
     }
 
     @ViewBuilder private func content() -> some View {
@@ -50,7 +49,8 @@ struct MainView: View {
                         }
                     }
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .ignoresSafeArea()
+                    .safeAreaPadding(.bottom, 94)
+                    .toolbarBackgroundVisibility(appearsActive ? .hidden : .automatic, for: .windowToolbar)
                     .morphed(isActive: appearsActive && !windowManager.isInFullScreen)
             case .leaflet:
                 LeafletView()
@@ -58,6 +58,7 @@ struct MainView: View {
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                     .ignoresSafeArea()
                     .toolbar(removing: .title)
+                    .toolbarBackgroundVisibility(.hidden, for: .windowToolbar)
             }
         }
     }
@@ -94,7 +95,7 @@ struct MainView: View {
         }
         .environment(inspectorLyrics)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .ignoresSafeArea()
+        .safeAreaPadding(.bottom, 94)
         .morphed(isActive: appearsActive && !windowManager.isInFullScreen)
         .ignoresSafeArea()
     }

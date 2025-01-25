@@ -29,7 +29,7 @@ struct PlaylistView: View {
     var body: some View {
         @Bindable var metadataEditor = metadataEditor
 
-        ZStack(alignment: .topLeading) {
+        Group {
             if player.isPlaylistEmpty {
                 ExcerptView(tab: SidebarContentTab.playlist)
             } else {
@@ -37,7 +37,7 @@ struct PlaylistView: View {
 
                 List(selection: $metadataEditor.tracks) {
                     Spacer()
-                        .frame(height: 64 + minHeight)
+                        .frame(height: minHeight)
                         .listRowSeparator(.hidden)
 
                     ForEach(player.playlist, id: \.self) { track in
@@ -54,14 +54,9 @@ struct PlaylistView: View {
                         }
                     }
                     .transition(.slide)
-
-                    Spacer()
-                        .frame(height: 94)
-                        .listRowSeparator(.hidden)
                 }
+                .scrollClipDisabled()
                 .scrollContentBackground(.hidden)
-                .contentMargins(.top, 64, for: .scrollIndicators)
-                .contentMargins(.bottom, 94, for: .scrollIndicators)
                 .animation(.default, value: player.playlist)
                 .animation(.default, value: metadataEditor.tracks)
 
@@ -90,7 +85,8 @@ struct PlaylistView: View {
                     }
                 }
             }
-
+        }
+        .overlay(alignment: .top) {
             // MARK: Controls
 
             HStack(spacing: 0) {
@@ -113,8 +109,8 @@ struct PlaylistView: View {
                 .luminareSectionMaxWidth(nil)
                 .shadow(color: .black.opacity(0.25), radius: 32)
             }
-            .padding(.top, 64)
             .padding(.horizontal)
+            .padding(.top, 8)
         }
     }
 
@@ -161,7 +157,8 @@ struct PlaylistView: View {
                         Text("Remove from Playlist")
                     }
                 }
-                .padding()
+                .padding(.horizontal)
+                .padding(.vertical, 8)
             }
             .buttonStyle(.luminareProminent)
             .fixedSize(horizontal: true, vertical: false)

@@ -157,6 +157,10 @@ import SwiftUI
             replayGainTrackPeak, replayGainReferenceLoudness
         ]
     }
+
+    @MainActor fileprivate func updateState(to state: State) {
+        self.state = state
+    }
 }
 
 // MARK: Loading Functions
@@ -441,7 +445,7 @@ extension Metadata {
             print("Updated metadata from \(url)")
         }
 
-        state = .fine
+        await updateState(to: .fine)
 
         Task {
             await generateThumbnail()
@@ -454,7 +458,7 @@ extension Metadata {
             throw .invalidState
         }
 
-        state = .saving
+        await updateState(to: .saving)
         apply()
         print("Started writing metadata to \(url)")
 
@@ -478,7 +482,7 @@ extension Metadata {
             throw .noWritingPermission
         }
 
-        state = .fine
+        await updateState(to: .fine)
         print("Successfully written metadata to \(url)")
     }
 

@@ -51,15 +51,8 @@ struct InspectorAdvancedMetadataView: View {
                     }
                 }
                 .padding(.horizontal)
-                // Don't use `contentMargins()` for content as it breaks progressive blurs
-                .safeAreaPadding(.top, 64)
-                .safeAreaPadding(.bottom, 94)
-
-                Spacer()
-                    .frame(height: 150)
             }
-            .contentMargins(.top, 64, for: .scrollIndicators)
-            .contentMargins(.bottom, 94, for: .scrollIndicators)
+            .scrollClipDisabled()
         }
     }
 

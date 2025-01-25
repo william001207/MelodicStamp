@@ -32,7 +32,6 @@ struct ComposedLyricsView: View {
                 emptyView()
             }
         }
-        .animation(.linear, value: elapsedTime) // For time interpolation
     }
 
     private var elapsedTime: CGFloat {

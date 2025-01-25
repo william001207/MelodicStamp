@@ -32,6 +32,7 @@ struct InspectorCommonMetadataView: View {
                 VStack(spacing: 24) {
                     VStack(spacing: 8) {
                         attachedPicturesEditor()
+                            .padding(.vertical, 8)
 
                         AdaptableMusicCovers(
                             entries: metadataEditor[
@@ -64,15 +65,8 @@ struct InspectorCommonMetadataView: View {
                     }
                 }
                 .padding(.horizontal)
-                // Don't use `contentMargins()` for content as it breaks progressive blurs
-                .safeAreaPadding(.top, 64)
-                .safeAreaPadding(.bottom, 94)
-
-                Spacer()
-                    .frame(height: 150)
             }
-            .contentMargins(.top, 64, for: .scrollIndicators)
-            .contentMargins(.bottom, 94, for: .scrollIndicators)
+            .scrollClipDisabled()
         }
     }
 

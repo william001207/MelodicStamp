@@ -131,7 +131,6 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
             }
             .onChange(of: identifier, initial: true) { _, _ in
                 // Force reset on external change
-//                updateAnimationState()
                 resetScrolling(in: proxy)
             }
             .onChange(of: interactionState) { _, _ in
@@ -140,14 +139,17 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
                 }
             }
             .onChange(of: highlightedRange) { oldValue, newValue in
-                let isJumped = newValue.lowerBound < oldValue.lowerBound || abs(newValue.lowerBound - oldValue.lowerBound) > 1
+                let isLowerBoundJumped = abs(newValue.lowerBound - oldValue.lowerBound) > 1
+                let isUpperBoundJumped = abs(newValue.upperBound - oldValue.upperBound) > 1
+                let isJumped = newValue.lowerBound < oldValue.lowerBound || (isLowerBoundJumped && isUpperBoundJumped)
+
                 if isJumped {
                     withAnimation {
                         resetScrolling(in: proxy)
                     }
                 } else {
                     withAnimation(.spring(duration: 0.65, bounce: 0.275)) {
-//                        scrollToHighlighted()
+                        scrollToHighlighted()
                     }
                 }
             }
@@ -155,7 +157,7 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
                 let isLowerBoundChanged = oldValue.lowerBound != newValue.lowerBound
                 let isUpperBoundChanged = oldValue.upperBound != newValue.upperBound
 
-                if isLowerBoundChanged, canPauseAnimation {
+                if isLowerBoundChanged {
                     updateAnimationState()
                 } else if isUpperBoundChanged {
                     pushAnimation()
@@ -163,7 +165,7 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
             }
             .onChange(of: contentOffsets) { _, _ in
                 withAnimation(.spring(duration: 0.65, bounce: 0.275)) {
-//                    scrollToHighlighted()
+                    scrollToHighlighted()
                 }
             }
             .onScrollGeometryChange(for: CGPoint.self) { proxy in
@@ -220,7 +222,9 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
         let delay = delay(at: index)
         let proportion = proportion(at: index)
 
-        let compensate = interactionState.isDelegated || isIndicatorVisible ? animationCompensation : .zero
+        let compensate: CGFloat = if interactionState.isDelegated || isIndicatorVisible {
+            animationCompensation
+        } else { .zero }
 
         content(index, isHighlighted)
             .onGeometryChange(for: CGSize.self) { proxy in
@@ -263,8 +267,12 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
 
     private func scrollToHighlighted() {
         guard interactionState.isDelegated, origin.isInitialized else { return }
+
+        let compensation: CGFloat = if let offset = contentOffsets[origin.index] {
+            -offset / 2
+        } else { .zero }
         let offset = fold(until: highlightedRange.lowerBound)
-        scrollOffset = max(0, origin.offset + offset + alignmentCompensation)
+        scrollOffset = max(0, origin.offset + offset + compensation)
         print("Scrolled to highlighted: \(offset)")
     }
 

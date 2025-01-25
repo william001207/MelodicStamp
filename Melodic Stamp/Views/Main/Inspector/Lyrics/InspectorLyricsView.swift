@@ -31,16 +31,9 @@ struct InspectorLyricsView: View {
                         .textSelection(.enabled)
                     }
                     .padding(.horizontal)
-                    .safeAreaPadding(.top, 64)
-                    .safeAreaPadding(.bottom, 94)
-
-                    Spacer()
-                        .frame(height: 150)
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .scrollContentBackground(.hidden)
-                .contentMargins(.top, 64, for: .scrollIndicators)
-                .contentMargins(.bottom, 94, for: .scrollIndicators)
+                .scrollClipDisabled()
             }
         }
         .onChange(of: entries, initial: true) { _, _ in
