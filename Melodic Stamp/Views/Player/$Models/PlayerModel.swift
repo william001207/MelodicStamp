@@ -22,6 +22,7 @@ import SwiftUI
     // MARK: Player
 
     private var player: any Player
+    private var analyzer: RealtimeAnalyzer = .init(fftSize: Int(PlayerModel.bufferSize))
 
     // MARK: Output Devices
 
@@ -53,8 +54,8 @@ import SwiftUI
     private var cancellables = Set<AnyCancellable>()
     private let timer = TimerPublisher(interval: PlayerModel.interval)
 
-    private var visualizationDataSubject = PassthroughSubject<AVAudioPCMBuffer?, Never>()
-    var visualizationDataPublisher: AnyPublisher<AVAudioPCMBuffer?, Never> { visualizationDataSubject.eraseToAnyPublisher() }
+    private var visualizationDataSubject = PassthroughSubject<[[Float]], Never>()
+    var visualizationDataPublisher: AnyPublisher<[[Float]], Never> { visualizationDataSubject.eraseToAnyPublisher() }
 
     // MARK: Playlist & Playback
 
@@ -384,12 +385,14 @@ extension PlayerModel {
 
             inputNode.removeTap(onBus: bus)
             inputNode.installTap(onBus: bus, bufferSize: Self.bufferSize, format: format) { [weak self] buffer, _ in
-                guard let strongSelf = self else { return }
-                guard strongSelf.player.isPlaying else { return }
+                guard let self else { return }
+                guard player.isPlaying else { return }
 
                 buffer.frameLength = Self.bufferSize
+                let data = analyzer.analyze(with: buffer)
+
                 Task { @MainActor in
-                    strongSelf.visualizationDataSubject.send(buffer)
+                    self.visualizationDataSubject.send(data)
                 }
             }
         }
