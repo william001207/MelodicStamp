@@ -20,6 +20,15 @@ struct TrackPreview: View {
                 }
             }
             .frame(width: 50)
+            .overlay(alignment: .topLeading) {
+                if let duration = track.metadata.properties.duration.map(Duration.init) {
+                    DurationText(duration: duration)
+                        .font(.system(size: 7))
+                        .padding(.horizontal, 2)
+                        .foregroundStyle(.white)
+                        .shadow(color: .black, radius: 2)
+                }
+            }
 
             VStack(alignment: .leading) {
                 MusicTitle(mode: .title, track: track)

@@ -51,10 +51,11 @@ struct TrackView: View {
                         .foregroundStyle(.red)
                         .bold()
                     }
+
+                    Spacer()
                 }
-                .font(.title3)
                 .frame(height: 24)
-                .opacity(opacity)
+                .font(.title3)
 
                 HStack(alignment: .center, spacing: 4) {
                     if isMetadataModified {
@@ -65,18 +66,27 @@ struct TrackView: View {
                             .animation(nil, value: isSelected)
                     }
 
+                    if let duration = track.metadata.properties.duration.flatMap(Duration.init) {
+                        DurationText(duration: duration)
+                            .foregroundStyle(.secondary)
+                            .fixedSize()
+                    }
+
                     Text(track.url.lastPathComponent)
-                        .font(.caption)
                         .foregroundStyle(.placeholder)
+
+                    Spacer()
                 }
                 .frame(height: 12)
+                .font(.caption)
             }
             .transition(.blurReplace)
+            .opacity(opacity)
             .animation(.default.speed(2), value: metadataState)
             .animation(.default.speed(2), value: isMetadataModified)
-            .animation(.default.speed(2), value: opacity)
-
-            Spacer()
+            .animation(.default.speed(2), value: isCurrentTrack)
+            .animation(.default.speed(2), value: player.isPlayable)
+            .animation(.default.speed(2), value: player.isPlaying)
 
             AliveButton {
                 player.play(track: track)

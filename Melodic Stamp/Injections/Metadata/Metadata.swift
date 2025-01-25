@@ -68,7 +68,7 @@ enum MetadataError: Error {
     var id: URL { url }
     let url: URL
 
-    private(set) var properties: AudioProperties!
+    private(set) var properties: AudioProperties
     private(set) var state: State
 
     private(set) var thumbnail: NSImage?
@@ -119,6 +119,7 @@ enum MetadataError: Error {
     var additional: Entry<AdditionalMetadata?>!
 
     init?(url: URL) {
+        self.properties = .init()
         self.state = .loading
         self.url = url
 
@@ -131,7 +132,8 @@ enum MetadataError: Error {
         }
     }
 
-    init(url: URL, from metadata: AudioMetadata) {
+    init(url: URL, from metadata: AudioMetadata, with properties: AudioProperties = .init()) {
+        self.properties = properties
         self.state = .fine
         self.url = url
         load(from: metadata)
