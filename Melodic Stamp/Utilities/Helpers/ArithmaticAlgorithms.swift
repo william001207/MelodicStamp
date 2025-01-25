@@ -7,9 +7,9 @@
 
 import Foundation
 
-func lerp<Value>(_ a: Value, _ b: Value, factor t: Double) -> Value where Value: BinaryFloatingPoint {
+@inlinable func lerp<Value>(_ a: Value, _ b: Value, factor t: Value) -> Value where Value: BinaryFloatingPoint {
     let t = min(max(t, 0), 1)
-    return a + (b - a) * Value(t)
+    return a + (b - a) * t
 }
 
 /// Generates a bell curve value for a given x, mean, standard deviation, and amplitude.
@@ -20,7 +20,7 @@ func lerp<Value>(_ a: Value, _ b: Value, factor t: Double) -> Value where Value:
 ///   - standardDeviation: The standard deviation (width) of the bell curve. Higher values result in a wider curve.
 ///   - amplitude: The peak (height) of the bell curve.
 /// - Returns: The y-value of the bell curve at the given x.
-func bellCurve<Value>(
+@inlinable func bellCurve<Value>(
     _ value: Value,
     mean: Value = .zero,
     standardDeviation: Value = 1,
@@ -35,7 +35,7 @@ func bellCurve<Value>(
 ///   - x: The input value, expected to be in the range [0, 1].
 ///   - curvature: A parameter to control the curvature. Higher values create a sharper bend.
 /// - Returns: The transformed output in the range [0, 1].
-func bentSigmoid<Value>(
+@inlinable func bentSigmoid<Value>(
     _ value: Value,
     curvature: Value = 7.5
 ) -> Value where Value: BinaryFloatingPoint {
