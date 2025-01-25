@@ -15,6 +15,9 @@ struct TrackView: View {
     var isSelected: Bool
 
     @State private var isHovering: Bool = false
+    @State private var cancelDoubleClickDispatch: DispatchWorkItem?
+
+    private let id = UUID()
 
     var body: some View {
         HStack(alignment: .center) {
@@ -88,6 +91,32 @@ struct TrackView: View {
             withAnimation(.default.speed(5)) {
                 isHovering = hover
             }
+        }
+        .onAppear {
+            EventMonitorManager.shared.addLocalMonitor(
+                for: id,
+                matching: [.leftMouseDown]
+            ) { event in
+                guard isHovering else { return event }
+
+                if let cancelDoubleClickDispatch {
+                    // Double click!
+                    cancelDoubleClickDispatch.cancel()
+                    self.cancelDoubleClickDispatch = nil
+                    player.play(track: track)
+                } else {
+                    let dispatch = DispatchWorkItem {
+                        cancelDoubleClickDispatch = nil
+                    }
+                    cancelDoubleClickDispatch = dispatch
+                    DispatchQueue.main.asyncAfter(deadline: .now() + NSEvent.doubleClickInterval, execute: dispatch)
+                }
+
+                return event
+            }
+        }
+        .onDisappear {
+            EventMonitorManager.shared.removeMonitor(for: id)
         }
     }
 
