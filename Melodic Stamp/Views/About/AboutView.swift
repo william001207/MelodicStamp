@@ -19,6 +19,7 @@ struct AboutView: View {
         HStack(spacing: 25) {
             appIcon()
                 .shadow(radius: 24)
+                .motionCard(scale: 1.02)
                 .padding(8)
 
             VStack(alignment: .leading, spacing: 17.5) {
