@@ -30,7 +30,7 @@ struct PlaylistView: View {
     // MARK: - Body
 
     var body: some View {
-        @Bindable var metadataEditor = metadataEditor
+        @Bindable var player = player
 
         // `ScrollPosition` isn't working for `List`
         ScrollViewReader { proxy in
@@ -40,7 +40,7 @@ struct PlaylistView: View {
                 } else {
                     // MARK: List
 
-                    List(selection: $metadataEditor.tracks) {
+                    List(selection: $player.selectedTracks) {
                         // This is much more stable than `.contentMargins()`
                         Spacer()
                             .frame(height: minHeight)
@@ -64,7 +64,7 @@ struct PlaylistView: View {
                     .scrollClipDisabled()
                     .scrollContentBackground(.hidden)
                     .animation(.default, value: player.playlist)
-                    .animation(.default, value: metadataEditor.tracks)
+                    .animation(.default, value: player.selectedTracks)
 
                     // MARK: Keyboard Handlers
 
@@ -79,7 +79,7 @@ struct PlaylistView: View {
 
                     // Handle [􁂒] -> remove selection
                     .onKeyPress(.deleteForward) {
-                        if handleRemove(tracks: .init(metadataEditor.tracks)) {
+                        if handleRemove(tracks: .init(player.selectedTracks)) {
                             .handled
                         } else {
                             .ignored
@@ -88,7 +88,7 @@ struct PlaylistView: View {
 
                     // Handle [⏎] -> play
                     .onKeyPress(.return) {
-                        if metadataEditor.tracks.count == 1, let track = metadataEditor.tracks.first {
+                        if player.selectedTracks.count == 1, let track = player.selectedTracks.first {
                             player.play(track: track)
                             return .handled
                         } else {
@@ -209,7 +209,7 @@ struct PlaylistView: View {
 
             Button(role: .destructive) {
                 if canEscape {
-                    handleRemove(tracks: .init(metadataEditor.tracks))
+                    handleRemove(tracks: .init(player.selectedTracks))
                 } else {
                     handleRemove(tracks: player.playlist)
                 }
@@ -275,7 +275,7 @@ struct PlaylistView: View {
 
         TrackView(
             track: track,
-            isSelected: metadataEditor.tracks.contains(track)
+            isSelected: player.selectedTracks.contains(track)
         )
         .redacted(reason: track.metadata.state == .loading ? .placeholder : [])
         .contextMenu {
@@ -370,7 +370,7 @@ struct PlaylistView: View {
 
         Button("Remove from Playlist") {
             if metadataEditor.hasMetadata {
-                handleRemove(tracks: .init(metadataEditor.tracks))
+                handleRemove(tracks: .init(player.selectedTracks))
             } else {
                 handleRemove(tracks: [track])
             }
@@ -418,7 +418,7 @@ struct PlaylistView: View {
 
     @discardableResult private func handleEscape() -> Bool {
         guard canEscape else { return false }
-        metadataEditor.tracks.removeAll()
+        player.selectedTracks.removeAll()
         return true
     }
 
@@ -437,7 +437,6 @@ struct PlaylistView: View {
     @discardableResult private func handleRemove(tracks: [Track]) -> Bool {
         guard canRemove else { return false }
         player.removeFromPlaylist(tracks: tracks)
-        tracks.forEach { metadataEditor.tracks.remove($0) }
         return true
     }
 }

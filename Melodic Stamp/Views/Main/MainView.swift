@@ -33,7 +33,7 @@ struct MainView: View {
                 inspector()
                     .ignoresSafeArea()
                     .inspectorColumnWidth(min: 300, ideal: 400, max: 700)
-                    .animation(nil, value: metadataEditor.tracks) // Remove strange transitions when selection changes
+                    .animation(nil, value: player.selectedTracks) // Remove strange transitions when selection changes
             }
             .luminareMinHeight(38)
     }

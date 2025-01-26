@@ -28,7 +28,7 @@ import SwiftUI
             let windowManager = WindowManagerModel()
             let fileManager = FileManagerModel(player: player)
             let playerKeyboardControl = PlayerKeyboardControlModel(player: player)
-            let metadataEditor = MetadataEditorModel()
+            let metadataEditor = MetadataEditorModel(player: player)
             let audioVisualizer = AudioVisualizerModel()
             let gradientVisualizer = GradientVisualizerModel()
 
@@ -36,7 +36,7 @@ import SwiftUI
 
             player.addToPlaylist(tracks: [track])
             player.play(track: track)
-            metadataEditor.tracks = [track]
+            player.selectedTracks = [track]
 
             let image = NSImage(resource: .templateArtwork)
             await gradientVisualizer.updateDominantColors(from: image)

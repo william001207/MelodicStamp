@@ -90,7 +90,7 @@ struct ContentView: View {
         self.fileManager = .init(player: player)
         self.player = player
         self.playerKeyboardControl = .init(player: player)
-        self.metadataEditor = .init()
+        self.metadataEditor = .init(player: player)
         self.audioVisualizer = .init()
         self.gradientVisualizer = .init()
 
@@ -194,7 +194,7 @@ struct ContentView: View {
                             isUnsavedSheetPresented = true
                         }
                     } else {
-                        Button("Save and Close", role: .destructive) {
+                        Button("Save and Close") {
                             player.writeAll {
                                 windowShouldForceClose = true
                                 DispatchQueue.main.async {
@@ -210,6 +210,10 @@ struct ContentView: View {
                             window?.close()
                         }
                     }
+                }
+
+                Button("Cancel", role: .cancel) {
+                    isUnsavedAlertPresented = false
                 }
             }
             .sheet(isPresented: $isUnsavedSheetPresented) {

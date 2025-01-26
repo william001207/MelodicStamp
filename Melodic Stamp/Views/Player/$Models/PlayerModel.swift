@@ -61,6 +61,7 @@ import SwiftUI
 
     private(set) var track: Track?
     private(set) var playlist: [Track] = []
+    var selectedTracks: Set<Track> = []
 
     var playbackMode: PlaybackMode = Defaults[.defaultPlaybackMode]
     var playbackLooping: Bool = false
@@ -332,7 +333,8 @@ extension PlayerModel {
                     player.stop()
                     track = nil
                 }
-                playlist.remove(at: index)
+                let removed = playlist.remove(at: index)
+                selectedTracks.remove(removed)
             }
         }
     }

@@ -16,7 +16,7 @@ struct PlaylistCommands: Commands {
             Group {
                 if let metadataEditor {
                     Button("Clear Selection") {
-                        metadataEditor.tracks.removeAll()
+                        player?.selectedTracks.removeAll()
                     }
                     .disabled(!metadataEditor.hasMetadata)
                 } else {
@@ -29,13 +29,11 @@ struct PlaylistCommands: Commands {
                 if let player, let metadataEditor {
                     if metadataEditor.hasMetadata {
                         Button("Remove from Playlist") {
-                            player.removeFromPlaylist(tracks: .init(metadataEditor.tracks))
-                            metadataEditor.tracks.removeAll()
+                            player.removeFromPlaylist(tracks: .init(player.selectedTracks))
                         }
                     } else {
                         Button("Clear Playlist") {
                             player.removeFromPlaylist(tracks: player.playlist)
-                            metadataEditor.tracks.removeAll()
                         }
                         .disabled(player.playlist.isEmpty)
                     }
@@ -48,9 +46,9 @@ struct PlaylistCommands: Commands {
 
             Group {
                 if
-                    let player, let metadataEditor,
-                    metadataEditor.tracks.count == 1,
-                    let track = metadataEditor.tracks.first {
+                    let player,
+                    player.selectedTracks.count == 1,
+                    let track = player.selectedTracks.first {
                     let title = MusicTitle.stringifiedTitle(mode: .title, for: track)
                     Button {
                         player.play(track: track)
