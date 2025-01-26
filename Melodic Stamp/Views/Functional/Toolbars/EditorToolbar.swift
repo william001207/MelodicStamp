@@ -52,12 +52,8 @@ struct EditorToolbar: View {
         Button {
             metadataEditor.updateAll()
         } label: {
-            ToolbarLabel {
-                Text("\(Image(systemSymbol: .arrowClockwise))")
-                    .imageScale(.small)
-                    .baselineOffset(-1)
-            }
-            .foregroundStyle(.tint)
+            ToolbarImageLabel(systemSymbol: .arrowClockwise)
+                .imageScale(.small)
         }
     }
 }

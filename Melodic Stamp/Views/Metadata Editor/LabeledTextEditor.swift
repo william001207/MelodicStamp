@@ -16,6 +16,7 @@ enum LabeledTextEditorLayout {
 
 enum LabeledTextEditorStyle {
     case regular
+    case code
 }
 
 struct LabeledTextEditor<Label, Info, V>: View where Label: View, Info: View, V: StringRepresentable & Hashable {
@@ -172,6 +173,8 @@ struct LabeledTextEditor<Label, Info, V>: View where Label: View, Info: View, V:
                 switch style {
                 case .regular:
                     regularEditor(binding: binding)
+                case .code:
+                    codeEditor(binding: binding)
                 }
             }
             .presentationSizing(.fitted)
@@ -228,8 +231,13 @@ struct LabeledTextEditor<Label, Info, V>: View where Label: View, Info: View, V:
         }
     }
 
-    @ViewBuilder private func codeEditor(binding _: Binding<String>) -> some View {
-        ZStack(alignment: .bottomTrailing) {
+    @ViewBuilder private func codeEditor(binding: Binding<String>) -> some View {
+        ZStack(alignment: .topTrailing) {
+            LuminareTextEditor(text: binding)
+                .luminareBordered(false)
+                .luminareHasBackground(false)
+                .monospaced()
+
             if !isControlsHidden {
                 controls()
                     .padding(14)

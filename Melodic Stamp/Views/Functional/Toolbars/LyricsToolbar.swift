@@ -16,14 +16,10 @@ struct LyricsToolbar: View {
     var body: some View {
         LabeledTextEditor(
             entries: metadataEditor[extracting: \.lyrics],
-            layout: .button
+            layout: .button, style: .code
         ) {
-            ToolbarLabel {
-                Text("\(Image(systemSymbol: .pencilLine))")
-                    .imageScale(.small)
-                    .baselineOffset(-1)
-            }
-            .monospaced(false)
+            ToolbarImageLabel(systemSymbol: .pencilLine)
+                .imageScale(.small)
         } info: {
             AliveButton {
                 isInfoPopoverPresented.toggle()
@@ -36,9 +32,7 @@ struct LyricsToolbar: View {
                         .padding()
                     }
             }
-            .monospaced(false)
         }
-        .monospaced()
         .disabled(!metadataEditor.hasMetadata)
     }
 }

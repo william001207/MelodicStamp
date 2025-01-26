@@ -340,7 +340,6 @@ struct PlaylistView: View {
                     Image(systemSymbol: .arrowUpDoc)
                     Text("Reload Metadata")
                 }
-                .tint(.accent)
             }
         }
     }
