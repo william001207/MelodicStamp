@@ -136,6 +136,8 @@ struct UnsavedChangesPresentation<Parent>: View where Parent: View {
     }
 
     private func forceClose() {
+        isPresented = false
+        isSheetPresented = false
         windowShouldForceClose = true
         DispatchQueue.main.async {
             window?.performClose(nil)
