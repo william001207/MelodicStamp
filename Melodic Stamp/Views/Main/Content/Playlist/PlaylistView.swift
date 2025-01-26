@@ -25,6 +25,8 @@ struct PlaylistView: View {
 
     var namespace: Namespace.ID
 
+    @State private var bounceAnimationTriggers: Set<Track> = []
+
     // MARK: - Body
 
     var body: some View {
@@ -50,6 +52,7 @@ struct PlaylistView: View {
                                 .draggable(track) {
                                     TrackPreview(track: track)
                                 }
+                                .bounceAnimation(bounceAnimationTriggers.contains(track), scale: .init(width: 1.01, height: 1.01))
                         }
                         .onMove { indices, destination in
                             withAnimation {
@@ -150,6 +153,16 @@ struct PlaylistView: View {
                 }
                 .padding(.horizontal)
                 .padding(.top, 8)
+            }
+            .onChange(of: player.playlist) { oldValue, newValue in
+                let addedTracks = Set(newValue).subtracting(oldValue)
+
+                if let firstAddedTrack = addedTracks.first {
+                    withAnimation {
+                        proxy.scrollTo(firstAddedTrack, anchor: .center)
+                    }
+                }
+                addedTracks.forEach(toggleBounceAnimation(for:))
             }
         }
     }
@@ -395,6 +408,14 @@ struct PlaylistView: View {
 
     // MARK: - Functions
 
+    private func toggleBounceAnimation(for track: Track) {
+        if bounceAnimationTriggers.contains(track) {
+            bounceAnimationTriggers.remove(track)
+        } else {
+            bounceAnimationTriggers.insert(track)
+        }
+    }
+
     @discardableResult private func handleEscape() -> Bool {
         guard canEscape else { return false }
         metadataEditor.tracks.removeAll()
@@ -404,9 +425,12 @@ struct PlaylistView: View {
     @discardableResult private func handleLocate(in proxy: ScrollViewProxy) -> Bool {
         guard canLocate else { return false }
         guard let track = player.track else { return false }
+
         withAnimation {
             proxy.scrollTo(track, anchor: .center)
         }
+        toggleBounceAnimation(for: track)
+
         return true
     }
 

@@ -47,17 +47,19 @@ enum FileAdderPresentationStyle {
     func open(url: URL, openWindow: OpenWindowAction) {
         guard url.startAccessingSecurityScopedResource() else { return }
 
-        switch fileOpenerPresentationStyle {
-        case .inCurrentPlaylist:
-            player?.play(url: url)
-        case .replacingCurrentPlaylistOrSelection:
-            player?.removeAll()
-            player?.play(url: url)
-        case .formingNewPlaylist:
-            openWindow(id: WindowID.content.rawValue, value: CreationParameters(
-                urls: Set([url]), shouldPlay: true,
-                initialWindowStyle: .miniPlayer
-            ))
+        Task { @MainActor in
+            switch fileOpenerPresentationStyle {
+            case .inCurrentPlaylist:
+                player?.play(url: url)
+            case .replacingCurrentPlaylistOrSelection:
+                player?.removeAll()
+                player?.play(url: url)
+            case .formingNewPlaylist:
+                openWindow(id: WindowID.content.rawValue, value: CreationParameters(
+                    urls: Set([url]), shouldPlay: true,
+                    initialWindowStyle: .miniPlayer
+                ))
+            }
         }
     }
 
@@ -66,17 +68,19 @@ enum FileAdderPresentationStyle {
             FileHelper.flatten(contentsOfFolder: url, allowedContentTypes: .init(allowedContentTypes))
         }
 
-        switch fileAdderPresentationStyle {
-        case .toCurrentPlaylist:
-            player?.addToPlaylist(urls: urls)
-        case .replacingCurrentPlaylistOrSelection:
-            player?.removeAll()
-            player?.addToPlaylist(urls: urls)
-        case .formingNewPlaylist:
-            print(urls)
-            openWindow(id: WindowID.content.rawValue, value: CreationParameters(
-                urls: Set(urls)
-            ))
+        Task { @MainActor in
+            switch fileAdderPresentationStyle {
+            case .toCurrentPlaylist:
+                player?.addToPlaylist(urls: urls)
+            case .replacingCurrentPlaylistOrSelection:
+                player?.removeAll()
+                player?.addToPlaylist(urls: urls)
+            case .formingNewPlaylist:
+                print(urls)
+                openWindow(id: WindowID.content.rawValue, value: CreationParameters(
+                    urls: Set(urls)
+                ))
+            }
         }
     }
 }

@@ -65,7 +65,7 @@ struct MetadataEditingState: OptionSet {
         return result
     }
 
-    func restoreAll() {
+    @MainActor func restoreAll() {
         metadatas.forEach { $0.restore() }
     }
 

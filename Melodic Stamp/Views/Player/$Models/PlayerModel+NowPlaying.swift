@@ -31,7 +31,7 @@ extension PlayerModel {
         infoCenter.nowPlayingInfo = info
     }
 
-    func updateNowPlayingMetadataInfo(to track: Track?) {
+    func updateNowPlayingMetadataInfo(from track: Track?) {
         if let track {
             track.metadata.updateNowPlayingInfo()
         } else {

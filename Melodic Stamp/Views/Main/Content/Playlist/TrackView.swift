@@ -19,6 +19,9 @@ struct TrackView: View {
     @State private var isAboutToDoubleClick: Bool = false
     @State private var cancelDoubleClickDispatch: DispatchWorkItem?
 
+    @State private var wiggleAnimationTrigger: Bool = false
+    @State private var bounceAnimationTrigger: Bool = false
+
     var body: some View {
         HStack(alignment: .center) {
             let metadataState = track.metadata.state
@@ -26,15 +29,19 @@ struct TrackView: View {
 
             VStack(alignment: .leading, spacing: 2) {
                 HStack {
-                    switch metadataState {
-                    case .loading:
-                        Text("Loading…")
-                            .foregroundStyle(.placeholder)
-                    case .fine, .saving, .interrupted:
-                        titleView()
-                    default:
-                        EmptyView()
+                    Group {
+                        switch metadataState {
+                        case .loading:
+                            Text("Loading…")
+                                .foregroundStyle(.placeholder)
+                        case .fine, .saving, .interrupted:
+                            titleView()
+                        case .dropped:
+                            Text(MusicTitle.fallbackTitle(for: track))
+                                .redacted(reason: .placeholder)
+                        }
                     }
+                    .onDoubleClick(handler: play)
 
                     switch metadataState {
                     case let .interrupted(error), let .dropped(error):
@@ -75,6 +82,7 @@ struct TrackView: View {
                 }
                 .frame(height: 12)
                 .font(.caption)
+                .onDoubleClick(handler: play)
             }
             .transition(.blurReplace)
             .opacity(opacity)
@@ -92,39 +100,24 @@ struct TrackView: View {
         }
         .padding(6)
         .padding(.trailing, -1)
+        .wiggleAnimation(wiggleAnimationTrigger)
+        .bounceAnimation(bounceAnimationTrigger, scale: .init(width: 1.01, height: 1.01))
+        .background {
+            Color.clear
+                .onDoubleClick(handler: play)
+        }
         .onHover { hover in
             withAnimation(.default.speed(5)) {
                 isHovering = hover
             }
         }
-        .onAppear {
-            EventMonitorManager.shared.addLocalMonitor(
-                for: track,
-                matching: [.leftMouseDown]
-            ) { event in
-                guard isHovering else { return event }
-
-                if isAboutToDoubleClick {
-                    // Double click!
-                    cancelDoubleClickDispatch?.cancel()
-                    isAboutToDoubleClick = false
-                    player.play(track: track)
-                } else {
-                    let dispatch = DispatchWorkItem {
-                        isAboutToDoubleClick = false
-                    }
-                    isAboutToDoubleClick = true
-                    cancelDoubleClickDispatch = dispatch
-                    DispatchQueue.main.asyncAfter(deadline: .now() + NSEvent.doubleClickInterval, execute: dispatch)
-                }
-
-                return event
-            }
-        }
-        .onDisappear {
-            EventMonitorManager.shared.removeMonitor(for: track)
+        .onChange(of: track.metadata.state) { _, newValue in
+            guard newValue.isError else { return }
+            wiggleAnimationTrigger.toggle()
         }
         .onReceive(track.metadata.applyPublisher) { _ in
+            bounceAnimationTrigger.toggle()
+
             guard isCurrentTrack else { return }
             track.metadata.updateNowPlayingInfo()
         }
@@ -154,7 +147,7 @@ struct TrackView: View {
 
     @ViewBuilder private func titleView() -> some View {
         if isCurrentTrack {
-            MarqueeScrollView(animate: false) {
+            ShrinkableMarqueeScrollView {
                 MusicTitle(track: track)
             }
         } else {
@@ -210,5 +203,11 @@ struct TrackView: View {
             }
         }
         .foregroundStyle(.red)
+    }
+
+    private func play() {
+        guard track.metadata.state.isInitialized else { return }
+        player.play(track: track)
+        bounceAnimationTrigger.toggle()
     }
 }

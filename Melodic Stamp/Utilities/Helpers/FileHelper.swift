@@ -25,10 +25,18 @@ enum FileHelper {
                 return flatten(contentsOfFolder: url, allowedContentTypes: allowedContentTypes, isRecursive: isRecursive)
             }
 
-            let resourceValues = try? url.resourceValues(forKeys: [.contentTypeKey])
-            guard let fileType = resourceValues?.contentType else { return [URL]() }
-
-            return allowedContentTypes.contains(fileType) ? [url] : [URL]()
+            return if let url = filter(url: url) {
+                [url]
+            } else { [] }
         }
+    }
+
+    static func filter(url: URL) -> URL? {
+        guard url.isFileURL else { return nil }
+
+        let resourceValues = try? url.resourceValues(forKeys: [.contentTypeKey])
+        guard let fileType = resourceValues?.contentType else { return nil }
+
+        return allowedContentTypes.contains(fileType) ? url : nil
     }
 }

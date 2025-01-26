@@ -17,4 +17,14 @@ extension URL {
         guard isFileURL else { return false }
         return FileManager.default.isWritableFile(atPath: path) == false
     }
+
+    var lastPathComponentRemovingExtension: String {
+        let pathExtensionCount: Int = if pathExtension.isEmpty {
+            .zero
+        } else {
+            pathExtension.count + 1
+        }
+
+        return String(lastPathComponent.dropLast(pathExtensionCount))
+    }
 }

@@ -49,6 +49,15 @@ enum MetadataError: Error {
             }
         }
 
+        var isError: Bool {
+            switch self {
+            case .interrupted, .dropped:
+                true
+            default:
+                false
+            }
+        }
+
         func with(error: MetadataError) -> Self {
             switch self {
             case .loading, .dropped:
@@ -62,11 +71,11 @@ enum MetadataError: Error {
     var id: URL { url }
     let url: URL
 
-    private(set) var properties: AudioProperties
+    @MainActor private(set) var properties: AudioProperties
     private(set) var state: State
 
-    private(set) var thumbnail: NSImage?
-    private(set) var menuThumbnail: NSImage?
+    @MainActor private(set) var thumbnail: NSImage?
+    @MainActor private(set) var menuThumbnail: NSImage?
 
     var attachedPictures: Entry<Set<AttachedPicture>>!
 
@@ -122,28 +131,28 @@ enum MetadataError: Error {
         restoreSubject.eraseToAnyPublisher()
     }
 
-    init?(url: URL) {
+    @MainActor init?(url: URL) {
         self.properties = .init()
         self.state = .loading
         self.url = url
 
-        Task {
-            try await update()
+        Task.detached {
+            try await self.update()
         }
     }
 
-    init(url: URL, from metadata: AudioMetadata, with properties: AudioProperties = .init()) {
+    @MainActor init(url: URL, from metadata: AudioMetadata, with properties: AudioProperties = .init()) {
         self.properties = properties
         self.state = .fine
         self.url = url
-        load(from: metadata)
 
-        Task {
-            await generateThumbnail()
+        Task { @MainActor in
+            load(from: metadata)
+            generateThumbnail()
         }
     }
 
-    fileprivate var restorables: [any Restorable] {
+    @MainActor fileprivate var restorables: [any Restorable] {
         guard state.isInitialized else { return [] }
         return [
             attachedPictures,
@@ -168,7 +177,7 @@ enum MetadataError: Error {
 // MARK: Loading Functions
 
 private extension Metadata {
-    func load(
+    @MainActor func load(
         attachedPictures: Set<AttachedPicture> = [],
         title: String? = nil, titleSortOrder: String? = nil,
         artist: String? = nil, artistSortOrder: String? = nil,
@@ -307,7 +316,7 @@ private extension Metadata {
         )
     }
 
-    func load(from metadata: AudioMetadata?) {
+    @MainActor func load(from metadata: AudioMetadata?) {
         load(
             attachedPictures: metadata?.attachedPictures ?? [],
             title: metadata?.title,
@@ -390,56 +399,56 @@ private extension Metadata {
 // MARK: Manipulating Functions
 
 extension Metadata: Modifiable {
-    var isModified: Bool {
+    @MainActor var isModified: Bool {
         guard state.isInitialized else { return false }
         return restorables.contains(where: \.isModified)
     }
 }
 
 extension Metadata {
-    func restore() {
+    @MainActor func restore() {
         guard state.isInitialized else { return }
         for var restorable in self.restorables {
-            Task { @MainActor in
-                restorable.restore()
-            }
+            restorable.restore()
         }
 
-        Task { @MainActor in
-            restoreSubject.send()
-        }
+        restoreSubject.send()
 
-        Task {
-            await generateThumbnail()
+        Task.detached {
+            await self.generateThumbnail()
         }
     }
 
-    func apply() {
+    @MainActor func apply() {
         guard state.isInitialized else { return }
         for var restorable in self.restorables {
-            Task { @MainActor in
-                restorable.apply()
-            }
+            restorable.apply()
         }
 
-        Task { @MainActor in
-            applySubject.send()
-        }
+        applySubject.send()
 
-        Task {
-            await generateThumbnail()
+        Task.detached {
+            await self.generateThumbnail()
         }
     }
 
-    func generateThumbnail() async {
+    @MainActor func generateThumbnail() {
         guard state.isInitialized else {
             thumbnail = nil
             return
         }
 
-        if let image = ThumbnailMaker.getCover(from: attachedPictures.current)?.image {
-            thumbnail = await ThumbnailMaker.make(image)
-            menuThumbnail = await ThumbnailMaker.make(image, resolution: 20)
+        guard let attachedPictures = self[extracting: \.attachedPictures]?.current else { return }
+        Task.detached {
+            if let image = ThumbnailMaker.getCover(from: attachedPictures)?.image {
+                let thumbnail = await ThumbnailMaker.make(image)
+                let menuThumbnail = await ThumbnailMaker.make(image, resolution: 20)
+
+                Task { @MainActor in
+                    self.thumbnail = thumbnail
+                    self.menuThumbnail = menuThumbnail
+                }
+            }
         }
     }
 
@@ -454,8 +463,11 @@ extension Metadata {
             throw .readingPermissionNotGranted
         }
 
-        properties = file.properties
-        load(from: file.metadata)
+        Task { @MainActor in
+            properties = file.properties
+        }
+
+        await load(from: file.metadata)
 
         switch state {
         case .loading:
@@ -465,14 +477,15 @@ extension Metadata {
         }
 
         await updateState(to: .fine)
+        await apply()
 
-        Task {
-            await generateThumbnail()
+        Task.detached {
+            await self.generateThumbnail()
         }
     }
 
     func write() async throws(MetadataError) {
-        guard state.isFine, isModified else { return }
+        guard state.isInitialized, await isModified else { return }
 
         guard url.isFileExist else {
             await updateState(to: state.with(error: .fileNotFound))
@@ -485,7 +498,7 @@ extension Metadata {
         }
 
         await updateState(to: .saving)
-        apply()
+        await apply()
 
         print("Started writing metadata to \(url)")
 
@@ -555,10 +568,6 @@ extension Metadata: Hashable {
 }
 
 extension Metadata {
-    static func fallbackTitle(for url: URL) -> String {
-        String(url.lastPathComponent.dropLast(url.pathExtension.count + 1))
-    }
-
     func updateNowPlayingInfo() {
         let infoCenter = MPNowPlayingInfoCenter.default()
         var info = infoCenter.nowPlayingInfo ?? .init()
@@ -586,7 +595,7 @@ extension Metadata {
         dict[MPMediaItemPropertyTitle] = if let title = title.initial, !title.isEmpty {
             title
         } else {
-            Self.fallbackTitle(for: url)
+            url.lastPathComponentRemovingExtension
         }
 
         dict[MPMediaItemPropertyArtist] = artist.initial

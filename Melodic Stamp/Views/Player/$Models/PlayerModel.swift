@@ -15,7 +15,7 @@ import SwiftUI
 
 // MARK: - Definition
 
-@Observable final class PlayerModel: NSObject {
+@MainActor @Observable final class PlayerModel: NSObject {
     static let interval: TimeInterval = 0.1
     static let bufferSize: AVAudioFrameCount = 2048
 
@@ -291,15 +291,15 @@ extension PlayerModel {
     func play(track: Track) {
         addToPlaylist(urls: [track.url])
 
-        Task { @MainActor in
-            self.track = track
-            player.play(track)
-        }
+        self.track = track
+        player.play(track)
     }
 
     func play(url: URL) {
-        if let track = Track(url: url) {
-            play(track: track)
+        Task {
+            if let track = await Track(url: url) {
+                play(track: track)
+            }
         }
     }
 
@@ -309,8 +309,10 @@ extension PlayerModel {
         for url in urls {
             guard !playlist.contains(where: { $0.url == url }) else { continue }
 
-            if let track = Track(url: url) {
-                addToPlaylist(tracks: [track])
+            Task {
+                if let track = await Track(url: url) {
+                    addToPlaylist(tracks: [track])
+                }
             }
         }
     }
@@ -483,8 +485,8 @@ extension PlayerModel {
 // MARK: - Delegates
 
 extension PlayerModel: PlayerDelegate {
-    func playerDidFinishPlaying(_: some Melodic_Stamp.Player) {
-        DispatchQueue.main.async {
+    nonisolated func playerDidFinishPlaying(_: some Melodic_Stamp.Player) {
+        Task { @MainActor in
             if self.playbackLooping {
                 if let track = self.track {
                     // Plays again
@@ -499,7 +501,7 @@ extension PlayerModel: PlayerDelegate {
 }
 
 extension PlayerModel: AudioPlayer.Delegate {
-    func audioPlayer(_: AudioPlayer, nowPlayingChanged nowPlaying: (any PCMDecoding)?) {
+    nonisolated func audioPlayer(_: AudioPlayer, nowPlayingChanged nowPlaying: (any PCMDecoding)?) {
         Task { @MainActor in
             // Updates track, otherwise keeps it
             if let nowPlaying,
@@ -509,23 +511,25 @@ extension PlayerModel: AudioPlayer.Delegate {
             }
 
             updatePlaybackState()
-            updateNowPlayingMetadataInfo(to: track)
+            updateNowPlayingMetadataInfo(from: track)
             updateNowPlayingState(with: playbackState)
             updateNowPlayingInfo(with: playbackState)
         }
     }
 
-    func audioPlayer(_: AudioPlayer, playbackStateChanged playbackState: AudioPlayer.PlaybackState) {
+    nonisolated func audioPlayer(_: AudioPlayer, playbackStateChanged playbackState: AudioPlayer.PlaybackState) {
         Task { @MainActor in
             updatePlaybackState()
-            updateNowPlayingMetadataInfo(to: track)
+            updateNowPlayingMetadataInfo(from: track)
             updateNowPlayingState(with: .init(playbackState))
             updateNowPlayingInfo(with: .init(playbackState))
         }
     }
 
-    func audioPlayer(_: AudioPlayer, encounteredError error: Error) {
-        stop()
-        print(error)
+    nonisolated func audioPlayer(_: AudioPlayer, encounteredError error: Error) {
+        Task { @MainActor in
+            stop()
+            print(error)
+        }
     }
 }
