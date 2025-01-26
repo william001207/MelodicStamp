@@ -1,5 +1,5 @@
 //
-//  UnsavedChangesView.swift
+//  ModifiedMetadataList.swift
 //  Melodic Stamp
 //
 //  Created by KrLite on 2025/1/26.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct UnsavedChangesView: View {
+struct ModifiedMetadataList: View {
     @Environment(PlayerModel.self) private var player
 
     var body: some View {
@@ -25,6 +25,7 @@ struct UnsavedChangesView: View {
                             }
                         }
                         .buttonStyle(.borderless)
+                        .foregroundStyle(.accent)
                     }
                 } header: {
                     Text(track.url.lastPathComponent)
@@ -45,6 +46,6 @@ struct UnsavedChangesView: View {
 
 #if DEBUG
     #Preview(traits: .modifier(SampleEnvironmentsPreviewModifier())) {
-        UnsavedChangesView()
+        ModifiedMetadataList()
     }
 #endif

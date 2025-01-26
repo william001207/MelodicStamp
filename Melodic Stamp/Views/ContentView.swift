@@ -76,10 +76,7 @@ struct ContentView: View {
     // MARK: Window
 
     @State private var sizer: Sizer = .init()
-
-    @State private var windowShouldForceClose: Bool = false
-    @State private var isUnsavedAlertPresented: Bool = false
-    @State private var isUnsavedSheetPresented: Bool = false
+    @State private var isUnsavedChangesPresented: Bool = false
 
     // MARK: - Initializers
 
@@ -174,100 +171,9 @@ struct ContentView: View {
                 audioVisualizer.clearData()
             }
 
-            // MARK: Unsaved Alert & Sheet
+            // MARK: Unsaved Changes
 
-            .background(MakeCloseDelegated(shouldClose: windowShouldClose) {
-                isUnsavedAlertPresented = !windowShouldClose
-            })
-            .alert("Unsaved Changes", isPresented: $isUnsavedAlertPresented) {
-                if modifiedFineMetadatas.isEmpty, !modifiedMetadatas.isEmpty {
-                    Button("Close") {
-                        windowShouldForceClose = true
-                        DispatchQueue.main.async {
-                            window?.close()
-                        }
-                    }
-                } else {
-                    if modifiedMetadatas.count > 1 {
-                        Button("Save…") {
-                            isUnsavedAlertPresented = false
-                            isUnsavedSheetPresented = true
-                        }
-                    } else {
-                        Button("Save and Close") {
-                            player.writeAll {
-                                windowShouldForceClose = true
-                                DispatchQueue.main.async {
-                                    window?.close()
-                                }
-                            }
-                        }
-                    }
-
-                    Button("Close Anyway", role: .destructive) {
-                        windowShouldForceClose = true
-                        DispatchQueue.main.async {
-                            window?.close()
-                        }
-                    }
-                }
-
-                Button("Cancel", role: .cancel) {
-                    isUnsavedAlertPresented = false
-                }
-            }
-            .sheet(isPresented: $isUnsavedSheetPresented) {
-                UnsavedChangesView()
-                    .frame(minWidth: 500, minHeight: 280)
-                    .safeAreaInset(edge: .bottom) {
-                        HStack {
-                            Button("Cancel", role: .cancel) {
-                                isUnsavedSheetPresented = false
-                            }
-
-                            Text("Unsaved Changes")
-                                .font(.headline)
-
-                            Spacer()
-
-                            if modifiedFineMetadatas.isEmpty, !modifiedMetadatas.isEmpty {
-                                Button("Close", role: .destructive) {
-                                    windowShouldForceClose = true
-                                    DispatchQueue.main.async {
-                                        window?.close()
-                                    }
-                                }
-                                .buttonStyle(.borderedProminent)
-                                .keyboardShortcut(.return, modifiers: [])
-                            } else {
-                                Button("Close Anyway", role: .destructive) {
-                                    windowShouldForceClose = true
-                                    DispatchQueue.main.async {
-                                        window?.close()
-                                    }
-                                }
-                                .buttonStyle(.borderedProminent)
-                                .tint(.red)
-
-                                Button("Save All and Close") {
-                                    player.writeAll {
-                                        if modifiedMetadatas.isEmpty {
-                                            windowShouldForceClose = true
-                                            DispatchQueue.main.async {
-                                                window?.close()
-                                            }
-                                        }
-                                    }
-                                }
-                                .buttonStyle(.borderedProminent)
-                                .keyboardShortcut(.return, modifiers: [])
-                            }
-                        }
-                        .padding()
-                        .background(.regularMaterial)
-                    }
-                    .presentationSizing(.fitted)
-            }
+            .modifier(UnsavedChangesModifier(isPresented: $isUnsavedChangesPresented, window: window))
         }
         .frame(minWidth: sizer.minWidth, maxWidth: sizer.maxWidth, minHeight: sizer.minHeight, maxHeight: sizer.maxHeight)
 
@@ -301,18 +207,6 @@ struct ContentView: View {
 
         .navigationTitle(title)
         .navigationSubtitle(subtitle)
-    }
-
-    private var modifiedMetadatas: [Metadata] {
-        player.metadatas.filter(\.isModified)
-    }
-
-    private var modifiedFineMetadatas: [Metadata] {
-        modifiedMetadatas.filter(\.state.isFine)
-    }
-
-    private var windowShouldClose: Bool {
-        windowShouldForceClose || modifiedMetadatas.isEmpty
     }
 
     private var title: String {
