@@ -20,16 +20,16 @@ struct MusicTitleDisplayMode: OptionSet {
 }
 
 struct MusicTitle: View {
-    var mode: MusicTitleDisplayMode = .all
     var track: Track?
+    var mode: MusicTitleDisplayMode = .all
+    var entry: KeyPath<MetadataBatchEditingEntry, String?> = \.initial
 
     var body: some View {
         if let track {
             HStack(spacing: 12) {
                 if mode.contains(.title) {
                     Group {
-                        if let title = track.metadata[extracting: \.title]?
-                            .initial, !title.isEmpty {
+                        if let title = track.metadata[extracting: \.title]?[keyPath: entry], !title.isEmpty {
                             Text(title)
                         } else {
                             Text(Self.fallbackTitle(for: track))
@@ -39,7 +39,7 @@ struct MusicTitle: View {
                 }
 
                 if mode.contains(.artists) {
-                    if let artists = track.metadata[extracting: \.artist]?.initial?.splittingArtists {
+                    if let artists = track.metadata[extracting: \.artist]?[keyPath: entry]?.splittingArtists {
                         HStack(spacing: 4) {
                             ForEach(Array(artists.enumerated()), id: \.offset) {
                                 offset, composer in

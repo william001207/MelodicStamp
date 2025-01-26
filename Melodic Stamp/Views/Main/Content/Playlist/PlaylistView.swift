@@ -168,7 +168,7 @@ struct PlaylistView: View {
     }
 
     private var canEscape: Bool {
-        metadataEditor.hasMetadatas
+        metadataEditor.hasMetadata
     }
 
     private var canLocate: Bool {
@@ -369,7 +369,7 @@ struct PlaylistView: View {
         // MARK: Remove from Playlist
 
         Button("Remove from Playlist") {
-            if metadataEditor.hasMetadatas {
+            if metadataEditor.hasMetadata {
                 handleRemove(tracks: .init(metadataEditor.tracks))
             } else {
                 handleRemove(tracks: [track])

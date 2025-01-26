@@ -32,9 +32,11 @@ import SwiftUI
             let audioVisualizer = AudioVisualizerModel()
             let gradientVisualizer = GradientVisualizerModel()
 
-            player.addToPlaylist(tracks: [sampleTrack])
-            player.play(track: sampleTrack)
-            metadataEditor.tracks = [sampleTrack]
+            let track = sampleTrack
+
+            player.addToPlaylist(tracks: [track])
+            player.play(track: track)
+            metadataEditor.tracks = [track]
 
             let image = NSImage(resource: .templateArtwork)
             await gradientVisualizer.updateDominantColors(from: image)
@@ -66,7 +68,7 @@ import SwiftUI
 
     extension SampleEnvironmentsPreviewModifier {
         static var sampleURL: URL {
-            .init(string: "https://example.com")!
+            .init(string: "file:///Files/A Fake Song File.flac")!
         }
 
         static var sampleProperties: AudioProperties {
@@ -83,7 +85,9 @@ import SwiftUI
             metadata.artist = "Artist 1/Artist 2"
             metadata.lyrics = sampleLyrics
 
-            return .init(url: sampleURL, from: metadata, with: sampleProperties)
+            let result = Metadata(url: sampleURL, from: metadata, with: sampleProperties)
+            result[extracting: \.title]?.current = "A Song (Modified)"
+            return result
         }
 
         static var sampleTrack: Track {

@@ -146,9 +146,10 @@ enum MetadataError: Error {
         self.state = .fine
         self.url = url
 
-        Task { @MainActor in
-            load(from: metadata)
-            generateThumbnail()
+        load(from: metadata)
+
+        Task.detached {
+            await self.generateThumbnail()
         }
     }
 
@@ -452,7 +453,7 @@ extension Metadata {
         }
     }
 
-    func update() async throws(MetadataError) {
+    func update(completion: (() -> ())? = nil) async throws(MetadataError) {
         guard url.isFileExist else {
             await updateState(to: state.with(error: .fileNotFound))
             throw .fileNotFound
@@ -478,14 +479,18 @@ extension Metadata {
 
         await updateState(to: .fine)
         await apply()
+        completion?()
 
         Task.detached {
             await self.generateThumbnail()
         }
     }
 
-    func write() async throws(MetadataError) {
-        guard state.isInitialized, await isModified else { return }
+    func write(completion: (() -> ())? = nil) async throws(MetadataError) {
+        guard state.isInitialized, await isModified else {
+            completion?()
+            return
+        }
 
         guard url.isFileExist else {
             await updateState(to: state.with(error: .fileNotFound))
@@ -525,6 +530,7 @@ extension Metadata {
         }
 
         await updateState(to: .fine)
+        completion?()
 
         print("Successfully written metadata to \(url)")
     }

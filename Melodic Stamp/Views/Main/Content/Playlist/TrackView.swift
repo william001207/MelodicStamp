@@ -48,7 +48,7 @@ struct TrackView: View {
                         Image(systemSymbol: .exclamationmarkCircleFill)
                             .foregroundStyle(.red)
                             .luminarePopover {
-                                errorView(error: error)
+                                MetadataErrorView(error: error)
                                     .padding()
                             }
                     default:
@@ -187,22 +187,6 @@ struct TrackView: View {
         .frame(width: 50, height: 50)
         .font(.title3)
         .contentTransition(.symbolEffect(.replace))
-    }
-
-    @ViewBuilder private func errorView(error: MetadataError) -> some View {
-        Group {
-            switch error {
-            case .invalidFormat:
-                Text("Invalid format.")
-            case .fileNotFound:
-                Text("File not found.")
-            case .readingPermissionNotGranted:
-                Text("Reading permission not granted.")
-            case .writingPermissionNotGranted:
-                Text("Writing permission not granted.")
-            }
-        }
-        .foregroundStyle(.red)
     }
 
     private func play() {

@@ -6,15 +6,46 @@
 //
 
 import Defaults
+import Luminare
 import SwiftUI
 
 struct ContentView: View {
+    struct Sizer: Equatable, Hashable {
+        var minWidth: CGFloat?
+        var maxWidth: CGFloat?
+        var minHeight: CGFloat?
+        var maxHeight: CGFloat?
+
+        mutating func with(windowStyle: MelodicStampWindowStyle) {
+            switch windowStyle {
+            case .main:
+                minWidth = 960
+                maxWidth = nil
+                minHeight = 550
+                maxHeight = 550
+            case .miniPlayer:
+                minWidth = nil
+                maxWidth = 500
+                minHeight = nil
+                maxHeight = nil
+            }
+        }
+
+        mutating func reset() {
+            minWidth = nil
+            maxWidth = nil
+            minHeight = nil
+            maxHeight = nil
+        }
+    }
+
     // MARK: - Environments
 
     @Environment(FloatingWindowsModel.self) private var floatingWindows
 
     @Environment(\.appearsActive) private var appearsActive
     @Environment(\.resetFocus) private var resetFocus
+    @Environment(\.dismissWindow) private var dismissWindow
 
     @FocusState private var isFocused
 
@@ -42,10 +73,13 @@ struct ContentView: View {
     @State private var selectedContentTab: SidebarContentTab = .playlist
     @State private var selectedInspectorTab: SidebarInspectorTab = .commonMetadata
 
-    // MARK: Sizing
+    // MARK: Window
 
-    @State private var minWidth: CGFloat?
-    @State private var maxWidth: CGFloat?
+    @State private var sizer: Sizer = .init()
+
+    @State private var windowShouldForceClose: Bool = false
+    @State private var isUnsavedAlertPresented: Bool = false
+    @State private var isUnsavedSheetPresented: Bool = false
 
     // MARK: - Initializers
 
@@ -110,20 +144,13 @@ struct ContentView: View {
                 floatingWindows.observe(window)
                 windowManager.observe(window)
             }
-            .onChange(of: windowManager.style, initial: true) { _, _ in
+            .onChange(of: windowManager.style, initial: true) { _, newValue in
                 isFocused = true
                 resetFocus(in: namespace)
-            }
-            .onChange(of: minWidth) { _, newValue in
-                guard newValue != nil else { return }
+                sizer.with(windowStyle: newValue)
+
                 DispatchQueue.main.async {
-                    minWidth = nil
-                }
-            }
-            .onChange(of: maxWidth) { _, newValue in
-                guard newValue != nil else { return }
-                DispatchQueue.main.async {
-                    maxWidth = nil
+                    sizer.reset()
                 }
             }
 
@@ -146,8 +173,99 @@ struct ContentView: View {
                 guard !newValue else { return }
                 audioVisualizer.clearData()
             }
+
+            // MARK: Unsaved Alert & Sheet
+
+            .background(MakeCloseDelegated(shouldClose: windowShouldClose) {
+                isUnsavedAlertPresented = !windowShouldClose
+            })
+            .alert("Unsaved Changes", isPresented: $isUnsavedAlertPresented) {
+                if modifiedFineMetadatas.isEmpty, !modifiedMetadatas.isEmpty {
+                    Button("Close") {
+                        windowShouldForceClose = true
+                        DispatchQueue.main.async {
+                            window?.close()
+                        }
+                    }
+                } else {
+                    if modifiedMetadatas.count > 1 {
+                        Button("Save…") {
+                            isUnsavedAlertPresented = false
+                            isUnsavedSheetPresented = true
+                        }
+                    } else {
+                        Button("Save and Close", role: .destructive) {
+                            player.writeAll {
+                                windowShouldForceClose = true
+                                DispatchQueue.main.async {
+                                    window?.close()
+                                }
+                            }
+                        }
+                    }
+
+                    Button("Close Anyway", role: .destructive) {
+                        windowShouldForceClose = true
+                        DispatchQueue.main.async {
+                            window?.close()
+                        }
+                    }
+                }
+            }
+            .sheet(isPresented: $isUnsavedSheetPresented) {
+                UnsavedChangesView()
+                    .frame(minWidth: 500, minHeight: 280)
+                    .safeAreaInset(edge: .bottom) {
+                        HStack {
+                            Button("Cancel", role: .cancel) {
+                                isUnsavedSheetPresented = false
+                            }
+
+                            Text("Unsaved Changes")
+                                .font(.headline)
+
+                            Spacer()
+
+                            if modifiedFineMetadatas.isEmpty, !modifiedMetadatas.isEmpty {
+                                Button("Close", role: .destructive) {
+                                    windowShouldForceClose = true
+                                    DispatchQueue.main.async {
+                                        window?.close()
+                                    }
+                                }
+                                .buttonStyle(.borderedProminent)
+                                .keyboardShortcut(.return, modifiers: [])
+                            } else {
+                                Button("Close Anyway", role: .destructive) {
+                                    windowShouldForceClose = true
+                                    DispatchQueue.main.async {
+                                        window?.close()
+                                    }
+                                }
+                                .buttonStyle(.borderedProminent)
+                                .tint(.red)
+
+                                Button("Save All and Close") {
+                                    player.writeAll {
+                                        if modifiedMetadatas.isEmpty {
+                                            windowShouldForceClose = true
+                                            DispatchQueue.main.async {
+                                                window?.close()
+                                            }
+                                        }
+                                    }
+                                }
+                                .buttonStyle(.borderedProminent)
+                                .keyboardShortcut(.return, modifiers: [])
+                            }
+                        }
+                        .padding()
+                        .background(.regularMaterial)
+                    }
+                    .presentationSizing(.fitted)
+            }
         }
-        .frame(minWidth: minWidth, maxWidth: maxWidth)
+        .frame(minWidth: sizer.minWidth, maxWidth: sizer.maxWidth, minHeight: sizer.minHeight, maxHeight: sizer.maxHeight)
 
         // MARK: Environments
 
@@ -179,6 +297,18 @@ struct ContentView: View {
 
         .navigationTitle(title)
         .navigationSubtitle(subtitle)
+    }
+
+    private var modifiedMetadatas: [Metadata] {
+        player.metadatas.filter(\.isModified)
+    }
+
+    private var modifiedFineMetadatas: [Metadata] {
+        modifiedMetadatas.filter(\.state.isFine)
+    }
+
+    private var windowShouldClose: Bool {
+        windowShouldForceClose || modifiedMetadatas.isEmpty
     }
 
     private var title: String {
@@ -242,9 +372,6 @@ struct ContentView: View {
                 }
             }
         }
-        .onAppear {
-            minWidth = 960
-        }
         .onDisappear {
             destroyFloatingWindows()
         }
@@ -286,7 +413,6 @@ struct ContentView: View {
             .frame(minWidth: 500, idealWidth: 500)
             .fixedSize(horizontal: false, vertical: true)
             .onAppear {
-                maxWidth = 500
                 destroyFloatingWindows(from: window)
             }
     }

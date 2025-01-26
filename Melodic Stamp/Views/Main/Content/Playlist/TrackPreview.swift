@@ -5,10 +5,12 @@
 //  Created by KrLite on 2025/1/25.
 //
 
+import Luminare
 import SwiftUI
 
 struct TrackPreview: View {
     var track: Track
+    var titleEntry: KeyPath<MetadataBatchEditingEntry, String?> = \.initial
 
     var body: some View {
         HStack(spacing: 12) {
@@ -31,10 +33,24 @@ struct TrackPreview: View {
             }
 
             VStack(alignment: .leading) {
-                MusicTitle(mode: .title, track: track)
-                    .font(.callout)
+                HStack {
+                    MusicTitle(track: track, mode: .title, entry: titleEntry)
 
-                MusicTitle(mode: .artists, track: track)
+                    switch track.metadata.state {
+                    case let .interrupted(error), let .dropped(error):
+                        Image(systemSymbol: .exclamationmarkCircleFill)
+                            .foregroundStyle(.red)
+                            .luminarePopover {
+                                MetadataErrorView(error: error)
+                                    .padding()
+                            }
+                    default:
+                        EmptyView()
+                    }
+                }
+                .font(.callout)
+
+                MusicTitle(track: track, mode: .artists, entry: titleEntry)
                     .font(.caption)
             }
         }

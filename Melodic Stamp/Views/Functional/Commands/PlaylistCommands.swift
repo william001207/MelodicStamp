@@ -18,7 +18,7 @@ struct PlaylistCommands: Commands {
                     Button("Clear Selection") {
                         metadataEditor.tracks.removeAll()
                     }
-                    .disabled(!metadataEditor.hasMetadatas)
+                    .disabled(!metadataEditor.hasMetadata)
                 } else {
                     Button("Clear Selection") {}
                         .disabled(true)
@@ -27,7 +27,7 @@ struct PlaylistCommands: Commands {
 
             Group {
                 if let player, let metadataEditor {
-                    if metadataEditor.hasMetadatas {
+                    if metadataEditor.hasMetadata {
                         Button("Remove from Playlist") {
                             player.removeFromPlaylist(tracks: .init(metadataEditor.tracks))
                             metadataEditor.tracks.removeAll()
