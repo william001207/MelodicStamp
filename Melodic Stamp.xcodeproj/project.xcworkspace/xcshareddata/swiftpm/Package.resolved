@@ -124,7 +124,7 @@
       "location" : "https://github.com/Cement-Labs/Luminare",
       "state" : {
         "branch" : "main",
-        "revision" : "a2b0f001d66bbd134e1620eac030e0bab92a2bee"
+        "revision" : "ce616c67c32ab5c87e56f7bb1555376a9827ae8c"
       }
     },
     {
@@ -142,7 +142,7 @@
       "location" : "https://github.com/Cement-Labs/Morphed",
       "state" : {
         "branch" : "main",
-        "revision" : "b1a0e4398f08514741d4aa20cb29056b0be71c6a"
+        "revision" : "bed3feff200fce49ccff276cd274fce041754c11"
       }
     },
     {
@@ -229,10 +229,10 @@
     {
       "identity" : "swiftsoup",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/scinfu/SwiftSoup.git",
+      "location" : "https://github.com/scinfu/SwiftSoup",
       "state" : {
-        "revision" : "0837db354faf9c9deb710dc597046edaadf5360f",
-        "version" : "2.7.6"
+        "revision" : "6b4930da67b462d3f200472c902dd016d37a554d",
+        "version" : "2.7.7"
       }
     },
     {

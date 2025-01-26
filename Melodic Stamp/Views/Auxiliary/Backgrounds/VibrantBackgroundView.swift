@@ -13,7 +13,6 @@ struct VibrantBackgroundView: View {
 
     var body: some View {
         VisualEffectView(material: .menu, blendingMode: .behindWindow, state: state, isEmphasized: isEmphasized)
-            .overlay(.thinMaterial)
     }
 }
 

@@ -17,6 +17,7 @@ protocol Player {
     var isRunning: Bool { get }
     var isMuted: Bool { get }
 
+    var playbackState: PlaybackState { get }
     var playbackTime: PlaybackTime? { get }
     var playbackVolume: CGFloat { get }
 
@@ -49,6 +50,18 @@ protocol Player {
 }
 
 extension Player {
+    var playbackState: PlaybackState {
+        if isRunning {
+            if isPlaying {
+                .playing
+            } else {
+                .paused
+            }
+        } else {
+            .stopped
+        }
+    }
+
     func setPlaying(_ playing: Bool) {
         if playing {
             play()

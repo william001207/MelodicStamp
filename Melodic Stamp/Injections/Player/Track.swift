@@ -16,10 +16,10 @@ import SwiftUI
 
     var id: URL { url }
 
-    init?(url: URL) {
+    init?(url: URL) async {
         self.url = url
 
-        guard let metadata = Metadata(url: url) else { return nil }
+        guard let metadata = await Metadata(url: url) else { return nil }
         self.metadata = metadata
     }
 
@@ -38,5 +38,40 @@ extension Track: Equatable {
 extension Track: Hashable {
     func hash(into hasher: inout Hasher) {
         hasher.combine(id)
+    }
+}
+
+extension Track: Transferable {
+    enum TransferableError: Error, LocalizedError, CustomStringConvertible {
+        case invalidURL(Data)
+        case invalidFormat(URL)
+        case notFileURL(URL)
+        case failedToCreateTrack(URL)
+
+        var description: String {
+            switch self {
+            case let .invalidURL(data):
+                "(invalidURL) The received data does not represent a valid URL: \(data)."
+            case let .invalidFormat(url):
+                "(invalidFormat) The file format is not supported: \(url)."
+            case let .notFileURL(url):
+                "(notFileURL) The content behind the URL is not a file: \(url)."
+            case let .failedToCreateTrack(url):
+                "(failedToCreateTrack) Failed to create a track from the provided URL: \(url)."
+            }
+        }
+    }
+
+    static var transferRepresentation: some TransferRepresentation {
+        DataRepresentation(contentType: .fileURL) { track in
+            track.url.dataRepresentation
+        } importing: { data in
+            guard let url = URL(dataRepresentation: data, relativeTo: nil) else { throw TransferableError.invalidURL(data) }
+            guard url.isFileURL else { throw TransferableError.notFileURL(url) }
+            guard let url = FileHelper.filter(url: url) else { throw TransferableError.invalidFormat(url) }
+
+            guard let track = await Track(url: url) else { throw TransferableError.failedToCreateTrack(url) }
+            return track
+        }
     }
 }

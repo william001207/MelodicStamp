@@ -18,7 +18,7 @@ struct PlaylistCommands: Commands {
                     Button("Clear Selection") {
                         metadataEditor.tracks.removeAll()
                     }
-                    .disabled(metadataEditor.tracks.isEmpty)
+                    .disabled(!metadataEditor.hasMetadatas)
                 } else {
                     Button("Clear Selection") {}
                         .disabled(true)
@@ -27,17 +27,17 @@ struct PlaylistCommands: Commands {
 
             Group {
                 if let player, let metadataEditor {
-                    if metadataEditor.tracks.isEmpty {
+                    if metadataEditor.hasMetadatas {
+                        Button("Remove from Playlist") {
+                            player.removeFromPlaylist(tracks: .init(metadataEditor.tracks))
+                            metadataEditor.tracks.removeAll()
+                        }
+                    } else {
                         Button("Clear Playlist") {
                             player.removeFromPlaylist(tracks: player.playlist)
                             metadataEditor.tracks.removeAll()
                         }
                         .disabled(player.playlist.isEmpty)
-                    } else {
-                        Button("Remove from Playlist") {
-                            player.removeFromPlaylist(tracks: .init(metadataEditor.tracks))
-                            metadataEditor.tracks.removeAll()
-                        }
                     }
                 } else {
                     Button("Clear Playlist") {}

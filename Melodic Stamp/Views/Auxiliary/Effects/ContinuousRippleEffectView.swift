@@ -9,58 +9,59 @@ import Metal
 import SwiftUI
 
 struct ContinuousRippleEffectView<Content>: View where Content: View {
-    var alpha: CGFloat = 0.2
+    var lerpFactor: CGFloat = 0.2
     @ViewBuilder var content: () -> Content
 
     @State private var isDragging = false
-    @State private var dragLocation = CGPoint(x: 0, y: 0)
-    @State private var dragVelocity = CGSize.zero
-    @State private var timer: Timer? = nil
+
+    @State private var dragLocation: CGPoint = .zero
+    @State private var dragVelocity: CGSize = .zero
+    @State private var animatedDragVelocity: CGSize = .zero
+
+    @State private var timer = Timer.publish(every: 0.05, on: .main, in: .default).autoconnect()
 
     var body: some View {
         // Make variables sendable
-        let dragLocation = dragLocation
-        let dragVelocity = dragVelocity
+        let animatedDragLocation = dragLocation
+        let animatedDragVelocity = animatedDragVelocity
 
         content()
             .visualEffect { content, _ in
                 content.layerEffect(
-                    ShaderLibrary.w(
-                        .float2(dragLocation),
-                        .float2(dragVelocity)
+                    ShaderLibrary.continuousRipple(
+                        .float2(animatedDragLocation),
+                        .float2(animatedDragVelocity)
                     ),
                     maxSampleOffset: .init(width: 600, height: 600)
                 )
             }
             .gesture(DragGesture()
                 .onChanged { value in
-                    self.dragLocation = value.location
-                    self.dragVelocity.width = alpha * value.velocity.width + (1 - alpha) * self.dragVelocity.width
-                    self.dragVelocity.height = alpha * value.velocity.height + (1 - alpha) * self.dragVelocity.height
+                    isDragging = true
+                    dragLocation = value.location
+                    dragVelocity = value.velocity
                 }
                 .onEnded { _ in
-                    timer?.invalidate()
-                    timer = Timer.scheduledTimer(withTimeInterval: 0.016, repeats: true) { timer in
-                        // Apply exponential deceleration for smoother stop
-                        self.dragVelocity.width *= 0.85
-                        self.dragVelocity.height *= 0.85
-
-                        // Stop the timer when velocity is very low
-                        if abs(self.dragVelocity.width) < 0.01, abs(self.dragVelocity.height) < 0.01 {
-                            self.dragVelocity = .zero
-                            timer.invalidate()
-                        }
-                    }
+                    isDragging = false
                 }
             )
+            .onReceive(timer) { _ in
+                let dragVelocity = isDragging ? dragVelocity : .zero
+                withAnimation(.linear(duration: 0.05)) {
+                    self.animatedDragVelocity = .init(
+                        width: lerp(animatedDragVelocity.width, dragVelocity.width, factor: lerpFactor),
+                        height: lerp(animatedDragVelocity.height, dragVelocity.height, factor: lerpFactor)
+                    )
+                }
+            }
     }
 }
 
 struct ContinuousRippleEffectModifier: ViewModifier {
-    var alpha: CGFloat = 0.2
+    var lerpFactor: CGFloat = 0.2
 
     func body(content: Content) -> some View {
-        ContinuousRippleEffectView(alpha: alpha) {
+        ContinuousRippleEffectView(lerpFactor: lerpFactor) {
             content
         }
     }

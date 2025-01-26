@@ -7,14 +7,24 @@
 
 import SwiftUI
 
-enum MetadataEditingState: Equatable {
-    case fine
-    case saving
-    case partiallySaving
+struct MetadataEditingState: OptionSet {
+    let rawValue: Int
 
-    var isEditable: Bool {
+    static let fine = MetadataEditingState(rawValue: 1 << 0)
+    static let saving = MetadataEditingState(rawValue: 1 << 1)
+
+    var isFine: Bool {
         switch self {
         case .fine:
+            true
+        default:
+            false
+        }
+    }
+
+    var isSaving: Bool {
+        switch self {
+        case .saving:
             true
         default:
             false
@@ -28,25 +38,34 @@ enum MetadataEditingState: Equatable {
     var tracks: Set<Track> = []
 
     var metadatas: Set<Metadata> {
-        Set(tracks.map(\.metadata).filter(\.state.isProcessed))
+        Set(tracks.map(\.metadata).filter(\.state.isInitialized))
     }
 
-    var isVisible: Bool {
+    var hasMetadatas: Bool {
         !metadatas.isEmpty
     }
 
     var state: MetadataEditingState {
+        guard hasMetadatas else { return [] }
+
+        var result: MetadataEditingState = []
         let states = metadatas.map(\.state)
-        return if states.allSatisfy(\.isEditable) {
-            .fine
-        } else if states.allSatisfy({ !$0.isEditable }) {
-            .saving
-        } else {
-            .partiallySaving
+
+        for state in states {
+            switch state {
+            case .fine:
+                result.formUnion(.fine)
+            case .saving:
+                result.formUnion(.saving)
+            default:
+                break
+            }
         }
+
+        return result
     }
 
-    func restoreAll() {
+    @MainActor func restoreAll() {
         metadatas.forEach { $0.restore() }
     }
 

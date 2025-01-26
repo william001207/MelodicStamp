@@ -26,21 +26,14 @@ struct InspectorLyricsView: View {
                     // Don't apply `.contentMargins()`, otherwise causing `LazyVStack` related glitches
                     LazyVStack(alignment: alignment, spacing: 10) {
                         ForEach(Array(lines.enumerated()), id: \.offset) { index, line in
-                            lyricLine(line: line, index: index)
+                            lyricLineView(line: line, index: index)
                         }
                         .textSelection(.enabled)
                     }
                     .padding(.horizontal)
-                    .safeAreaPadding(.top, 64)
-                    .safeAreaPadding(.bottom, 94)
-
-                    Spacer()
-                        .frame(height: 150)
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .scrollContentBackground(.hidden)
-                .contentMargins(.top, 64, for: .scrollIndicators)
-                .contentMargins(.bottom, 94, for: .scrollIndicators)
+                .scrollClipDisabled()
             }
         }
         .onChange(of: entries, initial: true) { _, _ in
@@ -77,24 +70,24 @@ struct InspectorLyricsView: View {
         }
     }
 
-    @ViewBuilder private func lyricLine(line: any LyricLine, index: Int) -> some View {
+    @ViewBuilder private func lyricLineView(line: any LyricLine, index: Int) -> some View {
         switch line {
         case let line as RawLyricLine:
-            rawLyricLine(line: line, index: index)
+            rawLyricLineView(line: line, index: index)
         case let line as LRCLyricLine:
-            lrcLyricLine(line: line, index: index)
+            lrcLyricLineView(line: line, index: index)
         case let line as TTMLLyricLine:
-            ttmlLyricLine(line: line, index: index)
+            ttmlLyricLineView(line: line, index: index)
         default:
             EmptyView()
         }
     }
 
-    @ViewBuilder private func rawLyricLine(line: RawLyricLine, index _: Int) -> some View {
+    @ViewBuilder private func rawLyricLineView(line: RawLyricLine, index _: Int) -> some View {
         Text(line.content)
     }
 
-    @ViewBuilder private func lrcLyricLine(line: LRCLyricLine, index: Int) -> some View {
+    @ViewBuilder private func lrcLyricLineView(line: LRCLyricLine, index: Int) -> some View {
         let isHighlighted = highlightedRange.contains(index)
 
         HStack {
@@ -111,7 +104,7 @@ struct InspectorLyricsView: View {
         .padding(.vertical, 4)
     }
 
-    @ViewBuilder private func ttmlLyricLine(line: TTMLLyricLine, index: Int)
+    @ViewBuilder private func ttmlLyricLineView(line: TTMLLyricLine, index: Int)
         -> some View {
         let isHighlighted = highlightedRange.contains(index)
 

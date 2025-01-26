@@ -9,24 +9,21 @@ import Foundation
 import MediaPlayer
 
 extension PlayerModel {
-    func updateNowPlayingState() {
+    func updateNowPlayingState(with playbackState: PlaybackState) {
         let infoCenter = MPNowPlayingInfoCenter.default()
 
-        infoCenter.playbackState = if isPlayable {
-            isPlaying ? .playing : .paused
-        } else {
-            .stopped
-        }
+        infoCenter.playbackState = .init(playbackState)
     }
 
-    func updateNowPlayingInfo() {
+    func updateNowPlayingInfo(with playbackState: PlaybackState) {
         let infoCenter = MPNowPlayingInfoCenter.default()
         var info = infoCenter.nowPlayingInfo ?? .init()
 
-        if isPlayable {
+        switch playbackState {
+        case .playing, .paused:
             info[MPMediaItemPropertyPlaybackDuration] = TimeInterval(unwrappedPlaybackTime.duration)
             info[MPNowPlayingInfoPropertyElapsedPlaybackTime] = unwrappedPlaybackTime.elapsed
-        } else {
+        case .stopped:
             info[MPMediaItemPropertyPlaybackDuration] = nil
             info[MPNowPlayingInfoPropertyElapsedPlaybackTime] = nil
         }
@@ -34,7 +31,7 @@ extension PlayerModel {
         infoCenter.nowPlayingInfo = info
     }
 
-    func updateNowPlayingMetadataInfo() {
+    func updateNowPlayingMetadataInfo(from track: Track?) {
         if let track {
             track.metadata.updateNowPlayingInfo()
         } else {

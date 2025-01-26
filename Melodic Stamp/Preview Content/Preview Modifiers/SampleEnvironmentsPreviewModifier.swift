@@ -69,6 +69,12 @@ import SwiftUI
             .init(string: "https://example.com")!
         }
 
+        static var sampleProperties: AudioProperties {
+            .init(dictionaryRepresentation: [
+                .duration: 100.0
+            ])
+        }
+
         static var sampleMetadata: Metadata {
             let metadata = AudioMetadata()
 
@@ -77,7 +83,7 @@ import SwiftUI
             metadata.artist = "Artist 1/Artist 2"
             metadata.lyrics = sampleLyrics
 
-            return .init(url: sampleURL, from: metadata)
+            return .init(url: sampleURL, from: metadata, with: sampleProperties)
         }
 
         static var sampleTrack: Track {

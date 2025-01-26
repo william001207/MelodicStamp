@@ -79,6 +79,7 @@ struct AdaptableMusicCovers<Content>: View where Content: View {
                 contentSize = size
             }
         }
+        .scrollClipDisabled()
         .scrollTargetBehavior(.viewAligned)
         .scrollDisabled(
             types.count <= 1 || contentSize.width >= contentWidth * CGFloat(types.count)

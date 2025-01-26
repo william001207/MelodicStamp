@@ -17,21 +17,24 @@ struct EditorToolbar: View {
         } label: {
             ToolbarLabel {
                 switch metadataEditor.state {
-                case .fine:
+                case .fine, []:
                     Image(systemSymbol: .trayAndArrowDownFill)
                         .imageScale(.small)
-
-                    Text("Save")
-                case .partiallySaving, .saving:
+                default:
                     ProgressView()
                         .progressViewStyle(.circular)
                         .controlSize(.small)
+                }
 
+                switch metadataEditor.state {
+                case .saving:
                     Text("Saving…")
+                default:
+                    Text("Save")
                 }
             }
         }
-        .disabled(!(metadataEditor.state.isEditable && metadataEditor.isModified))
+        .disabled(metadataEditor.state.isSaving || !metadataEditor.isModified)
 
         Button {
             metadataEditor.restoreAll()
@@ -45,5 +48,17 @@ struct EditorToolbar: View {
             .foregroundStyle(.red)
         }
         .disabled(!metadataEditor.isModified)
+
+        Button {
+            metadataEditor.updateAll()
+        } label: {
+            ToolbarLabel {
+                Image(systemSymbol: .arrowUpDoc)
+                    .imageScale(.small)
+
+                Text("Reload")
+            }
+            .foregroundStyle(.tint)
+        }
     }
 }

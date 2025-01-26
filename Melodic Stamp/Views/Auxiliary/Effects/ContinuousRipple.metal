@@ -9,7 +9,7 @@
 #include <SwiftUI/SwiftUI_Metal.h>
 using namespace metal;
 
-[[stitchable]] half4 w(float2 p, SwiftUI::Layer a, float2 l, float2 v) {
+[[stitchable]] half4 continuousRipple(float2 p, SwiftUI::Layer layer, float2 l, float2 v) {
     // Compute the motion vector with a falloff based on distance
     float2 m = -v * pow(clamp(1 - length(l - p) / 190, 0.0, 1.0), 2) * 0.45;
     
@@ -17,13 +17,13 @@ using namespace metal;
     
     // Loop to sample colors and accumulate
     for (float i = 0; i < 10; i++) {
-        float s = 0.200 + 0.005 * i; // Increasing spread factor
+        float s = 0.200 + i * 0.005; // Increasing spread factor
         
         // Accumulate sampled colors from texture a at various offsets
         c += half3(
-            a.sample(p + s * m).r,
-            a.sample(p + (s + 0.025) * m).g,
-            a.sample(p + (s + 0.05) * m).b
+            layer.sample(p + s * m).r,
+            layer.sample(p + (s + 0.025) * m).g,
+            layer.sample(p + (s + 0.05) * m).b
         );
     }
     

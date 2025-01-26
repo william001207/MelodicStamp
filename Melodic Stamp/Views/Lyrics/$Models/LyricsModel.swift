@@ -81,10 +81,10 @@ import SwiftSoup
     }
 
     func highlight(at time: TimeInterval, in url: URL? = nil) -> Range<Int> {
-        guard let storage else { return 0 ..< 0 }
+        guard let storage else { return -1 ..< 0 }
         return if let url, !isIdentical(to: url) {
             // Not the same song
-            0 ..< 0
+            -1 ..< 0
         } else {
             storage.parser.highlight(at: time)
         }

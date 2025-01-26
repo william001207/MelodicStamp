@@ -17,9 +17,9 @@ struct SpectrumView: View {
 
     var body: some View {
         HStack(spacing: 0) {
-            spectrum(sorted: leftSpectra.sorted(), count: leftChannelCount)
+            spectrumView(sorted: leftSpectra.sorted(), count: leftChannelCount)
 
-            spectrum(sorted: rightSpectra.sorted().reversed(), count: rightChannelCount)
+            spectrumView(sorted: rightSpectra.sorted().reversed(), count: rightChannelCount)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
         .onGeometryChange(for: CGSize.self) { proxy in
@@ -45,17 +45,17 @@ struct SpectrumView: View {
         }
     }
 
-    @ViewBuilder private func spectrum(sorted: [Float], count: Int) -> some View {
+    @ViewBuilder private func spectrumView(sorted: [Float], count: Int) -> some View {
         HStack(spacing: 0) {
             ForEach(0 ..< count, id: \.self) { index in
                 let amplitude = averageAmplitude(in: sorted, index: index, count: count)
-                bar(amplitude: amplitude)
+                barView(amplitude: amplitude)
                     .frame(maxWidth: .infinity)
             }
         }
     }
 
-    @ViewBuilder private func bar(amplitude: Float) -> some View {
+    @ViewBuilder private func barView(amplitude: Float) -> some View {
         VStack {
             let height = height(ofAmplitude: amplitude)
 

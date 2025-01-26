@@ -15,7 +15,7 @@ struct TinyBinaryChannelVisualizerView: View {
     @Default(.gradientDynamics) private var gradientDynamics
 
     var body: some View {
-        colors()
+        colorsView()
             .mask {
                 SpectrumView(spectra: audioVisualizer.normalizedData)
                     .foregroundStyle(.white)
@@ -23,7 +23,7 @@ struct TinyBinaryChannelVisualizerView: View {
             }
     }
 
-    @ViewBuilder private func colors() -> some View {
+    @ViewBuilder private func colorsView() -> some View {
         if gradientVisualizer.dominantColors.isEmpty {
             Color.primary
         } else {

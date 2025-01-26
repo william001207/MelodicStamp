@@ -21,8 +21,8 @@ protocol Restorable: Equatable, Modifiable {
     var current: V { get set }
     var initial: V { get set }
 
-    mutating func restore()
-    mutating func apply()
+    @MainActor mutating func restore()
+    @MainActor mutating func apply()
 }
 
 extension Restorable {
@@ -30,11 +30,11 @@ extension Restorable {
         current != initial
     }
 
-    mutating func restore() {
+    @MainActor mutating func restore() {
         current = initial
     }
 
-    mutating func apply() {
+    @MainActor mutating func apply() {
         initial = current
     }
 }
@@ -66,8 +66,7 @@ extension MetadataEntry: Equatable {
 
 // MARK: - Metadata Batch Editing Entry
 
-@Observable
-final class MetadataBatchEditingEntry<V: Hashable & Equatable>: Identifiable {
+@Observable final class MetadataBatchEditingEntry<V: Hashable & Equatable>: Identifiable {
     typealias Entry = MetadataEntry
     typealias EntryKeyPath = WritableKeyPath<Metadata, Entry<V>>
 
@@ -108,14 +107,14 @@ final class MetadataBatchEditingEntry<V: Hashable & Equatable>: Identifiable {
     }
 
     func projectedUnwrappedValue<Wrapped>() -> Binding<Wrapped>? where V == Wrapped? {
-        if current == nil {
-            nil
-        } else {
+        if let current {
             Binding {
-                self.current!
+                current
             } set: { newValue in
                 self.current = newValue
             }
+        } else {
+            nil
         }
     }
 
@@ -166,10 +165,14 @@ extension MetadataBatchEditingEntry: Equatable {
         case .none, .varied:
             nil
         case .identical:
-            Binding {
-                self.map(\.current).first!
-            } set: { newValue in
-                self.setAll(newValue)
+            if let current = map(\.current).first {
+                Binding {
+                    current
+                } set: { newValue in
+                    self.setAll(newValue)
+                }
+            } else {
+                nil
             }
         }
     }
@@ -179,7 +182,7 @@ extension MetadataBatchEditingEntry: Equatable {
         case .none, .varied:
             nil
         case .identical:
-            if let current = map(\.current).first! {
+            if let current = map(\.current).first, let current {
                 Binding {
                     current
                 } set: { newValue in

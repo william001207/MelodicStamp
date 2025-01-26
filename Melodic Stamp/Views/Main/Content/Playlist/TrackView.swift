@@ -6,6 +6,7 @@
 //
 
 import CSFBAudioEngine
+import Luminare
 import SwiftUI
 
 struct TrackView: View {
@@ -15,6 +16,11 @@ struct TrackView: View {
     var isSelected: Bool
 
     @State private var isHovering: Bool = false
+    @State private var isAboutToDoubleClick: Bool = false
+    @State private var cancelDoubleClickDispatch: DispatchWorkItem?
+
+    @State private var wiggleAnimationTrigger: Bool = false
+    @State private var bounceAnimationTrigger: Bool = false
 
     var body: some View {
         HStack(alignment: .center) {
@@ -23,36 +29,36 @@ struct TrackView: View {
 
             VStack(alignment: .leading, spacing: 2) {
                 HStack {
-                    switch metadataState {
-                    case .loading:
-                        Text("Loading…")
-                            .foregroundStyle(.placeholder)
-                    case .fine, .saving:
-                        if isPlaying {
-                            MarqueeScrollView(animate: false) {
-                                MusicTitle(track: track)
-                            }
-                        } else {
-                            MusicTitle(track: track)
+                    Group {
+                        switch metadataState {
+                        case .loading:
+                            Text("Loading…")
+                                .foregroundStyle(.placeholder)
+                        case .fine, .saving, .interrupted:
+                            titleView()
+                        case .dropped:
+                            Text(MusicTitle.fallbackTitle(for: track))
+                                .redacted(reason: .placeholder)
                         }
-                    case let .error(error):
-                        Group {
-                            switch error {
-                            case .invalidState:
-                                Text("Invalid State")
-                            case .noWritingPermission:
-                                Text("No Writing Permission")
-                            case .noReadingPermission:
-                                Text("No Reading Permission")
-                            }
-                        }
-                        .foregroundStyle(.red)
-                        .bold()
                     }
+                    .onDoubleClick(handler: play)
+
+                    switch metadataState {
+                    case let .interrupted(error), let .dropped(error):
+                        Image(systemSymbol: .exclamationmarkCircleFill)
+                            .foregroundStyle(.red)
+                            .luminarePopover {
+                                errorView(error: error)
+                                    .padding()
+                            }
+                    default:
+                        EmptyView()
+                    }
+
+                    Spacer()
                 }
-                .font(.title3)
                 .frame(height: 24)
-                .opacity(!player.isPlayable || isPlaying ? 1 : 0.5)
+                .font(.title3)
 
                 HStack(alignment: .center, spacing: 4) {
                     if isMetadataModified {
@@ -63,44 +69,99 @@ struct TrackView: View {
                             .animation(nil, value: isSelected)
                     }
 
+                    if let duration = track.metadata.properties.duration.flatMap(Duration.init) {
+                        DurationText(duration: duration)
+                            .foregroundStyle(.secondary)
+                            .fixedSize()
+                    }
+
                     Text(track.url.lastPathComponent)
-                        .font(.caption)
                         .foregroundStyle(.placeholder)
+
+                    Spacer()
                 }
                 .frame(height: 12)
+                .font(.caption)
+                .onDoubleClick(handler: play)
             }
             .transition(.blurReplace)
+            .opacity(opacity)
             .animation(.default.speed(2), value: metadataState)
             .animation(.default.speed(2), value: isMetadataModified)
-            .animation(.default.speed(2), value: isPlaying)
-
-            Spacer()
+            .animation(.default.speed(2), value: isCurrentTrack)
+            .animation(.default.speed(2), value: player.isPlayable)
+            .animation(.default.speed(2), value: player.isPlaying)
 
             AliveButton {
                 player.play(track: track)
             } label: {
-                cover(isMetadataProcessed: metadataState.isProcessed)
+                coverView()
             }
         }
-        .padding(.vertical, 10)
-        .padding(.leading, 12)
-        .padding(.trailing, 8)
+        .padding(6)
+        .padding(.trailing, -1)
+        .wiggleAnimation(wiggleAnimationTrigger)
+        .bounceAnimation(bounceAnimationTrigger, scale: .init(width: 1.01, height: 1.01))
+        .background {
+            Color.clear
+                .onDoubleClick(handler: play)
+        }
         .onHover { hover in
             withAnimation(.default.speed(5)) {
                 isHovering = hover
             }
         }
+        .onChange(of: track.metadata.state) { _, newValue in
+            guard newValue.isError else { return }
+            wiggleAnimationTrigger.toggle()
+        }
+        .onReceive(track.metadata.applyPublisher) { _ in
+            bounceAnimationTrigger.toggle()
+
+            guard isCurrentTrack else { return }
+            track.metadata.updateNowPlayingInfo()
+        }
     }
 
-    private var isPlaying: Bool {
+    private var opacity: CGFloat {
+        if isSelected {
+            1
+        } else if player.isPlayable {
+            if isCurrentTrack {
+                1
+            } else {
+                if player.isPlaying {
+                    0.45
+                } else {
+                    0.65
+                }
+            }
+        } else {
+            1
+        }
+    }
+
+    private var isCurrentTrack: Bool {
         player.track == track
     }
 
-    @ViewBuilder private func cover(isMetadataProcessed: Bool) -> some View {
+    @ViewBuilder private func titleView() -> some View {
+        if isCurrentTrack {
+            ShrinkableMarqueeScrollView {
+                MusicTitle(track: track)
+            }
+        } else {
+            MusicTitle(track: track)
+        }
+    }
+
+    @ViewBuilder private func coverView() -> some View {
+        let isInitialized = track.metadata.state.isInitialized
+
         ZStack {
-            if isMetadataProcessed, let image = track.metadata.thumbnail {
+            if isInitialized, let thumbnail = track.metadata.thumbnail {
                 MusicCover(
-                    images: [image], hasPlaceholder: false, cornerRadius: 8
+                    images: [thumbnail], hasPlaceholder: false, cornerRadius: 4
                 )
                 .overlay {
                     if isHovering {
@@ -111,20 +172,42 @@ struct TrackView: View {
                     }
                 }
 
-                if isHovering, isMetadataProcessed {
+                if isHovering, isInitialized {
                     Image(systemSymbol: .playFill)
                         .foregroundStyle(.white)
                 }
             } else {
-                if isHovering, isMetadataProcessed {
+                if isHovering, isInitialized {
                     Image(systemSymbol: .playFill)
                         .foregroundStyle(.primary)
                 }
             }
         }
-        .clipShape(.rect(cornerRadius: 8))
+        .clipShape(.rect(cornerRadius: 4))
         .frame(width: 50, height: 50)
         .font(.title3)
         .contentTransition(.symbolEffect(.replace))
+    }
+
+    @ViewBuilder private func errorView(error: MetadataError) -> some View {
+        Group {
+            switch error {
+            case .invalidFormat:
+                Text("Invalid format.")
+            case .fileNotFound:
+                Text("File not found.")
+            case .readingPermissionNotGranted:
+                Text("Reading permission not granted.")
+            case .writingPermissionNotGranted:
+                Text("Writing permission not granted.")
+            }
+        }
+        .foregroundStyle(.red)
+    }
+
+    private func play() {
+        guard track.metadata.state.isInitialized else { return }
+        player.play(track: track)
+        bounceAnimationTrigger.toggle()
     }
 }

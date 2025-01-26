@@ -12,12 +12,16 @@ extension String {
         // English
         /[aeiouAEIOU]+/,
         /[aeouAEIOU]+[hmHM]+/,
-        /[hH][mM]*/,
+        /[hH][mM]*/
         // Japanese
 //        /[あえいおう]+/,
         // Chinese
-        /[啊呀哈嗯嘿噢哦嗷呼嘻呃呵]+/
+//        /[啊呀哈嗯嘿噢哦嗷呼嘻呃呵]+/
     ]
+
+    var splittingArtists: [String] {
+        split(separator: /[\/,]\s*/).map(String.init)
+    }
 }
 
 extension String {

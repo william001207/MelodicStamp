@@ -1213,6 +1213,9 @@
         }
       }
     },
+    "File not found." : {
+
+    },
     "Forming New Playlist" : {
       "localizations" : {
         "zh-Hans" : {
@@ -1333,15 +1336,8 @@
         }
       }
     },
-    "Invalid State" : {
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "无效状态"
-          }
-        }
-      }
+    "Invalid format." : {
+
     },
     "ISRC" : {
       "localizations" : {
@@ -1625,26 +1621,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "下一曲"
-          }
-        }
-      }
-    },
-    "No Reading Permission" : {
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "无读取权限"
-          }
-        }
-      }
-    },
-    "No Writing Permission" : {
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "无写入权限"
           }
         }
       }
@@ -1949,6 +1925,9 @@
         }
       }
     },
+    "Reading permission not granted." : {
+
+    },
     "Recording ID" : {
       "localizations" : {
         "zh-Hans" : {
@@ -1985,6 +1964,26 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "发布序列号"
+          }
+        }
+      }
+    },
+    "Reload" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "重新加载"
+          }
+        }
+      }
+    },
+    "Reload Metadata" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "重新加载元数据"
           }
         }
       }
@@ -2358,6 +2357,9 @@
           }
         }
       }
+    },
+    "Writing permission not granted." : {
+
     },
     "You can use [AMLL TTML Tool](https://steve-xmh.github.io/amll-ttml-tool) to create TTML lyrics through a refined interface." : {
       "localizations" : {

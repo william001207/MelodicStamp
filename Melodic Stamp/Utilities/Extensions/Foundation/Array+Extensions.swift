@@ -8,6 +8,16 @@
 import Foundation
 
 extension Array {
+    init(alternating element: Element, count: Int) where Element: SignedNumeric {
+        self = (0 ..< count).map { index in
+            if index.isMultiple(of: 2) {
+                element
+            } else {
+                -element
+            }
+        }
+    }
+
     /// Blends an array of `[A, B, C]` to `[A, AB, B, BC, C, CA]` using a transformation function, which blends `A, B` into `AB`, etc.
     func blending(transform: @escaping (Element, Element) -> Element) -> Self {
         guard count > 1 else { return self }

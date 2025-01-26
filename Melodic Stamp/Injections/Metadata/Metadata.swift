@@ -5,9 +5,17 @@
 //  Created by KrLite on 2024/11/24.
 //
 
+import Combine
 @preconcurrency import CSFBAudioEngine
 import MediaPlayer
 import SwiftUI
+
+enum MetadataError: Error {
+    case readingPermissionNotGranted
+    case writingPermissionNotGranted
+    case fileNotFound
+    case invalidFormat
+}
 
 // MARK: - Metadata
 
@@ -20,9 +28,19 @@ import SwiftUI
         case loading
         case fine
         case saving
-        case error(MetadataError)
+        case interrupted(MetadataError)
+        case dropped(MetadataError)
 
-        var isEditable: Bool {
+        var isInitialized: Bool {
+            switch self {
+            case .fine, .saving, .interrupted:
+                true
+            default:
+                false
+            }
+        }
+
+        var isFine: Bool {
             switch self {
             case .fine:
                 true
@@ -31,48 +49,33 @@ import SwiftUI
             }
         }
 
-        var isLoaded: Bool {
+        var isError: Bool {
             switch self {
-            case .loading:
-                false
-            default:
+            case .interrupted, .dropped:
                 true
-            }
-        }
-
-        var isProcessed: Bool {
-            switch self {
-            case .loading, .error:
+            default:
                 false
-            default:
-                true
             }
         }
 
-        var error: MetadataError? {
+        func with(error: MetadataError) -> Self {
             switch self {
-            case let .error(error):
-                error
+            case .loading, .dropped:
+                .dropped(error)
             default:
-                nil
+                .interrupted(error)
             }
         }
-    }
-
-    enum MetadataError: Error {
-        case invalidState
-        case noWritingPermission
-        case noReadingPermission
     }
 
     var id: URL { url }
     let url: URL
 
-    private(set) var properties: AudioProperties!
+    @MainActor private(set) var properties: AudioProperties
     private(set) var state: State
 
-    private(set) var thumbnail: NSImage?
-    private(set) var menuThumbnail: NSImage?
+    @MainActor private(set) var thumbnail: NSImage?
+    @MainActor private(set) var menuThumbnail: NSImage?
 
     var attachedPictures: Entry<Set<AttachedPicture>>!
 
@@ -118,31 +121,39 @@ import SwiftUI
 
     var additional: Entry<AdditionalMetadata?>!
 
-    init?(url: URL) {
+    private var applySubject = PassthroughSubject<(), Never>()
+    var applyPublisher: AnyPublisher<(), Never> {
+        applySubject.eraseToAnyPublisher()
+    }
+
+    private var restoreSubject = PassthroughSubject<(), Never>()
+    var restorePublisher: AnyPublisher<(), Never> {
+        restoreSubject.eraseToAnyPublisher()
+    }
+
+    @MainActor init?(url: URL) {
+        self.properties = .init()
         self.state = .loading
         self.url = url
 
-        Task {
-            do {
-                try await update()
-            } catch let error as MetadataError {
-                state = .error(error)
-            }
+        Task.detached {
+            try await self.update()
         }
     }
 
-    init(url: URL, from metadata: AudioMetadata) {
+    @MainActor init(url: URL, from metadata: AudioMetadata, with properties: AudioProperties = .init()) {
+        self.properties = properties
         self.state = .fine
         self.url = url
-        load(from: metadata)
 
-        Task {
-            await generateThumbnail()
+        Task { @MainActor in
+            load(from: metadata)
+            generateThumbnail()
         }
     }
 
-    fileprivate var restorables: [any Restorable] {
-        guard state.isLoaded else { return [] }
+    @MainActor fileprivate var restorables: [any Restorable] {
+        guard state.isInitialized else { return [] }
         return [
             attachedPictures,
             title, titleSortOrder, artist, artistSortOrder, composer,
@@ -157,12 +168,16 @@ import SwiftUI
             replayGainTrackPeak, replayGainReferenceLoudness
         ]
     }
+
+    @MainActor fileprivate func updateState(to state: State) {
+        self.state = state
+    }
 }
 
 // MARK: Loading Functions
 
 private extension Metadata {
-    func load(
+    @MainActor func load(
         attachedPictures: Set<AttachedPicture> = [],
         title: String? = nil, titleSortOrder: String? = nil,
         artist: String? = nil, artistSortOrder: String? = nil,
@@ -301,7 +316,7 @@ private extension Metadata {
         )
     }
 
-    func load(from metadata: AudioMetadata?) {
+    @MainActor func load(from metadata: AudioMetadata?) {
         load(
             attachedPictures: metadata?.attachedPictures ?? [],
             title: metadata?.title,
@@ -384,55 +399,75 @@ private extension Metadata {
 // MARK: Manipulating Functions
 
 extension Metadata: Modifiable {
-    var isModified: Bool {
-        guard state.isProcessed else { return false }
+    @MainActor var isModified: Bool {
+        guard state.isInitialized else { return false }
         return restorables.contains(where: \.isModified)
     }
 }
 
 extension Metadata {
-    func restore() {
-        guard state.isProcessed else { return }
+    @MainActor func restore() {
+        guard state.isInitialized else { return }
         for var restorable in self.restorables {
             restorable.restore()
         }
 
-        Task {
-            await generateThumbnail()
+        restoreSubject.send()
+
+        Task.detached {
+            await self.generateThumbnail()
         }
     }
 
-    func apply() {
-        guard state.isProcessed else { return }
+    @MainActor func apply() {
+        guard state.isInitialized else { return }
         for var restorable in self.restorables {
             restorable.apply()
         }
 
-        Task {
-            await generateThumbnail()
-            updateNowPlayingInfo()
+        applySubject.send()
+
+        Task.detached {
+            await self.generateThumbnail()
         }
     }
 
-    func generateThumbnail() async {
-        guard state.isProcessed else {
+    @MainActor func generateThumbnail() {
+        guard state.isInitialized else {
             thumbnail = nil
             return
         }
 
-        if let image = ThumbnailMaker.getCover(from: attachedPictures.current)?.image {
-            thumbnail = await ThumbnailMaker.make(image)
-            menuThumbnail = await ThumbnailMaker.make(image, resolution: 20)
+        guard let attachedPictures = self[extracting: \.attachedPictures]?.current else { return }
+        Task.detached {
+            if let image = ThumbnailMaker.getCover(from: attachedPictures)?.image {
+                let thumbnail = await ThumbnailMaker.make(image)
+                let menuThumbnail = await ThumbnailMaker.make(image, resolution: 20)
+
+                Task { @MainActor in
+                    self.thumbnail = thumbnail
+                    self.menuThumbnail = menuThumbnail
+                }
+            }
         }
     }
 
     func update() async throws(MetadataError) {
-        guard let file = try? AudioFile(readingPropertiesAndMetadataFrom: url) else {
-            throw .noReadingPermission
+        guard url.isFileExist else {
+            await updateState(to: state.with(error: .fileNotFound))
+            throw .fileNotFound
         }
 
-        properties = file.properties
-        load(from: file.metadata)
+        guard let file = try? AudioFile(readingPropertiesAndMetadataFrom: url) else {
+            await updateState(to: state.with(error: .readingPermissionNotGranted))
+            throw .readingPermissionNotGranted
+        }
+
+        Task { @MainActor in
+            properties = file.properties
+        }
+
+        await load(from: file.metadata)
 
         switch state {
         case .loading:
@@ -441,25 +476,35 @@ extension Metadata {
             print("Updated metadata from \(url)")
         }
 
-        state = .fine
+        await updateState(to: .fine)
+        await apply()
 
-        Task {
-            await generateThumbnail()
-            updateNowPlayingInfo()
+        Task.detached {
+            await self.generateThumbnail()
         }
     }
 
     func write() async throws(MetadataError) {
-        guard state.isEditable, isModified else {
-            throw .invalidState
+        guard state.isInitialized, await isModified else { return }
+
+        guard url.isFileExist else {
+            await updateState(to: state.with(error: .fileNotFound))
+            throw .fileNotFound
         }
 
-        state = .saving
-        apply()
+        guard !url.isFileReadOnly else {
+            await updateState(to: state.with(error: .writingPermissionNotGranted))
+            throw .writingPermissionNotGranted
+        }
+
+        await updateState(to: .saving)
+        await apply()
+
         print("Started writing metadata to \(url)")
 
         guard let file = try? AudioFile(url: url) else {
-            throw .noWritingPermission
+            await updateState(to: state.with(error: .fileNotFound))
+            throw .fileNotFound
         }
 
         file.metadata = pack()
@@ -475,16 +520,19 @@ extension Metadata {
                 try file.writeMetadata()
             }
         } catch {
-            throw .noWritingPermission
+            await updateState(to: state.with(error: .writingPermissionNotGranted))
+            throw .writingPermissionNotGranted
         }
 
-        state = .fine
+        await updateState(to: .fine)
+
         print("Successfully written metadata to \(url)")
     }
 
     func poll<V>(for keyPath: WritableKeyPath<Metadata, Entry<V>>) async -> MetadataBatchEditingEntry<V> {
         print("Started polling metadata for \(keyPath)")
-        while !state.isProcessed {
+
+        while !state.isInitialized {
             try? await Task.sleep(for: .milliseconds(100))
         }
 
@@ -494,23 +542,18 @@ extension Metadata {
         } while entry == nil
 
         print("Succeed polling metadata for \(keyPath)")
+
         return entry!
     }
 
     subscript<V>(extracting keyPath: WritableKeyPath<Metadata, Entry<V>>)
         -> MetadataBatchEditingEntry<V>? {
-        guard state.isProcessed else { return nil }
+        guard state.isInitialized else { return nil }
         return .init(keyPath: keyPath, metadata: self)
     }
 }
 
 // MARK: Extensions
-
-extension Metadata {
-    static func splitArtists(from artist: String) -> [Substring] {
-        artist.split(separator: /[\/,]\s*/)
-    }
-}
 
 extension Metadata: Equatable {
     static func == (lhs: Metadata, rhs: Metadata) -> Bool {
@@ -525,15 +568,11 @@ extension Metadata: Hashable {
 }
 
 extension Metadata {
-    static func fallbackTitle(url: URL) -> String {
-        String(url.lastPathComponent.dropLast(url.pathExtension.count + 1))
-    }
-
     func updateNowPlayingInfo() {
         let infoCenter = MPNowPlayingInfoCenter.default()
         var info = infoCenter.nowPlayingInfo ?? .init()
 
-        if state.isProcessed {
+        if state.isInitialized {
             updateNowPlayingInfo(for: &info)
         } else {
             Self.resetNowPlayingInfo(for: &info)
@@ -543,7 +582,7 @@ extension Metadata {
     }
 
     func updateNowPlayingInfo(for dict: inout [String: Any]) {
-        guard state.isProcessed else {
+        guard state.isInitialized else {
             return Self.resetNowPlayingInfo(for: &dict)
         }
 
@@ -553,7 +592,12 @@ extension Metadata {
         .flatMap(\.image)
         .map(\.mediaItemArtwork)
 
-        dict[MPMediaItemPropertyTitle] = title.initial ?? Self.fallbackTitle(url: url)
+        dict[MPMediaItemPropertyTitle] = if let title = title.initial, !title.isEmpty {
+            title
+        } else {
+            url.lastPathComponentRemovingExtension
+        }
+
         dict[MPMediaItemPropertyArtist] = artist.initial
         dict[MPMediaItemPropertyComposer] = composer.initial
         dict[MPMediaItemPropertyGenre] = genre.initial
