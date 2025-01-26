@@ -43,10 +43,10 @@ struct TTMLDisplayLyricLineView: View {
                         .asymmetric(
                             insertion: .blurTransition(radius: 2.5)
                                 .combined(with: .opacity)
-                                .animation(.smooth(duration: 0.8)),
+                                .animation(.linear(duration: 0.6)),
                             removal: .blurTransition(radius: 2.5)
                                 .combined(with: .opacity)
-                                .animation(.smooth(duration: 0.8))
+                                .animation(.linear(duration: 0.6))
                         )
                     )
             }
@@ -55,11 +55,11 @@ struct TTMLDisplayLyricLineView: View {
         .frame(maxWidth: .infinity, alignment: alignment)
         .onChange(of: isHighlighted, initial: true) { _, newValue in
             if !newValue {
-                withAnimation(.linear(duration: 0.65).delay(highlightReleasingDelay)) {
+                withAnimation(.linear(duration: 0.45).delay(highlightReleasingDelay)) {
                     isActive = false
                 }
             } else {
-                withAnimation(.linear(duration: 0.8)) {
+                withAnimation(.linear(duration: 0.45)) {
                     isActive = true
                 }
             }
@@ -144,13 +144,11 @@ struct TTMLDisplayLyricLineView: View {
             ForEach(lyrics.translations) { translation in
                 Text(translation.text)
             }
-            .transition(.blurReplace)
         }
 
         if attachments.contains(.roman), let roman = lyrics.roman {
             Text(roman)
                 .bold()
-                .transition(.blurReplace)
         }
     }
 

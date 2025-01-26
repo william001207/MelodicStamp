@@ -22,7 +22,7 @@ import SwiftUI
     // MARK: Player
 
     private var player: any Player
-    private var analyzer: RealtimeAnalyzer = .init(fftSize: Int(PlayerModel.bufferSize))
+    private var analyzer: RealtimeAnalyzer!
 
     // MARK: Output Devices
 
@@ -403,16 +403,20 @@ extension PlayerModel {
             let bus = 0
             let format = inputNode.outputFormat(forBus: bus)
 
-            inputNode.removeTap(onBus: bus)
-            inputNode.installTap(onBus: bus, bufferSize: Self.bufferSize, format: format) { [weak self] buffer, _ in
-                guard let self else { return }
-                guard player.isPlaying else { return }
+            analyzer = RealtimeAnalyzer(fftSize: Int(Self.bufferSize))
 
-                buffer.frameLength = Self.bufferSize
-                let data = analyzer.analyze(with: buffer)
+            inputNode.removeTap(onBus: bus)
+
+            inputNode.installTap(onBus: bus, bufferSize: AVAudioFrameCount(PlayerModel.bufferSize), format: format) { [weak self] buffer, _ in
+                guard let strongSelf = self else { return }
+                if !strongSelf.player.isPlaying { return }
+
+                buffer.frameLength = AVAudioFrameCount(Self.bufferSize)
+
+                let spectra = strongSelf.analyzer.analyze(with: buffer)
 
                 Task { @MainActor in
-                    self.visualizationDataSubject.send(data)
+                    strongSelf.visualizationDataSubject.send(spectra)
                 }
             }
         }
