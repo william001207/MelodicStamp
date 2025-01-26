@@ -36,21 +36,30 @@ struct TTMLDisplayLyricLineView: View {
             }
 
             // Shows background lyrics when necessary
-            if isHighlighted, !line.backgroundLyrics.isEmpty {
+            if isActive, !line.backgroundLyrics.isEmpty {
                 backgroundContent()
                     .frame(maxWidth: .infinity, alignment: alignment)
-                    .transition(.blurReplace)
+                    .transition(
+                        .asymmetric(
+                            insertion: .blurTransition(radius: 2.5)
+                                .combined(with: .opacity)
+                                .animation(.smooth(duration: 0.8)),
+                            removal: .blurTransition(radius: 2.5)
+                                .combined(with: .opacity)
+                                .animation(.smooth(duration: 0.8))
+                        )
+                    )
             }
         }
         .multilineTextAlignment(textAlignment)
         .frame(maxWidth: .infinity, alignment: alignment)
         .onChange(of: isHighlighted, initial: true) { _, newValue in
             if !newValue {
-                withAnimation(.smooth(duration: 0.25).delay(highlightReleasingDelay)) {
+                withAnimation(.linear(duration: 0.65).delay(highlightReleasingDelay)) {
                     isActive = false
                 }
             } else {
-                withAnimation(.smooth(duration: 0.1)) {
+                withAnimation(.linear(duration: 0.8)) {
                     isActive = true
                 }
             }
