@@ -1213,7 +1213,7 @@
         }
       }
     },
-    "File not found" : {
+    "File not found." : {
 
     },
     "Forming New Playlist" : {
@@ -1336,19 +1336,8 @@
         }
       }
     },
-    "Invalid format" : {
+    "Invalid format." : {
 
-    },
-    "Invalid State" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "无效状态"
-          }
-        }
-      }
     },
     "ISRC" : {
       "localizations" : {
@@ -1632,28 +1621,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "下一曲"
-          }
-        }
-      }
-    },
-    "No Reading Permission" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "无读取权限"
-          }
-        }
-      }
-    },
-    "No Writing Permission" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "无写入权限"
           }
         }
       }
@@ -1958,7 +1925,7 @@
         }
       }
     },
-    "Reading permission not granted" : {
+    "Reading permission not granted." : {
 
     },
     "Recording ID" : {
@@ -2002,10 +1969,24 @@
       }
     },
     "Reload" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "重新加载"
+          }
+        }
+      }
     },
     "Reload Metadata" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "重新加载元数据"
+          }
+        }
+      }
     },
     "Remove from Playlist" : {
       "localizations" : {
@@ -2377,7 +2358,7 @@
         }
       }
     },
-    "Writing permission not granted" : {
+    "Writing permission not granted." : {
 
     },
     "You can use [AMLL TTML Tool](https://steve-xmh.github.io/amll-ttml-tool) to create TTML lyrics through a refined interface." : {
