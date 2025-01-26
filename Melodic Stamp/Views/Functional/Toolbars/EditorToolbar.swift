@@ -55,5 +55,6 @@ struct EditorToolbar: View {
             ToolbarImageLabel(systemSymbol: .arrowClockwise)
                 .imageScale(.small)
         }
+        .disabled(!metadataEditor.hasMetadata)
     }
 }

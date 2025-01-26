@@ -97,7 +97,6 @@ struct MainView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .safeAreaPadding(.bottom, 94)
         .morphed(isActive: appearsActive && !windowManager.isInFullScreen)
-        .ignoresSafeArea()
     }
 }
 

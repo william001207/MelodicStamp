@@ -120,7 +120,7 @@ struct UnsavedChangesPresentation<Parent>: View where Parent: View {
                 .padding()
                 .background(.regularMaterial)
             }
-            .presentationSizing(.fitted)
+            .presentationSizing(.form)
     }
 
     @ViewBuilder private func closeAnywayButton() -> some View {
