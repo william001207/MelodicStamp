@@ -19,8 +19,12 @@ struct UnsavedChangesPresentation<Parent>: View where Parent: View {
 
     var body: some View {
         parent()
-            .background(MakeCloseDelegated(shouldClose: windowShouldClose) {
-                isPresented = !windowShouldClose
+            .background(MakeCloseDelegated(shouldClose: windowShouldClose) { shouldClose in
+                if shouldClose {
+                    player.stop()
+                } else {
+                    isPresented = true
+                }
             })
             .alert("Unsaved Changes", isPresented: $isPresented) {
                 alertContent()

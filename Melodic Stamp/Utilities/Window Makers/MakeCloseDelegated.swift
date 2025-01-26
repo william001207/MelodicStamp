@@ -9,7 +9,7 @@ import SwiftUI
 
 struct MakeCloseDelegated: NSViewControllerRepresentable {
     var shouldClose: Bool = false
-    var onClose: () -> ()
+    var onClose: (Bool) -> ()
 
     func makeNSViewController(context: Context) -> NSViewController {
         let hostingController = CloseDelegatedWindowHostingController(
@@ -37,7 +37,7 @@ struct MakeCloseDelegated: NSViewControllerRepresentable {
 class CloseDelegatedWindowHostingController<Content: View>: NSHostingController<Content> {
     var delegate: CloseDelegatedWindowDelegate
 
-    init(rootView: Content, shouldClose: Bool = false, onClose: @escaping () -> ()) {
+    init(rootView: Content, shouldClose: Bool = false, onClose: @escaping (Bool) -> ()) {
         self.delegate = .init(shouldClose: shouldClose, onClose: onClose)
         super.init(rootView: rootView)
     }
@@ -57,15 +57,15 @@ class CloseDelegatedWindowHostingController<Content: View>: NSHostingController<
 
 class CloseDelegatedWindowDelegate: NSObject, NSWindowDelegate {
     var shouldClose: Bool
-    var onClose: () -> ()
+    var onClose: (Bool) -> ()
 
-    init(shouldClose: Bool = false, onClose: @escaping () -> ()) {
+    init(shouldClose: Bool = false, onClose: @escaping (Bool) -> ()) {
         self.shouldClose = shouldClose
         self.onClose = onClose
     }
 
     func windowShouldClose(_: NSWindow) -> Bool {
-        onClose()
+        onClose(shouldClose)
         return shouldClose
     }
 }

@@ -25,6 +25,7 @@ struct ModifiedMetadataList: View {
                             }
                         }
                         .buttonStyle(.borderless)
+                        .disabled(!track.metadata.state.isFine)
                         .foregroundStyle(.accent)
                     }
                 } header: {
