@@ -19,8 +19,9 @@ struct LyricsToolbar: View {
             layout: .button
         ) {
             ToolbarLabel {
-                Image(systemSymbol: .pencilLine)
-                Text("Edit")
+                Text("\(Image(systemSymbol: .pencilLine))")
+                    .imageScale(.small)
+                    .baselineOffset(-1)
             }
             .monospaced(false)
         } info: {

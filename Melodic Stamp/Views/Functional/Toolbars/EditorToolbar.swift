@@ -53,10 +53,9 @@ struct EditorToolbar: View {
             metadataEditor.updateAll()
         } label: {
             ToolbarLabel {
-                Image(systemSymbol: .arrowUpDoc)
+                Text("\(Image(systemSymbol: .arrowClockwise))")
                     .imageScale(.small)
-
-                Text("Reload")
+                    .baselineOffset(-1)
             }
             .foregroundStyle(.tint)
         }
