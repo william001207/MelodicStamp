@@ -22,7 +22,7 @@ import SwiftUI
     // MARK: Player
 
     private var player: any Player
-    private var analyzer: RealtimeAnalyzer!
+    private var analyzer: RealtimeAnalyzer
 
     // MARK: Output Devices
 
@@ -205,6 +205,7 @@ import SwiftUI
 
     init(_ player: some Player) {
         self.player = player
+        self.analyzer = .init(fftSize: Int(Self.bufferSize))
         super.init()
 
         self.player.delegate = self
@@ -402,8 +403,6 @@ extension PlayerModel {
             let inputNode = engine.mainMixerNode
             let bus = 0
             let format = inputNode.outputFormat(forBus: bus)
-
-            analyzer = RealtimeAnalyzer(fftSize: Int(Self.bufferSize))
 
             inputNode.removeTap(onBus: bus)
 
