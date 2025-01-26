@@ -15,7 +15,7 @@ struct InspectorAdvancedMetadataView: View {
     @State private var ratingIncreasedAnimation: Bool = false
 
     var body: some View {
-        if !metadataEditor.isVisible {
+        if !metadataEditor.hasMetadatas {
             ExcerptView(tab: SidebarInspectorTab.advancedMetadata)
         } else {
             AutoScrollView(.vertical) {

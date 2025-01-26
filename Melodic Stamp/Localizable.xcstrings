@@ -1213,6 +1213,9 @@
         }
       }
     },
+    "File not found" : {
+
+    },
     "Forming New Playlist" : {
       "localizations" : {
         "zh-Hans" : {
@@ -1333,7 +1336,11 @@
         }
       }
     },
+    "Invalid format" : {
+
+    },
     "Invalid State" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -1630,6 +1637,7 @@
       }
     },
     "No Reading Permission" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -1640,6 +1648,7 @@
       }
     },
     "No Writing Permission" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -1949,6 +1958,9 @@
         }
       }
     },
+    "Reading permission not granted" : {
+
+    },
     "Recording ID" : {
       "localizations" : {
         "zh-Hans" : {
@@ -1988,6 +2000,12 @@
           }
         }
       }
+    },
+    "Reload" : {
+
+    },
+    "Reload Metadata" : {
+
     },
     "Remove from Playlist" : {
       "localizations" : {
@@ -2358,6 +2376,9 @@
           }
         }
       }
+    },
+    "Writing permission not granted" : {
+
     },
     "You can use [AMLL TTML Tool](https://steve-xmh.github.io/amll-ttml-tool) to create TTML lyrics through a refined interface." : {
       "localizations" : {

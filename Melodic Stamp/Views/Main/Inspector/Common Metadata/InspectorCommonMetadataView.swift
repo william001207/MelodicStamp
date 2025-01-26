@@ -25,7 +25,7 @@ struct InspectorCommonMetadataView: View {
     @State private var isBPMStepperPresented: Bool = false
 
     var body: some View {
-        if !metadataEditor.isVisible {
+        if !metadataEditor.hasMetadatas {
             ExcerptView(tab: SidebarInspectorTab.commonMetadata)
         } else {
             AutoScrollView(.vertical) {

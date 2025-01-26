@@ -16,7 +16,7 @@ struct MusicCover: View {
     var body: some View {
         if !images.isEmpty {
             // TODO: Handle multiple images
-            image(images.first!)
+            imageView(images.first!)
         } else {
             Group {
                 if hasPlaceholder {
@@ -36,7 +36,7 @@ struct MusicCover: View {
         }
     }
 
-    @ViewBuilder private func image(_ image: NSImage) -> some View {
+    @ViewBuilder private func imageView(_ image: NSImage) -> some View {
         Image(nsImage: image)
             .resizable()
             .interpolation(.high)

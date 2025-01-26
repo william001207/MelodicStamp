@@ -17,11 +17,11 @@ struct ComposedLyricLineView: View {
         Group {
             switch line {
             case let line as RawLyricLine:
-                rawLyricLine(line: line)
+                rawLyricLineView(line: line)
             case let line as LRCLyricLine:
-                lrcLyricLine(line: line)
+                lrcLyricLineView(line: line)
             case let line as TTMLLyricLine:
-                ttmlLyricLine(line: line)
+                ttmlLyricLineView(line: line)
             default:
                 EmptyView()
             }
@@ -30,15 +30,15 @@ struct ComposedLyricLineView: View {
         .lineLimit(1)
     }
 
-    @ViewBuilder private func rawLyricLine(line: RawLyricLine) -> some View {
+    @ViewBuilder private func rawLyricLineView(line: RawLyricLine) -> some View {
         Text(line.content)
     }
 
-    @ViewBuilder private func lrcLyricLine(line: LRCLyricLine) -> some View {
+    @ViewBuilder private func lrcLyricLineView(line: LRCLyricLine) -> some View {
         Text(line.content)
     }
 
-    @ViewBuilder private func ttmlLyricLine(line: TTMLLyricLine) -> some View {
+    @ViewBuilder private func ttmlLyricLineView(line: TTMLLyricLine) -> some View {
         let lyricsRenderer = DisplayLyricsRenderer(
             elapsedTime: elapsedTime,
             strings: line.lyrics.children, vowelTimes: line.lyrics.vowelTimes,

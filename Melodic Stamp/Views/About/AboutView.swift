@@ -17,13 +17,13 @@ struct AboutView: View {
 
     var body: some View {
         HStack(spacing: 25) {
-            appIcon()
+            appIconView()
                 .shadow(radius: 24)
                 .motionCard(scale: 1.02)
                 .padding(8)
 
             VStack(alignment: .leading, spacing: 17.5) {
-                title()
+                titleView()
 
                 VStack(alignment: .leading, spacing: 4) {
                     AliveButton {
@@ -55,12 +55,12 @@ struct AboutView: View {
                         .foregroundStyle(.tertiary)
                     }
 
-                    version()
+                    versionView()
                 }
             }
         }
         .containerBackground(for: .window) {
-            gradient()
+            gradientView()
                 .continuousRippleEffect()
         }
         .padding(.horizontal, 25)
@@ -84,14 +84,14 @@ struct AboutView: View {
         String(localized: .init("About: Copyright", defaultValue: "© 2024→Future"))
     }
 
-    @ViewBuilder private func appIcon() -> some View {
+    @ViewBuilder private func appIconView() -> some View {
         Image("AppIcon")
             .resizable()
             .aspectRatio(contentMode: .fit)
             .frame(width: 72)
     }
 
-    @ViewBuilder private func title() -> some View {
+    @ViewBuilder private func titleView() -> some View {
         HStack {
             Text(appNameText)
                 .fontWeight(.black)
@@ -104,7 +104,7 @@ struct AboutView: View {
         .fontWidth(.expanded)
     }
 
-    @ViewBuilder private func version() -> some View {
+    @ViewBuilder private func versionView() -> some View {
         if let version = Bundle.main.appVersion {
             let build = Bundle.main.appBuild.flatMap(String.init) ?? ""
             let hasBuild = !build.isEmpty
@@ -152,7 +152,7 @@ struct AboutView: View {
         }
     }
 
-    @ViewBuilder private func gradient() -> some View {
+    @ViewBuilder private func gradientView() -> some View {
         MeshGradient(
             width: 4,
             height: 4,

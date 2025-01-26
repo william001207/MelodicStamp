@@ -6,6 +6,7 @@
 //
 
 import CSFBAudioEngine
+import Luminare
 import SwiftUI
 
 struct TrackView: View {
@@ -29,27 +30,22 @@ struct TrackView: View {
                     case .loading:
                         Text("Loading…")
                             .foregroundStyle(.placeholder)
-                    case .fine, .saving:
-                        if isCurrentTrack {
-                            MarqueeScrollView(animate: false) {
-                                MusicTitle(track: track)
+                    case .fine, .saving, .interrupted:
+                        titleView()
+                    default:
+                        EmptyView()
+                    }
+
+                    switch metadataState {
+                    case let .interrupted(error), let .dropped(error):
+                        Image(systemSymbol: .exclamationmarkCircleFill)
+                            .foregroundStyle(.red)
+                            .luminarePopover {
+                                errorView(error: error)
+                                    .padding()
                             }
-                        } else {
-                            MusicTitle(track: track)
-                        }
-                    case let .error(error):
-                        Group {
-                            switch error {
-                            case .invalidState:
-                                Text("Invalid State")
-                            case .noWritingPermission:
-                                Text("No Writing Permission")
-                            case .noReadingPermission:
-                                Text("No Reading Permission")
-                            }
-                        }
-                        .foregroundStyle(.red)
-                        .bold()
+                    default:
+                        EmptyView()
                     }
 
                     Spacer()
@@ -91,7 +87,7 @@ struct TrackView: View {
             AliveButton {
                 player.play(track: track)
             } label: {
-                cover(isMetadataProcessed: metadataState.isProcessed)
+                coverView()
             }
         }
         .padding(6)
@@ -156,9 +152,21 @@ struct TrackView: View {
         player.track == track
     }
 
-    @ViewBuilder private func cover(isMetadataProcessed: Bool) -> some View {
+    @ViewBuilder private func titleView() -> some View {
+        if isCurrentTrack {
+            MarqueeScrollView(animate: false) {
+                MusicTitle(track: track)
+            }
+        } else {
+            MusicTitle(track: track)
+        }
+    }
+
+    @ViewBuilder private func coverView() -> some View {
+        let isInitialized = track.metadata.state.isInitialized
+
         ZStack {
-            if isMetadataProcessed, let thumbnail = track.metadata.thumbnail {
+            if isInitialized, let thumbnail = track.metadata.thumbnail {
                 MusicCover(
                     images: [thumbnail], hasPlaceholder: false, cornerRadius: 4
                 )
@@ -171,12 +179,12 @@ struct TrackView: View {
                     }
                 }
 
-                if isHovering, isMetadataProcessed {
+                if isHovering, isInitialized {
                     Image(systemSymbol: .playFill)
                         .foregroundStyle(.white)
                 }
             } else {
-                if isHovering, isMetadataProcessed {
+                if isHovering, isInitialized {
                     Image(systemSymbol: .playFill)
                         .foregroundStyle(.primary)
                 }
@@ -186,5 +194,21 @@ struct TrackView: View {
         .frame(width: 50, height: 50)
         .font(.title3)
         .contentTransition(.symbolEffect(.replace))
+    }
+
+    @ViewBuilder private func errorView(error: MetadataError) -> some View {
+        Group {
+            switch error {
+            case .invalidFormat:
+                Text("Invalid format.")
+            case .fileNotFound:
+                Text("File not found.")
+            case .readingPermissionNotGranted:
+                Text("Reading permission not granted.")
+            case .writingPermissionNotGranted:
+                Text("Writing permission not granted.")
+            }
+        }
+        .foregroundStyle(.red)
     }
 }

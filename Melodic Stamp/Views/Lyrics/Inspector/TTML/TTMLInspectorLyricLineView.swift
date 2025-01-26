@@ -20,7 +20,7 @@ struct TTMLInspectorLyricLineView: View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
                 Text("\(line.position)")
-                    .foregroundStyle(.accent)
+                    .foregroundStyle(.tint)
 
                 Text("#\(line.index)")
             }
@@ -33,7 +33,7 @@ struct TTMLInspectorLyricLineView: View {
             if !line.backgroundLyrics.isEmpty {
                 HStack {
                     Text("background")
-                        .foregroundStyle(.accent)
+                        .foregroundStyle(.tint)
 
                     VStack {
                         Divider()
@@ -57,7 +57,7 @@ struct TTMLInspectorLyricLineView: View {
                 ZStack(alignment: .trailing) {
                     Rectangle()
                         .frame(width: 4)
-                        .foregroundStyle(.accent)
+                        .foregroundStyle(.tint)
                         .padding(.vertical, 6)
 
                     VStack {
@@ -73,7 +73,7 @@ struct TTMLInspectorLyricLineView: View {
                         .padding(.horizontal, 4)
                         .background {
                             Rectangle()
-                                .foregroundStyle(.accent)
+                                .foregroundStyle(.tint)
                         }
                         .clipShape(.rect(cornerRadii: .init(
                             topLeading: 6, bottomLeading: 6, bottomTrailing: 0, topTrailing: 6
@@ -93,7 +93,7 @@ struct TTMLInspectorLyricLineView: View {
                         .padding(.horizontal, 4)
                         .background {
                             Rectangle()
-                                .foregroundStyle(.accent)
+                                .foregroundStyle(.tint)
                         }
                         .clipShape(.rect(cornerRadii: .init(
                             topLeading: 6, bottomLeading: 6, bottomTrailing: 6, topTrailing: 0

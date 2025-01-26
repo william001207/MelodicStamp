@@ -8,6 +8,11 @@
 import Foundation
 
 extension URL {
+    var isFileExist: Bool {
+        guard isFileURL else { return false }
+        return FileManager.default.fileExists(atPath: path)
+    }
+
     var isFileReadOnly: Bool {
         guard isFileURL else { return false }
         return FileManager.default.isWritableFile(atPath: path) == false

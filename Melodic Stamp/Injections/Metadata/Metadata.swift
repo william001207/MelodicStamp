@@ -11,9 +11,10 @@ import MediaPlayer
 import SwiftUI
 
 enum MetadataError: Error {
-    case invalidState
-    case noWritingPermission
-    case noReadingPermission
+    case readingPermissionNotGranted
+    case writingPermissionNotGranted
+    case fileNotFound
+    case invalidFormat
 }
 
 // MARK: - Metadata
@@ -27,9 +28,19 @@ enum MetadataError: Error {
         case loading
         case fine
         case saving
-        case error(MetadataError)
+        case interrupted(MetadataError)
+        case dropped(MetadataError)
 
-        var isEditable: Bool {
+        var isInitialized: Bool {
+            switch self {
+            case .fine, .saving, .interrupted:
+                true
+            default:
+                false
+            }
+        }
+
+        var isFine: Bool {
             switch self {
             case .fine:
                 true
@@ -38,30 +49,12 @@ enum MetadataError: Error {
             }
         }
 
-        var isLoaded: Bool {
+        func with(error: MetadataError) -> Self {
             switch self {
-            case .loading:
-                false
+            case .loading, .dropped:
+                .dropped(error)
             default:
-                true
-            }
-        }
-
-        var isProcessed: Bool {
-            switch self {
-            case .loading, .error:
-                false
-            default:
-                true
-            }
-        }
-
-        var error: MetadataError? {
-            switch self {
-            case let .error(error):
-                error
-            default:
-                nil
+                .interrupted(error)
             }
         }
     }
@@ -151,7 +144,7 @@ enum MetadataError: Error {
     }
 
     fileprivate var restorables: [any Restorable] {
-        guard state.isLoaded else { return [] }
+        guard state.isInitialized else { return [] }
         return [
             attachedPictures,
             title, titleSortOrder, artist, artistSortOrder, composer,
@@ -398,14 +391,14 @@ private extension Metadata {
 
 extension Metadata: Modifiable {
     var isModified: Bool {
-        guard state.isProcessed else { return false }
+        guard state.isInitialized else { return false }
         return restorables.contains(where: \.isModified)
     }
 }
 
 extension Metadata {
     func restore() {
-        guard state.isProcessed else { return }
+        guard state.isInitialized else { return }
         for var restorable in self.restorables {
             Task { @MainActor in
                 restorable.restore()
@@ -422,7 +415,7 @@ extension Metadata {
     }
 
     func apply() {
-        guard state.isProcessed else { return }
+        guard state.isInitialized else { return }
         for var restorable in self.restorables {
             Task { @MainActor in
                 restorable.apply()
@@ -439,7 +432,7 @@ extension Metadata {
     }
 
     func generateThumbnail() async {
-        guard state.isProcessed else {
+        guard state.isInitialized else {
             thumbnail = nil
             return
         }
@@ -451,9 +444,14 @@ extension Metadata {
     }
 
     func update() async throws(MetadataError) {
+        guard url.isFileExist else {
+            await updateState(to: state.with(error: .fileNotFound))
+            throw .fileNotFound
+        }
+
         guard let file = try? AudioFile(readingPropertiesAndMetadataFrom: url) else {
-            await updateState(to: .error(.noReadingPermission))
-            throw .noReadingPermission
+            await updateState(to: state.with(error: .readingPermissionNotGranted))
+            throw .readingPermissionNotGranted
         }
 
         properties = file.properties
@@ -474,22 +472,26 @@ extension Metadata {
     }
 
     func write() async throws(MetadataError) {
-        guard state.isEditable, isModified else {
-            await updateState(to: .error(.invalidState))
-            throw .invalidState
+        guard state.isFine, isModified else { return }
+
+        guard url.isFileExist else {
+            await updateState(to: state.with(error: .fileNotFound))
+            throw .fileNotFound
         }
+
         guard !url.isFileReadOnly else {
-            await updateState(to: .error(.noWritingPermission))
-            throw .noWritingPermission
+            await updateState(to: state.with(error: .writingPermissionNotGranted))
+            throw .writingPermissionNotGranted
         }
 
         await updateState(to: .saving)
         apply()
+
         print("Started writing metadata to \(url)")
 
         guard let file = try? AudioFile(url: url) else {
-            await updateState(to: .error(.noWritingPermission))
-            throw .noWritingPermission
+            await updateState(to: state.with(error: .fileNotFound))
+            throw .fileNotFound
         }
 
         file.metadata = pack()
@@ -505,17 +507,19 @@ extension Metadata {
                 try file.writeMetadata()
             }
         } catch {
-            await updateState(to: .error(.noWritingPermission))
-            throw .noWritingPermission
+            await updateState(to: state.with(error: .writingPermissionNotGranted))
+            throw .writingPermissionNotGranted
         }
 
         await updateState(to: .fine)
+
         print("Successfully written metadata to \(url)")
     }
 
     func poll<V>(for keyPath: WritableKeyPath<Metadata, Entry<V>>) async -> MetadataBatchEditingEntry<V> {
         print("Started polling metadata for \(keyPath)")
-        while !state.isProcessed {
+
+        while !state.isInitialized {
             try? await Task.sleep(for: .milliseconds(100))
         }
 
@@ -525,12 +529,13 @@ extension Metadata {
         } while entry == nil
 
         print("Succeed polling metadata for \(keyPath)")
+
         return entry!
     }
 
     subscript<V>(extracting keyPath: WritableKeyPath<Metadata, Entry<V>>)
         -> MetadataBatchEditingEntry<V>? {
-        guard state.isProcessed else { return nil }
+        guard state.isInitialized else { return nil }
         return .init(keyPath: keyPath, metadata: self)
     }
 }
@@ -558,7 +563,7 @@ extension Metadata {
         let infoCenter = MPNowPlayingInfoCenter.default()
         var info = infoCenter.nowPlayingInfo ?? .init()
 
-        if state.isProcessed {
+        if state.isInitialized {
             updateNowPlayingInfo(for: &info)
         } else {
             Self.resetNowPlayingInfo(for: &info)
@@ -568,7 +573,7 @@ extension Metadata {
     }
 
     func updateNowPlayingInfo(for dict: inout [String: Any]) {
-        guard state.isProcessed else {
+        guard state.isInitialized else {
             return Self.resetNowPlayingInfo(for: &dict)
         }
 

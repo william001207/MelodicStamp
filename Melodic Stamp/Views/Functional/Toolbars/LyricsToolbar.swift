@@ -38,6 +38,6 @@ struct LyricsToolbar: View {
             .monospaced(false)
         }
         .monospaced()
-        .disabled(!metadataEditor.isVisible)
+        .disabled(!metadataEditor.hasMetadatas)
     }
 }

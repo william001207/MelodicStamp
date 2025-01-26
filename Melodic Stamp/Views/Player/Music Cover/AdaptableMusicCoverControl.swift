@@ -28,7 +28,7 @@ struct AdaptableMusicCoverControl: View {
         AliveButton {
             isImagePickerPresented = true
         } label: {
-            image()
+            imageView()
                 .motionCard(scale: 1.02, angle: .degrees(3.5), shadowColor: .black.opacity(0.1), shadowRadius: 10)
                 .padding(.horizontal, 16)
         }
@@ -129,7 +129,7 @@ struct AdaptableMusicCoverControl: View {
         .animation(.smooth(duration: 0.25), value: isHeaderHovering)
     }
 
-    @ViewBuilder private func image() -> some View {
+    @ViewBuilder private func imageView() -> some View {
         let images: [NSImage] = if let binding = entries.projectedValue {
             [AttachedPicture](binding.wrappedValue)
                 .filter { $0.type == type }

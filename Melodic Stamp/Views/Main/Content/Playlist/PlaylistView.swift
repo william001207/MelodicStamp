@@ -155,7 +155,7 @@ struct PlaylistView: View {
     }
 
     private var canEscape: Bool {
-        metadataEditor.isVisible
+        metadataEditor.hasMetadatas
     }
 
     private var canLocate: Bool {
@@ -257,18 +257,19 @@ struct PlaylistView: View {
     // MARK: - Item View
 
     @ViewBuilder private func itemView(for track: Track) -> some View {
-        let isProcessed = track.metadata.state.isProcessed
+        let isInitialized = track.metadata.state.isInitialized
+        let isModified = track.metadata.isModified
 
         TrackView(
             track: track,
             isSelected: metadataEditor.tracks.contains(track)
         )
-        .redacted(reason: track.metadata.state.isLoaded ? [] : .placeholder)
+        .redacted(reason: track.metadata.state == .loading ? .placeholder : [])
         .contextMenu {
             contextMenu(for: track)
         }
         .swipeActions {
-            if isProcessed {
+            if isInitialized {
                 // MARK: Play
 
                 Button {
@@ -289,10 +290,10 @@ struct PlaylistView: View {
             }
         }
         .swipeActions(edge: .leading) {
-            if isProcessed {
+            if isInitialized {
                 // MARK: Save Metadata
 
-                if track.metadata.isModified {
+                if isModified {
                     Button {
                         Task {
                             try await track.metadata.write()
@@ -306,15 +307,27 @@ struct PlaylistView: View {
 
                 // MARK: Restore Metadata
 
-                if track.metadata.isModified {
+                if isModified {
                     Button {
                         track.metadata.restore()
                     } label: {
                         Image(systemSymbol: .arrowUturnLeft)
                         Text("Restore Metadata")
                     }
-                    .tint(.gray)
+                    .tint(.red)
                 }
+
+                // MARK: Reload Metadata
+
+                Button {
+                    Task {
+                        try await track.metadata.update()
+                    }
+                } label: {
+                    Image(systemSymbol: .arrowUpDoc)
+                    Text("Reload Metadata")
+                }
+                .tint(.accent)
             }
         }
     }
@@ -322,8 +335,8 @@ struct PlaylistView: View {
     // MARK: - Context Menu
 
     @ViewBuilder private func contextMenu(for track: Track) -> some View {
-        let isProcessed = track.metadata.state.isProcessed
-        let isEditable = track.metadata.state.isEditable
+        let isInitialized = track.metadata.state.isInitialized
+        let isModified = track.metadata.isModified
 
         // MARK: Play
 
@@ -337,13 +350,13 @@ struct PlaylistView: View {
                 Text("Play")
             }
         }
-        .disabled(!isProcessed)
+        .disabled(!isInitialized)
         .keyboardShortcut(.return, modifiers: [])
 
         // MARK: Remove from Playlist
 
         Button("Remove from Playlist") {
-            if metadataEditor.isVisible {
+            if metadataEditor.hasMetadatas {
                 handleRemove(tracks: .init(metadataEditor.tracks))
             } else {
                 handleRemove(tracks: [track])
@@ -360,7 +373,7 @@ struct PlaylistView: View {
                 try await track.metadata.write()
             }
         }
-        .disabled(!isEditable || !track.metadata.isModified)
+        .disabled(!isInitialized || !isModified)
         .keyboardShortcut("s", modifiers: .command)
 
         // MARK: Restore Metadata
@@ -368,7 +381,15 @@ struct PlaylistView: View {
         Button("Restore Metadata") {
             track.metadata.restore()
         }
-        .disabled(!isEditable || !track.metadata.isModified)
+        .disabled(!isInitialized || !isModified)
+
+        // MARK: Reload Metadata
+
+        Button("Reload Metadata") {
+            Task {
+                try await track.metadata.update()
+            }
+        }
         .keyboardShortcut("r", modifiers: .command)
     }
 
