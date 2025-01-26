@@ -131,7 +131,7 @@ struct DisplayLyricsRenderer<Animated>: TextRenderer where Animated: AnimatedStr
     }
 
     func draw(
-        slice: Text.Layout.RunSlice, index: Int,
+        slice: Text.Layout.RunSlice, index _: Int,
         beginTime: TimeInterval, endTime: TimeInterval,
         in context: inout GraphicsContext
     ) {
@@ -140,18 +140,18 @@ struct DisplayLyricsRenderer<Animated>: TextRenderer where Animated: AnimatedStr
 
         let unclampedProgress = elapsed / duration
         let progress = max(0, min(1, unclampedProgress))
-        let softenProgress = max(0, min(1, elapsed / (duration / softness)))
+        // let softenProgress = max(0, min(1, elapsed / (duration / softness)))
 
         let bounds = slice.typographicBounds.rect
         let unclampedFilledWidth = bounds.width * unclampedProgress
         let filledWidth = bounds.width * progress
-        let liftAmount = lift * bentSigmoid(softenProgress)
+        // let liftAmount = lift * bentSigmoid(softenProgress)
 
-        let waveDelay = waveDelay * Double(index) - waveActivationDelay
-        let timeToVowels = timeToVowels(at: elapsedTime - waveDelay)
+        // let waveDelay = waveDelay * Double(index) - waveActivationDelay
+        // let timeToVowels = timeToVowels(at: elapsedTime - waveDelay)
 
         do {
-            var context = context
+            // var context = context
 
             /*
              // Premultiplied wave & glow effect for long vowels
@@ -200,7 +200,7 @@ struct DisplayLyricsRenderer<Animated>: TextRenderer where Animated: AnimatedStr
                 ))
 
                 // Shadow
-                context.addFilter(.shadow(color: shadowColor, radius: shadowRadius))
+                // context.addFilter(.shadow(color: shadowColor, radius: shadowRadius))
 
                 // Mask
                 context.clipToLayer { context in
@@ -211,10 +211,8 @@ struct DisplayLyricsRenderer<Animated>: TextRenderer where Animated: AnimatedStr
                     ))
                 }
 
-                /*
-                 // Lift
-                 context.translateBy(x: 0, y: -liftAmount)
-                  */
+                // Lift
+                // context.translateBy(x: 0, y: -liftAmount)
 
                 // Brightness
                 context.addFilter(.brightness(brightness * progress))

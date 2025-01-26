@@ -36,21 +36,30 @@ struct TTMLDisplayLyricLineView: View {
             }
 
             // Shows background lyrics when necessary
-            if isHighlighted, !line.backgroundLyrics.isEmpty {
+            if isActive, !line.backgroundLyrics.isEmpty {
                 backgroundContent()
                     .frame(maxWidth: .infinity, alignment: alignment)
-                    .transition(.blurReplace)
+                    .transition(
+                        .asymmetric(
+                            insertion: .blurTransition(radius: 2.5)
+                                .combined(with: .opacity)
+                                .animation(.linear(duration: 0.6)),
+                            removal: .blurTransition(radius: 2.5)
+                                .combined(with: .opacity)
+                                .animation(.linear(duration: 0.6))
+                        )
+                    )
             }
         }
         .multilineTextAlignment(textAlignment)
         .frame(maxWidth: .infinity, alignment: alignment)
         .onChange(of: isHighlighted, initial: true) { _, newValue in
             if !newValue {
-                withAnimation(.smooth(duration: 0.25).delay(highlightReleasingDelay)) {
+                withAnimation(.linear(duration: 0.45).delay(highlightReleasingDelay)) {
                     isActive = false
                 }
             } else {
-                withAnimation(.smooth(duration: 0.1)) {
+                withAnimation(.linear(duration: 0.45)) {
                     isActive = true
                 }
             }
@@ -135,13 +144,11 @@ struct TTMLDisplayLyricLineView: View {
             ForEach(lyrics.translations) { translation in
                 Text(translation.text)
             }
-            .transition(.blurReplace)
         }
 
         if attachments.contains(.roman), let roman = lyrics.roman {
             Text(roman)
                 .bold()
-                .transition(.blurReplace)
         }
     }
 

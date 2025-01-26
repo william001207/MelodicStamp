@@ -22,7 +22,7 @@ import SwiftUI
     static func extractDominantColors(from image: NSImage) async throws -> [Color] {
         let colors = try DominantColors.dominantColors(
             nsImage: image, quality: .fair,
-            algorithm: .CIEDE2000, maxCount: 6,
+            algorithm: .CIEDE2000, maxCount: 8,
             options: [.excludeBlack], sorting: .frequency,
             deltaColors: 6
         )
