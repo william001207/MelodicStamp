@@ -28,7 +28,7 @@ struct MainView: View {
 
     var body: some View {
         content()
-            .frame(minWidth: 600)
+            .frame(minWidth: 600, minHeight: 400)
             .inspector(isPresented: $isInspectorPresented) {
                 inspector()
                     .ignoresSafeArea()
