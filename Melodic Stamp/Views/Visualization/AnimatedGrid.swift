@@ -66,7 +66,7 @@ struct AnimatedGrid: View {
                         framesPerSecond: Int(fps),
                         locationAnimationSpeedRange: 4...5,
                         tangentAnimationSpeedRange: 4...5,
-                        colorAnimationSpeedRange: 0.2...0.25,
+                        colorAnimationSpeedRange: 0.4...0.41,
                         meshRandomizer: randomizer
                     ),
                     grainAlpha: 0,
