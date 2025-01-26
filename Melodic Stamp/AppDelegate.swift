@@ -61,11 +61,12 @@ extension AppDelegate {
     }
 
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
-        guard sender.windows.isEmpty else {
+        if sender.windows.isEmpty {
+            return .terminateNow
+        } else {
+            // Allows each window to delegate its closing
             sender.windows.forEach { $0.performClose(nil) }
             return .terminateLater
         }
-
-        return .terminateNow
     }
 }
