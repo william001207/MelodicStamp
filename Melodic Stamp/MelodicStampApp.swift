@@ -33,6 +33,10 @@ struct MelodicStampApp: App {
         WindowGroup(id: WindowID.content.rawValue, for: CreationParameters.self) { $parameters in
             ContentView(parameters)
                 .environment(floatingWindows)
+                .environment(\.appDelegate, appDelegate)
+                .onAppear {
+                    appDelegate.resumeWindowSuspension()
+                }
         }
         .windowResizability(.contentSize)
         .windowToolbarStyle(.unified)

@@ -2098,6 +2098,9 @@
         }
       }
     },
+    "Review your changes before closing." : {
+
+    },
     "Rewind" : {
       "localizations" : {
         "zh-Hans" : {

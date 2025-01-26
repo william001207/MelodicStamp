@@ -10,6 +10,8 @@ import SwiftUI
 struct UnsavedChangesPresentation<Parent>: View where Parent: View {
     @Environment(PlayerModel.self) private var player
 
+    @Environment(\.appDelegate) private var appDelegate
+
     @Binding var isPresented: Bool
     var window: NSWindow?
     @ViewBuilder var parent: () -> Parent
@@ -19,15 +21,19 @@ struct UnsavedChangesPresentation<Parent>: View where Parent: View {
 
     var body: some View {
         parent()
-            .background(MakeCloseDelegated(shouldClose: windowShouldClose) { shouldClose in
+            .background(MakeCloseDelegated(shouldClose: windowShouldClose) { window, shouldClose in
                 if shouldClose {
                     player.stop()
+                    appDelegate?.destroy(window: window)
                 } else {
                     isPresented = true
+                    appDelegate?.suspend(window: window)
                 }
             })
             .alert("Unsaved Changes", isPresented: $isPresented) {
                 alertContent()
+            } message: {
+                alertMessage()
             }
             .sheet(isPresented: $isSheetPresented) {
                 sheetContent()
@@ -60,7 +66,9 @@ struct UnsavedChangesPresentation<Parent>: View where Parent: View {
             } else {
                 Button("Save and Close") {
                     player.writeAll {
-                        forceClose()
+                        if modifiedMetadatas.isEmpty {
+                            forceClose()
+                        }
                     }
                 }
             }
@@ -68,9 +76,11 @@ struct UnsavedChangesPresentation<Parent>: View where Parent: View {
             closeAnywayButton()
         }
 
-        Button("Cancel", role: .cancel) {
-            isPresented = false
-        }
+        cancelButton()
+    }
+
+    @ViewBuilder private func alertMessage() -> some View {
+        Text("Review your changes before closing.")
     }
 
     @ViewBuilder private func sheetContent() -> some View {
@@ -78,9 +88,7 @@ struct UnsavedChangesPresentation<Parent>: View where Parent: View {
             .frame(minWidth: 500, minHeight: 280)
             .safeAreaInset(edge: .bottom) {
                 HStack {
-                    Button("Cancel", role: .cancel) {
-                        isSheetPresented = false
-                    }
+                    cancelButton()
 
                     Text("Unsaved Changes")
                         .font(.headline)
@@ -121,11 +129,23 @@ struct UnsavedChangesPresentation<Parent>: View where Parent: View {
         }
     }
 
+    @ViewBuilder private func cancelButton() -> some View {
+        Button("Cancel", role: .cancel) {
+            cancel()
+        }
+    }
+
     private func forceClose() {
         windowShouldForceClose = true
         DispatchQueue.main.async {
-            window?.close()
+            window?.performClose(nil)
         }
+    }
+
+    private func cancel() {
+        isPresented = false
+        isSheetPresented = false
+        appDelegate?.resumeWindowSuspension()
     }
 }
 
