@@ -9,7 +9,7 @@ import SwiftUI
 
 // MARK: - Modifiable
 
-protocol Modifiable {
+@MainActor protocol Modifiable {
     var isModified: Bool { get }
 }
 
@@ -49,6 +49,11 @@ extension Restorable {
         self.current = value
         self.initial = value
     }
+
+    init(migratingFrom other: MetadataEntry<V>, withMutation mutation: (V) -> V = \.self) {
+        self.current = mutation(other.current)
+        self.initial = mutation(other.initial)
+    }
 }
 
 extension MetadataEntry: Hashable {
@@ -66,12 +71,12 @@ extension MetadataEntry: Equatable {
 
 // MARK: - Metadata Batch Editing Entry
 
-@Observable final class MetadataBatchEditingEntry<V: Hashable & Equatable>: Identifiable {
+@MainActor @Observable final class MetadataBatchEditingEntry<V: Hashable & Equatable>: Identifiable {
     typealias Entry = MetadataEntry
     typealias EntryKeyPath = WritableKeyPath<Metadata, Entry<V>>
 
-    let keyPath: EntryKeyPath
-    let metadata: Metadata
+    nonisolated let keyPath: EntryKeyPath
+    nonisolated let metadata: Metadata
 
     init(keyPath: EntryKeyPath, metadata: Metadata) {
         self.keyPath = keyPath
@@ -132,26 +137,26 @@ extension MetadataEntry: Equatable {
 }
 
 extension MetadataBatchEditingEntry: Hashable {
-    func hash(into hasher: inout Hasher) {
+    nonisolated func hash(into hasher: inout Hasher) {
         hasher.combine(keyPath)
         hasher.combine(metadata)
     }
 }
 
 extension MetadataBatchEditingEntry: Equatable {
-    static func == (lhs: MetadataBatchEditingEntry<V>, rhs: MetadataBatchEditingEntry<V>) -> Bool {
+    nonisolated static func == (lhs: MetadataBatchEditingEntry<V>, rhs: MetadataBatchEditingEntry<V>) -> Bool {
         lhs.hashValue == rhs.hashValue
     }
 }
 
 // MARK: - Metadata Batch Editing Entries
 
-@Observable final class MetadataBatchEditingEntries<V: Hashable & Equatable>: Identifiable {
+@MainActor @Observable final class MetadataBatchEditingEntries<V: Hashable & Equatable>: Identifiable {
     typealias Entry = MetadataEntry
     typealias EntryKeyPath = WritableKeyPath<Metadata, Entry<V>>
 
-    let keyPath: EntryKeyPath
-    let metadatas: Set<Metadata>
+    nonisolated let keyPath: EntryKeyPath
+    nonisolated let metadatas: Set<Metadata>
 
     private var isRestoring: Bool = false
 
@@ -228,21 +233,21 @@ extension MetadataBatchEditingEntry: Equatable {
     }
 }
 
-extension MetadataBatchEditingEntries: Sequence {
+extension MetadataBatchEditingEntries: @preconcurrency Sequence {
     func makeIterator() -> Array<MetadataBatchEditingEntry<V>>.Iterator {
         metadatas.compactMap { $0[extracting: keyPath] }.makeIterator()
     }
 }
 
 extension MetadataBatchEditingEntries: Hashable {
-    func hash(into hasher: inout Hasher) {
+    nonisolated func hash(into hasher: inout Hasher) {
         hasher.combine(keyPath)
         hasher.combine(metadatas)
     }
 }
 
 extension MetadataBatchEditingEntries: Equatable {
-    static func == (lhs: MetadataBatchEditingEntries<V>, rhs: MetadataBatchEditingEntries<V>) -> Bool {
+    nonisolated static func == (lhs: MetadataBatchEditingEntries<V>, rhs: MetadataBatchEditingEntries<V>) -> Bool {
         lhs.hashValue == rhs.hashValue
     }
 }

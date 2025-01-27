@@ -36,10 +36,6 @@ struct MetadataEditingState: OptionSet {
     var metadatas: Set<Metadata> { get }
     var hasMetadata: Bool { get }
     var state: MetadataEditingState { get }
-
-    func restoreAll()
-    func updateAll(completion: (() -> ())?)
-    func writeAll(completion: (() -> ())?)
 }
 
 extension MetadataEditorProtocol {

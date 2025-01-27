@@ -21,7 +21,7 @@ enum MetadataError: Error {
 
 // MARK: Definition
 
-@Observable final class Metadata: Identifiable {
+@MainActor @Observable final class Metadata: Identifiable {
     typealias Entry = MetadataEntry
 
     enum State: Hashable, Equatable {
@@ -68,14 +68,14 @@ enum MetadataError: Error {
         }
     }
 
-    var id: URL { url }
-    let url: URL
+    nonisolated var id: URL { url }
+    nonisolated let url: URL
 
-    @MainActor private(set) var properties: AudioProperties
     private(set) var state: State
+    private(set) var properties: AudioProperties
 
-    @MainActor private(set) var thumbnail: NSImage?
-    @MainActor private(set) var menuThumbnail: NSImage?
+    private(set) var thumbnail: NSImage?
+    private(set) var menuThumbnail: NSImage?
 
     var attachedPictures: Entry<Set<AttachedPicture>>!
 
@@ -131,7 +131,7 @@ enum MetadataError: Error {
         restoreSubject.eraseToAnyPublisher()
     }
 
-    @MainActor init?(url: URL) {
+    init?(url: URL) {
         self.properties = .init()
         self.state = .loading
         self.url = url
@@ -141,7 +141,7 @@ enum MetadataError: Error {
         }
     }
 
-    @MainActor init(url: URL, from metadata: AudioMetadata, with properties: AudioProperties = .init()) {
+    init(url: URL, from metadata: AudioMetadata, with properties: AudioProperties = .init()) {
         self.properties = properties
         self.state = .fine
         self.url = url
@@ -153,7 +153,64 @@ enum MetadataError: Error {
         }
     }
 
-    @MainActor fileprivate var restorables: [any Restorable] {
+    init(migratingFrom oldValue: Metadata, withURL url: URL? = nil) {
+        let url = url ?? oldValue.url
+
+        self.url = url
+        self.state = oldValue.state
+
+        self.properties = oldValue.properties
+        self.thumbnail = oldValue.thumbnail
+        self.menuThumbnail = oldValue.menuThumbnail
+
+        self.attachedPictures = oldValue.attachedPictures
+
+        self.title = oldValue.title
+        self.titleSortOrder = oldValue.titleSortOrder
+        self.artist = oldValue.artist
+        self.artistSortOrder = oldValue.artistSortOrder
+        self.composer = oldValue.composer
+        self.composerSortOrder = oldValue.composerSortOrder
+        self.genre = oldValue.genre
+        self.genreSortOrder = oldValue.genreSortOrder
+        self.bpm = oldValue.bpm
+
+        self.albumTitle = oldValue.albumTitle
+        self.albumTitleSortOrder = oldValue.albumTitleSortOrder
+        self.albumArtist = oldValue.albumArtist
+        self.albumArtistSortOrder = oldValue.albumArtistSortOrder
+
+        self.trackNumber = oldValue.trackNumber
+        self.trackCount = oldValue.trackCount
+        self.discNumber = oldValue.discNumber
+        self.discCount = oldValue.discCount
+
+        self.comment = oldValue.comment
+        self.grouping = oldValue.grouping
+        self.isCompilation = oldValue.isCompilation
+
+        self.isrc = oldValue.isrc
+        self.lyrics = oldValue.lyrics.map {
+            MetadataEntry(migratingFrom: $0) { $0.map {
+                RawLyrics(url: url, content: $0.content)
+            } }
+        }
+        self.mcn = oldValue.mcn
+
+        self.musicBrainzRecordingID = oldValue.musicBrainzRecordingID
+        self.musicBrainzReleaseID = oldValue.musicBrainzReleaseID
+
+        self.rating = oldValue.rating
+        self.releaseDate = oldValue.releaseDate
+
+        self.replayGainAlbumGain = oldValue.replayGainAlbumGain
+        self.replayGainAlbumPeak = oldValue.replayGainAlbumPeak
+        self.replayGainTrackGain = oldValue.replayGainTrackGain
+        self.replayGainTrackPeak = oldValue.replayGainTrackPeak
+        self.replayGainReferenceLoudness = oldValue.replayGainReferenceLoudness
+    }
+
+    fileprivate var restorables: [any Restorable] {
         guard state.isInitialized else { return [] }
         return [
             attachedPictures,
@@ -170,7 +227,7 @@ enum MetadataError: Error {
         ]
     }
 
-    @MainActor fileprivate func updateState(to state: State) {
+    fileprivate func updateState(to state: State) {
         self.state = state
     }
 }
@@ -178,7 +235,7 @@ enum MetadataError: Error {
 // MARK: Loading Functions
 
 private extension Metadata {
-    @MainActor func load(
+    func load(
         attachedPictures: Set<AttachedPicture> = [],
         title: String? = nil, titleSortOrder: String? = nil,
         artist: String? = nil, artistSortOrder: String? = nil,
@@ -276,7 +333,7 @@ private extension Metadata {
             isrc.flatMap { ISRC(parsing: $0) }
         )
         self.lyrics = .init(
-            .init(url: url, content: lyrics)
+            RawLyrics(url: url, content: lyrics)
         )
         self.mcn = .init(
             mcn
@@ -317,7 +374,7 @@ private extension Metadata {
         )
     }
 
-    @MainActor func load(from metadata: AudioMetadata?) {
+    func load(from metadata: AudioMetadata?) {
         load(
             attachedPictures: metadata?.attachedPictures ?? [],
             title: metadata?.title,
@@ -400,14 +457,14 @@ private extension Metadata {
 // MARK: Manipulating Functions
 
 extension Metadata: Modifiable {
-    @MainActor var isModified: Bool {
+    var isModified: Bool {
         guard state.isInitialized else { return false }
         return restorables.contains(where: \.isModified)
     }
 }
 
 extension Metadata {
-    @MainActor func restore() {
+    func restore() {
         guard state.isInitialized else { return }
         for var restorable in self.restorables {
             restorable.restore()
@@ -420,7 +477,7 @@ extension Metadata {
         }
     }
 
-    @MainActor func apply() {
+    func apply() {
         guard state.isInitialized else { return }
         for var restorable in self.restorables {
             restorable.apply()
@@ -433,7 +490,7 @@ extension Metadata {
         }
     }
 
-    @MainActor func generateThumbnail() {
+    func generateThumbnail() {
         guard state.isInitialized else {
             thumbnail = nil
             return
@@ -453,7 +510,7 @@ extension Metadata {
         }
     }
 
-    func update(completion: (() -> ())? = nil) async throws(MetadataError) {
+    nonisolated func update(completion: (() -> ())? = nil) async throws(MetadataError) {
         guard url.isFileExist else {
             await updateState(to: state.with(error: .fileNotFound))
             throw .fileNotFound
@@ -470,7 +527,7 @@ extension Metadata {
 
         await load(from: file.metadata)
 
-        switch state {
+        switch await state {
         case .loading:
             print("Loaded metadata from \(url)")
         default:
@@ -486,8 +543,8 @@ extension Metadata {
         }
     }
 
-    func write(completion: (() -> ())? = nil) async throws(MetadataError) {
-        guard state.isInitialized, await isModified else {
+    nonisolated func write(completion: (() -> ())? = nil) async throws(MetadataError) {
+        guard await state.isInitialized, await isModified else {
             completion?()
             return
         }
@@ -512,7 +569,7 @@ extension Metadata {
             throw .fileNotFound
         }
 
-        file.metadata = pack()
+        file.metadata = await pack()
 
         do {
             if file.metadata.comment != nil {
@@ -562,13 +619,13 @@ extension Metadata {
 // MARK: Extensions
 
 extension Metadata: Equatable {
-    static func == (lhs: Metadata, rhs: Metadata) -> Bool {
+    nonisolated static func == (lhs: Metadata, rhs: Metadata) -> Bool {
         lhs.id == rhs.id
     }
 }
 
 extension Metadata: Hashable {
-    func hash(into hasher: inout Hasher) {
+    nonisolated func hash(into hasher: inout Hasher) {
         hasher.combine(id)
     }
 }

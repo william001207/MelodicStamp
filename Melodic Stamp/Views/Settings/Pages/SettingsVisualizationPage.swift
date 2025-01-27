@@ -11,7 +11,7 @@ struct SettingsVisualizationPage: View {
     var body: some View {
         SettingsExcerptView(
             .visualization,
-            descriptionKey: "Tweak \(Bundle.main[localized: .appName])'s audio visualization experience to the fullest."
+            descriptionKey: "Tweak \(Bundle.main[localized: .displayName])'s audio visualization experience to the fullest."
         )
 
         Section {

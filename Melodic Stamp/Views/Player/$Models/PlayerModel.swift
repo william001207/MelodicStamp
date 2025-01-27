@@ -15,14 +15,17 @@ import SwiftUI
 
 // MARK: - Definition
 
-@MainActor @Observable final class PlayerModel: NSObject {
+extension PlayerModel {
     static let interval: TimeInterval = 0.1
     static let bufferSize: AVAudioFrameCount = 2048
+}
 
+@MainActor @Observable final class PlayerModel: NSObject {
     // MARK: Player
 
     private var player: any Player
-    private var analyzer: RealtimeAnalyzer
+    // The initialization is delayed to `setupEngine`
+    private var analyzer: RealtimeAnalyzer!
 
     // MARK: Output Devices
 
@@ -59,12 +62,18 @@ import SwiftUI
 
     // MARK: Playlist & Playback
 
-    private(set) var track: Track?
-    private(set) var playlist: [Track] = []
+    private(set) var playlist: Playlist = .init()
     var selectedTracks: Set<Track> = []
 
-    var playbackMode: PlaybackMode = Defaults[.defaultPlaybackMode]
-    var playbackLooping: Bool = false
+    var playbackMode: PlaybackMode {
+        get { playlist.playbackMode }
+        set { playlist.playbackMode = newValue }
+    }
+
+    var playbackLooping: Bool {
+        get { playlist.playbackLooping }
+        set { playlist.playbackLooping = newValue }
+    }
 
     private(set) var playbackState: PlaybackState = .stopped
     private(set) var playbackTime: PlaybackTime?
@@ -73,9 +82,7 @@ import SwiftUI
     // MARK: Responsive Fields
 
     var progress: CGFloat {
-        get {
-            unwrappedPlaybackTime.progress
-        }
+        get { unwrappedPlaybackTime.progress }
 
         set {
             player.seekProgress(to: newValue)
@@ -85,9 +92,7 @@ import SwiftUI
     }
 
     var time: TimeInterval {
-        get {
-            unwrappedPlaybackTime.elapsed
-        }
+        get { unwrappedPlaybackTime.elapsed }
 
         set {
             player.seekTime(to: newValue)
@@ -133,28 +138,22 @@ import SwiftUI
         }
     }
 
-    var isPlaylistEmpty: Bool {
-        playlist.isEmpty
-    }
+    // MARK: Playlist
 
-    var isPlayable: Bool {
-        isRunning && hasCurrentTrack
+    var currentTrack: Track? {
+        playlist.currentTrack
     }
-
-    // MARK: Tracks & Indices
 
     var nextTrack: Track? {
-        guard let nextIndex else { return nil }
-        return playlist[nextIndex]
+        playlist.nextTrack
     }
 
     var previousTrack: Track? {
-        guard let previousIndex else { return nil }
-        return playlist[previousIndex]
+        playlist.previousTrack
     }
 
     var hasCurrentTrack: Bool {
-        track != nil
+        currentTrack != nil
     }
 
     var hasNextTrack: Bool {
@@ -165,48 +164,18 @@ import SwiftUI
         previousTrack != nil
     }
 
-    private var index: Int? {
-        guard let track else { return nil }
-        return playlist.firstIndex(of: track)
+    var isPlaylistEmpty: Bool {
+        playlist.isEmpty
     }
 
-    private var nextIndex: Int? {
-        switch playbackMode {
-        case .sequential:
-            guard let index else { return nil }
-            let nextIndex = index + 1
-
-            guard nextIndex < playlist.endIndex else { return nil }
-            return nextIndex
-        case .loop:
-            guard let index else { return nil }
-            return (index + 1) % playlist.count
-        case .shuffle:
-            return randomIndex()
-        }
-    }
-
-    private var previousIndex: Int? {
-        switch playbackMode {
-        case .sequential:
-            guard let index else { return nil }
-            let previousIndex = index - 1
-
-            guard previousIndex >= 0 else { return nil }
-            return previousIndex
-        case .loop:
-            guard let index else { return nil }
-            return (index + playlist.count - 1) % playlist.count
-        case .shuffle:
-            return randomIndex()
-        }
+    var isPlayable: Bool {
+        isRunning && hasCurrentTrack
     }
 
     // MARK: Initializers
 
     init(_ player: some Player) {
         self.player = player
-        self.analyzer = .init(fftSize: Int(Self.bufferSize))
         super.init()
 
         self.player.delegate = self
@@ -277,17 +246,6 @@ extension PlayerModel {
 }
 
 extension PlayerModel {
-    func randomIndex() -> Int? {
-        guard !playlist.isEmpty else { return nil }
-
-        if let track, let index = playlist.firstIndex(of: track) {
-            let indices = Array(playlist.indices).filter { $0 != index }
-            return indices.randomElement()
-        } else {
-            return playlist.indices.randomElement()
-        }
-    }
-
     // MARK: Play
 
     func play(track: Track) {
@@ -400,6 +358,8 @@ extension PlayerModel {
     private func setupEngine() {
         player.withEngine { [weak self] engine in
             guard let self else { return }
+
+            analyzer = .init(fftSize: Int(Self.bufferSize))
 
             // Audio visualization
             let inputNode = engine.mainMixerNode

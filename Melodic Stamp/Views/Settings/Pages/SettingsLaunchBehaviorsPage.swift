@@ -11,7 +11,7 @@ struct SettingsLaunchBehaviorsPage: View {
     var body: some View {
         SettingsExcerptView(
             .launchBehaviors,
-            descriptionKey: "Control what \(Bundle.main[localized: .appName]) should do when launching from a previous interruption."
+            descriptionKey: "Control what \(Bundle.main[localized: .displayName]) should do when launching from a previous interruption."
         )
 
         Section {

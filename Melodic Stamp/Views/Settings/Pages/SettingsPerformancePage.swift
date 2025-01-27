@@ -11,7 +11,7 @@ struct SettingsPerformancePage: View {
     var body: some View {
         SettingsExcerptView(
             .performance,
-            descriptionKey: "Adjust \(Bundle.main[localized: .appName])'s performance to meet your hardware's needs."
+            descriptionKey: "Adjust \(Bundle.main[localized: .displayName])'s performance to meet your hardware's needs."
         )
 
         Section {

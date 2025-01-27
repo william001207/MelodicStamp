@@ -12,7 +12,7 @@ struct SettingsAppearancePage: View {
     var body: some View {
         SettingsExcerptView(
             .appearance,
-            descriptionKey: "Decorate \(Bundle.main[localized: .appName]) as you like."
+            descriptionKey: "Decorate \(Bundle.main[localized: .displayName]) as you like."
         )
 
         Section {

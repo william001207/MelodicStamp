@@ -67,7 +67,7 @@ struct DisplayLyricsView: View {
                         let duration = endTime - beginTime
                         let progress = (elapsedTime - beginTime) / duration
 
-                        return if duration >= 4, progress <= 1 {
+                        return if duration >= 4.5, progress <= 1 {
                             .visible {
                                 ProgressDotsContainerView(elapsedTime: elapsedTime, beginTime: beginTime, endTime: endTime)
                                     .padding(8.5)

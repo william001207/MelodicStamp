@@ -11,7 +11,6 @@ protocol AnimatedString: Equatable, Hashable, Identifiable {
     var content: String { get }
     var beginTime: TimeInterval? { get }
     var endTime: TimeInterval? { get }
-    var duration: Duration? { get }
 }
 
 extension AnimatedString {

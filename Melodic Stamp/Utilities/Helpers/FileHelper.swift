@@ -8,7 +8,9 @@
 import Foundation
 import UniformTypeIdentifiers
 
-enum FileHelper {
+enum FileHelper {}
+
+extension FileHelper {
     static func flatten(contentsOfFolder folderURL: URL, allowedContentTypes: [UTType], isRecursive: Bool = true) -> [URL] {
         guard folderURL.startAccessingSecurityScopedResource() else { return [] }
         guard folderURL.hasDirectoryPath else { return [folderURL] }

@@ -10,9 +10,9 @@ import CSFBAudioEngine
 import Luminare
 import SwiftUI
 
-@Observable final class Track: Identifiable {
+struct Track: Identifiable {
     let url: URL
-    var metadata: Metadata
+    var metadata: Metadata!
 
     var id: URL { url }
 
@@ -26,6 +26,12 @@ import SwiftUI
     init(url: URL, metadata: Metadata) {
         self.url = url
         self.metadata = metadata
+    }
+
+    init(migratingFrom oldValue: Track, withURL url: URL?) async {
+        let url = url ?? oldValue.url
+        self.url = url
+        self.metadata = await .init(migratingFrom: oldValue.metadata, withURL: url)
     }
 }
 

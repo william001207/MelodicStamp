@@ -21,7 +21,7 @@ struct SettingsFeedbackPage: View {
         } header: {
             Text("Contributors")
             Text("""
-            We developed this app in our spare time. We are looking forward to your participation in bringing \(Bundle.main[localized: .appName]) to perfection!
+            We developed this app in our spare time. We are looking forward to your participation in bringing \(Bundle.main[localized: .displayName]) to perfection!
             """)
         }
 

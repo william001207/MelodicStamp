@@ -17,12 +17,6 @@ protocol LyricsParser: Hashable, Equatable {
     var metadata: [LyricsMetadata] { get }
 
     init(string: String) throws
-
-    func highlight(at time: TimeInterval) -> Range<Int>
-
-    func duration(of index: Int) -> (begin: TimeInterval?, end: TimeInterval?)
-
-    func duration(before index: Int) -> (begin: TimeInterval?, end: TimeInterval?)
 }
 
 extension LyricsParser {
@@ -32,7 +26,7 @@ extension LyricsParser {
     // Do not use sequences, otherwise causing huge performance issues
     func highlight(at time: TimeInterval) -> Range<Int> {
         let endIndex = lines.endIndex
-        let suspensionThreshold: TimeInterval = 4
+        let suspensionThreshold: TimeInterval = 4.5
 
         let current = lines.last {
             guard let beginTime = $0.beginTime else { return false }

@@ -46,7 +46,7 @@ struct MelodicStampApp: App {
             InspectorCommands()
 
             CommandGroup(replacing: .appInfo) {
-                Button("About \(Bundle.main[localized: .appName])") {
+                Button("About \(Bundle.main[localized: .displayName])") {
                     if isAboutWindowPresented {
                         dismissWindow(id: WindowID.about.rawValue)
                     } else {
@@ -66,7 +66,7 @@ struct MelodicStampApp: App {
             WindowCommands()
         }
 
-        Window("About \(Bundle.main[localized: .appName])", id: WindowID.about.rawValue) {
+        Window("About \(Bundle.main[localized: .displayName])", id: WindowID.about.rawValue) {
             AboutView()
                 .onAppear {
                     isAboutWindowPresented = true
