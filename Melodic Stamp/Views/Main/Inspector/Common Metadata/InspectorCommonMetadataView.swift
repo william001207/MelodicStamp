@@ -91,6 +91,7 @@ struct InspectorCommonMetadataView: View {
                     } label: {
                         HStack {
                             Image(systemSymbol: .trashFill)
+
                             Text("Clear")
                         }
                         .padding()
@@ -123,9 +124,8 @@ struct InspectorCommonMetadataView: View {
                         }
                     } label: {
                         Image(systemSymbol: .plus)
-                            .padding()
                     }
-                    .aspectRatio(1 / 1, contentMode: .fit)
+                    .aspectRatio(6 / 5, contentMode: .fit)
                     .disabled(availableTypes.isEmpty)
                     .fileImporter(
                         isPresented: $isCoverPickerPresented,

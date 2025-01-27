@@ -169,12 +169,10 @@ struct FloatingTabBarView: View {
                         .fill(.tint.quaternary)
                 } else {
                     RoundedRectangle(cornerRadius: 20)
-                        .stroke(.quaternary)
                         .fill(.quaternary)
                 }
             } else if isTabHovering {
                 RoundedRectangle(cornerRadius: 20)
-                    .stroke(.quinary)
                     .fill(.quinary)
             }
         }

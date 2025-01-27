@@ -189,10 +189,9 @@ struct PlaylistView: View {
                 handleEscape()
             } label: {
                 Image(systemSymbol: .xmark)
-                    .padding()
             }
-            .aspectRatio(1 / 1, contentMode: .fit)
             .disabled(!canEscape)
+            .aspectRatio(6 / 5, contentMode: .fit)
 
             // MARK: Locate Selection
 
@@ -200,10 +199,9 @@ struct PlaylistView: View {
                 handleLocate(in: proxy)
             } label: {
                 Image(systemSymbol: .scope)
-                    .padding()
             }
-            .aspectRatio(1 / 1, contentMode: .fit)
             .disabled(!canLocate)
+            .aspectRatio(6 / 5, contentMode: .fit)
 
             // MARK: Remove Selection from Playlist / Remove All
 
@@ -260,9 +258,8 @@ struct PlaylistView: View {
                 Image(systemSymbol: .repeat1)
                     .aliveHighlight(player.playbackLooping)
                     .luminareAnimation(.instant)
-                    .padding()
             }
-            .aspectRatio(1 / 1, contentMode: .fit)
+            .aspectRatio(6 / 5, contentMode: .fit)
         }
         .buttonStyle(.luminare)
     }
@@ -337,9 +334,10 @@ struct PlaylistView: View {
                         try await track.metadata.update()
                     }
                 } label: {
-                    Image(systemSymbol: .arrowUpDoc)
+                    Image(systemSymbol: .arrowClockwise)
                     Text("Reload Metadata")
                 }
+                .tint(.accent)
             }
         }
     }
@@ -439,3 +437,11 @@ struct PlaylistView: View {
         return true
     }
 }
+
+#if DEBUG
+    #Preview(traits: .modifier(SampleEnvironmentsPreviewModifier())) {
+        @Previewable @Namespace var namespace
+
+        PlaylistView(namespace: namespace)
+    }
+#endif
