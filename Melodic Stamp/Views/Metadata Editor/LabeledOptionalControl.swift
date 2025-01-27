@@ -37,14 +37,14 @@ struct LabeledOptionalControl<V, Label, Content, ContentB>: View
 
                 if isHovering {
                     HStack(spacing: 2) {
-                        AliveButton {
+                        Button {
                             entries.restoreAll()
                         } label: {
                             Image(systemSymbol: .arrowUturnLeft)
                         }
                         .disabled(!entries.isModified)
 
-                        AliveButton {
+                        Button {
                             entries.setAll(nil)
                         } label: {
                             Image(systemSymbol: .trash)
@@ -83,6 +83,7 @@ struct LabeledOptionalControl<V, Label, Content, ContentB>: View
                 .italic()
             }
         }
+        .buttonStyle(.alive)
         .modifier(LuminareHoverable())
         .luminareAspectRatio(contentMode: .fill)
         .onHover { hover in

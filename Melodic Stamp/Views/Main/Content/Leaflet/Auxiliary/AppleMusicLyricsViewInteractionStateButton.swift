@@ -22,7 +22,7 @@ struct AppleMusicLyricsViewInteractionStateButton: View, Animatable {
     var hasProgressRing: Bool = true
 
     var body: some View {
-        AliveButton(isOn: binding) {
+        Button {} label: {
             ZStack {
                 Color.clear
                     .hoverableBackground(isExplicitlyVisible: true)
@@ -46,6 +46,7 @@ struct AppleMusicLyricsViewInteractionStateButton: View, Animatable {
                 .font(.title2)
             }
         }
+        .buttonStyle(.alive(isOn: binding))
         .animation(.default, value: hasProgressRing)
         .animation(.default, value: interactionState)
     }

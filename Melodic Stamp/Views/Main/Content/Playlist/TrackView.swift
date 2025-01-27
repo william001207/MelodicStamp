@@ -92,11 +92,12 @@ struct TrackView: View {
             .animation(.default.speed(2), value: player.isPlayable)
             .animation(.default.speed(2), value: player.isPlaying)
 
-            AliveButton {
+            Button {
                 player.play(track: track)
             } label: {
                 coverView()
             }
+            .buttonStyle(.alive)
         }
         .padding(6)
         .padding(.trailing, -1)

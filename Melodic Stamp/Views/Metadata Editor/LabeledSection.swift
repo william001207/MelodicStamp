@@ -47,7 +47,7 @@ struct LabeledSection<Content, Label>: View where Content: View, Label: View {
         VStack(alignment: .leading, spacing: 8) {
             if Label.self != EmptyView.self {
                 HStack(spacing: 0) {
-                    AliveButton {
+                    Button {
                         withAnimation(animation) {
                             isExpanded.toggle()
                         }
@@ -74,6 +74,7 @@ struct LabeledSection<Content, Label>: View where Content: View, Label: View {
                 .transition(.blurReplace)
             }
         }
+        .buttonStyle(.alive)
     }
 }
 

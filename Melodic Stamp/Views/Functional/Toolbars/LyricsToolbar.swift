@@ -11,8 +11,6 @@ import SwiftUI
 struct LyricsToolbar: View {
     @Environment(MetadataEditorModel.self) private var metadataEditor
 
-    @State private var isInfoPopoverPresented: Bool = false
-
     var body: some View {
         LabeledTextEditor(
             entries: metadataEditor[extracting: \.lyrics],
@@ -20,18 +18,14 @@ struct LyricsToolbar: View {
         ) {
             ToolbarImageLabel(systemSymbol: .pencilLine)
                 .imageScale(.small)
-        } info: {
-            AliveButton {
-                isInfoPopoverPresented.toggle()
-            } label: {
-                Image(systemSymbol: .info)
-                    .luminarePopover {
-                        Text("""
-                        You can use [AMLL TTML Tool](https://steve-xmh.github.io/amll-ttml-tool) to create TTML lyrics through a refined interface.
-                        """)
-                        .padding()
-                    }
-            }
+        } actions: {
+            Image(systemSymbol: .info)
+                .luminarePopover {
+                    Text("""
+                    You can use [AMLL TTML Tool](https://steve-xmh.github.io/amll-ttml-tool) to create TTML lyrics through a refined interface.
+                    """)
+                    .padding()
+                }
         }
         .disabled(!metadataEditor.hasMetadata)
     }

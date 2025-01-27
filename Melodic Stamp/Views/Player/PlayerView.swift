@@ -71,9 +71,7 @@ struct PlayerView: View {
         HStack(alignment: .center, spacing: 12) {
             // MARK: Playback Mode
 
-            AliveButton(
-                enabledStyle: .tertiary, hoveringStyle: .secondary
-            ) {
+            Button {
                 let hasShift = NSEvent.modifierFlags.contains(.shift)
                 player.playbackMode = player.playbackMode.cycle(
                     negate: hasShift)
@@ -81,7 +79,7 @@ struct PlayerView: View {
                 Image(systemSymbol: player.playbackMode.systemSymbol)
                     .font(.headline)
                     .contentTransition(.symbolEffect(.replace))
-                    .frame(width: 20)
+                    .frame(width: 20, height: 20)
             }
             .matchedGeometryEffect(
                 id: PlayerNamespace.playbackModeButton, in: namespace
@@ -92,9 +90,7 @@ struct PlayerView: View {
 
             // MARK: Playback Looping
 
-            AliveButton(
-                enabledStyle: .tertiary, hoveringStyle: .secondary
-            ) {
+            Button {
                 player.playbackLooping.toggle()
             } label: {
                 Image(systemSymbol: .repeat1)
@@ -141,9 +137,7 @@ struct PlayerView: View {
             // MARK: Expand / Shrink
 
             if !windowManager.isInFullScreen {
-                AliveButton(
-                    enabledStyle: .tertiary, hoveringStyle: .secondary
-                ) {
+                Button {
                     windowManager.style = .miniPlayer
                 } label: {
                     Image(systemSymbol: .arrowDownRightAndArrowUpLeft)
@@ -155,6 +149,7 @@ struct PlayerView: View {
                 )
             }
         }
+        .buttonStyle(.alive(enabledStyle: .tertiary, hoveringStyle: .secondary))
         .frame(height: 20)
     }
 
@@ -164,7 +159,7 @@ struct PlayerView: View {
         Group {
             // MARK: Previous Track
 
-            AliveButton {
+            Button {
                 player.playPreviousTrack()
                 playerKeyboardControl.previousSongButtonBounceAnimation.toggle()
             } label: {
@@ -182,7 +177,7 @@ struct PlayerView: View {
 
             // MARK: Play / Pause
 
-            AliveButton {
+            Button {
                 player.isPlaying.toggle()
                 playerKeyboardControl.isPressingSpace = false
             } label: {
@@ -202,7 +197,7 @@ struct PlayerView: View {
 
             // MARK: Next Track
 
-            AliveButton {
+            Button {
                 player.playNextTrack()
                 playerKeyboardControl.nextSongButtonBounceAnimation.toggle()
             } label: {
@@ -218,6 +213,7 @@ struct PlayerView: View {
                 id: PlayerNamespace.nextSongButton, in: namespace
             )
         }
+        .buttonStyle(.alive)
         .disabled(!player.hasCurrentTrack)
     }
 
@@ -248,7 +244,7 @@ struct PlayerView: View {
 
         // MARK: Speaker
 
-        AliveButton(enabledStyle: .secondary) {
+        Button {
             player.isMuted.toggle()
         } label: {
             player.speakerImage
@@ -256,6 +252,7 @@ struct PlayerView: View {
                 .contentTransition(.symbolEffect(.replace))
                 .frame(width: 16)
         }
+        .buttonStyle(.alive(enabledStyle: .secondary))
         .disabled(!player.isPlayable)
         .symbolEffect(
             .bounce, value: playerKeyboardControl.speakerButtonBounceAnimation

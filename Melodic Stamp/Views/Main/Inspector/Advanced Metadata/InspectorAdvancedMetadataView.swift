@@ -88,7 +88,7 @@ struct InspectorAdvancedMetadataView: View {
                 format: .number
             )
 
-            AliveButton {
+            Button {
                 binding.wrappedValue -= 1
                 ratingDecreasedAnimation.toggle()
             } label: {
@@ -98,7 +98,7 @@ struct InspectorAdvancedMetadataView: View {
                     .tint(isModified ? .accent : .secondary)
             }
 
-            AliveButton {
+            Button {
                 binding.wrappedValue += 1
                 ratingIncreasedAnimation.toggle()
             } label: {
@@ -108,6 +108,7 @@ struct InspectorAdvancedMetadataView: View {
                     .tint(isModified ? .accent : .secondary)
             }
         }
+        .buttonStyle(.alive)
     }
 
     @ViewBuilder private func releaseDateEditor() -> some View {
@@ -116,7 +117,7 @@ struct InspectorAdvancedMetadataView: View {
 
             LabeledTextField("Release Date", text: metadataEditor[extracting: \.releaseDate])
 
-            AliveButton {
+            Button {
                 metadataEditor[extracting: \.releaseDate].setAll(Date.now.formatted(date: .complete, time: .shortened))
             } label: {
                 Image(systemSymbol: .dotScope)
@@ -124,6 +125,7 @@ struct InspectorAdvancedMetadataView: View {
                     .tint(isModified ? .accent : .secondary)
             }
         }
+        .buttonStyle(.alive)
     }
 
     @ViewBuilder private func sortingEditor() -> some View {

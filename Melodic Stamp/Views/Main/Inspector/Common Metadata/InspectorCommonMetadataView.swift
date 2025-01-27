@@ -159,7 +159,7 @@ struct InspectorCommonMetadataView: View {
             .luminareButtonMaterial(.thin)
             .luminareSectionMasked(true)
             .luminareSectionMaxWidth(nil)
-            .shadow(color: .black.opacity(0.2), radius: 15)
+            .shadow(color: .black.opacity(0.1), radius: 15)
         }
     }
 
@@ -195,7 +195,7 @@ struct InspectorCommonMetadataView: View {
             )
 
             if let binding = metadataEditor[extracting: \.bpm].projectedValue {
-                AliveButton {
+                Button {
                     isBPMStepperPresented.toggle()
                 } label: {
                     Image(systemSymbol: .sliderHorizontal3)
@@ -219,6 +219,7 @@ struct InspectorCommonMetadataView: View {
                 }
             }
         }
+        .buttonStyle(.alive)
 
         HStack {
             LabeledTextField(

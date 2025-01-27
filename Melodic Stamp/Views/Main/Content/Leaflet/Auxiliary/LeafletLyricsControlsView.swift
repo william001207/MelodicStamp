@@ -21,7 +21,7 @@ struct LeafletLyricsControlsView: View {
                 // Sadly we can't add toggles for lyrics attachments here, as it will trigger implicit view resizing and cause the whole lyrics to misalign
                 // See commits before c4e3d8b067a7bc72868d1f8ff2e3e9742bd4c138
 
-                AliveButton {
+                Button {
                     isHidden.toggle()
                 } label: {
                     Image(systemSymbol: isHidden ? .eyeSlash : .eye)
@@ -38,7 +38,7 @@ struct LeafletLyricsControlsView: View {
 
                 if abs(availableTypeSizes.lowerBound.distance(to: availableTypeSizes.upperBound)) > 1 {
                     VStack(spacing: 4) {
-                        AliveButton {
+                        Button {
                             typeSize -~ availableTypeSizes.lowerBound
                         } label: {
                             Image(systemSymbol: .textformatSizeSmaller)
@@ -50,7 +50,7 @@ struct LeafletLyricsControlsView: View {
 
                         ForEach(availableTypeSizes, id: \.hashValue) { size in
                             let isSelected = typeSize == size
-                            AliveButton {
+                            Button {
                                 typeSize = size
                             } label: {
                                 Circle()
@@ -64,7 +64,7 @@ struct LeafletLyricsControlsView: View {
                             }
                         }
 
-                        AliveButton {
+                        Button {
                             typeSize +~ availableTypeSizes.upperBound
                         } label: {
                             Image(systemSymbol: .textformatSizeLarger)
@@ -77,6 +77,7 @@ struct LeafletLyricsControlsView: View {
                 }
             }
         }
+        .buttonStyle(.alive)
         .font(.title2)
         .padding(.vertical, 12)
         .frame(width: 48)

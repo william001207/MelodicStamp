@@ -43,12 +43,13 @@ struct AliveHighlightViewModifier: ViewModifier {
 #Preview {
     @Previewable @State var isHighlighted = false
 
-    AliveButton {
+    Button {
         isHighlighted.toggle()
     } label: {
         AliveHighlight(isHighlighted: isHighlighted) {
             Text("Highlight Me!")
         }
     }
+    .buttonStyle(.alive)
     .padding()
 }

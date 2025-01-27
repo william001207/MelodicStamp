@@ -30,7 +30,7 @@ struct DisplayLyricLineView: View {
         let blurRadius = blurRadius(for: index, in: highlightedRange)
         let opacity = opacity(for: index, in: highlightedRange)
 
-        AliveButton(enabledStyle: .white) {
+        Button {
             guard let beginTime = line.beginTime else { return }
             player.time = beginTime + 0.01 // To make sure it's highlighting the current line
         } label: {
@@ -62,6 +62,7 @@ struct DisplayLyricLineView: View {
             }
             .animation(.smooth(duration: 0.25), value: hasFadingEffect)
         }
+        .buttonStyle(.alive(enabledStyle: .white))
     }
 
     private var isHighlighted: Bool {

@@ -89,19 +89,19 @@ struct AdaptableMusicCovers<Content>: View where Content: View {
     @ViewBuilder private func listView() -> some View {}
 }
 
-private struct AdaptableMusicCoversPreview: View {
-    @Environment(MetadataEditorModel.self) private var metadataEditor
+#if DEBUG
+    private struct AdaptableMusicCoversPreview: View {
+        @Environment(MetadataEditorModel.self) private var metadataEditor
 
-    var body: some View {
-        AdaptableMusicCovers(
-            entries: metadataEditor[extracting: \.attachedPictures]
-        ) {
-            Color.red
+        var body: some View {
+            AdaptableMusicCovers(
+                entries: metadataEditor[extracting: \.attachedPictures]
+            ) {
+                Color.red
+            }
         }
     }
-}
 
-#if DEBUG
     #Preview(traits: .modifier(SampleEnvironmentsPreviewModifier())) {
         @Previewable @State var attachedPicturesHandler: AttachedPicturesHandlerModel = .init()
 

@@ -19,7 +19,7 @@ enum LabeledTextEditorStyle {
     case code
 }
 
-struct LabeledTextEditor<Label, Info, V>: View where Label: View, Info: View, V: StringRepresentable & Hashable {
+struct LabeledTextEditor<Label, Actions, V>: View where Label: View, Actions: View, V: StringRepresentable & Hashable {
     typealias Entries = MetadataBatchEditingEntries<V?>
 
     @Environment(\.undoManager) private var undoManager
@@ -32,14 +32,12 @@ struct LabeledTextEditor<Label, Info, V>: View where Label: View, Info: View, V:
     private var style: LabeledTextEditorStyle
     private var allowedFileTypes: [UTType]
     @ViewBuilder private var label: () -> Label
-    @ViewBuilder private var info: () -> Info
+    @ViewBuilder private var actions: () -> Actions
 
     @State private var textInput: TextInputModel<V> = .init()
 
     @State private var isPresented: Bool = false
     @State private var isFileImporterPresented: Bool = false
-    @State private var isEditorHovering: Bool = false
-    @State private var isControlsHidden: Bool = false
 
     init(
         entries: Entries,
@@ -47,14 +45,14 @@ struct LabeledTextEditor<Label, Info, V>: View where Label: View, Info: View, V:
         style: LabeledTextEditorStyle = .regular,
         allowedFileTypes: [UTType] = [.text, .ttml],
         @ViewBuilder label: @escaping () -> Label,
-        @ViewBuilder info: @escaping () -> Info
+        @ViewBuilder actions: @escaping () -> Actions
     ) {
         self.entries = entries
         self.layout = layout
         self.style = style
         self.allowedFileTypes = allowedFileTypes
         self.label = label
-        self.info = info
+        self.actions = actions
     }
 
     init(
@@ -63,7 +61,7 @@ struct LabeledTextEditor<Label, Info, V>: View where Label: View, Info: View, V:
         style: LabeledTextEditorStyle = .regular,
         allowedFileTypes: [UTType] = [.text, .ttml],
         @ViewBuilder label: @escaping () -> Label
-    ) where Info == EmptyView {
+    ) where Actions == EmptyView {
         self.init(
             entries: entries,
             layout: layout,
@@ -81,12 +79,17 @@ struct LabeledTextEditor<Label, Info, V>: View where Label: View, Info: View, V:
         layout: LabeledTextEditorLayout = .field,
         style: LabeledTextEditorStyle = .regular,
         allowedFileTypes: [UTType] = [.text, .ttml],
-        @ViewBuilder info: @escaping () -> Info
+        @ViewBuilder actions: @escaping () -> Actions
     ) where Label == Text {
-        self.init(entries: entries, layout: layout, style: style, allowedFileTypes: allowedFileTypes) {
+        self.init(
+            entries: entries,
+            layout: layout,
+            style: style,
+            allowedFileTypes: allowedFileTypes
+        ) {
             Text(key)
-        } info: {
-            info()
+        } actions: {
+            actions()
         }
     }
 
@@ -96,8 +99,14 @@ struct LabeledTextEditor<Label, Info, V>: View where Label: View, Info: View, V:
         layout: LabeledTextEditorLayout = .field,
         style: LabeledTextEditorStyle = .regular,
         allowedFileTypes: [UTType] = [.text, .ttml]
-    ) where Label == Text, Info == EmptyView {
-        self.init(key, entries: entries, layout: layout, style: style, allowedFileTypes: allowedFileTypes) {
+    ) where Label == Text, Actions == EmptyView {
+        self.init(
+            key,
+            entries: entries,
+            layout: layout,
+            style: style,
+            allowedFileTypes: allowedFileTypes
+        ) {
             EmptyView()
         }
     }
@@ -138,13 +147,14 @@ struct LabeledTextEditor<Label, Info, V>: View where Label: View, Info: View, V:
                         .allowsHitTesting(false)
                     }
 
-                    AliveButton {
+                    Button {
                         isPresented.toggle()
                     } label: {
                         Image(systemSymbol: .textRedaction)
                             .foregroundStyle(.tint)
                             .tint(isModified ? .accent : .secondary)
                     }
+                    .buttonStyle(.alive)
                 }
             case .button:
                 Button {
@@ -169,25 +179,23 @@ struct LabeledTextEditor<Label, Info, V>: View where Label: View, Info: View, V:
             textInput.registerUndo(oldValue, for: entries, in: undoManager)
         }
         .sheet(isPresented: $isPresented) {
-            Group {
-                switch style {
-                case .regular:
-                    regularEditor(binding: binding)
-                case .code:
-                    codeEditor(binding: binding)
+            // In order to make safe area work, we need a wrapper
+            ScrollView {
+                Group {
+                    switch style {
+                    case .regular:
+                        regularEditor(binding: binding)
+                    case .code:
+                        codeEditor(binding: binding)
+                    }
                 }
+                .scrollDisabled(true)
             }
+            .scrollContentBackground(.hidden)
+            .scrollClipDisabled()
+            .presentationAttachmentBar(edge: .top, attachment: controls)
             .presentationSizing(.fitted)
             .frame(minWidth: 725, minHeight: 500, maxHeight: 1200)
-            .onHover { hover in
-                withAnimation(animationFast) {
-                    isEditorHovering = hover
-                }
-            }
-            .onChange(of: isEditorHovering) { _, newValue in
-                guard newValue else { return }
-                isControlsHidden = false
-            }
             .fileImporter(
                 isPresented: $isFileImporterPresented,
                 allowedContentTypes: allowedFileTypes
@@ -219,112 +227,79 @@ struct LabeledTextEditor<Label, Info, V>: View where Label: View, Info: View, V:
     }
 
     @ViewBuilder private func regularEditor(binding: Binding<String>) -> some View {
-        ZStack(alignment: .topTrailing) {
-            LuminareTextEditor(text: binding)
-                .luminareBordered(false)
-                .luminareHasBackground(false)
-
-            if !isControlsHidden {
-                controls()
-                    .padding(14)
-            }
-        }
+        LuminareTextEditor(text: binding)
+            .luminareBordered(false)
+            .luminareHasBackground(false)
     }
 
     @ViewBuilder private func codeEditor(binding: Binding<String>) -> some View {
-        ZStack(alignment: .topTrailing) {
-            LuminareTextEditor(text: binding)
-                .luminareBordered(false)
-                .luminareHasBackground(false)
-                .monospaced()
-
-            if !isControlsHidden {
-                controls()
-                    .padding(14)
-            }
-        }
+        LuminareTextEditor(text: binding)
+            .luminareBordered(false)
+            .luminareHasBackground(false)
+            .monospaced()
     }
 
     @ViewBuilder private func controls() -> some View {
-        HStack {
-            if Info.self != EmptyView.self {
-                info()
-
-                Divider()
-            }
-
-            AliveButton {
+        Group {
+            Button {
                 entries.restoreAll()
             } label: {
-                HStack(alignment: .center, spacing: 2) {
-                    HoverableLabel { isHovering in
-                        Image(systemSymbol: .arrowUturnLeft)
-                        if isHovering { Text("Restore") }
-                    }
-                }
+                Image(systemSymbol: .arrowUturnLeft)
             }
             .foregroundStyle(.red)
             .disabled(!entries.isModified)
 
-            AliveButton {
+            Button {
                 entries.setAll { V.wrappingUpdate($0, with: "") }
             } label: {
-                HStack(alignment: .center, spacing: 2) {
-                    HoverableLabel { isHovering in
-                        Image(systemSymbol: .trash)
-                        if isHovering { Text("Clear") }
-                    }
-                }
+                Image(systemSymbol: .trash)
             }
             .foregroundStyle(.red)
             .disabled(isEmpty)
 
-            AliveButton {
-                isFileImporterPresented.toggle()
+            if Actions.self != EmptyView.self {
+                Divider()
+
+                actions()
+            }
+
+            Spacer()
+
+            Button {
+                isFileImporterPresented = true
             } label: {
-                HStack(alignment: .center, spacing: 2) {
-                    HoverableLabel { isHovering in
-                        Image(systemSymbol: .docText)
-                        if isHovering { Text("Load from File") }
-                    }
+                HStack {
+                    Text("Load from File")
+
+                    Image(systemSymbol: .docText)
                 }
             }
 
             Divider()
 
-            AliveButton {
+            Button {
                 isPresented = false
             } label: {
-                HStack(alignment: .center, spacing: 2) {
-                    HoverableLabel { isHovering in
-                        Image(systemSymbol: .xmark)
-                        if isHovering { Text("Dismiss") }
-                    }
-                }
+                Text("Done")
             }
-
-            AliveButton {
-                withAnimation(animationFast) {
-                    isControlsHidden = true
-                }
-            } label: {
-                HStack(alignment: .center, spacing: 2) {
-                    HoverableLabel { isHovering in
-                        Image(systemSymbol: .chevronRight)
-                        if isHovering { Text("Hide") }
-                    }
-                }
-            }
+            .foregroundStyle(.tint)
         }
-        .frame(height: 16)
-        .bold()
-        .padding(8)
-        .background {
-            Rectangle()
-                .fill(.ultraThinMaterial)
-        }
-        .clipShape(.capsule)
-        .shadow(color: .black.opacity(0.25), radius: 32)
-        .monospaced(false)
+        .buttonStyle(.alive)
     }
 }
+
+#if DEBUG
+    private struct LabeledTextEditorPreview: View {
+        @Environment(MetadataEditorModel.self) private var metadataEditor
+
+        var body: some View {
+            LabeledTextEditor("Editor", entries: metadataEditor[extracting: \.lyrics]) {
+                Image(systemSymbol: .info)
+            }
+        }
+    }
+
+    #Preview(traits: .modifier(SampleEnvironmentsPreviewModifier())) {
+        LabeledTextEditorPreview()
+    }
+#endif

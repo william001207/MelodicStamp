@@ -149,7 +149,7 @@ struct PlaylistView: View {
                     .luminareButtonMaterial(.thin)
                     .luminareSectionMasked(true)
                     .luminareSectionMaxWidth(nil)
-                    .shadow(color: .black.opacity(0.2), radius: 15)
+                    .shadow(color: .black.opacity(0.1), radius: 15)
                 }
                 .padding(.horizontal)
                 .padding(.top, 8)

@@ -60,7 +60,6 @@ struct UnsavedChangesPresentation<Parent>: View where Parent: View {
         } else {
             if modifiedMetadatas.count > 1 {
                 Button("Save…") {
-                    isPresented = false
                     isSheetPresented = true
                 }
             } else {
@@ -86,12 +85,15 @@ struct UnsavedChangesPresentation<Parent>: View where Parent: View {
     @ViewBuilder private func sheetContent() -> some View {
         ModifiedMetadataList()
             .frame(minWidth: 500, minHeight: 280)
-            .safeAreaInset(edge: .bottom) {
-                HStack {
+            .presentationAttachmentBar(edge: .bottom) {
+                Group {
                     cancelButton()
+                        .buttonStyle(.alive(enabledStyle: .secondary, hoveringStyle: .tertiary))
+
+                    Divider()
 
                     Text("Unsaved Changes")
-                        .font(.headline)
+                        .bold()
 
                     Spacer()
 
@@ -103,8 +105,7 @@ struct UnsavedChangesPresentation<Parent>: View where Parent: View {
                         .keyboardShortcut(.return, modifiers: [])
                     } else {
                         closeAnywayButton()
-                            .buttonStyle(.borderedProminent)
-                            .tint(.red)
+                            .foregroundStyle(.red)
 
                         Button("Save All and Close") {
                             player.writeAll {
@@ -113,12 +114,11 @@ struct UnsavedChangesPresentation<Parent>: View where Parent: View {
                                 }
                             }
                         }
-                        .buttonStyle(.borderedProminent)
+                        .foregroundStyle(.tint)
                         .keyboardShortcut(.return, modifiers: [])
                     }
                 }
-                .padding()
-                .background(.regularMaterial)
+                .buttonStyle(.alive)
             }
             .presentationSizing(.form)
     }
@@ -136,8 +136,6 @@ struct UnsavedChangesPresentation<Parent>: View where Parent: View {
     }
 
     private func forceClose() {
-        isPresented = false
-        isSheetPresented = false
         windowShouldForceClose = true
         DispatchQueue.main.async {
             window?.performClose(nil)

@@ -99,6 +99,7 @@ struct MiniPlayerView: View {
             .animation(.default, value: activeControl)
             .animation(.default, value: headerControl)
         }
+        .buttonStyle(.alive)
         .padding(12)
         .focusable()
         .focusEffectDisabled()
@@ -222,15 +223,13 @@ struct MiniPlayerView: View {
 
             // MARK: Playback Mode
 
-            AliveButton(
-                enabledStyle: .tertiary, hoveringStyle: .secondary
-            ) {
+            Button {
                 let hasShift = NSEvent.modifierFlags.contains(.shift)
                 player.playbackMode = player.playbackMode.cycle(negate: hasShift)
             } label: {
                 Image(systemSymbol: player.playbackMode.systemSymbol)
                     .contentTransition(.symbolEffect(.replace))
-                    .frame(width: 16)
+                    .frame(width: 16, height: 16)
             }
             .matchedGeometryEffect(
                 id: PlayerNamespace.playbackModeButton, in: namespace
@@ -241,9 +240,7 @@ struct MiniPlayerView: View {
 
             // MARK: Playback Looping
 
-            AliveButton(
-                enabledStyle: .tertiary, hoveringStyle: .secondary
-            ) {
+            Button {
                 player.playbackLooping.toggle()
             } label: {
                 Image(systemSymbol: .repeat1)
@@ -254,7 +251,7 @@ struct MiniPlayerView: View {
                 id: PlayerNamespace.playbackLoopingButton, in: namespace
             )
 
-            AliveButton {
+            Button {
                 headerControl = switch headerControl {
                 case .title:
                     .lyrics
@@ -275,6 +272,7 @@ struct MiniPlayerView: View {
                 .matchedGeometryEffect(id: PlayerNamespace.title, in: namespace)
                 .padding(.bottom, 2)
             }
+            .buttonStyle(.alive)
 
             if headerControl.hasThumbnail, let thumbnail = player.track?.metadata.thumbnail {
                 MusicCover(images: [thumbnail], hasPlaceholder: false, cornerRadius: 2)
@@ -284,9 +282,7 @@ struct MiniPlayerView: View {
             // MARK: Pin / Unpin
 
             if isTitleHovering || windowManager.isAlwaysOnTop {
-                AliveButton(
-                    enabledStyle: .tertiary, hoveringStyle: .secondary
-                ) {
+                Button {
                     windowManager.isAlwaysOnTop.toggle()
                 } label: {
                     Image(systemSymbol: .pinFill)
@@ -300,9 +296,7 @@ struct MiniPlayerView: View {
             if isTitleHovering {
                 // MARK: Expand / Shrink
 
-                AliveButton(
-                    enabledStyle: .tertiary, hoveringStyle: .secondary
-                ) {
+                Button {
                     windowManager.style = .main
                 } label: {
                     Image(systemSymbol: .arrowUpLeftAndArrowDownRight)
@@ -313,6 +307,7 @@ struct MiniPlayerView: View {
                 .transition(.blurReplace)
             }
         }
+        .buttonStyle(.alive(enabledStyle: .tertiary, hoveringStyle: .secondary))
         .frame(height: 16)
     }
 
@@ -323,7 +318,7 @@ struct MiniPlayerView: View {
             Group {
                 // MARK: Previous Track
 
-                AliveButton {
+                Button {
                     player.playPreviousTrack()
                     playerKeyboardControl.previousSongButtonBounceAnimation
                         .toggle()
@@ -341,7 +336,7 @@ struct MiniPlayerView: View {
 
                 // MARK: Play / Pause
 
-                AliveButton {
+                Button {
                     player.isPlaying.toggle()
                     playerKeyboardControl.isPressingSpace = false
                 } label: {
@@ -363,7 +358,7 @@ struct MiniPlayerView: View {
 
                 // MARK: Next Track
 
-                AliveButton {
+                Button {
                     player.playNextTrack()
                     playerKeyboardControl.nextSongButtonBounceAnimation.toggle()
                 } label: {
@@ -378,6 +373,7 @@ struct MiniPlayerView: View {
                     id: PlayerNamespace.nextSongButton, in: namespace
                 )
             }
+            .buttonStyle(.alive)
             .disabled(!player.hasCurrentTrack)
         }
     }
@@ -413,7 +409,7 @@ struct MiniPlayerView: View {
         if isVolumeControlActive || !isProgressBarExpanded {
             // MARK: Speaker
 
-            AliveButton(enabledStyle: .secondary) {
+            Button {
                 activeControl = switch activeControl {
                 case .progress:
                     .volume
@@ -425,6 +421,7 @@ struct MiniPlayerView: View {
                     .contentTransition(.symbolEffect(.replace))
                     .frame(width: 20, height: 16)
             }
+            .buttonStyle(.alive(enabledStyle: .secondary))
             .symbolEffect(.bounce, value: activeControl)
             .symbolEffect(
                 .bounce,

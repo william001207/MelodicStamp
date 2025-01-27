@@ -1,6 +1,9 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "" : {
+
+    },
     "--:--" : {
       "shouldTranslate" : false
     },
@@ -916,6 +919,7 @@
       }
     },
     "Dismiss" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -934,6 +938,9 @@
           }
         }
       }
+    },
+    "Done" : {
+
     },
     "During Performance" : {
       "localizations" : {
@@ -1186,6 +1193,9 @@
         }
       }
     },
+    "Editor" : {
+
+    },
     "Ethereal" : {
       "localizations" : {
         "zh-Hans" : {
@@ -1320,6 +1330,7 @@
       }
     },
     "Hide" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {

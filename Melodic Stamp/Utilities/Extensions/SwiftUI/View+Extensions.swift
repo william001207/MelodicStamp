@@ -42,6 +42,13 @@ extension View {
             glintColor: glintColor, glintRadius: glintRadius
         ))
     }
+
+    @ViewBuilder func presentationAttachmentBar(
+        edge: VerticalEdge, material: Material = .regular,
+        @ViewBuilder attachment: @escaping () -> some View
+    ) -> some View {
+        modifier(PresentationAttachmentBarModifier("", edge: edge, material: material, attachment: attachment))
+    }
 }
 
 extension View {

@@ -19,7 +19,6 @@ struct FloatingTabBarView: View {
     @Binding var selectedInspectorTab: SidebarInspectorTab
 
     @State private var isHovering: Bool = true // Avoids glitches on first hover
-    @State private var isDragging: Bool = false
     @State private var hoveringTabs: Set<AnyHashable> = []
 
     var body: some View {
@@ -38,6 +37,7 @@ struct FloatingTabBarView: View {
             .padding(4)
             .transition(.blurReplace)
         }
+        .buttonStyle(.alive)
         .background {
             // Do not use `.background(:)` otherwise causing temporary vibrancy lost
             VisualEffectView(material: .popover, blendingMode: .behindWindow, state: .active)
@@ -67,7 +67,7 @@ struct FloatingTabBarView: View {
     }
 
     private var isExpanded: Bool {
-        isHovering || isDragging
+        isHovering
     }
 
     @ViewBuilder private func sectionLabel(_ key: LocalizedStringKey) -> some View {
@@ -89,18 +89,10 @@ struct FloatingTabBarView: View {
     @ViewBuilder private func contentTab(for tab: SidebarContentTab) -> some View {
         let isSelected = selectedContentTab == tab
 
-        AliveButton {
+        Button {
             selectedContentTab = tab
         } label: {
             label(for: tab, isSelected: isSelected)
-        } onGestureChanged: { _ in
-            withAnimation(animation) {
-                isDragging = true
-            }
-        } onGestureEnded: { _ in
-            withAnimation(animation) {
-                isDragging = false
-            }
         }
         .onHover { hover in
             withAnimation(animationFast) {
@@ -117,7 +109,7 @@ struct FloatingTabBarView: View {
     @ViewBuilder private func inspectorTab(for tab: SidebarInspectorTab) -> some View {
         let isSelected = isInspectorPresented && selectedInspectorTab == tab
 
-        AliveButton {
+        Button {
             if isSelected {
                 isInspectorPresented.toggle()
             } else {
@@ -126,10 +118,6 @@ struct FloatingTabBarView: View {
             }
         } label: {
             label(for: tab, isSelected: isSelected)
-        } onGestureChanged: { _ in
-            isDragging = true
-        } onGestureEnded: { _ in
-            isDragging = false
         }
         .onHover { hover in
             withAnimation(animationFast) {

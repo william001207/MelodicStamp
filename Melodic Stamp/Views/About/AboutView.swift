@@ -26,7 +26,7 @@ struct AboutView: View {
                 titleView()
 
                 VStack(alignment: .leading, spacing: 4) {
-                    AliveButton {
+                    Button {
                         openURL(.organization)
                     } label: {
                         HStack(alignment: .firstTextBaseline, spacing: 12) {
@@ -45,7 +45,7 @@ struct AboutView: View {
                         .fixedSize()
                     }
 
-                    AliveButton {
+                    Button {
                         openURL(.repository)
                     } label: {
                         HStack {
@@ -59,6 +59,7 @@ struct AboutView: View {
                 }
             }
         }
+        .buttonStyle(.alive)
         .containerBackground(for: .window) {
             gradientView()
                 .continuousRippleEffect()
@@ -118,7 +119,7 @@ struct AboutView: View {
                 version
             }
 
-            AliveButton {
+            Button {
                 NSPasteboard.general.setString(combined, forType: .string)
 
                 copyVersionDispatch?.cancel()

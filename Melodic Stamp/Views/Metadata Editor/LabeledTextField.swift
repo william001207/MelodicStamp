@@ -153,19 +153,20 @@ struct LabeledTextField<F, Label>: View where F: ParseableFormatStyle, F.FormatO
             .overlay {
                 if isLabelHovering {
                     HStack(spacing: 2) {
-                        AliveButton {
+                        Button {
                             entries.restoreAll()
                         } label: {
                             Image(systemSymbol: .arrowUturnLeft)
                         }
                         .disabled(!entries.isModified)
 
-                        AliveButton {
+                        Button {
                             entries.setAll(nil)
                         } label: {
                             Image(systemSymbol: .trash)
                         }
                     }
+                    .buttonStyle(.alive)
                     .foregroundStyle(.red)
                     .bold()
                     .animation(.bouncy, value: entries.isModified) // To match the animation in `AliveButton`

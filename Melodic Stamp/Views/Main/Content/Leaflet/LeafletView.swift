@@ -207,7 +207,7 @@ struct LeafletView: View {
 
         Group {
             if hasLyrics {
-                AliveButton {
+                Button {
                     isShowingLyrics.toggle()
                 } label: {
                     MusicCover(
@@ -216,15 +216,17 @@ struct LeafletView: View {
                     )
                     .motionCard(scale: 1.02, angle: .degrees(5))
                 }
+                .buttonStyle(.alive)
                 .scaleEffect(player.isPlaying ? 1 : 0.85, anchor: .center)
             } else {
-                AliveButton(isOn: $player.isPlaying) {
+                Button {} label: {
                     MusicCover(
                         images: [cover], hasPlaceholder: true,
                         cornerRadius: 12
                     )
                     .motionCard()
                 }
+                .buttonStyle(.alive(isOn: $player.isPlaying))
             }
         }
         .matchedGeometryEffect(id: "cover", in: namespace)

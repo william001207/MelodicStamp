@@ -25,13 +25,14 @@ struct AdaptableMusicCoverControl: View {
     @State private var isHeaderHovering: Bool = false
 
     var body: some View {
-        AliveButton {
+        Button {
             isImagePickerPresented = true
         } label: {
             imageView()
                 .motionCard(scale: 1.02, angle: .degrees(3.5), shadowColor: .black.opacity(0.1), shadowRadius: 10)
                 .padding(.horizontal, 16)
         }
+        .buttonStyle(.alive)
         .fileImporter(
             isPresented: $isImagePickerPresented,
             allowedContentTypes: AttachedPicturesHandlerModel
@@ -70,7 +71,7 @@ struct AdaptableMusicCoverControl: View {
         Group {
             if isHeaderHovering {
                 HStack(spacing: 2) {
-                    AliveButton {
+                    Button {
                         attachedPicturesHandler.restore(
                             of: [type], entries: entries,
                             undoManager: undoManager
@@ -85,7 +86,7 @@ struct AdaptableMusicCoverControl: View {
                         )
                     )
 
-                    AliveButton {
+                    Button {
                         attachedPicturesHandler.remove(
                             of: [type], entries: entries,
                             undoManager: undoManager
@@ -94,6 +95,7 @@ struct AdaptableMusicCoverControl: View {
                         Image(systemSymbol: .trash)
                     }
                 }
+                .buttonStyle(.alive)
                 .foregroundStyle(.red)
                 .bold()
                 .padding(.vertical, 6)
@@ -159,18 +161,18 @@ struct AdaptableMusicCoverControl: View {
     }
 }
 
-private struct AdaptableMusicCoverControlPreview: View {
-    @Environment(MetadataEditorModel.self) private var metadataEditor
-
-    var body: some View {
-        AdaptableMusicCoverControl(
-            entries: metadataEditor[extracting: \.attachedPictures],
-            type: .other
-        )
-    }
-}
-
 #if DEBUG
+    private struct AdaptableMusicCoverControlPreview: View {
+        @Environment(MetadataEditorModel.self) private var metadataEditor
+
+        var body: some View {
+            AdaptableMusicCoverControl(
+                entries: metadataEditor[extracting: \.attachedPictures],
+                type: .other
+            )
+        }
+    }
+
     #Preview(traits: .modifier(SampleEnvironmentsPreviewModifier())) {
         @Previewable @State var attachedPicturesHandler: AttachedPicturesHandlerModel = .init()
 

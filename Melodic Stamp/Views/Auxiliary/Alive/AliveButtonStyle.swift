@@ -1,4 +1,11 @@
 //
+//  AliveButtonStyle.swift
+//  Playground
+//
+//  Created by KrLite on 2025/1/27.
+//
+
+//
 //  AliveButton.swift
 //  Playground
 //
@@ -8,7 +15,7 @@
 import SFSafeSymbols
 import SwiftUI
 
-struct AliveButton<Label>: View where Label: View {
+struct AliveButtonStyle: ButtonStyle {
     @Environment(\.isEnabled) private var isEnabled
 
     var scaleFactor: CGFloat
@@ -19,28 +26,17 @@ struct AliveButton<Label>: View where Label: View {
     var hoveringStyle: AnyShapeStyle?
     var disabledStyle: AnyShapeStyle
 
-    var action: () -> ()
-    @ViewBuilder var label: () -> Label
-
-    var onGestureChanged: ((DragGesture.Value) -> ())?
-    var onGestureEnded: ((DragGesture.Value) -> ())?
-
     private var isOn: Binding<Bool>?
 
     @State private var isHovering: Bool = false
     @State private var isActive: Bool = false
-    @State private var isPressing: Bool = false
-    @State private var frame: CGRect = .zero
+    @State private var isPressed: Bool = false
 
     // MARK: Initializers - Button
 
     init(
         scaleFactor: CGFloat = 0.85, shadowRadius: CGFloat = 4, duration: TimeInterval = 0.45,
-        enabledStyle: some ShapeStyle = .primary, hoveringStyle: some ShapeStyle, disabledStyle: some ShapeStyle = .quinary,
-        action: @escaping () -> (),
-        @ViewBuilder label: @escaping () -> Label,
-        onGestureChanged: ((DragGesture.Value) -> ())? = nil,
-        onGestureEnded: ((DragGesture.Value) -> ())? = nil
+        enabledStyle: some ShapeStyle = .primary, hoveringStyle: some ShapeStyle, disabledStyle: some ShapeStyle = .quinary
     ) {
         self.scaleFactor = scaleFactor
         self.shadowRadius = shadowRadius
@@ -48,21 +44,13 @@ struct AliveButton<Label>: View where Label: View {
         self.enabledStyle = .init(enabledStyle)
         self.hoveringStyle = .init(hoveringStyle)
         self.disabledStyle = .init(disabledStyle)
-        self.onGestureChanged = onGestureChanged
-        self.onGestureEnded = onGestureEnded
-        self.action = action
-        self.label = label
 
         self.isOn = nil
     }
 
     init(
         scaleFactor: CGFloat = 0.85, shadowRadius: CGFloat = 4, duration: TimeInterval = 0.45,
-        enabledStyle: some ShapeStyle = .primary, disabledStyle: some ShapeStyle = .quinary,
-        action: @escaping () -> (),
-        @ViewBuilder label: @escaping () -> Label,
-        onGestureChanged: ((DragGesture.Value) -> ())? = nil,
-        onGestureEnded: ((DragGesture.Value) -> ())? = nil
+        enabledStyle: some ShapeStyle = .primary, disabledStyle: some ShapeStyle = .quinary
     ) {
         self.scaleFactor = scaleFactor
         self.shadowRadius = shadowRadius
@@ -70,10 +58,6 @@ struct AliveButton<Label>: View where Label: View {
         self.enabledStyle = .init(enabledStyle)
         self.hoveringStyle = nil
         self.disabledStyle = .init(disabledStyle)
-        self.onGestureChanged = onGestureChanged
-        self.onGestureEnded = onGestureEnded
-        self.action = action
-        self.label = label
 
         self.isOn = nil
     }
@@ -83,10 +67,7 @@ struct AliveButton<Label>: View where Label: View {
     init(
         scaleFactor: CGFloat = 0.85, shadowRadius: CGFloat = 4, duration: TimeInterval = 0.45,
         enabledStyle: some ShapeStyle = .primary, hoveringStyle: some ShapeStyle, disabledStyle: some ShapeStyle = .quinary,
-        isOn: Binding<Bool>,
-        @ViewBuilder label: @escaping () -> Label,
-        onGestureChanged: ((DragGesture.Value) -> ())? = nil,
-        onGestureEnded: ((DragGesture.Value) -> ())? = nil
+        isOn: Binding<Bool>
     ) {
         self.scaleFactor = scaleFactor
         self.shadowRadius = shadowRadius
@@ -94,21 +75,14 @@ struct AliveButton<Label>: View where Label: View {
         self.enabledStyle = .init(enabledStyle)
         self.hoveringStyle = .init(hoveringStyle)
         self.disabledStyle = .init(disabledStyle)
-        self.onGestureChanged = onGestureChanged
-        self.onGestureEnded = onGestureEnded
-        self.label = label
 
-        self.action = {}
         self.isOn = isOn
     }
 
     init(
         scaleFactor: CGFloat = 0.85, shadowRadius: CGFloat = 4, duration: TimeInterval = 0.45,
         enabledStyle: some ShapeStyle = .primary, disabledStyle: some ShapeStyle = .quinary,
-        isOn: Binding<Bool>,
-        @ViewBuilder label: @escaping () -> Label,
-        onGestureChanged: ((DragGesture.Value) -> ())? = nil,
-        onGestureEnded: ((DragGesture.Value) -> ())? = nil
+        isOn: Binding<Bool>
     ) {
         self.scaleFactor = scaleFactor
         self.shadowRadius = shadowRadius
@@ -116,62 +90,37 @@ struct AliveButton<Label>: View where Label: View {
         self.enabledStyle = .init(enabledStyle)
         self.hoveringStyle = nil
         self.disabledStyle = .init(disabledStyle)
-        self.onGestureChanged = onGestureChanged
-        self.onGestureEnded = onGestureEnded
-        self.label = label
 
-        self.action = {}
         self.isOn = isOn
     }
 
-    var body: some View {
-        label()
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
             .onAppear {
                 guard let isOn else { return }
                 isActive = isOn.wrappedValue
             }
             .onChange(of: isOn?.wrappedValue ?? false) { _, newValue in
                 isActive = newValue
-                isPressing = false
+                isPressed = false
             }
-            .gesture(DragGesture(minimumDistance: 0)
-                .onChanged { gesture in
-                    guard isEnabled else { return }
-
+            .onChange(of: configuration.isPressed) { _, newValue in
+                guard isEnabled else { return }
+                isPressed = newValue
+                if newValue {
                     if let isOn {
                         isActive = !isOn.wrappedValue
                     } else {
                         isActive = true
                     }
-                    isPressing = true
-
-                    onGestureChanged?(gesture)
-                }
-                .onEnded { gesture in
-                    guard isEnabled else { return }
-
-                    // Only triggers action when location is valid (inside this view)
-                    if frame.contains(gesture.location) {
-                        if let isOn {
-                            isOn.wrappedValue.toggle()
-                        } else {
-                            action()
-                        }
-                    }
-
+                } else {
                     if let isOn {
+                        isOn.wrappedValue.toggle()
                         isActive = isOn.wrappedValue
                     } else {
                         isActive = false
                     }
-                    isPressing = false
-
-                    onGestureEnded?(gesture)
-                })
-            .onGeometryChange(for: CGRect.self) { proxy in
-                proxy.frame(in: .local)
-            } action: { frame in
-                self.frame = frame
+                }
             }
             .onHover { hover in
                 isHovering = hover
@@ -181,12 +130,12 @@ struct AliveButton<Label>: View where Label: View {
             .shadow(color: .black.opacity(isActive ? 0.1 : 0), radius: isActive ? shadowRadius : 0)
             .animation(hasHoveringStyle ? .default : nil, value: isHovering) // Avoid unnecessary transitions on hover
             .animation(.bouncy, value: isActive)
-            .animation(.bouncy, value: isPressing)
+            .animation(.bouncy, value: isPressed)
             .animation(.default, value: isEnabled)
     }
 
     private var computedScaleFactor: CGFloat {
-        if isPressing {
+        if isPressed {
             scaleFactor * 0.95
         } else {
             isActive ? scaleFactor : 1
@@ -214,14 +163,14 @@ struct AliveButton<Label>: View where Label: View {
     @Previewable @State var isOn = false
 
     HStack {
-        AliveButton {
+        Button {
             print("Clicked!")
         } label: {
             Image(systemSymbol: .appleLogo)
                 .imageScale(.large)
         }
 
-        AliveButton {
+        Button {
             print("Clicked!")
         } label: {
             Image(systemSymbol: .appleLogo)
@@ -229,12 +178,14 @@ struct AliveButton<Label>: View where Label: View {
         }
         .disabled(true)
 
-        AliveButton(isOn: $isOn) {
+        Button {} label: {
             Image(systemSymbol: .appleLogo)
                 .imageScale(.large)
         }
+        .buttonStyle(AliveButtonStyle(isOn: $isOn))
 
         Toggle("External", isOn: $isOn)
     }
+    .buttonStyle(AliveButtonStyle())
     .padding()
 }
