@@ -9,9 +9,9 @@ import SwiftUI
 
 struct AlternativeAboutView: View {
     var body: some View {
-        let version = Bundle.main.appVersion
-        let build = Bundle.main.appBuild.flatMap(String.init)
-        let combined = "\(version ?? "000") \(build ?? "000")"
+        let version = Bundle.main[.appVersion]
+        let build = Bundle.main[.appBuild]
+        let combined = "\(version) \(build)"
 
         VStack {
             ContinuousRippleEffectView {

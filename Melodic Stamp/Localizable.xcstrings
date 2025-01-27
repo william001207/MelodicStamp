@@ -1329,17 +1329,6 @@
         }
       }
     },
-    "Hide" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "隐藏"
-          }
-        }
-      }
-    },
     "Illustration" : {
       "localizations" : {
         "zh-Hans" : {

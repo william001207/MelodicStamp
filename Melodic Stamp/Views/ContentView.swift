@@ -210,7 +210,7 @@ struct ContentView: View {
     }
 
     private var title: String {
-        let fallbackTitle = Bundle.main.displayName
+        let fallbackTitle = Bundle.main[localized: .appName]
 
         if player.isPlayable, let track = player.track {
             let musicTitle = MusicTitle.stringifiedTitle(mode: .title, for: track)

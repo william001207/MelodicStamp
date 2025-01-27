@@ -106,50 +106,49 @@ struct AboutView: View {
     }
 
     @ViewBuilder private func versionView() -> some View {
-        if let version = Bundle.main.appVersion {
-            let build = Bundle.main.appBuild.flatMap(String.init) ?? ""
-            let hasBuild = !build.isEmpty
+        let version = Bundle.main[.appVersion]
+        let build = Bundle.main[.appBuild]
+        let hasBuild = !build.isEmpty
 
-            let combined: String = if hasBuild {
-                String(localized: .init(
-                    "About: Version Template",
-                    defaultValue: "\(version) (\(build))"
-                ))
-            } else {
-                version
+        let combined: String = if hasBuild {
+            String(localized: .init(
+                "About: Version Template",
+                defaultValue: "\(version) (\(build))"
+            ))
+        } else {
+            version
+        }
+
+        Button {
+            NSPasteboard.general.setString(combined, forType: .string)
+
+            copyVersionDispatch?.cancel()
+            withAnimation {
+                isVersionCopied = true
             }
 
-            Button {
-                NSPasteboard.general.setString(combined, forType: .string)
-
-                copyVersionDispatch?.cancel()
+            let dispatch = DispatchWorkItem {
                 withAnimation {
-                    isVersionCopied = true
+                    isVersionCopied = false
                 }
-
-                let dispatch = DispatchWorkItem {
-                    withAnimation {
-                        isVersionCopied = false
-                    }
-                }
-                copyVersionDispatch = dispatch
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1.5, execute: dispatch)
-            } label: {
-                Group {
-                    if isVersionCopied {
-                        Text("Copied to clipboard!")
-                    } else {
-                        HStack(spacing: 12) {
-                            Text("Version")
-
-                            Text(combined)
-                                .monospaced()
-                        }
-                    }
-                }
-                .font(.caption)
-                .foregroundStyle(.tertiary)
             }
+            copyVersionDispatch = dispatch
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5, execute: dispatch)
+        } label: {
+            Group {
+                if isVersionCopied {
+                    Text("Copied to clipboard!")
+                } else {
+                    HStack(spacing: 12) {
+                        Text("Version")
+
+                        Text(combined)
+                            .monospaced()
+                    }
+                }
+            }
+            .font(.caption)
+            .foregroundStyle(.tertiary)
         }
     }
 

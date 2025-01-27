@@ -8,35 +8,22 @@
 import Foundation
 
 extension Bundle {
-    var appName: String {
-        self[localizedInfo: "CFBundleName"] ?? "⚠️"
+    enum Key: String {
+        case appName = "CFBundleName"
+        case displayName = "CFBundleDisplayName"
+        case bundleID = "CFBundleIdentifier"
+        case copyright = "NSHumanReadableCopyright"
+        case appBuild = "CFBundleVersion"
+        case appVersion = "CFBundleShortVersionString"
+    }
+}
+
+extension Bundle {
+    subscript(localized key: Key) -> String {
+        localizedInfoDictionary?[key.rawValue] as? String ?? "⚠️"
     }
 
-    var displayName: String {
-        self[localizedInfo: "CFBundleDisplayName"] ?? "⚠️"
-    }
-
-    var bundleID: String {
-        self[localizedInfo: "CFBundleIdentifier"] ?? "⚠️"
-    }
-
-    var copyright: String {
-        self[localizedInfo: "NSHumanReadableCopyright"] ?? "⚠️"
-    }
-
-    var appBuild: Int? {
-        self[info: "CFBundleVersion"].flatMap(Int.init)
-    }
-
-    var appVersion: String? {
-        self[info: "CFBundleShortVersionString"]
-    }
-
-    subscript(localizedInfo key: String) -> String? {
-        localizedInfoDictionary?[key] as? String
-    }
-
-    subscript(info key: String) -> String? {
-        infoDictionary?[key] as? String
+    subscript(_ key: Key) -> String {
+        infoDictionary?[key.rawValue] as? String ?? "⚠️"
     }
 }
