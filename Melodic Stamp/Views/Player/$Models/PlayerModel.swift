@@ -62,7 +62,7 @@ extension PlayerModel {
 
     // MARK: Playlist & Playback
 
-    private(set) var playlist: Playlist = .init()
+    private(set) var playlist: Playlist = .referenced()
     var selectedTracks: Set<Track> = []
 
     var playbackMode: PlaybackMode {
@@ -141,7 +141,8 @@ extension PlayerModel {
     // MARK: Playlist
 
     var currentTrack: Track? {
-        playlist.currentTrack
+        get { playlist.currentTrack }
+        set { playlist.currentTrack = newValue }
     }
 
     var nextTrack: Track? {
@@ -248,65 +249,53 @@ extension PlayerModel {
 extension PlayerModel {
     // MARK: Play
 
-    func play(track: Track) {
-        addToPlaylist(urls: [track.url])
-
-        self.track = track
-        player.play(track)
-    }
-
-    func play(url: URL) {
+    func play(_ url: URL) {
         Task {
-            if let track = await Track(url: url) {
-                play(track: track)
+            let track = await playlist.getOrCreateTrack(at: url)
+            currentTrack = track
+
+            if let track {
+                player.play(track)
             }
         }
     }
 
     // MARK: Playlist
 
-    func addToPlaylist(urls: [URL]) {
+    func addToPlaylist(_ urls: [URL]) {
         for url in urls {
-            guard !playlist.contains(where: { $0.url == url }) else { continue }
-
             Task {
-                if let track = await Track(url: url) {
-                    addToPlaylist(tracks: [track])
-                }
+                guard let track = await playlist.getOrCreateTrack(at: url) else { return }
+                guard !playlist.contains(track) else { return }
+
+                playlist.tracks.append(track)
             }
         }
     }
 
-    func addToPlaylist(tracks: [Track]) {
-        for track in tracks {
-            guard !playlist.contains(track) else { continue }
-            playlist.append(track)
-        }
-    }
-
-    func removeFromPlaylist(urls: [URL]) {
+    func removeFromPlaylist(_ urls: [URL]) {
         for url in urls {
-            if let index = playlist.firstIndex(where: { $0.url == url }) {
-                if track?.url == url {
+            Task {
+                guard let track = await playlist.getOrCreateTrack(at: url) else { return }
+
+                // Stops if the playing track is removed
+                if currentTrack == track {
                     player.stop()
-                    track = nil
+                    currentTrack = nil
                 }
-                let removed = playlist.remove(at: index)
-                selectedTracks.remove(removed)
+
+                // Removes from selected
+                selectedTracks.remove(track)
             }
         }
     }
 
-    func removeFromPlaylist(tracks: [Track]) {
-        removeFromPlaylist(urls: tracks.map(\.url))
+    func clearPlaylist() {
+        removeFromPlaylist(playlist.map(\.url))
     }
 
     func movePlaylist(fromOffsets indices: IndexSet, toOffset destination: Int) {
-        playlist.move(fromOffsets: indices, toOffset: destination)
-    }
-
-    func removeAll() {
-        removeFromPlaylist(tracks: playlist)
+        playlist.tracks.move(fromOffsets: indices, toOffset: destination)
     }
 
     // MARK: Convenient Functions
@@ -314,8 +303,8 @@ extension PlayerModel {
     func play() {
         if isRunning {
             player.play()
-        } else if let track {
-            play(track: track)
+        } else if let currentTrack {
+            play(currentTrack.url)
         }
     }
 
@@ -336,21 +325,21 @@ extension PlayerModel {
     }
 
     func playNextTrack() {
-        guard let nextIndex else {
+        guard let nextTrack else {
             stop()
             return
         }
 
-        play(track: playlist[nextIndex])
+        play(nextTrack.url)
     }
 
     func playPreviousTrack() {
-        guard let previousIndex else {
+        guard let previousTrack else {
             stop()
             return
         }
 
-        play(track: playlist[previousIndex])
+        play(previousTrack.url)
     }
 
     // MARK: Engine
@@ -453,9 +442,9 @@ extension PlayerModel: PlayerDelegate {
     nonisolated func playerDidFinishPlaying(_: some Melodic_Stamp.Player) {
         Task { @MainActor in
             if self.playbackLooping {
-                if let track = self.track {
+                if let currentTrack = self.currentTrack {
                     // Plays again
-                    self.play(track: track)
+                    self.play(currentTrack.url)
                 }
             } else {
                 // Jumps to next track
@@ -472,11 +461,11 @@ extension PlayerModel: AudioPlayer.Delegate {
             if let nowPlaying,
                let audioDecoder = nowPlaying as? AudioDecoder,
                let url = audioDecoder.inputSource.url {
-                track = playlist.first { $0.url == url }
+                currentTrack = await playlist.getTrack(at: url)
             }
 
             updatePlaybackState()
-            updateNowPlayingMetadataInfo(from: track)
+            updateNowPlayingMetadataInfo(from: currentTrack)
             updateNowPlayingState(with: playbackState)
             updateNowPlayingInfo(with: playbackState)
         }
@@ -485,7 +474,7 @@ extension PlayerModel: AudioPlayer.Delegate {
     nonisolated func audioPlayer(_: AudioPlayer, playbackStateChanged playbackState: AudioPlayer.PlaybackState) {
         Task { @MainActor in
             updatePlaybackState()
-            updateNowPlayingMetadataInfo(from: track)
+            updateNowPlayingMetadataInfo(from: currentTrack)
             updateNowPlayingState(with: .init(playbackState))
             updateNowPlayingInfo(with: .init(playbackState))
         }

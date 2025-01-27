@@ -149,54 +149,41 @@ extension Playlist {
 }
 
 extension Playlist {
-    mutating func play(track: Track) {
-        add(urls: [track.url])
-        currentTrack = track
+    static func isCanonical(url: URL) -> Bool {
+        let parent = URL.playlists.standardized
+        return url.standardized.path().hasPrefix(parent.path())
     }
 
-    mutating func play(url: URL) async {
-        if let track = await Track(url: url) {
-            play(track: track)
-        }
-    }
+    private func makeValid(url: URL) async throws -> URL {
+        switch mode {
+        case .referenced:
+            return url
+        case .canonical:
+            if Self.isCanonical(url: url) {
+                return url
+            } else {
+                let id = UUID()
+                let destination = URL.playlists
+                    .appending(component: id.uuidString, directoryHint: .notDirectory)
+                    .appendingPathExtension(url.pathExtension)
 
-    mutating func add(urls: [URL]) {
-        for url in urls {
-            guard !playlist.contains(where: { $0.url == url }) else { continue }
-
-            Task {
-                if let track = await Track(url: url) {
-                    addToPlaylist(tracks: [track])
-                }
+                try FileManager.default.copyItem(at: url, to: destination)
+                return destination
             }
         }
     }
 
-    mutating func add(tracks: [Track]) {
-        for track in tracks {
-            guard !playlist.contains(track) else { continue }
-            playlist.append(track)
+    func getTrack(at _: URL) async -> Track? {
+        guard let url = try? await makeValid(url: url) else { return nil }
+        return first(where: { $0.url == url })
+    }
+
+    func getOrCreateTrack(at url: URL) async -> Track? {
+        if let track = await getTrack(at: url) {
+            return track
+        } else {
+            guard let url = try? await makeValid(url: url) else { return nil }
+            return await Track(url: url)
         }
-    }
-
-    mutating func remove(urls: [URL]) {
-        for url in urls {
-            if let index = playlist.firstIndex(where: { $0.url == url }) {
-                if track?.url == url {
-                    player.stop()
-                    track = nil
-                }
-                let removed = playlist.remove(at: index)
-                selectedTracks.remove(removed)
-            }
-        }
-    }
-
-    mutating func remove(tracks: [Track]) {
-        removeFromPlaylist(urls: tracks.map(\.url))
-    }
-
-    mutating func removeAll() {
-        removeFromPlaylist(tracks: playlist)
     }
 }
