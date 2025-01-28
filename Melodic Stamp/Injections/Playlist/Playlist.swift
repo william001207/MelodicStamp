@@ -72,6 +72,8 @@ struct Playlist: Equatable, Hashable, Identifiable {
             guard let permanentTrack = await getOrCreateTrack(at: track.url) else { continue }
             tracks.append(permanentTrack)
         }
+
+        print("Made permanent playlist at \(url)")
     }
 
     static func referenced() -> Playlist {
@@ -188,6 +190,7 @@ extension Playlist {
         guard isCanonical(url: url) else { return }
         Task {
             try FileManager.default.removeItem(at: url)
+            print("Deleted canonical track at \(url)")
         }
     }
 
@@ -201,6 +204,7 @@ extension Playlist {
             .appendingPathExtension(url.pathExtension)
 
         try FileManager.default.copyItem(at: url, to: destinationURL)
+        print("Created canonical track at \(destinationURL), copying from \(url)")
         return await Track(loadingFrom: destinationURL)
     }
 
