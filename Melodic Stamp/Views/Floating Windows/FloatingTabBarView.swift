@@ -20,6 +20,7 @@ struct FloatingTabBarView: View {
 
     @State private var isHovering: Bool = true // Avoids glitches on first hover
     @State private var hoveringTabs: Set<AnyHashable> = []
+    @State private var tabBounceAnimations: [AnyHashable: Bool] = [:]
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -137,6 +138,16 @@ struct FloatingTabBarView: View {
             Image(systemSymbol: tab.systemSymbol)
                 .font(.system(size: 18))
                 .frame(width: 32, height: 32)
+                .symbolVariant(isSelected ? .fill : .none)
+                .symbolEffect(.bounce, value: tabBounceAnimations[tab])
+                .onChange(of: isSelected) { _, newValue in
+                    guard newValue else { return }
+                    if tabBounceAnimations.keys.contains(tab) {
+                        tabBounceAnimations[tab]?.toggle()
+                    } else {
+                        tabBounceAnimations.updateValue(true, forKey: tab)
+                    }
+                }
 
             if isExpanded {
                 Text(tab.title)

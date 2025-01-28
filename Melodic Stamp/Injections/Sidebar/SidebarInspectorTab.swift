@@ -12,6 +12,7 @@ enum SidebarInspectorTab: String, SidebarTab, CaseIterable, Codable {
     case commonMetadata
     case advancedMetadata
     case lyrics
+    case library
     case analytics
 
     var id: Self { self }
@@ -24,6 +25,8 @@ enum SidebarInspectorTab: String, SidebarTab, CaseIterable, Codable {
             String(localized: "Advanced")
         case .lyrics:
             String(localized: "Lyrics")
+        case .library:
+            String(localized: "Library")
         case .analytics:
             String(localized: "Analytics")
         }
@@ -37,8 +40,10 @@ enum SidebarInspectorTab: String, SidebarTab, CaseIterable, Codable {
             .at
         case .lyrics:
             .textQuote
+        case .library:
+            .buildingColumns
         case .analytics:
-            .checkmarkSealFill
+            .checkmarkSeal
         }
     }
 }

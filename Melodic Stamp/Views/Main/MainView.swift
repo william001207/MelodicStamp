@@ -89,6 +89,8 @@ struct MainView: View {
                             LyricsToolbar()
                         }
                     }
+            case .library:
+                InspectorLibraryView()
             case .analytics:
                 InspectorAnalyticsView()
             }

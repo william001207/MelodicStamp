@@ -1329,6 +1329,9 @@
         }
       }
     },
+    "Hello, World!" : {
+
+    },
     "Illustration" : {
       "localizations" : {
         "zh-Hans" : {
@@ -1411,6 +1414,9 @@
           }
         }
       }
+    },
+    "Library" : {
+
     },
     "Load from File" : {
       "localizations" : {

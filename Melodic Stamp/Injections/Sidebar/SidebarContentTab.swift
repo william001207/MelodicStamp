@@ -35,9 +35,9 @@ enum SidebarContentTab: String, SidebarTab, CaseIterable, Codable {
     var inspectors: [SidebarInspectorTab] {
         switch self {
         case .playlist:
-            [.commonMetadata, .advancedMetadata, .lyrics, .analytics]
+            [.commonMetadata, .advancedMetadata, .lyrics, .library, .analytics]
         case .leaflet:
-            [.analytics]
+            [.library, .analytics]
         }
     }
 }
