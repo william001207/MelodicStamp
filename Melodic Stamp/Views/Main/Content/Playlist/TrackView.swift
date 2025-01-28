@@ -165,7 +165,7 @@ struct TrackView: View {
                     images: [thumbnail], hasPlaceholder: false, cornerRadius: 4
                 )
                 .overlay {
-                    if isHovering {
+                    if isHovering, isInitialized {
                         Rectangle()
                             .foregroundStyle(.black)
                             .opacity(0.25)

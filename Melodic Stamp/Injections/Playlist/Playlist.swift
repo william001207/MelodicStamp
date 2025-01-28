@@ -228,22 +228,22 @@ extension Playlist {
     }
 
     func getOrCreateTrack(at url: URL) async -> Track? {
-        if let track = await getTrack(at: url) {
-            if Self.isCanonical(url: url) {
+        switch mode {
+        case .referenced:
+            if let track = await getTrack(at: url) {
                 track
             } else {
-                await Track(migratingFrom: track, withURL: generateCanonicalURL(for: url), useFallbackTitleIfNotProvided: true)
-            }
-        } else {
-            switch mode {
-            case .referenced:
                 await Track(loadingFrom: url)
-            case .canonical:
+            }
+        case .canonical:
+            if let track = await getTrack(at: url) {
                 if Self.isCanonical(url: url) {
-                    await Track(loadingFrom: url)
+                    track
                 } else {
-                    try? await createTrack(copyingFrom: url)
+                    await Track(migratingFrom: track, withURL: generateCanonicalURL(for: url), useFallbackTitleIfNotProvided: true)
                 }
+            } else {
+                try? await createTrack(copyingFrom: url)
             }
         }
     }

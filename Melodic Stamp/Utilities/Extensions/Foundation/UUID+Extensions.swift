@@ -48,7 +48,7 @@ extension FormatStyle where Self == UUID.FormatStyle {
 }
 
 extension UUID {
-    var shortString: String {
-        String(hashValue, radix: 26)
+    var shortened: String {
+        UUIDShortener.shorten(uuid: self)
     }
 }
