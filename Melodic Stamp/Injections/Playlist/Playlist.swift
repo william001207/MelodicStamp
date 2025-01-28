@@ -184,17 +184,18 @@ extension Playlist {
         }
     }
 
-    func getTrack(at _: URL) async -> Track? {
-        guard let url = try? await makeValid(url: url) else { return nil }
-        return first(where: { $0.url == url })
+    // SwiftFormat meets a bug when `validURL` is named `url`
+    func getTrack(at url: URL) async -> Track? {
+        guard let validURL = try? await makeValid(url: url) else { return nil }
+        return first(where: { $0.url == validURL })
     }
 
     func getOrCreateTrack(at url: URL) async -> Track? {
         if let track = await getTrack(at: url) {
             return track
         } else {
-            guard let url = try? await makeValid(url: url) else { return nil }
-            return await Track(loadingFrom: url)
+            guard let validURL = try? await makeValid(url: url) else { return nil }
+            return await Track(loadingFrom: validURL)
         }
     }
 }
