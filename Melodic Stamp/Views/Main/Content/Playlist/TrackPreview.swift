@@ -60,7 +60,5 @@ struct TrackPreview: View {
 #if DEBUG
     #Preview {
         TrackPreview(track: SampleEnvironmentsPreviewModifier.sampleTrack)
-            .border(.blue)
-            .padding(100)
     }
 #endif

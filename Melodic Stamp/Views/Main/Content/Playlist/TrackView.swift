@@ -195,3 +195,9 @@ struct TrackView: View {
         bounceAnimationTrigger.toggle()
     }
 }
+
+#if DEBUG
+    #Preview(traits: .modifier(SampleEnvironmentsPreviewModifier())) {
+        TrackView(track: SampleEnvironmentsPreviewModifier.sampleTrack, isSelected: false)
+    }
+#endif

@@ -15,7 +15,7 @@ struct InspectorLibraryView: View {
     var body: some View {
         List(selection: $selectedPlaylist) {
             ForEach(library.playlists) { playlist in
-                LibraryPlaylistView(playlist: playlist)
+                LibraryItemView(playlist: playlist)
                     .id(playlist)
             }
         }

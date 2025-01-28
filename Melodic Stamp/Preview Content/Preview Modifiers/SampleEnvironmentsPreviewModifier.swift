@@ -71,6 +71,10 @@ import SwiftUI
     }
 
     extension SampleEnvironmentsPreviewModifier {
+        static var sampleArtwork: NSImage {
+            .templateArtwork
+        }
+
         static var sampleURL: URL {
             .init(string: "file:///Files/A Fake Song File.flac")!
         }
@@ -84,7 +88,7 @@ import SwiftUI
         static var sampleMetadata: Metadata {
             let metadata = AudioMetadata()
 
-            metadata.attachPicture(NSImage.templateArtwork.attachedPicture(of: .other)!)
+            metadata.attachPicture(sampleArtwork.attachedPicture(of: .other)!)
             metadata.title = "A Song"
             metadata.artist = "Artist 1/Artist 2"
             metadata.lyrics = sampleLyrics
@@ -104,6 +108,11 @@ import SwiftUI
         static var samplePlaylist: Playlist {
             var result = Playlist.referenced()
             result.add([sampleTrack])
+
+            result.information.info.title = "Sample Playlist"
+            result.information.info.description = "A sample playlist."
+            result.information.artwork.tiffRepresentation = sampleArtwork.tiffRepresentation
+
             return result
         }
 

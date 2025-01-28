@@ -46,3 +46,9 @@ extension FormatStyle where Self == UUID.FormatStyle {
         .init(parseStrategy: parseStrategy)
     }
 }
+
+extension UUID {
+    var shortString: String {
+        String(hashValue, radix: 26)
+    }
+}

@@ -9,7 +9,7 @@ import Foundation
 @testable import Melodic_Stamp
 import Testing
 
-@Suite struct SequenceTests {
+@Suite struct SequenceExtensionTests {
     @Test func normalize() {
         let sequence: [Float] = [1, 2, 3, 4, 5]
         let normalizedSequence: [Float] = [0, 0.25, 0.5, 0.75, 1]
