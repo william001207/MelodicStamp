@@ -69,12 +69,12 @@ struct PlaylistInformation: Equatable, Hashable, Identifiable, Codable {
 }
 
 extension PlaylistInformation {
-    static func blank(id: UUID = .init()) -> Self {
+    static func blank(bindingTo id: UUID = .init()) -> Self {
         .init(id: id, info: .init(), state: .init(), artwork: .init())
     }
 
     static func url(forID id: UUID) -> URL {
-        URL.playlists.appending(component: id.uuidString)
+        URL.playlists.appending(component: id.uuidString, directoryHint: .isDirectory)
     }
 
     var url: URL {

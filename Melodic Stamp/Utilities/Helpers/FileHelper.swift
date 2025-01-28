@@ -11,8 +11,9 @@ import UniformTypeIdentifiers
 enum FileHelper {}
 
 extension FileHelper {
-    static func flatten(contentsOfFolder folderURL: URL, allowedContentTypes: [UTType], isRecursive: Bool = true) -> [URL] {
-        guard folderURL.startAccessingSecurityScopedResource() else { return [] }
+    static func flatten(contentsOf folderURL: URL, allowedContentTypes: Set<UTType> = allowedContentTypes, isRecursive: Bool = true) -> [URL] {
+        let isReachable = (try? folderURL.checkResourceIsReachable()) ?? false
+        guard folderURL.startAccessingSecurityScopedResource() || isReachable else { return [] }
         guard folderURL.hasDirectoryPath else { return [folderURL] }
 
         guard let contents = try? FileManager.default.contentsOfDirectory(
@@ -23,7 +24,7 @@ extension FileHelper {
 
         return contents.flatMap { url in
             guard url.isFileURL else {
-                return flatten(contentsOfFolder: url, allowedContentTypes: allowedContentTypes, isRecursive: isRecursive)
+                return flatten(contentsOf: url, allowedContentTypes: allowedContentTypes, isRecursive: isRecursive)
             }
 
             return if let url = filter(url: url) {

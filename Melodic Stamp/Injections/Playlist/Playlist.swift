@@ -55,13 +55,13 @@ struct Playlist: Equatable, Hashable, Identifiable {
         self.information = information
     }
 
-    init?(bindingTo id: UUID) async {
+    init?(loadingWith id: UUID) async {
         self.mode = .canonical
 
         guard let information = try? PlaylistInformation(readingFromPlaylistID: id) else { return nil }
         self.information = information
 
-        let urls = FileHelper.flatten(contentsOfFolder: information.url, allowedContentTypes: Array(allowedContentTypes), isRecursive: false)
+        let urls = FileHelper.flatten(contentsOf: information.url, isRecursive: false)
         for url in urls {
             guard let track = await Track(loadingFrom: url) else { return }
             tracks.append(track)
@@ -69,19 +69,19 @@ struct Playlist: Equatable, Hashable, Identifiable {
     }
 
     init?(makingCanonical oldValue: Playlist) async {
-        self.mode = .canonical
-        self.information = oldValue.information
-
-        let url = information.url
+        let url = oldValue.information.url
         if FileManager.default.fileExists(atPath: url.path) {
             // Load from existing canonical playlist
 
-            guard let instance = await Self(bindingTo: id) else { return nil }
+            guard let instance = await Self(loadingWith: oldValue.id) else { return nil }
             self = instance
 
             logger.info("Loaded permanent playlist from \(url)")
         } else {
             // Copy and create a new canonical playlist
+
+            self.mode = .canonical
+            self.information = oldValue.information
 
             do {
                 try FileManager.default.createDirectory(at: url, withIntermediateDirectories: true)
@@ -99,10 +99,10 @@ struct Playlist: Equatable, Hashable, Identifiable {
         }
     }
 
-    static func referenced(id: UUID = .init()) -> Playlist {
+    static func referenced(bindingTo id: UUID = .init()) -> Playlist {
         .init(
             mode: .referenced,
-            information: .blank(id: id)
+            information: .blank(bindingTo: id)
         )
     }
 }

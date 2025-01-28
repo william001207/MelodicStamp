@@ -185,7 +185,7 @@ extension PlayerModel: TypeNameReflectable {}
 
     init(_ player: some Player, bindingTo id: UUID = .init()) {
         self.player = player
-        self.playlist = .referenced(id: id)
+        self.playlist = .referenced(bindingTo: id)
         super.init()
 
         self.player.delegate = self
@@ -331,7 +331,7 @@ extension PlayerModel {
 
         for content in contents.filter(\.hasDirectoryPath) {
             let pathName = content.lastPathComponent
-            guard let id = UUID(uuidString: pathName), let playlist = await Playlist(bindingTo: id) else { continue }
+            guard let id = UUID(uuidString: pathName), let playlist = await Playlist(loadingWith: id) else { continue }
 
             playlists.append(playlist)
         }

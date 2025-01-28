@@ -46,6 +46,7 @@ enum FileAdderPresentationStyle {
 
     func open(url: URL, openWindow: OpenWindowAction) {
         guard url.startAccessingSecurityScopedResource() else { return }
+        defer { url.stopAccessingSecurityScopedResource() }
 
         Task { @MainActor in
             switch fileOpenerPresentationStyle {
@@ -65,7 +66,7 @@ enum FileAdderPresentationStyle {
 
     func add(urls: [URL], openWindow: OpenWindowAction) {
         let urls = urls.flatMap { url in
-            FileHelper.flatten(contentsOfFolder: url, allowedContentTypes: .init(allowedContentTypes))
+            FileHelper.flatten(contentsOf: url)
         }
 
         Task { @MainActor in

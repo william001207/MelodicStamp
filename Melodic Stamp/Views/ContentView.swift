@@ -325,11 +325,11 @@ struct ContentView: View {
                     case let .referenced(urls):
                         player.addToPlaylist(urls)
 
-                        logger.info("Created playlist from referenced URLs: \(urls)")
+                        logger.info("Created window from referenced URLs: \(urls)")
                     case let .canonical(id):
                         await player.makePlaylistCanonical()
 
-                        logger.info("Created playlist with canonical ID: \(id)")
+                        logger.info("Created window with canonical ID: \(id)")
                     }
 
                     if parameters.shouldPlay, let firstTrack = player.playlist.first {
