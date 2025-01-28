@@ -31,6 +31,9 @@ import SwiftUI
     var isTabBarAdded: Bool { tabBarWindow != nil }
     var isPlayerAdded: Bool { playerWindow != nil }
 
+    private var tabBarAdditionDispatch: DispatchWorkItem?
+    private var playerAdditionDispatch: DispatchWorkItem?
+
     func observe(_ window: NSWindow? = nil) {
         NotificationCenter.default.removeObserver(self)
         guard let window else { return }
@@ -106,11 +109,14 @@ import SwiftUI
         floatingWindow.alphaValue = 0
         floatingWindow.animator().alphaValue = 1
 
-        DispatchQueue.main.async {
+        tabBarAdditionDispatch?.cancel()
+        let dispatch = DispatchWorkItem {
             applicationWindow.addChildWindow(floatingWindow, ordered: .above)
             self.updateTabBarPosition(window: floatingWindow, in: applicationWindow)
             self.isHidden = false
         }
+        tabBarAdditionDispatch = dispatch
+        DispatchQueue.main.async(execute: dispatch)
     }
 
     func addPlayer(to mainWindow: NSWindow? = nil, @ViewBuilder content: @escaping () -> some View) {
@@ -129,16 +135,20 @@ import SwiftUI
         floatingWindow.alphaValue = 0
         floatingWindow.animator().alphaValue = 1
 
-        DispatchQueue.main.async {
+        playerAdditionDispatch?.cancel()
+        let dispatch = DispatchWorkItem {
             applicationWindow.addChildWindow(floatingWindow, ordered: .above)
             self.updatePlayerPosition(window: floatingWindow, in: applicationWindow)
             self.isHidden = false
         }
+        playerAdditionDispatch = dispatch
+        DispatchQueue.main.async(execute: dispatch)
     }
 
     func removeTabBar(from mainWindow: NSWindow? = nil) {
         guard let tabBarWindow, let applicationWindow = mainWindow ?? NSApp.mainWindow else { return }
 
+        tabBarAdditionDispatch?.cancel()
         applicationWindow.removeChildWindow(tabBarWindow)
         tabBarWindow.orderOut(nil)
         self.tabBarWindow = nil
@@ -147,6 +157,7 @@ import SwiftUI
     func removePlayer(from mainWindow: NSWindow? = nil) {
         guard let playerWindow, let applicationWindow = mainWindow ?? NSApp.mainWindow else { return }
 
+        playerAdditionDispatch?.cancel()
         applicationWindow.removeChildWindow(playerWindow)
         playerWindow.orderOut(nil)
         self.playerWindow = nil

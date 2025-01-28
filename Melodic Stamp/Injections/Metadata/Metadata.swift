@@ -533,9 +533,9 @@ extension Metadata {
 
         switch await state {
         case .loading:
-            logger.info("Loaded metadata from \(url)")
+            logger.info("Loaded metadata from \(self.url)")
         default:
-            logger.info("Updated metadata from \(url)")
+            logger.info("Updated metadata from \(self.url)")
         }
 
         await updateState(to: .fine)
@@ -566,7 +566,7 @@ extension Metadata {
         await updateState(to: .saving)
         await apply()
 
-        logger.info("Started writing metadata to \(url)")
+        logger.info("Started writing metadata to \(self.url)")
 
         guard let file = try? AudioFile(url: url) else {
             await updateState(to: state.with(error: .fileNotFound))
@@ -593,7 +593,7 @@ extension Metadata {
         await updateState(to: .fine)
         completion?()
 
-        logger.info("Successfully written metadata to \(url)")
+        logger.info("Successfully written metadata to \(self.url)")
     }
 
     func poll<V>(for keyPath: WritableKeyPath<Metadata, Entry<V>>) async -> MetadataBatchEditingEntry<V> {

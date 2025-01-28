@@ -1,3 +1,4 @@
+--languagemode 6
 --acronyms ID,URL,UUID
 --allman false
 --anonymousforeach convert
@@ -55,7 +56,7 @@
 --ranges spaced
 --redundanttype infer-locals-only
 --self init-only
---selfrequired 
+--selfrequired info,error,debug,log,trace,warning,notice,critical,fault 
 --semicolons inline
 --shortoptionals except-properties
 --smarttabs enabled

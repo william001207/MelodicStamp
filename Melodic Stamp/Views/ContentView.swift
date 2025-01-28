@@ -81,6 +81,7 @@ struct ContentView: View {
 
     @State private var sizer: Sizer = .init()
     @State private var isUnsavedChangesPresented: Bool = false
+    @State private var floatingWindowsInitializationDispatch: DispatchWorkItem?
 
     // MARK: - Initializers
 
@@ -275,9 +276,7 @@ struct ContentView: View {
         }
         .onChange(of: appearsActive, initial: true) { _, newValue in
             if newValue {
-                DispatchQueue.main.async {
-                    initializeFloatingWindows(to: window)
-                }
+                initializeFloatingWindows(to: window)
             } else {
                 destroyFloatingWindows(from: window)
             }
@@ -344,38 +343,44 @@ struct ContentView: View {
     }
 
     private func initializeFloatingWindows(to mainWindow: NSWindow? = nil) {
-        floatingWindows.addTabBar(to: mainWindow) {
-            FloatingTabBarView(
-                isInspectorPresented: $isInspectorPresented,
-                selectedContentTab: $selectedContentTab,
-                selectedInspectorTab: $selectedInspectorTab
-            )
-            .onGeometryChange(for: CGSize.self) { proxy in
-                proxy.size
-            } action: { newValue in
-                floatingWindows.updateTabBarPosition(size: newValue, in: mainWindow, animate: true)
-            }
-            .environment(floatingWindows)
-        }
-        floatingWindows.addPlayer(to: mainWindow) {
-            FloatingPlayerView()
+        floatingWindowsInitializationDispatch?.cancel()
+        let dispatch = DispatchWorkItem {
+            floatingWindows.addTabBar(to: mainWindow) {
+                FloatingTabBarView(
+                    isInspectorPresented: $isInspectorPresented,
+                    selectedContentTab: $selectedContentTab,
+                    selectedInspectorTab: $selectedInspectorTab
+                )
                 .onGeometryChange(for: CGSize.self) { proxy in
                     proxy.size
                 } action: { newValue in
-                    floatingWindows.updatePlayerPosition(size: newValue, in: mainWindow, animate: true)
+                    floatingWindows.updateTabBarPosition(size: newValue, in: mainWindow, animate: true)
                 }
                 .environment(floatingWindows)
-                .environment(windowManager)
-                .environment(fileManager)
-                .environment(player)
-                .environment(playerKeyboardControl)
-                .environment(metadataEditor)
-                .environment(audioVisualizer)
-                .environment(gradientVisualizer)
+            }
+            floatingWindows.addPlayer(to: mainWindow) {
+                FloatingPlayerView()
+                    .onGeometryChange(for: CGSize.self) { proxy in
+                        proxy.size
+                    } action: { newValue in
+                        floatingWindows.updatePlayerPosition(size: newValue, in: mainWindow, animate: true)
+                    }
+                    .environment(floatingWindows)
+                    .environment(windowManager)
+                    .environment(fileManager)
+                    .environment(player)
+                    .environment(playerKeyboardControl)
+                    .environment(metadataEditor)
+                    .environment(audioVisualizer)
+                    .environment(gradientVisualizer)
+            }
         }
+        floatingWindowsInitializationDispatch = dispatch
+        DispatchQueue.main.async(execute: dispatch)
     }
 
     private func destroyFloatingWindows(from mainWindow: NSWindow? = nil) {
+        floatingWindowsInitializationDispatch?.cancel()
         floatingWindows.removeTabBar(from: mainWindow)
         floatingWindows.removePlayer(from: mainWindow)
     }
