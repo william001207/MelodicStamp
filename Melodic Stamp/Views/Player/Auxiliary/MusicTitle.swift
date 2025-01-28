@@ -20,6 +20,8 @@ struct MusicTitleDisplayMode: OptionSet {
 }
 
 struct MusicTitle: View {
+    @Environment(PlayerModel.self) private var player
+
     var track: Track?
     var mode: MusicTitleDisplayMode = .all
     var entry: KeyPath<MetadataBatchEditingEntry, String?> = \.initial
@@ -32,7 +34,13 @@ struct MusicTitle: View {
                         if let title = track.metadata[extracting: \.title]?[keyPath: entry], !title.isEmpty {
                             Text(title)
                         } else {
-                            Text(Self.fallbackTitle(for: track))
+                            switch player.playlist.mode {
+                            case .referenced:
+                                Text(Self.fallbackTitle(for: track))
+                            case .canonical:
+                                Text("Unknown Music")
+                                    .foregroundStyle(.secondary)
+                            }
                         }
                     }
                     .bold()
