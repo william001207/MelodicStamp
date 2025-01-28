@@ -229,7 +229,11 @@ extension Playlist {
 
     func getOrCreateTrack(at url: URL) async -> Track? {
         if let track = await getTrack(at: url) {
-            track
+            if Self.isCanonical(url: url) {
+                track
+            } else {
+                await Track(migratingFrom: track, withURL: generateCanonicalURL(for: url), useFallbackTitleIfNotProvided: true)
+            }
         } else {
             switch mode {
             case .referenced:

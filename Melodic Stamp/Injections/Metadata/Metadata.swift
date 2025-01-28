@@ -157,7 +157,7 @@ extension Metadata: TypeNameReflectable {}
         }
     }
 
-    init(migratingFrom oldValue: Metadata, withURL url: URL? = nil) {
+    init(migratingFrom oldValue: Metadata, withURL url: URL? = nil, useFallbackTitleIfNotProvided useFallbackTitle: Bool = false) {
         let url = url ?? oldValue.url
 
         self.url = url
@@ -212,6 +212,12 @@ extension Metadata: TypeNameReflectable {}
         self.replayGainTrackGain = oldValue.replayGainTrackGain
         self.replayGainTrackPeak = oldValue.replayGainTrackPeak
         self.replayGainReferenceLoudness = oldValue.replayGainReferenceLoudness
+
+        if useFallbackTitle, title.initial == nil, title.current == nil {
+            let fallbackTitle = oldValue.url.lastPathComponentRemovingExtension
+            title.initial = fallbackTitle
+            title.current = fallbackTitle
+        }
     }
 
     fileprivate var restorables: [any Restorable] {
