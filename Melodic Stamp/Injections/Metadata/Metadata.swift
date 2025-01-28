@@ -21,9 +21,7 @@ enum MetadataError: Error {
 
 // MARK: Definition
 
-@MainActor @Observable final class Metadata: Identifiable {
-    typealias Entry = MetadataEntry
-
+extension Metadata {
     enum State: Hashable, Equatable {
         case loading
         case fine
@@ -67,6 +65,10 @@ enum MetadataError: Error {
             }
         }
     }
+}
+
+@MainActor @Observable final class Metadata: Identifiable {
+    typealias Entry = MetadataEntry
 
     nonisolated var id: URL { url }
     nonisolated let url: URL
@@ -131,16 +133,6 @@ enum MetadataError: Error {
         restoreSubject.eraseToAnyPublisher()
     }
 
-    init?(url: URL) {
-        self.properties = .init()
-        self.state = .loading
-        self.url = url
-
-        Task.detached {
-            try await self.update()
-        }
-    }
-
     init(url: URL, from metadata: AudioMetadata, with properties: AudioProperties = .init()) {
         self.properties = properties
         self.state = .fine
@@ -150,6 +142,16 @@ enum MetadataError: Error {
 
         Task.detached {
             await self.generateThumbnail()
+        }
+    }
+
+    init?(loadingFrom url: URL) {
+        self.properties = .init()
+        self.state = .loading
+        self.url = url
+
+        Task.detached {
+            try await self.update()
         }
     }
 

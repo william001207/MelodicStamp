@@ -60,55 +60,55 @@ struct DelegatedPlayerSceneStorage: View {
 
     @ViewBuilder private func playlistObservations() -> some View {
         Color.clear
-            .onChange(of: playlistURLs) { _, newValue in
-                playlistURLsState.value = newValue
-            }
-            .onChange(of: player.playlist) { _, newValue in
-                playlistURLsState.isReady = false
-                storePlaylistURLs(newValue)
-            }
-            .onChange(of: playlistURLsState.preparedValue) { _, newValue in
-                guard let newValue else { return }
+//            .onChange(of: playlistURLs) { _, newValue in
+//                playlistURLsState.value = newValue
+//            }
+//            .onChange(of: player.playlist) { _, newValue in
+//                playlistURLsState.isReady = false
+//                storePlaylistURLs(newValue)
+//            }
+//            .onChange(of: playlistURLsState.preparedValue) { _, newValue in
+//                guard let newValue else { return }
+//
+//                if let string = newValue {
+//                    restorePlaylistURLs(string)
+//
+//                    print("Successfully restored playlist tracks")
+//
+//                    // Dependents
+//                    trackState.isReady = true
+//                }
+//
+//                playlistURLsState.isReady = false
+//            }
 
-                if let string = newValue {
-                    restorePlaylistURLs(string)
-
-                    print("Successfully restored playlist tracks")
-
-                    // Dependents
-                    trackState.isReady = true
-                }
-
-                playlistURLsState.isReady = false
-            }
-
-            .onChange(of: track) { _, newValue in
-                trackState.value = newValue
-            }
-            .onChange(of: player.track) { _, newValue in
-                trackState.isReady = false
-                track = newValue?.url
-            }
-            .onChange(of: trackState.preparedValue) { _, newValue in
-                guard let newValue else { return }
-
-                if let url = newValue {
-                    player.play(url: url)
-
-                    print("Successfully restored currently playing track to \(url)")
-
-                    // Dependents
-                    playbackVolumeState.isReady = true
-                    playbackMutedState.isReady = true
-
-                    DispatchQueue.main.async {
-                        player.pause()
-                        playbackPositionState.isReady = true
-                    }
-                }
-
-                trackState.isReady = false
-            }
+//            .onChange(of: track) { _, newValue in
+//                trackState.value = newValue
+//            }
+//            .onChange(of: player.currentTrack) { _, newValue in
+//                trackState.isReady = false
+//                track = newValue?.url
+//            }
+//            .onChange(of: trackState.preparedValue) { _, newValue in
+//                guard let newValue else { return }
+//
+//                if let url = newValue {
+//                    player.play(url: url)
+//
+//                    print("Successfully restored currently playing track to \(url)")
+//
+//                    // Dependents
+//                    playbackVolumeState.isReady = true
+//                    playbackMutedState.isReady = true
+//
+//                    DispatchQueue.main.async {
+//                        player.pause()
+//                        playbackPositionState.isReady = true
+//                    }
+//                }
+//
+//                trackState.isReady = false
+//            }
     }
 
     // MARK: Playback Mode
@@ -231,7 +231,7 @@ struct DelegatedPlayerSceneStorage: View {
                 var isStale = false
                 let url = try URL(resolvingBookmarkData: $0, options: [], bookmarkDataIsStale: &isStale)
                 guard !isStale else { return }
-                player.addToPlaylist(urls: [url])
+                player.addToPlaylist([url])
             }
         } catch {
             fatalError("Failed to decode \(Self.self) from \(string): \(error)")

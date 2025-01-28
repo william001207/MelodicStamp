@@ -34,8 +34,8 @@ import SwiftUI
 
             let track = sampleTrack
 
-            player.addToPlaylist(tracks: [track])
-            player.play(track: track)
+            player.setPlaylist(samplePlaylist)
+            player.play(track.url)
             player.selectedTracks = [track]
 
             let image = NSImage(resource: .templateArtwork)
@@ -95,6 +95,12 @@ import SwiftUI
                 url: sampleURL,
                 metadata: sampleMetadata
             )
+        }
+
+        static var samplePlaylist: Playlist {
+            var result = Playlist.referenced()
+            result.tracks.append(sampleTrack)
+            return result
         }
 
         static var sampleLyrics: String {

@@ -130,14 +130,14 @@ struct LeafletView: View {
 
             // Don't extract this logic or modify the tasks!
             .onAppear {
-                guard let track = player.track else { return }
+                guard let track = player.currentTrack else { return }
 
                 Task {
                     let raw = await track.metadata.poll(for: \.lyrics).current
                     await lyrics.read(raw)
                 }
             }
-            .onChange(of: player.track) { _, newValue in
+            .onChange(of: player.currentTrack) { _, newValue in
                 lyrics.clear(newValue?.url)
                 guard let newValue else { return }
 
@@ -188,7 +188,7 @@ struct LeafletView: View {
 
     private var cover: NSImage? {
         if
-            let attachedPictures = player.track?.metadata[extracting: \.attachedPictures]?.current,
+            let attachedPictures = player.currentTrack?.metadata[extracting: \.attachedPictures]?.current,
             let cover = ThumbnailMaker.getCover(from: attachedPictures)?.image {
             cover
         } else { nil }

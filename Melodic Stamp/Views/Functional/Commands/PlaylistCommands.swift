@@ -29,11 +29,11 @@ struct PlaylistCommands: Commands {
                 if let player, let metadataEditor {
                     if metadataEditor.hasMetadata {
                         Button("Remove from Playlist") {
-                            player.removeFromPlaylist(tracks: .init(player.selectedTracks))
+                            player.removeFromPlaylist(player.selectedTracks.map(\.url))
                         }
                     } else {
                         Button("Clear Playlist") {
-                            player.removeFromPlaylist(tracks: player.playlist)
+                            player.clearPlaylist()
                         }
                         .disabled(player.playlist.isEmpty)
                     }
@@ -51,7 +51,7 @@ struct PlaylistCommands: Commands {
                     let track = player.selectedTracks.first {
                     let title = MusicTitle.stringifiedTitle(mode: .title, for: track)
                     Button {
-                        player.play(track: track)
+                        player.play(track.url)
                     } label: {
                         if !title.isEmpty {
                             Text("Play \(title)")

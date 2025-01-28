@@ -152,11 +152,13 @@ struct AdaptableMusicCoverControl: View {
     private func registerUndo(_ oldValue: Set<AttachedPicture>, for entries: Entries) {
         guard oldValue != entries.projectedValue?.wrappedValue ?? [] else { return }
         undoManager?.registerUndo(withTarget: attachedPicturesHandler) { _ in
-            let entries = self.entries
-            let fallback = attachedPicturesHandler.copy(contents: entries)
-            entries.setAll(oldValue)
+            Task { @MainActor in
+                let entries = self.entries
+                let fallback = attachedPicturesHandler.copy(contents: entries)
+                entries.setAll(oldValue)
 
-            registerUndo(fallback, for: entries)
+                registerUndo(fallback, for: entries)
+            }
         }
     }
 }

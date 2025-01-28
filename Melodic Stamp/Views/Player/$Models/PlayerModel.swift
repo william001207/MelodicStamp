@@ -262,6 +262,10 @@ extension PlayerModel {
 
     // MARK: Playlist
 
+    func setPlaylist(_ playlist: Playlist) {
+        self.playlist = playlist
+    }
+
     func addToPlaylist(_ urls: [URL]) {
         for url in urls {
             Task {
@@ -278,14 +282,17 @@ extension PlayerModel {
             Task {
                 guard let track = await playlist.getOrCreateTrack(at: url) else { return }
 
+                // Removes from selected
+                selectedTracks.remove(track)
+
                 // Stops if the playing track is removed
                 if currentTrack == track {
                     player.stop()
                     currentTrack = nil
                 }
 
-                // Removes from selected
-                selectedTracks.remove(track)
+                // Removes from playlist
+                playlist.tracks.removeAll { $0 == track }
             }
         }
     }

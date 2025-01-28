@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-@Observable final class TextInputModel<V> where V: Equatable & Hashable {
+@MainActor @Observable final class TextInputModel<V> where V: Equatable & Hashable {
     typealias Entries = MetadataBatchEditingEntries<V?>
 
     private var checkpoint: Checkpoint<V?> = .invalid
@@ -54,10 +54,12 @@ import SwiftUI
         undoTargetCheckpoint.set(oldValue)
 
         undoManager?.registerUndo(withTarget: entries) { entries in
-            let fallback = entries.projectedUnwrappedValue()?.wrappedValue
-            entries.setAll(oldValue)
+            Task { @MainActor in
+                let fallback = entries.projectedUnwrappedValue()?.wrappedValue
+                entries.setAll(oldValue)
 
-            self.registerUndo(fallback, for: entries, in: undoManager)
+                self.registerUndo(fallback, for: entries, in: undoManager)
+            }
         }
     }
 }

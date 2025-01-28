@@ -93,7 +93,7 @@ struct TrackView: View {
             .animation(.default.speed(2), value: player.isPlaying)
 
             Button {
-                player.play(track: track)
+                play()
             } label: {
                 coverView()
             }
@@ -143,7 +143,7 @@ struct TrackView: View {
     }
 
     private var isCurrentTrack: Bool {
-        player.track == track
+        player.currentTrack == track
     }
 
     @ViewBuilder private func titleView() -> some View {
@@ -191,8 +191,7 @@ struct TrackView: View {
     }
 
     private func play() {
-        guard track.metadata.state.isInitialized else { return }
-        player.play(track: track)
+        player.play(track.url)
         bounceAnimationTrigger.toggle()
     }
 }

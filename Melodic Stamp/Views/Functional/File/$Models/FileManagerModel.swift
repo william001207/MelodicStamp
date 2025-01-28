@@ -50,10 +50,10 @@ enum FileAdderPresentationStyle {
         Task { @MainActor in
             switch fileOpenerPresentationStyle {
             case .inCurrentPlaylist:
-                player?.play(url: url)
+                player?.play(url)
             case .replacingCurrentPlaylistOrSelection:
-                player?.removeAll()
-                player?.play(url: url)
+                player?.clearPlaylist()
+                player?.play(url)
             case .formingNewPlaylist:
                 openWindow(id: WindowID.content.rawValue, value: CreationParameters(
                     urls: Set([url]), shouldPlay: true,
@@ -71,10 +71,10 @@ enum FileAdderPresentationStyle {
         Task { @MainActor in
             switch fileAdderPresentationStyle {
             case .toCurrentPlaylist:
-                player?.addToPlaylist(urls: urls)
+                player?.addToPlaylist(urls)
             case .replacingCurrentPlaylistOrSelection:
-                player?.removeAll()
-                player?.addToPlaylist(urls: urls)
+                player?.clearPlaylist()
+                player?.addToPlaylist(urls)
             case .formingNewPlaylist:
                 print(urls)
                 openWindow(id: WindowID.content.rawValue, value: CreationParameters(

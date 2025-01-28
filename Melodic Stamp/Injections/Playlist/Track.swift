@@ -16,15 +16,15 @@ struct Track: Identifiable {
 
     var id: URL { url }
 
-    init?(url: URL) async {
+    init(url: URL, metadata: Metadata) {
         self.url = url
-
-        guard let metadata = await Metadata(url: url) else { return nil }
         self.metadata = metadata
     }
 
-    init(url: URL, metadata: Metadata) {
+    init?(loadingFrom url: URL) async {
         self.url = url
+
+        guard let metadata = await Metadata(loadingFrom: url) else { return nil }
         self.metadata = metadata
     }
 
@@ -76,7 +76,7 @@ extension Track: Transferable {
             guard url.isFileURL else { throw TransferableError.notFileURL(url) }
             guard let url = FileHelper.filter(url: url) else { throw TransferableError.invalidFormat(url) }
 
-            guard let track = await Track(url: url) else { throw TransferableError.failedToCreateTrack(url) }
+            guard let track = await Track(loadingFrom: url) else { throw TransferableError.failedToCreateTrack(url) }
             return track
         }
     }

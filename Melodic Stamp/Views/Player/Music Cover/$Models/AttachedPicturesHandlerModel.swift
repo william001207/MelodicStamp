@@ -5,11 +5,11 @@
 //  Created by KrLite on 2024/12/1.
 //
 
-import CSFBAudioEngine
+@preconcurrency import CSFBAudioEngine
 import SwiftUI
 import UniformTypeIdentifiers
 
-@Observable class AttachedPicturesHandlerModel {
+@MainActor @Observable class AttachedPicturesHandlerModel {
     typealias APType = AttachedPicture.`Type`
     typealias Entry = MetadataBatchEditingEntry<Set<AttachedPicture>>
     typealias Entries = MetadataBatchEditingEntries<Set<AttachedPicture>>
@@ -130,10 +130,12 @@ extension AttachedPicturesHandlerModel {
     func registerUndo(_ oldValue: Set<AttachedPicture>, for entries: Entries, in undoManager: UndoManager?) {
         guard oldValue != entries.projectedValue?.wrappedValue ?? [] else { return }
         undoManager?.registerUndo(withTarget: self) { _ in
-            let fallback = self.copy(contents: entries)
-            entries.setAll(oldValue)
+            Task { @MainActor in
+                let fallback = self.copy(contents: entries)
+                entries.setAll(oldValue)
 
-            self.registerUndo(fallback, for: entries, in: undoManager)
+                self.registerUndo(fallback, for: entries, in: undoManager)
+            }
         }
     }
 

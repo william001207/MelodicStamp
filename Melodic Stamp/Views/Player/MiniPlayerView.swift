@@ -121,14 +121,14 @@ struct MiniPlayerView: View {
 
         // Don't extract this logic or modify the tasks!
         .onAppear {
-            guard let track = player.track else { return }
+            guard let track = player.currentTrack else { return }
 
             Task {
                 let raw = await track.metadata.poll(for: \.lyrics).current
                 await lyrics.read(raw)
             }
         }
-        .onChange(of: player.track) { _, newValue in
+        .onChange(of: player.currentTrack) { _, newValue in
             guard let newValue else { return }
             lyrics.clear(newValue.url)
 
@@ -141,7 +141,7 @@ struct MiniPlayerView: View {
         // MARK: Observations
 
         // Regain progress control on new track
-        .onChange(of: player.track) { _, newValue in
+        .onChange(of: player.currentTrack) { _, newValue in
             guard newValue != nil else { return }
             activeControl = .progress
         }
@@ -262,19 +262,19 @@ struct MiniPlayerView: View {
                 ShrinkableMarqueeScrollView {
                     switch headerControl {
                     case .title:
-                        MusicTitle(track: player.track)
+                        MusicTitle(track: player.currentTrack)
                     case .lyrics:
                         ComposedLyricsView()
                             .environment(lyrics)
                     }
                 }
-                .animation(.default, value: player.track)
+                .animation(.default, value: player.currentTrack)
                 .matchedGeometryEffect(id: PlayerNamespace.title, in: namespace)
                 .padding(.bottom, 2)
             }
             .buttonStyle(.alive)
 
-            if headerControl.hasThumbnail, let thumbnail = player.track?.metadata.thumbnail {
+            if headerControl.hasThumbnail, let thumbnail = player.currentTrack?.metadata.thumbnail {
                 MusicCover(images: [thumbnail], hasPlaceholder: false, cornerRadius: 2)
                     .padding(.bottom, 2)
             }
@@ -552,10 +552,10 @@ struct MiniPlayerView: View {
 
     @ViewBuilder private func playlistMenu() -> some View {
         let selection: Binding<Track?> = Binding {
-            player.track
+            player.currentTrack
         } set: { newValue in
             if let newValue {
-                player.play(track: newValue)
+                player.play(newValue.url)
             } else {
                 player.stop()
             }

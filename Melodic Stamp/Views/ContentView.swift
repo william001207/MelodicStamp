@@ -93,10 +93,10 @@ struct ContentView: View {
 
         if let parameters {
             let urls = Array(parameters.urls)
-            player.addToPlaylist(urls: urls)
+            player.addToPlaylist(urls)
 
             if parameters.shouldPlay, urls.count == 1, let url = urls.first {
-                player.play(url: url)
+                player.play(url)
             }
         }
     }
@@ -113,15 +113,15 @@ struct ContentView: View {
                     miniPlayerView(window)
                 }
             }
-            .dropDestination(for: Track.self) { items, _ in
-                player.addToPlaylist(tracks: items)
+            .dropDestination(for: Track.self) { tracks, _ in
+                player.addToPlaylist(tracks.map(\.url))
                 return true
             }
             .background {
                 Group {
                     FileImporters()
 
-                    DelegatedPlayerSceneStorage()
+//                    DelegatedPlayerSceneStorage()
                 }
                 .allowsHitTesting(false)
             }
@@ -153,7 +153,7 @@ struct ContentView: View {
 
             // MARK: Updates
 
-            .onChange(of: player.track) { _, newValue in
+            .onChange(of: player.currentTrack) { _, newValue in
                 Task {
                     if let newValue, let attachedPictures = newValue.metadata[extracting: \.attachedPictures]?.current {
                         let cover = ThumbnailMaker.getCover(from: attachedPictures)?.image
@@ -212,7 +212,7 @@ struct ContentView: View {
     private var title: String {
         let fallbackTitle = Bundle.main[localized: .displayName]
 
-        if player.isPlayable, let track = player.track {
+        if player.isPlayable, let track = player.currentTrack {
             let musicTitle = MusicTitle.stringifiedTitle(mode: .title, for: track)
             return switch dynamicTitleBar {
             case .never: fallbackTitle
@@ -235,7 +235,7 @@ struct ContentView: View {
             ""
         }
 
-        if player.isPlayable, let track = player.track {
+        if player.isPlayable, let track = player.currentTrack {
             let musicSubtitle = MusicTitle.stringifiedTitle(mode: .artists, for: track)
             return switch dynamicTitleBar {
             case .never: fallbackTitle

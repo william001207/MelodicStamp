@@ -64,7 +64,7 @@ struct InspectorLyricsView: View {
 
     private var highlightedRange: Range<Int> {
         if let elapsedTime = player.playbackTime?.elapsed {
-            lyrics.highlight(at: elapsedTime, in: player.track?.url)
+            lyrics.highlight(at: elapsedTime, in: player.currentTrack?.url)
         } else {
             0 ..< 0
         }

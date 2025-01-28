@@ -39,7 +39,7 @@ struct DisplayLyricsView: View {
     var body: some View {
         // Avoids multiple instantializations
         let lines = lyrics.lines
-        let highlightedRange = lyrics.highlight(at: elapsedTime, in: player.track?.url)
+        let highlightedRange = lyrics.highlight(at: elapsedTime, in: player.currentTrack?.url)
 
         Group {
             if !lines.isEmpty {

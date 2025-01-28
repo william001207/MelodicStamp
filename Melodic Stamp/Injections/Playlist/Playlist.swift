@@ -37,11 +37,22 @@ struct Playlist: Equatable, Hashable, Identifiable {
         self.playbackLooping = playbackLooping
     }
 
-    init(
-        loadingFrom _: URL
-    ) {
+    init?(indexedBy id: UUID) async {
+        self.id = id
         self.mode = .canonical
-        // TODO:
+
+        let url = URL.playlists.appending(component: id.uuidString)
+        guard url.hasDirectoryPath else { return nil }
+
+        // TODO: Read the properties
+        self.playbackMode = .loop
+        self.playbackLooping = false
+
+        let urls = FileHelper.flatten(contentsOfFolder: url, allowedContentTypes: Array(allowedContentTypes), isRecursive: false)
+        for url in urls {
+            guard let track = await Track(loadingFrom: url) else { continue }
+            tracks.append(track)
+        }
     }
 
     static func referenced() -> Playlist {
@@ -183,7 +194,7 @@ extension Playlist {
             return track
         } else {
             guard let url = try? await makeValid(url: url) else { return nil }
-            return await Track(url: url)
+            return await Track(loadingFrom: url)
         }
     }
 }

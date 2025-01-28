@@ -113,10 +113,12 @@ struct LabeledOptionalControl<V, Label, Content, ContentB>: View
         undoTargetCheckpoint.set(oldValue)
 
         undoManager?.registerUndo(withTarget: entries) { entries in
-            let fallback = entries.projectedUnwrappedValue()?.wrappedValue
-            entries.setAll(oldValue)
+            Task { @MainActor in
+                let fallback = entries.projectedUnwrappedValue()?.wrappedValue
+                entries.setAll(oldValue)
 
-            registerUndo(fallback, for: entries)
+                registerUndo(fallback, for: entries)
+            }
         }
     }
 

@@ -79,7 +79,7 @@ struct PlaylistView: View {
 
                     // Handle [􁂒] -> remove selection
                     .onKeyPress(.deleteForward) {
-                        if handleRemove(tracks: .init(player.selectedTracks)) {
+                        if handleRemove(player.selectedTracks.map(\.url)) {
                             .handled
                         } else {
                             .ignored
@@ -89,7 +89,7 @@ struct PlaylistView: View {
                     // Handle [⏎] -> play
                     .onKeyPress(.return) {
                         if player.selectedTracks.count == 1, let track = player.selectedTracks.first {
-                            player.play(track: track)
+                            player.play(track.url)
                             return .handled
                         } else {
                             return .ignored
@@ -154,7 +154,7 @@ struct PlaylistView: View {
                 .padding(.horizontal)
                 .padding(.top, 8)
             }
-            .onChange(of: player.playlist) { oldValue, newValue in
+            .onChange(of: player.playlist.tracks) { oldValue, newValue in
                 let addedTracks = Set(newValue).subtracting(oldValue)
 
                 if let firstAddedTrack = addedTracks.first {
@@ -207,9 +207,9 @@ struct PlaylistView: View {
 
             Button(role: .destructive) {
                 if canEscape {
-                    handleRemove(tracks: .init(player.selectedTracks))
+                    handleRemove(player.selectedTracks.map(\.url))
                 } else {
-                    handleRemove(tracks: player.playlist)
+                    handleRemove(player.playlist.map(\.url))
                 }
 
                 resetFocus(in: namespace) // Must regain focus due to unknown reasons
@@ -283,7 +283,7 @@ struct PlaylistView: View {
                 // MARK: Play
 
                 Button {
-                    player.play(track: track)
+                    player.play(track.url)
                 } label: {
                     Image(systemSymbol: .play)
                 }
@@ -292,7 +292,7 @@ struct PlaylistView: View {
                 // MARK: Remove from Playlist
 
                 Button(role: .destructive) {
-                    handleRemove(tracks: [track])
+                    handleRemove([track.url])
                 } label: {
                     Image(systemSymbol: .trash)
                 }
@@ -351,7 +351,7 @@ struct PlaylistView: View {
         // MARK: Play
 
         Button {
-            player.play(track: track)
+            player.play(track.url)
         } label: {
             let title = MusicTitle.stringifiedTitle(mode: .title, for: track)
             if !title.isEmpty {
@@ -367,9 +367,9 @@ struct PlaylistView: View {
 
         Button("Remove from Playlist") {
             if metadataEditor.hasMetadata {
-                handleRemove(tracks: .init(player.selectedTracks))
+                handleRemove(player.selectedTracks.map(\.url))
             } else {
-                handleRemove(tracks: [track])
+                handleRemove([track.url])
             }
         }
         .keyboardShortcut(.deleteForward, modifiers: [])
@@ -421,7 +421,7 @@ struct PlaylistView: View {
 
     @discardableResult private func handleLocate(in proxy: ScrollViewProxy) -> Bool {
         guard canLocate else { return false }
-        guard let track = player.track else { return false }
+        guard let track = player.currentTrack else { return false }
 
         withAnimation {
             proxy.scrollTo(track, anchor: .center)
@@ -431,9 +431,9 @@ struct PlaylistView: View {
         return true
     }
 
-    @discardableResult private func handleRemove(tracks: [Track]) -> Bool {
+    @discardableResult private func handleRemove(_ urls: [URL]) -> Bool {
         guard canRemove else { return false }
-        player.removeFromPlaylist(tracks: tracks)
+        player.removeFromPlaylist(urls)
         return true
     }
 }
