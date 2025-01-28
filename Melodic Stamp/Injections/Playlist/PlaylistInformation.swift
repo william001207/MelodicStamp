@@ -32,6 +32,11 @@ extension PlaylistInformation {
 
     struct Artwork: Equatable, Hashable, Codable {
         var tiffRepresentation: Data?
+
+        var image: NSImage? {
+            guard let tiffRepresentation else { return nil }
+            return NSImage(data: tiffRepresentation)
+        }
     }
 }
 

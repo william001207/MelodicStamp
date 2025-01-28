@@ -91,6 +91,11 @@ struct MainView: View {
                     }
             case .library:
                 InspectorLibraryView()
+                    .toolbar {
+                        if isInspectorPresented {
+                            LibraryToolbar()
+                        }
+                    }
             case .analytics:
                 InspectorAnalyticsView()
             }

@@ -30,7 +30,7 @@ import SwiftUI
         playlists.move(fromOffsets: indices, toOffset: destination)
     }
 
-    func load() async {
+    func refresh() async {
         playlists.removeAll()
         guard let contents = try? FileManager.default.contentsOfDirectory(
             at: .playlists,

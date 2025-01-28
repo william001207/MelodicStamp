@@ -23,32 +23,42 @@ struct LibraryItemView: View {
                         .bold()
                         .font(.title3)
 
-                    Text(playlist.id.shortened)
+                    Text(playlist.id.uuidString)
                         .font(.caption)
                         .foregroundStyle(.placeholder)
                 } else {
-                    Text("Playlist \(playlist.id.shortened)")
-                        .font(.title3)
-                        .foregroundStyle(.placeholder)
+                    HStack {
+                        Text("Playlist")
+                            .fixedSize()
+
+                        Text(playlist.id.uuidString)
+                            .foregroundStyle(.placeholder)
+                    }
+                    .font(.title3)
                 }
             }
+            .lineLimit(1)
             .onDoubleClick(handler: makeCurrent)
             .transition(.blurReplace)
             .opacity(opacity)
+            .animation(.default.speed(2), value: hasControl)
 
             Spacer()
 
-            if !isCurrentPlaylist {
-                Button {
-                    makeCurrent()
-                } label: {
+            if hasControl {
+                if isCurrentPlaylist {
                     coverView()
+                } else {
+                    Button {
+                        makeCurrent()
+                    } label: {
+                        coverView()
+                    }
+                    .buttonStyle(.alive)
                 }
-                .buttonStyle(.alive)
-            } else {
-                coverView()
             }
         }
+        .frame(height: 50)
         .padding(6)
         .padding(.trailing, -1)
         .background {
@@ -63,11 +73,19 @@ struct LibraryItemView: View {
     }
 
     private var opacity: CGFloat {
-        if isSelected || isCurrentPlaylist {
-            1
+        if hasCurrentPlaylist {
+            if isSelected || isCurrentPlaylist {
+                1
+            } else {
+                0.65
+            }
         } else {
-            0.65
+            1
         }
+    }
+
+    private var hasCurrentPlaylist: Bool {
+        library.currentPlaylist != nil
     }
 
     private var isCurrentPlaylist: Bool {
@@ -78,11 +96,13 @@ struct LibraryItemView: View {
         !playlist.information.info.title.isEmpty
     }
 
+    private var hasControl: Bool {
+        isHovering || playlist.information.artwork.image != nil
+    }
+
     @ViewBuilder private func coverView() -> some View {
         ZStack {
-            if
-                let tiffRepresentation = playlist.information.artwork.tiffRepresentation,
-                let image = NSImage(data: tiffRepresentation) {
+            if let image = playlist.information.artwork.image {
                 MusicCover(
                     images: [image], hasPlaceholder: false, cornerRadius: 4
                 )

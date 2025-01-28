@@ -84,21 +84,26 @@ struct TrackView: View {
                 .font(.caption)
                 .onDoubleClick(handler: play)
             }
+            .lineLimit(1)
             .transition(.blurReplace)
             .opacity(opacity)
             .animation(.default.speed(2), value: metadataState)
             .animation(.default.speed(2), value: isMetadataModified)
             .animation(.default.speed(2), value: isCurrentTrack)
+            .animation(.default.speed(2), value: hasControl)
             .animation(.default.speed(2), value: player.isPlayable)
             .animation(.default.speed(2), value: player.isPlaying)
 
-            Button {
-                play()
-            } label: {
-                coverView()
+            if hasControl {
+                Button {
+                    play()
+                } label: {
+                    coverView()
+                }
+                .buttonStyle(.alive)
             }
-            .buttonStyle(.alive)
         }
+        .frame(height: 50)
         .padding(6)
         .padding(.trailing, -1)
         .wiggleAnimation(wiggleAnimationTrigger)
@@ -144,6 +149,10 @@ struct TrackView: View {
 
     private var isCurrentTrack: Bool {
         player.currentTrack == track
+    }
+
+    private var hasControl: Bool {
+        isHovering || (track.metadata.state.isInitialized && track.metadata.thumbnail != nil)
     }
 
     @ViewBuilder private func titleView() -> some View {

@@ -439,6 +439,9 @@ struct PlaylistView: View {
 }
 
 #if DEBUG
+
+    // MARK: - Preview
+
     #Preview(traits: .modifier(SampleEnvironmentsPreviewModifier())) {
         @Previewable @Namespace var namespace
 

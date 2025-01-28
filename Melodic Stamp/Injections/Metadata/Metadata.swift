@@ -501,12 +501,15 @@ extension Metadata {
     }
 
     func generateThumbnail() {
-        guard state.isInitialized else {
+        guard
+            state.isInitialized,
+            let attachedPictures = self[extracting: \.attachedPictures]?.current
+        else {
             thumbnail = nil
+            menuThumbnail = nil
             return
         }
 
-        guard let attachedPictures = self[extracting: \.attachedPictures]?.current else { return }
         Task.detached {
             if let image = ThumbnailMaker.getCover(from: attachedPictures)?.image {
                 let thumbnail = await ThumbnailMaker.make(image)
@@ -515,6 +518,11 @@ extension Metadata {
                 Task { @MainActor in
                     self.thumbnail = thumbnail
                     self.menuThumbnail = menuThumbnail
+                }
+            } else {
+                Task { @MainActor in
+                    self.thumbnail = nil
+                    self.menuThumbnail = nil
                 }
             }
         }
