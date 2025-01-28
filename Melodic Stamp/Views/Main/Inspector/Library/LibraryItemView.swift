@@ -97,7 +97,8 @@ struct LibraryItemView: View {
     }
 
     private var hasControl: Bool {
-        isHovering || playlist.information.artwork.image != nil
+        guard !isCurrentPlaylist else { return false }
+        return isHovering || playlist.information.artwork.image != nil
     }
 
     @ViewBuilder private func coverView() -> some View {

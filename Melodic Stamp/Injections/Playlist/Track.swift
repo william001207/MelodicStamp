@@ -21,10 +21,10 @@ struct Track: Identifiable {
         self.metadata = metadata
     }
 
-    init?(loadingFrom url: URL) async {
+    init?(loadingFrom url: URL, useFallbackTitleFrom fallbackURL: URL? = nil) async {
         self.url = url
 
-        guard let metadata = await Metadata(loadingFrom: url) else { return nil }
+        guard let metadata = await Metadata(loadingFrom: url, useFallbackTitleFrom: fallbackURL) else { return nil }
         self.metadata = metadata
     }
 

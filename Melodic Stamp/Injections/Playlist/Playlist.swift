@@ -220,7 +220,7 @@ extension Playlist {
         try FileManager.default.copyItem(at: url, to: destinationURL)
 
         logger.info("Created canonical track at \(destinationURL), copying from \(url)")
-        return await Track(loadingFrom: destinationURL)
+        return await Track(loadingFrom: destinationURL, useFallbackTitleFrom: url)
     }
 
     func getTrack(at url: URL) async -> Track? {

@@ -69,6 +69,14 @@ extension MetadataEntry: Equatable {
     }
 }
 
+extension MetadataEntry where V == String? {
+    var isStringEmpty: Bool {
+        let isInitialEmpty = initial == nil || initial?.isEmpty ?? true
+        let isCurrentEmpty = current == nil || current?.isEmpty ?? true
+        return isInitialEmpty && isCurrentEmpty
+    }
+}
+
 // MARK: - Metadata Batch Editing Entry
 
 @MainActor @Observable final class MetadataBatchEditingEntry<V: Hashable & Equatable>: Identifiable {

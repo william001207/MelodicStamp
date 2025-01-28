@@ -147,13 +147,21 @@ extension Metadata: TypeNameReflectable {}
         }
     }
 
-    init?(loadingFrom url: URL) {
+    init?(loadingFrom url: URL, useFallbackTitleFrom fallbackURL: URL? = nil) {
         self.properties = .init()
         self.state = .loading
         self.url = url
 
         Task.detached {
             try await self.update()
+
+            Task { @MainActor in
+                if let fallbackURL, self.title.isStringEmpty {
+                    let fallbackTitle = fallbackURL.lastPathComponentRemovingExtension
+                    self.title.initial = fallbackTitle
+                    self.title.current = fallbackTitle
+                }
+            }
         }
     }
 
@@ -213,7 +221,7 @@ extension Metadata: TypeNameReflectable {}
         self.replayGainTrackPeak = oldValue.replayGainTrackPeak
         self.replayGainReferenceLoudness = oldValue.replayGainReferenceLoudness
 
-        if useFallbackTitle, title.initial == nil, title.current == nil {
+        if useFallbackTitle, title.isStringEmpty {
             let fallbackTitle = oldValue.url.lastPathComponentRemovingExtension
             title.initial = fallbackTitle
             title.current = fallbackTitle
