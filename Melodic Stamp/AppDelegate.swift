@@ -49,7 +49,7 @@ extension AppDelegate {
     func applicationWillTerminate(_: Notification) {}
 
     func application(_: NSApplication, open urls: [URL]) {
-        openWindow(id: WindowID.content.rawValue, value: CreationParameters(urls: Set(urls)))
+        openWindow(id: WindowID.content.rawValue, value: CreationParameters(playlist: .referenced(urls)))
     }
 
     func applicationShouldTerminateAfterLastWindowClosed(_: NSApplication) -> Bool {

@@ -57,6 +57,8 @@ struct ContentView: View {
 
     // MARK: - Fields
 
+    private var parameters: CreationParameters?
+
     // MARK: Models
 
     @State private var windowManager: WindowManagerModel
@@ -81,6 +83,8 @@ struct ContentView: View {
     // MARK: - Initializers
 
     init(_ parameters: CreationParameters?) {
+        self.parameters = parameters
+
         let player = PlayerModel(SFBAudioEnginePlayer())
 
         self.windowManager = .init(style: parameters?.initialWindowStyle ?? .main)
@@ -90,15 +94,6 @@ struct ContentView: View {
         self.metadataEditor = .init(player: player)
         self.audioVisualizer = .init()
         self.gradientVisualizer = .init()
-
-        if let parameters {
-            let urls = Array(parameters.urls)
-            player.addToPlaylist(urls)
-
-            if parameters.shouldPlay, urls.count == 1, let url = urls.first {
-                player.play(url)
-            }
-        }
     }
 
     // MARK: - Body
@@ -112,6 +107,9 @@ struct ContentView: View {
                 case .miniPlayer:
                     miniPlayerView(window)
                 }
+            }
+            .onAppear {
+                initialize()
             }
             .dropDestination(for: Track.self) { tracks, _ in
                 player.addToPlaylist(tracks.map(\.url))
@@ -316,6 +314,32 @@ struct ContentView: View {
     }
 
     // MARK: - Functions
+
+    private func initialize() {
+        if !windowManager.isInitialized {
+            windowManager.isInitialized = true
+            if let parameters {
+                Task {
+                    switch parameters.playlist {
+                    case let .referenced(urls):
+                        player.setPlaylist(.referenced())
+                        player.addToPlaylist(urls)
+
+                        print("Created playlist from referenced URLs: \(urls)")
+                    case let .canonical(id):
+                        guard let playlist = await Playlist(indexedBy: id) else { break }
+                        player.setPlaylist(playlist)
+
+                        print("Created playlist with canonical ID: \(id)")
+                    }
+
+                    if parameters.shouldPlay, let firstTrack = player.playlist.first {
+                        player.play(firstTrack.url)
+                    }
+                }
+            }
+        }
+    }
 
     private func initializeFloatingWindows(to mainWindow: NSWindow? = nil) {
         floatingWindows.addTabBar(to: mainWindow) {

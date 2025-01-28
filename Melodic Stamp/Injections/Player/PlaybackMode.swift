@@ -9,7 +9,7 @@ import Foundation
 import SFSafeSymbols
 import SwiftUI
 
-enum PlaybackMode: String, Hashable, Equatable, CaseIterable, Identifiable {
+enum PlaybackMode: String, Hashable, Equatable, CaseIterable, Identifiable, Codable {
     case sequential
     case loop
     case shuffle

@@ -9,9 +9,11 @@ import Defaults
 import Foundation
 
 extension Playlist {
-    enum Mode {
+    enum Mode: String, Equatable, Hashable, CaseIterable, Identifiable, Codable {
         case referenced
         case canonical
+
+        var id: Self { self }
     }
 }
 
@@ -44,15 +46,16 @@ struct Playlist: Equatable, Hashable, Identifiable {
         let url = URL.playlists.appending(component: id.uuidString)
         guard url.hasDirectoryPath else { return nil }
 
-        // TODO: Read the properties
+        // TODO: Read these properties
         self.playbackMode = .loop
         self.playbackLooping = false
 
         let urls = FileHelper.flatten(contentsOfFolder: url, allowedContentTypes: Array(allowedContentTypes), isRecursive: false)
         for url in urls {
-            guard let track = await Track(loadingFrom: url) else { continue }
+            guard let track = await Track(loadingFrom: url) else { return }
             tracks.append(track)
         }
+        self.currentTrack = nil
     }
 
     init?(makingPermanent oldValue: Playlist) async {
@@ -69,7 +72,7 @@ struct Playlist: Equatable, Hashable, Identifiable {
         }
 
         for track in oldValue.tracks {
-            guard let permanentTrack = await getOrCreateTrack(at: track.url) else { continue }
+            guard let permanentTrack = await getOrCreateTrack(at: track.url) else { return }
             tracks.append(permanentTrack)
         }
 

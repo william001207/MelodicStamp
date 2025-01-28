@@ -28,6 +28,7 @@ enum MelodicStampWindowStyle: String, Equatable, Hashable, CaseIterable, Identif
         }
     }
 
+    var isInitialized: Bool = false
     var isAlwaysOnTop: Bool = false
     private(set) var isInFullScreen: Bool = false
 
