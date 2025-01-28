@@ -8,12 +8,13 @@
 import SwiftUI
 
 struct InspectorLibraryView: View {
-    @State var playlists: [Playlist]
-    @Binding var selectedPlaylist: Playlist?
+    @Environment(LibraryModel.self) private var library
+
+    @State private var selectedPlaylist: Playlist?
 
     var body: some View {
         List(selection: $selectedPlaylist) {
-            ForEach(playlists) { playlist in
+            ForEach(library.playlists) { playlist in
                 LibraryPlaylistView(playlist: playlist)
                     .id(playlist)
             }
@@ -24,10 +25,7 @@ struct InspectorLibraryView: View {
 }
 
 #if DEBUG
-    #Preview {
-        @Previewable @State var playlists: [Playlist] = [SampleEnvironmentsPreviewModifier.samplePlaylist]
-        @Previewable @State var selectedPlaylist: Playlist?
-
-        InspectorLibraryView(playlists: playlists, selectedPlaylist: $selectedPlaylist)
+    #Preview(traits: .modifier(SampleEnvironmentsPreviewModifier())) {
+        InspectorLibraryView()
     }
 #endif

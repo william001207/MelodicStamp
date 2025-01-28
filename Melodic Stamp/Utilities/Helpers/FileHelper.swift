@@ -15,8 +15,7 @@ extension FileHelper {
         guard folderURL.startAccessingSecurityScopedResource() else { return [] }
         guard folderURL.hasDirectoryPath else { return [folderURL] }
 
-        let fileManager = FileManager.default
-        guard let contents = try? fileManager.contentsOfDirectory(
+        guard let contents = try? FileManager.default.contentsOfDirectory(
             at: folderURL,
             includingPropertiesForKeys: [.isRegularFileKey, .isDirectoryKey],
             options: [.skipsHiddenFiles]

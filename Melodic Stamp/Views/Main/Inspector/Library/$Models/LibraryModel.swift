@@ -25,4 +25,34 @@ import SwiftUI
     init(player: PlayerModel?) {
         self.player = player
     }
+
+    func move(from indices: IndexSet, to destination: Int) {
+        playlists.move(fromOffsets: indices, toOffset: destination)
+    }
+
+    func load() async {
+        playlists.removeAll()
+        guard let contents = try? FileManager.default.contentsOfDirectory(
+            at: .playlists,
+            includingPropertiesForKeys: [.isDirectoryKey],
+            options: [.skipsHiddenFiles]
+        ) else { return }
+
+        for content in contents.filter(\.hasDirectoryPath) {
+            let pathName = content.lastPathComponent
+            guard let id = UUID(uuidString: pathName), let playlist = await Playlist(indexedBy: id) else { continue }
+
+            playlists.append(playlist)
+        }
+    }
+
+    func makeCurrentPlaylistPermanent() async {
+        guard
+            let currentPlaylist,
+            !currentPlaylist.mode.isCanonical,
+            let permanentPlaylist = await Playlist(makingPermanent: currentPlaylist)
+        else { return }
+        self.currentPlaylist = permanentPlaylist
+        playlists.append(permanentPlaylist)
+    }
 }

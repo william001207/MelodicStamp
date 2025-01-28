@@ -78,12 +78,5 @@ struct FileToolbar: View {
                 Image(systemSymbol: .plus)
             }
         }
-
-        Button("Make Permanent") {
-            Task {
-                guard let permanentPlaylist = await Playlist(makingPermanent: player.playlist) else { return }
-                player.setPlaylist(permanentPlaylist)
-            }
-        }
     }
 }
