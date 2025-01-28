@@ -9,6 +9,8 @@ import AppKit
 import Defaults
 import SwiftUI
 
+extension AppDelegate: TypeNameReflectable {}
+
 class AppDelegate: NSObject, NSApplicationDelegate {
     // Hacky but works
     @Environment(\.openWindow) private var openWindow
@@ -16,7 +18,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     private var suspendedWindows: Set<NSWindow> = []
 
     func resumeWindowSuspension() {
-        print("Resume")
+        logger.info("Resumed window suspension")
         suspendedWindows.removeAll()
         NSApp.reply(toApplicationShouldTerminate: false)
     }
@@ -24,18 +26,18 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     func suspend(window: NSWindow?) {
         if let window {
             suspendedWindows.insert(window)
-            print("Suspended \(window)")
+            logger.info("Suspended \(window)")
         }
     }
 
     func destroy(window: NSWindow?) {
         if let window, suspendedWindows.contains(window) {
             suspendedWindows.remove(window)
-            print("Destroyed \(window)")
+            logger.info("Destroyed \(window)")
         }
 
         if suspendedWindows.isEmpty {
-            print("Terminated")
+            logger.info("Terminated application because no window is suspended anymore")
             NSApp.reply(toApplicationShouldTerminate: true)
         }
     }

@@ -67,6 +67,8 @@ extension Metadata {
     }
 }
 
+extension Metadata: TypeNameReflectable {}
+
 @MainActor @Observable final class Metadata: Identifiable {
     typealias Entry = MetadataEntry
 
@@ -531,9 +533,9 @@ extension Metadata {
 
         switch await state {
         case .loading:
-            print("Loaded metadata from \(url)")
+            logger.info("Loaded metadata from \(url)")
         default:
-            print("Updated metadata from \(url)")
+            logger.info("Updated metadata from \(url)")
         }
 
         await updateState(to: .fine)
@@ -564,7 +566,7 @@ extension Metadata {
         await updateState(to: .saving)
         await apply()
 
-        print("Started writing metadata to \(url)")
+        logger.info("Started writing metadata to \(url)")
 
         guard let file = try? AudioFile(url: url) else {
             await updateState(to: state.with(error: .fileNotFound))
@@ -591,11 +593,11 @@ extension Metadata {
         await updateState(to: .fine)
         completion?()
 
-        print("Successfully written metadata to \(url)")
+        logger.info("Successfully written metadata to \(url)")
     }
 
     func poll<V>(for keyPath: WritableKeyPath<Metadata, Entry<V>>) async -> MetadataBatchEditingEntry<V> {
-        print("Started polling metadata for \(keyPath)")
+        logger.info("Started polling metadata for \("\(keyPath)")")
 
         while !state.isInitialized {
             try? await Task.sleep(for: .milliseconds(100))
@@ -606,7 +608,7 @@ extension Metadata {
             entry = self[extracting: keyPath]
         } while entry == nil
 
-        print("Succeed polling metadata for \(keyPath)")
+        logger.info("Succeed polling metadata for \("\(keyPath)")")
 
         return entry!
     }

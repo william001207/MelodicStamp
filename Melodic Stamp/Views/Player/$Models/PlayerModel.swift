@@ -20,6 +20,8 @@ extension PlayerModel {
     static let bufferSize: AVAudioFrameCount = 2048
 }
 
+extension PlayerModel: TypeNameReflectable {}
+
 @MainActor @Observable final class PlayerModel: NSObject {
     // MARK: Player
 
@@ -427,13 +429,13 @@ extension PlayerModel {
                     selectOutputDevice(defaultSystemOutputDevice)
                     _selectedOutputDevice = defaultSystemOutputDevice
 
-                    print("Setting output device to system: \(defaultSystemOutputDevice)")
+                    logger.info("Setting output device to system: \("\(defaultSystemOutputDevice)")")
                 }
             } else {
                 if let device = _selectedOutputDevice, try forceUpdating || device != player.selectedOutputDevice() {
                     selectOutputDevice(device)
 
-                    print("Setting output device to \(device)")
+                    logger.info("Setting output device to \("\(device)")")
                 }
             }
         } catch {}
@@ -487,7 +489,7 @@ extension PlayerModel: AudioPlayer.Delegate {
     nonisolated func audioPlayer(_: AudioPlayer, encounteredError error: Error) {
         Task { @MainActor in
             stop()
-            print(error)
+            logger.error("\(error)")
         }
     }
 }

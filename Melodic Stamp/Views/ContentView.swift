@@ -9,6 +9,8 @@ import Defaults
 import Luminare
 import SwiftUI
 
+extension ContentView: TypeNameReflectable {}
+
 struct ContentView: View {
     struct Sizer: Equatable, Hashable {
         var minWidth: CGFloat?
@@ -325,12 +327,12 @@ struct ContentView: View {
                         player.setPlaylist(.referenced())
                         player.addToPlaylist(urls)
 
-                        print("Created playlist from referenced URLs: \(urls)")
+                        logger.info("Created playlist from referenced URLs: \(urls)")
                     case let .canonical(id):
                         guard let playlist = await Playlist(indexedBy: id) else { break }
                         player.setPlaylist(playlist)
 
-                        print("Created playlist with canonical ID: \(id)")
+                        logger.info("Created playlist with canonical ID: \(id)")
                     }
 
                     if parameters.shouldPlay, let firstTrack = player.playlist.first {

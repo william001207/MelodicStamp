@@ -64,6 +64,8 @@ enum AppleMusicLyricsViewIndicator {
 
 // MARK: Apple Music Lyrics View
 
+extension AppleMusicLyricsView: TypeNameReflectable {}
+
 struct AppleMusicLyricsView<Content>: View where Content: View {
     struct Origin {
         var offset: CGFloat
@@ -172,7 +174,7 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
                     scrollOffset = newValue.y
                     origin.offset = newValue.y
                     origin.isInitialized = true
-                    print("Initialized: \(newValue.y)")
+                    logger.info("Initialized: \(newValue.y)")
                 } else if scrollPosition.isPositionedByUser {
                     scrollOffset = newValue.y
                     onScrolling?(scrollPosition, newValue)
@@ -261,7 +263,7 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
 
         DispatchQueue.main.async {
             proxy.scrollTo(index, anchor: alignment.unitPoint)
-            print("Reset: \(origin)")
+            logger.info("Reset: \("\(origin)")")
         }
     }
 
@@ -273,7 +275,7 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
         } else { .zero }
         let offset = fold(until: highlightedRange.lowerBound)
         scrollOffset = max(0, origin.offset + offset + compensation + alignmentCompensation)
-        print("Scrolled to highlighted: \(offset)")
+        logger.info("Scrolled to highlighted: \(offset)")
     }
 
     private func fold(until index: Int) -> CGFloat {

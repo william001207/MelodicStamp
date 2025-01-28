@@ -9,6 +9,8 @@ import CAAudioHardware
 import Foundation
 import SFBAudioEngine
 
+extension SFBAudioEnginePlayer: TypeNameReflectable {}
+
 class SFBAudioEnginePlayer: NSObject, Player {
     init(_ player: AudioPlayer = .init()) {
         self.player = player
@@ -51,7 +53,7 @@ class SFBAudioEnginePlayer: NSObject, Player {
                 try player.play(decoder)
             }
         } catch {
-            print(error)
+            logger.error("\(error)")
         }
     }
 
@@ -61,7 +63,7 @@ class SFBAudioEnginePlayer: NSObject, Player {
                 try player.enqueue(decoder)
             }
         } catch {
-            print(error)
+            logger.error("\(error)")
         }
     }
 
@@ -69,7 +71,7 @@ class SFBAudioEnginePlayer: NSObject, Player {
         do {
             try player.play()
         } catch {
-            print(error)
+            logger.error("\(error)")
         }
     }
 
@@ -115,7 +117,7 @@ class SFBAudioEnginePlayer: NSObject, Player {
                 try player.setVolume(Float(volume))
             }
         } catch {
-            print(error)
+            logger.error("\(error)")
         }
     }
 

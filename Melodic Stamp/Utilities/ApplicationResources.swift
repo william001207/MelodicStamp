@@ -5,7 +5,24 @@
 //  Created by KrLite on 2025/1/21.
 //
 
-import Foundation
+import OSLog
+import SwiftUI
+
+protocol TypeNameReflectable {}
+
+extension TypeNameReflectable {
+    static var typeName: String {
+        String(describing: Self.self)
+    }
+
+    static var logger: Logger {
+        .init(subsystem: Bundle.main.bundleIdentifier ?? "Application", category: typeName)
+    }
+
+    var logger: Logger {
+        Self.logger
+    }
+}
 
 extension URL {
     static let github = URL(string: "https://github.com")!
