@@ -99,7 +99,7 @@ import SwiftUI
 
         static var samplePlaylist: Playlist {
             var result = Playlist.referenced()
-            result.tracks.append(sampleTrack)
+            result.add([sampleTrack])
             return result
         }
 

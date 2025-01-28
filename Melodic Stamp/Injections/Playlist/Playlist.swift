@@ -19,11 +19,11 @@ struct Playlist: Equatable, Hashable, Identifiable {
     let id: UUID
     var mode: Mode
 
-    var tracks: [Track] = []
-    var currentTrack: Track?
+    private(set) var tracks: [Track] = []
+    private(set) var currentTrack: Track?
 
-    var playbackMode: PlaybackMode
-    var playbackLooping: Bool
+    private(set) var playbackMode: PlaybackMode
+    private(set) var playbackLooping: Bool
 
     private init(
         id: UUID,
@@ -52,6 +52,25 @@ struct Playlist: Equatable, Hashable, Identifiable {
         for url in urls {
             guard let track = await Track(loadingFrom: url) else { continue }
             tracks.append(track)
+        }
+    }
+
+    init?(makingPermanent oldValue: Playlist) async {
+        self.id = oldValue.id
+        self.mode = .canonical
+        self.playbackMode = oldValue.playbackMode
+        self.playbackLooping = oldValue.playbackLooping
+
+        let url = URL.playlists.appending(component: id.uuidString)
+        do {
+            try FileManager.default.createDirectory(at: url, withIntermediateDirectories: true)
+        } catch {
+            return nil
+        }
+
+        for track in oldValue.tracks {
+            guard let permanentTrack = await getOrCreateTrack(at: track.url) else { continue }
+            tracks.append(permanentTrack)
         }
     }
 
@@ -165,37 +184,84 @@ extension Playlist {
         return url.standardized.path().hasPrefix(parent.path())
     }
 
-    private func makeValid(url: URL) async throws -> URL {
-        switch mode {
-        case .referenced:
-            return url
-        case .canonical:
-            if Self.isCanonical(url: url) {
-                return url
-            } else {
-                let id = UUID()
-                let destination = URL.playlists
-                    .appending(component: id.uuidString, directoryHint: .notDirectory)
-                    .appendingPathExtension(url.pathExtension)
-
-                try FileManager.default.copyItem(at: url, to: destination)
-                return destination
-            }
+    private static func deleteTrack(at url: URL) throws {
+        guard isCanonical(url: url) else { return }
+        Task {
+            try FileManager.default.removeItem(at: url)
         }
     }
 
-    // SwiftFormat meets a bug when `validURL` is named `url`
+    private func createTrack(copyingFrom url: URL) async throws -> Track? {
+        let trackID = UUID()
+        let playlistURL = URL.playlists.appending(component: id.uuidString)
+        try FileManager.default.createDirectory(at: playlistURL, withIntermediateDirectories: true)
+
+        let destinationURL = playlistURL
+            .appending(component: trackID.uuidString, directoryHint: .notDirectory)
+            .appendingPathExtension(url.pathExtension)
+
+        try FileManager.default.copyItem(at: url, to: destinationURL)
+        return await Track(loadingFrom: destinationURL)
+    }
+
     func getTrack(at url: URL) async -> Track? {
-        guard let validURL = try? await makeValid(url: url) else { return nil }
-        return first(where: { $0.url == validURL })
+        first(where: { $0.url == url })
     }
 
     func getOrCreateTrack(at url: URL) async -> Track? {
         if let track = await getTrack(at: url) {
-            return track
+            track
         } else {
-            guard let validURL = try? await makeValid(url: url) else { return nil }
-            return await Track(loadingFrom: validURL)
+            switch mode {
+            case .referenced:
+                await Track(loadingFrom: url)
+            case .canonical:
+                if Self.isCanonical(url: url) {
+                    await Track(loadingFrom: url)
+                } else {
+                    try? await createTrack(copyingFrom: url)
+                }
+            }
         }
+    }
+}
+
+extension Playlist {
+    mutating func setCurrentTrack(_ track: Track?) {
+        currentTrack = track
+    }
+
+    mutating func setPlaybackMode(_ mode: PlaybackMode) {
+        playbackMode = mode
+    }
+
+    mutating func setPlaybackLooping(_ isEnabled: Bool) {
+        playbackLooping = isEnabled
+    }
+
+    mutating func add(_ tracks: [Track]) {
+        for track in tracks {
+            guard !contains(track) else { return }
+            self.tracks.append(track)
+        }
+    }
+
+    mutating func remove(_ tracks: [Track]) {
+        if let currentTrack, tracks.contains(currentTrack) {
+            self.currentTrack = nil
+        }
+
+        for track in tracks {
+            self.tracks.removeAll { $0 == track }
+            try? Self.deleteTrack(at: track.url)
+        }
+    }
+
+    mutating func clearPlaylist() {
+        remove(tracks)
+    }
+
+    mutating func move(fromOffsets indices: IndexSet, toOffset destination: Int) {
+        tracks.move(fromOffsets: indices, toOffset: destination)
     }
 }

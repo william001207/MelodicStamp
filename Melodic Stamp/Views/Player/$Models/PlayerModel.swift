@@ -67,12 +67,12 @@ extension PlayerModel {
 
     var playbackMode: PlaybackMode {
         get { playlist.playbackMode }
-        set { playlist.playbackMode = newValue }
+        set { playlist.setPlaybackMode(newValue) }
     }
 
     var playbackLooping: Bool {
         get { playlist.playbackLooping }
-        set { playlist.playbackLooping = newValue }
+        set { playlist.setPlaybackLooping(newValue) }
     }
 
     private(set) var playbackState: PlaybackState = .stopped
@@ -142,7 +142,7 @@ extension PlayerModel {
 
     var currentTrack: Track? {
         get { playlist.currentTrack }
-        set { playlist.currentTrack = newValue }
+        set { playlist.setCurrentTrack(newValue) }
     }
 
     var nextTrack: Track? {
@@ -270,9 +270,7 @@ extension PlayerModel {
         for url in urls {
             Task {
                 guard let track = await playlist.getOrCreateTrack(at: url) else { return }
-                guard !playlist.contains(track) else { return }
-
-                playlist.tracks.append(track)
+                playlist.add([track])
             }
         }
     }
@@ -288,11 +286,10 @@ extension PlayerModel {
                 // Stops if the playing track is removed
                 if currentTrack == track {
                     player.stop()
-                    currentTrack = nil
                 }
 
                 // Removes from playlist
-                playlist.tracks.removeAll { $0 == track }
+                playlist.remove([track])
             }
         }
     }
@@ -302,7 +299,7 @@ extension PlayerModel {
     }
 
     func movePlaylist(fromOffsets indices: IndexSet, toOffset destination: Int) {
-        playlist.tracks.move(fromOffsets: indices, toOffset: destination)
+        playlist.move(fromOffsets: indices, toOffset: destination)
     }
 
     // MARK: Convenient Functions
