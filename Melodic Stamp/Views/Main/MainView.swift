@@ -90,7 +90,8 @@ struct MainView: View {
                         }
                     }
             case .library:
-                InspectorLibraryView()
+//                InspectorLibraryView()
+                EmptyView()
             case .analytics:
                 InspectorAnalyticsView()
             }

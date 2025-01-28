@@ -8,11 +8,26 @@
 import SwiftUI
 
 struct InspectorLibraryView: View {
+    @State var playlists: [Playlist]
+    @Binding var selectedPlaylist: Playlist?
+
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        List(selection: $selectedPlaylist) {
+            ForEach(playlists) { playlist in
+                LibraryPlaylistView(playlist: playlist)
+                    .id(playlist)
+            }
+        }
+        .scrollClipDisabled()
+        .scrollContentBackground(.hidden)
     }
 }
 
-#Preview {
-    InspectorLibraryView()
-}
+#if DEBUG
+    #Preview {
+        @Previewable @State var playlists: [Playlist] = [SampleEnvironmentsPreviewModifier.samplePlaylist]
+        @Previewable @State var selectedPlaylist: Playlist?
+
+        InspectorLibraryView(playlists: playlists, selectedPlaylist: $selectedPlaylist)
+    }
+#endif

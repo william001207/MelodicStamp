@@ -68,13 +68,13 @@ extension PlayerModel: TypeNameReflectable {}
     var selectedTracks: Set<Track> = []
 
     var playbackMode: PlaybackMode {
-        get { playlist.playbackMode }
-        set { playlist.setPlaybackMode(newValue) }
+        get { playlist.information.state.playbackMode }
+        set { playlist.information.state.playbackMode = newValue }
     }
 
     var playbackLooping: Bool {
-        get { playlist.playbackLooping }
-        set { playlist.setPlaybackLooping(newValue) }
+        get { playlist.information.state.playbackLooping }
+        set { playlist.information.state.playbackLooping = newValue }
     }
 
     private(set) var playbackState: PlaybackState = .stopped
@@ -144,7 +144,7 @@ extension PlayerModel: TypeNameReflectable {}
 
     var currentTrack: Track? {
         get { playlist.currentTrack }
-        set { playlist.setCurrentTrack(newValue) }
+        set { playlist.currentTrack = newValue }
     }
 
     var nextTrack: Track? {

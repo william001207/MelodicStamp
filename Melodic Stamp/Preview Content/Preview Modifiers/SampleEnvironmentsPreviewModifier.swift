@@ -14,6 +14,7 @@ import SwiftUI
             floatingWindows: FloatingWindowsModel,
             windowManager: WindowManagerModel,
             fileManager: FileManagerModel,
+            library: LibraryModel,
             player: PlayerModel,
             playerKeyboardControl: PlayerKeyboardControlModel,
             metadataEditor: MetadataEditorModel,
@@ -27,6 +28,7 @@ import SwiftUI
             let floatingWindows = FloatingWindowsModel()
             let windowManager = WindowManagerModel()
             let fileManager = FileManagerModel(player: player)
+            let library = LibraryModel(player: player)
             let playerKeyboardControl = PlayerKeyboardControlModel(player: player)
             let metadataEditor = MetadataEditorModel(player: player)
             let audioVisualizer = AudioVisualizerModel()
@@ -45,6 +47,7 @@ import SwiftUI
                 floatingWindows,
                 windowManager,
                 fileManager,
+                library,
                 player,
                 playerKeyboardControl,
                 metadataEditor,
@@ -58,6 +61,7 @@ import SwiftUI
                 .environment(context.floatingWindows)
                 .environment(context.windowManager)
                 .environment(context.fileManager)
+                .environment(context.library)
                 .environment(context.player)
                 .environment(context.playerKeyboardControl)
                 .environment(context.metadataEditor)

@@ -1329,9 +1329,6 @@
         }
       }
     },
-    "Hello, World!" : {
-
-    },
     "Illustration" : {
       "localizations" : {
         "zh-Hans" : {
@@ -1906,6 +1903,9 @@
           }
         }
       }
+    },
+    "Playlist %@" : {
+
     },
     "Previous Track" : {
       "localizations" : {

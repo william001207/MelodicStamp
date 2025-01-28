@@ -65,6 +65,7 @@ struct ContentView: View {
 
     @State private var windowManager: WindowManagerModel
     @State private var fileManager: FileManagerModel
+    @State private var library: LibraryModel
     @State private var player: PlayerModel
     @State private var playerKeyboardControl: PlayerKeyboardControlModel
     @State private var metadataEditor: MetadataEditorModel
@@ -90,13 +91,14 @@ struct ContentView: View {
 
         let player = PlayerModel(SFBAudioEnginePlayer())
 
-        self.windowManager = .init(style: parameters?.initialWindowStyle ?? .main)
-        self.fileManager = .init(player: player)
+        self.windowManager = WindowManagerModel(style: parameters?.initialWindowStyle ?? .main)
+        self.fileManager = FileManagerModel(player: player)
+        self.library = LibraryModel(player: player)
         self.player = player
-        self.playerKeyboardControl = .init(player: player)
-        self.metadataEditor = .init(player: player)
-        self.audioVisualizer = .init()
-        self.gradientVisualizer = .init()
+        self.playerKeyboardControl = PlayerKeyboardControlModel(player: player)
+        self.metadataEditor = MetadataEditorModel(player: player)
+        self.audioVisualizer = AudioVisualizerModel()
+        self.gradientVisualizer = GradientVisualizerModel()
     }
 
     // MARK: - Body
@@ -183,6 +185,7 @@ struct ContentView: View {
         .environment(floatingWindows)
         .environment(windowManager)
         .environment(fileManager)
+        .environment(library)
         .environment(player)
         .environment(playerKeyboardControl)
         .environment(metadataEditor)

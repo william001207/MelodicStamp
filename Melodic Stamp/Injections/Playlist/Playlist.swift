@@ -14,61 +14,68 @@ extension Playlist {
         case canonical
 
         var id: Self { self }
+
+        var isCanonical: Bool {
+            switch self {
+            case .canonical:
+                true
+            default:
+                false
+            }
+        }
     }
 }
 
 extension Playlist: TypeNameReflectable {}
 
 struct Playlist: Equatable, Hashable, Identifiable {
-    let id: UUID
     var mode: Mode
+    var information: PlaylistInformation
 
     private(set) var tracks: [Track] = []
-    private(set) var currentTrack: Track?
+    var currentTrack: Track? {
+        get {
+            first { $0.url == information.state.currentTrackURL }
+        }
 
-    private(set) var playbackMode: PlaybackMode
-    private(set) var playbackLooping: Bool
+        set {
+            information.state.currentTrackURL = newValue?.url
+        }
+    }
+
+    var id: UUID {
+        information.id
+    }
 
     private init(
-        id: UUID,
         mode: Mode,
-        playbackMode: PlaybackMode,
-        playbackLooping: Bool
+        information: PlaylistInformation
     ) {
-        self.id = id
         self.mode = mode
-        self.playbackMode = playbackMode
-        self.playbackLooping = playbackLooping
+        self.information = information
     }
 
     init?(indexedBy id: UUID) async {
-        self.id = id
         self.mode = .canonical
 
-        let url = URL.playlists.appending(component: id.uuidString)
-        guard url.hasDirectoryPath else { return nil }
+        guard let information = try? PlaylistInformation(readingFromPlaylistID: id) else { return nil }
+        self.information = information
 
-        // TODO: Read these properties
-        self.playbackMode = .loop
-        self.playbackLooping = false
-
-        let urls = FileHelper.flatten(contentsOfFolder: url, allowedContentTypes: Array(allowedContentTypes), isRecursive: false)
+        let urls = FileHelper.flatten(contentsOfFolder: information.url, allowedContentTypes: Array(allowedContentTypes), isRecursive: false)
         for url in urls {
             guard let track = await Track(loadingFrom: url) else { return }
             tracks.append(track)
         }
-        self.currentTrack = nil
     }
 
     init?(makingPermanent oldValue: Playlist) async {
-        self.id = oldValue.id
         self.mode = .canonical
-        self.playbackMode = oldValue.playbackMode
-        self.playbackLooping = oldValue.playbackLooping
+        self.information = oldValue.information
 
-        let url = URL.playlists.appending(component: id.uuidString)
+        let url = information.url
         do {
             try FileManager.default.createDirectory(at: url, withIntermediateDirectories: true)
+            try information.write(segments: PlaylistInformation.FileSegment.allCases)
         } catch {
             return nil
         }
@@ -78,15 +85,13 @@ struct Playlist: Equatable, Hashable, Identifiable {
             tracks.append(permanentTrack)
         }
 
-        logger.info("Made permanent playlist at \(url)")
+        logger.info("Successfully made permanent playlist at \(url)")
     }
 
     static func referenced() -> Playlist {
         .init(
-            id: UUID(),
             mode: .referenced,
-            playbackMode: Defaults[.defaultPlaybackMode],
-            playbackLooping: false
+            information: .blank()
         )
     }
 }
@@ -142,7 +147,7 @@ extension Playlist {
     }
 
     private var nextIndex: Int? {
-        switch playbackMode {
+        switch information.state.playbackMode {
         case .sequential:
             guard let index else { return nil }
             let nextIndex = index + 1
@@ -158,7 +163,7 @@ extension Playlist {
     }
 
     private var previousIndex: Int? {
-        switch playbackMode {
+        switch information.state.playbackMode {
         case .sequential:
             guard let index else { return nil }
             let previousIndex = index - 1
@@ -195,20 +200,25 @@ extension Playlist {
         guard isCanonical(url: url) else { return }
         Task {
             try FileManager.default.removeItem(at: url)
+
             logger.info("Deleted canonical track at \(url)")
         }
     }
 
-    private func createTrack(copyingFrom url: URL) async throws -> Track? {
+    private func generateCanonicalURL(for url: URL) -> URL {
+        guard !Self.isCanonical(url: url) else { return url }
         let trackID = UUID()
-        let playlistURL = URL.playlists.appending(component: id.uuidString)
-        try FileManager.default.createDirectory(at: playlistURL, withIntermediateDirectories: true)
-
-        let destinationURL = playlistURL
+        return information.url
             .appending(component: trackID.uuidString, directoryHint: .notDirectory)
             .appendingPathExtension(url.pathExtension)
+    }
 
+    private func createTrack(copyingFrom url: URL) async throws -> Track? {
+        try FileManager.default.createDirectory(at: information.url, withIntermediateDirectories: true)
+
+        let destinationURL = generateCanonicalURL(for: url)
         try FileManager.default.copyItem(at: url, to: destinationURL)
+
         logger.info("Created canonical track at \(destinationURL), copying from \(url)")
         return await Track(loadingFrom: destinationURL)
     }
@@ -236,18 +246,6 @@ extension Playlist {
 }
 
 extension Playlist {
-    mutating func setCurrentTrack(_ track: Track?) {
-        currentTrack = track
-    }
-
-    mutating func setPlaybackMode(_ mode: PlaybackMode) {
-        playbackMode = mode
-    }
-
-    mutating func setPlaybackLooping(_ isEnabled: Bool) {
-        playbackLooping = isEnabled
-    }
-
     mutating func add(_ tracks: [Track]) {
         for track in tracks {
             guard !contains(track) else { return }

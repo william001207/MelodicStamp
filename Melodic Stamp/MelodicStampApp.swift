@@ -25,6 +25,7 @@ struct MelodicStampApp: App {
 
     @FocusedValue(\.windowManager) private var windowManager
 
+    // Globally manages floating windows, ensuring their uniqueness
     @State private var floatingWindows: FloatingWindowsModel = .init()
 
     @State private var isAboutWindowPresented: Bool = false
