@@ -14,7 +14,6 @@ import SwiftUI
             floatingWindows: FloatingWindowsModel,
             windowManager: WindowManagerModel,
             fileManager: FileManagerModel,
-            library: LibraryModel,
             player: PlayerModel,
             playerKeyboardControl: PlayerKeyboardControlModel,
             metadataEditor: MetadataEditorModel,
@@ -28,7 +27,6 @@ import SwiftUI
             let floatingWindows = FloatingWindowsModel()
             let windowManager = WindowManagerModel()
             let fileManager = FileManagerModel(player: player)
-            let library = LibraryModel(player: player)
             let playerKeyboardControl = PlayerKeyboardControlModel(player: player)
             let metadataEditor = MetadataEditorModel(player: player)
             let audioVisualizer = AudioVisualizerModel()
@@ -36,9 +34,9 @@ import SwiftUI
 
             let track = sampleTrack
 
-            player.setPlaylist(samplePlaylist)
             player.play(track.url)
             player.selectedTracks = [track]
+            player.playlistInformation = samplePlaylistInformation
 
             let image = NSImage(resource: .templateArtwork)
             await gradientVisualizer.updateDominantColors(from: image)
@@ -47,7 +45,6 @@ import SwiftUI
                 floatingWindows,
                 windowManager,
                 fileManager,
-                library,
                 player,
                 playerKeyboardControl,
                 metadataEditor,
@@ -61,7 +58,6 @@ import SwiftUI
                 .environment(context.floatingWindows)
                 .environment(context.windowManager)
                 .environment(context.fileManager)
-                .environment(context.library)
                 .environment(context.player)
                 .environment(context.playerKeyboardControl)
                 .environment(context.metadataEditor)
@@ -99,21 +95,30 @@ import SwiftUI
         }
 
         static var sampleTrack: Track {
-            .init(
+            Track(
                 url: sampleURL,
                 metadata: sampleMetadata
             )
         }
 
+        static var samplePlaylistInformation: PlaylistInformation {
+            var information = PlaylistInformation.blank()
+
+            information.info.title = "Sample Playlist"
+            information.info.description = "A sample playlist."
+            information.artwork.tiffRepresentation = sampleArtwork.tiffRepresentation
+
+            return information
+        }
+
         static var samplePlaylist: Playlist {
-            var result = Playlist.referenced()
-            result.add([sampleTrack])
+            var playlist = Playlist.referenced()
 
-            result.information.info.title = "Sample Playlist"
-            result.information.info.description = "A sample playlist."
-            result.information.artwork.tiffRepresentation = sampleArtwork.tiffRepresentation
+            playlist.information = samplePlaylistInformation
+            playlist.add([sampleTrack])
+            playlist.currentTrack = sampleTrack
 
-            return result
+            return playlist
         }
 
         static var sampleLyrics: String {

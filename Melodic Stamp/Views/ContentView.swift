@@ -65,7 +65,6 @@ struct ContentView: View {
 
     @State private var windowManager: WindowManagerModel
     @State private var fileManager: FileManagerModel
-    @State private var library: LibraryModel
     @State private var player: PlayerModel
     @State private var playerKeyboardControl: PlayerKeyboardControlModel
     @State private var metadataEditor: MetadataEditorModel
@@ -89,11 +88,10 @@ struct ContentView: View {
     init(_ parameters: CreationParameters?) {
         self.parameters = parameters
 
-        let player = PlayerModel(SFBAudioEnginePlayer())
+        let player = PlayerModel(SFBAudioEnginePlayer(), bindingTo: parameters?.id ?? .init())
 
         self.windowManager = WindowManagerModel(style: parameters?.initialWindowStyle ?? .main)
         self.fileManager = FileManagerModel(player: player)
-        self.library = LibraryModel(player: player)
         self.player = player
         self.playerKeyboardControl = PlayerKeyboardControlModel(player: player)
         self.metadataEditor = MetadataEditorModel(player: player)
@@ -185,7 +183,6 @@ struct ContentView: View {
         .environment(floatingWindows)
         .environment(windowManager)
         .environment(fileManager)
-        .environment(library)
         .environment(player)
         .environment(playerKeyboardControl)
         .environment(metadataEditor)
@@ -326,13 +323,11 @@ struct ContentView: View {
                 Task {
                     switch parameters.playlist {
                     case let .referenced(urls):
-                        player.setPlaylist(.referenced())
                         player.addToPlaylist(urls)
 
                         logger.info("Created playlist from referenced URLs: \(urls)")
                     case let .canonical(id):
-                        guard let playlist = await Playlist(indexedBy: id) else { break }
-                        player.setPlaylist(playlist)
+                        await player.makePlaylistCanonical()
 
                         logger.info("Created playlist with canonical ID: \(id)")
                     }

@@ -55,7 +55,7 @@ struct Playlist: Equatable, Hashable, Identifiable {
         self.information = information
     }
 
-    init?(indexedBy id: UUID) async {
+    init?(bindingTo id: UUID) async {
         self.mode = .canonical
 
         guard let information = try? PlaylistInformation(readingFromPlaylistID: id) else { return nil }
@@ -68,30 +68,41 @@ struct Playlist: Equatable, Hashable, Identifiable {
         }
     }
 
-    init?(makingPermanent oldValue: Playlist) async {
+    init?(makingCanonical oldValue: Playlist) async {
         self.mode = .canonical
         self.information = oldValue.information
 
         let url = information.url
-        do {
-            try FileManager.default.createDirectory(at: url, withIntermediateDirectories: true)
-            try information.write(segments: PlaylistInformation.FileSegment.allCases)
-        } catch {
-            return nil
-        }
+        if FileManager.default.fileExists(atPath: url.path) {
+            // Load from existing canonical playlist
 
-        for track in oldValue.tracks {
-            guard let permanentTrack = await getOrCreateTrack(at: track.url) else { return }
-            tracks.append(permanentTrack)
-        }
+            guard let instance = await Self(bindingTo: id) else { return nil }
+            self = instance
 
-        logger.info("Successfully made permanent playlist at \(url)")
+            logger.info("Loaded permanent playlist from \(url)")
+        } else {
+            // Copy and create a new canonical playlist
+
+            do {
+                try FileManager.default.createDirectory(at: url, withIntermediateDirectories: true)
+                try information.write(segments: PlaylistInformation.FileSegment.allCases)
+            } catch {
+                return nil
+            }
+
+            for track in oldValue.tracks {
+                guard let permanentTrack = await getOrCreateTrack(at: track.url) else { return }
+                tracks.append(permanentTrack)
+            }
+
+            logger.info("Successfully made permanent playlist at \(url)")
+        }
     }
 
-    static func referenced() -> Playlist {
+    static func referenced(id: UUID = .init()) -> Playlist {
         .init(
             mode: .referenced,
-            information: .blank()
+            information: .blank(id: id)
         )
     }
 }

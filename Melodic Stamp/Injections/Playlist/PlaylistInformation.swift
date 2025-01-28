@@ -66,9 +66,11 @@ struct PlaylistInformation: Equatable, Hashable, Identifiable, Codable {
         logger.info("Successfully read playlist information for playlist at \(url)")
         dump(self)
     }
+}
 
-    static func blank() -> Self {
-        .init(id: .init(), info: .init(), state: .init(), artwork: .init())
+extension PlaylistInformation {
+    static func blank(id: UUID = .init()) -> Self {
+        .init(id: id, info: .init(), state: .init(), artwork: .init())
     }
 
     static func url(forID id: UUID) -> URL {

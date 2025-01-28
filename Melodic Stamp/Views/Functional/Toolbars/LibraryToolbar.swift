@@ -8,14 +8,15 @@
 import SwiftUI
 
 struct LibraryToolbar: View {
-    @Environment(LibraryModel.self) private var library
+    @Environment(PlayerModel.self) private var player
 
     var body: some View {
-        Button("Make Permanent") {
-            Task {
-                await library.makeCurrentPlaylistPermanent()
+        if !player.playlist.mode.isCanonical {
+            Button("Add to Library") {
+                Task {
+                    await player.makePlaylistCanonical()
+                }
             }
         }
-        .disabled(library.currentPlaylist?.mode.isCanonical ?? true)
     }
 }

@@ -8,7 +8,9 @@
 import SwiftUI
 
 struct LibraryItemView: View {
-    @Environment(LibraryModel.self) private var library
+    @Environment(PlayerModel.self) private var player
+
+    @Environment(\.openWindow) private var openWindow
 
     var playlist: Playlist
     var isSelected: Bool
@@ -38,19 +40,18 @@ struct LibraryItemView: View {
                 }
             }
             .lineLimit(1)
-            .onDoubleClick(handler: makeCurrent)
+            .onDoubleClick(handler: open)
             .transition(.blurReplace)
-            .opacity(opacity)
             .animation(.default.speed(2), value: hasControl)
 
             Spacer()
 
             if hasControl {
-                if isCurrentPlaylist {
+                if isOpened {
                     coverView()
                 } else {
                     Button {
-                        makeCurrent()
+                        open()
                     } label: {
                         coverView()
                     }
@@ -58,12 +59,13 @@ struct LibraryItemView: View {
                 }
             }
         }
+        .foregroundStyle(isOpened ? AnyShapeStyle(.tint) : AnyShapeStyle(.primary))
         .frame(height: 50)
         .padding(6)
         .padding(.trailing, -1)
         .background {
             Color.clear
-                .onDoubleClick(handler: makeCurrent)
+                .onDoubleClick(handler: open)
         }
         .onHover { hover in
             withAnimation(.default.speed(5)) {
@@ -72,33 +74,24 @@ struct LibraryItemView: View {
         }
     }
 
-    private var opacity: CGFloat {
-        if hasCurrentPlaylist {
-            if isSelected || isCurrentPlaylist {
-                1
-            } else {
-                0.65
-            }
-        } else {
-            1
-        }
-    }
-
-    private var hasCurrentPlaylist: Bool {
-        library.currentPlaylist != nil
-    }
-
-    private var isCurrentPlaylist: Bool {
-        library.currentPlaylist == playlist
+    private var isOpened: Bool {
+        player.playlist == playlist
     }
 
     private var hasTitle: Bool {
         !playlist.information.info.title.isEmpty
     }
 
+    private var hasArtwork: Bool {
+        playlist.information.artwork.image != nil
+    }
+
     private var hasControl: Bool {
-        guard !isCurrentPlaylist else { return false }
-        return isHovering || playlist.information.artwork.image != nil
+        if isOpened {
+            hasArtwork
+        } else {
+            isHovering || hasArtwork
+        }
     }
 
     @ViewBuilder private func coverView() -> some View {
@@ -108,7 +101,7 @@ struct LibraryItemView: View {
                     images: [image], hasPlaceholder: false, cornerRadius: 4
                 )
                 .overlay {
-                    if isHovering, !isCurrentPlaylist {
+                    if isHovering, !isOpened {
                         Rectangle()
                             .foregroundStyle(.black)
                             .opacity(0.25)
@@ -116,12 +109,12 @@ struct LibraryItemView: View {
                     }
                 }
 
-                if isHovering, !isCurrentPlaylist {
+                if isHovering, !isOpened {
                     Image(systemSymbol: .rectangleStackFill)
                         .foregroundStyle(.white)
                 }
             } else {
-                if isHovering, !isCurrentPlaylist {
+                if isHovering, !isOpened {
                     Image(systemSymbol: .rectangleStackFill)
                         .foregroundStyle(.primary)
                 }
@@ -133,8 +126,11 @@ struct LibraryItemView: View {
         .contentTransition(.symbolEffect(.replace))
     }
 
-    private func makeCurrent() {
-        library.currentPlaylist = playlist
+    private func open() {
+        openWindow(
+            id: WindowID.content.rawValue,
+            value: CreationParameters(playlist: .canonical(playlist.id))
+        )
     }
 }
 

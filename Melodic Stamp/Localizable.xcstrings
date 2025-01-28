@@ -128,6 +128,9 @@
         }
       }
     },
+    "Add to Library" : {
+
+    },
     "Add to Playlist" : {
       "localizations" : {
         "zh-Hans" : {
@@ -1495,9 +1498,6 @@
         }
       }
     },
-    "Make Permanent" : {
-
-    },
     "Max lyrics width" : {
       "localizations" : {
         "zh-Hans" : {
@@ -2356,6 +2356,9 @@
           }
         }
       }
+    },
+    "Unknown Music" : {
+
     },
     "Unsaved Changes" : {
       "localizations" : {

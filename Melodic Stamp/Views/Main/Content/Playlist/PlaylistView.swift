@@ -56,7 +56,7 @@ struct PlaylistView: View {
                         }
                         .onMove { indices, destination in
                             withAnimation {
-                                player.movePlaylist(fromOffsets: indices, toOffset: destination)
+                                player.moveTrack(fromOffsets: indices, toOffset: destination)
                             }
                         }
                         .transition(.slide)

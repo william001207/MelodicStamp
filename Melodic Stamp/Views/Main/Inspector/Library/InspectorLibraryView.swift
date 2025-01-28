@@ -10,7 +10,7 @@ import SwiftUI
 struct InspectorLibraryView: View {
     // MARK: - Environments
 
-    @Environment(LibraryModel.self) private var library
+    @Environment(PlayerModel.self) private var player
 
     @Environment(\.appearsActive) private var appearsActive
 
@@ -22,7 +22,7 @@ struct InspectorLibraryView: View {
 
     var body: some View {
         List(selection: $selectedPlaylist) {
-            ForEach(library.playlists) { playlist in
+            ForEach(player.playlists) { playlist in
                 LibraryItemView(playlist: playlist, isSelected: selectedPlaylist == playlist)
                     .id(playlist)
             }
@@ -32,7 +32,7 @@ struct InspectorLibraryView: View {
         .onChange(of: appearsActive, initial: true) { _, newValue in
             guard newValue else { return }
             Task {
-                await library.refresh()
+                await player.refreshLibrary()
             }
         }
 

@@ -8,16 +8,24 @@
 import Foundation
 
 struct CreationParameters: Hashable, Identifiable, Codable {
-    var uniqueID = UUID()
+    let id: UUID
 
-    var playlist: PlaylistFactory = .referenced
-    var shouldPlay: Bool = false
-    var initialWindowStyle: MelodicStampWindowStyle = .main
+    var playlist: PlaylistFactory
+    var shouldPlay: Bool
+    var initialWindowStyle: MelodicStampWindowStyle
 
-    var id: UUID {
-        switch playlist {
+    init(
+        playlist: PlaylistFactory = .referenced,
+        shouldPlay: Bool = false,
+        initialWindowStyle: MelodicStampWindowStyle = .main
+    ) {
+        self.playlist = playlist
+        self.shouldPlay = shouldPlay
+        self.initialWindowStyle = initialWindowStyle
+
+        self.id = switch playlist {
         case .referenced:
-            uniqueID
+            UUID()
         case let .canonical(id):
             id
         }

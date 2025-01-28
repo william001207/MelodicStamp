@@ -64,8 +64,14 @@ extension PlayerModel: TypeNameReflectable {}
 
     // MARK: Playlist & Playback
 
-    private(set) var playlist: Playlist = .referenced()
+    private(set) var playlists: [Playlist] = []
+    private(set) var playlist: Playlist
     var selectedTracks: Set<Track> = []
+
+    var playlistInformation: PlaylistInformation {
+        get { playlist.information }
+        set { playlist.information = newValue }
+    }
 
     var playbackMode: PlaybackMode {
         get { playlist.information.state.playbackMode }
@@ -177,8 +183,9 @@ extension PlayerModel: TypeNameReflectable {}
 
     // MARK: Initializers
 
-    init(_ player: some Player) {
+    init(_ player: some Player, bindingTo id: UUID = .init()) {
         self.player = player
+        self.playlist = .referenced(id: id)
         super.init()
 
         self.player.delegate = self
@@ -264,10 +271,6 @@ extension PlayerModel {
 
     // MARK: Playlist
 
-    func setPlaylist(_ playlist: Playlist) {
-        self.playlist = playlist
-    }
-
     func addToPlaylist(_ urls: [URL]) {
         for url in urls {
             Task {
@@ -300,8 +303,38 @@ extension PlayerModel {
         removeFromPlaylist(playlist.map(\.url))
     }
 
-    func movePlaylist(fromOffsets indices: IndexSet, toOffset destination: Int) {
+    func moveTrack(fromOffsets indices: IndexSet, toOffset destination: Int) {
         playlist.move(fromOffsets: indices, toOffset: destination)
+    }
+
+    // MARK: Library
+
+    func makePlaylistCanonical() async {
+        guard
+            !playlist.mode.isCanonical,
+            let permanentPlaylist = await Playlist(makingCanonical: playlist)
+        else { return }
+        playlist = permanentPlaylist
+    }
+
+    func movePlaylist(from indices: IndexSet, to destination: Int) {
+        playlists.move(fromOffsets: indices, toOffset: destination)
+    }
+
+    func refreshLibrary() async {
+        playlists.removeAll()
+        guard let contents = try? FileManager.default.contentsOfDirectory(
+            at: .playlists,
+            includingPropertiesForKeys: [.isDirectoryKey],
+            options: [.skipsHiddenFiles]
+        ) else { return }
+
+        for content in contents.filter(\.hasDirectoryPath) {
+            let pathName = content.lastPathComponent
+            guard let id = UUID(uuidString: pathName), let playlist = await Playlist(bindingTo: id) else { continue }
+
+            playlists.append(playlist)
+        }
     }
 
     // MARK: Convenient Functions
