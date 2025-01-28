@@ -28,3 +28,10 @@ extension URL {
         return String(lastPathComponent.dropLast(pathExtensionCount))
     }
 }
+
+extension URL {
+    func canAccessSecurityScopedResourceOrIsReachable() -> Bool {
+        let isReachable = (try? checkResourceIsReachable()) ?? false
+        return startAccessingSecurityScopedResource() || isReachable
+    }
+}

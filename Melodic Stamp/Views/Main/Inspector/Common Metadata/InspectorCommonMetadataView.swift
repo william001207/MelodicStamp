@@ -135,6 +135,7 @@ struct InspectorCommonMetadataView: View {
                         switch result {
                         case let .success(url):
                             guard url.startAccessingSecurityScopedResource() else { break }
+                            defer { url.stopAccessingSecurityScopedResource() }
 
                             guard
                                 let image = NSImage(contentsOf: url),

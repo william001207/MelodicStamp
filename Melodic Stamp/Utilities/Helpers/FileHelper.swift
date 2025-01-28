@@ -12,8 +12,7 @@ enum FileHelper {}
 
 extension FileHelper {
     static func flatten(contentsOf folderURL: URL, allowedContentTypes: Set<UTType> = allowedContentTypes, isRecursive: Bool = true) -> [URL] {
-        let isReachable = (try? folderURL.checkResourceIsReachable()) ?? false
-        guard folderURL.startAccessingSecurityScopedResource() || isReachable else { return [] }
+        guard folderURL.canAccessSecurityScopedResourceOrIsReachable() else { return [] }
         guard folderURL.hasDirectoryPath else { return [folderURL] }
 
         guard let contents = try? FileManager.default.contentsOfDirectory(
