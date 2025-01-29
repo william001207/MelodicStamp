@@ -157,7 +157,7 @@ extension Metadata {
         }
     }
 
-    init(migratingFrom oldValue: Metadata, to url: URL? = nil, useFallbackTitleIfNotProvided useFallbackTitle: Bool = false) {
+    init(migratingFrom oldValue: Metadata, to url: URL? = nil, useFallbackTitleIfNotProvided useFallbackTitle: Bool = false) async throws(MetadataError) {
         let url = url ?? oldValue.url
 
         self.url = url
@@ -213,10 +213,17 @@ extension Metadata {
         self.replayGainTrackPeak = oldValue.replayGainTrackPeak
         self.replayGainReferenceLoudness = oldValue.replayGainReferenceLoudness
 
-        if useFallbackTitle, title.isStringEmpty {
+        self.additional = oldValue.additional
+
+        // Automatically apply a fallback title based on file name for those don't have titles
+        let hasInitialTitle = if let title = title.initial { !title.isEmpty } else { false }
+        let hasCurrentTitle = if let title = title.current { !title.isEmpty } else { false }
+        if useFallbackTitle, !hasInitialTitle, !hasCurrentTitle {
             let fallbackTitle = oldValue.url.deletingPathExtension().lastPathComponent
             title.initial = fallbackTitle
             title.current = fallbackTitle
+
+            try await overwrite()
         }
     }
 
@@ -582,6 +589,18 @@ extension Metadata {
 
         logger.info("Started writing metadata to \(self.url)")
 
+        try await overwrite()
+
+        await updateState(to: .fine)
+        completion?()
+
+        logger.info("Successfully written metadata to \(self.url)")
+    }
+
+    // Overwrites the metadata file using only values from the `initial` fields
+    private nonisolated func overwrite() async throws(MetadataError) {
+        logger.info("Started overwriting initial metadata values to \(self.url)")
+
         guard let file = try? AudioFile(url: url) else {
             await updateState(to: state.with(error: .fileNotFound))
             throw .fileNotFound
@@ -604,10 +623,7 @@ extension Metadata {
             throw .writingPermissionNotGranted
         }
 
-        await updateState(to: .fine)
-        completion?()
-
-        logger.info("Successfully written metadata to \(self.url)")
+        logger.info("Successfully overwritten initial metadata values to \(self.url)")
     }
 
     func poll<V>(for keyPath: WritableKeyPath<Metadata, Entry<V>>) async -> MetadataBatchEditingEntry<V> {

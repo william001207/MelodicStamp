@@ -278,7 +278,7 @@ extension Playlist {
         try FileManager.default.copyItem(at: track.url, to: destinationURL)
 
         logger.info("Migrating to canonical track at \(destinationURL), copying from \(track.url)")
-        return await Track(
+        return try await Track(
             migratingFrom: track, to: destinationURL,
             useFallbackTitleIfNotProvided: true
         )

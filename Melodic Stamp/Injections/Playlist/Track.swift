@@ -28,7 +28,7 @@ struct Track: Identifiable {
         self.metadata = metadata
     }
 
-    init(migratingFrom oldValue: Track, to url: URL?, useFallbackTitleIfNotProvided useFallbackTitle: Bool = false) async {
+    init(migratingFrom oldValue: Track, to url: URL?, useFallbackTitleIfNotProvided useFallbackTitle: Bool = false) async throws {
         guard url != oldValue.url else {
             self = oldValue
             return
@@ -36,7 +36,7 @@ struct Track: Identifiable {
 
         let url = url ?? oldValue.url
         self.url = url
-        self.metadata = await .init(migratingFrom: oldValue.metadata, to: url, useFallbackTitleIfNotProvided: useFallbackTitle)
+        self.metadata = try await Metadata(migratingFrom: oldValue.metadata, to: url, useFallbackTitleIfNotProvided: useFallbackTitle)
     }
 }
 
