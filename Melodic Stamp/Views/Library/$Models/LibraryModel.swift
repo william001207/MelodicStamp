@@ -9,11 +9,11 @@ import SwiftUI
 
 @MainActor @Observable final class LibraryModel {
     private(set) var playlists: [Playlist] = []
-    private var index: PlaylistIndex!
+    private var indexer: PlaylistIndexer = .init()
 
     init() {
         Task {
-            await refresh()
+            try await refresh()
         }
     }
 
@@ -21,15 +21,18 @@ import SwiftUI
 }
 
 extension LibraryModel {
-    private func updatePlaylistIndex(with ids: [UUID]) async throws {
-        guard var index else { return }
-        index.playlistIDs = ids
-        try await index.write()
+    private func captureIndices() -> PlaylistIndexer.Value {
+        playlists.map(\.id)
     }
 
-    func refresh() async {
-        await index = .read()
-        await playlists = index.loadPlaylists()
+    private func indexPlaylists(with value: PlaylistIndexer.Value) throws {
+        indexer.value = value
+        try indexer.write()
+    }
+
+    func refresh() async throws {
+        indexer.readAndUpdate()
+        await playlists = indexer.loadPlaylists()
     }
 }
 
@@ -37,10 +40,7 @@ extension LibraryModel {
     func move(fromOffsets indices: IndexSet, toOffset destination: Int) {
         playlists.move(fromOffsets: indices, toOffset: destination)
 
-        let ids = playlists.map(\.id)
-        Task {
-            try await self.updatePlaylistIndex(with: ids)
-        }
+        try? indexPlaylists(with: captureIndices())
     }
 
     func add(_ playlists: [Playlist]) {
@@ -49,18 +49,12 @@ extension LibraryModel {
             self.playlists.append(playlist)
         }
 
-        let ids = playlists.map(\.id)
-        Task {
-            try await self.updatePlaylistIndex(with: ids)
-        }
+        try? indexPlaylists(with: captureIndices())
     }
 
     func remove(_ playlists: [Playlist]) {
         self.playlists.removeAll { playlists.contains($0) }
 
-        let ids = playlists.map(\.id)
-        Task {
-            try await self.updatePlaylistIndex(with: ids)
-        }
+        try? indexPlaylists(with: captureIndices())
     }
 }

@@ -1,5 +1,5 @@
 //
-//  PlaylistInformation.swift
+//  Playlist+Metadata.swift
 //  Melodic Stamp
 //
 //  Created by KrLite on 2025/1/28.
@@ -8,9 +8,9 @@
 import Defaults
 import SwiftUI
 
-extension PlaylistInformation: TypeNameReflectable {}
+extension Playlist.Metadata: TypeNameReflectable {}
 
-extension PlaylistInformation {
+extension Playlist.Metadata {
     enum Segment: String, CaseIterable {
         case info = ".info"
         case state = ".state"
@@ -42,33 +42,35 @@ extension PlaylistInformation {
     }
 }
 
-struct PlaylistInformation: Equatable, Hashable, Identifiable, Codable {
-    let id: UUID
+extension Playlist {
+    struct Metadata: Equatable, Hashable, Identifiable, Codable {
+        let id: UUID
 
-    var info: Info
-    var state: State
-    var artwork: Artwork
+        var info: Info
+        var state: State
+        var artwork: Artwork
 
-    private init(id: UUID, info: Info, state: State, artwork: Artwork) {
-        self.id = id
-        self.info = info
-        self.state = state
-        self.artwork = artwork
-    }
+        private init(id: UUID, info: Info, state: State, artwork: Artwork) {
+            self.id = id
+            self.info = info
+            self.state = state
+            self.artwork = artwork
+        }
 
-    init(readingFromPlaylistID id: UUID) async throws {
-        let url = Self.url(forID: id)
-        self.id = id
-        self.info = try await JSONDecoder().decode(Info.self, from: Self.read(segment: .info, fromDirectory: url))
-        self.state = try await JSONDecoder().decode(State.self, from: Self.read(segment: .state, fromDirectory: url))
-        self.artwork = try await JSONDecoder().decode(Artwork.self, from: Self.read(segment: .artwork, fromDirectory: url))
+        init(readingFromPlaylistID id: UUID) async throws {
+            let url = Self.url(forID: id)
+            self.id = id
+            self.info = try await JSONDecoder().decode(Info.self, from: Self.read(segment: .info, fromDirectory: url))
+            self.state = try await JSONDecoder().decode(State.self, from: Self.read(segment: .state, fromDirectory: url))
+            self.artwork = try await JSONDecoder().decode(Artwork.self, from: Self.read(segment: .artwork, fromDirectory: url))
 
-        logger.info("Successfully read playlist information for playlist at \(url)")
-        dump(self)
+            logger.info("Successfully read playlist information for playlist at \(url)")
+            dump(self)
+        }
     }
 }
 
-extension PlaylistInformation {
+extension Playlist.Metadata {
     static func blank(bindingTo id: UUID = .init()) -> Self {
         .init(id: id, info: .init(), state: .init(), artwork: .init())
     }
@@ -100,7 +102,7 @@ extension PlaylistInformation {
     }
 }
 
-private extension PlaylistInformation {
+private extension Playlist.Metadata {
     static func read(segment: Segment, fromDirectory root: URL) async throws -> Data {
         let url = segment.url(relativeTo: root)
         return try Data(contentsOf: url)

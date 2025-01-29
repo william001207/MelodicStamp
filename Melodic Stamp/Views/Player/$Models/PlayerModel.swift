@@ -129,23 +129,27 @@ extension PlayerModel {
         }
     }
 
-    // MARK: Playlist
-
-    subscript<V>(playlistInformation keyPath: WritableKeyPath<PlaylistInformation, V>) -> V {
-        get { playlist.information[keyPath: keyPath] }
-        set { playlist.information[keyPath: keyPath] = newValue }
-    }
+    // MARK: Selected Tracks
 
     var selectedTracks: Set<Track> = []
 
+    // MARK: Playback
+
     var playbackMode: PlaybackMode {
-        get { self[playlistInformation: \.state.playbackMode] }
-        set { self[playlistInformation: \.state.playbackMode] = newValue }
+        get { self[playlistMetadata: \.state.playbackMode] }
+        set { self[playlistMetadata: \.state.playbackMode] = newValue }
     }
 
     var playbackLooping: Bool {
-        get { self[playlistInformation: \.state.playbackLooping] }
-        set { self[playlistInformation: \.state.playbackLooping] = newValue }
+        get { self[playlistMetadata: \.state.playbackLooping] }
+        set { self[playlistMetadata: \.state.playbackLooping] = newValue }
+    }
+
+    // MARK: Playlist
+
+    subscript<V>(playlistMetadata keyPath: WritableKeyPath<Playlist.Metadata, V>) -> V {
+        get { playlist[metadata: keyPath] }
+        set { playlist[metadata: keyPath] = newValue }
     }
 
     var currentTrack: Track? {

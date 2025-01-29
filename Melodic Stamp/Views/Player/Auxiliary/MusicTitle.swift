@@ -76,7 +76,7 @@ struct MusicTitle: View {
     }
 
     static func fallbackTitle(for track: Track) -> String {
-        track.url.lastPathComponentRemovingExtension
+        track.url.deletingPathExtension().lastPathComponent
     }
 
     static func stringifiedTitle(

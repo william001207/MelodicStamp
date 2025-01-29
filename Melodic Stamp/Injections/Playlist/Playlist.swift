@@ -30,7 +30,8 @@ extension Playlist {
 
 struct Playlist: Hashable, Identifiable {
     var mode: Mode
-    var information: PlaylistInformation
+    var information: Playlist.Metadata
+    private var indexer: TrackIndexer
 
     private(set) var tracks: [Track] = []
     var currentTrack: Track? {
@@ -49,46 +50,49 @@ struct Playlist: Hashable, Identifiable {
 
     private init(
         mode: Mode,
-        information: PlaylistInformation
+        information: Playlist.Metadata
     ) {
         self.mode = mode
         self.information = information
+        self.indexer = .init(playlistID: information.id)
     }
 
     init?(loadingWith id: UUID) async {
         self.mode = .canonical
 
-        guard let information = try? await PlaylistInformation(readingFromPlaylistID: id) else { return nil }
+        guard let information = try? await Playlist.Metadata(readingFromPlaylistID: id) else { return nil }
         self.information = information
+        self.indexer = .init(playlistID: information.id)
     }
 
     init?(makingCanonical oldValue: Playlist) async {
         let url = oldValue.information.url
         if FileManager.default.fileExists(atPath: url.path) {
-            // Load from existing canonical playlist
+            // Loads from existing canonical playlist
 
             guard let instance = await Self(loadingWith: oldValue.id) else { return nil }
             self = instance
 
-            await loadTracks()
+            try? await refresh()
 
             logger.info("Loaded canonical playlist from \(url)")
         } else {
-            // Copy and create a new canonical playlist
+            // Migrates to a new canonical playlist
 
             self.mode = .canonical
             self.information = oldValue.information
+            self.indexer = .init(playlistID: oldValue.id)
 
             do {
                 try FileManager.default.createDirectory(at: url, withIntermediateDirectories: true)
-                try await information.write(segments: PlaylistInformation.Segment.allCases)
+                try await information.write(segments: Playlist.Metadata.Segment.allCases)
             } catch {
                 return nil
             }
 
             for track in oldValue.tracks {
                 guard let migratedTrack = try? await migrateTrack(from: track) else { continue }
-                tracks.append(migratedTrack)
+                add([migratedTrack])
 
                 let wasCurrentTrack = track.url == oldValue.information.state.currentTrackURL
                 if wasCurrentTrack {
@@ -106,14 +110,30 @@ struct Playlist: Hashable, Identifiable {
             information: .blank(bindingTo: id)
         )
     }
+}
 
-    mutating func loadTracks() async {
-        tracks.removeAll()
-        let urls = FileHelper.flatten(contentsOf: information.url, isRecursive: false)
-        for url in urls {
-            guard let track = await Track(loadingFrom: url) else { return }
-            tracks.append(track)
-        }
+extension Playlist {
+    private func captureIndices() -> TrackIndexer.Value {
+        Dictionary(
+            uniqueKeysWithValues: tracks
+                .map(\.url)
+                .compactMap { url in
+                    guard let id = UUID(uuidString: url.deletingPathExtension().lastPathComponent) else { return nil }
+                    return (id, url.pathExtension)
+                }
+        )
+    }
+
+    private mutating func indexTracks(with value: TrackIndexer.Value) throws {
+        guard mode.isCanonical else { return }
+        indexer.value = value
+        try indexer.write()
+    }
+
+    mutating func refresh() async throws {
+        guard mode.isCanonical else { return }
+        indexer.readAndUpdate()
+        await tracks = indexer.loadTracks()
     }
 }
 
@@ -143,9 +163,12 @@ extension Playlist: Sequence, RandomAccessCollection {
     var endIndex: Array<Track>.Index {
         tracks.endIndex
     }
+}
 
-    mutating func move(fromOffsets indices: IndexSet, toOffset destination: Int) {
-        tracks.move(fromOffsets: indices, toOffset: destination)
+extension Playlist {
+    subscript<V>(metadata keyPath: WritableKeyPath<Metadata, V>) -> V {
+        get { information[keyPath: keyPath] }
+        set { information[keyPath: keyPath] = newValue }
     }
 }
 
@@ -172,7 +195,7 @@ extension Playlist {
         previousTrack != nil
     }
 
-    private var index: Int? {
+    private var currentIndex: Int? {
         guard let currentTrack else { return nil }
         return firstIndex(of: currentTrack)
     }
@@ -180,14 +203,14 @@ extension Playlist {
     private var nextIndex: Int? {
         switch information.state.playbackMode {
         case .sequential:
-            guard let index else { return nil }
-            let nextIndex = index + 1
+            guard let currentIndex else { return nil }
+            let nextIndex = currentIndex + 1
 
             guard nextIndex < endIndex else { return nil }
             return nextIndex
         case .loop:
-            guard let index else { return nil }
-            return (index + 1) % count
+            guard let currentIndex else { return nil }
+            return (currentIndex + 1) % count
         case .shuffle:
             return randomIndex()
         }
@@ -196,14 +219,14 @@ extension Playlist {
     private var previousIndex: Int? {
         switch information.state.playbackMode {
         case .sequential:
-            guard let index else { return nil }
-            let previousIndex = index - 1
+            guard let currentIndex else { return nil }
+            let previousIndex = currentIndex - 1
 
             guard previousIndex >= 0 else { return nil }
             return previousIndex
         case .loop:
-            guard let index else { return nil }
-            return (index + count - 1) % count
+            guard let currentIndex else { return nil }
+            return (currentIndex + count - 1) % count
         case .shuffle:
             return randomIndex()
         }
@@ -284,11 +307,19 @@ extension Playlist {
 }
 
 extension Playlist {
+    mutating func move(fromOffsets indices: IndexSet, toOffset destination: Int) {
+        tracks.move(fromOffsets: indices, toOffset: destination)
+
+        try? indexTracks(with: captureIndices())
+    }
+
     mutating func add(_ tracks: [Track]) {
         for track in tracks {
             guard !contains(track) else { return }
             self.tracks.append(track)
         }
+
+        try? indexTracks(with: captureIndices())
     }
 
     mutating func remove(_ tracks: [Track]) {
@@ -300,6 +331,8 @@ extension Playlist {
             self.tracks.removeAll { $0 == track }
             try? Self.deleteTrack(at: track.url)
         }
+
+        try? indexTracks(with: captureIndices())
     }
 
     mutating func clearPlaylist() {

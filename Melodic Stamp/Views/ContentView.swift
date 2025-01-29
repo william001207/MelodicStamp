@@ -287,7 +287,7 @@ struct ContentView: View {
             guard newValue else { return }
 
             Task.detached {
-                await library.refresh()
+                try await library.refresh()
             }
         }
     }

@@ -214,7 +214,7 @@ extension Metadata {
         self.replayGainReferenceLoudness = oldValue.replayGainReferenceLoudness
 
         if useFallbackTitle, title.isStringEmpty {
-            let fallbackTitle = oldValue.url.lastPathComponentRemovingExtension
+            let fallbackTitle = oldValue.url.deletingPathExtension().lastPathComponent
             title.initial = fallbackTitle
             title.current = fallbackTitle
         }
@@ -676,7 +676,7 @@ extension Metadata {
         dict[MPMediaItemPropertyTitle] = if let title = title.initial, !title.isEmpty {
             title
         } else {
-            url.lastPathComponentRemovingExtension
+            url.deletingPathExtension().lastPathComponent
         }
 
         dict[MPMediaItemPropertyArtist] = artist.initial
