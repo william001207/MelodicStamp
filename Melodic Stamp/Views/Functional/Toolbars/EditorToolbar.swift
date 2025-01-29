@@ -52,7 +52,7 @@ struct EditorToolbar: View {
         Button {
             metadataEditor.updateAll()
         } label: {
-            ToolbarImageLabel(systemSymbol: .arrowClockwise)
+            ToolbarImageLabel(systemSymbol: .trayAndArrowUpFill)
                 .imageScale(.small)
         }
         .disabled(!metadataEditor.hasMetadata)

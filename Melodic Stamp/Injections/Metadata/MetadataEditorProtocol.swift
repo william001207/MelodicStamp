@@ -33,21 +33,19 @@ struct MetadataEditingState: OptionSet {
 }
 
 @MainActor protocol MetadataEditorProtocol: Modifiable {
-    var metadatas: Set<Metadata> { get }
+    var metadataSet: Set<Metadata> { get }
     var hasMetadata: Bool { get }
     var state: MetadataEditingState { get }
 }
 
 extension MetadataEditorProtocol {
-    var hasMetadata: Bool {
-        !metadatas.isEmpty
-    }
+    var hasMetadata: Bool { !metadataSet.isEmpty }
 
     var state: MetadataEditingState {
         guard hasMetadata else { return [] }
 
         var result: MetadataEditingState = []
-        let states = metadatas.map(\.state)
+        let states = metadataSet.map(\.state)
 
         for state in states {
             switch state {
@@ -64,12 +62,12 @@ extension MetadataEditorProtocol {
     }
 
     @MainActor func restoreAll() {
-        metadatas.forEach { $0.restore() }
+        metadataSet.forEach { $0.restore() }
     }
 
     func updateAll(completion: (() -> ())? = nil) {
-        var pending: Set<URL> = Set(metadatas.map(\.url))
-        for metadata in metadatas {
+        var pending: Set<URL> = Set(metadataSet.map(\.url))
+        for metadata in metadataSet {
             Task.detached {
                 do {
                     try await metadata.update {
@@ -94,8 +92,8 @@ extension MetadataEditorProtocol {
     }
 
     func writeAll(completion: (() -> ())? = nil) {
-        var pending: Set<URL> = Set(metadatas.map(\.url))
-        for metadata in metadatas {
+        var pending: Set<URL> = Set(metadataSet.map(\.url))
+        for metadata in metadataSet {
             Task.detached {
                 do {
                     try await metadata.write {
@@ -122,6 +120,6 @@ extension MetadataEditorProtocol {
 
 extension MetadataEditorProtocol {
     var isModified: Bool {
-        metadatas.contains(where: \.isModified)
+        metadataSet.contains(where: \.isModified)
     }
 }

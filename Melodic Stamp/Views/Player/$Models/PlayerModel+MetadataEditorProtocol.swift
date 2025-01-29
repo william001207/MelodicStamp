@@ -8,7 +8,7 @@
 import Foundation
 
 extension PlayerModel: MetadataEditorProtocol {
-    var metadatas: Set<Metadata> {
+    var metadataSet: Set<Metadata> {
         Set(playlist.map(\.metadata).filter(\.state.isInitialized))
     }
 }

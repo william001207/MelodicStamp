@@ -41,7 +41,7 @@ enum SidebarInspectorTab: String, SidebarTab, CaseIterable, Codable {
         case .lyrics:
             .textQuote
         case .library:
-            .buildingColumns
+            .booksVertical
         case .analytics:
             .checkmarkSeal
         }

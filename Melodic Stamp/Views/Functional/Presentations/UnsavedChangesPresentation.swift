@@ -41,7 +41,7 @@ struct UnsavedChangesPresentation<Parent>: View where Parent: View {
     }
 
     private var modifiedMetadatas: [Metadata] {
-        player.metadatas.filter(\.isModified)
+        player.metadataSet.filter(\.isModified)
     }
 
     private var modifiedFineMetadatas: [Metadata] {

@@ -19,7 +19,11 @@ extension PlayerModel {
 }
 
 extension PlayerModel.LibraryModel {
-    func movePlaylist(from indices: IndexSet, to destination: Int) {
+    var hasPlaylists: Bool { !playlists.isEmpty }
+}
+
+extension PlayerModel.LibraryModel {
+    func movePlaylist(fromOffsets indices: IndexSet, toOffset destination: Int) {
         playlists.move(fromOffsets: indices, toOffset: destination)
     }
 

@@ -334,7 +334,7 @@ struct PlaylistView: View {
                         try await track.metadata.update()
                     }
                 } label: {
-                    Image(systemSymbol: .arrowClockwise)
+                    Image(systemSymbol: .trayAndArrowUp)
                     Text("Reload Metadata")
                 }
                 .tint(.accent)

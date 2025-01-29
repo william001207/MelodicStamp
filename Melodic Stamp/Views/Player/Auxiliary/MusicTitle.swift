@@ -39,7 +39,7 @@ struct MusicTitle: View {
                                 Text(Self.fallbackTitle(for: track))
                             case .canonical:
                                 Text("Unknown Music")
-                                    .foregroundStyle(.secondary)
+                                    .foregroundStyle(.placeholder)
                             }
                         }
                     }

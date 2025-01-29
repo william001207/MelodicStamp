@@ -14,7 +14,7 @@ import SwiftUI
         self.player = player
     }
 
-    var metadatas: Set<Metadata> {
+    var metadataSet: Set<Metadata> {
         guard let player else {
             return []
         }
@@ -22,6 +22,6 @@ import SwiftUI
     }
 
     subscript<V: Equatable & Hashable>(extracting keyPath: WritableKeyPath<Metadata, MetadataEntry<V>>) -> MetadataBatchEditingEntries<V> {
-        .init(keyPath: keyPath, metadatas: metadatas)
+        .init(keyPath: keyPath, metadatas: metadataSet)
     }
 }

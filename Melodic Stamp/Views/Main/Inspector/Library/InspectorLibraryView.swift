@@ -16,47 +16,60 @@ struct InspectorLibraryView: View {
 
     // MARK: - Fields
 
-    @State private var selectedPlaylist: Playlist?
+    @State private var selectedPlaylists: Set<Playlist> = []
 
     // MARK: - Body
 
     var body: some View {
-        List(selection: $selectedPlaylist) {
-            ForEach(player.library.playlists) { playlist in
-                LibraryItemView(playlist: playlist, isSelected: selectedPlaylist == playlist)
-                    .id(playlist)
+        Group {
+            if !player.library.hasPlaylists {
+                ExcerptView(tab: SidebarInspectorTab.library)
+            } else {
+                List(selection: $selectedPlaylists) {
+                    ForEach(player.library.playlists) { playlist in
+                        let isSelected = selectedPlaylists.contains(playlist)
+                        LibraryItemView(playlist: playlist, isSelected: isSelected)
+                            .id(playlist)
+                    }
+                    .onMove { indices, destination in
+                        withAnimation {
+                            player.library.movePlaylist(fromOffsets: indices, toOffset: destination)
+                        }
+                    }
+                    .transition(.slide)
+                }
+                .scrollClipDisabled()
+                .scrollContentBackground(.hidden)
+
+                // MARK: Keyboard Handlers
+
+                // Handle [escape] -> clear selection
+                .onKeyPress(.escape) {
+                    if handleEscape() {
+                        .handled
+                    } else {
+                        .ignored
+                    }
+                }
             }
         }
-        .scrollClipDisabled()
-        .scrollContentBackground(.hidden)
         .onChange(of: appearsActive, initial: true) { _, newValue in
             guard newValue else { return }
             Task {
                 await player.library.refresh()
             }
         }
-
-        // MARK: Keyboard Handlers
-
-        // Handle [escape] -> clear selection
-        .onKeyPress(.escape) {
-            if handleEscape() {
-                .handled
-            } else {
-                .ignored
-            }
-        }
     }
 
     private var canEscape: Bool {
-        selectedPlaylist != nil
+        !selectedPlaylists.isEmpty
     }
 
     // MARK: - Functions
 
     @discardableResult private func handleEscape() -> Bool {
         guard canEscape else { return false }
-        selectedPlaylist = nil
+        selectedPlaylists.removeAll()
         return true
     }
 }
