@@ -282,6 +282,13 @@ struct ContentView: View {
                 destroyFloatingWindows(from: window)
             }
         }
+        .onChange(of: appearsActive, initial: true) { _, newValue in
+            guard newValue else { return }
+
+            Task.detached {
+                await player.library.refresh()
+            }
+        }
     }
 
     // MARK: - Mini Player View
@@ -321,10 +328,10 @@ struct ContentView: View {
         if !windowManager.isInitialized {
             windowManager.isInitialized = true
 
-            Task {
+            Task.detached {
                 switch parameters.playlist {
                 case let .referenced(urls):
-                    player.addToPlaylist(urls)
+                    await player.addToPlaylist(urls)
 
                     logger.info("Created window from referenced URLs: \(urls)")
                 case let .canonical(id):
@@ -333,8 +340,8 @@ struct ContentView: View {
                     logger.info("Created window with canonical ID: \(id)")
                 }
 
-                if parameters.shouldPlay, let firstTrack = player.playlist.first {
-                    player.play(firstTrack.url)
+                if parameters.shouldPlay, let firstTrack = await player.playlist.first {
+                    await player.play(firstTrack.url)
                 }
             }
         }

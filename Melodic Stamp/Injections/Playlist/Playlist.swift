@@ -28,7 +28,7 @@ extension Playlist {
     }
 }
 
-struct Playlist: Equatable, Hashable, Identifiable {
+struct Playlist: Hashable, Identifiable {
     var mode: Mode
     var information: PlaylistInformation
 
@@ -58,7 +58,7 @@ struct Playlist: Equatable, Hashable, Identifiable {
     init?(loadingWith id: UUID) async {
         self.mode = .canonical
 
-        guard let information = try? PlaylistInformation(readingFromPlaylistID: id) else { return nil }
+        guard let information = try? await PlaylistInformation(readingFromPlaylistID: id) else { return nil }
         self.information = information
     }
 
@@ -79,7 +79,7 @@ struct Playlist: Equatable, Hashable, Identifiable {
 
             do {
                 try FileManager.default.createDirectory(at: url, withIntermediateDirectories: true)
-                try information.write(segments: PlaylistInformation.Segment.allCases)
+                try await information.write(segments: PlaylistInformation.Segment.allCases)
             } catch {
                 return nil
             }
@@ -106,6 +106,12 @@ struct Playlist: Equatable, Hashable, Identifiable {
             guard let track = await Track(loadingFrom: url) else { return }
             tracks.append(track)
         }
+    }
+}
+
+extension Playlist: Equatable {
+    static func == (lhs: Playlist, rhs: Playlist) -> Bool {
+        lhs.id == rhs.id
     }
 }
 

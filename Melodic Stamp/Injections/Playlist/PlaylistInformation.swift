@@ -56,12 +56,12 @@ struct PlaylistInformation: Equatable, Hashable, Identifiable, Codable {
         self.artwork = artwork
     }
 
-    init(readingFromPlaylistID id: UUID) throws {
+    init(readingFromPlaylistID id: UUID) async throws {
         let url = Self.url(forID: id)
         self.id = id
-        self.info = try JSONDecoder().decode(Info.self, from: Self.read(segment: .info, fromDirectory: url))
-        self.state = try JSONDecoder().decode(State.self, from: Self.read(segment: .state, fromDirectory: url))
-        self.artwork = try JSONDecoder().decode(Artwork.self, from: Self.read(segment: .artwork, fromDirectory: url))
+        self.info = try await JSONDecoder().decode(Info.self, from: Self.read(segment: .info, fromDirectory: url))
+        self.state = try await JSONDecoder().decode(State.self, from: Self.read(segment: .state, fromDirectory: url))
+        self.artwork = try await JSONDecoder().decode(Artwork.self, from: Self.read(segment: .artwork, fromDirectory: url))
 
         logger.info("Successfully read playlist information for playlist at \(url)")
         dump(self)
@@ -81,7 +81,7 @@ extension PlaylistInformation {
         Self.url(forID: id)
     }
 
-    func write(segments: [Segment]) throws {
+    func write(segments: [Segment]) async throws {
         guard !segments.isEmpty else { return }
 
         for segment in segments {
@@ -93,7 +93,7 @@ extension PlaylistInformation {
             case .artwork:
                 try JSONEncoder().encode(artwork)
             }
-            try Self.write(segment: segment, ofData: data, toDirectory: url)
+            try await Self.write(segment: segment, ofData: data, toDirectory: url)
         }
 
         logger.info("Successfully wrote playlist information segments \(segments) for playlist at \(url)")
@@ -101,12 +101,12 @@ extension PlaylistInformation {
 }
 
 private extension PlaylistInformation {
-    static func read(segment: Segment, fromDirectory root: URL) throws -> Data {
+    static func read(segment: Segment, fromDirectory root: URL) async throws -> Data {
         let url = segment.url(relativeTo: root)
         return try Data(contentsOf: url)
     }
 
-    static func write(segment: Segment, ofData fileData: Data, toDirectory root: URL) throws {
+    static func write(segment: Segment, ofData fileData: Data, toDirectory root: URL) async throws {
         let url = segment.url(relativeTo: root)
         try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
         try fileData.write(to: url)

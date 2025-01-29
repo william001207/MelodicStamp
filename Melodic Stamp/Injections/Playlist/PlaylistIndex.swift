@@ -15,7 +15,7 @@ struct PlaylistIndex: Equatable, Hashable, Codable {
 
     var playlistIDs: [UUID]
 
-    static func read() -> Self {
+    static func read() async -> Self {
         guard
             let data = try? Data(contentsOf: url),
             let result = try? JSONDecoder().decode(Self.self, from: data)
@@ -23,7 +23,7 @@ struct PlaylistIndex: Equatable, Hashable, Codable {
         return result
     }
 
-    func write() throws {
+    func write() async throws {
         try FileManager.default.createDirectory(at: .playlists, withIntermediateDirectories: true)
         let data = try JSONEncoder().encode(self)
         try data.write(to: Self.url)
@@ -40,9 +40,5 @@ extension PlaylistIndex {
             playlists.append(playlist)
         }
         return playlists
-    }
-
-    mutating func updateIDs(from playlists: [Playlist]) {
-        playlistIDs = playlists.map(\.information.id)
     }
 }

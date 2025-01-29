@@ -21,42 +21,34 @@ struct InspectorLibraryView: View {
     // MARK: - Body
 
     var body: some View {
-        Group {
-            if !player.library.hasPlaylists {
-                ExcerptView(tab: SidebarInspectorTab.library)
-            } else {
-                List(selection: $selectedPlaylists) {
-                    ForEach(player.library.playlists) { playlist in
-                        let isSelected = selectedPlaylists.contains(playlist)
-                        LibraryItemView(playlist: playlist, isSelected: isSelected)
-                            .id(playlist)
-                    }
-                    .onMove { indices, destination in
-                        withAnimation {
-                            player.library.movePlaylist(fromOffsets: indices, toOffset: destination)
-                        }
-                    }
-                    .transition(.slide)
+        if !player.library.hasPlaylists {
+            ExcerptView(tab: SidebarInspectorTab.library)
+        } else {
+            List(selection: $selectedPlaylists) {
+                ForEach(player.library.playlists) { playlist in
+                    let isSelected = selectedPlaylists.contains(playlist)
+                    LibraryItemView(playlist: playlist, isSelected: isSelected)
+                        .id(playlist)
                 }
-                .scrollClipDisabled()
-                .scrollContentBackground(.hidden)
-
-                // MARK: Keyboard Handlers
-
-                // Handle [escape] -> clear selection
-                .onKeyPress(.escape) {
-                    if handleEscape() {
-                        .handled
-                    } else {
-                        .ignored
+                .onMove { indices, destination in
+                    withAnimation {
+                        player.library.movePlaylist(fromOffsets: indices, toOffset: destination)
                     }
                 }
+                .transition(.slide)
             }
-        }
-        .onChange(of: appearsActive, initial: true) { _, newValue in
-            guard newValue else { return }
-            Task {
-                await player.library.refresh()
+            .scrollClipDisabled()
+            .scrollContentBackground(.hidden)
+
+            // MARK: Keyboard Handlers
+
+            // Handle [escape] -> clear selection
+            .onKeyPress(.escape) {
+                if handleEscape() {
+                    .handled
+                } else {
+                    .ignored
+                }
             }
         }
     }
