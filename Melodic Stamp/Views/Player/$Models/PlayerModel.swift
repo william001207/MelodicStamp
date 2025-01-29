@@ -212,9 +212,14 @@ extension PlayerModel {
             .store(in: &cancellables)
     }
 
-    func bindTo(_ id: UUID) {
+    func bindTo(_ id: UUID, mode: Playlist.Mode = .referenced) async {
         guard !playlist.mode.isCanonical else { return }
-        playlist = .referenced(bindingTo: id)
+        if mode.isCanonical, let playlist = await Playlist(loadingWith: id) {
+            self.playlist = playlist
+            try? await playlist.refresh()
+        } else {
+            playlist = .referenced(bindingTo: id)
+        }
     }
 }
 
@@ -319,10 +324,9 @@ extension PlayerModel {
         playlist.move(fromOffsets: indices, toOffset: destination)
     }
 
-    func saveOrLoadPlaylist() async {
-        guard let canonicalPlaylist = await Playlist(makingCanonical: playlist) else { return }
-        playlist = canonicalPlaylist
-        library?.add([canonicalPlaylist])
+    func makePlaylistCanonical() async {
+        await playlist.makeCanonical()
+        library?.add([playlist])
     }
 
     // MARK: Convenient Functions

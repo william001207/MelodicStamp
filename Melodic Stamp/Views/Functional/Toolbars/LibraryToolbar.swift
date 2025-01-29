@@ -14,7 +14,7 @@ struct LibraryToolbar: View {
         if !player.playlist.mode.isCanonical {
             Button {
                 Task {
-                    await player.saveOrLoadPlaylist()
+                    await player.makePlaylistCanonical()
                 }
             } label: {
                 ToolbarLabel {

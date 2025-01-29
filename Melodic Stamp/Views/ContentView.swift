@@ -116,7 +116,7 @@ struct ContentView: View {
                     miniPlayerView(window)
                 }
             }
-            .onChange(of: concreteParameters) { _, newValue in
+            .onChange(of: concreteParameters, initial: true) { _, newValue in
                 guard let newValue else { return }
                 processConcreteParameters(newValue)
             }
@@ -334,16 +334,15 @@ struct ContentView: View {
         if !windowManager.hasConcreteParameters {
             windowManager.hasConcreteParameters = true
 
-            player.bindTo(parameters.id)
-
             Task.detached {
                 switch parameters.playlist {
                 case let .referenced(urls):
+                    await player.bindTo(parameters.id, mode: .referenced)
                     await player.addToPlaylist(urls)
 
                     logger.info("Created window from referenced URLs: \(urls)")
                 case let .canonical(id):
-                    await player.saveOrLoadPlaylist()
+                    await player.bindTo(parameters.id, mode: .canonical)
 
                     logger.info("Created window with canonical ID: \(id)")
                 }

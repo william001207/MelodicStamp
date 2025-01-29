@@ -18,10 +18,6 @@ struct TrackIndexer: Indexer {
 }
 
 extension TrackIndexer {
-    mutating func readAndUpdate() {
-        value = read() ?? [:]
-    }
-
     func trackURL(for element: Value.Element) -> URL {
         folderURL
             .appending(path: element.key.uuidString, directoryHint: .notDirectory)

@@ -28,8 +28,8 @@ extension Playlist {
     }
 }
 
-struct Playlist: Hashable, Identifiable {
-    let mode: Mode
+@Observable class Playlist: Identifiable {
+    private(set) var mode: Mode
     private var metadata: Playlist.Metadata
     private var indexer: TrackIndexer
 
@@ -45,65 +45,62 @@ struct Playlist: Hashable, Identifiable {
 
     private init(
         mode: Mode,
-        information: Playlist.Metadata
+        metadata: Playlist.Metadata
     ) {
         self.mode = mode
-        self.metadata = information
-        self.indexer = .init(playlistID: information.id)
-    }
-
-    init?(loadingWith id: UUID) async {
-        self.mode = .canonical
-
-        guard let metadata = try? await Playlist.Metadata(readingFromPlaylistID: id) else { return nil }
         self.metadata = metadata
         self.indexer = .init(playlistID: metadata.id)
     }
 
-    init?(makingCanonical oldValue: Playlist) async {
-        let url = oldValue.metadata.url
-        if FileManager.default.fileExists(atPath: url.path) {
-            // Loads from existing canonical playlist
+    convenience init?(loadingWith id: UUID) async {
+        guard let metadata = try? await Playlist.Metadata(readingFromPlaylistID: id) else { return nil }
+        self.init(mode: .canonical, metadata: metadata)
 
-            guard let instance = await Self(loadingWith: oldValue.id) else { return nil }
-            self = instance
+        logger.info("Loaded canonical playlist from \(metadata.url)")
+    }
 
-            try? await refresh()
+    func makeCanonical() async {
+        guard !mode.isCanonical else { return }
+        // Migrates to a new canonical playlist
 
-            logger.info("Loaded canonical playlist from \(url)")
-        } else {
-            // Migrates to a new canonical playlist
+        let url = metadata.url
 
-            self.mode = .canonical
-            self.metadata = oldValue.metadata
-            self.indexer = .init(playlistID: oldValue.id)
-
-            do {
-                try FileManager.default.createDirectory(at: url, withIntermediateDirectories: true)
-                try metadata.write(segments: Playlist.Metadata.Segment.allCases)
-            } catch {
-                return nil
-            }
-
-            for track in oldValue.tracks {
-                guard let migratedTrack = try? await migrateTrack(from: track) else { continue }
-                add([migratedTrack])
-
-                let wasCurrentTrack = track.url == oldValue.metadata.state.currentTrackURL
-                if wasCurrentTrack {
-                    metadata.state.currentTrackURL = migratedTrack.url
-                }
-            }
-
-            logger.info("Successfully made canonical playlist at \(url)")
+        do {
+            try FileManager.default.createDirectory(at: url, withIntermediateDirectories: true)
+            try metadata.write(segments: Playlist.Metadata.Segment.allCases)
+        } catch {
+            return
         }
+
+        mode = .canonical
+
+        for track in tracks {
+            guard let migratedTrack = try? await migrateTrack(from: track) else { continue }
+            remove([track])
+            add([migratedTrack])
+
+            let wasCurrentTrack = track.url == metadata.state.currentTrackURL
+            if wasCurrentTrack {
+                metadata.state.currentTrackURL = migratedTrack.url
+            }
+        }
+
+        logger.info("Successfully made canonical playlist at \(url)")
     }
 
     static func referenced(bindingTo id: UUID = .init()) -> Playlist {
         .init(
             mode: .referenced,
-            information: .blank(bindingTo: id)
+            metadata: .blank(bindingTo: id)
         )
+    }
+}
+
+extension Playlist: Hashable {
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
+        hasher.combine(mode)
+        hasher.combine(metadata)
     }
 }
 
@@ -119,15 +116,15 @@ extension Playlist {
         )
     }
 
-    private mutating func indexTracks(with value: TrackIndexer.Value) throws {
+    private func indexTracks(with value: TrackIndexer.Value) throws {
         guard mode.isCanonical else { return }
         indexer.value = value
         try indexer.write()
     }
 
-    mutating func refresh() async throws {
+    func refresh() async throws {
         guard mode.isCanonical else { return }
-        indexer.readAndUpdate()
+        indexer.value = indexer.read() ?? [:]
         await tracks = indexer.loadTracks()
     }
 }
@@ -306,13 +303,13 @@ extension Playlist {
 }
 
 extension Playlist {
-    mutating func move(fromOffsets indices: IndexSet, toOffset destination: Int) {
+    func move(fromOffsets indices: IndexSet, toOffset destination: Int) {
         tracks.move(fromOffsets: indices, toOffset: destination)
 
         try? indexTracks(with: captureIndices())
     }
 
-    mutating func add(_ tracks: [Track]) {
+    func add(_ tracks: [Track]) {
         for track in tracks {
             guard !contains(track) else { return }
             self.tracks.append(track)
@@ -321,7 +318,7 @@ extension Playlist {
         try? indexTracks(with: captureIndices())
     }
 
-    mutating func remove(_ tracks: [Track]) {
+    func remove(_ tracks: [Track]) {
         if let currentTrack, tracks.contains(currentTrack) {
             self.currentTrack = nil
         }
@@ -334,7 +331,7 @@ extension Playlist {
         try? indexTracks(with: captureIndices())
     }
 
-    mutating func clearPlaylist() {
+    func clearPlaylist() {
         remove(tracks)
     }
 }

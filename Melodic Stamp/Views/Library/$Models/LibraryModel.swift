@@ -31,7 +31,7 @@ extension LibraryModel {
     }
 
     func refresh() async throws {
-        indexer.readAndUpdate()
+        indexer.value = indexer.read() ?? []
         await playlists = indexer.loadPlaylists()
     }
 }

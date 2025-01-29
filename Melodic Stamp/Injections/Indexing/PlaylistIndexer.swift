@@ -14,10 +14,6 @@ struct PlaylistIndexer: Indexer {
 }
 
 extension PlaylistIndexer {
-    mutating func readAndUpdate() {
-        value = read() ?? []
-    }
-
     func loadPlaylists() async -> [Playlist] {
         guard !value.isEmpty else { return [] }
 
