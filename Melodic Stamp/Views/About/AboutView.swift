@@ -120,6 +120,7 @@ struct AboutView: View {
         }
 
         Button {
+            NSPasteboard.general.clearContents()
             NSPasteboard.general.setString(combined, forType: .string)
 
             copyVersionDispatch?.cancel()

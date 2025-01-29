@@ -43,6 +43,19 @@ extension Playlist {
         metadata.id
     }
 
+    var possibleURL: URL {
+        metadata.url
+    }
+
+    var canonicalURL: URL? {
+        switch mode {
+        case .referenced:
+            nil
+        case .canonical:
+            possibleURL
+        }
+    }
+
     private init(
         mode: Mode,
         metadata: Playlist.Metadata

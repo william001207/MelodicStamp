@@ -13,6 +13,7 @@ struct InspectorLibraryView: View {
     @Environment(LibraryModel.self) private var library
 
     @Environment(\.appearsActive) private var appearsActive
+    @Environment(\.openURL) private var openURL
 
     // MARK: - Fields
 
@@ -26,8 +27,7 @@ struct InspectorLibraryView: View {
         } else {
             List(selection: $selectedPlaylists) {
                 ForEach(library.playlists) { playlist in
-                    let isSelected = selectedPlaylists.contains(playlist)
-                    LibraryItemView(playlist: playlist, isSelected: isSelected)
+                    itemView(for: playlist)
                         .id(playlist)
                 }
                 .onMove { indices, destination in
@@ -55,6 +55,30 @@ struct InspectorLibraryView: View {
 
     private var canEscape: Bool {
         !selectedPlaylists.isEmpty
+    }
+
+    // MARK: - Item View
+
+    @ViewBuilder private func itemView(for playlist: Playlist) -> some View {
+        let isSelected = selectedPlaylists.contains(playlist)
+
+        LibraryItemView(
+            playlist: playlist,
+            isSelected: isSelected
+        )
+        .contextMenu {
+            contextMenu(for: playlist)
+        }
+    }
+
+    // MARK: - Context Menu
+
+    @ViewBuilder private func contextMenu(for playlist: Playlist) -> some View {
+        if let url = playlist.canonicalURL {
+            Button("Reveal in Finder") {
+                openURL(url)
+            }
+        }
     }
 
     // MARK: - Functions

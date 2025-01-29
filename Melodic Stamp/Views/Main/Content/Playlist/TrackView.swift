@@ -60,7 +60,6 @@ struct TrackView: View {
                 .frame(height: 24)
                 .font(.title3)
 
-//                if !player.playlist.mode.isCanonical {
                 HStack(alignment: .center, spacing: 4) {
                     if isMetadataModified {
                         Circle()
@@ -84,7 +83,6 @@ struct TrackView: View {
                 .frame(height: 12)
                 .font(.caption)
                 .onDoubleClick(handler: play)
-//                }
             }
             .lineLimit(1)
             .transition(.blurReplace)
