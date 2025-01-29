@@ -116,10 +116,9 @@ struct ContentView: View {
                     miniPlayerView(window)
                 }
             }
-            .onAppear {
-                if let concreteParameters {
-                    processConcreteParameters(concreteParameters)
-                }
+            .onChange(of: concreteParameters) { _, newValue in
+                guard let newValue else { return }
+                processConcreteParameters(newValue)
             }
             .dropDestination(for: Track.self) { tracks, _ in
                 player.addToPlaylist(tracks.map(\.url))
@@ -334,6 +333,8 @@ struct ContentView: View {
         logger.info("Processing concrete parameters \("\(parameters)")")
         if !windowManager.hasConcreteParameters {
             windowManager.hasConcreteParameters = true
+
+            player.bindTo(parameters.id)
 
             Task.detached {
                 switch parameters.playlist {

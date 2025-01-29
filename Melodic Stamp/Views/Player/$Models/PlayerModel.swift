@@ -211,6 +211,11 @@ extension PlayerModel {
             }
             .store(in: &cancellables)
     }
+
+    func bindTo(_ id: UUID) {
+        guard !playlist.mode.isCanonical else { return }
+        playlist = .referenced(bindingTo: id)
+    }
 }
 
 // MARK: - Functions
