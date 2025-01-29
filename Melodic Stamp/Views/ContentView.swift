@@ -128,7 +128,7 @@ struct ContentView: View {
                 Group {
                     FileImporters()
 
-//                    DelegatedPlayerSceneStorage()
+                    DelegatedPlayerStorage()
                 }
                 .allowsHitTesting(false)
             }
