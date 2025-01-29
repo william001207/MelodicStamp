@@ -25,16 +25,18 @@ struct MelodicStampApp: App {
 
     @FocusedValue(\.windowManager) private var windowManager
 
-    // Globally manages floating windows, ensuring their uniqueness
+    // Globally managed models, uniqueness ensured
     @State private var floatingWindows: FloatingWindowsModel = .init()
+    @State private var library: LibraryModel = .init()
 
     @State private var isAboutWindowPresented: Bool = false
 
     var body: some Scene {
         WindowGroup(id: WindowID.content.rawValue, for: CreationParameters.self) { $parameters in
-            ContentView(parameters)
-                .environment(floatingWindows)
+            ContentView(parameters, library: library)
                 .environment(\.appDelegate, appDelegate)
+                .environment(floatingWindows)
+                .environment(library)
                 .onAppear {
                     appDelegate.resumeWindowSuspension()
                 }

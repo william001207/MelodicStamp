@@ -22,7 +22,7 @@ enum FileAdderPresentationStyle {
 }
 
 @Observable class FileManagerModel {
-    weak var player: PlayerModel?
+    private weak var player: PlayerModel?
 
     var isFileOpenerPresented: Bool = false
     private var fileOpenerPresentationStyle: FileOpenerPresentationStyle = .inCurrentPlaylist

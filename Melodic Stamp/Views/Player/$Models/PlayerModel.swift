@@ -26,7 +26,8 @@ extension PlayerModel {
     // MARK: Player, Library & Analyzer
 
     private var player: any Player
-    private(set) var library: LibraryModel
+    private weak var library: LibraryModel?
+    private(set) var playlist: Playlist
     // The initialization is delayed to `setupEngine`
     private(set) var analyzer: RealtimeAnalyzer!
 
@@ -131,11 +132,10 @@ extension PlayerModel {
     // MARK: Playlist
 
     subscript<V>(playlistInformation keyPath: WritableKeyPath<PlaylistInformation, V>) -> V {
-        get { library.playlist.information[keyPath: keyPath] }
-        set { library.playlist.information[keyPath: keyPath] = newValue }
+        get { playlist.information[keyPath: keyPath] }
+        set { playlist.information[keyPath: keyPath] = newValue }
     }
 
-    var playlist: Playlist { library.playlist }
     var selectedTracks: Set<Track> = []
 
     var playbackMode: PlaybackMode {
@@ -149,8 +149,8 @@ extension PlayerModel {
     }
 
     var currentTrack: Track? {
-        get { library.playlist.currentTrack }
-        set { library.playlist.currentTrack = newValue }
+        get { playlist.currentTrack }
+        set { playlist.currentTrack = newValue }
     }
 
     var nextTrack: Track? {
@@ -183,9 +183,10 @@ extension PlayerModel {
 
     // MARK: Initializers
 
-    init(_ player: some Player, bindingTo id: UUID = .init()) {
+    init(_ player: some Player, library: LibraryModel, bindingTo id: UUID = .init()) {
         self.player = player
-        self.library = .init(bindingTo: id)
+        self.library = library
+        self.playlist = .referenced(bindingTo: id)
         super.init()
 
         self.player.delegate = self
@@ -275,7 +276,7 @@ extension PlayerModel {
         for url in urls {
             Task {
                 guard let track = await playlist.getOrCreateTrack(at: url) else { return }
-                library.playlist.add([track])
+                playlist.add([track])
             }
         }
     }
@@ -294,7 +295,7 @@ extension PlayerModel {
                 }
 
                 // Removes from playlist
-                library.playlist.remove([track])
+                playlist.remove([track])
             }
         }
     }
@@ -304,7 +305,20 @@ extension PlayerModel {
     }
 
     func moveTrack(fromOffsets indices: IndexSet, toOffset destination: Int) {
-        library.playlist.move(fromOffsets: indices, toOffset: destination)
+        playlist.move(fromOffsets: indices, toOffset: destination)
+    }
+
+    func saveOrLoadPlaylist() async {
+        switch playlist.mode {
+        case .referenced:
+            guard let canonicalPlaylist = await Playlist(makingCanonical: playlist) else { break }
+            playlist = canonicalPlaylist
+            library?.add([canonicalPlaylist])
+        case .canonical:
+            Task { [weak self] in
+                await self?.playlist.loadTracks()
+            }
+        }
     }
 
     // MARK: Convenient Functions

@@ -8,7 +8,7 @@
 import SwiftUI
 
 @MainActor @Observable final class PlayerKeyboardControlModel {
-    weak var player: PlayerModel?
+    private weak var player: PlayerModel?
 
     var previousSongButtonBounceAnimation: Bool = false
     var nextSongButtonBounceAnimation: Bool = false

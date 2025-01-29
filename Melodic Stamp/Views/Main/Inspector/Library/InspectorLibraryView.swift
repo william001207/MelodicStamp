@@ -10,7 +10,7 @@ import SwiftUI
 struct InspectorLibraryView: View {
     // MARK: - Environments
 
-    @Environment(PlayerModel.self) private var player
+    @Environment(LibraryModel.self) private var library
 
     @Environment(\.appearsActive) private var appearsActive
 
@@ -21,18 +21,18 @@ struct InspectorLibraryView: View {
     // MARK: - Body
 
     var body: some View {
-        if !player.library.hasPlaylists {
+        if !library.hasPlaylists {
             ExcerptView(tab: SidebarInspectorTab.library)
         } else {
             List(selection: $selectedPlaylists) {
-                ForEach(player.library.playlists) { playlist in
+                ForEach(library.playlists) { playlist in
                     let isSelected = selectedPlaylists.contains(playlist)
                     LibraryItemView(playlist: playlist, isSelected: isSelected)
                         .id(playlist)
                 }
                 .onMove { indices, destination in
                     withAnimation {
-                        player.library.movePlaylist(fromOffsets: indices, toOffset: destination)
+                        library.move(fromOffsets: indices, toOffset: destination)
                     }
                 }
                 .transition(.slide)

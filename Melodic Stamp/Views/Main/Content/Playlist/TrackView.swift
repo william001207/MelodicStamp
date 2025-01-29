@@ -60,31 +60,31 @@ struct TrackView: View {
                 .frame(height: 24)
                 .font(.title3)
 
-                if !player.playlist.mode.isCanonical {
-                    HStack(alignment: .center, spacing: 4) {
-                        if isMetadataModified {
-                            Circle()
-                                .foregroundStyle(.tint)
-                                .tint(isSelected ? .primary : .accent)
-                                .padding(2)
-                                .animation(nil, value: isSelected)
-                        }
-
-                        if let duration = track.metadata.properties.duration.flatMap(Duration.init) {
-                            DurationText(duration: duration)
-                                .foregroundStyle(.secondary)
-                                .fixedSize()
-                        }
-
-                        Text(track.url.lastPathComponent)
-                            .foregroundStyle(.placeholder)
-
-                        Spacer()
+//                if !player.playlist.mode.isCanonical {
+                HStack(alignment: .center, spacing: 4) {
+                    if isMetadataModified {
+                        Circle()
+                            .foregroundStyle(.tint)
+                            .tint(isSelected ? .primary : .accent)
+                            .padding(2)
+                            .animation(nil, value: isSelected)
                     }
-                    .frame(height: 12)
-                    .font(.caption)
-                    .onDoubleClick(handler: play)
+
+                    if let duration = track.metadata.properties.duration.flatMap(Duration.init) {
+                        DurationText(duration: duration)
+                            .foregroundStyle(.secondary)
+                            .fixedSize()
+                    }
+
+                    Text(track.url.lastPathComponent)
+                        .foregroundStyle(.placeholder)
+
+                    Spacer()
                 }
+                .frame(height: 12)
+                .font(.caption)
+                .onDoubleClick(handler: play)
+//                }
             }
             .lineLimit(1)
             .transition(.blurReplace)

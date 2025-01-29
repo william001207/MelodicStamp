@@ -147,25 +147,17 @@ extension Metadata {
         }
     }
 
-    init?(loadingFrom url: URL, useFallbackTitleFrom fallbackURL: URL? = nil) {
+    init?(loadingFrom url: URL) {
         self.properties = .init()
         self.state = .loading
         self.url = url
 
         Task.detached {
             try await self.update()
-
-            Task { @MainActor in
-                if let fallbackURL, self.title.isStringEmpty {
-                    let fallbackTitle = fallbackURL.lastPathComponentRemovingExtension
-                    self.title.initial = fallbackTitle
-                    self.title.current = fallbackTitle
-                }
-            }
         }
     }
 
-    init(migratingFrom oldValue: Metadata, withURL url: URL? = nil, useFallbackTitleIfNotProvided useFallbackTitle: Bool = false) {
+    init(migratingFrom oldValue: Metadata, to url: URL? = nil, useFallbackTitleIfNotProvided useFallbackTitle: Bool = false) {
         let url = url ?? oldValue.url
 
         self.url = url

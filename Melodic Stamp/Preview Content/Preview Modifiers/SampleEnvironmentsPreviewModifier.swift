@@ -12,6 +12,7 @@ import SwiftUI
     struct SampleEnvironmentsPreviewModifier: PreviewModifier {
         typealias Context = (
             floatingWindows: FloatingWindowsModel,
+            library: LibraryModel,
             windowManager: WindowManagerModel,
             fileManager: FileManagerModel,
             player: PlayerModel,
@@ -22,7 +23,8 @@ import SwiftUI
         )
 
         static func makeSharedContext() async throws -> Context {
-            let player = PlayerModel(BlankPlayer())
+            let library = LibraryModel()
+            let player = PlayerModel(BlankPlayer(), library: library)
 
             let floatingWindows = FloatingWindowsModel()
             let windowManager = WindowManagerModel()
@@ -46,6 +48,7 @@ import SwiftUI
 
             return (
                 floatingWindows,
+                library,
                 windowManager,
                 fileManager,
                 player,
@@ -59,6 +62,7 @@ import SwiftUI
         func body(content: Content, context: Context) -> some View {
             content
                 .environment(context.floatingWindows)
+                .environment(context.library)
                 .environment(context.windowManager)
                 .environment(context.fileManager)
                 .environment(context.player)

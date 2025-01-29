@@ -85,8 +85,13 @@ struct Playlist: Hashable, Identifiable {
             }
 
             for track in oldValue.tracks {
-                guard let permanentTrack = await getOrCreateTrack(at: track.url) else { return }
-                tracks.append(permanentTrack)
+                guard let migratedTrack = try? await migrateTrack(from: track) else { continue }
+                tracks.append(migratedTrack)
+
+                let wasCurrentTrack = track.url == oldValue.information.state.currentTrackURL
+                if wasCurrentTrack {
+                    information.state.currentTrackURL = migratedTrack.url
+                }
             }
 
             logger.info("Successfully made canonical playlist at \(url)")
@@ -101,6 +106,7 @@ struct Playlist: Hashable, Identifiable {
     }
 
     mutating func loadTracks() async {
+        tracks.removeAll()
         let urls = FileHelper.flatten(contentsOf: information.url, isRecursive: false)
         for url in urls {
             guard let track = await Track(loadingFrom: url) else { return }
@@ -228,6 +234,10 @@ extension Playlist {
         }
     }
 
+    private func createFolder() throws {
+        try FileManager.default.createDirectory(at: information.url, withIntermediateDirectories: true)
+    }
+
     private func generateCanonicalURL(for url: URL) -> URL {
         guard !Self.isCanonical(url: url) else { return url }
         let trackID = UUID()
@@ -236,14 +246,17 @@ extension Playlist {
             .appendingPathExtension(url.pathExtension)
     }
 
-    private func createTrack(copyingFrom url: URL) async throws -> Track? {
-        try FileManager.default.createDirectory(at: information.url, withIntermediateDirectories: true)
+    private func migrateTrack(from track: Track) async throws -> Track {
+        try createFolder()
 
-        let destinationURL = generateCanonicalURL(for: url)
-        try FileManager.default.copyItem(at: url, to: destinationURL)
+        let destinationURL = generateCanonicalURL(for: track.url)
+        try FileManager.default.copyItem(at: track.url, to: destinationURL)
 
-        logger.info("Created canonical track at \(destinationURL), copying from \(url)")
-        return await Track(loadingFrom: destinationURL, useFallbackTitleFrom: url)
+        logger.info("Migrating to canonical track at \(destinationURL), copying from \(track.url)")
+        return await Track(
+            migratingFrom: track, to: destinationURL,
+            useFallbackTitleIfNotProvided: true
+        )
     }
 
     func getTrack(at url: URL) async -> Track? {
@@ -251,22 +264,18 @@ extension Playlist {
     }
 
     func getOrCreateTrack(at url: URL) async -> Track? {
-        switch mode {
-        case .referenced:
-            if let track = await getTrack(at: url) {
-                track
-            } else {
+        if let track = await getTrack(at: url) {
+            track
+        } else {
+            switch mode {
+            case .referenced:
                 await Track(loadingFrom: url)
-            }
-        case .canonical:
-            if let track = await getTrack(at: url) {
-                if Self.isCanonical(url: url) {
-                    track
+            case .canonical:
+                if let track = await Track(loadingFrom: url) {
+                    try? await migrateTrack(from: track)
                 } else {
-                    await Track(migratingFrom: track, withURL: generateCanonicalURL(for: url), useFallbackTitleIfNotProvided: true)
+                    nil
                 }
-            } else {
-                try? await createTrack(copyingFrom: url)
             }
         }
     }

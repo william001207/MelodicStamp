@@ -44,6 +44,7 @@ struct ContentView: View {
     // MARK: - Environments
 
     @Environment(FloatingWindowsModel.self) private var floatingWindows
+    @Environment(LibraryModel.self) private var library
 
     @Environment(\.appearsActive) private var appearsActive
     @Environment(\.resetFocus) private var resetFocus
@@ -85,11 +86,11 @@ struct ContentView: View {
 
     // MARK: - Initializers
 
-    init(_ parameters: CreationParameters) {
+    init(_ parameters: CreationParameters, library: LibraryModel) {
         self.parameters = parameters
         Self.logger.info("Unwrapped parameters to \("\(parameters)")")
 
-        let player = PlayerModel(SFBAudioEnginePlayer(), bindingTo: parameters.id)
+        let player = PlayerModel(SFBAudioEnginePlayer(), library: library, bindingTo: parameters.id)
 
         self.windowManager = WindowManagerModel(style: parameters.initialWindowStyle)
         self.fileManager = FileManagerModel(player: player)
@@ -286,7 +287,7 @@ struct ContentView: View {
             guard newValue else { return }
 
             Task.detached {
-                await player.library.refresh()
+                await library.refresh()
             }
         }
     }
@@ -335,7 +336,7 @@ struct ContentView: View {
 
                     logger.info("Created window from referenced URLs: \(urls)")
                 case let .canonical(id):
-                    await player.library.saveOrLoadPlaylist()
+                    await player.saveOrLoadPlaylist()
 
                     logger.info("Created window with canonical ID: \(id)")
                 }
