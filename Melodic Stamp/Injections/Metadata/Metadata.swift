@@ -21,6 +21,8 @@ enum MetadataError: Error {
 
 // MARK: Definition
 
+extension Metadata: TypeNameReflectable {}
+
 extension Metadata {
     enum State: Hashable, Equatable {
         case loading
@@ -66,8 +68,6 @@ extension Metadata {
         }
     }
 }
-
-extension Metadata: TypeNameReflectable {}
 
 @MainActor @Observable final class Metadata: Identifiable {
     typealias Entry = MetadataEntry

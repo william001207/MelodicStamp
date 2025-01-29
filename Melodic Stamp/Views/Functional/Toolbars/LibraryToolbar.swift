@@ -12,11 +12,19 @@ struct LibraryToolbar: View {
 
     var body: some View {
         if !player.playlist.mode.isCanonical {
-            Button("Add to Library") {
+            Button {
                 Task {
-                    await player.makePlaylistCanonical()
+                    await player.library.saveOrLoadPlaylist()
+                }
+            } label: {
+                ToolbarLabel {
+                    Image(systemSymbol: .docZipper)
+                        .imageScale(.small)
+
+                    Text("Add to Library")
                 }
             }
+            .disabled(player.playlist.isEmpty)
         }
     }
 }

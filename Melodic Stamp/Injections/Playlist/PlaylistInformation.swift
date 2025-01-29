@@ -8,6 +8,8 @@
 import Defaults
 import SwiftUI
 
+extension PlaylistInformation: TypeNameReflectable {}
+
 extension PlaylistInformation {
     enum FileSegment: String, CaseIterable {
         case info = ".info"
@@ -39,8 +41,6 @@ extension PlaylistInformation {
         }
     }
 }
-
-extension PlaylistInformation: TypeNameReflectable {}
 
 struct PlaylistInformation: Equatable, Hashable, Identifiable, Codable {
     let id: UUID

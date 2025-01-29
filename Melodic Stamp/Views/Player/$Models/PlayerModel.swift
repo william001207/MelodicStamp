@@ -15,19 +15,20 @@ import SwiftUI
 
 // MARK: - Definition
 
+extension PlayerModel: TypeNameReflectable {}
+
 extension PlayerModel {
     static let interval: TimeInterval = 0.1
     static let bufferSize: AVAudioFrameCount = 2048
 }
 
-extension PlayerModel: TypeNameReflectable {}
-
 @MainActor @Observable final class PlayerModel: NSObject {
-    // MARK: Player
+    // MARK: Player, Library & Analyzer
 
     private var player: any Player
+    private(set) var library: LibraryModel
     // The initialization is delayed to `setupEngine`
-    private var analyzer: RealtimeAnalyzer!
+    private(set) var analyzer: RealtimeAnalyzer!
 
     // MARK: Output Devices
 
@@ -62,26 +63,7 @@ extension PlayerModel: TypeNameReflectable {}
     private var visualizationDataSubject = PassthroughSubject<[[Float]], Never>()
     var visualizationDataPublisher: AnyPublisher<[[Float]], Never> { visualizationDataSubject.eraseToAnyPublisher() }
 
-    // MARK: Playlist & Playback
-
-    private(set) var playlists: [Playlist] = []
-    private(set) var playlist: Playlist
-    var selectedTracks: Set<Track> = []
-
-    var playlistInformation: PlaylistInformation {
-        get { playlist.information }
-        set { playlist.information = newValue }
-    }
-
-    var playbackMode: PlaybackMode {
-        get { playlist.information.state.playbackMode }
-        set { playlist.information.state.playbackMode = newValue }
-    }
-
-    var playbackLooping: Bool {
-        get { playlist.information.state.playbackLooping }
-        set { playlist.information.state.playbackLooping = newValue }
-    }
+    // MARK: Playback
 
     private(set) var playbackState: PlaybackState = .stopped
     private(set) var playbackTime: PlaybackTime?
@@ -148,9 +130,27 @@ extension PlayerModel: TypeNameReflectable {}
 
     // MARK: Playlist
 
+    subscript<V>(playlistInformation keyPath: WritableKeyPath<PlaylistInformation, V>) -> V {
+        get { library.playlist.information[keyPath: keyPath] }
+        set { library.playlist.information[keyPath: keyPath] = newValue }
+    }
+
+    var playlist: Playlist { library.playlist }
+    var selectedTracks: Set<Track> = []
+
+    var playbackMode: PlaybackMode {
+        get { self[playlistInformation: \.state.playbackMode] }
+        set { self[playlistInformation: \.state.playbackMode] = newValue }
+    }
+
+    var playbackLooping: Bool {
+        get { self[playlistInformation: \.state.playbackLooping] }
+        set { self[playlistInformation: \.state.playbackLooping] = newValue }
+    }
+
     var currentTrack: Track? {
-        get { playlist.currentTrack }
-        set { playlist.currentTrack = newValue }
+        get { library.playlist.currentTrack }
+        set { library.playlist.currentTrack = newValue }
     }
 
     var nextTrack: Track? {
@@ -185,7 +185,7 @@ extension PlayerModel: TypeNameReflectable {}
 
     init(_ player: some Player, bindingTo id: UUID = .init()) {
         self.player = player
-        self.playlist = .referenced(bindingTo: id)
+        self.library = .init(bindingTo: id)
         super.init()
 
         self.player.delegate = self
@@ -275,7 +275,7 @@ extension PlayerModel {
         for url in urls {
             Task {
                 guard let track = await playlist.getOrCreateTrack(at: url) else { return }
-                playlist.add([track])
+                library.playlist.add([track])
             }
         }
     }
@@ -294,7 +294,7 @@ extension PlayerModel {
                 }
 
                 // Removes from playlist
-                playlist.remove([track])
+                library.playlist.remove([track])
             }
         }
     }
@@ -304,37 +304,7 @@ extension PlayerModel {
     }
 
     func moveTrack(fromOffsets indices: IndexSet, toOffset destination: Int) {
-        playlist.move(fromOffsets: indices, toOffset: destination)
-    }
-
-    // MARK: Library
-
-    func makePlaylistCanonical() async {
-        guard
-            !playlist.mode.isCanonical,
-            let permanentPlaylist = await Playlist(makingCanonical: playlist)
-        else { return }
-        playlist = permanentPlaylist
-    }
-
-    func movePlaylist(from indices: IndexSet, to destination: Int) {
-        playlists.move(fromOffsets: indices, toOffset: destination)
-    }
-
-    func refreshLibrary() async {
-        playlists.removeAll()
-        guard let contents = try? FileManager.default.contentsOfDirectory(
-            at: .playlists,
-            includingPropertiesForKeys: [.isDirectoryKey],
-            options: [.skipsHiddenFiles]
-        ) else { return }
-
-        for content in contents.filter(\.hasDirectoryPath) {
-            let pathName = content.lastPathComponent
-            guard let id = UUID(uuidString: pathName), let playlist = await Playlist(loadingWith: id) else { continue }
-
-            playlists.append(playlist)
-        }
+        library.playlist.move(fromOffsets: indices, toOffset: destination)
     }
 
     // MARK: Convenient Functions

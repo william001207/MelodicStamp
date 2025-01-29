@@ -327,7 +327,7 @@ struct ContentView: View {
 
                         logger.info("Created window from referenced URLs: \(urls)")
                     case let .canonical(id):
-                        await player.makePlaylistCanonical()
+                        await player.library.saveOrLoadPlaylist()
 
                         logger.info("Created window with canonical ID: \(id)")
                     }

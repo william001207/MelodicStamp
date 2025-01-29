@@ -22,7 +22,7 @@ struct InspectorLibraryView: View {
 
     var body: some View {
         List(selection: $selectedPlaylist) {
-            ForEach(player.playlists) { playlist in
+            ForEach(player.library.playlists) { playlist in
                 LibraryItemView(playlist: playlist, isSelected: selectedPlaylist == playlist)
                     .id(playlist)
             }
@@ -32,7 +32,7 @@ struct InspectorLibraryView: View {
         .onChange(of: appearsActive, initial: true) { _, newValue in
             guard newValue else { return }
             Task {
-                await player.refreshLibrary()
+                await player.library.refresh()
             }
         }
 

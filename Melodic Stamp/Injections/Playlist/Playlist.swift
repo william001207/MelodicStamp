@@ -8,6 +8,8 @@
 import Defaults
 import Foundation
 
+extension Playlist: TypeNameReflectable {}
+
 extension Playlist {
     enum Mode: String, Equatable, Hashable, CaseIterable, Identifiable, Codable {
         case referenced
@@ -25,8 +27,6 @@ extension Playlist {
         }
     }
 }
-
-extension Playlist: TypeNameReflectable {}
 
 struct Playlist: Equatable, Hashable, Identifiable {
     var mode: Mode
@@ -126,6 +126,10 @@ extension Playlist: Sequence, RandomAccessCollection {
 
     var endIndex: Array<Track>.Index {
         tracks.endIndex
+    }
+
+    mutating func move(fromOffsets indices: IndexSet, toOffset destination: Int) {
+        tracks.move(fromOffsets: indices, toOffset: destination)
     }
 }
 
@@ -281,9 +285,5 @@ extension Playlist {
 
     mutating func clearPlaylist() {
         remove(tracks)
-    }
-
-    mutating func move(fromOffsets indices: IndexSet, toOffset destination: Int) {
-        tracks.move(fromOffsets: indices, toOffset: destination)
     }
 }

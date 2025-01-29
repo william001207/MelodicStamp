@@ -36,7 +36,10 @@ import SwiftUI
 
             player.play(track.url)
             player.selectedTracks = [track]
-            player.playlistInformation = samplePlaylistInformation
+
+            player[playlistInformation: \.info] = samplePlaylistInformation.info
+            player[playlistInformation: \.state] = samplePlaylistInformation.state
+            player[playlistInformation: \.artwork] = samplePlaylistInformation.artwork
 
             let image = NSImage(resource: .templateArtwork)
             await gradientVisualizer.updateDominantColors(from: image)
