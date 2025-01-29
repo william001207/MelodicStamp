@@ -125,36 +125,36 @@ struct PlaylistView: View {
                     return .handled
                 }
             }
-            .overlay(alignment: .top) {
-                // MARK: Controls
+        }
+        .overlay(alignment: .top) {
+            // MARK: Controls
 
-                HStack(spacing: 0) {
-                    Group {
-                        LuminareSection(hasPadding: false) {
-                            leadingActions()
-                                .frame(height: minHeight)
-                        }
-
-                        Spacer()
-
-                        LuminareSection(hasPadding: false) {
-                            trailingActions()
-                                .frame(height: minHeight)
-                        }
+            HStack(spacing: 0) {
+                Group {
+                    LuminareSection(hasPadding: false) {
+                        leadingActions()
+                            .frame(height: minHeight)
                     }
-                    .luminareBordered(false)
-                    .luminareButtonMaterial(.thin)
-                    .luminareSectionMasked(true)
-                    .luminareSectionMaxWidth(nil)
-                    .shadow(color: .black.opacity(0.1), radius: 15)
+
+                    Spacer()
+
+                    LuminareSection(hasPadding: false) {
+                        trailingActions()
+                            .frame(height: minHeight)
+                    }
                 }
-                .padding(.horizontal)
-                .padding(.top, 8)
+                .luminareBordered(false)
+                .luminareButtonMaterial(.thin)
+                .luminareSectionMasked(true)
+                .luminareSectionMaxWidth(nil)
+                .shadow(color: .black.opacity(0.1), radius: 15)
             }
-            .onChange(of: player.playlist.tracks) { oldValue, newValue in
-                let addedTracks = Set(newValue).subtracting(oldValue)
-                addedTracks.forEach(toggleBounceAnimation(for:))
-            }
+            .padding(.horizontal)
+            .padding(.top, 8)
+        }
+        .onChange(of: player.playlist.tracks) { oldValue, newValue in
+            let addedTracks = Set(newValue).subtracting(oldValue)
+            addedTracks.forEach(toggleBounceAnimation(for:))
         }
     }
 
