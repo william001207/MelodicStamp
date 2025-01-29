@@ -44,7 +44,10 @@ extension LibraryModel {
     }
 
     func add(_ playlists: [Playlist]) {
-        self.playlists.append(contentsOf: playlists)
+        for playlist in playlists {
+            guard !self.playlists.contains(playlist) else { continue }
+            self.playlists.append(playlist)
+        }
 
         let ids = playlists.map(\.id)
         Task {

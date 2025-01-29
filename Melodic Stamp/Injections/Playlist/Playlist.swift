@@ -70,6 +70,8 @@ struct Playlist: Hashable, Identifiable {
             guard let instance = await Self(loadingWith: oldValue.id) else { return nil }
             self = instance
 
+            await loadTracks()
+
             logger.info("Loaded canonical playlist from \(url)")
         } else {
             // Copy and create a new canonical playlist

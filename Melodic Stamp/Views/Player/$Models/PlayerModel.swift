@@ -309,16 +309,9 @@ extension PlayerModel {
     }
 
     func saveOrLoadPlaylist() async {
-        switch playlist.mode {
-        case .referenced:
-            guard let canonicalPlaylist = await Playlist(makingCanonical: playlist) else { break }
-            playlist = canonicalPlaylist
-            library?.add([canonicalPlaylist])
-        case .canonical:
-            Task { [weak self] in
-                await self?.playlist.loadTracks()
-            }
-        }
+        guard let canonicalPlaylist = await Playlist(makingCanonical: playlist) else { return }
+        playlist = canonicalPlaylist
+        library?.add([canonicalPlaylist])
     }
 
     // MARK: Convenient Functions
