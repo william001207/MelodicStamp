@@ -31,13 +31,15 @@ struct MelodicStampApp: App {
     @State private var isAboutWindowPresented: Bool = false
 
     var body: some Scene {
-        WindowGroup(id: WindowID.content.rawValue, for: CreationParameters.self) { parameters in
+        WindowGroup(id: WindowID.content.rawValue, for: CreationParameters.self) { $parameters in
             ContentView(parameters)
                 .environment(floatingWindows)
                 .environment(\.appDelegate, appDelegate)
                 .onAppear {
                     appDelegate.resumeWindowSuspension()
                 }
+        } defaultValue: {
+            CreationParameters()
         }
         .windowResizability(.contentSize)
         .windowToolbarStyle(.unified)

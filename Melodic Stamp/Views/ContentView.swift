@@ -59,8 +59,7 @@ struct ContentView: View {
 
     // MARK: - Fields
 
-    let unwrappedParameters: CreationParameters
-    @Binding private var parameters: CreationParameters?
+    private let parameters: CreationParameters
 
     // MARK: Models
 
@@ -86,20 +85,13 @@ struct ContentView: View {
 
     // MARK: - Initializers
 
-    init(_ parameters: Binding<CreationParameters?>) {
-        self._parameters = parameters
+    init(_ parameters: CreationParameters) {
+        self.parameters = parameters
+        Self.logger.info("Unwrapped parameters to \("\(parameters)")")
 
-        let unwrappedParameters: CreationParameters = if let parameters = parameters.wrappedValue {
-            parameters
-        } else {
-            .init()
-        }
-        self.unwrappedParameters = unwrappedParameters
-        Self.logger.info("Unwrapped parameters to \("\(unwrappedParameters)")")
+        let player = PlayerModel(SFBAudioEnginePlayer(), bindingTo: parameters.id)
 
-        let player = PlayerModel(SFBAudioEnginePlayer(), bindingTo: unwrappedParameters.id)
-
-        self.windowManager = WindowManagerModel(style: unwrappedParameters.initialWindowStyle)
+        self.windowManager = WindowManagerModel(style: parameters.initialWindowStyle)
         self.fileManager = FileManagerModel(player: player)
         self.player = player
         self.playerKeyboardControl = PlayerKeyboardControlModel(player: player)
@@ -328,10 +320,9 @@ struct ContentView: View {
     private func initialize() {
         if !windowManager.isInitialized {
             windowManager.isInitialized = true
-            parameters = unwrappedParameters
 
             Task {
-                switch unwrappedParameters.playlist {
+                switch parameters.playlist {
                 case let .referenced(urls):
                     player.addToPlaylist(urls)
 
@@ -342,7 +333,7 @@ struct ContentView: View {
                     logger.info("Created window with canonical ID: \(id)")
                 }
 
-                if unwrappedParameters.shouldPlay, let firstTrack = player.playlist.first {
+                if parameters.shouldPlay, let firstTrack = player.playlist.first {
                     player.play(firstTrack.url)
                 }
             }
