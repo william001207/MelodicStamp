@@ -59,7 +59,8 @@ struct ContentView: View {
 
     // MARK: - Fields
 
-    private var parameters: CreationParameters?
+    let unwrappedParameters: CreationParameters
+    @Binding private var parameters: CreationParameters?
 
     // MARK: Models
 
@@ -85,12 +86,20 @@ struct ContentView: View {
 
     // MARK: - Initializers
 
-    init(_ parameters: CreationParameters?) {
-        self.parameters = parameters
+    init(_ parameters: Binding<CreationParameters?>) {
+        self._parameters = parameters
 
-        let player = PlayerModel(SFBAudioEnginePlayer(), bindingTo: parameters?.id ?? .init())
+        let unwrappedParameters: CreationParameters = if let parameters = parameters.wrappedValue {
+            parameters
+        } else {
+            .init()
+        }
+        self.unwrappedParameters = unwrappedParameters
+        Self.logger.info("Unwrapped parameters to \("\(unwrappedParameters)")")
 
-        self.windowManager = WindowManagerModel(style: parameters?.initialWindowStyle ?? .main)
+        let player = PlayerModel(SFBAudioEnginePlayer(), bindingTo: unwrappedParameters.id)
+
+        self.windowManager = WindowManagerModel(style: unwrappedParameters.initialWindowStyle)
         self.fileManager = FileManagerModel(player: player)
         self.player = player
         self.playerKeyboardControl = PlayerKeyboardControlModel(player: player)
@@ -319,22 +328,22 @@ struct ContentView: View {
     private func initialize() {
         if !windowManager.isInitialized {
             windowManager.isInitialized = true
-            if let parameters {
-                Task {
-                    switch parameters.playlist {
-                    case let .referenced(urls):
-                        player.addToPlaylist(urls)
+            parameters = unwrappedParameters
 
-                        logger.info("Created window from referenced URLs: \(urls)")
-                    case let .canonical(id):
-                        await player.library.saveOrLoadPlaylist()
+            Task {
+                switch unwrappedParameters.playlist {
+                case let .referenced(urls):
+                    player.addToPlaylist(urls)
 
-                        logger.info("Created window with canonical ID: \(id)")
-                    }
+                    logger.info("Created window from referenced URLs: \(urls)")
+                case let .canonical(id):
+                    await player.library.saveOrLoadPlaylist()
 
-                    if parameters.shouldPlay, let firstTrack = player.playlist.first {
-                        player.play(firstTrack.url)
-                    }
+                    logger.info("Created window with canonical ID: \(id)")
+                }
+
+                if unwrappedParameters.shouldPlay, let firstTrack = player.playlist.first {
+                    player.play(firstTrack.url)
                 }
             }
         }
