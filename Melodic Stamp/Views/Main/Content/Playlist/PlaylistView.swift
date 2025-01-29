@@ -18,7 +18,6 @@ struct PlaylistView: View {
     @Environment(MetadataEditorModel.self) private var metadataEditor
 
     @Environment(\.resetFocus) private var resetFocus
-    @Environment(\.openURL) private var openURL
     @Environment(\.luminareMinHeight) private var minHeight
     @Environment(\.luminareAnimation) private var animation
 
@@ -383,7 +382,7 @@ struct PlaylistView: View {
         Divider()
 
         Button("Reveal in Finder") {
-            openURL(track.url)
+            NSWorkspace.shared.activateFileViewerSelecting([track.url])
         }
     }
 

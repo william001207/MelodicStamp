@@ -13,7 +13,6 @@ struct InspectorLibraryView: View {
     @Environment(LibraryModel.self) private var library
 
     @Environment(\.appearsActive) private var appearsActive
-    @Environment(\.openURL) private var openURL
 
     // MARK: - Fields
 
@@ -76,7 +75,7 @@ struct InspectorLibraryView: View {
     @ViewBuilder private func contextMenu(for playlist: Playlist) -> some View {
         if let url = playlist.canonicalURL {
             Button("Reveal in Finder") {
-                openURL(url)
+                NSWorkspace.shared.activateFileViewerSelecting([url])
             }
         }
     }

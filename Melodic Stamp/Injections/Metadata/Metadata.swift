@@ -157,7 +157,7 @@ extension Metadata {
         }
     }
 
-    init(migratingFrom oldValue: Metadata, to url: URL? = nil, useFallbackTitleIfNotProvided useFallbackTitle: Bool = false) async throws(MetadataError) {
+    init(migratingFrom oldValue: Metadata, to url: URL? = nil, useFallbackTitleIfNotProvided useFallbackTitle: Bool = false) throws(MetadataError) {
         let url = url ?? oldValue.url
 
         self.url = url
@@ -226,7 +226,9 @@ extension Metadata {
                 title?.current = fallbackTitle
             }
 
-            try await overwrite()
+            Task.detached {
+                try await self.overwrite()
+            }
         }
     }
 
@@ -435,6 +437,7 @@ private extension Metadata {
 
     func pack() -> AudioMetadata {
         let metadata = AudioMetadata()
+        guard state.isInitialized else { return metadata }
 
         metadata.title = title.current
         metadata.titleSortOrder = titleSortOrder.current

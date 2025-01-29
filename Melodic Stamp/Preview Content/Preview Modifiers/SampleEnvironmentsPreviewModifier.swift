@@ -119,7 +119,7 @@ import SwiftUI
         }
 
         static var samplePlaylist: Playlist {
-            var playlist = Playlist.referenced()
+            let playlist = Playlist.referenced()
 
             playlist[metadata: \.info] = samplePlaylistMetadata.info
             playlist[metadata: \.state] = samplePlaylistMetadata.state
