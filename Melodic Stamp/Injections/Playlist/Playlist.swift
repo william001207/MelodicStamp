@@ -106,6 +106,27 @@ extension Playlist: Hashable {
         hasher.combine(id)
         hasher.combine(mode)
         hasher.combine(metadata)
+        hasher.combine(tracks)
+    }
+}
+
+extension Playlist: Equatable {
+    static func == (lhs: Playlist, rhs: Playlist) -> Bool {
+        lhs.id == rhs.id
+    }
+}
+
+extension Playlist: Sequence {
+    func makeIterator() -> Array<Track>.Iterator {
+        tracks.makeIterator()
+    }
+
+    var isEmpty: Bool {
+        tracks.isEmpty
+    }
+
+    var count: Int {
+        tracks.count
     }
 }
 
@@ -131,26 +152,6 @@ extension Playlist {
         guard mode.isCanonical else { return }
         indexer.value = indexer.read() ?? [:]
         await tracks = indexer.loadTracks()
-    }
-}
-
-extension Playlist: Equatable {
-    static func == (lhs: Playlist, rhs: Playlist) -> Bool {
-        lhs.id == rhs.id
-    }
-}
-
-extension Playlist: Sequence {
-    func makeIterator() -> Array<Track>.Iterator {
-        tracks.makeIterator()
-    }
-
-    var isEmpty: Bool {
-        tracks.isEmpty
-    }
-
-    var count: Int {
-        tracks.count
     }
 }
 

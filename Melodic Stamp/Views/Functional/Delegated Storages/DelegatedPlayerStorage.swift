@@ -57,12 +57,12 @@ struct DelegatedPlayerStorage: View {
             .onChange(of: playlist) { _, newValue in
                 playlistState.value = newValue
             }
-            .onChange(of: player.playlist) { _, newValue in
-                print(newValue)
+            // `player.playlist` isn't triggering view updates
+            .onChange(of: player.playlist) { _, _ in
                 playlistState.isReady = false
 
                 Task {
-                    try storePlaylist(from: newValue)
+                    try storePlaylist(from: player.playlist)
                 }
             }
             .onChange(of: playlistState.preparedValue) { _, newValue in
@@ -135,12 +135,14 @@ struct DelegatedPlayerStorage: View {
         case let .unhandled(bookmarks, currentTrackURL, currentTrackElapsedTime, playbackMode, playbackLooping):
             guard !player.playlist.mode.isCanonical else { break }
 
+            var urls: [URL] = []
             try bookmarks.forEach {
                 var isStale = false
                 let url = try URL(resolvingBookmarkData: $0, options: [], bookmarkDataIsStale: &isStale)
                 guard !isStale else { return }
-                player.addToPlaylist([url])
+                urls.append(url)
             }
+            player.addToPlaylist(urls)
 
             player[playlistMetadata: \.state] = .init(
                 currentTrackURL: currentTrackURL,

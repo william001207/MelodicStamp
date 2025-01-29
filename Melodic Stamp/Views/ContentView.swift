@@ -125,12 +125,8 @@ struct ContentView: View {
                 return true
             }
             .background {
-                Group {
-                    FileImporters()
-
-                    DelegatedPlayerStorage()
-                }
-                .allowsHitTesting(false)
+                FileImporters()
+                DelegatedPlayerStorage()
             }
 
             // MARK: Window Styling
