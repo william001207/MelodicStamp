@@ -38,8 +38,9 @@ extension PlayerModel.LibraryModel {
     func saveOrLoadPlaylist() async {
         guard
             !playlist.mode.isCanonical,
-            let canonicalPlaylist = await Playlist(makingCanonical: playlist)
+            var canonicalPlaylist = await Playlist(makingCanonical: playlist)
         else { return }
+        await canonicalPlaylist.loadTracks()
         playlist = canonicalPlaylist
 
         if !playlists.contains(canonicalPlaylist) {

@@ -60,12 +60,6 @@ struct Playlist: Equatable, Hashable, Identifiable {
 
         guard let information = try? PlaylistInformation(readingFromPlaylistID: id) else { return nil }
         self.information = information
-
-        let urls = FileHelper.flatten(contentsOf: information.url, isRecursive: false)
-        for url in urls {
-            guard let track = await Track(loadingFrom: url) else { return }
-            tracks.append(track)
-        }
     }
 
     init?(makingCanonical oldValue: Playlist) async {
@@ -76,7 +70,7 @@ struct Playlist: Equatable, Hashable, Identifiable {
             guard let instance = await Self(loadingWith: oldValue.id) else { return nil }
             self = instance
 
-            logger.info("Loaded permanent playlist from \(url)")
+            logger.info("Loaded canonical playlist from \(url)")
         } else {
             // Copy and create a new canonical playlist
 
@@ -95,7 +89,7 @@ struct Playlist: Equatable, Hashable, Identifiable {
                 tracks.append(permanentTrack)
             }
 
-            logger.info("Successfully made permanent playlist at \(url)")
+            logger.info("Successfully made canonical playlist at \(url)")
         }
     }
 
@@ -104,6 +98,14 @@ struct Playlist: Equatable, Hashable, Identifiable {
             mode: .referenced,
             information: .blank(bindingTo: id)
         )
+    }
+
+    mutating func loadTracks() async {
+        let urls = FileHelper.flatten(contentsOf: information.url, isRecursive: false)
+        for url in urls {
+            guard let track = await Track(loadingFrom: url) else { return }
+            tracks.append(track)
+        }
     }
 }
 
