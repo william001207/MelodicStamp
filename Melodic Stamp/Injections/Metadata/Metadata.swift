@@ -216,14 +216,14 @@ extension Metadata {
         self.additional = oldValue.additional
 
         // Automatically applies a fallback title based on file name for those don't have titles
-        let hasInitialTitle = if let title = title.initial { !title.isEmpty } else { false }
-        let hasCurrentTitle = if let title = title.current { !title.isEmpty } else { false }
+        let hasInitialTitle = if let title = title?.initial { !title.isEmpty } else { false }
+        let hasCurrentTitle = if let title = title?.current { !title.isEmpty } else { false }
         if useFallbackTitle, !hasInitialTitle {
             let fallbackTitle = oldValue.url.deletingPathExtension().lastPathComponent
-            title.initial = fallbackTitle
+            title?.initial = fallbackTitle
 
             if !hasCurrentTitle {
-                title.current = fallbackTitle
+                title?.current = fallbackTitle
             }
 
             try await overwrite()
