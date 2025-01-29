@@ -58,25 +58,27 @@ struct DelegatedPlayerStorage: View {
                 playlistState.value = newValue
             }
             // `player.playlist` isn't triggering view updates
-            .onChange(of: player.playlist) { _, _ in
+            .onChange(of: player.playlist.hashValue) { _, _ in
                 playlistState.isReady = false
 
-                Task {
-                    try storePlaylist(from: player.playlist)
+                Task.detached {
+                    try await storePlaylist(from: player.playlist)
                 }
             }
             .onChange(of: playlistState.preparedValue) { _, newValue in
                 guard let newValue else { return }
 
                 if let data = newValue {
-                    Task {
-                        try restorePlaylist(from: data)
+                    Task.detached {
+                        try await restorePlaylist(from: data)
 
                         logger.log("Successfully restored playlist")
 
-                        // Dependents
-                        playbackVolumeState.isReady = true
-                        playbackMutedState.isReady = true
+                        Task { @MainActor in
+                            // Dependents
+                            playbackVolumeState.isReady = true
+                            playbackMutedState.isReady = true
+                        }
                     }
                 }
 
@@ -127,7 +129,7 @@ struct DelegatedPlayerStorage: View {
             }
     }
 
-    private func restorePlaylist(from data: Data) throws {
+    private func restorePlaylist(from data: Data) async throws {
         guard let delegatedPlaylist = try? JSONDecoder().decode(DelegatedPlaylist.self, from: data) else { return }
         switch delegatedPlaylist {
         case .handled:
@@ -153,7 +155,7 @@ struct DelegatedPlayerStorage: View {
         }
     }
 
-    private func storePlaylist(from playlist: Playlist) throws {
+    private func storePlaylist(from playlist: Playlist) async throws {
         let delegatedPlaylist: DelegatedPlaylist
         switch playlist.mode {
         case .canonical:
