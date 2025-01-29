@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct DelegatedSceneStorageState<V> {
+struct DelegatedStorageState<V> {
     var isReady: Bool = false
     var value: V?
 

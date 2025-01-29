@@ -14,7 +14,7 @@ struct MakeCloseDelegated: NSViewControllerRepresentable {
     func makeNSViewController(context: Context) -> NSViewController {
         let hostingController = CloseDelegatedWindowHostingController(
             rootView: EmptyView(),
-            shouldClose: shouldClose, onClose: onClose
+            parent: self
         )
         context.coordinator.hostingController = hostingController
 
@@ -22,7 +22,7 @@ struct MakeCloseDelegated: NSViewControllerRepresentable {
     }
 
     func updateNSViewController(_: NSViewController, context: Context) {
-        context.coordinator.hostingController.delegate.shouldClose = shouldClose
+        context.coordinator.hostingController.delegate.parent = self
     }
 
     func makeCoordinator() -> Coordinator {
@@ -37,8 +37,8 @@ struct MakeCloseDelegated: NSViewControllerRepresentable {
 class CloseDelegatedWindowHostingController<Content: View>: NSHostingController<Content> {
     var delegate: CloseDelegatedWindowDelegate
 
-    init(rootView: Content, shouldClose: Bool = false, onClose: @escaping (NSWindow, Bool) -> ()) {
-        self.delegate = .init(shouldClose: shouldClose, onClose: onClose)
+    init(rootView: Content, parent: MakeCloseDelegated) {
+        self.delegate = .init(parent: parent)
         super.init(rootView: rootView)
     }
 
@@ -51,21 +51,32 @@ class CloseDelegatedWindowHostingController<Content: View>: NSHostingController<
         super.viewWillLayout()
 
         guard let window = view.window else { return }
-        window.delegate = delegate
+        if window.delegate !== delegate {
+            delegate.originalDelegate = window.delegate
+            window.delegate = delegate
+        }
     }
 }
 
 class CloseDelegatedWindowDelegate: NSObject, NSWindowDelegate {
-    var shouldClose: Bool
-    var onClose: (NSWindow, Bool) -> ()
+    weak var originalDelegate: NSWindowDelegate?
+    var parent: MakeCloseDelegated
 
-    init(shouldClose: Bool = false, onClose: @escaping (NSWindow, Bool) -> ()) {
-        self.shouldClose = shouldClose
-        self.onClose = onClose
+    init(parent: MakeCloseDelegated) {
+        self.parent = parent
     }
 
     func windowShouldClose(_ window: NSWindow) -> Bool {
-        onClose(window, shouldClose)
+        let shouldClose = parent.shouldClose
+        parent.onClose(window, shouldClose)
         return shouldClose
+    }
+
+    override func responds(to aSelector: Selector!) -> Bool {
+        super.responds(to: aSelector) || (originalDelegate?.responds(to: aSelector) ?? false)
+    }
+
+    override func forwardingTarget(for _: Selector!) -> Any? {
+        originalDelegate
     }
 }

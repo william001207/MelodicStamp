@@ -30,6 +30,15 @@ struct CreationParameters: Hashable, Identifiable, Codable {
             id
         }
     }
+
+    var isConcrete: Bool {
+        switch playlist {
+        case let .referenced(urls):
+            !urls.isEmpty
+        case .canonical:
+            true
+        }
+    }
 }
 
 extension CreationParameters: Equatable {

@@ -14,15 +14,18 @@ extension View {
         size: CGSize = .init(width: 5, height: 0),
         delay: TimeInterval = .zero
     ) -> some View {
-        let phases: [CGFloat] = [0.0] + Array(alternating: 1.0, count: count) + [0.0]
+        let phases: [CGFloat?] = [0.0] + Array(alternating: 1.0, count: count) + [0.0] + [nil]
         phaseAnimator(phases, trigger: trigger) { content, value in
+            let value = value ?? .zero
             content
                 .offset(x: value * size.width, y: value * size.height)
         } animation: { value in
-            if abs(value) > 0 {
-                .easeOut(duration: 0.1).delay(delay)
-            } else {
-                .easeIn(duration: 0.1).delay(delay)
+            value.flatMap {
+                if abs($0) > 0 {
+                    .easeOut(duration: 0.1).delay(delay)
+                } else {
+                    .easeIn(duration: 0.1).delay(delay)
+                }
             }
         }
     }
@@ -34,14 +37,18 @@ extension View {
         duration: Double = 0.5,
         delay: TimeInterval = .zero
     ) -> some View {
-        phaseAnimator([false, true], trigger: trigger) { content, value in
+        let phases: [Bool?] = [false, true, false, nil]
+        phaseAnimator(phases, trigger: trigger) { content, value in
+            let value = value ?? false
             content
                 .scaleEffect(value ? scale : .init(width: 1, height: 1), anchor: anchor)
         } animation: { value in
-            if value {
-                .smooth(duration: duration).delay(delay)
-            } else {
-                .bouncy(duration: duration, extraBounce: 0.25).delay(delay)
+            value.flatMap {
+                if $0 {
+                    .smooth(duration: duration).delay(delay)
+                } else {
+                    .bouncy(duration: duration, extraBounce: 0.25).delay(delay)
+                }
             }
         }
     }

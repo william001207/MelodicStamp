@@ -21,7 +21,7 @@ struct LibraryItemView: View {
         HStack(alignment: .center) {
             VStack(alignment: .leading, spacing: 2) {
                 if hasTitle {
-                    Text(playlist.information.info.title)
+                    Text(playlist[metadata: \.info].title)
                         .bold()
                         .font(.title3)
                 } else {
@@ -79,11 +79,11 @@ struct LibraryItemView: View {
     }
 
     private var hasTitle: Bool {
-        !playlist.information.info.title.isEmpty
+        !playlist[metadata: \.info].title.isEmpty
     }
 
     private var hasArtwork: Bool {
-        playlist.information.artwork.image != nil
+        playlist[metadata: \.artwork].image != nil
     }
 
     private var hasControl: Bool {
@@ -96,7 +96,7 @@ struct LibraryItemView: View {
 
     @ViewBuilder private func coverView() -> some View {
         ZStack {
-            if let image = playlist.information.artwork.image {
+            if let image = playlist[metadata: \.artwork].image {
                 MusicCover(
                     images: [image], hasPlaceholder: false, cornerRadius: 4
                 )

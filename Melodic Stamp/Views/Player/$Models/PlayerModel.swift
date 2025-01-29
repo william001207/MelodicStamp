@@ -135,6 +135,11 @@ extension PlayerModel {
 
     // MARK: Playback
 
+    var currentTrack: Track? {
+        get { playlist.currentTrack }
+        set { playlist.currentTrack = newValue }
+    }
+
     var playbackMode: PlaybackMode {
         get { self[playlistMetadata: \.state.playbackMode] }
         set { self[playlistMetadata: \.state.playbackMode] = newValue }
@@ -150,11 +155,6 @@ extension PlayerModel {
     subscript<V>(playlistMetadata keyPath: WritableKeyPath<Playlist.Metadata, V>) -> V {
         get { playlist[metadata: keyPath] }
         set { playlist[metadata: keyPath] = newValue }
-    }
-
-    var currentTrack: Track? {
-        get { playlist.currentTrack }
-        set { playlist.currentTrack = newValue }
     }
 
     var nextTrack: Track? {
@@ -240,8 +240,10 @@ extension PlayerModel {
         if let updated = player.playbackTime {
             guard playbackTime != updated else { return }
             playbackTime = updated
+            self[playlistMetadata: \.state.currentTrackElapsedTime] = updated.elapsed
         } else {
             playbackTime = nil
+            self[playlistMetadata: \.state.currentTrackElapsedTime] = .zero
         }
     }
 

@@ -35,8 +35,7 @@ struct LeafletView: View {
     @State private var isShowingLyrics: Bool = true
     @State private var isControlsHovering: Bool = false
 
-    @SceneStorage(AppSceneStorage.lyricsTypeSize()) private var typeSize: DynamicTypeSize = Defaults[.lyricsTypeSize]
-
+    @State private var typeSize: DynamicTypeSize = Defaults[.lyricsTypeSize]
     @State private var interaction: AppleMusicLyricsViewInteractionModel = .init()
 
     // MARK: - Body

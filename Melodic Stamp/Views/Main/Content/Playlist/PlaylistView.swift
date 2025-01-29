@@ -171,17 +171,13 @@ struct PlaylistView: View {
         metadataEditor.hasMetadata
     }
 
-    private var canLocate: Bool {
-        player.hasCurrentTrack
-    }
-
     private var canRemove: Bool {
         !player.playlist.isEmpty
     }
 
     // MARK: - Leading Actions
 
-    @ViewBuilder private func leadingActions(in proxy: ScrollViewProxy) -> some View {
+    @ViewBuilder private func leadingActions(in _: ScrollViewProxy) -> some View {
         HStack(spacing: 2) {
             // MARK: Clear Selection
 
@@ -191,16 +187,6 @@ struct PlaylistView: View {
                 Image(systemSymbol: .xmark)
             }
             .disabled(!canEscape)
-            .aspectRatio(6 / 5, contentMode: .fit)
-
-            // MARK: Locate Selection
-
-            Button {
-                handleLocate(in: proxy)
-            } label: {
-                Image(systemSymbol: .scope)
-            }
-            .disabled(!canLocate)
             .aspectRatio(6 / 5, contentMode: .fit)
 
             // MARK: Remove Selection from Playlist / Remove All
@@ -416,18 +402,6 @@ struct PlaylistView: View {
     @discardableResult private func handleEscape() -> Bool {
         guard canEscape else { return false }
         player.selectedTracks.removeAll()
-        return true
-    }
-
-    @discardableResult private func handleLocate(in proxy: ScrollViewProxy) -> Bool {
-        guard canLocate else { return false }
-        guard let track = player.currentTrack else { return false }
-
-        withAnimation {
-            proxy.scrollTo(track, anchor: .center)
-        }
-        toggleBounceAnimation(for: track)
-
         return true
     }
 

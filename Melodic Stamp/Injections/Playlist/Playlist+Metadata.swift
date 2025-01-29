@@ -23,6 +23,7 @@ extension Playlist.Metadata {
 
     struct State: Equatable, Hashable, Codable {
         var currentTrackURL: URL?
+        var currentTrackElapsedTime: TimeInterval = .zero
         var playbackMode: PlaybackMode = Defaults[.defaultPlaybackMode]
         var playbackLooping: Bool = false
     }
@@ -83,7 +84,7 @@ extension Playlist.Metadata {
         Self.url(forID: id)
     }
 
-    func write(segments: [Segment]) async throws {
+    func write(segments: [Segment] = Segment.allCases) throws {
         guard !segments.isEmpty else { return }
 
         for segment in segments {
@@ -95,7 +96,7 @@ extension Playlist.Metadata {
             case .artwork:
                 try JSONEncoder().encode(artwork)
             }
-            try await Self.write(segment: segment, ofData: data, toDirectory: url)
+            try Self.write(segment: segment, ofData: data, toDirectory: url)
         }
 
         logger.info("Successfully wrote playlist information segments \(segments) for playlist at \(url)")
@@ -108,7 +109,7 @@ private extension Playlist.Metadata {
         return try Data(contentsOf: url)
     }
 
-    static func write(segment: Segment, ofData fileData: Data, toDirectory root: URL) async throws {
+    static func write(segment: Segment, ofData fileData: Data, toDirectory root: URL) throws {
         let url = segment.url(relativeTo: root)
         try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
         try fileData.write(to: url)

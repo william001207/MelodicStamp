@@ -29,23 +29,18 @@ extension Playlist {
 }
 
 struct Playlist: Hashable, Identifiable {
-    var mode: Mode
-    var information: Playlist.Metadata
+    let mode: Mode
+    private var metadata: Playlist.Metadata
     private var indexer: TrackIndexer
 
     private(set) var tracks: [Track] = []
     var currentTrack: Track? {
-        get {
-            first { $0.url == information.state.currentTrackURL }
-        }
-
-        set {
-            information.state.currentTrackURL = newValue?.url
-        }
+        get { first { $0.url == metadata.state.currentTrackURL } }
+        set { metadata.state.currentTrackURL = newValue?.url }
     }
 
     var id: UUID {
-        information.id
+        metadata.id
     }
 
     private init(
@@ -53,20 +48,20 @@ struct Playlist: Hashable, Identifiable {
         information: Playlist.Metadata
     ) {
         self.mode = mode
-        self.information = information
+        self.metadata = information
         self.indexer = .init(playlistID: information.id)
     }
 
     init?(loadingWith id: UUID) async {
         self.mode = .canonical
 
-        guard let information = try? await Playlist.Metadata(readingFromPlaylistID: id) else { return nil }
-        self.information = information
-        self.indexer = .init(playlistID: information.id)
+        guard let metadata = try? await Playlist.Metadata(readingFromPlaylistID: id) else { return nil }
+        self.metadata = metadata
+        self.indexer = .init(playlistID: metadata.id)
     }
 
     init?(makingCanonical oldValue: Playlist) async {
-        let url = oldValue.information.url
+        let url = oldValue.metadata.url
         if FileManager.default.fileExists(atPath: url.path) {
             // Loads from existing canonical playlist
 
@@ -80,12 +75,12 @@ struct Playlist: Hashable, Identifiable {
             // Migrates to a new canonical playlist
 
             self.mode = .canonical
-            self.information = oldValue.information
+            self.metadata = oldValue.metadata
             self.indexer = .init(playlistID: oldValue.id)
 
             do {
                 try FileManager.default.createDirectory(at: url, withIntermediateDirectories: true)
-                try await information.write(segments: Playlist.Metadata.Segment.allCases)
+                try metadata.write(segments: Playlist.Metadata.Segment.allCases)
             } catch {
                 return nil
             }
@@ -94,9 +89,9 @@ struct Playlist: Hashable, Identifiable {
                 guard let migratedTrack = try? await migrateTrack(from: track) else { continue }
                 add([migratedTrack])
 
-                let wasCurrentTrack = track.url == oldValue.information.state.currentTrackURL
+                let wasCurrentTrack = track.url == oldValue.metadata.state.currentTrackURL
                 if wasCurrentTrack {
-                    information.state.currentTrackURL = migratedTrack.url
+                    metadata.state.currentTrackURL = migratedTrack.url
                 }
             }
 
@@ -167,8 +162,12 @@ extension Playlist: Sequence, RandomAccessCollection {
 
 extension Playlist {
     subscript<V>(metadata keyPath: WritableKeyPath<Metadata, V>) -> V {
-        get { information[keyPath: keyPath] }
-        set { information[keyPath: keyPath] = newValue }
+        get { metadata[keyPath: keyPath] }
+        set { metadata[keyPath: keyPath] = newValue }
+    }
+
+    func writeMetadata(segments: [Metadata.Segment] = Metadata.Segment.allCases) throws {
+        try metadata.write(segments: segments)
     }
 }
 
@@ -201,7 +200,7 @@ extension Playlist {
     }
 
     private var nextIndex: Int? {
-        switch information.state.playbackMode {
+        switch metadata.state.playbackMode {
         case .sequential:
             guard let currentIndex else { return nil }
             let nextIndex = currentIndex + 1
@@ -217,7 +216,7 @@ extension Playlist {
     }
 
     private var previousIndex: Int? {
-        switch information.state.playbackMode {
+        switch metadata.state.playbackMode {
         case .sequential:
             guard let currentIndex else { return nil }
             let previousIndex = currentIndex - 1
@@ -260,13 +259,13 @@ extension Playlist {
     }
 
     private func createFolder() throws {
-        try FileManager.default.createDirectory(at: information.url, withIntermediateDirectories: true)
+        try FileManager.default.createDirectory(at: metadata.url, withIntermediateDirectories: true)
     }
 
     private func generateCanonicalURL(for url: URL) -> URL {
         guard !Self.isCanonical(url: url) else { return url }
         let trackID = UUID()
-        return information.url
+        return metadata.url
             .appending(component: trackID.uuidString, directoryHint: .notDirectory)
             .appendingPathExtension(url.pathExtension)
     }

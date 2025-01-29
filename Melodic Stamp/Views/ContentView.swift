@@ -60,7 +60,7 @@ struct ContentView: View {
 
     // MARK: - Fields
 
-    private let parameters: CreationParameters
+    private var concreteParameters: CreationParameters?
 
     // MARK: Models
 
@@ -87,9 +87,6 @@ struct ContentView: View {
     // MARK: - Initializers
 
     init(_ parameters: CreationParameters, library: LibraryModel) {
-        self.parameters = parameters
-        Self.logger.info("Unwrapped parameters to \("\(parameters)")")
-
         let player = PlayerModel(SFBAudioEnginePlayer(), library: library, bindingTo: parameters.id)
 
         self.windowManager = WindowManagerModel(style: parameters.initialWindowStyle)
@@ -99,6 +96,12 @@ struct ContentView: View {
         self.metadataEditor = MetadataEditorModel(player: player)
         self.audioVisualizer = AudioVisualizerModel()
         self.gradientVisualizer = GradientVisualizerModel()
+
+        if parameters.isConcrete {
+            self.concreteParameters = parameters
+        }
+
+        Self.logger.info("Initializing content with \("\(parameters)")")
     }
 
     // MARK: - Body
@@ -114,7 +117,9 @@ struct ContentView: View {
                 }
             }
             .onAppear {
-                initialize()
+                if let concreteParameters {
+                    processConcreteParameters(concreteParameters)
+                }
             }
             .dropDestination(for: Track.self) { tracks, _ in
                 player.addToPlaylist(tracks.map(\.url))
@@ -140,9 +145,9 @@ struct ContentView: View {
                 isFocused = true
                 resetFocus(in: namespace)
 
-                player.updateOutputDevices()
                 floatingWindows.observe(window)
                 windowManager.observe(window)
+                player.updateOutputDevices()
             }
             .onChange(of: windowManager.style, initial: true) { _, newValue in
                 isFocused = true
@@ -325,9 +330,10 @@ struct ContentView: View {
 
     // MARK: - Functions
 
-    private func initialize() {
-        if !windowManager.isInitialized {
-            windowManager.isInitialized = true
+    private func processConcreteParameters(_ parameters: CreationParameters) {
+        logger.info("Processing concrete parameters \("\(parameters)")")
+        if !windowManager.hasConcreteParameters {
+            windowManager.hasConcreteParameters = true
 
             Task.detached {
                 switch parameters.playlist {
