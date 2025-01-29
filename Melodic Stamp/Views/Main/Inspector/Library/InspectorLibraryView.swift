@@ -21,7 +21,7 @@ struct InspectorLibraryView: View {
     // MARK: - Body
 
     var body: some View {
-        if !library.hasPlaylists {
+        if library.isEmpty {
             ExcerptView(tab: SidebarInspectorTab.library)
         } else {
             List(selection: $selectedPlaylists) {

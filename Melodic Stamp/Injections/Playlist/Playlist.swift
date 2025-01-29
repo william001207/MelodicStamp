@@ -74,16 +74,21 @@ extension Playlist {
 
         mode = .canonical
 
+        var migratedTracks: [Track] = []
+        var migratedCurrentTrackURL: URL?
         for track in tracks {
             guard let migratedTrack = try? await migrateTrack(from: track) else { continue }
-            remove([track])
-            add([migratedTrack])
+            migratedTracks.append(migratedTrack)
 
             let wasCurrentTrack = track.url == metadata.state.currentTrackURL
             if wasCurrentTrack {
-                metadata.state.currentTrackURL = migratedTrack.url
+                migratedCurrentTrackURL = migratedTrack.url
             }
         }
+
+        metadata.state.currentTrackURL = migratedCurrentTrackURL
+        clearPlaylist()
+        add(migratedTracks)
 
         logger.info("Successfully made canonical playlist at \(url)")
     }
@@ -135,25 +140,17 @@ extension Playlist: Equatable {
     }
 }
 
-extension Playlist: Sequence, RandomAccessCollection {
-    typealias Index = Array<Track>.Index
-
+extension Playlist: Sequence {
     func makeIterator() -> Array<Track>.Iterator {
         tracks.makeIterator()
     }
 
-    subscript(position: Array<Track>.Index) -> Track {
-        _read {
-            yield tracks[position]
-        }
+    var isEmpty: Bool {
+        tracks.isEmpty
     }
 
-    var startIndex: Array<Track>.Index {
-        tracks.startIndex
-    }
-
-    var endIndex: Array<Track>.Index {
-        tracks.endIndex
+    var count: Int {
+        tracks.count
     }
 }
 
@@ -171,12 +168,12 @@ extension Playlist {
 extension Playlist {
     var nextTrack: Track? {
         guard let nextIndex else { return nil }
-        return self[nextIndex]
+        return tracks[nextIndex]
     }
 
     var previousTrack: Track? {
         guard let previousIndex else { return nil }
-        return self[previousIndex]
+        return tracks[previousIndex]
     }
 
     var hasCurrentTrack: Bool {
@@ -193,7 +190,7 @@ extension Playlist {
 
     private var currentIndex: Int? {
         guard let currentTrack else { return nil }
-        return firstIndex(of: currentTrack)
+        return tracks.firstIndex(of: currentTrack)
     }
 
     private var nextIndex: Int? {
@@ -202,11 +199,11 @@ extension Playlist {
             guard let currentIndex else { return nil }
             let nextIndex = currentIndex + 1
 
-            guard nextIndex < endIndex else { return nil }
+            guard nextIndex < tracks.endIndex else { return nil }
             return nextIndex
         case .loop:
             guard let currentIndex else { return nil }
-            return (currentIndex + 1) % count
+            return (currentIndex + 1) % tracks.count
         case .shuffle:
             return randomIndex()
         }
@@ -222,20 +219,20 @@ extension Playlist {
             return previousIndex
         case .loop:
             guard let currentIndex else { return nil }
-            return (currentIndex + count - 1) % count
+            return (currentIndex + tracks.count - 1) % tracks.count
         case .shuffle:
             return randomIndex()
         }
     }
 
     func randomIndex() -> Int? {
-        guard !isEmpty else { return nil }
+        guard !tracks.isEmpty else { return nil }
 
-        if let currentTrack, let index = firstIndex(of: currentTrack) {
-            let indices = Array(indices).filter { $0 != index }
+        if let currentTrack, let index = tracks.firstIndex(of: currentTrack) {
+            let indices = Array(tracks.indices).filter { $0 != index }
             return indices.randomElement()
         } else {
-            return indices.randomElement()
+            return tracks.indices.randomElement()
         }
     }
 }

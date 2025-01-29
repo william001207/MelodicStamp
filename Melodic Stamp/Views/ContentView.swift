@@ -347,7 +347,7 @@ struct ContentView: View {
                     logger.info("Created window with canonical ID: \(id)")
                 }
 
-                if parameters.shouldPlay, let firstTrack = await player.playlist.first {
+                if parameters.shouldPlay, let firstTrack = await player.playlist.tracks.first {
                     await player.play(firstTrack.url)
                 }
             }

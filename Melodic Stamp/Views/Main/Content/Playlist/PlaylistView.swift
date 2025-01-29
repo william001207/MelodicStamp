@@ -32,100 +32,97 @@ struct PlaylistView: View {
     var body: some View {
         @Bindable var player = player
 
-        // `ScrollPosition` isn't working for `List`
-        ScrollViewReader { proxy in
-            Group {
-                if player.isPlaylistEmpty {
-                    ExcerptView(tab: SidebarContentTab.playlist)
-                } else {
-                    // MARK: List
+        Group {
+            if player.isPlaylistEmpty {
+                ExcerptView(tab: SidebarContentTab.playlist)
+            } else {
+                // MARK: List
 
-                    List(selection: $player.selectedTracks) {
-                        // This is much more stable than `.contentMargins()`
-                        Spacer()
-                            .frame(height: minHeight)
-                            .listRowSeparator(.hidden)
+                List(selection: $player.selectedTracks) {
+                    // This is much more stable than `.contentMargins()`
+                    Spacer()
+                        .frame(height: minHeight)
+                        .listRowSeparator(.hidden)
 
-                        ForEach(player.playlist, id: \.self) { track in
-                            itemView(for: track)
-                                .id(track)
-                                .draggable(track) {
-                                    TrackPreview(track: track)
-                                }
-                                .bounceAnimation(bounceAnimationTriggers.contains(track), scale: .init(width: 1.01, height: 1.01))
-                        }
-                        .onMove { indices, destination in
-                            withAnimation {
-                                player.moveTrack(fromOffsets: indices, toOffset: destination)
+                    ForEach(player.playlist.tracks) { track in
+                        itemView(for: track)
+                            .id(track)
+                            .draggable(track) {
+                                TrackPreview(track: track)
                             }
-                        }
-                        .transition(.slide)
+                            .bounceAnimation(bounceAnimationTriggers.contains(track), scale: .init(width: 1.01, height: 1.01))
                     }
-                    .scrollClipDisabled()
-                    .scrollContentBackground(.hidden)
-                    .animation(.default, value: player.playlist)
-                    .animation(.default, value: player.selectedTracks)
-
-                    // MARK: Keyboard Handlers
-
-                    // Handle [escape] -> clear selection
-                    .onKeyPress(.escape) {
-                        if handleEscape() {
-                            .handled
-                        } else {
-                            .ignored
+                    .onMove { indices, destination in
+                        withAnimation {
+                            player.moveTrack(fromOffsets: indices, toOffset: destination)
                         }
                     }
+                    .transition(.slide)
+                }
+                .scrollClipDisabled()
+                .scrollContentBackground(.hidden)
+                .animation(.default, value: player.playlist)
+                .animation(.default, value: player.selectedTracks)
 
-                    // Handle [􁂒] -> remove selection
-                    .onKeyPress(.deleteForward) {
-                        if handleRemove(player.selectedTracks.map(\.url)) {
-                            .handled
-                        } else {
-                            .ignored
-                        }
+                // MARK: Keyboard Handlers
+
+                // Handle [escape] -> clear selection
+                .onKeyPress(.escape) {
+                    if handleEscape() {
+                        .handled
+                    } else {
+                        .ignored
                     }
+                }
 
-                    // Handle [⏎] -> play
-                    .onKeyPress(.return) {
-                        if player.selectedTracks.count == 1, let track = player.selectedTracks.first {
-                            player.play(track.url)
-                            return .handled
-                        } else {
-                            return .ignored
-                        }
+                // Handle [􁂒] -> remove selection
+                .onKeyPress(.deleteForward) {
+                    if handleRemove(player.selectedTracks.map(\.url)) {
+                        .handled
+                    } else {
+                        .ignored
                     }
+                }
 
-                    // Handle [space] -> toggle play / pause
-                    .onKeyPress(keys: [.space], phases: .all) { key in
-                        playerKeyboardControl.handlePlayPause(
-                            phase: key.phase, modifiers: key.modifiers
-                        )
-                    }
-
-                    // Handle [← / →] -> adjust progress
-                    .onKeyPress(keys: [.leftArrow, .rightArrow], phases: .all) { key in
-                        let sign: FloatingPointSign = key.key == .leftArrow ? .minus : .plus
-
-                        return playerKeyboardControl.handleProgressAdjustment(
-                            phase: key.phase, modifiers: key.modifiers, sign: sign
-                        )
-                    }
-
-                    // Handle [↑ / ↓] -> adjust volume
-                    .onKeyPress(keys: [.leftArrow, .rightArrow], phases: .all) { key in
-                        let sign: FloatingPointSign = key.key == .leftArrow ? .minus : .plus
-
-                        return playerKeyboardControl.handleVolumeAdjustment(
-                            phase: key.phase, modifiers: key.modifiers, sign: sign
-                        )
-                    }
-
-                    // Handle [m] -> toggle muted
-                    .onKeyPress(keys: ["m"], phases: .down) { _ in
-                        player.isMuted.toggle()
+                // Handle [⏎] -> play
+                .onKeyPress(.return) {
+                    if player.selectedTracks.count == 1, let track = player.selectedTracks.first {
+                        player.play(track.url)
                         return .handled
+                    } else {
+                        return .ignored
                     }
+                }
+
+                // Handle [space] -> toggle play / pause
+                .onKeyPress(keys: [.space], phases: .all) { key in
+                    playerKeyboardControl.handlePlayPause(
+                        phase: key.phase, modifiers: key.modifiers
+                    )
+                }
+
+                // Handle [← / →] -> adjust progress
+                .onKeyPress(keys: [.leftArrow, .rightArrow], phases: .all) { key in
+                    let sign: FloatingPointSign = key.key == .leftArrow ? .minus : .plus
+
+                    return playerKeyboardControl.handleProgressAdjustment(
+                        phase: key.phase, modifiers: key.modifiers, sign: sign
+                    )
+                }
+
+                // Handle [↑ / ↓] -> adjust volume
+                .onKeyPress(keys: [.leftArrow, .rightArrow], phases: .all) { key in
+                    let sign: FloatingPointSign = key.key == .leftArrow ? .minus : .plus
+
+                    return playerKeyboardControl.handleVolumeAdjustment(
+                        phase: key.phase, modifiers: key.modifiers, sign: sign
+                    )
+                }
+
+                // Handle [m] -> toggle muted
+                .onKeyPress(keys: ["m"], phases: .down) { _ in
+                    player.isMuted.toggle()
+                    return .handled
                 }
             }
             .overlay(alignment: .top) {
@@ -134,14 +131,14 @@ struct PlaylistView: View {
                 HStack(spacing: 0) {
                     Group {
                         LuminareSection(hasPadding: false) {
-                            leadingActions(in: proxy)
+                            leadingActions()
                                 .frame(height: minHeight)
                         }
 
                         Spacer()
 
                         LuminareSection(hasPadding: false) {
-                            trailingActions(in: proxy)
+                            trailingActions()
                                 .frame(height: minHeight)
                         }
                     }
@@ -156,12 +153,6 @@ struct PlaylistView: View {
             }
             .onChange(of: player.playlist.tracks) { oldValue, newValue in
                 let addedTracks = Set(newValue).subtracting(oldValue)
-
-                if let firstAddedTrack = addedTracks.first {
-                    withAnimation {
-                        proxy.scrollTo(firstAddedTrack, anchor: .center)
-                    }
-                }
                 addedTracks.forEach(toggleBounceAnimation(for:))
             }
         }
@@ -177,7 +168,7 @@ struct PlaylistView: View {
 
     // MARK: - Leading Actions
 
-    @ViewBuilder private func leadingActions(in _: ScrollViewProxy) -> some View {
+    @ViewBuilder private func leadingActions() -> some View {
         HStack(spacing: 2) {
             // MARK: Clear Selection
 
@@ -222,7 +213,7 @@ struct PlaylistView: View {
 
     // MARK: - Trailing Actions
 
-    @ViewBuilder private func trailingActions(in _: ScrollViewProxy) -> some View {
+    @ViewBuilder private func trailingActions() -> some View {
         HStack(spacing: 2) {
             // MARK: Playback Mode
 

@@ -562,7 +562,7 @@ struct MiniPlayerView: View {
         }
 
         Menu {
-            ForEach(player.playlist) { track in
+            ForEach(player.playlist.tracks) { track in
                 let binding: Binding<Bool> = Binding {
                     selection.wrappedValue == track
                 } set: { newValue in

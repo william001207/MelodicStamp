@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-@MainActor @Observable final class LibraryModel {
+@Observable final class LibraryModel {
     private(set) var playlists: [Playlist] = []
     private var indexer: PlaylistIndexer = .init()
 
@@ -16,8 +16,20 @@ import SwiftUI
             try await refresh()
         }
     }
+}
 
-    var hasPlaylists: Bool { !playlists.isEmpty }
+extension LibraryModel: Sequence {
+    func makeIterator() -> Array<Playlist>.Iterator {
+        playlists.makeIterator()
+    }
+
+    var isEmpty: Bool {
+        playlists.isEmpty
+    }
+
+    var count: Int {
+        playlists.count
+    }
 }
 
 extension LibraryModel {
