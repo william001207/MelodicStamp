@@ -85,7 +85,7 @@ struct Playlist: Equatable, Hashable, Identifiable {
 
             do {
                 try FileManager.default.createDirectory(at: url, withIntermediateDirectories: true)
-                try information.write(segments: PlaylistInformation.FileSegment.allCases)
+                try information.write(segments: PlaylistInformation.Segment.allCases)
             } catch {
                 return nil
             }

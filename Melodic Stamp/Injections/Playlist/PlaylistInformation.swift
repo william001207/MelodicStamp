@@ -11,13 +11,13 @@ import SwiftUI
 extension PlaylistInformation: TypeNameReflectable {}
 
 extension PlaylistInformation {
-    enum FileSegment: String, CaseIterable {
+    enum Segment: String, CaseIterable {
         case info = ".info"
         case state = ".state"
         case artwork = ".artwork"
 
         func url(relativeTo root: URL) -> URL {
-            root.appending(path: rawValue)
+            root.appending(path: rawValue, directoryHint: .notDirectory)
         }
     }
 
@@ -81,7 +81,7 @@ extension PlaylistInformation {
         Self.url(forID: id)
     }
 
-    func write(segments: [FileSegment]) throws {
+    func write(segments: [Segment]) throws {
         guard !segments.isEmpty else { return }
 
         for segment in segments {
@@ -101,12 +101,12 @@ extension PlaylistInformation {
 }
 
 private extension PlaylistInformation {
-    static func read(segment: FileSegment, fromDirectory root: URL) throws -> Data {
+    static func read(segment: Segment, fromDirectory root: URL) throws -> Data {
         let url = segment.url(relativeTo: root)
         return try Data(contentsOf: url)
     }
 
-    static func write(segment: FileSegment, ofData fileData: Data, toDirectory root: URL) throws {
+    static func write(segment: Segment, ofData fileData: Data, toDirectory root: URL) throws {
         let url = segment.url(relativeTo: root)
         try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
         try fileData.write(to: url)

@@ -31,5 +31,7 @@ extension URL {
 }
 
 extension URL {
-    static let playlists = musicDirectory.appending(component: Bundle.main[.appName]).appending(component: "Playlists")
+    static let playlists = musicDirectory
+        .appending(component: Bundle.main[.appName], directoryHint: .isDirectory)
+        .appending(component: "Playlists", directoryHint: .isDirectory)
 }

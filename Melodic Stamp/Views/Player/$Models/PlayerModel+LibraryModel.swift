@@ -9,7 +9,15 @@ import Foundation
 
 extension PlayerModel {
     @Observable final class LibraryModel {
-        var playlists: [Playlist] = []
+        private(set) var index: PlaylistIndex = .read()
+
+        var playlists: [Playlist] = [] {
+            didSet {
+                index.updateIDs(from: playlists)
+                try? index.write()
+            }
+        }
+
         var playlist: Playlist
 
         init(bindingTo id: UUID) {
@@ -33,21 +41,13 @@ extension PlayerModel.LibraryModel {
             let canonicalPlaylist = await Playlist(makingCanonical: playlist)
         else { return }
         playlist = canonicalPlaylist
+
+        if !playlists.contains(canonicalPlaylist) {
+            playlists.append(canonicalPlaylist)
+        }
     }
 
     func refresh() async {
-        playlists.removeAll()
-        guard let contents = try? FileManager.default.contentsOfDirectory(
-            at: .playlists,
-            includingPropertiesForKeys: [.isDirectoryKey],
-            options: [.skipsHiddenFiles]
-        ) else { return }
-
-        for content in contents.filter(\.hasDirectoryPath) {
-            let pathName = content.lastPathComponent
-            guard let id = UUID(uuidString: pathName), let playlist = await Playlist(loadingWith: id) else { continue }
-
-            playlists.append(playlist)
-        }
+        await playlists = index.loadPlaylists()
     }
 }

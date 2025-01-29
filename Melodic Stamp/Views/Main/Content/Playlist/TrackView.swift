@@ -96,6 +96,8 @@ struct TrackView: View {
             .animation(.default.speed(2), value: player.isPlayable)
             .animation(.default.speed(2), value: player.isPlaying)
 
+            Spacer()
+
             if hasControl {
                 Button {
                     play()

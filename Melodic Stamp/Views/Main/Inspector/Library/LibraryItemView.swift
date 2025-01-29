@@ -24,10 +24,6 @@ struct LibraryItemView: View {
                     Text(playlist.information.info.title)
                         .bold()
                         .font(.title3)
-
-                    Text(playlist.id.uuidString)
-                        .font(.caption)
-                        .foregroundStyle(.placeholder)
                 } else {
                     HStack {
                         Text("Playlist")
@@ -38,6 +34,10 @@ struct LibraryItemView: View {
                     }
                     .font(.title3)
                 }
+
+                Text(playlist.id.uuidString)
+                    .font(.caption)
+                    .foregroundStyle(.placeholder)
             }
             .lineLimit(1)
             .onDoubleClick(handler: open)
