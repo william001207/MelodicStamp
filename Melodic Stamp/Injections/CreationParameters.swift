@@ -32,6 +32,12 @@ struct CreationParameters: Hashable, Identifiable, Codable {
     }
 }
 
+extension CreationParameters: Equatable {
+    static func == (lhs: Self, rhs: Self) -> Bool {
+        lhs.id == rhs.id
+    }
+}
+
 extension CreationParameters {
     enum PlaylistFactory: Equatable, Hashable, Codable {
         case referenced([URL] = [])
