@@ -31,10 +31,15 @@ import SwiftUI
     var isTabBarAdded: Bool { tabBarWindow != nil }
     var isPlayerAdded: Bool { playerWindow != nil }
 
+    private var targetWindow: NSWindow?
     private var tabBarAdditionDispatch: DispatchWorkItem?
     private var playerAdditionDispatch: DispatchWorkItem?
 
     func observe(_ window: NSWindow? = nil) {
+        removeTabBar(from: targetWindow)
+        removePlayer(from: targetWindow)
+        targetWindow = window
+
         NotificationCenter.default.removeObserver(self)
         guard let window else { return }
 
@@ -93,9 +98,12 @@ import SwiftUI
         playerWindow?.animator().alphaValue = 0
     }
 
-    func addTabBar(to mainWindow: NSWindow? = nil, @ViewBuilder content: @escaping () -> some View) {
+    func addTabBar(to mainWindow: NSWindow? = nil, @ViewBuilder content: @MainActor @escaping () -> some View) async {
         guard !isTabBarAdded else { return }
-        guard let applicationWindow = mainWindow ?? NSApp.mainWindow else { return }
+        guard
+            mainWindow == targetWindow,
+            let applicationWindow = mainWindow ?? NSApp.mainWindow
+        else { return }
 
         let floatingWindow = NSWindow()
         tabBarWindow = floatingWindow
@@ -119,9 +127,12 @@ import SwiftUI
         DispatchQueue.main.async(execute: dispatch)
     }
 
-    func addPlayer(to mainWindow: NSWindow? = nil, @ViewBuilder content: @escaping () -> some View) {
+    func addPlayer(to mainWindow: NSWindow? = nil, @ViewBuilder content: @MainActor @escaping () -> some View) async {
         guard !isPlayerAdded else { return }
-        guard let applicationWindow = mainWindow ?? NSApp.mainWindow else { return }
+        guard
+            mainWindow == targetWindow,
+            let applicationWindow = mainWindow ?? NSApp.mainWindow
+        else { return }
 
         let floatingWindow = NSWindow()
         playerWindow = floatingWindow
@@ -146,7 +157,11 @@ import SwiftUI
     }
 
     func removeTabBar(from mainWindow: NSWindow? = nil) {
-        guard let tabBarWindow, let applicationWindow = mainWindow ?? NSApp.mainWindow else { return }
+        guard
+            mainWindow == targetWindow,
+            let tabBarWindow,
+            let applicationWindow = mainWindow ?? NSApp.mainWindow
+        else { return }
 
         tabBarAdditionDispatch?.cancel()
         applicationWindow.removeChildWindow(tabBarWindow)
@@ -155,7 +170,11 @@ import SwiftUI
     }
 
     func removePlayer(from mainWindow: NSWindow? = nil) {
-        guard let playerWindow, let applicationWindow = mainWindow ?? NSApp.mainWindow else { return }
+        guard
+            mainWindow == targetWindow,
+            let playerWindow,
+            let applicationWindow = mainWindow ?? NSApp.mainWindow
+        else { return }
 
         playerAdditionDispatch?.cancel()
         applicationWindow.removeChildWindow(playerWindow)

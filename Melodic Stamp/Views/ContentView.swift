@@ -275,7 +275,7 @@ struct ContentView: View {
             }
         }
         .onDisappear {
-            destroyFloatingWindows()
+            destroyFloatingWindows(from: window)
         }
         .onChange(of: appearsActive, initial: true) { _, newValue in
             if newValue {
@@ -327,7 +327,6 @@ struct ContentView: View {
     // MARK: - Functions
 
     private func processConcreteParameters(_ parameters: CreationParameters) {
-        logger.info("Processing concrete parameters \("\(parameters)")")
         if !windowManager.hasConcreteParameters {
             windowManager.hasConcreteParameters = true
 
@@ -355,34 +354,39 @@ struct ContentView: View {
     private func initializeFloatingWindows(to mainWindow: NSWindow? = nil) {
         floatingWindowsInitializationDispatch?.cancel()
         let dispatch = DispatchWorkItem {
-            floatingWindows.addTabBar(to: mainWindow) {
-                FloatingTabBarView(
-                    isInspectorPresented: $isInspectorPresented,
-                    selectedContentTab: $selectedContentTab,
-                    selectedInspectorTab: $selectedInspectorTab
-                )
-                .onGeometryChange(for: CGSize.self) { proxy in
-                    proxy.size
-                } action: { newValue in
-                    floatingWindows.updateTabBarPosition(size: newValue, in: mainWindow, animate: true)
-                }
-                .environment(floatingWindows)
-            }
-            floatingWindows.addPlayer(to: mainWindow) {
-                FloatingPlayerView()
+            Task.detached {
+                await floatingWindows.addTabBar(to: mainWindow) {
+                    FloatingTabBarView(
+                        isInspectorPresented: $isInspectorPresented,
+                        selectedContentTab: $selectedContentTab,
+                        selectedInspectorTab: $selectedInspectorTab
+                    )
                     .onGeometryChange(for: CGSize.self) { proxy in
                         proxy.size
                     } action: { newValue in
-                        floatingWindows.updatePlayerPosition(size: newValue, in: mainWindow, animate: true)
+                        floatingWindows.updateTabBarPosition(size: newValue, in: mainWindow, animate: true)
                     }
                     .environment(floatingWindows)
-                    .environment(windowManager)
-                    .environment(fileManager)
-                    .environment(player)
-                    .environment(keyboardControl)
-                    .environment(metadataEditor)
-                    .environment(audioVisualizer)
-                    .environment(gradientVisualizer)
+                }
+            }
+
+            Task.detached {
+                await floatingWindows.addPlayer(to: mainWindow) {
+                    FloatingPlayerView()
+                        .onGeometryChange(for: CGSize.self) { proxy in
+                            proxy.size
+                        } action: { newValue in
+                            floatingWindows.updatePlayerPosition(size: newValue, in: mainWindow, animate: true)
+                        }
+                        .environment(floatingWindows)
+                        .environment(windowManager)
+                        .environment(fileManager)
+                        .environment(player)
+                        .environment(keyboardControl)
+                        .environment(metadataEditor)
+                        .environment(audioVisualizer)
+                        .environment(gradientVisualizer)
+                }
             }
         }
         floatingWindowsInitializationDispatch = dispatch
