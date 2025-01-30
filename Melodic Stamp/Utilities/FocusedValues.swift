@@ -11,6 +11,6 @@ extension FocusedValues {
     @Entry var windowManager: WindowManagerModel?
     @Entry var fileManager: FileManagerModel?
     @Entry var player: PlayerModel?
-    @Entry var playerKeyboardControl: PlayerKeyboardControlModel?
+    @Entry var keyboardControl: KeyboardControlModel?
     @Entry var metadataEditor: MetadataEditorModel?
 }

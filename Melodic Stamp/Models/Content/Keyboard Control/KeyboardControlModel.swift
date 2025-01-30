@@ -1,5 +1,5 @@
 //
-//  PlayerKeyboardControlModel.swift
+//  KeyboardControlModel.swift
 //  MelodicStamp
 //
 //  Created by KrLite on 2024/12/8.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-@MainActor @Observable final class PlayerKeyboardControlModel {
+@MainActor @Observable final class KeyboardControlModel {
     private weak var player: PlayerModel?
 
     var previousSongButtonBounceAnimation: Bool = false

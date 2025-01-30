@@ -16,7 +16,7 @@ import SwiftUI
             windowManager: WindowManagerModel,
             fileManager: FileManagerModel,
             player: PlayerModel,
-            playerKeyboardControl: PlayerKeyboardControlModel,
+            keyboardControl: KeyboardControlModel,
             metadataEditor: MetadataEditorModel,
             audioVisualizer: AudioVisualizerModel,
             gradientVisualizer: GradientVisualizerModel
@@ -29,7 +29,7 @@ import SwiftUI
             let floatingWindows = FloatingWindowsModel()
             let windowManager = WindowManagerModel()
             let fileManager = FileManagerModel(player: player)
-            let playerKeyboardControl = PlayerKeyboardControlModel(player: player)
+            let keyboardControl = KeyboardControlModel(player: player)
             let metadataEditor = MetadataEditorModel(player: player)
             let audioVisualizer = AudioVisualizerModel()
             let gradientVisualizer = GradientVisualizerModel()
@@ -52,7 +52,7 @@ import SwiftUI
                 windowManager,
                 fileManager,
                 player,
-                playerKeyboardControl,
+                keyboardControl,
                 metadataEditor,
                 audioVisualizer,
                 gradientVisualizer
@@ -66,7 +66,7 @@ import SwiftUI
                 .environment(context.windowManager)
                 .environment(context.fileManager)
                 .environment(context.player)
-                .environment(context.playerKeyboardControl)
+                .environment(context.keyboardControl)
                 .environment(context.metadataEditor)
                 .environment(context.audioVisualizer)
                 .environment(context.gradientVisualizer)

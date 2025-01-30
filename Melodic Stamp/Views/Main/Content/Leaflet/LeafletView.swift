@@ -13,7 +13,7 @@ struct LeafletView: View {
     // MARK: - Environments
 
     @Environment(FloatingWindowsModel.self) private var floatingWindows
-    @Environment(PlayerKeyboardControlModel.self) private var playerKeyboardControl
+    @Environment(KeyboardControlModel.self) private var keyboardControl
     @Environment(PlayerModel.self) private var player
     @Environment(MetadataEditorModel.self) private var metadataEditor
     @Environment(LyricsModel.self) private var lyrics
@@ -154,7 +154,7 @@ struct LeafletView: View {
 
             // Handle [space / ⏎] -> toggle play / pause
             .onKeyPress(keys: [.space, .return], phases: .all) { key in
-                playerKeyboardControl.handlePlayPause(
+                keyboardControl.handlePlayPause(
                     phase: key.phase, modifiers: key.modifiers
                 )
             }
@@ -163,7 +163,7 @@ struct LeafletView: View {
             .onKeyPress(keys: [.leftArrow, .rightArrow], phases: .all) { key in
                 let sign: FloatingPointSign = key.key == .leftArrow ? .minus : .plus
 
-                return playerKeyboardControl.handleProgressAdjustment(
+                return keyboardControl.handleProgressAdjustment(
                     phase: key.phase, modifiers: key.modifiers, sign: sign
                 )
             }
@@ -172,7 +172,7 @@ struct LeafletView: View {
             .onKeyPress(keys: [.leftArrow, .rightArrow], phases: .all) { key in
                 let sign: FloatingPointSign = key.key == .leftArrow ? .minus : .plus
 
-                return playerKeyboardControl.handleVolumeAdjustment(
+                return keyboardControl.handleVolumeAdjustment(
                     phase: key.phase, modifiers: key.modifiers, sign: sign
                 )
             }

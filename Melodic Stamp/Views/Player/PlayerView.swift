@@ -15,7 +15,7 @@ struct PlayerView: View {
 
     @Environment(WindowManagerModel.self) private var windowManager
     @Environment(PlayerModel.self) private var player
-    @Environment(PlayerKeyboardControlModel.self) private var playerKeyboardControl
+    @Environment(KeyboardControlModel.self) private var keyboardControl
     @Environment(AudioVisualizerModel.self) private var audioVisualizer
 
     // MARK: - Fields
@@ -161,7 +161,7 @@ struct PlayerView: View {
 
             Button {
                 player.playPreviousTrack()
-                playerKeyboardControl.previousSongButtonBounceAnimation.toggle()
+                keyboardControl.previousSongButtonBounceAnimation.toggle()
             } label: {
                 Image(systemSymbol: .backwardFill)
                     .font(.headline)
@@ -169,7 +169,7 @@ struct PlayerView: View {
             .disabled(!player.hasPreviousTrack)
             .symbolEffect(
                 .bounce,
-                value: playerKeyboardControl.previousSongButtonBounceAnimation
+                value: keyboardControl.previousSongButtonBounceAnimation
             )
             .matchedGeometryEffect(
                 id: PlayerNamespace.previousSongButton, in: namespace
@@ -179,7 +179,7 @@ struct PlayerView: View {
 
             Button {
                 player.isPlaying.toggle()
-                playerKeyboardControl.isPressingSpace = false
+                keyboardControl.isPressingSpace = false
             } label: {
                 player.playPauseImage
                     .font(.title)
@@ -187,10 +187,10 @@ struct PlayerView: View {
                     .frame(width: 20)
             }
             .scaleEffect(
-                playerKeyboardControl.isPressingSpace ? 0.75 : 1,
+                keyboardControl.isPressingSpace ? 0.75 : 1,
                 anchor: .center
             )
-            .animation(.bouncy, value: playerKeyboardControl.isPressingSpace)
+            .animation(.bouncy, value: keyboardControl.isPressingSpace)
             .matchedGeometryEffect(
                 id: PlayerNamespace.playPauseButton, in: namespace
             )
@@ -199,7 +199,7 @@ struct PlayerView: View {
 
             Button {
                 player.playNextTrack()
-                playerKeyboardControl.nextSongButtonBounceAnimation.toggle()
+                keyboardControl.nextSongButtonBounceAnimation.toggle()
             } label: {
                 Image(systemSymbol: .forwardFill)
                     .font(.headline)
@@ -207,7 +207,7 @@ struct PlayerView: View {
             .disabled(!player.hasNextTrack)
             .symbolEffect(
                 .bounce,
-                value: playerKeyboardControl.nextSongButtonBounceAnimation
+                value: keyboardControl.nextSongButtonBounceAnimation
             )
             .matchedGeometryEffect(
                 id: PlayerNamespace.nextSongButton, in: namespace
@@ -225,10 +225,10 @@ struct PlayerView: View {
         ProgressBar(
             value: $player.volume,
             isActive: $isVolumeBarActive,
-            externalOvershootSign: playerKeyboardControl.volumeBarExternalOvershootSign,
+            externalOvershootSign: keyboardControl.volumeBarExternalOvershootSign,
             onOvershootOffsetChange: { oldValue, newValue in
                 if oldValue <= 0, newValue > 0 {
-                    playerKeyboardControl.speakerButtonBounceAnimation.toggle()
+                    keyboardControl.speakerButtonBounceAnimation.toggle()
                 }
             }
         )
@@ -255,7 +255,7 @@ struct PlayerView: View {
         .buttonStyle(.alive(enabledStyle: .secondary))
         .disabled(!player.isPlayable)
         .symbolEffect(
-            .bounce, value: playerKeyboardControl.speakerButtonBounceAnimation
+            .bounce, value: keyboardControl.speakerButtonBounceAnimation
         )
         .matchedGeometryEffect(id: PlayerNamespace.volumeButton, in: namespace)
         .contextMenu {
@@ -303,7 +303,7 @@ struct PlayerView: View {
             value: $player.progress,
             isActive: $isProgressBarActive,
             isDelegated: true,
-            externalOvershootSign: playerKeyboardControl.progressBarExternalOvershootSign,
+            externalOvershootSign: keyboardControl.progressBarExternalOvershootSign,
             onPercentageChange: { _, newValue in
                 adjustmentPercentage = newValue
             }

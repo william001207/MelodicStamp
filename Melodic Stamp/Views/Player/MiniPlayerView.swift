@@ -40,7 +40,7 @@ struct MiniPlayerView: View {
     @Environment(WindowManagerModel.self) private var windowManager
     @Environment(FileManagerModel.self) private var fileManager
     @Environment(PlayerModel.self) private var player
-    @Environment(PlayerKeyboardControlModel.self) private var playerKeyboardControl
+    @Environment(KeyboardControlModel.self) private var keyboardControl
 
     @Environment(\.appearsActive) private var appearsActive
 
@@ -150,7 +150,7 @@ struct MiniPlayerView: View {
 
         // Handle [space / ⏎] -> toggle play / pause
         .onKeyPress(keys: [.space, .return], phases: .all) { key in
-            playerKeyboardControl.handlePlayPause(
+            keyboardControl.handlePlayPause(
                 phase: key.phase, modifiers: key.modifiers
             )
         }
@@ -161,11 +161,11 @@ struct MiniPlayerView: View {
 
             return switch activeControl {
             case .progress:
-                playerKeyboardControl.handleProgressAdjustment(
+                keyboardControl.handleProgressAdjustment(
                     phase: key.phase, modifiers: key.modifiers, sign: sign
                 )
             case .volume:
-                playerKeyboardControl.handleVolumeAdjustment(
+                keyboardControl.handleVolumeAdjustment(
                     phase: key.phase, modifiers: key.modifiers, sign: sign
                 )
             }
@@ -320,7 +320,7 @@ struct MiniPlayerView: View {
 
                 Button {
                     player.playPreviousTrack()
-                    playerKeyboardControl.previousSongButtonBounceAnimation
+                    keyboardControl.previousSongButtonBounceAnimation
                         .toggle()
                 } label: {
                     Image(systemSymbol: .backwardFill)
@@ -328,7 +328,7 @@ struct MiniPlayerView: View {
                 .disabled(!player.hasPreviousTrack)
                 .symbolEffect(
                     .bounce,
-                    value: playerKeyboardControl.previousSongButtonBounceAnimation
+                    value: keyboardControl.previousSongButtonBounceAnimation
                 )
                 .matchedGeometryEffect(
                     id: PlayerNamespace.previousSongButton, in: namespace
@@ -338,7 +338,7 @@ struct MiniPlayerView: View {
 
                 Button {
                     player.isPlaying.toggle()
-                    playerKeyboardControl.isPressingSpace = false
+                    keyboardControl.isPressingSpace = false
                 } label: {
                     player.playPauseImage
                         .font(.title2)
@@ -346,11 +346,11 @@ struct MiniPlayerView: View {
                         .frame(width: 16)
                 }
                 .scaleEffect(
-                    playerKeyboardControl.isPressingSpace ? 0.75 : 1,
+                    keyboardControl.isPressingSpace ? 0.75 : 1,
                     anchor: .center
                 )
                 .animation(
-                    .bouncy, value: playerKeyboardControl.isPressingSpace
+                    .bouncy, value: keyboardControl.isPressingSpace
                 )
                 .matchedGeometryEffect(
                     id: PlayerNamespace.playPauseButton, in: namespace
@@ -360,14 +360,14 @@ struct MiniPlayerView: View {
 
                 Button {
                     player.playNextTrack()
-                    playerKeyboardControl.nextSongButtonBounceAnimation.toggle()
+                    keyboardControl.nextSongButtonBounceAnimation.toggle()
                 } label: {
                     Image(systemSymbol: .forwardFill)
                 }
                 .disabled(!player.hasNextTrack)
                 .symbolEffect(
                     .bounce,
-                    value: playerKeyboardControl.nextSongButtonBounceAnimation
+                    value: keyboardControl.nextSongButtonBounceAnimation
                 )
                 .matchedGeometryEffect(
                     id: PlayerNamespace.nextSongButton, in: namespace
@@ -425,7 +425,7 @@ struct MiniPlayerView: View {
             .symbolEffect(.bounce, value: activeControl)
             .symbolEffect(
                 .bounce,
-                value: playerKeyboardControl.speakerButtonBounceAnimation
+                value: keyboardControl.speakerButtonBounceAnimation
             )
             .matchedGeometryEffect(
                 id: PlayerNamespace.volumeButton, in: namespace
@@ -497,13 +497,13 @@ struct MiniPlayerView: View {
                     isActive: $isProgressBarActive,
                     isDelegated: isProgressControlActive,
                     externalOvershootSign: isProgressControlActive
-                        ? playerKeyboardControl.progressBarExternalOvershootSign
-                        : playerKeyboardControl.volumeBarExternalOvershootSign
+                        ? keyboardControl.progressBarExternalOvershootSign
+                        : keyboardControl.volumeBarExternalOvershootSign
                 ) { _, newValue in
                     adjustmentPercentage = newValue
                 } onOvershootOffsetChange: { oldValue, newValue in
                     if isVolumeControlActive, oldValue <= 0, newValue > 0 {
-                        playerKeyboardControl.speakerButtonBounceAnimation.toggle()
+                        keyboardControl.speakerButtonBounceAnimation.toggle()
                     }
                 }
                 .disabled(!player.isPlayable)

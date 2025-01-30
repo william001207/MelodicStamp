@@ -10,7 +10,7 @@ import SwiftUI
 
 struct PlayerCommands: Commands {
     @FocusedValue(\.player) private var player
-    @FocusedValue(\.playerKeyboardControl) private var playerKeyboardControl
+    @FocusedValue(\.keyboardControl) private var keyboardControl
 
     var body: some Commands {
         CommandMenu("Player") {
@@ -23,14 +23,14 @@ struct PlayerCommands: Commands {
 
                 Group {
                     Button("Fast Forward") {
-                        playerKeyboardControl?.handleProgressAdjustment(
+                        keyboardControl?.handleProgressAdjustment(
                             phase: .all, sign: .plus
                         )
                     }
                     .keyboardShortcut(.rightArrow, modifiers: .command)
                     .modifierKeyAlternate(.shift) {
                         Button("Fast Forward") {
-                            playerKeyboardControl?.handleProgressAdjustment(
+                            keyboardControl?.handleProgressAdjustment(
                                 phase: .all, modifiers: .shift, sign: .plus
                             )
                         }
@@ -38,7 +38,7 @@ struct PlayerCommands: Commands {
                     }
                     .modifierKeyAlternate(.option) {
                         Button("Fast Forward") {
-                            playerKeyboardControl?.handleProgressAdjustment(
+                            keyboardControl?.handleProgressAdjustment(
                                 phase: .all, modifiers: .option, sign: .plus
                             )
                         }
@@ -46,14 +46,14 @@ struct PlayerCommands: Commands {
                     }
 
                     Button("Rewind") {
-                        playerKeyboardControl?.handleProgressAdjustment(
+                        keyboardControl?.handleProgressAdjustment(
                             phase: .all, sign: .minus
                         )
                     }
                     .keyboardShortcut(.leftArrow, modifiers: .command)
                     .modifierKeyAlternate(.shift) {
                         Button("Rewind") {
-                            playerKeyboardControl?.handleProgressAdjustment(
+                            keyboardControl?.handleProgressAdjustment(
                                 phase: .all, modifiers: .shift, sign: .minus
                             )
                         }
@@ -61,7 +61,7 @@ struct PlayerCommands: Commands {
                     }
                     .modifierKeyAlternate(.option) {
                         Button("Rewind") {
-                            playerKeyboardControl?.handleProgressAdjustment(
+                            keyboardControl?.handleProgressAdjustment(
                                 phase: .all, modifiers: .option, sign: .minus
                             )
                         }
@@ -87,14 +87,14 @@ struct PlayerCommands: Commands {
                     .keyboardShortcut("m", modifiers: [.command, .control])
 
                     Button("Louder") {
-                        playerKeyboardControl?.handleVolumeAdjustment(
+                        keyboardControl?.handleVolumeAdjustment(
                             phase: .all, sign: .plus
                         )
                     }
                     .keyboardShortcut(.upArrow, modifiers: .command)
                     .modifierKeyAlternate(.shift) {
                         Button("Louder") {
-                            playerKeyboardControl?.handleVolumeAdjustment(
+                            keyboardControl?.handleVolumeAdjustment(
                                 phase: .all, modifiers: .shift, sign: .plus
                             )
                         }
@@ -102,7 +102,7 @@ struct PlayerCommands: Commands {
                     }
                     .modifierKeyAlternate(.option) {
                         Button("Louder") {
-                            playerKeyboardControl?.handleVolumeAdjustment(
+                            keyboardControl?.handleVolumeAdjustment(
                                 phase: .all, modifiers: .option, sign: .plus
                             )
                         }
@@ -110,14 +110,14 @@ struct PlayerCommands: Commands {
                     }
 
                     Button("Quieter") {
-                        playerKeyboardControl?.handleVolumeAdjustment(
+                        keyboardControl?.handleVolumeAdjustment(
                             phase: .all, sign: .minus
                         )
                     }
                     .keyboardShortcut(.downArrow, modifiers: .command)
                     .modifierKeyAlternate(.shift) {
                         Button("Quieter") {
-                            playerKeyboardControl?.handleVolumeAdjustment(
+                            keyboardControl?.handleVolumeAdjustment(
                                 phase: .all, modifiers: .shift, sign: .minus
                             )
                         }
@@ -125,7 +125,7 @@ struct PlayerCommands: Commands {
                     }
                     .modifierKeyAlternate(.option) {
                         Button("Quieter") {
-                            playerKeyboardControl?.handleVolumeAdjustment(
+                            keyboardControl?.handleVolumeAdjustment(
                                 phase: .all, modifiers: .option, sign: .minus
                             )
                         }
@@ -200,7 +200,7 @@ struct PlayerCommands: Commands {
 
     private var hasPlayer: Bool { player != nil }
 
-    private var hasPlayerKeyboardControl: Bool { playerKeyboardControl != nil }
+    private var hasPlayerKeyboardControl: Bool { keyboardControl != nil }
 
     private var isPlayable: Bool { player?.isPlayable ?? false }
 

@@ -67,7 +67,7 @@ struct ContentView: View {
     @State private var windowManager: WindowManagerModel
     @State private var fileManager: FileManagerModel
     @State private var player: PlayerModel
-    @State private var playerKeyboardControl: PlayerKeyboardControlModel
+    @State private var keyboardControl: KeyboardControlModel
     @State private var metadataEditor: MetadataEditorModel
     @State private var audioVisualizer: AudioVisualizerModel
     @State private var gradientVisualizer: GradientVisualizerModel
@@ -92,7 +92,7 @@ struct ContentView: View {
         self.windowManager = WindowManagerModel(style: parameters.initialWindowStyle)
         self.fileManager = FileManagerModel(player: player)
         self.player = player
-        self.playerKeyboardControl = PlayerKeyboardControlModel(player: player)
+        self.keyboardControl = KeyboardControlModel(player: player)
         self.metadataEditor = MetadataEditorModel(player: player)
         self.audioVisualizer = AudioVisualizerModel()
         self.gradientVisualizer = GradientVisualizerModel()
@@ -187,7 +187,7 @@ struct ContentView: View {
         .environment(windowManager)
         .environment(fileManager)
         .environment(player)
-        .environment(playerKeyboardControl)
+        .environment(keyboardControl)
         .environment(metadataEditor)
         .environment(audioVisualizer)
         .environment(gradientVisualizer)
@@ -204,7 +204,7 @@ struct ContentView: View {
         .focusedValue(\.windowManager, windowManager)
         .focusedValue(\.fileManager, fileManager)
         .focusedValue(\.player, player)
-        .focusedValue(\.playerKeyboardControl, playerKeyboardControl)
+        .focusedValue(\.keyboardControl, keyboardControl)
         .focusedValue(\.metadataEditor, metadataEditor)
 
         // MARK: Navigation
@@ -379,7 +379,7 @@ struct ContentView: View {
                     .environment(windowManager)
                     .environment(fileManager)
                     .environment(player)
-                    .environment(playerKeyboardControl)
+                    .environment(keyboardControl)
                     .environment(metadataEditor)
                     .environment(audioVisualizer)
                     .environment(gradientVisualizer)
