@@ -9,20 +9,6 @@ import AppKit
 import Luminare
 import SFSafeSymbols
 import SwiftUI
-import SwiftUIScrollOffset
-
-private struct ScrollOffsetReader: View {
-    @ScrollOffset(.top, in: ...0) private var scrollOffset
-
-    @Binding var offset: CGFloat
-
-    var body: some View {
-        Color.clear
-            .onChange(of: scrollOffset, initial: true) { _, newValue in
-                offset = newValue
-            }
-    }
-}
 
 struct PlaylistView: View {
     // MARK: - Environments
@@ -36,11 +22,15 @@ struct PlaylistView: View {
     @Environment(\.luminareAnimation) private var animation
     @Environment(\.luminareAnimationFast) private var animationFast
 
+    @Namespace private var coordinateSpace
+
     // MARK: - Fields
 
     var namespace: Namespace.ID
 
     @State private var scrollOffset: CGFloat = .zero
+    @State private var containerSize: CGSize = .zero
+    @State private var contentSize: CGSize = .zero
     @State private var bounceAnimationTriggers: Set<Track> = []
 
     // MARK: - Body
@@ -66,11 +56,9 @@ struct PlaylistView: View {
                         .frame(height: minHeight)
                 }
             }
-            .background {
-                ScrollOffsetReader(offset: $scrollOffset)
-            }
             .listRowSeparator(.hidden)
             .selectionDisabled()
+            .contentOffset($scrollOffset, in: coordinateSpace)
 
             // MARK: Tracks
 
@@ -91,7 +79,17 @@ struct PlaylistView: View {
         }
         .scrollClipDisabled()
         .scrollContentBackground(.hidden)
-        .scrollOffsetID(.automatic)
+        .coordinateSpace(name: coordinateSpace)
+        .onScrollGeometryChange(for: CGSize.self) { proxy in
+            proxy.containerSize
+        } action: { _, newValue in
+            containerSize = newValue
+        }
+        .onScrollGeometryChange(for: CGSize.self) { proxy in
+            proxy.contentSize
+        } action: { _, newValue in
+            contentSize = newValue
+        }
         .overlay(alignment: .top) {
             // MARK: Controls
 
@@ -119,6 +117,7 @@ struct PlaylistView: View {
             .padding(.top, 8)
             .opacity(controlsOpacity)
             .blur(radius: lerp(2.5, 0, factor: controlsOpacity))
+            .animation(animationFast, value: controlsOpacity)
             .allowsHitTesting(controlsOpacity >= 0.1)
         }
         .animation(animationFast, value: player.playlist.mode)
@@ -206,11 +205,15 @@ struct PlaylistView: View {
     }
 
     private var controlsOpacity: CGFloat {
-        switch player.playlist.mode {
-        case .referenced:
+        if contentSize.height >= containerSize.height + metadataHeight {
+            switch player.playlist.mode {
+            case .referenced:
+                1.0
+            case .canonical:
+                max(0, min(1, -scrollOffset / (metadataHeight / 2)))
+            }
+        } else {
             1.0
-        case .canonical:
-            max(0, min(1, -scrollOffset / (metadataHeight / 2)))
         }
     }
 

@@ -12,6 +12,10 @@ extension View {
     func observeAnimation<Value: VectorArithmetic>(for observedValue: Value, onChange: ((Value) -> ())? = nil, onComplete: (() -> ())? = nil) -> some View {
         modifier(AnimationObserverModifier(for: observedValue, onChange: onChange, onComplete: onComplete))
     }
+
+    @ViewBuilder func contentOffset(_ offset: Binding<CGFloat>, in name: AnyHashable) -> some View {
+        modifier(ContentOffsetModifier(name: name, offset: offset))
+    }
 }
 
 extension View {
