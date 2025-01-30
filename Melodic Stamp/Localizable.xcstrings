@@ -951,6 +951,9 @@
         }
       }
     },
+    "Description" : {
+
+    },
     "Design, test, and development support." : {
       "localizations" : {
         "zh-Hans" : {
@@ -1953,6 +1956,9 @@
           }
         }
       }
+    },
+    "Playlist Information" : {
+
     },
     "Previous Track" : {
       "localizations" : {

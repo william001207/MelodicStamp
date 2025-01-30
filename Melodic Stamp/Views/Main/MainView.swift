@@ -64,6 +64,8 @@ struct MainView: View {
     }
 
     @ViewBuilder private func inspector() -> some View {
+        @Bindable var player = player
+
         Group {
             switch selectedInspectorTab {
             case .commonMetadata:
@@ -90,12 +92,25 @@ struct MainView: View {
                         }
                     }
             case .library:
-                InspectorLibraryView()
-                    .toolbar {
-                        if isInspectorPresented {
-                            LibraryToolbar()
+                Group {
+                    switch player.playlist.mode {
+                    case .referenced:
+                        InspectorLibraryView()
+                    case .canonical:
+                        VSplitView {
+                            InspectorPlaylistSegmentsView(segments: $player.playlistSegments)
+                                .frame(minHeight: 200)
+
+                            InspectorLibraryView()
+                                .frame(minHeight: 200)
                         }
                     }
+                }
+                .toolbar {
+                    if isInspectorPresented {
+                        LibraryToolbar()
+                    }
+                }
             case .analytics:
                 InspectorAnalyticsView()
             }

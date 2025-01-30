@@ -132,21 +132,25 @@ struct AdaptableMusicCoverControl: View {
     }
 
     @ViewBuilder private func imageView() -> some View {
-        let images: [NSImage] = if let binding = entries.projectedValue {
-            [AttachedPicture](binding.wrappedValue)
-                .filter { $0.type == type }
-                .compactMap(\.image)
-        } else { [] }
-
-        MusicCover(images: images, cornerRadius: 8)
-            .overlay {
-                if isModified {
-                    RoundedRectangle(cornerRadius: 8)
-                        .fill(.clear)
-                        .stroke(.tint, lineWidth: 4)
-                }
+        Group {
+            if
+                let binding = entries.projectedValue,
+                let image = [AttachedPicture](binding.wrappedValue)
+                .first(where: { $0.type == type })
+                .flatMap(\.image) {
+                MusicCover(images: [image], cornerRadius: 8)
+            } else {
+                MusicCover(cornerRadius: 8)
             }
-            .clipShape(.rect(cornerRadius: 8))
+        }
+        .overlay {
+            if isModified {
+                RoundedRectangle(cornerRadius: 8)
+                    .fill(.clear)
+                    .stroke(.tint, lineWidth: 4)
+            }
+        }
+        .clipShape(.rect(cornerRadius: 8))
     }
 
     private func registerUndo(_ oldValue: Set<AttachedPicture>, for entries: Entries) {
