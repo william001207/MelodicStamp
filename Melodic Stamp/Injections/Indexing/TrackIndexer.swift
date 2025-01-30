@@ -5,6 +5,7 @@
 //  Created by KrLite on 2025/1/29.
 //
 
+import Collections
 import Foundation
 
 struct TrackIndexer: Indexer {
@@ -14,7 +15,7 @@ struct TrackIndexer: Indexer {
     }
 
     // The keys are the file names, while the values are the path extensions
-    var value: [UUID: String] = [:]
+    var value: OrderedDictionary<UUID, String> = [:]
 }
 
 extension TrackIndexer {

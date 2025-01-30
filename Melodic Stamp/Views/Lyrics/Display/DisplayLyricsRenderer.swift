@@ -5,12 +5,13 @@
 //  Created by Xinshao_Air on 2024/12/25.
 //
 
+import Collections
 import SmartCache
 import SwiftUI
 
 struct DisplayLyricsGroupCache {
     typealias Key = [AnyHashable]
-    typealias Value = [(AnyHashable, [Text.Layout.RunSlice])]
+    typealias Value = OrderedDictionary<AnyHashable, [Text.Layout.RunSlice]>
     typealias Identifier = AnyHashable
 
     static var shared = Self()
@@ -25,19 +26,20 @@ struct DisplayLyricsGroupCache {
     func get<Animated>(
         key: [Animated],
         identifiedBy identifier: Identifier
-    ) -> [(Animated, [Text.Layout.RunSlice])]? where Animated: AnimatedString {
+    ) -> OrderedDictionary<Animated, [Text.Layout.RunSlice]>? where Animated: AnimatedString {
         let hashableKey = key.map(\.self)
         guard let pair = cache.value(forKey: hashableKey) else { return nil }
 
         guard pair.identifier == identifier else { return nil }
-        return pair.value as? [(Animated, [Text.Layout.RunSlice])]
+        return pair.value as? OrderedDictionary<Animated, [Text.Layout.RunSlice]>
     }
 
     mutating func set<Animated>(
-        key: [Animated], value: [(Animated, [Text.Layout.RunSlice])],
+        key: [Animated], value: OrderedDictionary<Animated, [Text.Layout.RunSlice]>,
         identifiedBy identifier: Identifier
     ) where Animated: AnimatedString {
         let hashableKey = key.map(\.self)
+        guard let value = value as? Value else { return }
         cache.insert((identifier, value), forKey: hashableKey)
     }
 }
@@ -75,10 +77,9 @@ struct DisplayLyricsRenderer<Animated>: TextRenderer where Animated: AnimatedStr
             .map { (abs($0), $1) }
     }
 
-    // Do not use [Animated: [Text.Layout.RunSlice]] as it does not preserve insertion order!!!
-    func group(layout: Text.Layout) -> [(Animated, [Text.Layout.RunSlice])] {
+    func group(layout: Text.Layout) -> OrderedDictionary<Animated, [Text.Layout.RunSlice]> {
         let slices = Array(layout.flattenedRunSlices)
-        var result: [(Animated, [Text.Layout.RunSlice])] = []
+        var result: OrderedDictionary<Animated, [Text.Layout.RunSlice]> = [:]
         var index = 0
 
         for string in strings {
@@ -86,7 +87,7 @@ struct DisplayLyricsRenderer<Animated>: TextRenderer where Animated: AnimatedStr
             let endIndex = index + count
             guard endIndex <= slices.endIndex else { break }
 
-            result.append((string, Array(slices[index ..< endIndex])))
+            result.updateValue(Array(slices[index ..< endIndex]), forKey: string)
             index = endIndex
         }
         return result
@@ -94,7 +95,7 @@ struct DisplayLyricsRenderer<Animated>: TextRenderer where Animated: AnimatedStr
 
     func draw(layout: Text.Layout, in context: inout GraphicsContext) {
         let identifier = layout.hashValue
-        var group: [(Animated, [Text.Layout.RunSlice])] = []
+        var group: OrderedDictionary<Animated, [Text.Layout.RunSlice]> = [:]
 
         if let cached = DisplayLyricsGroupCache.shared.get(key: strings, identifiedBy: identifier) {
             group = cached

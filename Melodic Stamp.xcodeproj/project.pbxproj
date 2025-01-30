@@ -10,6 +10,11 @@
 		2810E2452CFB169E006FF94A /* Morphed in Frameworks */ = {isa = PBXBuildFile; productRef = 2810E2442CFB169E006FF94A /* Morphed */; };
 		2845A9F72D08745900CD7517 /* SmartCache in Frameworks */ = {isa = PBXBuildFile; productRef = 2845A9F62D08745900CD7517 /* SmartCache */; };
 		287260F52D4B2EDD00D501FB /* SwiftUIScrollOffset in Frameworks */ = {isa = PBXBuildFile; productRef = 287260F42D4B2EDD00D501FB /* SwiftUIScrollOffset */; };
+		287261762D4BBC3000D501FB /* BitCollections in Frameworks */ = {isa = PBXBuildFile; productRef = 287261752D4BBC3000D501FB /* BitCollections */; };
+		287261782D4BBC3000D501FB /* Collections in Frameworks */ = {isa = PBXBuildFile; productRef = 287261772D4BBC3000D501FB /* Collections */; };
+		2872617A2D4BBC3000D501FB /* DequeModule in Frameworks */ = {isa = PBXBuildFile; productRef = 287261792D4BBC3000D501FB /* DequeModule */; };
+		2872617C2D4BBC3000D501FB /* HashTreeCollections in Frameworks */ = {isa = PBXBuildFile; productRef = 2872617B2D4BBC3000D501FB /* HashTreeCollections */; };
+		2872617E2D4BBC3000D501FB /* HeapModule in Frameworks */ = {isa = PBXBuildFile; productRef = 2872617D2D4BBC3000D501FB /* HeapModule */; };
 		28797B9A2D10724C00FB4395 /* SwiftUIIntrospect in Frameworks */ = {isa = PBXBuildFile; productRef = 28797B992D10724C00FB4395 /* SwiftUIIntrospect */; };
 		287F978D2CF3160700C60307 /* Luminare in Frameworks */ = {isa = PBXBuildFile; productRef = 287F978C2CF3160700C60307 /* Luminare */; };
 		65D940472D26671900F67AA6 /* MeshGradient in Frameworks */ = {isa = PBXBuildFile; productRef = 65D940462D26671900F67AA6 /* MeshGradient */; };
@@ -64,17 +69,22 @@
 			buildActionMask = 2147483647;
 			files = (
 				65D940492D26671900F67AA6 /* MeshGradientCHeaders in Frameworks */,
+				2872617E2D4BBC3000D501FB /* HeapModule in Frameworks */,
 				2810E2452CFB169E006FF94A /* Morphed in Frameworks */,
 				287260F52D4B2EDD00D501FB /* SwiftUIScrollOffset in Frameworks */,
 				65F1DAB32CEDBED700389E37 /* SFSafeSymbols in Frameworks */,
 				2845A9F72D08745900CD7517 /* SmartCache in Frameworks */,
 				65D940472D26671900F67AA6 /* MeshGradient in Frameworks */,
+				2872617C2D4BBC3000D501FB /* HashTreeCollections in Frameworks */,
 				28797B9A2D10724C00FB4395 /* SwiftUIIntrospect in Frameworks */,
 				287F978D2CF3160700C60307 /* Luminare in Frameworks */,
 				65F1DA9D2CEDBD8700389E37 /* Defaults in Frameworks */,
 				65F1DA8D2CED83F800389E37 /* FullDiskAccess in Frameworks */,
+				287261782D4BBC3000D501FB /* Collections in Frameworks */,
 				65DFF89D2CFC2A6F00285040 /* SwiftSoup in Frameworks */,
+				287261762D4BBC3000D501FB /* BitCollections in Frameworks */,
 				65EE5C9B2D1CEBD30026B8F1 /* DominantColors in Frameworks */,
+				2872617A2D4BBC3000D501FB /* DequeModule in Frameworks */,
 				65F1DA7D2CED77F100389E37 /* SFBAudioEngine in Frameworks */,
 				65F1DA842CED788D00389E37 /* CAAudioHardware in Frameworks */,
 			);
@@ -158,6 +168,11 @@
 				65D940462D26671900F67AA6 /* MeshGradient */,
 				65D940482D26671900F67AA6 /* MeshGradientCHeaders */,
 				287260F42D4B2EDD00D501FB /* SwiftUIScrollOffset */,
+				287261752D4BBC3000D501FB /* BitCollections */,
+				287261772D4BBC3000D501FB /* Collections */,
+				287261792D4BBC3000D501FB /* DequeModule */,
+				2872617B2D4BBC3000D501FB /* HashTreeCollections */,
+				2872617D2D4BBC3000D501FB /* HeapModule */,
 			);
 			productName = MelodicStamp;
 			productReference = 65F1DA012CECCEE900389E37 /* Melodic Stamp.app */;
@@ -207,6 +222,7 @@
 				65EE5C992D1CEBD30026B8F1 /* XCRemoteSwiftPackageReference "DominantColors" */,
 				65D940452D26671900F67AA6 /* XCRemoteSwiftPackageReference "MeshGradient" */,
 				287260F32D4B2EDD00D501FB /* XCRemoteSwiftPackageReference "SwiftUIScrollOffset" */,
+				287261742D4BBC3000D501FB /* XCRemoteSwiftPackageReference "swift-collections" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 65F1DA022CECCEE900389E37 /* Products */;
@@ -545,6 +561,14 @@
 				kind = branch;
 			};
 		};
+		287261742D4BBC3000D501FB /* XCRemoteSwiftPackageReference "swift-collections" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/apple/swift-collections.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.1.4;
+			};
+		};
 		28797B982D10724C00FB4395 /* XCRemoteSwiftPackageReference "swiftui-introspect" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/siteline/swiftui-introspect";
@@ -642,6 +666,31 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 287260F32D4B2EDD00D501FB /* XCRemoteSwiftPackageReference "SwiftUIScrollOffset" */;
 			productName = SwiftUIScrollOffset;
+		};
+		287261752D4BBC3000D501FB /* BitCollections */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 287261742D4BBC3000D501FB /* XCRemoteSwiftPackageReference "swift-collections" */;
+			productName = BitCollections;
+		};
+		287261772D4BBC3000D501FB /* Collections */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 287261742D4BBC3000D501FB /* XCRemoteSwiftPackageReference "swift-collections" */;
+			productName = Collections;
+		};
+		287261792D4BBC3000D501FB /* DequeModule */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 287261742D4BBC3000D501FB /* XCRemoteSwiftPackageReference "swift-collections" */;
+			productName = DequeModule;
+		};
+		2872617B2D4BBC3000D501FB /* HashTreeCollections */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 287261742D4BBC3000D501FB /* XCRemoteSwiftPackageReference "swift-collections" */;
+			productName = HashTreeCollections;
+		};
+		2872617D2D4BBC3000D501FB /* HeapModule */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 287261742D4BBC3000D501FB /* XCRemoteSwiftPackageReference "swift-collections" */;
+			productName = HeapModule;
 		};
 		28797B992D10724C00FB4395 /* SwiftUIIntrospect */ = {
 			isa = XCSwiftPackageProductDependency;

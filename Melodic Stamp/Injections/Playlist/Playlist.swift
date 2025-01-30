@@ -5,6 +5,7 @@
 //  Created by KrLite on 2025/1/27.
 //
 
+import Collections
 import Defaults
 import Foundation
 
@@ -162,7 +163,7 @@ extension Playlist {
 
 extension Playlist {
     private func captureIndices() -> TrackIndexer.Value {
-        Dictionary(
+        OrderedDictionary(
             uniqueKeysWithValues: tracks
                 .map(\.url)
                 .compactMap { url in
