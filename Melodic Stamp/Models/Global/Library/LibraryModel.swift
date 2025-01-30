@@ -93,7 +93,7 @@ extension LibraryModel {
     func remove(_ playlists: [Playlist]) {
         for playlist in playlists {
             self.playlists.removeAll { $0 == playlist }
-            try? Self.deleteTrack(at: playlist.possibleURL)
+            try? Self.deletePlaylist(at: playlist.possibleURL)
         }
 
         try? indexPlaylists(with: captureIndices())
