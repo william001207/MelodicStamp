@@ -141,18 +141,18 @@ extension PlayerModel {
     }
 
     var playbackMode: PlaybackMode {
-        get { playlistMetadataSegments.state.playbackMode }
-        set { playlistMetadataSegments.state.playbackMode = newValue }
+        get { playlistSegments.state.playbackMode }
+        set { playlistSegments.state.playbackMode = newValue }
     }
 
     var playbackLooping: Bool {
-        get { playlistMetadataSegments.state.playbackLooping }
-        set { playlistMetadataSegments.state.playbackLooping = newValue }
+        get { playlistSegments.state.playbackLooping }
+        set { playlistSegments.state.playbackLooping = newValue }
     }
 
     // MARK: Playlist
 
-    var playlistMetadataSegments: Playlist.Metadata.Segments {
+    var playlistSegments: Playlist.Segments {
         get { playlist.segments }
         set { playlist.segments = newValue }
     }
@@ -249,10 +249,10 @@ extension PlayerModel {
         if let updated = player.playbackTime {
             guard playbackTime != updated else { return }
             playbackTime = updated
-            playlistMetadataSegments.state.currentTrackElapsedTime = updated.elapsed
+            playlistSegments.state.currentTrackElapsedTime = updated.elapsed
         } else {
             playbackTime = nil
-            playlistMetadataSegments.state.currentTrackElapsedTime = .zero
+            playlistSegments.state.currentTrackElapsedTime = .zero
         }
     }
 

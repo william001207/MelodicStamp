@@ -28,43 +28,31 @@ extension Playlist {
     }
 }
 
-@MainActor @Observable class Playlist: @preconcurrency Identifiable {
+@MainActor @Observable class Playlist: Identifiable {
+    nonisolated let id: UUID
     private(set) var mode: Mode
-    private var metadata: Playlist.Metadata
     private var indexer: TrackIndexer
+    var segments: Segments
 
     private(set) var tracks: [Track] = []
 
     // Delegated variables
     // Must not have inlined getters and setters, otherwise causing UI glitches
 
-    var segments: Metadata.Segments = .init() {
-        didSet {
-            Task {
-                metadata.segments = segments
-            }
-        }
-    }
-
     var currentTrack: Track? {
         didSet {
             Task {
-                metadata.segments.state.currentTrackURL = currentTrack?.url
+                segments.state.currentTrackURL = currentTrack?.url
             }
         }
     }
 
     private func loadDelegatedVariables() {
-//        metadataSegments = metadata.segments
-//        currentTrack = tracks.first { $0.url == metadata.segments.state.currentTrackURL }
-    }
-
-    var id: UUID {
-        metadata.id
+        currentTrack = tracks.first { $0.url == segments.state.currentTrackURL }
     }
 
     var possibleURL: URL {
-        metadata.url
+        Self.url(forID: id)
     }
 
     var canonicalURL: URL? {
@@ -77,31 +65,32 @@ extension Playlist {
     }
 
     private init(
+        id: UUID,
         mode: Mode,
-        metadata: Playlist.Metadata
+        segments: Segments
     ) {
+        self.id = id
         self.mode = mode
-        self.metadata = metadata
-        self.indexer = .init(playlistID: metadata.id)
+        self.segments = segments
+        self.indexer = .init(playlistID: id)
         loadDelegatedVariables()
     }
 
     convenience init?(loadingWith id: UUID) async {
-        guard let metadata = try? await Playlist.Metadata(readingFromPlaylistID: id) else { return nil }
-        self.init(mode: .canonical, metadata: metadata)
+        let url = Self.url(forID: id)
+        guard let segments = try? await Segments(loadingFrom: url) else { return nil }
+        self.init(id: id, mode: .canonical, segments: segments)
 
-        logger.info("Loaded canonical playlist from \(metadata.url)")
+        logger.info("Loaded canonical playlist from \(url)")
     }
 
     func makeCanonical() async {
-        guard !mode.isCanonical else { return }
+        guard let url = canonicalURL else { return }
         // Migrates to a new canonical playlist
-
-        let url = metadata.url
 
         do {
             try FileManager.default.createDirectory(at: url, withIntermediateDirectories: true)
-            try metadata.write(segments: Playlist.Metadata.Segment.allCases)
+            try write(segments: Segment.allCases)
         } catch {
             return
         }
@@ -114,13 +103,13 @@ extension Playlist {
             guard let migratedTrack = try? await migrateTrack(from: track) else { continue }
             migratedTracks.append(migratedTrack)
 
-            let wasCurrentTrack = track.url == metadata.segments.state.currentTrackURL
+            let wasCurrentTrack = track.url == segments.state.currentTrackURL
             if wasCurrentTrack {
                 migratedCurrentTrackURL = migratedTrack.url
             }
         }
 
-        metadata.segments.state.currentTrackURL = migratedCurrentTrackURL
+        segments.state.currentTrackURL = migratedCurrentTrackURL
         clearPlaylist()
         add(migratedTracks)
         loadDelegatedVariables()
@@ -130,8 +119,9 @@ extension Playlist {
 
     static func referenced(bindingTo id: UUID = .init()) -> Playlist {
         .init(
+            id: id,
             mode: .referenced,
-            metadata: .blank(bindingTo: id)
+            segments: .init()
         )
     }
 }
@@ -140,7 +130,6 @@ extension Playlist: @preconcurrency Hashable {
     func hash(into hasher: inout Hasher) {
         hasher.combine(id)
         hasher.combine(mode)
-        hasher.combine(metadata)
         hasher.combine(tracks)
     }
 }
@@ -162,6 +151,12 @@ extension Playlist: @preconcurrency Sequence {
 
     var count: Int {
         tracks.count
+    }
+}
+
+extension Playlist {
+    static func url(forID id: UUID) -> URL {
+        URL.playlists.appending(component: id.uuidString, directoryHint: .isDirectory)
     }
 }
 
@@ -191,8 +186,22 @@ extension Playlist {
 }
 
 extension Playlist {
-    func writeMetadata(segments: [Metadata.Segment] = Metadata.Segment.allCases) throws {
-        try metadata.write(segments: segments)
+    func write(segments: [Playlist.Segment] = Playlist.Segment.allCases) throws {
+        guard !segments.isEmpty, let url = canonicalURL else { return }
+
+        for segment in segments {
+            let data = switch segment {
+            case .info:
+                try JSONEncoder().encode(self.segments.info)
+            case .state:
+                try JSONEncoder().encode(self.segments.state)
+            case .artwork:
+                try JSONEncoder().encode(self.segments.artwork)
+            }
+            try Segments.write(segment: segment, ofData: data, toDirectory: url)
+        }
+
+        logger.info("Successfully written playlist metadata segments \(segments) for playlist at \(url)")
     }
 }
 
@@ -225,7 +234,7 @@ extension Playlist {
     }
 
     private var nextIndex: Int? {
-        switch metadata.segments.state.playbackMode {
+        switch segments.state.playbackMode {
         case .sequential:
             guard let currentIndex else { return nil }
             let nextIndex = currentIndex + 1
@@ -241,7 +250,7 @@ extension Playlist {
     }
 
     private var previousIndex: Int? {
-        switch metadata.segments.state.playbackMode {
+        switch segments.state.playbackMode {
         case .sequential:
             guard let currentIndex else { return nil }
             let previousIndex = currentIndex - 1
@@ -284,13 +293,13 @@ extension Playlist {
     }
 
     private func createFolder() throws {
-        try FileManager.default.createDirectory(at: metadata.url, withIntermediateDirectories: true)
+        try FileManager.default.createDirectory(at: possibleURL, withIntermediateDirectories: true)
     }
 
     private func generateCanonicalURL(for url: URL) -> URL {
         guard !Self.isCanonical(url: url) else { return url }
         let trackID = UUID()
-        return metadata.url
+        return possibleURL
             .appending(component: trackID.uuidString, directoryHint: .notDirectory)
             .appendingPathExtension(url.pathExtension)
     }

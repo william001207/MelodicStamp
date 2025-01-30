@@ -20,30 +20,30 @@ struct DelegatedPlaylistMetadataStorage: View {
 
     @ViewBuilder private func infoObservations() -> some View {
         Color.clear
-            .onChange(of: player.playlistMetadataSegments.info) { _, _ in
+            .onChange(of: player.playlistSegments.info) { _, _ in
                 guard player.playlist.mode.isCanonical else { return }
                 Task.detached {
-                    try await player.playlist.writeMetadata(segments: [.info])
+                    try await player.playlist.write(segments: [.info])
                 }
             }
     }
 
     @ViewBuilder private func stateObservations() -> some View {
         Color.clear
-            .onChange(of: player.playlistMetadataSegments.state) { _, _ in
+            .onChange(of: player.playlistSegments.state) { _, _ in
                 guard player.playlist.mode.isCanonical else { return }
                 Task.detached {
-                    try await player.playlist.writeMetadata(segments: [.state])
+                    try await player.playlist.write(segments: [.state])
                 }
             }
     }
 
     @ViewBuilder private func artworkObservations() -> some View {
         Color.clear
-            .onChange(of: player.playlistMetadataSegments.artwork) { _, _ in
+            .onChange(of: player.playlistSegments.artwork) { _, _ in
                 guard player.playlist.mode.isCanonical else { return }
                 Task.detached {
-                    try await player.playlist.writeMetadata(segments: [.artwork])
+                    try await player.playlist.write(segments: [.artwork])
                 }
             }
     }

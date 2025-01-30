@@ -150,7 +150,7 @@ struct DelegatedPlaylistStorage: View {
             }
             player.addToPlaylist(urls)
 
-            player.playlistMetadataSegments.state = .init(
+            player.playlistSegments.state = .init(
                 currentTrackURL: currentTrackURL,
                 currentTrackElapsedTime: currentTrackElapsedTime,
                 playbackMode: playbackMode,
