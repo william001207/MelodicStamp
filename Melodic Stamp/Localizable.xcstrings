@@ -951,9 +951,6 @@
         }
       }
     },
-    "Description" : {
-
-    },
     "Design, test, and development support." : {
       "localizations" : {
         "zh-Hans" : {
@@ -1957,7 +1954,10 @@
         }
       }
     },
-    "Playlist Information" : {
+    "Playlist Description" : {
+
+    },
+    "Playlist Title" : {
 
     },
     "Previous Track" : {
@@ -2434,6 +2434,7 @@
       }
     },
     "Unknown Playlist" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {

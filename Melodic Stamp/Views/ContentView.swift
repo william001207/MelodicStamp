@@ -126,8 +126,8 @@ struct ContentView: View {
             }
             .background {
                 FileImporters()
-//                DelegatedPlaylistStorage()
-//                DelegatedPlaylistMetadataStorage()
+                DelegatedPlaylistStorage()
+                DelegatedPlaylistStateStorage()
             }
 
             // MARK: Window Styling

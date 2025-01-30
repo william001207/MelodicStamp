@@ -92,25 +92,12 @@ struct MainView: View {
                         }
                     }
             case .library:
-                Group {
-                    switch player.playlist.mode {
-                    case .referenced:
-                        InspectorLibraryView()
-                    case .canonical:
-                        VSplitView {
-                            InspectorPlaylistSegmentsView(segments: $player.playlistSegments)
-                                .frame(minHeight: 200)
-
-                            InspectorLibraryView()
-                                .frame(minHeight: 200)
+                InspectorLibraryView()
+                    .toolbar {
+                        if isInspectorPresented {
+                            LibraryToolbar()
                         }
                     }
-                }
-                .toolbar {
-                    if isInspectorPresented {
-                        LibraryToolbar()
-                    }
-                }
             case .analytics:
                 InspectorAnalyticsView()
             }

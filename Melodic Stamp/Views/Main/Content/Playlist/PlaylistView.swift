@@ -42,18 +42,21 @@ struct PlaylistView: View {
 
         List(selection: $player.selectedTracks) {
             Group {
+                // MARK: Controls Placeholder
+
+                // This is much more stable than `.contentMargins()`
+                Spacer()
+                    .frame(height: minHeight)
+
                 if player.playlist.mode.isCanonical {
                     // MARK: Metadata
 
-                    PlaylistMetadataView(playlist: player.playlist)
-                        .frame(height: metadataHeight)
-                        .padding(.horizontal)
-                } else {
-                    // MARK: Controls Placeholder
-
-                    // This is much more stable than `.contentMargins()`
-                    Spacer()
-                        .frame(height: minHeight)
+                    PlaylistMetadataView(
+                        playlist: player.playlist,
+                        segments: $player.playlistSegments
+                    )
+                    .frame(height: metadataHeight)
+                    .padding(.horizontal)
                 }
             }
             .listRowSeparator(.hidden)
