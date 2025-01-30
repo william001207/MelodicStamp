@@ -19,7 +19,6 @@ struct PlaylistMetadataView: View {
         HStack(spacing: 25) {
             if hasArtwork {
                 artworkView()
-                    .motionCard(scale: 1.02, angle: .degrees(5))
             }
 
             VStack(alignment: .leading) {
@@ -27,6 +26,7 @@ struct PlaylistMetadataView: View {
                     .font(.title)
 
                 descriptionView()
+                    .foregroundStyle(.secondary)
             }
         }
         .frame(height: 250)
@@ -38,7 +38,7 @@ struct PlaylistMetadataView: View {
 
     @ViewBuilder private func artworkView() -> some View {
         if let artwork = playlist.segments.artwork.image {
-            MusicCover(images: [artwork], cornerRadius: 4)
+            MusicCover(images: [artwork], cornerRadius: 4, hasMotion: true)
                 .frame(width: 200, height: 200)
                 .contentTransition(.symbolEffect(.replace))
         }
@@ -65,12 +65,15 @@ struct PlaylistMetadataView: View {
                     Button {
                         NSWorkspace.shared.activateFileViewerSelecting([playlist.possibleURL])
                     } label: {
-                        Group {
-                            Image(systemSymbol: .folder)
-
+                        HStack {
                             if let creationDate = try? playlist.possibleURL.attribute(.creationDate) as? Date {
-                                Text(creationDate.formatted())
+                                Text(creationDate.formatted(
+                                    date: .complete,
+                                    time: .standard
+                                ))
                             }
+
+                            Image(systemSymbol: .folder)
                         }
                         .foregroundStyle(.placeholder)
                     }

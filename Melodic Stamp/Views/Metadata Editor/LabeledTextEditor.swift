@@ -293,7 +293,9 @@ struct LabeledTextEditor<Label, Actions, V>: View where Label: View, Actions: Vi
         @Environment(MetadataEditorModel.self) private var metadataEditor
 
         var body: some View {
-            LabeledTextEditor("Editor", entries: metadataEditor[extracting: \.lyrics]) {
+            LabeledTextEditor(entries: metadataEditor[extracting: \.lyrics]) {
+                Text(verbatim: "Editor")
+            } actions: {
                 Image(systemSymbol: .info)
             }
         }

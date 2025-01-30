@@ -1,9 +1,6 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-    "" : {
-
-    },
     "--:--" : {
       "shouldTranslate" : false
     },
@@ -17,11 +14,51 @@
         }
       }
     },
-    "%@" : {
-
-    },
     "%lld tracks" : {
-
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld track"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "new",
+                  "value" : "%lld tracks"
+                }
+              },
+              "zero" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "No tracks"
+                }
+              }
+            }
+          }
+        },
+        "zh-Hans" : {
+          "variations" : {
+            "plural" : {
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld首音乐"
+                }
+              },
+              "zero" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "无音乐"
+                }
+              }
+            }
+          }
+        }
+      }
     },
     "%lld words" : {
       "localizations" : {
@@ -132,7 +169,14 @@
       }
     },
     "Add to Library" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "保存至资源库"
+          }
+        }
+      }
     },
     "Add to Playlist" : {
       "localizations" : {
@@ -924,17 +968,6 @@
         }
       }
     },
-    "Dismiss" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "关闭"
-          }
-        }
-      }
-    },
     "Displays the information of the currently playing track as window title." : {
       "localizations" : {
         "zh-Hans" : {
@@ -946,7 +979,14 @@
       }
     },
     "Done" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "完成"
+          }
+        }
+      }
     },
     "During Performance" : {
       "localizations" : {
@@ -1199,9 +1239,6 @@
         }
       }
     },
-    "Editor" : {
-
-    },
     "Ethereal" : {
       "localizations" : {
         "zh-Hans" : {
@@ -1419,7 +1456,14 @@
       }
     },
     "Library" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "资源库"
+          }
+        }
+      }
     },
     "Load from File" : {
       "localizations" : {
@@ -2091,7 +2135,14 @@
       }
     },
     "Reveal in Finder" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "在访达中显示"
+          }
+        }
+      }
     },
     "Review your changes before closing." : {
       "localizations" : {
@@ -2364,10 +2415,24 @@
       }
     },
     "Unknown Music" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "未知音乐"
+          }
+        }
+      }
     },
     "Unknown Playlist" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "未知播放列表"
+          }
+        }
+      }
     },
     "Unsaved Changes" : {
       "localizations" : {

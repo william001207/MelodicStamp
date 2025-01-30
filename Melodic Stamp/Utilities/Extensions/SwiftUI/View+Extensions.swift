@@ -51,7 +51,9 @@ extension View {
         edge: VerticalEdge, material: Material = .regular,
         @ViewBuilder attachment: @escaping () -> some View
     ) -> some View {
-        modifier(PresentationAttachmentBarModifier("", edge: edge, material: material, attachment: attachment))
+        modifier(PresentationAttachmentBarModifier(edge: edge, material: material, attachment: attachment) {
+            EmptyView()
+        })
     }
 }
 
