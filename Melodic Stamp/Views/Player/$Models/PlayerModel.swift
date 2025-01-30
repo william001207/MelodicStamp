@@ -216,7 +216,6 @@ extension PlayerModel {
         guard !playlist.mode.isCanonical else { return }
         if mode.isCanonical, let playlist = await Playlist(loadingWith: id) {
             self.playlist = playlist
-            try? await playlist.refresh()
         } else {
             playlist = .referenced(bindingTo: id)
         }

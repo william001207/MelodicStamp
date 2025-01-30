@@ -126,7 +126,8 @@ struct ContentView: View {
             }
             .background {
                 FileImporters()
-                DelegatedPlayerStorage()
+                DelegatedPlaylistStorage()
+                DelegatedPlaylistMetadataStorage()
             }
 
             // MARK: Window Styling
@@ -339,6 +340,7 @@ struct ContentView: View {
                     logger.info("Created window from referenced URLs: \(urls)")
                 case let .canonical(id):
                     await player.bindTo(parameters.id, mode: .canonical)
+                    await player.playlist.refresh()
 
                     logger.info("Created window with canonical ID: \(id)")
                 }

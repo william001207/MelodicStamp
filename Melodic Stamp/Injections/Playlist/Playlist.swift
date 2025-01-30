@@ -161,7 +161,7 @@ extension Playlist {
         try indexer.write()
     }
 
-    func refresh() async throws {
+    func refresh() async {
         guard mode.isCanonical else { return }
         indexer.value = indexer.read() ?? [:]
         await tracks = indexer.loadTracks()

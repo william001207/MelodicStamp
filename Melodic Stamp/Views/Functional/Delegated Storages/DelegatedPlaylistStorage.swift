@@ -1,5 +1,5 @@
 //
-//  DelegatedPlayerStorage.swift
+//  DelegatedPlaylistStorage.swift
 //  MelodicStamp
 //
 //  Created by KrLite on 2025/1/12.
@@ -8,9 +8,9 @@
 import Defaults
 import SwiftUI
 
-extension DelegatedPlayerStorage: TypeNameReflectable {}
+extension DelegatedPlaylistStorage: TypeNameReflectable {}
 
-extension DelegatedPlayerStorage {
+extension DelegatedPlaylistStorage {
     enum DelegatedPlaylist: Equatable, Hashable, Codable {
         case handled
         case unhandled(
@@ -23,7 +23,7 @@ extension DelegatedPlayerStorage {
     }
 }
 
-struct DelegatedPlayerStorage: View {
+struct DelegatedPlaylistStorage: View {
     @Environment(PlayerModel.self) private var player
 
     // MARK: Storages
@@ -73,6 +73,10 @@ struct DelegatedPlayerStorage: View {
                         try await restorePlaylist(from: data)
 
                         logger.log("Successfully restored playlist")
+
+                        #if DEBUG
+                            await dump(playlist)
+                        #endif
 
                         Task { @MainActor in
                             // Dependents

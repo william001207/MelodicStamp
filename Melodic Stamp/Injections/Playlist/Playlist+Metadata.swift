@@ -65,8 +65,11 @@ extension Playlist {
             self.state = try await JSONDecoder().decode(State.self, from: Self.read(segment: .state, fromDirectory: url))
             self.artwork = try await JSONDecoder().decode(Artwork.self, from: Self.read(segment: .artwork, fromDirectory: url))
 
-            logger.info("Successfully read playlist information for playlist at \(url)")
-            dump(self)
+            logger.info("Successfully read playlist metadata for playlist at \(url)")
+
+            #if DEBUG
+                dump(self)
+            #endif
         }
     }
 }
@@ -99,7 +102,7 @@ extension Playlist.Metadata {
             try Self.write(segment: segment, ofData: data, toDirectory: url)
         }
 
-        logger.info("Successfully wrote playlist information segments \(segments) for playlist at \(url)")
+        logger.info("Successfully written playlist metadata segments \(segments) for playlist at \(url)")
     }
 }
 
