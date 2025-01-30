@@ -53,10 +53,11 @@ extension LibraryModel {
         isLoadingPlaylists = true
         loadIndexer()
 
-        playlists.removeAll()
+        var playlists: [Playlist] = []
         for await playlist in indexer.loadPlaylists() {
             playlists.append(playlist)
         }
+        self.playlists = playlists
         isLoadingPlaylists = false
     }
 }

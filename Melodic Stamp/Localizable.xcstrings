@@ -14,7 +14,10 @@
         }
       }
     },
-    "%lld tracks" : {
+    "%@" : {
+      "shouldTranslate" : false
+    },
+    "%lld Tracks" : {
       "localizations" : {
         "en" : {
           "variations" : {
@@ -22,19 +25,19 @@
               "one" : {
                 "stringUnit" : {
                   "state" : "translated",
-                  "value" : "%lld track"
+                  "value" : "%lld Track"
                 }
               },
               "other" : {
                 "stringUnit" : {
                   "state" : "new",
-                  "value" : "%lld tracks"
+                  "value" : "%lld Tracks"
                 }
               },
               "zero" : {
                 "stringUnit" : {
                   "state" : "translated",
-                  "value" : "No tracks"
+                  "value" : "No Tracks"
                 }
               }
             }
@@ -62,10 +65,34 @@
     },
     "%lld words" : {
       "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld word"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "new",
+                  "value" : "%lld words"
+                }
+              }
+            }
+          }
+        },
         "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld个字"
+          "variations" : {
+            "plural" : {
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld个字"
+                }
+              }
+            }
           }
         }
       }
@@ -298,20 +325,37 @@
         }
       }
     },
-    "App: (Subtitle) Songs" : {
+    "App: (Subtitle) Tracks" : {
       "comment" : "The subtitle displayed when there are songs in the playlist and nothing is playing",
-      "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "%lld Songs"
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "%lld Tracks"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "new",
+                  "value" : "%lld Tracks"
+                }
+              }
+            }
           }
         },
         "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld首歌曲"
+          "variations" : {
+            "plural" : {
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld首音乐"
+                }
+              }
+            }
           }
         }
       }
@@ -357,7 +401,14 @@
       }
     },
     "Asks for information when creating a new playlist" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "在创建新播放列表时要求填写信息"
+          }
+        }
+      }
     },
     "Attachments & Type Size" : {
       "localizations" : {
@@ -892,15 +943,11 @@
       }
     },
     "Control %@'s behaviors." : {
-
-    },
-    "Control what %@ should do when launching from a previous interruption." : {
-      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "控制%@在打断后再次启动时的行为。"
+            "value" : "控制%@的行为。"
           }
         }
       }
@@ -926,7 +973,14 @@
       }
     },
     "Created at %@" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "创建于%@"
+          }
+        }
+      }
     },
     "Customize how lyrics are displayed in the leaflet page." : {
       "localizations" : {
@@ -1300,7 +1354,14 @@
       }
     },
     "File not found." : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "未找到文件。"
+          }
+        }
+      }
     },
     "Forming New Playlist" : {
       "localizations" : {
@@ -1413,7 +1474,14 @@
       }
     },
     "Invalid format." : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "无效格式。"
+          }
+        }
+      }
     },
     "ISRC" : {
       "localizations" : {
@@ -1962,13 +2030,34 @@
       }
     },
     "Playlist Description" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "播放列表描述"
+          }
+        }
+      }
     },
     "Playlist Information" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "播放列表信息"
+          }
+        }
+      }
     },
     "Playlist Title" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "播放列表标题"
+          }
+        }
+      }
     },
     "Previous Track" : {
       "localizations" : {
@@ -2021,7 +2110,14 @@
       }
     },
     "Reading permission not granted." : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "未给予读取权限。"
+          }
+        }
+      }
     },
     "Recording ID" : {
       "localizations" : {
@@ -2109,50 +2205,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "恢复元数据"
-          }
-        }
-      }
-    },
-    "Restores playback modes for each window" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "为每个窗口恢复播放模式"
-          }
-        }
-      }
-    },
-    "Restores playback positions" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "恢复进度"
-          }
-        }
-      }
-    },
-    "Restores playback volumes" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "恢复音量"
-          }
-        }
-      }
-    },
-    "Restores playlists for each window" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "为每个窗口恢复播放列表"
           }
         }
       }
@@ -2447,17 +2499,6 @@
         }
       }
     },
-    "Unknown Playlist" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "未知播放列表"
-          }
-        }
-      }
-    },
     "Unsaved Changes" : {
       "localizations" : {
         "zh-Hans" : {
@@ -2529,7 +2570,14 @@
       }
     },
     "Writing permission not granted." : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "未给予写入权限。"
+          }
+        }
+      }
     },
     "You can use [AMLL TTML Tool](https://steve-xmh.github.io/amll-ttml-tool) to create TTML lyrics through a refined interface." : {
       "localizations" : {

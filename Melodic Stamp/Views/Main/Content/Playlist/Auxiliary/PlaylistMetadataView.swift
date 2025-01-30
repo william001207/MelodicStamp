@@ -119,7 +119,7 @@ struct PlaylistMetadataView: View {
                         }
                         .buttonStyle(.alive)
                     } else {
-                        Text("\(playlist.tracks.count) tracks")
+                        Text("\(playlist.tracks.count) Tracks")
                     }
                 }
                 .font(.body)

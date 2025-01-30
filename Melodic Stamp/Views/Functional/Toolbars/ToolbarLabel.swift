@@ -31,7 +31,7 @@ struct ToolbarImageLabel: View {
     var body: some View {
         ToolbarLabel {
             // Text interpolation is used to obtain the button border
-            Text(verbatim: "\(Image(systemSymbol: systemSymbol))")
+            Text("\(Image(systemSymbol: systemSymbol))")
                 .baselineOffset(-1)
                 .frame(width: 14)
         }

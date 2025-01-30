@@ -9,6 +9,7 @@ import Luminare
 import SwiftUI
 
 struct LibraryItemView: View {
+    @Environment(LibraryModel.self) private var library
     @Environment(PlayerModel.self) private var player
 
     @Environment(\.openWindow) private var openWindow
@@ -61,7 +62,8 @@ struct LibraryItemView: View {
                 }
             }
         }
-        .foregroundStyle(isOpened ? AnyShapeStyle(.tint) : AnyShapeStyle(.primary))
+        .foregroundStyle(isOpened && !isSelected ? AnyShapeStyle(.tint) : AnyShapeStyle(.primary))
+        .redacted(reason: library.isLoadingPlaylists ? .placeholder : [])
         .frame(height: 50)
         .padding(6)
         .padding(.trailing, -1)
