@@ -12,14 +12,14 @@ extension DelegatedPlaylistStorage: TypeNameReflectable {}
 
 extension DelegatedPlaylistStorage {
     enum DelegatedPlaylist: Equatable, Hashable, Codable {
-        case handled
-        case unhandled(
+        case referenced(
             bookmarks: [Data],
             currentTrackURL: URL?,
             currentTrackElapsedTime: TimeInterval,
             playbackMode: PlaybackMode,
             playbackLooping: Bool
         )
+        case canonical(UUID)
     }
 }
 
@@ -136,9 +136,7 @@ struct DelegatedPlaylistStorage: View {
     private func restorePlaylist(from data: Data) async throws {
         guard let delegatedPlaylist = try? JSONDecoder().decode(DelegatedPlaylist.self, from: data) else { return }
         switch delegatedPlaylist {
-        case .handled:
-            break
-        case let .unhandled(bookmarks, currentTrackURL, currentTrackElapsedTime, playbackMode, playbackLooping):
+        case let .referenced(bookmarks, currentTrackURL, currentTrackElapsedTime, playbackMode, playbackLooping):
             guard !player.playlist.mode.isCanonical else { break }
 
             var urls: [URL] = []
@@ -156,6 +154,15 @@ struct DelegatedPlaylistStorage: View {
                 playbackMode: playbackMode,
                 playbackLooping: playbackLooping
             )
+        case let .canonical(id):
+            switch player.playlist.mode {
+            case .canonical:
+                // Already handled by `ContentView`
+                break
+            case .referenced:
+                await player.bindTo(id, mode: .canonical)
+                await player.playlist.loadTracks()
+            }
         }
     }
 
@@ -163,13 +170,13 @@ struct DelegatedPlaylistStorage: View {
         let delegatedPlaylist: DelegatedPlaylist
         switch playlist.mode {
         case .canonical:
-            delegatedPlaylist = .handled
+            delegatedPlaylist = .canonical(playlist.id)
         case .referenced:
             let bookmarks: [Data] = try playlist.map(\.url).compactMap { url in
                 try url.bookmarkData(options: [])
             }
 
-            delegatedPlaylist = .unhandled(
+            delegatedPlaylist = .referenced(
                 bookmarks: bookmarks,
                 currentTrackURL: playlist.segments.state.currentTrackURL,
                 currentTrackElapsedTime: playlist.segments.state.currentTrackElapsedTime,

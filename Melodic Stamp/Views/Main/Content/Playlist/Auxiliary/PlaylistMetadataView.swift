@@ -124,8 +124,6 @@ struct PlaylistMetadataView: View {
                 }
                 .font(.body)
                 .foregroundStyle(.placeholder)
-                .shadow(radius: 10)
-                .fixedSize()
             }
         }
         .animation(animationFast, value: isTitleHovering)
