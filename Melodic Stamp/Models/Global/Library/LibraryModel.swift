@@ -11,9 +11,11 @@ import SwiftUI
     private(set) var playlists: [Playlist] = []
     private(set) var indexer: PlaylistIndexer = .init()
 
+    private(set) var isLoadingPlaylists: Bool = false
+
     init() {
-        Task.detached {
-            await self.loadIndexer()
+        Task {
+            loadIndexer()
         }
     }
 }
@@ -47,12 +49,15 @@ extension LibraryModel {
     }
 
     func loadPlaylists() async {
+        guard !isLoadingPlaylists else { return }
+        isLoadingPlaylists = true
         loadIndexer()
 
         playlists.removeAll()
         for await playlist in indexer.loadPlaylists() {
             playlists.append(playlist)
         }
+        isLoadingPlaylists = false
     }
 }
 

@@ -31,10 +31,12 @@ extension Playlist {
 @MainActor @Observable class Playlist: Identifiable {
     nonisolated let id: UUID
     private(set) var mode: Mode
-    private(set) var indexer: TrackIndexer
     var segments: Segments
 
+    private(set) var indexer: TrackIndexer
     private(set) var tracks: [Track] = []
+
+    private(set) var isLoadingTracks: Bool = false
 
     // Delegated variables
     // Must not have inlined getters and setters, otherwise causing UI glitches
@@ -183,12 +185,15 @@ extension Playlist {
 
     func loadTracks() async {
         guard mode.isCanonical else { return }
+        guard !isLoadingTracks else { return }
+        isLoadingTracks = true
         loadIndexer()
 
         tracks.removeAll()
         for await track in indexer.loadTracks() {
             tracks.append(track)
         }
+        isLoadingTracks = false
     }
 }
 
@@ -328,18 +333,24 @@ extension Playlist {
         first(where: { $0.url == url })
     }
 
-    func getOrCreateTrack(at url: URL) -> Track? {
-        if let track = getTrack(at: url) {
-            track
-        } else {
-            switch mode {
-            case .referenced:
-                Track(loadingFrom: url)
-            case .canonical:
-                if let track = Track(loadingFrom: url) {
-                    try? migrateTrack(from: track)
-                } else {
-                    nil
+    func getOrCreateTrack(at url: URL) async -> Track? {
+        await withCheckedContinuation { continuation in
+            if let track = getTrack(at: url) {
+                continuation.resume(returning: track)
+            } else {
+                switch mode {
+                case .referenced:
+                    continuation.resume(returning: Track(loadingFrom: url))
+                case .canonical:
+                    var track: Track?
+                    if let loadedTrack = Track(loadingFrom: url, completion: {
+                        guard let track else { return continuation.resume(returning: nil) }
+                        continuation.resume(returning: try? self.migrateTrack(from: track))
+                    }) {
+                        track = loadedTrack
+                    } else {
+                        continuation.resume(returning: nil)
+                    }
                 }
             }
         }

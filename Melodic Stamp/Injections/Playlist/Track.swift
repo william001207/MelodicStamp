@@ -21,10 +21,10 @@ struct Track: Identifiable {
         self.metadata = metadata
     }
 
-    @MainActor init?(loadingFrom url: URL) {
+    @MainActor init?(loadingFrom url: URL, completion: (() -> ())? = nil) {
         self.url = url
 
-        guard let metadata = Metadata(loadingFrom: url) else { return nil }
+        guard let metadata = Metadata(loadingFrom: url, completion: completion) else { return nil }
         self.metadata = metadata
     }
 
