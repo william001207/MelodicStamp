@@ -13,7 +13,7 @@ struct LibraryItemView: View {
     @Environment(PlayerModel.self) private var player
 
     @Environment(\.openWindow) private var openWindow
-    @Environment(\.luminareAnimationFast) private var animationFast
+    @Environment(\.luminareAnimation) private var animation
 
     var playlist: Playlist
     var isSelected: Bool
@@ -50,16 +50,19 @@ struct LibraryItemView: View {
             Spacer()
 
             if hasControl {
-                if isOpened {
-                    coverView()
-                } else {
-                    Button {
-                        open()
-                    } label: {
+                Group {
+                    if isOpened {
                         coverView()
+                    } else {
+                        Button {
+                            open()
+                        } label: {
+                            coverView()
+                        }
+                        .buttonStyle(.alive)
                     }
-                    .buttonStyle(.alive)
                 }
+                .animation(nil, value: isHovering)
             }
         }
         .foregroundStyle(isOpened && !isSelected ? AnyShapeStyle(.tint) : AnyShapeStyle(.primary))
@@ -67,7 +70,7 @@ struct LibraryItemView: View {
         .frame(height: 50)
         .padding(6)
         .padding(.trailing, -1)
-        .animation(animationFast, value: isHovering)
+        .animation(animation, value: isHovering)
         .background {
             Color.clear
                 .onDoubleClick(handler: open)

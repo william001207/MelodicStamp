@@ -9,7 +9,7 @@ import Luminare
 import SwiftUI
 
 struct PlaylistMetadataView: View {
-    @Environment(\.luminareAnimationFast) private var animationFast
+    @Environment(\.luminareAnimation) private var animation
 
     @FocusState private var isTitleFocused: Bool
 
@@ -47,6 +47,7 @@ struct PlaylistMetadataView: View {
                 }
             }
             .shadow(color: .black.opacity(0.1), radius: 5)
+            .animation(nil, value: isTitleHovering)
 
             VStack(alignment: .leading) {
                 titleView()
@@ -78,6 +79,7 @@ struct PlaylistMetadataView: View {
             }
         }
         .frame(height: 250)
+        .animation(animation, value: isTitleHovering)
     }
 
     @ViewBuilder private func artworkView() -> some View {
@@ -124,9 +126,9 @@ struct PlaylistMetadataView: View {
                 }
                 .font(.body)
                 .foregroundStyle(.placeholder)
+                .transition(.blurReplace)
             }
         }
-        .animation(animationFast, value: isTitleHovering)
         .onHover { hover in
             isTitleHovering = hover
         }

@@ -12,7 +12,7 @@ import SwiftUI
 struct TrackView: View {
     @Environment(PlayerModel.self) private var player
 
-    @Environment(\.luminareAnimationFast) private var animationFast
+    @Environment(\.luminareAnimation) private var animation
 
     var track: Track
     var isSelected: Bool
@@ -106,6 +106,7 @@ struct TrackView: View {
                         .frame(width: 50, height: 50)
                 }
                 .buttonStyle(.alive)
+                .animation(nil, value: isHovering)
             }
         }
         .frame(height: 50)
@@ -113,7 +114,7 @@ struct TrackView: View {
         .padding(.trailing, -1)
         .wiggleAnimation(wiggleAnimationTrigger)
         .bounceAnimation(bounceAnimationTrigger, scale: .init(width: 1.01, height: 1.01))
-        .animation(animationFast, value: isHovering)
+        .animation(animation, value: isHovering)
         .background {
             Color.clear
                 .onDoubleClick(handler: play)

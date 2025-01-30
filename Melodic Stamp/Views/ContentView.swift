@@ -230,11 +230,7 @@ struct ContentView: View {
 
     private var subtitle: String {
         let fallbackTitle = if !player.isPlaylistEmpty {
-            String(localized: .init(
-                "App: (Subtitle) Tracks",
-                defaultValue: "\(player.playlist.count) Tracks",
-                comment: "The subtitle displayed when there are songs in the playlist and nothing is playing"
-            ))
+            String(localized: .init("\(player.playlist.count) Tracks"))
         } else {
             ""
         }

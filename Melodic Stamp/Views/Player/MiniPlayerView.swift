@@ -43,7 +43,7 @@ struct MiniPlayerView: View {
     @Environment(KeyboardControlModel.self) private var keyboardControl
 
     @Environment(\.appearsActive) private var appearsActive
-    @Environment(\.luminareAnimationFast) private var animationFast
+    @Environment(\.luminareAnimation) private var animation
 
     @FocusState private var isFocused: Bool
 
@@ -305,7 +305,7 @@ struct MiniPlayerView: View {
         }
         .buttonStyle(.alive(enabledStyle: .tertiary, hoveringStyle: .secondary))
         .frame(height: 16)
-        .animation(animationFast, value: isTitleHovering)
+        .animation(animation, value: isTitleHovering)
         .onHover { hover in
             isTitleHovering = hover
         }

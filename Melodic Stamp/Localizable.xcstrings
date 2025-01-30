@@ -327,6 +327,7 @@
     },
     "App: (Subtitle) Tracks" : {
       "comment" : "The subtitle displayed when there are songs in the playlist and nothing is playing",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "variations" : {
