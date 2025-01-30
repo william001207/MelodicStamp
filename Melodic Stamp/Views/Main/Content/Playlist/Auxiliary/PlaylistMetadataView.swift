@@ -89,52 +89,53 @@ struct PlaylistMetadataView: View {
     }
 
     @ViewBuilder private func titleView() -> some View {
-        TextField("Playlist Title", text: $segments.info.title)
-            .bold()
-            .textFieldStyle(.plain)
-            .focused($isTitleFocused)
-            .overlay(alignment: .trailing) {
-                if !isTitleFocused {
-                    HStack {
-                        if isTitleHovering {
-                            Button {
-                                NSWorkspace.shared.activateFileViewerSelecting([playlist.possibleURL])
-                            } label: {
-                                HStack {
-                                    if let creationDate = try? playlist.possibleURL.attribute(.creationDate) as? Date {
-                                        let formattedCreationDate = creationDate.formatted(
-                                            date: .complete,
-                                            time: .standard
-                                        )
-                                        Text("Created at \(formattedCreationDate)")
-                                    }
-
-                                    Image(systemSymbol: .folder)
-                                }
-                                .foregroundStyle(.placeholder)
-                            }
-                            .buttonStyle(.alive)
-                        } else {
-                            Text("\(playlist.tracks.count) tracks")
-                        }
-                    }
-                    .font(.body)
-                    .foregroundStyle(.placeholder)
-                    .shadow(radius: 10)
-                    .fixedSize()
+        HStack {
+            TextField("Playlist Title", text: $segments.info.title)
+                .bold()
+                .textFieldStyle(.plain)
+                .focused($isTitleFocused)
+                .onSubmit {
+                    isTitleFocused = false
                 }
+
+            if !isTitleFocused {
+                HStack {
+                    if isTitleHovering {
+                        Button {
+                            NSWorkspace.shared.activateFileViewerSelecting([playlist.possibleURL])
+                        } label: {
+                            HStack {
+                                if let creationDate = try? playlist.possibleURL.attribute(.creationDate) as? Date {
+                                    let formattedCreationDate = creationDate.formatted(
+                                        date: .complete,
+                                        time: .standard
+                                    )
+                                    Text("Created at \(formattedCreationDate)")
+                                }
+
+                                Image(systemSymbol: .folder)
+                            }
+                            .foregroundStyle(.placeholder)
+                        }
+                        .buttonStyle(.alive)
+                    } else {
+                        Text("\(playlist.tracks.count) tracks")
+                    }
+                }
+                .font(.body)
+                .foregroundStyle(.placeholder)
+                .shadow(radius: 10)
+                .fixedSize()
             }
-            .animation(animationFast, value: isTitleHovering)
-            .onSubmit {
-                isTitleFocused = false
-            }
-            .onChange(of: isTitleFocused) { _, newValue in
-                guard !newValue else { return }
-                try? playlist.write(segments: [.info])
-            }
-            .onHover { hover in
-                isTitleHovering = hover
-            }
+        }
+        .animation(animationFast, value: isTitleHovering)
+        .onHover { hover in
+            isTitleHovering = hover
+        }
+        .onChange(of: isTitleFocused) { _, newValue in
+            guard !newValue else { return }
+            try? playlist.write(segments: [.info])
+        }
     }
 
     @ViewBuilder private func descriptionView() -> some View {
