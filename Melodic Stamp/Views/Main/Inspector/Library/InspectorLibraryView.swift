@@ -12,6 +12,7 @@ struct InspectorLibraryView: View {
 
     @Environment(LibraryModel.self) private var library
 
+    @Environment(\.openWindow) private var openWindow
     @Environment(\.appearsActive) private var appearsActive
 
     // MARK: - Fields
@@ -41,7 +42,7 @@ struct InspectorLibraryView: View {
 
             // MARK: Keyboard Handlers
 
-            // Handle [escape] -> clear selection
+            // Handles [escape] -> clear selection
             .onKeyPress(.escape) {
                 if handleEscape() {
                     .handled
@@ -49,11 +50,32 @@ struct InspectorLibraryView: View {
                     .ignored
                 }
             }
+
+            // Handles [􁂒] -> remove selection
+            .onKeyPress(.deleteForward) {
+                if handleRemove(Array(selectedPlaylists)) {
+                    .handled
+                } else {
+                    .ignored
+                }
+            }
+
+            // Handles [⏎] -> open selection
+            .onKeyPress(.return) {
+                guard !selectedPlaylists.isEmpty else { return .ignored }
+
+                selectedPlaylists.forEach(open)
+                return .handled
+            }
         }
     }
 
     private var canEscape: Bool {
         !selectedPlaylists.isEmpty
+    }
+
+    private var canRemove: Bool {
+        !library.isEmpty
     }
 
     // MARK: - Item View
@@ -82,9 +104,22 @@ struct InspectorLibraryView: View {
 
     // MARK: - Functions
 
+    private func open(_ playlist: Playlist) {
+        openWindow(
+            id: WindowID.content.rawValue,
+            value: CreationParameters(playlist: .canonical(playlist.id))
+        )
+    }
+
     @discardableResult private func handleEscape() -> Bool {
         guard canEscape else { return false }
         selectedPlaylists.removeAll()
+        return true
+    }
+
+    @discardableResult private func handleRemove(_ playlists: [Playlist]) -> Bool {
+        guard canRemove else { return false }
+        library.remove(playlists)
         return true
     }
 }

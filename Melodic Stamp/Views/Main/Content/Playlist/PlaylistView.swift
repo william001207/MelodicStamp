@@ -130,7 +130,7 @@ struct PlaylistView: View {
 
         // MARK: Keyboard Handlers
 
-        // Handle [escape] -> clear selection
+        // Handles [escape] -> clear selection
         .onKeyPress(.escape) {
             if handleEscape() {
                 .handled
@@ -139,7 +139,7 @@ struct PlaylistView: View {
             }
         }
 
-        // Handle [􁂒] -> remove selection
+        // Handles [􁂒] -> remove selection
         .onKeyPress(.deleteForward) {
             if handleRemove(player.selectedTracks.map(\.url)) {
                 .handled
@@ -148,7 +148,7 @@ struct PlaylistView: View {
             }
         }
 
-        // Handle [⏎] -> play
+        // Handles [⏎] -> play
         .onKeyPress(.return) {
             if player.selectedTracks.count == 1, let track = player.selectedTracks.first {
                 player.play(track.url)
@@ -158,14 +158,14 @@ struct PlaylistView: View {
             }
         }
 
-        // Handle [space] -> toggle play / pause
+        // Handles [space] -> toggle play / pause
         .onKeyPress(keys: [.space], phases: .all) { key in
             keyboardControl.handlePlayPause(
                 phase: key.phase, modifiers: key.modifiers
             )
         }
 
-        // Handle [← / →] -> adjust progress
+        // Handles [← / →] -> adjust progress
         .onKeyPress(keys: [.leftArrow, .rightArrow], phases: .all) { key in
             let sign: FloatingPointSign = key.key == .leftArrow ? .minus : .plus
 
@@ -174,7 +174,7 @@ struct PlaylistView: View {
             )
         }
 
-        // Handle [↑ / ↓] -> adjust volume
+        // Handles [↑ / ↓] -> adjust volume
         .onKeyPress(keys: [.leftArrow, .rightArrow], phases: .all) { key in
             let sign: FloatingPointSign = key.key == .leftArrow ? .minus : .plus
 
@@ -183,7 +183,7 @@ struct PlaylistView: View {
             )
         }
 
-        // Handle [m] -> toggle muted
+        // Handles [m] -> toggle muted
         .onKeyPress(keys: ["m"], phases: .down) { _ in
             player.isMuted.toggle()
             return .handled
