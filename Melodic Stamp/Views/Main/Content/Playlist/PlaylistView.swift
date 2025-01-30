@@ -396,11 +396,17 @@ struct PlaylistView: View {
 
         // MARK: Remove from Playlist
 
-        Button("Remove from Playlist") {
-            if metadataEditor.hasMetadata {
-                handleRemove(player.selectedTracks.map(\.url))
+        Group {
+            if player.selectedTracks.count <= 1 {
+                Button("Remove from Playlist") {
+                    handleRemove([track.url])
+                }
             } else {
-                handleRemove([track.url])
+                Button {
+                    handleRemove(player.selectedTracks.map(\.url))
+                } label: {
+                    Text("Remove \(player.selectedTracks.count) Tracks from Playlist")
+                }
             }
         }
         .keyboardShortcut(.deleteForward, modifiers: [])

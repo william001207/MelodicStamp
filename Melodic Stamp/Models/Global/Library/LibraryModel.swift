@@ -7,6 +7,8 @@
 
 import SwiftUI
 
+extension LibraryModel: TypeNameReflectable {}
+
 @MainActor @Observable final class LibraryModel {
     private(set) var playlists: [Playlist] = []
     private(set) var indexer: PlaylistIndexer = .init()
@@ -63,6 +65,16 @@ extension LibraryModel {
 }
 
 extension LibraryModel {
+    private static func deletePlaylist(at url: URL) throws {
+        Task {
+            try FileManager.default.removeItem(at: url)
+
+            logger.info("Deleted playlist at \(url)")
+        }
+    }
+}
+
+extension LibraryModel {
     func move(fromOffsets indices: IndexSet, toOffset destination: Int) {
         playlists.move(fromOffsets: indices, toOffset: destination)
 
@@ -79,7 +91,10 @@ extension LibraryModel {
     }
 
     func remove(_ playlists: [Playlist]) {
-        self.playlists.removeAll { playlists.contains($0) }
+        for playlist in playlists {
+            self.playlists.removeAll { $0 == playlist }
+            try? Self.deleteTrack(at: playlist.possibleURL)
+        }
 
         try? indexPlaylists(with: captureIndices())
     }

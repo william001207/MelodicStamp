@@ -90,12 +90,60 @@ struct InspectorLibraryView: View {
         .contextMenu {
             contextMenu(for: playlist)
         }
+        .swipeActions {
+            // MARK: Remove from Library
+
+            Button(role: .destructive) {
+                handleRemove([playlist])
+            } label: {
+                Image(systemSymbol: .trash)
+            }
+            .tint(.red)
+        }
+        .swipeActions(edge: .leading) {
+            // MARK: Open
+
+            Button {
+                open(playlist)
+            } label: {
+                Image(systemSymbol: .rectangleStackFill)
+            }
+            .tint(.accent)
+        }
     }
 
     // MARK: - Context Menu
 
     @ViewBuilder private func contextMenu(for playlist: Playlist) -> some View {
+        // MARK: Remove from Library
+
+        Group {
+            if selectedPlaylists.count <= 1 {
+                Button("Remove from Library") {
+                    handleRemove([playlist])
+                }
+            } else {
+                Button {
+                    handleRemove(Array(selectedPlaylists))
+                } label: {
+                    Text("Remove \(selectedPlaylists.count) Playlists from Library")
+                }
+            }
+        }
+        .keyboardShortcut(.deleteForward, modifiers: [])
+
+        // MARK: Open
+
+        Button("Open in New Window") {
+            open(playlist)
+        }
+        .keyboardShortcut(.return, modifiers: [])
+
+        Divider()
+
         if let url = playlist.canonicalURL {
+            // MARK: Reveal in Finder
+
             Button("Reveal in Finder") {
                 NSWorkspace.shared.activateFileViewerSelecting([url])
             }

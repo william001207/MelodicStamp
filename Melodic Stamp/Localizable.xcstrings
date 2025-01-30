@@ -1819,6 +1819,16 @@
         }
       }
     },
+    "Open in New Window" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "在新窗口中打开"
+          }
+        }
+      }
+    },
     "Open in Playlist" : {
       "localizations" : {
         "zh-Hans" : {
@@ -2165,6 +2175,84 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "重新加载元数据"
+          }
+        }
+      }
+    },
+    "Remove %lld Playlists from Library" : {
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Remove from Library"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "new",
+                  "value" : "Remove %lld Playlists from Library"
+                }
+              }
+            }
+          }
+        },
+        "zh-Hans" : {
+          "variations" : {
+            "plural" : {
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "从资源库中移除%lld个播放列表"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "Remove %lld Tracks from Playlist" : {
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Remove from Playlist"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "new",
+                  "value" : "Remove %lld Tracks from Playlist"
+                }
+              }
+            }
+          }
+        },
+        "zh-Hans" : {
+          "variations" : {
+            "plural" : {
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "从播放列表中移除%lld首音乐"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "Remove from Library" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "从资源库中移除"
           }
         }
       }
