@@ -14,12 +14,14 @@ struct DelegatedPlaylistMetadataStorage: View {
         ZStack {
             infoObservations()
             stateObservations()
+            artworkObservations()
         }
     }
 
     @ViewBuilder private func infoObservations() -> some View {
         Color.clear
             .onChange(of: player[playlistMetadata: \.info]) { _, _ in
+                guard player.playlist.mode.isCanonical else { return }
                 Task.detached {
                     try await player.playlist.writeMetadata(segments: [.info])
                 }
@@ -29,8 +31,19 @@ struct DelegatedPlaylistMetadataStorage: View {
     @ViewBuilder private func stateObservations() -> some View {
         Color.clear
             .onChange(of: player[playlistMetadata: \.state]) { _, _ in
+                guard player.playlist.mode.isCanonical else { return }
                 Task.detached {
                     try await player.playlist.writeMetadata(segments: [.state])
+                }
+            }
+    }
+
+    @ViewBuilder private func artworkObservations() -> some View {
+        Color.clear
+            .onChange(of: player[playlistMetadata: \.artwork]) { _, _ in
+                guard player.playlist.mode.isCanonical else { return }
+                Task.detached {
+                    try await player.playlist.writeMetadata(segments: [.artwork])
                 }
             }
     }

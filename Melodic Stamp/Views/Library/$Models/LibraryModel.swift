@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-@Observable final class LibraryModel {
+@MainActor @Observable final class LibraryModel {
     private(set) var playlists: [Playlist] = []
     private var indexer: PlaylistIndexer = .init()
 
@@ -18,7 +18,7 @@ import SwiftUI
     }
 }
 
-extension LibraryModel: Sequence {
+extension LibraryModel: @preconcurrency Sequence {
     func makeIterator() -> Array<Playlist>.Iterator {
         playlists.makeIterator()
     }

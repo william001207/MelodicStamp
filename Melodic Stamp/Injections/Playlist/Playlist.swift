@@ -28,7 +28,7 @@ extension Playlist {
     }
 }
 
-@Observable class Playlist: Identifiable {
+@MainActor @Observable class Playlist: @preconcurrency Identifiable {
     private(set) var mode: Mode
     private var metadata: Playlist.Metadata
     private var indexer: TrackIndexer
@@ -114,7 +114,7 @@ extension Playlist {
     }
 }
 
-extension Playlist: Hashable {
+extension Playlist: @preconcurrency Hashable {
     func hash(into hasher: inout Hasher) {
         hasher.combine(id)
         hasher.combine(mode)
@@ -123,13 +123,13 @@ extension Playlist: Hashable {
     }
 }
 
-extension Playlist: Equatable {
+extension Playlist: @preconcurrency Equatable {
     static func == (lhs: Playlist, rhs: Playlist) -> Bool {
         lhs.id == rhs.id
     }
 }
 
-extension Playlist: Sequence {
+extension Playlist: @preconcurrency Sequence {
     func makeIterator() -> Array<Track>.Iterator {
         tracks.makeIterator()
     }
@@ -285,7 +285,7 @@ extension Playlist {
         try FileManager.default.copyItem(at: track.url, to: destinationURL)
 
         logger.info("Migrating to canonical track at \(destinationURL), copying from \(track.url)")
-        return try await Track(
+        return try Track(
             migratingFrom: track, to: destinationURL,
             useFallbackTitleIfNotProvided: true
         )

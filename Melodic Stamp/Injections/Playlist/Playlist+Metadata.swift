@@ -45,7 +45,7 @@ extension Playlist.Metadata {
 
 extension Playlist {
     struct Metadata: Equatable, Hashable, Identifiable, Codable {
-        let id: UUID
+        nonisolated let id: UUID
 
         var info: Info
         var state: State
