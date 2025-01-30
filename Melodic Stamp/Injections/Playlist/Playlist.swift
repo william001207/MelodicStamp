@@ -85,11 +85,10 @@ extension Playlist {
     }
 
     func makeCanonical() async {
-        guard let url = canonicalURL else { return }
         // Migrates to a new canonical playlist
 
         do {
-            try FileManager.default.createDirectory(at: url, withIntermediateDirectories: true)
+            try FileManager.default.createDirectory(at: possibleURL, withIntermediateDirectories: true)
             try write(segments: Segment.allCases)
         } catch {
             return
@@ -114,7 +113,7 @@ extension Playlist {
         add(migratedTracks)
         loadDelegatedVariables()
 
-        logger.info("Successfully made canonical playlist at \(url)")
+        logger.info("Successfully made canonical playlist at \(self.possibleURL)")
     }
 
     static func referenced(bindingTo id: UUID = .init()) -> Playlist {
