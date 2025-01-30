@@ -19,6 +19,7 @@ struct PlaylistMetadataView: View {
         HStack(spacing: 25) {
             if hasArtwork {
                 artworkView()
+                    .frame(width: 200, height: 200)
             }
 
             VStack(alignment: .leading) {
@@ -38,9 +39,9 @@ struct PlaylistMetadataView: View {
 
     @ViewBuilder private func artworkView() -> some View {
         if let artwork = playlist.segments.artwork.image {
-            MusicCover(images: [artwork], cornerRadius: 4, hasMotion: true)
-                .frame(width: 200, height: 200)
+            MusicCover(images: [artwork], cornerRadius: 4)
                 .contentTransition(.symbolEffect(.replace))
+                .motionCard()
         }
     }
 
@@ -67,10 +68,11 @@ struct PlaylistMetadataView: View {
                     } label: {
                         HStack {
                             if let creationDate = try? playlist.possibleURL.attribute(.creationDate) as? Date {
-                                Text(creationDate.formatted(
+                                let formattedCreationDate = creationDate.formatted(
                                     date: .complete,
                                     time: .standard
-                                ))
+                                )
+                                Text("Created at \(formattedCreationDate)")
                             }
 
                             Image(systemSymbol: .folder)

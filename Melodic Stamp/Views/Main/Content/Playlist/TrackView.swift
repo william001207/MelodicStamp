@@ -103,6 +103,7 @@ struct TrackView: View {
                     play()
                 } label: {
                     coverView()
+                        .frame(width: 50, height: 50)
                 }
                 .buttonStyle(.alive)
             }
@@ -197,7 +198,6 @@ struct TrackView: View {
             }
         }
         .clipShape(.rect(cornerRadius: 4))
-        .frame(width: 50, height: 50)
         .font(.title3)
         .contentTransition(.symbolEffect(.replace))
     }

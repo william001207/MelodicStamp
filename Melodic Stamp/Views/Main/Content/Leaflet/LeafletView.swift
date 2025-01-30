@@ -211,8 +211,9 @@ struct LeafletView: View {
                 } label: {
                     MusicCover(
                         images: [cover], hasPlaceholder: true,
-                        cornerRadius: 12, hasMotion: true
+                        cornerRadius: 12
                     )
+                    .motionCard()
                 }
                 .buttonStyle(.alive)
                 .scaleEffect(player.isPlaying ? 1 : 0.85, anchor: .center)
@@ -220,8 +221,9 @@ struct LeafletView: View {
                 Button {} label: {
                     MusicCover(
                         images: [cover], hasPlaceholder: true,
-                        cornerRadius: 12, hasMotion: true
+                        cornerRadius: 12
                     )
+                    .motionCard()
                 }
                 .buttonStyle(.alive(isOn: $player.isPlaying))
             }

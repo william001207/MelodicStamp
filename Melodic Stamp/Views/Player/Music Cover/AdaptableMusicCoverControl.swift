@@ -29,6 +29,7 @@ struct AdaptableMusicCoverControl: View {
             isImagePickerPresented = true
         } label: {
             imageView()
+                .motionCard()
                 .padding(.horizontal, 16)
         }
         .buttonStyle(.alive)
@@ -137,7 +138,7 @@ struct AdaptableMusicCoverControl: View {
                 .compactMap(\.image)
         } else { [] }
 
-        MusicCover(images: images, cornerRadius: 8, hasMotion: true)
+        MusicCover(images: images, cornerRadius: 8)
             .overlay {
                 if isModified {
                     RoundedRectangle(cornerRadius: 8)

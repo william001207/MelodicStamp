@@ -13,22 +13,10 @@ struct MusicCover: View {
     var hasPlaceholder: Bool = true
     var cornerRadius: CGFloat = 8
 
-    var hasMotion: Bool = false
-
     var body: some View {
         if !images.isEmpty {
             // TODO: Handle multiple images
-            if hasMotion {
-                imageView(images.first!)
-                    .motionCard(
-                        scale: 1.02,
-                        angle: .degrees(3.5),
-                        shadowColor: .black.opacity(0.1),
-                        shadowRadius: 10
-                    )
-            } else {
-                imageView(images.first!)
-            }
+            imageView(images.first!)
         } else {
             Group {
                 if hasPlaceholder {
@@ -59,8 +47,7 @@ struct MusicCover: View {
 
 #if DEBUG
     #Preview {
-        MusicCover(images: [.templateArtwork], cornerRadius: 12, hasMotion: true)
+        MusicCover(images: [.templateArtwork], cornerRadius: 12)
             .scaleEffect(0.85, anchor: .center)
-            .padding()
     }
 #endif

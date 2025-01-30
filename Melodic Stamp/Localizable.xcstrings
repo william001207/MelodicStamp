@@ -918,6 +918,9 @@
         }
       }
     },
+    "Created at %@" : {
+
+    },
     "Customize how lyrics are displayed in the leaflet page." : {
       "localizations" : {
         "zh-Hans" : {

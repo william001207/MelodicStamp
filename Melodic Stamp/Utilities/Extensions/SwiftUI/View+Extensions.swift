@@ -36,8 +36,8 @@ extension View {
     }
 
     @ViewBuilder func motionCard(
-        scale: CGFloat = 1.065, angle: Angle = .degrees(10),
-        shadowColor: Color = .black.opacity(0.45), shadowRadius: CGFloat = 25,
+        scale: CGFloat = 1.02, angle: Angle = .degrees(3.5),
+        shadowColor: Color = .black.opacity(0.1), shadowRadius: CGFloat = 10,
         glintColor: Color = .white.opacity(0.1), glintRadius: CGFloat = 50
     ) -> some View {
         modifier(MotionCardModifier(
