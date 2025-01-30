@@ -43,7 +43,7 @@ struct SettingsView: View {
                     case .lyrics:
                         SettingsLyricsPage()
                     case .launchBehaviors:
-                        SettingsLaunchBehaviorsPage()
+                        SettingsBehaviorsPage()
                     case .performance:
                         SettingsPerformancePage()
                     case .feedback:

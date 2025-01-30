@@ -356,6 +356,9 @@
         }
       }
     },
+    "Asks for information when creating a new playlist" : {
+
+    },
     "Attachments & Type Size" : {
       "localizations" : {
         "zh-Hans" : {
@@ -888,7 +891,11 @@
         }
       }
     },
+    "Control %@'s behaviors." : {
+
+    },
     "Control what %@ should do when launching from a previous interruption." : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -1957,6 +1964,9 @@
     "Playlist Description" : {
 
     },
+    "Playlist Information" : {
+
+    },
     "Playlist Title" : {
 
     },
@@ -2104,6 +2114,7 @@
       }
     },
     "Restores playback modes for each window" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -2114,6 +2125,7 @@
       }
     },
     "Restores playback positions" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -2124,6 +2136,7 @@
       }
     },
     "Restores playback volumes" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -2134,6 +2147,7 @@
       }
     },
     "Restores playlists for each window" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {

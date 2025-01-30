@@ -58,10 +58,6 @@ extension AppDelegate {
         true
     }
 
-    func applicationSupportsSecureRestorableState(_: NSApplication) -> Bool {
-        Defaults.canApplicationRestore
-    }
-
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
         if sender.windows.isEmpty {
             return .terminateNow

@@ -17,30 +17,15 @@ extension Defaults.Keys {
         default: .whilePlaying
     )
 
-    // MARK: Behavior
+    // MARK: Behaviors
 
     static let defaultPlaybackMode: Key<PlaybackMode> = .init(
         "defaultPlaybackMode",
         default: .sequential
     )
 
-    static let memorizesPlaybackModes: Key<Bool> = .init(
-        "memorizesPlaybackModes",
-        default: true
-    )
-
-    static let memorizesPlaylists: Key<Bool> = .init(
-        "memorizesPlaylists",
-        default: true
-    )
-
-    static let memorizesPlaybackPositions: Key<Bool> = .init(
-        "memorizesPlaybackPositions",
-        default: true
-    )
-
-    static let memorizesPlaybackVolumes: Key<Bool> = .init(
-        "memorizesPlaybackVolumes",
+    static let asksForPlaylistInformation: Key<Bool> = .init(
+        "asksForPlaylistInformation",
         default: true
     )
 
@@ -104,10 +89,4 @@ extension Defaults.Keys {
         "lyricsTypeSize",
         default: .large
     )
-}
-
-extension Defaults {
-    static var canApplicationRestore: Bool {
-        Self[.memorizesPlaylists] || Self[.memorizesPlaybackModes] || Self[.memorizesPlaybackPositions] || Self[.memorizesPlaybackVolumes]
-    }
 }
