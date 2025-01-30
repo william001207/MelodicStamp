@@ -43,7 +43,7 @@ extension Playlist {
 
 extension Playlist {
     // Important! Do not make this a struct, otherwise causing severe UI glitches!!!
-    @Observable class Segments: Codable {
+    @Observable final class Segments {
         var info: Info = .init()
         var state: State = .init()
         var artwork: Artwork = .init()

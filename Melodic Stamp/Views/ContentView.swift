@@ -287,8 +287,8 @@ struct ContentView: View {
         .onChange(of: appearsActive, initial: true) { _, newValue in
             guard newValue else { return }
 
-            Task.detached {
-                try await library.refresh()
+            Task {
+                await library.loadPlaylists()
             }
         }
     }
@@ -340,7 +340,7 @@ struct ContentView: View {
                     logger.info("Created window from referenced URLs: \(urls)")
                 case let .canonical(id):
                     await player.bindTo(parameters.id, mode: .canonical)
-                    await player.playlist.refresh()
+                    await player.playlist.loadTracks()
 
                     logger.info("Created window with canonical ID: \(id)")
                 }

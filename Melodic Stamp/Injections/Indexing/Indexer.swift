@@ -23,6 +23,10 @@ extension Indexer {
         folderURL.appending(path: fileName, directoryHint: .notDirectory)
     }
 
+    func read(defaultValue: Value) -> Value {
+        read() ?? defaultValue
+    }
+
     func read() -> Value? {
         if
             let data = try? Data(contentsOf: url),

@@ -276,7 +276,8 @@ extension PlayerModel {
 
     func play(_ url: URL) {
         Task {
-            let track = await playlist.getOrCreateTrack(at: url)
+            let track = playlist.getOrCreateTrack(at: url)
+
             currentTrack = track
 
             if let track {
@@ -290,7 +291,7 @@ extension PlayerModel {
     func addToPlaylist(_ urls: [URL]) {
         for url in urls {
             Task {
-                guard let track = await playlist.getOrCreateTrack(at: url) else { return }
+                guard let track = playlist.getOrCreateTrack(at: url) else { return }
                 playlist.add([track])
             }
         }
@@ -299,7 +300,7 @@ extension PlayerModel {
     func removeFromPlaylist(_ urls: [URL]) {
         for url in urls {
             Task {
-                guard let track = await playlist.getOrCreateTrack(at: url) else { return }
+                guard let track = playlist.getOrCreateTrack(at: url) else { return }
 
                 // Removes from selected
                 selectedTracks.remove(track)
@@ -323,9 +324,11 @@ extension PlayerModel {
         playlist.move(fromOffsets: indices, toOffset: destination)
     }
 
-    func makePlaylistCanonical() async {
-        await playlist.makeCanonical()
-        library?.add([playlist])
+    func makePlaylistCanonical() {
+        Task {
+            try playlist.makeCanonical()
+            library?.add([playlist])
+        }
     }
 
     // MARK: Convenient Functions
@@ -491,7 +494,7 @@ extension PlayerModel: AudioPlayer.Delegate {
             if let nowPlaying,
                let audioDecoder = nowPlaying as? AudioDecoder,
                let url = audioDecoder.inputSource.url {
-                currentTrack = await playlist.getTrack(at: url)
+                currentTrack = playlist.getTrack(at: url)
             }
 
             updatePlaybackState()

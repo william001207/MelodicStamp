@@ -31,7 +31,7 @@ extension Playlist {
 @MainActor @Observable class Playlist: Identifiable {
     nonisolated let id: UUID
     private(set) var mode: Mode
-    private var indexer: TrackIndexer
+    private(set) var indexer: TrackIndexer
     var segments: Segments
 
     private(set) var tracks: [Track] = []
@@ -84,23 +84,21 @@ extension Playlist {
         logger.info("Loaded canonical playlist from \(url)")
     }
 
-    func makeCanonical() async {
+    func makeCanonical() throws {
         // Migrates to a new canonical playlist
 
         do {
             try FileManager.default.createDirectory(at: possibleURL, withIntermediateDirectories: true)
-            try write(segments: Segment.allCases)
         } catch {
             return
         }
 
         mode = .canonical
 
-        var migratedTracks: [Track] = []
         var migratedCurrentTrackURL: URL?
-        for track in tracks {
-            guard let migratedTrack = try? await migrateTrack(from: track) else { continue }
-            migratedTracks.append(migratedTrack)
+        for (index, track) in tracks.enumerated() {
+            guard let migratedTrack = try? migrateTrack(from: track) else { continue }
+            tracks[index] = migratedTrack
 
             let wasCurrentTrack = track.url == segments.state.currentTrackURL
             if wasCurrentTrack {
@@ -109,8 +107,9 @@ extension Playlist {
         }
 
         segments.state.currentTrackURL = migratedCurrentTrackURL
-        clearPlaylist()
-        add(migratedTracks)
+
+        try write()
+        try indexTracks(with: captureIndices())
         loadDelegatedVariables()
 
         logger.info("Successfully made canonical playlist at \(self.possibleURL)")
@@ -177,10 +176,19 @@ extension Playlist {
         try indexer.write()
     }
 
-    func refresh() async {
+    func loadIndexer() {
         guard mode.isCanonical else { return }
         indexer.value = indexer.read() ?? [:]
-        await tracks = indexer.loadTracks()
+    }
+
+    func loadTracks() async {
+        guard mode.isCanonical else { return }
+        loadIndexer()
+
+        tracks.removeAll()
+        for await track in indexer.loadTracks() {
+            tracks.append(track)
+        }
     }
 }
 
@@ -303,7 +311,7 @@ extension Playlist {
             .appendingPathExtension(url.pathExtension)
     }
 
-    private func migrateTrack(from track: Track) async throws -> Track {
+    private func migrateTrack(from track: Track) throws -> Track {
         try createFolder()
 
         let destinationURL = generateCanonicalURL(for: track.url)
@@ -316,20 +324,20 @@ extension Playlist {
         )
     }
 
-    func getTrack(at url: URL) async -> Track? {
+    func getTrack(at url: URL) -> Track? {
         first(where: { $0.url == url })
     }
 
-    func getOrCreateTrack(at url: URL) async -> Track? {
-        if let track = await getTrack(at: url) {
+    func getOrCreateTrack(at url: URL) -> Track? {
+        if let track = getTrack(at: url) {
             track
         } else {
             switch mode {
             case .referenced:
-                await Track(loadingFrom: url)
+                Track(loadingFrom: url)
             case .canonical:
-                if let track = await Track(loadingFrom: url) {
-                    try? await migrateTrack(from: track)
+                if let track = Track(loadingFrom: url) {
+                    try? migrateTrack(from: track)
                 } else {
                     nil
                 }

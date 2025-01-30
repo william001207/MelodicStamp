@@ -24,14 +24,18 @@ extension TrackIndexer {
             .appendingPathExtension(element.value)
     }
 
-    func loadTracks() async -> [Track] {
-        guard !value.isEmpty else { return [] }
+    func loadTracks() -> AsyncStream<Track> {
+        .init { continuation in
+            guard !value.isEmpty else { return continuation.finish() }
 
-        var tracks: [Track] = []
-        for element in value {
-            guard let track = await Track(loadingFrom: trackURL(for: element)) else { continue }
-            tracks.append(track)
+            Task {
+                for element in value {
+                    guard let track = await Track(loadingFrom: trackURL(for: element)) else { return }
+                    continuation.yield(track)
+                }
+
+                continuation.finish()
+            }
         }
-        return tracks
     }
 }

@@ -12,13 +12,12 @@ import SwiftUI
 import SwiftUIScrollOffset
 
 private struct ScrollOffsetReader: View {
-    @ScrollOffset(.top) private var scrollOffset
+    @ScrollOffset(.top, in: ...0) private var scrollOffset
 
     @Binding var offset: CGFloat
 
     var body: some View {
         Color.clear
-            .frame(height: 0)
             .onChange(of: scrollOffset, initial: true) { _, newValue in
                 offset = newValue
             }
@@ -35,6 +34,7 @@ struct PlaylistView: View {
     @Environment(\.resetFocus) private var resetFocus
     @Environment(\.luminareMinHeight) private var minHeight
     @Environment(\.luminareAnimation) private var animation
+    @Environment(\.luminareAnimationFast) private var animationFast
 
     // MARK: - Fields
 
@@ -51,22 +51,26 @@ struct PlaylistView: View {
         // MARK: List
 
         List(selection: $player.selectedTracks) {
-            if player.playlist.mode.isCanonical {
-                // MARK: Metadata
+            Group {
+                if player.playlist.mode.isCanonical {
+                    // MARK: Metadata
 
-                PlaylistMetadataView(playlist: player.playlist)
-                    .selectionDisabled()
-                    .frame(height: metadataHeight)
-                    .padding(.horizontal)
+                    PlaylistMetadataView(playlist: player.playlist)
+                        .frame(height: metadataHeight)
+                        .padding(.horizontal)
+                } else {
+                    // MARK: Controls Placeholder
+
+                    // This is much more stable than `.contentMargins()`
+                    Spacer()
+                        .frame(height: minHeight)
+                }
             }
-
-            // MARK: Controls Placeholder
-
-//            // This is much more stable than `.contentMargins()`
-//            ScrollOffsetReader(offset: $scrollOffset)
-//                .frame(height: minHeight)
-//                .listRowSeparator(.hidden)
-//                .selectionDisabled()
+            .background {
+                ScrollOffsetReader(offset: $scrollOffset)
+            }
+            .listRowSeparator(.hidden)
+            .selectionDisabled()
 
             // MARK: Tracks
 
@@ -87,7 +91,7 @@ struct PlaylistView: View {
         }
         .scrollClipDisabled()
         .scrollContentBackground(.hidden)
-//        .scrollOffsetID(.automatic)
+        .scrollOffsetID(.automatic)
         .overlay(alignment: .top) {
             // MARK: Controls
 
@@ -113,12 +117,14 @@ struct PlaylistView: View {
             }
             .padding(.horizontal)
             .padding(.top, 8)
-            .offset(y: max(0, metadataHeight + scrollOffset))
-            .animation(.smooth, value: scrollOffset)
+            .opacity(controlsOpacity)
+            .blur(radius: lerp(2.5, 0, factor: controlsOpacity))
+            .allowsHitTesting(controlsOpacity >= 0.1)
         }
-        .animation(.default, value: player.playlist.tracks)
-        .animation(.default, value: player.playlist.mode)
-        .animation(.default, value: player.selectedTracks)
+        .animation(animationFast, value: player.playlist.mode)
+        .animation(animationFast, value: player.playlist.tracks)
+        .animation(animationFast, value: player.playlist.segments)
+        .animation(animationFast, value: player.selectedTracks)
 
         // MARK: Keyboard Handlers
 
@@ -196,6 +202,15 @@ struct PlaylistView: View {
             .zero
         case .canonical:
             300
+        }
+    }
+
+    private var controlsOpacity: CGFloat {
+        switch player.playlist.mode {
+        case .referenced:
+            1.0
+        case .canonical:
+            max(0, min(1, -scrollOffset / (metadataHeight / 2)))
         }
     }
 

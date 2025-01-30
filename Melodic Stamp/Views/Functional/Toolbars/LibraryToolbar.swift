@@ -13,7 +13,7 @@ struct LibraryToolbar: View {
     var body: some View {
         if !player.playlist.mode.isCanonical {
             Button {
-                Task {
+                Task.detached {
                     await player.makePlaylistCanonical()
                 }
             } label: {

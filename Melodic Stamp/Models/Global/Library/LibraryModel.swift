@@ -9,11 +9,11 @@ import SwiftUI
 
 @MainActor @Observable final class LibraryModel {
     private(set) var playlists: [Playlist] = []
-    private var indexer: PlaylistIndexer = .init()
+    private(set) var indexer: PlaylistIndexer = .init()
 
     init() {
-        Task {
-            try await refresh()
+        Task.detached {
+            await self.loadIndexer()
         }
     }
 }
@@ -42,9 +42,17 @@ extension LibraryModel {
         try indexer.write()
     }
 
-    func refresh() async throws {
+    func loadIndexer() {
         indexer.value = indexer.read() ?? []
-        await playlists = indexer.loadPlaylists()
+    }
+
+    func loadPlaylists() async {
+        loadIndexer()
+
+        playlists.removeAll()
+        for await playlist in indexer.loadPlaylists() {
+            playlists.append(playlist)
+        }
     }
 }
 
