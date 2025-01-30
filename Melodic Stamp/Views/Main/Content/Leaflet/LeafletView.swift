@@ -152,14 +152,14 @@ struct LeafletView: View {
 
             // MARK: Keyboard Handlers
 
-            // Handle [space / ⏎] -> toggle play / pause
+            // Handles [space / ⏎] -> toggle play / pause
             .onKeyPress(keys: [.space, .return], phases: .all) { key in
                 keyboardControl.handlePlayPause(
                     phase: key.phase, modifiers: key.modifiers
                 )
             }
 
-            // Handle [← / →] -> adjust progress
+            // Handles [← / →] -> adjust progress
             .onKeyPress(keys: [.leftArrow, .rightArrow], phases: .all) { key in
                 let sign: FloatingPointSign = key.key == .leftArrow ? .minus : .plus
 
@@ -168,7 +168,7 @@ struct LeafletView: View {
                 )
             }
 
-            // Handle [↑ / ↓] -> adjust volume
+            // Handles [↑ / ↓] -> adjust volume
             .onKeyPress(keys: [.leftArrow, .rightArrow], phases: .all) { key in
                 let sign: FloatingPointSign = key.key == .leftArrow ? .minus : .plus
 
@@ -177,7 +177,7 @@ struct LeafletView: View {
                 )
             }
 
-            // Handle [m] -> toggle muted
+            // Handles [m] -> toggle muted
             .onKeyPress(keys: ["m"], phases: .down) { _ in
                 player.isMuted.toggle()
                 return .handled

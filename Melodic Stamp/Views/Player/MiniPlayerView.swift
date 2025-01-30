@@ -144,14 +144,14 @@ struct MiniPlayerView: View {
 
         // MARK: Keyboard Handlers
 
-        // Handle [space / ⏎] -> toggle play / pause
+        // Handles [space / ⏎] -> toggle play / pause
         .onKeyPress(keys: [.space, .return], phases: .all) { key in
             keyboardControl.handlePlayPause(
                 phase: key.phase, modifiers: key.modifiers
             )
         }
 
-        // Handle [← / →] -> adjust progress & volume
+        // Handles [← / →] -> adjust progress & volume
         .onKeyPress(keys: [.leftArrow, .rightArrow], phases: .all) { key in
             let sign: FloatingPointSign = key.key == .leftArrow ? .minus : .plus
 
@@ -167,7 +167,7 @@ struct MiniPlayerView: View {
             }
         }
 
-        // Handle [escape] -> regain progress control
+        // Handles [escape] -> regain progress control
         .onKeyPress(.escape) {
             guard activeControl == .volume else { return .ignored }
 
@@ -175,7 +175,7 @@ struct MiniPlayerView: View {
             return .handled
         }
 
-        // Handle [m] -> toggle muted
+        // Handles [m] -> toggle muted
         .onKeyPress(keys: ["m"], phases: .down) { _ in
             player.isMuted.toggle()
             return .handled
