@@ -17,18 +17,16 @@ struct PlaylistMetadataView: View {
 
     var body: some View {
         HStack(spacing: 25) {
-//            if hasArtwork {
-//                artworkView()
-//                    .motionCard(scale: 1.02, angle: .degrees(5))
-//            }
+            if hasArtwork {
+                artworkView()
+                    .motionCard(scale: 1.02, angle: .degrees(5))
+            }
 
             VStack(alignment: .leading) {
-//                titleView()
-//                    .font(.title)
+                titleView()
+                    .font(.title)
 
-//                descriptionView()
-                Text("\(playlist.segments)")
-                    .foregroundStyle(.secondary)
+                descriptionView()
             }
         }
         .frame(height: 250)

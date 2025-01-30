@@ -57,15 +57,16 @@ struct PlaylistView: View {
                 PlaylistMetadataView(playlist: player.playlist)
                     .selectionDisabled()
                     .frame(height: metadataHeight)
+                    .padding(.horizontal)
             }
 
             // MARK: Controls Placeholder
 
-            // This is much more stable than `.contentMargins()`
-            ScrollOffsetReader(offset: $scrollOffset)
-                .frame(height: minHeight)
-                .listRowSeparator(.hidden)
-                .selectionDisabled()
+//            // This is much more stable than `.contentMargins()`
+//            ScrollOffsetReader(offset: $scrollOffset)
+//                .frame(height: minHeight)
+//                .listRowSeparator(.hidden)
+//                .selectionDisabled()
 
             // MARK: Tracks
 
@@ -86,7 +87,7 @@ struct PlaylistView: View {
         }
         .scrollClipDisabled()
         .scrollContentBackground(.hidden)
-        .scrollOffsetID(.automatic)
+//        .scrollOffsetID(.automatic)
         .overlay(alignment: .top) {
             // MARK: Controls
 
@@ -113,10 +114,11 @@ struct PlaylistView: View {
             .padding(.horizontal)
             .padding(.top, 8)
             .offset(y: max(0, metadataHeight + scrollOffset))
+            .animation(.smooth, value: scrollOffset)
         }
-//        .animation(.default, value: player.playlist.tracks)
-//        .animation(.default, value: player.playlist.mode)
-//        .animation(.default, value: player.selectedTracks)
+        .animation(.default, value: player.playlist.tracks)
+        .animation(.default, value: player.playlist.mode)
+        .animation(.default, value: player.selectedTracks)
 
         // MARK: Keyboard Handlers
 
