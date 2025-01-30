@@ -45,6 +45,7 @@ struct FloatingTabBarView: View {
         }
         .animation(animation, value: selectedContentTab)
         .task {
+            // Without animation
             isHovering = false
         }
         .onHover { hover in
@@ -55,7 +56,7 @@ struct FloatingTabBarView: View {
         .onChange(of: selectedContentTab) { _, newValue in
             guard isInspectorPresented else { return }
             if !newValue.inspectors.contains(selectedInspectorTab) {
-                // Tell the inspector to close
+                // Tells the inspector to close
                 isInspectorPresented = false
             }
         }
@@ -64,7 +65,7 @@ struct FloatingTabBarView: View {
         .clipShape(.rect(cornerRadius: 24))
         .frame(maxWidth: .infinity, alignment: .leading)
         .contentShape(.rect(cornerRadius: 24))
-        .fixedSize(horizontal: false, vertical: true) // Force resizing window
+        .fixedSize(horizontal: false, vertical: true) // Force resizes window
     }
 
     private var isExpanded: Bool {

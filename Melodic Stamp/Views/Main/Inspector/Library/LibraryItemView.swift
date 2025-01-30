@@ -5,12 +5,14 @@
 //  Created by KrLite on 2025/1/28.
 //
 
+import Luminare
 import SwiftUI
 
 struct LibraryItemView: View {
     @Environment(PlayerModel.self) private var player
 
     @Environment(\.openWindow) private var openWindow
+    @Environment(\.luminareAnimationFast) private var animationFast
 
     var playlist: Playlist
     var isSelected: Bool
@@ -21,7 +23,7 @@ struct LibraryItemView: View {
         HStack(alignment: .center) {
             VStack(alignment: .leading, spacing: 2) {
                 if hasTitle {
-                    Text(playlist[metadata: \.info].title)
+                    Text(playlist.segments.info.title)
                         .bold()
                         .font(.title3)
                 } else {
@@ -63,14 +65,13 @@ struct LibraryItemView: View {
         .frame(height: 50)
         .padding(6)
         .padding(.trailing, -1)
+        .animation(animationFast, value: isHovering)
         .background {
             Color.clear
                 .onDoubleClick(handler: open)
         }
         .onHover { hover in
-            withAnimation(.default.speed(5)) {
-                isHovering = hover
-            }
+            isHovering = hover
         }
     }
 
@@ -79,11 +80,11 @@ struct LibraryItemView: View {
     }
 
     private var hasTitle: Bool {
-        !playlist[metadata: \.info].title.isEmpty
+        !playlist.segments.info.title.isEmpty
     }
 
     private var hasArtwork: Bool {
-        playlist[metadata: \.artwork].image != nil
+        playlist.segments.artwork.image != nil
     }
 
     private var hasControl: Bool {
@@ -96,9 +97,9 @@ struct LibraryItemView: View {
 
     @ViewBuilder private func coverView() -> some View {
         ZStack {
-            if let image = playlist[metadata: \.artwork].image {
+            if let artwork = playlist.segments.artwork.image {
                 MusicCover(
-                    images: [image], hasPlaceholder: false, cornerRadius: 4
+                    images: [artwork], hasPlaceholder: false, cornerRadius: 4
                 )
                 .overlay {
                     if isHovering, !isOpened {

@@ -36,12 +36,11 @@ import SwiftUI
 
             let track = sampleTrack
 
-            player.play(track.url)
+            player.playlist.add([track])
             player.selectedTracks = [track]
+            player.play(track.url)
 
-            player[playlistMetadata: \.info] = samplePlaylistMetadata.info
-            player[playlistMetadata: \.state] = samplePlaylistMetadata.state
-            player[playlistMetadata: \.artwork] = samplePlaylistMetadata.artwork
+            player.playlistMetadataSegments = samplePlaylistMetadata.segments
 
             let image = NSImage(resource: .templateArtwork)
             await gradientVisualizer.updateDominantColors(from: image)
@@ -111,9 +110,9 @@ import SwiftUI
         static var samplePlaylistMetadata: Playlist.Metadata {
             var metadata = Playlist.Metadata.blank()
 
-            metadata.info.title = "Sample Playlist"
-            metadata.info.description = "A sample playlist."
-            metadata.artwork.tiffRepresentation = sampleArtwork.tiffRepresentation
+            metadata.segments.info.title = "Sample Playlist"
+            metadata.segments.info.description = "A sample playlist."
+            metadata.segments.artwork.tiffRepresentation = sampleArtwork.tiffRepresentation
 
             return metadata
         }
@@ -121,9 +120,7 @@ import SwiftUI
         static var samplePlaylist: Playlist {
             let playlist = Playlist.referenced()
 
-            playlist[metadata: \.info] = samplePlaylistMetadata.info
-            playlist[metadata: \.state] = samplePlaylistMetadata.state
-            playlist[metadata: \.artwork] = samplePlaylistMetadata.artwork
+            playlist.segments = samplePlaylistMetadata.segments
 
             playlist.add([sampleTrack])
             playlist.currentTrack = sampleTrack

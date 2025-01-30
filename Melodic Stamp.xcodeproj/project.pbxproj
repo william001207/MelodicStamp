@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		2810E2452CFB169E006FF94A /* Morphed in Frameworks */ = {isa = PBXBuildFile; productRef = 2810E2442CFB169E006FF94A /* Morphed */; };
 		2845A9F72D08745900CD7517 /* SmartCache in Frameworks */ = {isa = PBXBuildFile; productRef = 2845A9F62D08745900CD7517 /* SmartCache */; };
+		287260F52D4B2EDD00D501FB /* SwiftUIScrollOffset in Frameworks */ = {isa = PBXBuildFile; productRef = 287260F42D4B2EDD00D501FB /* SwiftUIScrollOffset */; };
 		28797B9A2D10724C00FB4395 /* SwiftUIIntrospect in Frameworks */ = {isa = PBXBuildFile; productRef = 28797B992D10724C00FB4395 /* SwiftUIIntrospect */; };
 		287F978D2CF3160700C60307 /* Luminare in Frameworks */ = {isa = PBXBuildFile; productRef = 287F978C2CF3160700C60307 /* Luminare */; };
 		65D940472D26671900F67AA6 /* MeshGradient in Frameworks */ = {isa = PBXBuildFile; productRef = 65D940462D26671900F67AA6 /* MeshGradient */; };
@@ -64,6 +65,7 @@
 			files = (
 				65D940492D26671900F67AA6 /* MeshGradientCHeaders in Frameworks */,
 				2810E2452CFB169E006FF94A /* Morphed in Frameworks */,
+				287260F52D4B2EDD00D501FB /* SwiftUIScrollOffset in Frameworks */,
 				65F1DAB32CEDBED700389E37 /* SFSafeSymbols in Frameworks */,
 				2845A9F72D08745900CD7517 /* SmartCache in Frameworks */,
 				65D940472D26671900F67AA6 /* MeshGradient in Frameworks */,
@@ -155,6 +157,7 @@
 				65EE5C9A2D1CEBD30026B8F1 /* DominantColors */,
 				65D940462D26671900F67AA6 /* MeshGradient */,
 				65D940482D26671900F67AA6 /* MeshGradientCHeaders */,
+				287260F42D4B2EDD00D501FB /* SwiftUIScrollOffset */,
 			);
 			productName = MelodicStamp;
 			productReference = 65F1DA012CECCEE900389E37 /* Melodic Stamp.app */;
@@ -203,6 +206,7 @@
 				28797B982D10724C00FB4395 /* XCRemoteSwiftPackageReference "swiftui-introspect" */,
 				65EE5C992D1CEBD30026B8F1 /* XCRemoteSwiftPackageReference "DominantColors" */,
 				65D940452D26671900F67AA6 /* XCRemoteSwiftPackageReference "MeshGradient" */,
+				287260F32D4B2EDD00D501FB /* XCRemoteSwiftPackageReference "SwiftUIScrollOffset" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 65F1DA022CECCEE900389E37 /* Products */;
@@ -533,6 +537,14 @@
 				minimumVersion = 1.0.0;
 			};
 		};
+		287260F32D4B2EDD00D501FB /* XCRemoteSwiftPackageReference "SwiftUIScrollOffset" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/ciaranrobrien/SwiftUIScrollOffset";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
 		28797B982D10724C00FB4395 /* XCRemoteSwiftPackageReference "swiftui-introspect" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/siteline/swiftui-introspect";
@@ -625,6 +637,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 2845A9F52D08745900CD7517 /* XCRemoteSwiftPackageReference "smart-cache" */;
 			productName = SmartCache;
+		};
+		287260F42D4B2EDD00D501FB /* SwiftUIScrollOffset */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 287260F32D4B2EDD00D501FB /* XCRemoteSwiftPackageReference "SwiftUIScrollOffset" */;
+			productName = SwiftUIScrollOffset;
 		};
 		28797B992D10724C00FB4395 /* SwiftUIIntrospect */ = {
 			isa = XCSwiftPackageProductDependency;

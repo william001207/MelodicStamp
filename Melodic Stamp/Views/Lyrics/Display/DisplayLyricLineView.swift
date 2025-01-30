@@ -57,10 +57,10 @@ struct DisplayLyricLineView: View {
             .opacity(hasFadingEffect ? opacity : 1)
             .hoverableBackground()
             .clipShape(.rect(cornerRadius: 12))
+            .animation(.smooth(duration: 0.25), value: hasFadingEffect)
             .onHover { hover in
                 isHovering = hover
             }
-            .animation(.smooth(duration: 0.25), value: hasFadingEffect)
         }
         .buttonStyle(.alive(enabledStyle: .white))
     }

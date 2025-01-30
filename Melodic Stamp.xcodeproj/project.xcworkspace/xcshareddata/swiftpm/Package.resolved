@@ -1,5 +1,5 @@
 {
-  "originHash" : "4514d8c92410fcfc774b458dffb34494e8fb2175ee96501b6f61195093c93412",
+  "originHash" : "2613bd3a89b90602c381f357be6be4a9c61719af98c26828e654056aa54348d2",
   "pins" : [
     {
       "identity" : "avfaudioextensions",
@@ -251,6 +251,15 @@
       "state" : {
         "revision" : "af67d0e85bd2b499fbfb4cda834117e7c52b12b0",
         "version" : "1.0.0"
+      }
+    },
+    {
+      "identity" : "swiftuiscrolloffset",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/ciaranrobrien/SwiftUIScrollOffset",
+      "state" : {
+        "branch" : "main",
+        "revision" : "e9a3d34a3597e1940b0de7d1d9b38fcb16f0565e"
       }
     },
     {

@@ -43,27 +43,32 @@ extension Playlist.Metadata {
     }
 }
 
+extension Playlist.Metadata {
+    struct Segments: Equatable, Hashable, Codable {
+        var info: Info = .init()
+        var state: State = .init()
+        var artwork: Artwork = .init()
+    }
+}
+
 extension Playlist {
     struct Metadata: Equatable, Hashable, Identifiable, Codable {
-        nonisolated let id: UUID
+        let id: UUID
+        var segments: Segments
 
-        var info: Info
-        var state: State
-        var artwork: Artwork
-
-        private init(id: UUID, info: Info, state: State, artwork: Artwork) {
+        private init(id: UUID, segments: Segments) {
             self.id = id
-            self.info = info
-            self.state = state
-            self.artwork = artwork
+            self.segments = segments
         }
 
         init(readingFromPlaylistID id: UUID) async throws {
             let url = Self.url(forID: id)
             self.id = id
-            self.info = try await JSONDecoder().decode(Info.self, from: Self.read(segment: .info, fromDirectory: url))
-            self.state = try await JSONDecoder().decode(State.self, from: Self.read(segment: .state, fromDirectory: url))
-            self.artwork = try await JSONDecoder().decode(Artwork.self, from: Self.read(segment: .artwork, fromDirectory: url))
+
+            let info = try await JSONDecoder().decode(Info.self, from: Self.read(segment: .info, fromDirectory: url))
+            let state = try await JSONDecoder().decode(State.self, from: Self.read(segment: .state, fromDirectory: url))
+            let artwork = try await JSONDecoder().decode(Artwork.self, from: Self.read(segment: .artwork, fromDirectory: url))
+            self.segments = .init(info: info, state: state, artwork: artwork)
 
             logger.info("Successfully read playlist metadata for playlist at \(url)")
 
@@ -76,7 +81,7 @@ extension Playlist {
 
 extension Playlist.Metadata {
     static func blank(bindingTo id: UUID = .init()) -> Self {
-        .init(id: id, info: .init(), state: .init(), artwork: .init())
+        .init(id: id, segments: .init())
     }
 
     static func url(forID id: UUID) -> URL {
@@ -93,11 +98,11 @@ extension Playlist.Metadata {
         for segment in segments {
             let data = switch segment {
             case .info:
-                try JSONEncoder().encode(info)
+                try JSONEncoder().encode(self.segments.info)
             case .state:
-                try JSONEncoder().encode(state)
+                try JSONEncoder().encode(self.segments.state)
             case .artwork:
-                try JSONEncoder().encode(artwork)
+                try JSONEncoder().encode(self.segments.artwork)
             }
             try Self.write(segment: segment, ofData: data, toDirectory: url)
         }

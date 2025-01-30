@@ -5,9 +5,12 @@
 //  Created by KrLite on 2025/1/4.
 //
 
+import Luminare
 import SwiftUI
 
 struct HoverableLabel<Content>: View where Content: View {
+    @Environment(\.luminareAnimationFast) private var animationFast
+
     @ViewBuilder var content: (Bool) -> Content
 
     var isExternallyHovering: Bool?
@@ -16,7 +19,7 @@ struct HoverableLabel<Content>: View where Content: View {
 
     var body: some View {
         content(isHovering)
-            .animation(.smooth, value: isHovering)
+            .animation(animationFast, value: isHovering)
             .onHover { hover in
                 isInternallyHovering = hover
             }

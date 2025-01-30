@@ -175,10 +175,9 @@ struct LabeledTextField<F, Label>: View where F: ParseableFormatStyle, F.FormatO
             .foregroundStyle(.secondary)
             .frame(height: minHeight)
             .fixedSize()
+            .animation(animationFast, value: isLabelHovering)
             .onHover { hover in
-                withAnimation(animationFast) {
-                    isLabelHovering = hover
-                }
+                isLabelHovering = hover
             }
         }
     }

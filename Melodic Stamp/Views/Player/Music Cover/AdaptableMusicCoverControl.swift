@@ -125,10 +125,10 @@ struct AdaptableMusicCoverControl: View {
                     }
             }
         }
+        .animation(.smooth(duration: 0.25), value: isHeaderHovering)
         .onHover { hover in
             isHeaderHovering = hover
         }
-        .animation(.smooth(duration: 0.25), value: isHeaderHovering)
     }
 
     @ViewBuilder private func imageView() -> some View {

@@ -9,6 +9,21 @@ import AppKit
 import Luminare
 import SFSafeSymbols
 import SwiftUI
+import SwiftUIScrollOffset
+
+private struct ScrollOffsetReader: View {
+    @ScrollOffset(.top) private var scrollOffset
+
+    @Binding var offset: CGFloat
+
+    var body: some View {
+        Color.clear
+            .frame(height: 0)
+            .onChange(of: scrollOffset, initial: true) { _, newValue in
+                offset = newValue
+            }
+    }
+}
 
 struct PlaylistView: View {
     // MARK: - Environments
@@ -25,6 +40,7 @@ struct PlaylistView: View {
 
     var namespace: Namespace.ID
 
+    @State private var scrollOffset: CGFloat = .zero
     @State private var bounceAnimationTriggers: Set<Track> = []
 
     // MARK: - Body
@@ -32,100 +48,45 @@ struct PlaylistView: View {
     var body: some View {
         @Bindable var player = player
 
-        Group {
-            if player.isPlaylistEmpty {
-                ExcerptView(tab: SidebarContentTab.playlist)
-            } else {
-                // MARK: List
+        // MARK: List
 
-                List(selection: $player.selectedTracks) {
-                    // This is much more stable than `.contentMargins()`
-                    Spacer()
-                        .frame(height: minHeight)
-                        .listRowSeparator(.hidden)
+        List(selection: $player.selectedTracks) {
+            if player.playlist.mode.isCanonical {
+                // MARK: Metadata
 
-                    ForEach(player.playlist.tracks) { track in
-                        itemView(for: track)
-                            .id(track)
-                            .draggable(track) {
-                                TrackPreview(track: track)
-                            }
-                            .bounceAnimation(bounceAnimationTriggers.contains(track), scale: .init(width: 1.01, height: 1.01))
+                PlaylistMetadataView(playlist: player.playlist)
+                    .selectionDisabled()
+                    .frame(height: metadataHeight)
+            }
+
+            // MARK: Controls Placeholder
+
+            // This is much more stable than `.contentMargins()`
+            ScrollOffsetReader(offset: $scrollOffset)
+                .frame(height: minHeight)
+                .listRowSeparator(.hidden)
+                .selectionDisabled()
+
+            // MARK: Tracks
+
+            ForEach(player.playlist.tracks) { track in
+                itemView(for: track)
+                    .id(track)
+                    .draggable(track) {
+                        TrackPreview(track: track)
                     }
-                    .onMove { indices, destination in
-                        withAnimation {
-                            player.moveTrack(fromOffsets: indices, toOffset: destination)
-                        }
-                    }
-                    .transition(.slide)
-                }
-                .scrollClipDisabled()
-                .scrollContentBackground(.hidden)
-                .animation(.default, value: player.playlist)
-                .animation(.default, value: player.selectedTracks)
-
-                // MARK: Keyboard Handlers
-
-                // Handle [escape] -> clear selection
-                .onKeyPress(.escape) {
-                    if handleEscape() {
-                        .handled
-                    } else {
-                        .ignored
-                    }
-                }
-
-                // Handle [􁂒] -> remove selection
-                .onKeyPress(.deleteForward) {
-                    if handleRemove(player.selectedTracks.map(\.url)) {
-                        .handled
-                    } else {
-                        .ignored
-                    }
-                }
-
-                // Handle [⏎] -> play
-                .onKeyPress(.return) {
-                    if player.selectedTracks.count == 1, let track = player.selectedTracks.first {
-                        player.play(track.url)
-                        return .handled
-                    } else {
-                        return .ignored
-                    }
-                }
-
-                // Handle [space] -> toggle play / pause
-                .onKeyPress(keys: [.space], phases: .all) { key in
-                    keyboardControl.handlePlayPause(
-                        phase: key.phase, modifiers: key.modifiers
-                    )
-                }
-
-                // Handle [← / →] -> adjust progress
-                .onKeyPress(keys: [.leftArrow, .rightArrow], phases: .all) { key in
-                    let sign: FloatingPointSign = key.key == .leftArrow ? .minus : .plus
-
-                    return keyboardControl.handleProgressAdjustment(
-                        phase: key.phase, modifiers: key.modifiers, sign: sign
-                    )
-                }
-
-                // Handle [↑ / ↓] -> adjust volume
-                .onKeyPress(keys: [.leftArrow, .rightArrow], phases: .all) { key in
-                    let sign: FloatingPointSign = key.key == .leftArrow ? .minus : .plus
-
-                    return keyboardControl.handleVolumeAdjustment(
-                        phase: key.phase, modifiers: key.modifiers, sign: sign
-                    )
-                }
-
-                // Handle [m] -> toggle muted
-                .onKeyPress(keys: ["m"], phases: .down) { _ in
-                    player.isMuted.toggle()
-                    return .handled
+                    .bounceAnimation(bounceAnimationTriggers.contains(track), scale: .init(width: 1.01, height: 1.01))
+            }
+            .onMove { indices, destination in
+                withAnimation {
+                    player.moveTrack(fromOffsets: indices, toOffset: destination)
                 }
             }
+            .transition(.slide)
         }
+        .scrollClipDisabled()
+        .scrollContentBackground(.hidden)
+        .scrollOffsetID(.automatic)
         .overlay(alignment: .top) {
             // MARK: Controls
 
@@ -151,10 +112,71 @@ struct PlaylistView: View {
             }
             .padding(.horizontal)
             .padding(.top, 8)
+            .offset(y: max(0, metadataHeight + scrollOffset))
         }
-        .onChange(of: player.playlist.tracks) { oldValue, newValue in
-            let addedTracks = Set(newValue).subtracting(oldValue)
-            addedTracks.forEach(toggleBounceAnimation(for:))
+//        .animation(.default, value: player.playlist.tracks)
+//        .animation(.default, value: player.playlist.mode)
+//        .animation(.default, value: player.selectedTracks)
+
+        // MARK: Keyboard Handlers
+
+        // Handle [escape] -> clear selection
+        .onKeyPress(.escape) {
+            if handleEscape() {
+                .handled
+            } else {
+                .ignored
+            }
+        }
+
+        // Handle [􁂒] -> remove selection
+        .onKeyPress(.deleteForward) {
+            if handleRemove(player.selectedTracks.map(\.url)) {
+                .handled
+            } else {
+                .ignored
+            }
+        }
+
+        // Handle [⏎] -> play
+        .onKeyPress(.return) {
+            if player.selectedTracks.count == 1, let track = player.selectedTracks.first {
+                player.play(track.url)
+                return .handled
+            } else {
+                return .ignored
+            }
+        }
+
+        // Handle [space] -> toggle play / pause
+        .onKeyPress(keys: [.space], phases: .all) { key in
+            keyboardControl.handlePlayPause(
+                phase: key.phase, modifiers: key.modifiers
+            )
+        }
+
+        // Handle [← / →] -> adjust progress
+        .onKeyPress(keys: [.leftArrow, .rightArrow], phases: .all) { key in
+            let sign: FloatingPointSign = key.key == .leftArrow ? .minus : .plus
+
+            return keyboardControl.handleProgressAdjustment(
+                phase: key.phase, modifiers: key.modifiers, sign: sign
+            )
+        }
+
+        // Handle [↑ / ↓] -> adjust volume
+        .onKeyPress(keys: [.leftArrow, .rightArrow], phases: .all) { key in
+            let sign: FloatingPointSign = key.key == .leftArrow ? .minus : .plus
+
+            return keyboardControl.handleVolumeAdjustment(
+                phase: key.phase, modifiers: key.modifiers, sign: sign
+            )
+        }
+
+        // Handle [m] -> toggle muted
+        .onKeyPress(keys: ["m"], phases: .down) { _ in
+            player.isMuted.toggle()
+            return .handled
         }
     }
 
@@ -164,6 +186,15 @@ struct PlaylistView: View {
 
     private var canRemove: Bool {
         !player.playlist.isEmpty
+    }
+
+    private var metadataHeight: CGFloat {
+        switch player.playlist.mode {
+        case .referenced:
+            .zero
+        case .canonical:
+            300
+        }
     }
 
     // MARK: - Leading Actions

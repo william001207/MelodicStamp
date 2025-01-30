@@ -24,4 +24,8 @@ extension URL {
         let isReachable = (try? checkResourceIsReachable()) ?? false
         return startAccessingSecurityScopedResource() || isReachable
     }
+
+    func attribute(_ key: FileAttributeKey) throws -> Any? {
+        try FileManager.default.attributesOfItem(atPath: path())[key]
+    }
 }

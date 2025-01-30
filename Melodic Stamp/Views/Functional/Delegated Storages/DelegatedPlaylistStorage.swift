@@ -150,7 +150,7 @@ struct DelegatedPlaylistStorage: View {
             }
             player.addToPlaylist(urls)
 
-            player[playlistMetadata: \.state] = .init(
+            player.playlistMetadataSegments.state = .init(
                 currentTrackURL: currentTrackURL,
                 currentTrackElapsedTime: currentTrackElapsedTime,
                 playbackMode: playbackMode,
@@ -171,10 +171,10 @@ struct DelegatedPlaylistStorage: View {
 
             delegatedPlaylist = .unhandled(
                 bookmarks: bookmarks,
-                currentTrackURL: playlist[metadata: \.state].currentTrackURL,
-                currentTrackElapsedTime: playlist[metadata: \.state].currentTrackElapsedTime,
-                playbackMode: playlist[metadata: \.state].playbackMode,
-                playbackLooping: playlist[metadata: \.state].playbackLooping
+                currentTrackURL: playlist.segments.state.currentTrackURL,
+                currentTrackElapsedTime: playlist.segments.state.currentTrackElapsedTime,
+                playbackMode: playlist.segments.state.playbackMode,
+                playbackLooping: playlist.segments.state.playbackLooping
             )
         }
         self.playlist = try? JSONEncoder().encode(delegatedPlaylist)

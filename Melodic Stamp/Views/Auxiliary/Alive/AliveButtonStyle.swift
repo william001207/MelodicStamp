@@ -122,16 +122,16 @@ struct AliveButtonStyle: ButtonStyle {
                     }
                 }
             }
-            .onHover { hover in
-                isHovering = hover
-            }
             .foregroundStyle(style)
             .scaleEffect(computedScaleFactor, anchor: .center)
             .shadow(color: .black.opacity(isActive ? 0.1 : 0), radius: isActive ? shadowRadius : 0)
-            .animation(hasHoveringStyle ? .default : nil, value: isHovering) // Avoid unnecessary transitions on hover
+            .animation(hasHoveringStyle ? .default : nil, value: isHovering) // Avoids unnecessary transitions on hover
             .animation(.bouncy, value: isActive)
             .animation(.bouncy, value: isPressed)
             .animation(.default, value: isEnabled)
+            .onHover { hover in
+                isHovering = hover
+            }
     }
 
     private var computedScaleFactor: CGFloat {

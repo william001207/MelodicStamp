@@ -86,10 +86,9 @@ struct LabeledOptionalControl<V, Label, Content, ContentB>: View
         .buttonStyle(.alive)
         .modifier(LuminareHoverable())
         .luminareAspectRatio(contentMode: .fill)
+        .animation(animationFast, value: isHovering)
         .onHover { hover in
-            withAnimation(animationFast) {
-                isHovering = hover
-            }
+            isHovering = hover
         }
         .onChange(of: entries.projectedValue?.wrappedValue) { oldValue, _ in
             registerUndo(oldValue, for: entries)

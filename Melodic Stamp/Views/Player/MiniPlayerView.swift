@@ -43,6 +43,7 @@ struct MiniPlayerView: View {
     @Environment(KeyboardControlModel.self) private var keyboardControl
 
     @Environment(\.appearsActive) private var appearsActive
+    @Environment(\.luminareAnimationFast) private var animationFast
 
     @FocusState private var isFocused: Bool
 
@@ -78,11 +79,6 @@ struct MiniPlayerView: View {
         VStack(spacing: 12) {
             header()
                 .padding(.horizontal, 4)
-                .onHover { hover in
-                    withAnimation(.default.speed(2)) {
-                        isTitleHovering = hover
-                    }
-                }
 
             HStack(alignment: .center, spacing: 12) {
                 leadingControls()
@@ -309,6 +305,10 @@ struct MiniPlayerView: View {
         }
         .buttonStyle(.alive(enabledStyle: .tertiary, hoveringStyle: .secondary))
         .frame(height: 16)
+        .animation(animationFast, value: isTitleHovering)
+        .onHover { hover in
+            isTitleHovering = hover
+        }
     }
 
     // MARK: - Leading Controls

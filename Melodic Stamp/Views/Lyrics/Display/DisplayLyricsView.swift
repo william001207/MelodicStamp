@@ -84,12 +84,11 @@ struct DisplayLyricsView: View {
                 Color.clear
             }
         }
-        .onHover { hover in
-            withAnimation(.smooth(duration: 0.45)) {
-                isHovering = hover
-            }
-        }
+        .animation(.smooth(duration: 0.45), value: isHovering)
         .animation(.linear(duration: PlayerModel.interval), value: elapsedTime) // For time interpolation
+        .onHover { hover in
+            isHovering = hover
+        }
     }
 
     private var identifier: Identifier {

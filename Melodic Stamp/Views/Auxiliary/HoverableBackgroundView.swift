@@ -5,9 +5,12 @@
 //  Created by KrLite on 2025/1/12.
 //
 
+import Luminare
 import SwiftUI
 
 struct HoverableBackgroundView<Content>: View where Content: View {
+    @Environment(\.luminareAnimationFast) private var animationFast
+
     var isExplicitlyVisible: Bool?
     @ViewBuilder var content: () -> Content
 
@@ -21,10 +24,10 @@ struct HoverableBackgroundView<Content>: View where Content: View {
                     .opacity(isVisible ? 0.1 : 0)
                     .blendMode(.multiply)
             }
+            .animation(animationFast, value: isVisible)
             .onHover { hover in
                 isHovering = hover
             }
-            .animation(.smooth(duration: 0.25), value: isVisible)
     }
 
     private var isVisible: Bool {

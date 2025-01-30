@@ -12,6 +12,8 @@ import SwiftUI
 struct TrackView: View {
     @Environment(PlayerModel.self) private var player
 
+    @Environment(\.luminareAnimationFast) private var animationFast
+
     var track: Track
     var isSelected: Bool
 
@@ -110,14 +112,13 @@ struct TrackView: View {
         .padding(.trailing, -1)
         .wiggleAnimation(wiggleAnimationTrigger)
         .bounceAnimation(bounceAnimationTrigger, scale: .init(width: 1.01, height: 1.01))
+        .animation(animationFast, value: isHovering)
         .background {
             Color.clear
                 .onDoubleClick(handler: play)
         }
         .onHover { hover in
-            withAnimation(.default.speed(5)) {
-                isHovering = hover
-            }
+            isHovering = hover
         }
         .onChange(of: track.metadata.state) { _, newValue in
             guard newValue.isError else { return }

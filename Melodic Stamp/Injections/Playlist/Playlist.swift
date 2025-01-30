@@ -34,9 +34,29 @@ extension Playlist {
     private var indexer: TrackIndexer
 
     private(set) var tracks: [Track] = []
+
+    // Delegated variables
+    // Must not have inlined getters and setters, otherwise causing UI glitches
+
+    var segments: Metadata.Segments = .init() {
+        didSet {
+            Task {
+                metadata.segments = segments
+            }
+        }
+    }
+
     var currentTrack: Track? {
-        get { first { $0.url == metadata.state.currentTrackURL } }
-        set { metadata.state.currentTrackURL = newValue?.url }
+        didSet {
+            Task {
+                metadata.segments.state.currentTrackURL = currentTrack?.url
+            }
+        }
+    }
+
+    private func loadDelegatedVariables() {
+//        metadataSegments = metadata.segments
+//        currentTrack = tracks.first { $0.url == metadata.segments.state.currentTrackURL }
     }
 
     var id: UUID {
@@ -63,6 +83,7 @@ extension Playlist {
         self.mode = mode
         self.metadata = metadata
         self.indexer = .init(playlistID: metadata.id)
+        loadDelegatedVariables()
     }
 
     convenience init?(loadingWith id: UUID) async {
@@ -93,15 +114,16 @@ extension Playlist {
             guard let migratedTrack = try? await migrateTrack(from: track) else { continue }
             migratedTracks.append(migratedTrack)
 
-            let wasCurrentTrack = track.url == metadata.state.currentTrackURL
+            let wasCurrentTrack = track.url == metadata.segments.state.currentTrackURL
             if wasCurrentTrack {
                 migratedCurrentTrackURL = migratedTrack.url
             }
         }
 
-        metadata.state.currentTrackURL = migratedCurrentTrackURL
+        metadata.segments.state.currentTrackURL = migratedCurrentTrackURL
         clearPlaylist()
         add(migratedTracks)
+        loadDelegatedVariables()
 
         logger.info("Successfully made canonical playlist at \(url)")
     }
@@ -169,11 +191,6 @@ extension Playlist {
 }
 
 extension Playlist {
-    subscript<V>(metadata keyPath: WritableKeyPath<Metadata, V>) -> V {
-        get { metadata[keyPath: keyPath] }
-        set { metadata[keyPath: keyPath] = newValue }
-    }
-
     func writeMetadata(segments: [Metadata.Segment] = Metadata.Segment.allCases) throws {
         try metadata.write(segments: segments)
     }
@@ -208,7 +225,7 @@ extension Playlist {
     }
 
     private var nextIndex: Int? {
-        switch metadata.state.playbackMode {
+        switch metadata.segments.state.playbackMode {
         case .sequential:
             guard let currentIndex else { return nil }
             let nextIndex = currentIndex + 1
@@ -224,7 +241,7 @@ extension Playlist {
     }
 
     private var previousIndex: Int? {
-        switch metadata.state.playbackMode {
+        switch metadata.segments.state.playbackMode {
         case .sequential:
             guard let currentIndex else { return nil }
             let previousIndex = currentIndex - 1

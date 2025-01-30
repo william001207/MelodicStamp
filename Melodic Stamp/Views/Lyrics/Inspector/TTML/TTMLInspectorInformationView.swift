@@ -27,10 +27,9 @@ struct TTMLInspectorInformationView<Content>: View where Content: View {
         }
         .font(.subheadline)
         .opacity(isHovering ? 1 : 0.6)
+        .animation(animationFast, value: isHovering)
         .onHover { hover in
-            withAnimation(animationFast) {
-                isHovering = hover
-            }
+            isHovering = hover
         }
     }
 }

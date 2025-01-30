@@ -83,9 +83,9 @@ struct LeafletLyricsControlsView: View {
         .frame(width: 48)
         .hoverableBackground()
         .clipShape(.capsule)
+        .animation(.smooth(duration: 0.25), value: isHovering)
         .onHover { hover in
             isHovering = hover
         }
-        .animation(.smooth(duration: 0.25), value: isHovering)
     }
 }
