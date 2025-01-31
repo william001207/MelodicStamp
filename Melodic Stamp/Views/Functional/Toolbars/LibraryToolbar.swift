@@ -9,7 +9,7 @@ import Defaults
 import SwiftUI
 
 struct LibraryToolbar: View {
-    @Environment(PlayerModel.self) private var player
+    @Environment(PlaylistModel.self) private var playlist
 
     @Default(.asksForPlaylistInformation) private var asksForPlaylistInformation
 
@@ -17,13 +17,13 @@ struct LibraryToolbar: View {
     @State private var isPlaylistSegmentsSheetPresented: Bool = false
 
     var body: some View {
-        @Bindable var player = player
+        @Bindable var playlist = playlist
 
-        if !player.playlistStatus.mode.isCanonical || shouldWaitForPresentation {
+        if !playlist.mode.isCanonical || shouldWaitForPresentation {
             Button {
                 shouldWaitForPresentation = asksForPlaylistInformation
                 Task.detached {
-                    try await player.makePlaylistCanonical()
+                    try await playlist.makeCanonical()
                 }
             } label: {
                 ToolbarLabel {
@@ -33,15 +33,15 @@ struct LibraryToolbar: View {
                     Text("Add to Library")
                 }
             }
-            .disabled(player.playlistStatus.canMakeCanonical)
-            .onChange(of: player.playlistStatus.mode) { _, newValue in
+            .disabled(playlist.canMakeCanonical)
+            .onChange(of: playlist.mode) { _, newValue in
                 guard newValue.isCanonical, asksForPlaylistInformation else { return }
                 isPlaylistSegmentsSheetPresented = true
             }
             .sheet(isPresented: $isPlaylistSegmentsSheetPresented) {
                 shouldWaitForPresentation = false
             } content: {
-                PlaylistMetadataView(status: player.playlistStatus)
+                PlaylistMetadataView()
                     .padding(.horizontal)
                     .padding(.top)
                     .padding(.bottom, -8)

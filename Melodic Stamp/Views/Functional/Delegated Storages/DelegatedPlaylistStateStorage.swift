@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct DelegatedPlaylistStateStorage: View {
-    @Environment(PlayerModel.self) private var player
+    @Environment(PlaylistModel.self) private var playlist
 
     var body: some View {
         ZStack {
@@ -18,10 +18,10 @@ struct DelegatedPlaylistStateStorage: View {
 
     @ViewBuilder private func stateObservations() -> some View {
         Color.clear
-            .onChange(of: player.playlistStatus) { _, _ in
-                guard player.playlistStatus.mode.isCanonical else { return }
+            .onChange(of: playlist) { _, newValue in
+                guard newValue.mode.isCanonical else { return }
                 Task.detached {
-                    try await player.playlistStatus.write(segments: [.state])
+                    try newValue.write(segments: [.state])
                 }
             }
     }

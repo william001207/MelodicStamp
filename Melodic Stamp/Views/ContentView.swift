@@ -66,6 +66,7 @@ struct ContentView: View {
 
     @State private var windowManager: WindowManagerModel
     @State private var fileManager: FileManagerModel
+    @State private var playlist: PlaylistModel
     @State private var player: PlayerModel
     @State private var keyboardControl: KeyboardControlModel
     @State private var metadataEditor: MetadataEditorModel
@@ -86,10 +87,12 @@ struct ContentView: View {
     // MARK: - Initializers
 
     init(_ parameters: CreationParameters, library: LibraryModel) {
-        let player = PlayerModel(SFBAudioEnginePlayer(), library: library, bindingTo: parameters.id)
+        let playlist = PlaylistModel(bindingTo: parameters.id, library: library)
+        let player = PlayerModel(SFBAudioEnginePlayer(), library: library, playlist: playlist)
 
         self.windowManager = WindowManagerModel(style: parameters.initialWindowStyle)
-        self.fileManager = FileManagerModel(player: player)
+        self.fileManager = FileManagerModel(player: player, playlist: playlist)
+        self.playlist = playlist
         self.player = player
         self.keyboardControl = KeyboardControlModel(player: player)
         self.metadataEditor = MetadataEditorModel(player: player)
@@ -121,7 +124,7 @@ struct ContentView: View {
             }
             .dropDestination(for: Track.self) { tracks, _ in
                 Task.detached {
-                    await player.streamAppendToPlaylist(tracks.map(\.url))
+                    await playlist.append(tracks.map(\.url))
                 }
                 return true
             }
@@ -158,7 +161,7 @@ struct ContentView: View {
 
             // MARK: Updates
 
-            .onChange(of: player.currentTrack) { _, newValue in
+            .onChange(of: playlist.currentTrack) { _, newValue in
                 Task {
                     if let newValue, let attachedPictures = newValue.metadata[extracting: \.attachedPictures]?.current {
                         let cover = ThumbnailMaker.getCover(from: attachedPictures)?.image
@@ -186,6 +189,7 @@ struct ContentView: View {
 
         .environment(windowManager)
         .environment(fileManager)
+        .environment(playlist)
         .environment(player)
         .environment(keyboardControl)
         .environment(metadataEditor)
@@ -201,11 +205,12 @@ struct ContentView: View {
 
         // MARK: Focused Values
 
-        .focusedValue(\.windowManager, windowManager)
-        .focusedValue(\.fileManager, fileManager)
-        .focusedValue(\.player, player)
-        .focusedValue(\.keyboardControl, keyboardControl)
-        .focusedValue(\.metadataEditor, metadataEditor)
+        .focusedValue(windowManager)
+        .focusedValue(fileManager)
+        .focusedValue(playlist)
+        .focusedValue(player)
+        .focusedValue(keyboardControl)
+        .focusedValue(metadataEditor)
 
         // MARK: Navigation
 
@@ -216,7 +221,7 @@ struct ContentView: View {
     private var title: String {
         let fallbackTitle = Bundle.main[localized: .displayName]
 
-        if player.isPlayable, let track = player.currentTrack {
+        if player.isPlayable, let track = playlist.currentTrack {
             let musicTitle = MusicTitle.stringifiedTitle(mode: .title, for: track)
             return switch dynamicTitleBar {
             case .never: fallbackTitle
@@ -229,13 +234,13 @@ struct ContentView: View {
     }
 
     private var subtitle: String {
-        let fallbackTitle = if !player.playlistStatus.isEmpty {
-            String(localized: "\(player.playlistStatus.count) Tracks")
+        let fallbackTitle = if !playlist.isEmpty {
+            String(localized: "\(playlist.count) Tracks")
         } else {
             ""
         }
 
-        if player.isPlayable, let track = player.currentTrack {
+        if player.isPlayable, let track = playlist.currentTrack {
             let musicSubtitle = MusicTitle.stringifiedTitle(mode: .artists, for: track)
             return switch dynamicTitleBar {
             case .never: fallbackTitle
@@ -331,18 +336,18 @@ struct ContentView: View {
             Task.detached {
                 switch parameters.playlist {
                 case let .referenced(urls):
-                    await player.bindTo(parameters.id, mode: .referenced)
-                    await player.streamAppendToPlaylist(urls)
+                    await playlist.bindTo(parameters.id, mode: .referenced)
+                    await playlist.append(urls)
 
                     logger.info("Created window from referenced URLs: \(urls)")
                 case let .canonical(id):
-                    await player.bindTo(parameters.id, mode: .canonical)
-                    await player.loadTracks()
+                    await playlist.bindTo(parameters.id, mode: .canonical)
+                    await playlist.loadTracks()
 
                     logger.info("Created window with canonical ID: \(id)")
                 }
 
-                if parameters.shouldPlay, let firstTrack = await player.tracks.first {
+                if parameters.shouldPlay, let firstTrack = await playlist.tracks.first {
                     await player.play(firstTrack.url)
                 }
             }
@@ -379,6 +384,7 @@ struct ContentView: View {
                         .environment(floatingWindows)
                         .environment(windowManager)
                         .environment(fileManager)
+                        .environment(playlist)
                         .environment(player)
                         .environment(keyboardControl)
                         .environment(metadataEditor)

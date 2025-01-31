@@ -20,6 +20,7 @@ struct MusicTitleDisplayMode: OptionSet {
 }
 
 struct MusicTitle: View {
+    @Environment(PlaylistModel.self) private var playlist
     @Environment(PlayerModel.self) private var player
 
     var track: Track?
@@ -34,7 +35,7 @@ struct MusicTitle: View {
                         if let title = track.metadata[extracting: \.title]?[keyPath: entry], !title.isEmpty {
                             Text(title)
                         } else {
-                            switch player.playlistStatus.mode {
+                            switch playlist.mode {
                             case .referenced:
                                 Text(Self.fallbackTitle(for: track))
                             case .canonical:

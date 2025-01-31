@@ -9,8 +9,9 @@ import CAAudioHardware
 import SwiftUI
 
 struct PlayerCommands: Commands {
-    @FocusedValue(\.player) private var player
-    @FocusedValue(\.keyboardControl) private var keyboardControl
+    @FocusedValue(PlaylistModel.self) private var playlist
+    @FocusedValue(PlayerModel.self) private var player
+    @FocusedValue(KeyboardControlModel.self) private var keyboardControl
 
     var body: some Commands {
         CommandMenu("Player") {
@@ -151,17 +152,17 @@ struct PlayerCommands: Commands {
                 }
                 .disabled(!hasCurrentTrack)
 
-                if let player {
-                    @Bindable var player = player
-                    let playbackName = PlaybackModeView.name(of: player.playbackMode)
+                if let playlist {
+                    @Bindable var playlist = playlist
+                    let playbackName = PlaybackModeView.name(of: playlist.playbackMode)
 
                     Menu("Playback") {
                         ForEach(PlaybackMode.allCases) { mode in
                             let binding: Binding<Bool> = Binding {
-                                player.playbackMode == mode
+                                playlist.playbackMode == mode
                             } set: { newValue in
                                 guard newValue else { return }
-                                player.playbackMode = mode
+                                playlist.playbackMode = mode
                             }
 
                             Toggle(isOn: binding) {
@@ -171,7 +172,7 @@ struct PlayerCommands: Commands {
 
                         Divider()
 
-                        Toggle(isOn: $player.playbackLooping) {
+                        Toggle(isOn: $playlist.playbackLooping) {
                             Image(systemSymbol: .repeat1)
 
                             Text("Looping")
@@ -204,9 +205,9 @@ struct PlayerCommands: Commands {
 
     private var isPlayable: Bool { player?.isPlayable ?? false }
 
-    private var hasCurrentTrack: Bool { player?.hasCurrentTrack ?? false }
+    private var hasCurrentTrack: Bool { playlist?.hasCurrentTrack ?? false }
 
-    private var hasPreviousTrack: Bool { player?.hasPreviousTrack ?? false }
+    private var hasPreviousTrack: Bool { playlist?.hasPreviousTrack ?? false }
 
-    private var hasNextTrack: Bool { player?.hasNextTrack ?? false }
+    private var hasNextTrack: Bool { playlist?.hasNextTrack ?? false }
 }

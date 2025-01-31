@@ -24,11 +24,12 @@ extension DelegatedPlaylistStorage {
 }
 
 struct DelegatedPlaylistStorage: View {
+    @Environment(PlaylistModel.self) private var playlist
     @Environment(PlayerModel.self) private var player
 
     // MARK: Storages
 
-    @SceneStorage(AppSceneStorage.playlist()) private var playlist: Data?
+    @SceneStorage(AppSceneStorage.playlistData()) private var playlistData: Data?
 
     @SceneStorage(AppSceneStorage.playbackVolume()) private var playbackVolume: Double?
     @SceneStorage(AppSceneStorage.playbackMuted()) private var playbackMuted: Bool?
@@ -54,15 +55,14 @@ struct DelegatedPlaylistStorage: View {
 
     @ViewBuilder private func playlistObservations() -> some View {
         Color.clear
-            .onChange(of: playlist) { _, newValue in
+            .onChange(of: playlistData) { _, newValue in
                 playlistState.value = newValue
             }
-            // `player.playlist` isn't triggering view updates
-            .onChange(of: player.playlistStatus) { _, _ in
+            .onChange(of: playlist) { _, _ in
                 playlistState.isReady = false
 
                 Task.detached {
-                    try await storePlaylist(from: player.playlistStatus)
+                    try await storePlaylist()
                 }
             }
             .onChange(of: playlistState.preparedValue) { _, newValue in
@@ -137,7 +137,7 @@ struct DelegatedPlaylistStorage: View {
         guard let delegatedPlaylist = try? JSONDecoder().decode(DelegatedPlaylist.self, from: data) else { return }
         switch delegatedPlaylist {
         case let .referenced(bookmarks, currentTrackURL, currentTrackElapsedTime, playbackMode, playbackLooping):
-            guard !player.playlistStatus.mode.isCanonical else { break }
+            guard !playlist.mode.isCanonical else { break }
 
             var urls: [URL] = []
             try bookmarks.forEach {
@@ -146,44 +146,44 @@ struct DelegatedPlaylistStorage: View {
                 guard !isStale else { return }
                 urls.append(url)
             }
-            await player.streamAppendToPlaylist(urls)
+            await playlist.append(urls)
 
-            player.playlistStatus.segments.state = .init(
+            playlist.segments.state = .init(
                 currentTrackURL: currentTrackURL,
                 currentTrackElapsedTime: currentTrackElapsedTime,
                 playbackMode: playbackMode,
                 playbackLooping: playbackLooping
             )
         case let .canonical(id):
-            switch player.playlistStatus.mode {
+            switch playlist.mode {
             case .canonical:
                 // Already handled by `ContentView`
                 break
             case .referenced:
-                await player.bindTo(id, mode: .canonical)
-                await player.loadTracks()
+                await playlist.bindTo(id, mode: .canonical)
+                await playlist.loadTracks()
             }
         }
     }
 
-    private func storePlaylist(from status: Playlist.Status) async throws {
+    private func storePlaylist() async throws {
         let delegatedPlaylist: DelegatedPlaylist
-        switch status.mode {
+        switch playlist.mode {
         case .canonical:
-            delegatedPlaylist = .canonical(status.id)
+            delegatedPlaylist = .canonical(playlist.id)
         case .referenced:
-            let bookmarks: [Data] = try status.map(\.url).compactMap { url in
+            let bookmarks: [Data] = try playlist.map(\.url).compactMap { url in
                 try url.bookmarkData(options: [])
             }
 
             delegatedPlaylist = .referenced(
                 bookmarks: bookmarks,
-                currentTrackURL: status.segments.state.currentTrackURL,
-                currentTrackElapsedTime: status.segments.state.currentTrackElapsedTime,
-                playbackMode: status.segments.state.playbackMode,
-                playbackLooping: status.segments.state.playbackLooping
+                currentTrackURL: playlist.segments.state.currentTrackURL,
+                currentTrackElapsedTime: playlist.segments.state.currentTrackElapsedTime,
+                playbackMode: playlist.segments.state.playbackMode,
+                playbackLooping: playlist.segments.state.playbackLooping
             )
         }
-        playlist = try? JSONEncoder().encode(delegatedPlaylist)
+        playlistData = try? JSONEncoder().encode(delegatedPlaylist)
     }
 }

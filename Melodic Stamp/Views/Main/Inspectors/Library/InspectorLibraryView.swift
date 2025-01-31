@@ -113,7 +113,7 @@ struct InspectorLibraryView: View {
         let isSelected = selectedPlaylists.contains(playlist)
 
         LibraryItemView(
-            playlist: playlist,
+            item: playlist,
             isSelected: isSelected
         )
         .contextMenu {

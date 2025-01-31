@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct InspectorLyricsView: View {
+    @Environment(PlaylistModel.self) private var playlist
     @Environment(PlayerModel.self) private var player
     @Environment(MetadataEditorModel.self) private var metadataEditor
     @Environment(LyricsModel.self) private var lyrics
@@ -64,7 +65,7 @@ struct InspectorLyricsView: View {
 
     private var highlightedRange: Range<Int> {
         if let elapsedTime = player.playbackTime?.elapsed {
-            lyrics.highlight(at: elapsedTime, in: player.currentTrack?.url)
+            lyrics.highlight(at: elapsedTime, in: playlist.currentTrack?.url)
         } else {
             0 ..< 0
         }

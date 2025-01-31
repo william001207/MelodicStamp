@@ -15,6 +15,7 @@ import SwiftUI
             library: LibraryModel,
             windowManager: WindowManagerModel,
             fileManager: FileManagerModel,
+            playlist: PlaylistModel,
             player: PlayerModel,
             keyboardControl: KeyboardControlModel,
             metadataEditor: MetadataEditorModel,
@@ -24,21 +25,20 @@ import SwiftUI
 
         static func makeSharedContext() async throws -> Context {
             let library = LibraryModel()
-            let player = PlayerModel(BlankPlayer(), library: library)
+            let playlist = PlaylistModel(library: library)
+            playlist.playlist = samplePlaylist
+            let player = PlayerModel(BlankPlayer(), library: library, playlist: playlist)
 
             let floatingWindows = FloatingWindowsModel()
             let windowManager = WindowManagerModel()
-            let fileManager = FileManagerModel(player: player)
+            let fileManager = FileManagerModel(player: player, playlist: playlist)
             let keyboardControl = KeyboardControlModel(player: player)
             let metadataEditor = MetadataEditorModel(player: player)
             let audioVisualizer = AudioVisualizerModel()
             let gradientVisualizer = GradientVisualizerModel()
 
-            player.debug(withPlaylist: samplePlaylist)
             player.selectedTracks = [sampleTrack]
             player.play(sampleTrack.url)
-
-            player.playlistStatus.segments = samplePlaylistSegments
 
             let image = NSImage(resource: .templateArtwork)
             await gradientVisualizer.updateDominantColors(from: image)
@@ -48,6 +48,7 @@ import SwiftUI
                 library,
                 windowManager,
                 fileManager,
+                playlist,
                 player,
                 keyboardControl,
                 metadataEditor,
@@ -116,11 +117,10 @@ import SwiftUI
         }
 
         static var samplePlaylist: Playlist {
-            let playlist = Playlist.referenced()
+            var playlist = Playlist.referenced()
 
             playlist.segments = samplePlaylistSegments
-
-            playlist.debug(withTracks: [sampleTrack])
+            playlist.tracks = [sampleTrack]
             playlist.currentTrack = sampleTrack
 
             return playlist

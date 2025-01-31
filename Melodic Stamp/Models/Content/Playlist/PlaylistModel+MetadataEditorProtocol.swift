@@ -1,13 +1,13 @@
 //
-//  PlayerModel+MetadataEditorProtocol.swift
+//  PlaylistModel+MetadataEditorProtocol.swift
 //  Melodic Stamp
 //
-//  Created by KrLite on 2025/1/26.
+//  Created by KrLite on 2025/1/31.
 //
 
 import Foundation
 
-extension PlayerModel: MetadataEditorProtocol {
+extension PlaylistModel: MetadataEditorProtocol {
     var metadataSet: Set<Metadata> {
         Set(tracks.map(\.metadata).filter(\.state.isInitialized))
     }

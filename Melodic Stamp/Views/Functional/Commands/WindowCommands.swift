@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct WindowCommands: Commands {
-    @FocusedValue(\.windowManager) private var windowManager
+    @FocusedValue(WindowManagerModel.self) private var windowManager
 
     var body: some Commands {
         CommandGroup(after: .windowSize) {

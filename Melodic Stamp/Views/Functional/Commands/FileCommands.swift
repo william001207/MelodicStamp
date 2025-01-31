@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct FileCommands: Commands {
-    @FocusedValue(\.fileManager) private var fileManager
+    @FocusedValue(FileManagerModel.self) private var fileManager
 
     var body: some Commands {
         CommandGroup(after: .newItem) {

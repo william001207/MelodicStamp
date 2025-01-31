@@ -10,12 +10,13 @@ import SwiftUI
 
 struct LibraryItemView: View {
     @Environment(LibraryModel.self) private var library
+    @Environment(PlaylistModel.self) private var playlist
     @Environment(PlayerModel.self) private var player
 
     @Environment(\.openWindow) private var openWindow
     @Environment(\.luminareAnimation) private var animation
 
-    var playlist: Playlist
+    var item: Playlist
     var isSelected: Bool
 
     @State private var isHovering: Bool = false
@@ -26,7 +27,7 @@ struct LibraryItemView: View {
         HStack(alignment: .center) {
             VStack(alignment: .leading, spacing: 2) {
                 if hasTitle {
-                    Text(playlist.segments.info.title)
+                    Text(item.segments.info.title)
                         .bold()
                         .font(.title3)
                 } else {
@@ -36,9 +37,9 @@ struct LibraryItemView: View {
                 }
 
                 HStack {
-                    Text("\(playlist.count) Tracks")
+                    Text("\(item.count) Tracks")
 
-                    Text(playlist.id.uuidString)
+                    Text(item.id.uuidString)
                         .foregroundStyle(.placeholder)
                 }
                 .font(.caption)
@@ -86,15 +87,15 @@ struct LibraryItemView: View {
     }
 
     private var isOpened: Bool {
-        player.isCurrentPlaylist(playlist)
+        playlist.isUnderlying(playlist: item)
     }
 
     private var hasTitle: Bool {
-        !playlist.segments.info.title.isEmpty
+        !item.segments.info.title.isEmpty
     }
 
     private var hasArtwork: Bool {
-        playlist.segments.artwork.image != nil
+        item.segments.artwork.image != nil
     }
 
     private var hasControl: Bool {
@@ -107,7 +108,7 @@ struct LibraryItemView: View {
 
     @ViewBuilder private func coverView() -> some View {
         ZStack {
-            if let artwork = playlist.segments.artwork.image {
+            if let artwork = item.segments.artwork.image {
                 MusicCover(
                     images: [artwork], hasPlaceholder: false, cornerRadius: 4
                 )
@@ -140,13 +141,13 @@ struct LibraryItemView: View {
     private func open() {
         openWindow(
             id: WindowID.content.rawValue,
-            value: CreationParameters(playlist: .canonical(playlist.id))
+            value: CreationParameters(playlist: .canonical(item.id))
         )
     }
 }
 
 #if DEBUG
     #Preview(traits: .modifier(PreviewEnvironments())) {
-        LibraryItemView(playlist: PreviewEnvironments.samplePlaylist, isSelected: false)
+        LibraryItemView(item: PreviewEnvironments.samplePlaylist, isSelected: false)
     }
 #endif

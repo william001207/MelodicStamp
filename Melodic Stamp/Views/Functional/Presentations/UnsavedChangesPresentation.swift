@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct UnsavedChangesPresentation<Parent>: View where Parent: View {
+    @Environment(PlaylistModel.self) private var playlist
     @Environment(PlayerModel.self) private var player
 
     @Environment(\.appDelegate) private var appDelegate
@@ -41,7 +42,7 @@ struct UnsavedChangesPresentation<Parent>: View where Parent: View {
     }
 
     private var modifiedMetadatas: [Metadata] {
-        player.metadataSet.filter(\.isModified)
+        playlist.metadataSet.filter(\.isModified)
     }
 
     private var modifiedFineMetadatas: [Metadata] {
@@ -64,7 +65,7 @@ struct UnsavedChangesPresentation<Parent>: View where Parent: View {
                 }
             } else {
                 Button("Save and Close") {
-                    player.writeAll {
+                    playlist.writeAll {
                         if modifiedMetadatas.isEmpty {
                             forceClose()
                         }
@@ -108,7 +109,7 @@ struct UnsavedChangesPresentation<Parent>: View where Parent: View {
                             .foregroundStyle(.red)
 
                         Button("Save All and Close") {
-                            player.writeAll {
+                            playlist.writeAll {
                                 if modifiedMetadatas.isEmpty {
                                     forceClose()
                                 }

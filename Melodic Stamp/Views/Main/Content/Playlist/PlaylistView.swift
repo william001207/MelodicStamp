@@ -14,6 +14,7 @@ struct PlaylistView: View {
     // MARK: - Environments
 
     @Environment(KeyboardControlModel.self) private var keyboardControl
+    @Environment(PlaylistModel.self) private var playlist
     @Environment(PlayerModel.self) private var player
     @Environment(MetadataEditorModel.self) private var metadataEditor
 
@@ -49,10 +50,10 @@ struct PlaylistView: View {
                 Spacer()
                     .frame(height: minHeight)
 
-                if player.playlistStatus.mode.isCanonical {
+                if playlist.mode.isCanonical {
                     // MARK: Metadata
 
-                    PlaylistMetadataView(status: player.playlistStatus)
+                    PlaylistMetadataView()
                         .frame(height: metadataHeight)
                         .padding(.horizontal)
                 }
@@ -63,7 +64,7 @@ struct PlaylistView: View {
 
             // MARK: Tracks
 
-            ForEach(player.tracks) { track in
+            ForEach(playlist.tracks) { track in
                 itemView(for: track)
                     .id(track)
                     .draggable(track) {
@@ -72,7 +73,7 @@ struct PlaylistView: View {
             }
             .onMove { indices, destination in
                 withAnimation {
-                    player.moveTrack(fromOffsets: indices, toOffset: destination)
+                    playlist.move(fromOffsets: indices, toOffset: destination)
                 }
             }
             .transition(.slide)
@@ -120,7 +121,7 @@ struct PlaylistView: View {
             .animation(animationFast, value: controlsOpacity)
             .allowsHitTesting(controlsOpacity >= 0.1)
         }
-        .animation(animationFast, value: player.playlistStatus)
+        .animation(animationFast, value: playlist)
         .animation(animationFast, value: player.selectedTracks)
 
         // MARK: Keyboard Handlers
@@ -190,11 +191,11 @@ struct PlaylistView: View {
     }
 
     private var canRemove: Bool {
-        player.playlistStatus.isLoaded
+        playlist.isLoaded
     }
 
     private var metadataHeight: CGFloat {
-        switch player.playlistStatus.mode {
+        switch playlist.mode {
         case .referenced:
             .zero
         case .canonical:
@@ -204,7 +205,7 @@ struct PlaylistView: View {
 
     private var controlsOpacity: CGFloat {
         if contentSize.height >= containerSize.height + metadataHeight {
-            switch player.playlistStatus.mode {
+            switch playlist.mode {
             case .referenced:
                 1.0
             case .canonical:
@@ -279,7 +280,7 @@ struct PlaylistView: View {
             .alert("Removing All Tracks from Playlist", isPresented: $isRemoveAllAlertPresented) {
                 Button("Proceed", role: .destructive) {
                     Task {
-                        await player.clearPlaylist()
+                        await playlist.clear()
                     }
                 }
             }
@@ -295,10 +296,9 @@ struct PlaylistView: View {
 
             Button {
                 let hasShift = NSEvent.modifierFlags.contains(.shift)
-                player.playbackMode = player.playbackMode.cycle(
-                    negate: hasShift)
+                playlist.playbackMode = playlist.playbackMode.cycle(negate: hasShift)
             } label: {
-                PlaybackModeView(mode: player.playbackMode)
+                PlaybackModeView(mode: playlist.playbackMode)
                     .padding()
             }
             .fixedSize(horizontal: true, vertical: false)
@@ -306,10 +306,10 @@ struct PlaylistView: View {
             // MARK: Playback Looping
 
             Button {
-                player.playbackLooping.toggle()
+                playlist.playbackLooping.toggle()
             } label: {
                 Image(systemSymbol: .repeat1)
-                    .aliveHighlight(player.playbackLooping)
+                    .aliveHighlight(playlist.playbackLooping)
                     .luminareAnimation(.instant)
             }
             .aspectRatio(6 / 5, contentMode: .fit)
@@ -408,13 +408,13 @@ struct PlaylistView: View {
         } label: {
             let title = MusicTitle.stringifiedTitle(mode: .title, for: track)
             if !title.isEmpty {
-                if player.currentTrack == track {
+                if playlist.currentTrack == track {
                     Text("Replay \(title)")
                 } else {
                     Text("Play \(title)")
                 }
             } else {
-                if player.currentTrack == track {
+                if playlist.currentTrack == track {
                     Text("Replay")
                 } else {
                     Text("Play")
@@ -424,7 +424,7 @@ struct PlaylistView: View {
         .disabled(!isInitialized)
         .keyboardShortcut(.return, modifiers: [])
 
-        if player.playlistStatus.mode.isCanonical {
+        if playlist.mode.isCanonical {
             // MARK: Copy
 
             Group {
@@ -505,10 +505,10 @@ struct PlaylistView: View {
 
         for track in tracks {
             guard
-                let index = player.tracks.firstIndex(where: { $0.id == track.id }),
-                let copiedTrack = await player.createTrack(from: track.url)
+                let index = playlist.tracks.firstIndex(where: { $0.id == track.id }),
+                let copiedTrack = await playlist.createTrack(from: track.url)
             else { continue }
-            await player.addToPlaylist([copiedTrack.url], at: index + 1)
+            await playlist.add([copiedTrack.url], at: index + 1)
         }
     }
 
@@ -521,7 +521,7 @@ struct PlaylistView: View {
     @discardableResult private func handleRemove(_ urls: [URL]) -> Bool {
         guard canRemove else { return false }
         Task {
-            await player.removeFromPlaylist(urls)
+            await playlist.remove(urls)
         }
         return true
     }

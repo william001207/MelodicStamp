@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct ModifiedMetadataList: View {
-    @Environment(PlayerModel.self) private var player
+    @Environment(PlaylistModel.self) private var playlist
 
     var body: some View {
         List {
@@ -40,7 +40,7 @@ struct ModifiedMetadataList: View {
     }
 
     private var tracks: [Track] {
-        player.tracks
+        playlist.tracks
             .filter(\.metadata.isModified)
     }
 }

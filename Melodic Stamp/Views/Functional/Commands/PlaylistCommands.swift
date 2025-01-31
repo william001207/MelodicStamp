@@ -8,8 +8,9 @@
 import SwiftUI
 
 struct PlaylistCommands: Commands {
-    @FocusedValue(\.player) private var player
-    @FocusedValue(\.metadataEditor) private var metadataEditor
+    @FocusedValue(PlaylistModel.self) private var playlist
+    @FocusedValue(PlayerModel.self) private var player
+    @FocusedValue(MetadataEditorModel.self) private var metadataEditor
 
     @Bindable var library: LibraryModel
 
@@ -18,13 +19,13 @@ struct PlaylistCommands: Commands {
     var body: some Commands {
         CommandMenu("Playlist") {
             Group {
-                if let player {
+                if let playlist {
                     Button("Add to Library") {
                         Task.detached {
-                            try await player.makePlaylistCanonical()
+                            try await playlist.makeCanonical()
                         }
                     }
-                    .disabled(!player.playlistStatus.canMakeCanonical)
+                    .disabled(!playlist.canMakeCanonical)
                 } else {
                     Button("Add to Library") {}
                         .disabled(true)
@@ -100,7 +101,7 @@ struct PlaylistCommands: Commands {
 
             Group {
                 if
-                    let player,
+                    let player, let playlist,
                     player.selectedTracks.count == 1,
                     let track = player.selectedTracks.first {
                     let title = MusicTitle.stringifiedTitle(mode: .title, for: track)
@@ -108,13 +109,13 @@ struct PlaylistCommands: Commands {
                         player.play(track.url)
                     } label: {
                         if !title.isEmpty {
-                            if player.currentTrack == track {
+                            if playlist.currentTrack == track {
                                 Text("Replay \(title)")
                             } else {
                                 Text("Play \(title)")
                             }
                         } else {
-                            if player.currentTrack == track {
+                            if playlist.currentTrack == track {
                                 Text("Replay Selected Track")
                             } else {
                                 Text("Play Selected Track")
@@ -131,14 +132,14 @@ struct PlaylistCommands: Commands {
     }
 
     private func copy(_ tracks: [Track]) async {
-        guard let player, !tracks.isEmpty else { return }
+        guard let playlist, !tracks.isEmpty else { return }
 
         for track in tracks {
             guard
-                let index = player.tracks.firstIndex(where: { $0.id == track.id }),
-                let copiedTrack = await player.createTrack(from: track.url)
+                let index = playlist.tracks.firstIndex(where: { $0.id == track.id }),
+                let copiedTrack = await playlist.createTrack(from: track.url)
             else { continue }
-            await player.addToPlaylist([copiedTrack.url], at: index + 1)
+            await playlist.add([copiedTrack.url], at: index + 1)
         }
     }
 
@@ -148,9 +149,9 @@ struct PlaylistCommands: Commands {
     }
 
     private func handleRemove(_ urls: [URL]) {
-        guard let player else { return }
+        guard let playlist else { return }
         Task {
-            await player.removeFromPlaylist(urls)
+            await playlist.remove(urls)
         }
     }
 }

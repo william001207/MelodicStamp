@@ -10,17 +10,19 @@ import SwiftUI
 import SwiftUIIntrospect
 
 struct PlaylistMetadataView: View {
+    @Environment(PlaylistModel.self) private var playlist
+
     @Environment(\.luminareAnimation) private var animation
 
     @FocusState private var isTitleFocused: Bool
-
-    var status: Playlist.Status
 
     @State private var isTitleHovering: Bool = false
     @State private var isImagePickerPresented: Bool = false
     @State private var isDescriptionSheetPresented: Bool = false
 
     var body: some View {
+        @Bindable var playlist = playlist
+
         HStack(spacing: 25) {
             Button {
                 isImagePickerPresented = true
@@ -40,8 +42,8 @@ struct PlaylistMetadataView: View {
                     defer { url.stopAccessingSecurityScopedResource() }
 
                     guard let image = NSImage(contentsOf: url) else { break }
-                    status.segments.artwork.tiffRepresentation = image.tiffRepresentation
-                    try? status.write(segments: [.artwork])
+                    playlist.segments.artwork.tiffRepresentation = image.tiffRepresentation
+                    try? playlist.write(segments: [.artwork])
                 case .failure:
                     break
                 }
@@ -62,11 +64,11 @@ struct PlaylistMetadataView: View {
                 }
                 .buttonStyle(.alive)
                 .sheet(isPresented: $isDescriptionSheetPresented) {
-                    try? status.write(segments: [.info])
+                    try? playlist.write(segments: [.info])
                 } content: {
                     // In order to make safe area work, we need a wrapper
                     ScrollView {
-                        LuminareTextEditor(text: status.segmentsBinding.info.description)
+                        LuminareTextEditor(text: $playlist.segments.info.description)
                             .luminareBordered(false)
                             .luminareHasBackground(false)
                             .scrollDisabled(true)
@@ -85,7 +87,7 @@ struct PlaylistMetadataView: View {
     }
 
     @ViewBuilder private func artworkView() -> some View {
-        if let artwork = status.segments.artwork.image {
+        if let artwork = playlist.segments.artwork.image {
             MusicCover(images: [artwork], cornerRadius: 8)
         } else {
             MusicCover(cornerRadius: 8)
@@ -93,8 +95,10 @@ struct PlaylistMetadataView: View {
     }
 
     @ViewBuilder private func titleView() -> some View {
+        @Bindable var playlist = playlist
+
         HStack {
-            TextField("Playlist Title", text: status.segmentsBinding.info.title)
+            TextField("Playlist Title", text: $playlist.segments.info.title)
                 .bold()
                 .textFieldStyle(.plain)
                 .focused($isTitleFocused)
@@ -106,10 +110,10 @@ struct PlaylistMetadataView: View {
                 HStack {
                     if isTitleHovering {
                         Button {
-                            NSWorkspace.shared.activateFileViewerSelecting([status.url])
+                            NSWorkspace.shared.activateFileViewerSelecting([playlist.url])
                         } label: {
                             HStack {
-                                if let creationDate = try? status.url.attribute(.creationDate) as? Date {
+                                if let creationDate = try? playlist.url.attribute(.creationDate) as? Date {
                                     let formattedCreationDate = creationDate.formatted(
                                         date: .complete,
                                         time: .standard
@@ -123,7 +127,7 @@ struct PlaylistMetadataView: View {
                         }
                         .buttonStyle(.alive)
                     } else {
-                        Text("\(status.count) Tracks")
+                        Text("\(playlist.count) Tracks")
                     }
                 }
                 .font(.body)
@@ -136,12 +140,12 @@ struct PlaylistMetadataView: View {
         }
         .onChange(of: isTitleFocused) { _, newValue in
             guard !newValue else { return }
-            try? status.write(segments: [.info])
+            try? playlist.write(segments: [.info])
         }
     }
 
     @ViewBuilder private func descriptionView() -> some View {
-        let description = status.segments.info.description
+        let description = playlist.segments.info.description
 
         if !description.isEmpty {
             Text(description)
@@ -171,11 +175,7 @@ struct PlaylistMetadataView: View {
 }
 
 #if DEBUG
-    #Preview {
-        @Previewable @State var segments: Playlist.Segments = PreviewEnvironments.samplePlaylistSegments
-
-        PlaylistMetadataView(
-            status: PreviewEnvironments.samplePlaylist.status
-        )
+    #Preview(traits: .modifier(PreviewEnvironments())) {
+        PlaylistMetadataView()
     }
 #endif

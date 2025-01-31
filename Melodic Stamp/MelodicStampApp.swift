@@ -23,7 +23,7 @@ struct MelodicStampApp: App {
     @Environment(\.openWindow) private var openWindow
     @Environment(\.dismissWindow) private var dismissWindow
 
-    @FocusedValue(\.windowManager) private var windowManager
+    @FocusedValue(WindowManagerModel.self) private var windowManager
 
     // Globally managed models, uniqueness ensured
     @State private var floatingWindows: FloatingWindowsModel = .init()

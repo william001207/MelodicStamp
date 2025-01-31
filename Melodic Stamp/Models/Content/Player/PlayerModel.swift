@@ -27,7 +27,8 @@ extension PlayerModel {
 
     private var player: any Player
     private weak var library: LibraryModel?
-    private var playlist: Playlist
+    private weak var playlist: PlaylistModel?
+
     // The initialization is delayed to `setupEngine`
     private var analyzer: RealtimeAnalyzer!
 
@@ -133,35 +134,27 @@ extension PlayerModel {
 
     var selectedTracks: Set<Track> = []
 
-    // MARK: Playback
-
-    var currentTrack: Track? {
-        get { playlist.currentTrack }
-        set { playlist.currentTrack = newValue }
-    }
-
-    var playbackMode: PlaybackMode {
-        get { playlistStatus.segments.state.playbackMode }
-        set { playlistStatus.segments.state.playbackMode = newValue }
-    }
-
-    var playbackLooping: Bool {
-        get { playlistStatus.segments.state.playbackLooping }
-        set { playlistStatus.segments.state.playbackLooping = newValue }
-    }
-
     // MARK: Playlist
 
-    var tracks: [Track] { playlist.tracks }
-    var playlistStatus: Playlist.Status { playlist.status }
-    var playlistHashValue: Int { playlist.hashValue }
+    private var currentTrack: Track? {
+        get { playlist?.currentTrack }
+        set { playlist?.currentTrack = newValue }
+    }
 
-    var nextTrack: Track? { playlist.nextTrack }
-    var previousTrack: Track? { playlist.previousTrack }
+    var hasCurrentTrack: Bool {
+        guard let playlist else { return false }
+        return playlist.hasCurrentTrack
+    }
 
-    var hasCurrentTrack: Bool { playlist.hasCurrentTrack }
-    var hasNextTrack: Bool { playlist.hasNextTrack }
-    var hasPreviousTrack: Bool { playlist.hasPreviousTrack }
+    var hasNextTrack: Bool {
+        guard let playlist else { return false }
+        return playlist.hasNextTrack
+    }
+
+    var hasPreviousTrack: Bool {
+        guard let playlist else { return false }
+        return playlist.hasPreviousTrack
+    }
 
     var isPlayable: Bool {
         isRunning && hasCurrentTrack
@@ -169,10 +162,10 @@ extension PlayerModel {
 
     // MARK: Initializers
 
-    init(_ player: some Player, library: LibraryModel, bindingTo id: UUID = .init()) {
+    init(_ player: some Player, library: LibraryModel, playlist: PlaylistModel) {
         self.player = player
         self.library = library
-        self.playlist = .referenced(bindingTo: id)
+        self.playlist = playlist
         super.init()
 
         self.player.delegate = self
@@ -192,19 +185,6 @@ extension PlayerModel {
                 self.updateOutputDevices()
             }
             .store(in: &cancellables)
-    }
-
-    func bindTo(_ id: UUID, mode: Playlist.Mode = .referenced) async {
-        guard !playlist.mode.isCanonical else { return }
-        if mode.isCanonical, let playlist = await Playlist(loadingWith: id) {
-            self.playlist = playlist
-        } else {
-            playlist = .referenced(bindingTo: id)
-        }
-    }
-
-    func loadTracks() async {
-        await playlist.loadTracks()
     }
 }
 
@@ -235,10 +215,8 @@ extension PlayerModel {
         if let updated = player.playbackTime {
             guard playbackTime != updated else { return }
             playbackTime = updated
-            playlistStatus.segments.state.currentTrackElapsedTime = updated.elapsed
         } else {
             playbackTime = nil
-            playlistStatus.segments.state.currentTrackElapsedTime = .zero
         }
     }
 
@@ -262,68 +240,13 @@ extension PlayerModel {
 
     func play(_ url: URL) {
         Task {
-            let track = await playlist.getOrCreateTrack(at: url)
-
+            let track = await playlist?.getOrCreateTrack(at: url)
             currentTrack = track
 
             if let track {
                 player.play(track)
             }
         }
-    }
-
-    // MARK: Playlist
-
-    func isCurrentPlaylist(_ playlist: Playlist) -> Bool {
-        self.playlist === playlist
-    }
-
-    func getTrack(at url: URL) -> Track? {
-        playlist.getTrack(at: url)
-    }
-
-    func createTrack(from url: URL) async -> Track? {
-        await playlist.createTrack(from: url)
-    }
-
-    func getOrCreateTrack(at url: URL) async -> Track? {
-        await playlist.getOrCreateTrack(at: url)
-    }
-
-    func addToPlaylist(_ urls: [URL], at destination: Int? = nil) async {
-        var tracks: [Track] = []
-        for url in urls {
-            guard let track = await getOrCreateTrack(at: url) else { continue }
-            tracks.append(track)
-        }
-        playlist.add(tracks, at: destination)
-    }
-
-    func streamAppendToPlaylist(_ urls: [URL]) async {
-        for url in urls {
-            guard let track = await getOrCreateTrack(at: url) else { continue }
-            playlist.add([track])
-        }
-    }
-
-    func removeFromPlaylist(_ urls: [URL]) async {
-        for url in urls {
-            guard let track = await getOrCreateTrack(at: url) else { continue }
-            playlist.remove([track])
-        }
-    }
-
-    func clearPlaylist() async {
-        await removeFromPlaylist(playlist.map(\.url))
-    }
-
-    func moveTrack(fromOffsets indices: IndexSet, toOffset destination: Int) {
-        playlist.move(fromOffsets: indices, toOffset: destination)
-    }
-
-    func makePlaylistCanonical() throws {
-        try playlist.makeCanonical()
-        library?.add([playlist])
     }
 
     // MARK: Convenient Functions
@@ -353,7 +276,7 @@ extension PlayerModel {
     }
 
     func playNextTrack() {
-        guard let nextTrack else {
+        guard let nextTrack = playlist?.nextTrack else {
             stop()
             return
         }
@@ -362,7 +285,7 @@ extension PlayerModel {
     }
 
     func playPreviousTrack() {
-        guard let previousTrack else {
+        guard let previousTrack = playlist?.previousTrack else {
             stop()
             return
         }
@@ -469,7 +392,7 @@ extension PlayerModel {
 extension PlayerModel: PlayerDelegate {
     nonisolated func playerDidFinishPlaying(_: some Melodic_Stamp.Player) {
         Task { @MainActor in
-            if self.playbackLooping {
+            if let playlist, playlist.playbackLooping {
                 if let currentTrack = self.currentTrack {
                     // Plays again
                     self.play(currentTrack.url)
@@ -489,7 +412,7 @@ extension PlayerModel: AudioPlayer.Delegate {
             if let nowPlaying,
                let audioDecoder = nowPlaying as? AudioDecoder,
                let url = audioDecoder.inputSource.url {
-                currentTrack = playlist.getTrack(at: url)
+                currentTrack = playlist?.getTrack(at: url)
             }
 
             updatePlaybackState()
@@ -515,11 +438,3 @@ extension PlayerModel: AudioPlayer.Delegate {
         }
     }
 }
-
-#if DEBUG
-    extension PlayerModel {
-        func debug(withPlaylist playlist: Playlist) {
-            self.playlist = playlist
-        }
-    }
-#endif

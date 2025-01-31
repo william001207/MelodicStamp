@@ -14,6 +14,7 @@ struct PlayerView: View {
     // MARK: - Environments
 
     @Environment(WindowManagerModel.self) private var windowManager
+    @Environment(PlaylistModel.self) private var playlist
     @Environment(PlayerModel.self) private var player
     @Environment(KeyboardControlModel.self) private var keyboardControl
     @Environment(AudioVisualizerModel.self) private var audioVisualizer
@@ -66,6 +67,7 @@ struct PlayerView: View {
     // MARK: - Header
 
     @ViewBuilder private func header() -> some View {
+        @Bindable var playlist = playlist
         @Bindable var player = player
 
         HStack(alignment: .center, spacing: 12) {
@@ -73,10 +75,10 @@ struct PlayerView: View {
 
             Button {
                 let hasShift = NSEvent.modifierFlags.contains(.shift)
-                player.playbackMode = player.playbackMode.cycle(
+                playlist.playbackMode = playlist.playbackMode.cycle(
                     negate: hasShift)
             } label: {
-                Image(systemSymbol: player.playbackMode.systemSymbol)
+                Image(systemSymbol: playlist.playbackMode.systemSymbol)
                     .font(.headline)
                     .contentTransition(.symbolEffect(.replace))
                     .frame(width: 20, height: 20)
@@ -85,18 +87,18 @@ struct PlayerView: View {
                 id: PlayerNamespace.playbackModeButton, in: namespace
             )
             .contextMenu {
-                PlaybackModePicker(selection: $player.playbackMode)
+                PlaybackModePicker(selection: $playlist.playbackMode)
             }
 
             // MARK: Playback Looping
 
             Button {
-                player.playbackLooping.toggle()
+                playlist.playbackLooping.toggle()
             } label: {
                 Image(systemSymbol: .repeat1)
                     .font(.headline)
                     .frame(width: 20, height: 20)
-                    .aliveHighlight(player.playbackLooping)
+                    .aliveHighlight(playlist.playbackLooping)
             }
             .matchedGeometryEffect(
                 id: PlayerNamespace.playbackLoopingButton, in: namespace
@@ -106,9 +108,9 @@ struct PlayerView: View {
 
             Group {
                 ShrinkableMarqueeScrollView {
-                    MusicTitle(track: player.currentTrack)
+                    MusicTitle(track: playlist.currentTrack)
                 }
-                .animation(.default, value: player.currentTrack)
+                .animation(.default, value: playlist.currentTrack)
                 .matchedGeometryEffect(id: PlayerNamespace.title, in: namespace)
 
                 if player.hasCurrentTrack {

@@ -29,13 +29,17 @@ extension Playlist {
     }
 }
 
-@MainActor @Observable class Playlist: Identifiable {
-    nonisolated let id: UUID
-    private(set) var mode: Mode
+struct Playlist: Equatable, Hashable, Identifiable {
+    let id: UUID
+    let mode: Mode
     var segments: Segments
 
     private(set) var indexer: TrackIndexer
-    private(set) var tracks: [Track] = []
+    #if DEBUG
+        var tracks: [Track] = []
+    #else
+        private(set) var tracks: [Track] = []
+    #endif
 
     private(set) var isLoading: Bool = false
 
@@ -44,13 +48,11 @@ extension Playlist {
 
     var currentTrack: Track? {
         didSet {
-            Task {
-                segments.state.currentTrackURL = currentTrack?.url
-            }
+            segments.state.currentTrackURL = currentTrack?.url
         }
     }
 
-    private func loadDelegatedVariables() {
+    private mutating func loadDelegatedVariables() {
         currentTrack = tracks.first { $0.url == segments.state.currentTrackURL }
     }
 
@@ -83,19 +85,17 @@ extension Playlist {
         loadDelegatedVariables()
     }
 
-    convenience init?(loadingWith id: UUID) async {
+    init?(loadingWith id: UUID) async {
         let url = Self.url(forID: id)
         guard let segments = try? await Segments(loadingFrom: url) else { return nil }
         self.init(id: id, mode: .canonical, segments: segments)
 
-        Task {
-            loadIndexer()
-        }
+        loadIndexer()
 
         logger.info("Loaded canonical playlist from \(url)")
     }
 
-    convenience init?(copyingFrom playlist: Playlist) async throws {
+    init?(copyingFrom playlist: Playlist) async throws {
         guard playlist.mode.isCanonical else { return nil }
 
         let playlistID = UUID()
@@ -104,16 +104,14 @@ extension Playlist {
         await self.init(loadingWith: playlistID)
     }
 
-    func makeCanonical() throws {
-        // Migrates to a new canonical playlist
-
+    @MainActor init?(makingCanonical oldValue: Playlist) throws {
         do {
-            try FileManager.default.createDirectory(at: url, withIntermediateDirectories: true)
+            try FileManager.default.createDirectory(at: oldValue.url, withIntermediateDirectories: true)
         } catch {
-            return
+            return nil
         }
 
-        mode = .canonical
+        self.init(id: oldValue.id, mode: .canonical, segments: oldValue.segments)
 
         var migratedCurrentTrackURL: URL?
         for (index, track) in tracks.enumerated() {
@@ -132,7 +130,7 @@ extension Playlist {
         try indexTracks(with: captureIndices())
         loadDelegatedVariables()
 
-        logger.info("Successfully made canonical playlist at \(self.url)")
+        logger.info("Successfully made canonical playlist at \(oldValue.url)")
     }
 
     static func referenced(bindingTo id: UUID = .init()) -> Playlist {
@@ -144,21 +142,7 @@ extension Playlist {
     }
 }
 
-extension Playlist: @preconcurrency Hashable {
-    func hash(into hasher: inout Hasher) {
-        hasher.combine(id)
-        hasher.combine(mode)
-        hasher.combine(tracks)
-    }
-}
-
-extension Playlist: @preconcurrency Equatable {
-    static func == (lhs: Playlist, rhs: Playlist) -> Bool {
-        lhs.id == rhs.id
-    }
-}
-
-extension Playlist: @preconcurrency Sequence {
+extension Playlist: Sequence {
     func makeIterator() -> Array<Track>.Iterator {
         tracks.makeIterator()
     }
@@ -198,18 +182,18 @@ extension Playlist {
         )
     }
 
-    private func indexTracks(with value: TrackIndexer.Value) throws {
+    private mutating func indexTracks(with value: TrackIndexer.Value) throws {
         guard mode.isCanonical else { return }
         indexer.value = value
         try indexer.write()
     }
 
-    func loadIndexer() {
+    mutating func loadIndexer() {
         guard mode.isCanonical else { return }
         indexer.value = indexer.read() ?? [:]
     }
 
-    func loadTracks() async {
+    mutating func loadTracks() async {
         guard mode.isCanonical else { return }
         guard !isLoading else { return }
         isLoading = true
@@ -321,7 +305,7 @@ extension Playlist {
         return tracks.contains { $0.url == url }
     }
 
-    private func deleteTrack(at url: URL) throws {
+    private mutating func deleteTrack(at url: URL) throws {
         guard isExistingCanonicalTrack(at: url) else { return }
 
         if currentTrack?.url == url {
@@ -344,7 +328,7 @@ extension Playlist {
             .appendingPathExtension(url.pathExtension)
     }
 
-    private func migrateTrack(from track: Track) throws -> Track {
+    @MainActor private func migrateTrack(from track: Track) throws -> Track {
         try createFolder()
 
         let destinationURL = generateCanonicalURL(for: track.url)
@@ -361,7 +345,7 @@ extension Playlist {
         first(where: { $0.url == url })
     }
 
-    func createTrack(from url: URL) async -> Track? {
+    @MainActor func createTrack(from url: URL) async -> Track? {
         await withCheckedContinuation { continuation in
             switch mode {
             case .referenced:
@@ -390,13 +374,13 @@ extension Playlist {
 }
 
 extension Playlist {
-    func move(fromOffsets indices: IndexSet, toOffset destination: Int) {
+    mutating func move(fromOffsets indices: IndexSet, toOffset destination: Int) {
         tracks.move(fromOffsets: indices, toOffset: destination)
 
         try? indexTracks(with: captureIndices())
     }
 
-    func add(_ tracks: [Track], at destination: Int? = nil) {
+    mutating func add(_ tracks: [Track], at destination: Int? = nil) {
         let filteredTracks = tracks.filter { !self.tracks.contains($0) }
 
         if let destination, 0...self.tracks.endIndex ~= destination {
@@ -408,31 +392,15 @@ extension Playlist {
         try? indexTracks(with: captureIndices())
     }
 
-    func remove(_ tracks: [Track]) {
-        Task {
-            for track in tracks {
-                try deleteTrack(at: track.url)
-            }
-
-            try? indexTracks(with: captureIndices())
+    mutating func remove(_ tracks: [Track]) {
+        for track in tracks {
+            try? deleteTrack(at: track.url)
         }
+
+        try? indexTracks(with: captureIndices())
     }
 
-    func clearPlaylist() {
+    mutating func clearPlaylist() {
         remove(tracks)
     }
 }
-
-extension Playlist {
-    var status: Status {
-        .init(wrapping: self)
-    }
-}
-
-#if DEBUG
-    extension Playlist {
-        func debug(withTracks tracks: [Track]) {
-            self.tracks = tracks
-        }
-    }
-#endif

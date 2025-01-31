@@ -22,6 +22,7 @@ struct DisplayLyricsView: View {
         }
     }
 
+    @Environment(PlaylistModel.self) private var playlist
     @Environment(PlayerModel.self) private var player
     @Environment(LyricsModel.self) private var lyrics
 
@@ -39,7 +40,7 @@ struct DisplayLyricsView: View {
     var body: some View {
         // Avoids multiple instantializations
         let lines = lyrics.lines
-        let highlightedRange = lyrics.highlight(at: elapsedTime, in: player.currentTrack?.url)
+        let highlightedRange = lyrics.highlight(at: elapsedTime, in: playlist.currentTrack?.url)
 
         Group {
             if !lines.isEmpty {

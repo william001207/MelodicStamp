@@ -39,6 +39,7 @@ struct MiniPlayerView: View {
 
     @Environment(WindowManagerModel.self) private var windowManager
     @Environment(FileManagerModel.self) private var fileManager
+    @Environment(PlaylistModel.self) private var playlist
     @Environment(PlayerModel.self) private var player
     @Environment(KeyboardControlModel.self) private var keyboardControl
 
@@ -117,14 +118,14 @@ struct MiniPlayerView: View {
 
         // Don't extract this logic or modify the tasks!
         .onAppear {
-            guard let track = player.currentTrack else { return }
+            guard let track = playlist.currentTrack else { return }
 
             Task {
                 let raw = await track.metadata.poll(for: \.lyrics).current
                 await lyrics.read(raw)
             }
         }
-        .onChange(of: player.currentTrack) { _, newValue in
+        .onChange(of: playlist.currentTrack) { _, newValue in
             guard let newValue else { return }
             lyrics.clear(newValue.url)
 
@@ -137,7 +138,7 @@ struct MiniPlayerView: View {
         // MARK: Observations
 
         // Regain progress control on new track
-        .onChange(of: player.currentTrack) { _, newValue in
+        .onChange(of: playlist.currentTrack) { _, newValue in
             guard newValue != nil else { return }
             activeControl = .progress
         }
@@ -192,7 +193,7 @@ struct MiniPlayerView: View {
     // MARK: - Header
 
     @ViewBuilder private func header() -> some View {
-        @Bindable var player = player
+        @Bindable var playlist = playlist
 
         HStack(alignment: .center, spacing: 12) {
             if isTitleHovering {
@@ -221,9 +222,9 @@ struct MiniPlayerView: View {
 
             Button {
                 let hasShift = NSEvent.modifierFlags.contains(.shift)
-                player.playbackMode = player.playbackMode.cycle(negate: hasShift)
+                playlist.playbackMode = playlist.playbackMode.cycle(negate: hasShift)
             } label: {
-                Image(systemSymbol: player.playbackMode.systemSymbol)
+                Image(systemSymbol: playlist.playbackMode.systemSymbol)
                     .contentTransition(.symbolEffect(.replace))
                     .frame(width: 16, height: 16)
             }
@@ -231,17 +232,17 @@ struct MiniPlayerView: View {
                 id: PlayerNamespace.playbackModeButton, in: namespace
             )
             .contextMenu {
-                PlaybackModePicker(selection: $player.playbackMode)
+                PlaybackModePicker(selection: $playlist.playbackMode)
             }
 
             // MARK: Playback Looping
 
             Button {
-                player.playbackLooping.toggle()
+                playlist.playbackLooping.toggle()
             } label: {
                 Image(systemSymbol: .repeat1)
                     .frame(width: 16, height: 16)
-                    .aliveHighlight(player.playbackLooping)
+                    .aliveHighlight(playlist.playbackLooping)
             }
             .matchedGeometryEffect(
                 id: PlayerNamespace.playbackLoopingButton, in: namespace
@@ -258,19 +259,19 @@ struct MiniPlayerView: View {
                 ShrinkableMarqueeScrollView {
                     switch headerControl {
                     case .title:
-                        MusicTitle(track: player.currentTrack)
+                        MusicTitle(track: playlist.currentTrack)
                     case .lyrics:
                         ComposedLyricsView()
                             .environment(lyrics)
                     }
                 }
-                .animation(.default, value: player.currentTrack)
+                .animation(.default, value: playlist.currentTrack)
                 .matchedGeometryEffect(id: PlayerNamespace.title, in: namespace)
                 .padding(.bottom, 2)
             }
             .buttonStyle(.alive)
 
-            if headerControl.hasThumbnail, let thumbnail = player.currentTrack?.metadata.thumbnail {
+            if headerControl.hasThumbnail, let thumbnail = playlist.currentTrack?.metadata.thumbnail {
                 MusicCover(images: [thumbnail], hasPlaceholder: false, cornerRadius: 2)
                     .padding(.bottom, 2)
             }
@@ -552,7 +553,7 @@ struct MiniPlayerView: View {
 
     @ViewBuilder private func playlistMenu() -> some View {
         let selection: Binding<Track?> = Binding {
-            player.currentTrack
+            playlist.currentTrack
         } set: { newValue in
             if let newValue {
                 player.play(newValue.url)
@@ -562,7 +563,7 @@ struct MiniPlayerView: View {
         }
 
         Menu {
-            ForEach(player.tracks) { track in
+            ForEach(playlist.tracks) { track in
                 let binding: Binding<Bool> = Binding {
                     selection.wrappedValue == track
                 } set: { newValue in

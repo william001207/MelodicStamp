@@ -10,7 +10,7 @@ import SwiftUI
 enum AppSceneStorage: String, Hashable, Equatable, CaseIterable, Identifiable, Codable {
     // MARK: Playlist
 
-    case playlist
+    case playlistData
 
     // MARK: Player
 

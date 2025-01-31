@@ -22,6 +22,7 @@ enum FileAdderPresentationStyle {
 }
 
 @Observable class FileManagerModel {
+    private weak var playlist: PlaylistModel?
     private weak var player: PlayerModel?
 
     var isFileOpenerPresented: Bool = false
@@ -30,8 +31,9 @@ enum FileAdderPresentationStyle {
     var isFileAdderPresented: Bool = false
     private var fileAdderPresentationStyle: FileAdderPresentationStyle = .toCurrentPlaylist
 
-    init(player: PlayerModel) {
+    init(player: PlayerModel, playlist: PlaylistModel) {
         self.player = player
+        self.playlist = playlist
     }
 
     func emitOpen(style: FileOpenerPresentationStyle = .inCurrentPlaylist) {
@@ -53,7 +55,7 @@ enum FileAdderPresentationStyle {
             case .inCurrentPlaylist:
                 player?.play(url)
             case .replacingCurrentPlaylistOrSelection:
-                await player?.clearPlaylist()
+                await playlist?.clear()
                 player?.play(url)
             case .formingNewPlaylist:
                 openWindow(id: WindowID.content.rawValue, value: CreationParameters(
@@ -72,10 +74,10 @@ enum FileAdderPresentationStyle {
         Task { @MainActor in
             switch fileAdderPresentationStyle {
             case .toCurrentPlaylist:
-                await player?.streamAppendToPlaylist(urls)
+                await playlist?.append(urls)
             case .replacingCurrentPlaylistOrSelection:
-                await player?.clearPlaylist()
-                await player?.streamAppendToPlaylist(urls)
+                await playlist?.clear()
+                await playlist?.append(urls)
             case .formingNewPlaylist:
                 openWindow(id: WindowID.content.rawValue, value: CreationParameters(
                     playlist: .referenced(urls)

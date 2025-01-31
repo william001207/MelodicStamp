@@ -10,6 +10,7 @@ import Luminare
 import SwiftUI
 
 struct TrackView: View {
+    @Environment(PlaylistModel.self) private var playlist
     @Environment(PlayerModel.self) private var player
 
     @Environment(\.luminareAnimation) private var animation
@@ -153,7 +154,7 @@ struct TrackView: View {
     }
 
     private var isCurrentTrack: Bool {
-        player.currentTrack == track
+        playlist.currentTrack == track
     }
 
     private var hasControl: Bool {
