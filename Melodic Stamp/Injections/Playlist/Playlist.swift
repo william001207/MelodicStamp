@@ -5,7 +5,6 @@
 //  Created by KrLite on 2025/1/27.
 //
 
-import Collections
 import Defaults
 import Foundation
 
@@ -34,14 +33,13 @@ struct Playlist: Equatable, Hashable, Identifiable {
     let mode: Mode
     var segments: Segments
 
-    private(set) var indexer: TrackIndexer
     #if DEBUG
         var tracks: [Track] = []
     #else
         private(set) var tracks: [Track] = []
     #endif
 
-    private(set) var isLoading: Bool = false
+    var indexer: TrackIndexer
 
     // Delegated variables
     // Must not have inlined getters and setters, otherwise causing UI glitches
@@ -82,20 +80,19 @@ struct Playlist: Equatable, Hashable, Identifiable {
         self.mode = mode
         self.segments = segments
         self.indexer = .init(playlistID: id)
-        loadDelegatedVariables()
     }
 
-    @MainActor init?(loadingWith id: UUID) {
+    init?(loadingWith id: UUID) {
         let url = Self.url(forID: id)
         guard let segments = try? Segments(loadingFrom: url) else { return nil }
         self.init(id: id, mode: .canonical, segments: segments)
-
+        loadDelegatedVariables()
         loadIndexer()
 
         logger.info("Loaded canonical playlist from \(url)")
     }
 
-    @MainActor init?(copyingFrom playlist: Playlist) throws {
+    init?(copyingFrom playlist: Playlist) throws {
         guard playlist.mode.isCanonical else { return nil }
 
         let playlistID = UUID()
@@ -104,7 +101,7 @@ struct Playlist: Equatable, Hashable, Identifiable {
         self.init(loadingWith: playlistID)
     }
 
-    @MainActor init?(makingCanonical oldValue: Playlist) throws {
+    init?(makingCanonical oldValue: Playlist) async throws {
         do {
             try FileManager.default.createDirectory(at: oldValue.url, withIntermediateDirectories: true)
         } catch {
@@ -112,10 +109,11 @@ struct Playlist: Equatable, Hashable, Identifiable {
         }
 
         self.init(id: oldValue.id, mode: .canonical, segments: oldValue.segments)
+        self.tracks = oldValue.tracks
 
         var migratedCurrentTrackURL: URL?
         for (index, track) in tracks.enumerated() {
-            guard let migratedTrack = try? migrateTrack(from: track) else { continue }
+            guard let migratedTrack = try? await migrateTrack(from: track) else { continue }
             tracks[index] = migratedTrack
 
             let wasCurrentTrack = track.url == segments.state.currentTrackURL
@@ -127,7 +125,6 @@ struct Playlist: Equatable, Hashable, Identifiable {
         segments.state.currentTrackURL = migratedCurrentTrackURL
 
         try write()
-        try indexTracks(with: captureIndices())
         loadDelegatedVariables()
 
         logger.info("Successfully made canonical playlist at \(oldValue.url)")
@@ -171,36 +168,9 @@ extension Playlist {
 }
 
 extension Playlist {
-    private func captureIndices() -> TrackIndexer.Value {
-        OrderedDictionary(
-            uniqueKeysWithValues: tracks
-                .map(\.url)
-                .compactMap { url in
-                    guard let id = UUID(uuidString: url.deletingPathExtension().lastPathComponent) else { return nil }
-                    return (id, url.pathExtension)
-                }
-        )
-    }
-
-    private mutating func indexTracks(with value: TrackIndexer.Value) throws {
-        guard mode.isCanonical else { return }
-        indexer.value = value
-        try indexer.write()
-    }
-
     mutating func loadIndexer() {
         guard mode.isCanonical else { return }
         indexer.value = indexer.read() ?? [:]
-    }
-
-    @MainActor mutating func loadTracks() {
-        guard mode.isCanonical else { return }
-        guard !isLoading else { return }
-        isLoading = true
-        loadIndexer()
-
-        indexer.loadTracks(into: &tracks)
-        isLoading = false
     }
 }
 
@@ -320,19 +290,19 @@ extension Playlist {
 
     private func generateCanonicalURL(for url: URL) -> URL {
         let trackID = UUID()
-        return url
+        return self.url
             .appending(component: trackID.uuidString, directoryHint: .notDirectory)
             .appendingPathExtension(url.pathExtension)
     }
 
-    @MainActor private func migrateTrack(from track: Track) throws -> Track {
+    private func migrateTrack(from track: Track) async throws -> Track {
         try createFolder()
 
         let destinationURL = generateCanonicalURL(for: track.url)
         try FileManager.default.copyItem(at: track.url, to: destinationURL)
 
         logger.info("Migrating to canonical track at \(destinationURL), copying from \(track.url)")
-        return try Track(
+        return try await Track(
             migratingFrom: track, to: destinationURL,
             useFallbackTitleIfNotProvided: true
         )
@@ -342,20 +312,25 @@ extension Playlist {
         first(where: { $0.url == url })
     }
 
-    @MainActor func createTrack(from url: URL) async -> Track? {
+    func createTrack(from url: URL) async -> Track? {
         await withCheckedContinuation { continuation in
-            switch mode {
-            case .referenced:
-                continuation.resume(returning: Track(loadingFrom: url))
-            case .canonical:
-                var track: Track?
-                if let loadedTrack = Track(loadingFrom: url, completion: {
-                    guard let track else { return continuation.resume(returning: nil) }
-                    continuation.resume(returning: try? self.migrateTrack(from: track))
-                }) {
-                    track = loadedTrack
-                } else {
-                    continuation.resume(returning: nil)
+            Task {
+                switch mode {
+                case .referenced:
+                    await continuation.resume(returning: Track(loadingFrom: url))
+                case .canonical:
+                    var track: Track?
+                    if let loadedTrack = await Track(loadingFrom: url, completion: {
+                        guard let track else { return continuation.resume(returning: nil) }
+
+                        Task {
+                            await continuation.resume(returning: try? self.migrateTrack(from: track))
+                        }
+                    }) {
+                        track = loadedTrack
+                    } else {
+                        continuation.resume(returning: nil)
+                    }
                 }
             }
         }
@@ -373,8 +348,6 @@ extension Playlist {
 extension Playlist {
     mutating func move(fromOffsets indices: IndexSet, toOffset destination: Int) {
         tracks.move(fromOffsets: indices, toOffset: destination)
-
-        try? indexTracks(with: captureIndices())
     }
 
     mutating func add(_ tracks: [Track], at destination: Int? = nil) {
@@ -385,16 +358,12 @@ extension Playlist {
         } else {
             self.tracks.append(contentsOf: filteredTracks)
         }
-
-        try? indexTracks(with: captureIndices())
     }
 
     mutating func remove(_ tracks: [Track]) {
         for track in tracks {
             try? deleteTrack(at: track.url)
         }
-
-        try? indexTracks(with: captureIndices())
     }
 
     mutating func clearPlaylist() {

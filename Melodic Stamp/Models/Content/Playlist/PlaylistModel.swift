@@ -5,15 +5,18 @@
 //  Created by KrLite on 2025/1/31.
 //
 
+import Collections
 import SwiftUI
 
-@Observable final class PlaylistModel {
+@MainActor @Observable final class PlaylistModel {
     #if DEBUG
         var playlist: Playlist
     #else
         private var playlist: Playlist
     #endif
     private weak var library: LibraryModel?
+
+    private(set) var isLoading: Bool = false
 
     init(bindingTo id: UUID = .init(), library: LibraryModel) {
         self.playlist = .referenced(bindingTo: id)
@@ -45,30 +48,25 @@ extension PlaylistModel {
     var loadedCount: Int { playlist.loadedCount }
     var isEmpty: Bool { playlist.isEmpty }
     var isLoaded: Bool { playlist.isLoaded }
-    var isLoading: Bool { playlist.isLoading }
 
     var canMakeCanonical: Bool { playlist.canMakeCanonical }
 }
 
-extension PlaylistModel: Equatable {
+extension PlaylistModel: @preconcurrency Equatable {
     static func == (lhs: PlaylistModel, rhs: PlaylistModel) -> Bool {
         lhs.playlist == rhs.playlist
     }
 }
 
-extension PlaylistModel: Hashable {
+extension PlaylistModel: @preconcurrency Hashable {
     func hash(into hasher: inout Hasher) {
         hasher.combine(playlist)
     }
 }
 
-extension PlaylistModel: Sequence {
+extension PlaylistModel: @preconcurrency Sequence {
     func makeIterator() -> Playlist.Iterator {
         playlist.makeIterator()
-    }
-
-    func move(fromOffsets indices: IndexSet, toOffset destination: Int) {
-        playlist.move(fromOffsets: indices, toOffset: destination)
     }
 }
 
@@ -90,7 +88,38 @@ extension PlaylistModel {
 }
 
 extension PlaylistModel {
-    @MainActor func bindTo(_ id: UUID, mode: Playlist.Mode = .referenced) {
+    private func captureIndices() -> TrackIndexer.Value {
+        OrderedDictionary(
+            uniqueKeysWithValues: tracks
+                .map(\.url)
+                .compactMap { url in
+                    guard let id = UUID(uuidString: url.deletingPathExtension().lastPathComponent) else { return nil }
+                    return (id, url.pathExtension)
+                }
+        )
+    }
+
+    private func indexTracks(with value: TrackIndexer.Value) throws {
+        guard mode.isCanonical else { return }
+        playlist.indexer.value = value
+        try playlist.indexer.write()
+    }
+
+    func loadTracks() async {
+        guard mode.isCanonical, !isLoading else { return }
+        isLoading = true
+        playlist.loadIndexer()
+
+        var tracks: [Track] = []
+        await playlist.indexer.loadTracks(into: &tracks)
+        playlist.tracks = tracks
+
+        isLoading = false
+    }
+}
+
+extension PlaylistModel {
+    func bindTo(_ id: UUID, mode: Playlist.Mode = .referenced) {
         guard !playlist.mode.isCanonical else { return }
         if mode.isCanonical, let playlist = Playlist(loadingWith: id) {
             self.playlist = playlist
@@ -99,13 +128,10 @@ extension PlaylistModel {
         }
     }
 
-    @MainActor func loadTracks() {
-        playlist.loadTracks()
-    }
-
-    @MainActor func makeCanonical() async throws {
-        guard let canonicalPlaylist = try Playlist(makingCanonical: playlist) else { return }
+    func makeCanonical() async throws {
+        guard let canonicalPlaylist = try await Playlist(makingCanonical: playlist) else { return }
         playlist = canonicalPlaylist
+        try indexTracks(with: captureIndices())
         library?.add([canonicalPlaylist])
     }
 
@@ -129,6 +155,12 @@ extension PlaylistModel {
 }
 
 extension PlaylistModel {
+    func move(fromOffsets indices: IndexSet, toOffset destination: Int) {
+        playlist.move(fromOffsets: indices, toOffset: destination)
+
+        try? indexTracks(with: captureIndices())
+    }
+
     func add(_ urls: [URL], at destination: Int? = nil) async {
         var tracks: [Track] = []
         for url in urls {
@@ -136,6 +168,8 @@ extension PlaylistModel {
             tracks.append(track)
         }
         playlist.add(tracks, at: destination)
+
+        try? indexTracks(with: captureIndices())
     }
 
     func append(_ urls: [URL]) async {
@@ -143,6 +177,8 @@ extension PlaylistModel {
             guard let track = await getOrCreateTrack(at: url) else { continue }
             playlist.add([track])
         }
+
+        try? indexTracks(with: captureIndices())
     }
 
     func remove(_ urls: [URL]) async {
@@ -150,6 +186,8 @@ extension PlaylistModel {
             guard let track = await getOrCreateTrack(at: url) else { continue }
             playlist.remove([track])
         }
+
+        try? indexTracks(with: captureIndices())
     }
 
     func clear() async {

@@ -220,14 +220,16 @@ extension Metadata {
         let hasCurrentTitle = if let title = title?.current { !title.isEmpty } else { false }
         if useFallbackTitle, !hasInitialTitle {
             let fallbackTitle = oldValue.url.deletingPathExtension().lastPathComponent
-            title?.initial = fallbackTitle
-
             if !hasCurrentTitle {
                 title?.current = fallbackTitle
             }
 
-            Task.detached {
+            Task {
                 try await self.overwrite()
+
+                Task { @MainActor in
+                    title?.initial = fallbackTitle
+                }
             }
         }
     }

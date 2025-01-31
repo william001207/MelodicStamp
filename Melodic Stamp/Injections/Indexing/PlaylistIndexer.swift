@@ -19,7 +19,7 @@ extension PlaylistIndexer {
         guard !value.isEmpty else { return }
 
         for element in value {
-            guard let playlist = await Playlist(loadingWith: element) else { continue }
+            guard let playlist = Playlist(loadingWith: element) else { continue }
             playlists.append(playlist)
         }
     }

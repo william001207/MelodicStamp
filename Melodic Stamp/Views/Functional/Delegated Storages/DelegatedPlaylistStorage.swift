@@ -161,7 +161,7 @@ struct DelegatedPlaylistStorage: View {
                 break
             case .referenced:
                 playlist.bindTo(id, mode: .canonical)
-                playlist.loadTracks()
+                await playlist.loadTracks()
             }
         }
     }

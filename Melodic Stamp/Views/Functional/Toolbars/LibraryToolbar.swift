@@ -33,7 +33,7 @@ struct LibraryToolbar: View {
                     Text("Add to Library")
                 }
             }
-            .disabled(playlist.canMakeCanonical)
+            .disabled(!playlist.canMakeCanonical)
             .onChange(of: playlist.mode) { _, newValue in
                 guard newValue.isCanonical, asksForPlaylistInformation else { return }
                 isPlaylistSegmentsSheetPresented = true
