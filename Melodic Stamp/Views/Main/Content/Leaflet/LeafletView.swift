@@ -114,11 +114,11 @@ struct LeafletView: View {
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
-            .containerBackground(for: .window) {
+            .background {
                 windowBackgroundView()
             }
-            .animation(.bouncy, value: hasLyrics)
-            .animation(.bouncy, value: isShowingLyrics)
+//            .animation(.bouncy, value: hasLyrics)
+//            .animation(.bouncy, value: isShowingLyrics)
             .focusable()
             .focusEffectDisabled()
             .focused($isFocused)
@@ -229,7 +229,7 @@ struct LeafletView: View {
                 .buttonStyle(.alive(isOn: $player.isPlaying))
             }
         }
-        .matchedGeometryEffect(id: "cover", in: namespace)
+//        .matchedGeometryEffect(id: "cover", in: namespace)
         .containerRelativeFrame(.vertical, alignment: .center) { length, axis in
             switch axis {
             case .horizontal:
@@ -249,24 +249,24 @@ struct LeafletView: View {
             guard position.isPositionedByUser else { return }
             interaction.reset()
         }
-        .overlay(alignment: .trailing) {
-            Group {
-                if !interaction.state.isDelegated {
-                    AppleMusicLyricsViewInteractionStateButton(
-                        interactionState: $interaction.state,
-                        progress: interaction.delegationProgress,
-                        hasProgressRing: interaction.hasProgressRing && interaction.delegationProgress > 0
-                    )
-                    .tint(.white)
-                    .transition(.blurReplace(.downUp))
-                }
-            }
-            .animation(.bouncy, value: interaction.state.isDelegated)
-            .padding(12)
-            .alignmentGuide(.trailing) { d in
-                d[.leading]
-            }
-        }
+//        .overlay(alignment: .trailing) {
+//            Group {
+//                if !interaction.state.isDelegated {
+//                    AppleMusicLyricsViewInteractionStateButton(
+//                        interactionState: $interaction.state,
+//                        progress: interaction.delegationProgress,
+//                        hasProgressRing: interaction.hasProgressRing && interaction.delegationProgress > 0
+//                    )
+//                    .tint(.white)
+//                    .transition(.blurReplace(.downUp))
+//                }
+//            }
+//            .animation(.bouncy, value: interaction.state.isDelegated)
+//            .padding(12)
+//            .alignmentGuide(.trailing) { d in
+//                d[.leading]
+//            }
+//        }
     }
 
     // MARK: - Window Background

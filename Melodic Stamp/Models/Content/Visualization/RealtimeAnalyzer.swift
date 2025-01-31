@@ -9,7 +9,7 @@ import Accelerate
 import AVFoundation
 import Foundation
 
-class RealtimeAnalyzer {
+@MainActor class RealtimeAnalyzer {
     private var fftSize: Int
     private lazy var fftSetup = vDSP_create_fftsetup(vDSP_Length(Int(round(log2(Double(fftSize))))), FFTRadix(kFFTRadix2))
 
@@ -45,10 +45,6 @@ class RealtimeAnalyzer {
 
     init(fftSize: Int) {
         self.fftSize = fftSize
-    }
-
-    deinit {
-        vDSP_destroy_fftsetup(fftSetup)
     }
 
     func analyze(with buffer: AVAudioPCMBuffer) -> [[Float]] {

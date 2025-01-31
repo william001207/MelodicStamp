@@ -58,7 +58,6 @@ struct DisplayLyricsView: View {
                         shouldFade: !isHovering,
                         shouldAnimate: interactionState.isDelegated
                     )
-                    .padding(.bottom, 21)
                 } indicator: { index, _ in
                     let span = lyrics.storage?.parser.duration(before: index)
                     let beginTime = span?.begin
@@ -77,8 +76,6 @@ struct DisplayLyricsView: View {
                             }
                         } else { .invisible }
                     } else { return .invisible }
-                } onScrolling: { position, point in
-                    onScrolling?(position, point)
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {

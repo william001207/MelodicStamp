@@ -22,6 +22,7 @@ struct TTMLDisplayLyricLineView: View {
     var highlightReleasingDelay: TimeInterval = 0.25
 
     @State private var isActive: Bool = false
+    @State private var backgroundContentSize: CGSize = .zero
 
     var body: some View {
         VStack(spacing: 5) {
@@ -36,19 +37,20 @@ struct TTMLDisplayLyricLineView: View {
             }
 
             // Shows background lyrics when necessary
-            if isActive, !line.backgroundLyrics.isEmpty {
-                backgroundContent()
-                    .frame(maxWidth: .infinity, alignment: alignment)
-                    .transition(
-                        .asymmetric(
-                            insertion: .blurTransition(radius: 2.5)
-                                .combined(with: .opacity)
-                                .animation(.linear(duration: 0.6)),
-                            removal: .blurTransition(radius: 2.5)
-                                .combined(with: .opacity)
-                                .animation(.linear(duration: 0.6))
-                        )
-                    )
+            if !line.backgroundLyrics.isEmpty {
+                VStack {
+                    backgroundContent()
+                        .frame(maxWidth: .infinity, alignment: alignment)
+                        .onGeometryChange(for: CGSize.self) { proxy in
+                            proxy.size
+                        } action: { newValue in
+                            backgroundContentSize = newValue
+                        }
+                        .blur(radius: isHighlighted ? 0 : 2.5)
+                        .opacity(isHighlighted ? 1 : 0)
+                }
+                .frame(height: isHighlighted ? backgroundContentSize.height : 0)
+                .animation(.smooth(duration: 0.6), value: isHighlighted)
             }
         }
         .multilineTextAlignment(textAlignment)
