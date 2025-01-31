@@ -72,13 +72,9 @@ enum AppleMusicLyricsViewIndicator {
 extension AppleMusicLyricsView: TypeNameReflectable {}
 
 struct AppleMusicLyricsView<Content>: View where Content: View {
-    struct Origin {
-        var offset: CGFloat
-        var index: Int
-        var isInitialized: Bool = true
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
-        static var zero: Self { .init(offset: .zero, index: .zero) }
-    }
+    @Default(.lyricsAttachments) private var attachments
 
     // MARK: Fields
 
@@ -97,17 +93,12 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
     var indicator: (_ index: Int, _ isHighlighted: Bool) -> AppleMusicLyricsViewIndicator
 
     @State private var containerSize: CGSize = .zero
-    @State private var scrollPosition: ScrollPosition = .init()
-    @State private var scrollOffset: CGFloat = .zero
 
-    @State private var animationState: AppleMusicLyricsViewAnimationState = .pushed
-    @State private var contentOffsets: [Int: CGFloat] = [:]
-
-    @State private var lineOffsets: [Int: AppleMusicLyricsLineGeometry] = [:]
     @State private var contentOffset: [Int: CGFloat] = [:]
+    @State private var lineOffsets: [Int: AppleMusicLyricsLineGeometry] = [:]
 
-    @State private var origin: Origin = .zero
-    @State private var showAll: Bool = false
+    @State private var isVisible: Bool = false
+    @State private var isUserScrolling: Bool = false
 
     @State private var animationStateDispatch: DispatchWorkItem?
 
@@ -126,8 +117,18 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
                 }
                 .padding(.vertical, containerSize.height / 2)
             }
-            .scrollIndicators(.visible)
-            .onScrollPhaseChange { _, _, _ in
+            .coordinateSpace(name: coordinateSpace)
+            .scrollIndicators(isUserScrolling ? .visible : .never)
+            .onScrollPhaseChange { phase, _, _ in
+                switch phase {
+                case .idle:
+                    isVisible = false
+                    isUserScrolling = false
+
+                case .interacting, .decelerating, .animating, .tracking:
+                    isVisible = true
+                    isUserScrolling = true
+                }
             }
             .onGeometryChange(for: CGSize.self) { proxy in // The code below follows a strict order, do not rearrange arbitrarily
                 proxy.size
@@ -138,21 +139,28 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
             .onChange(of: identifier, initial: true) { _, _ in // Force reset on external change
                 resetScrolling(in: proxy)
             }
+            .onChange(of: attachments) { _, _ in
+                resetScrolling(in: proxy)
+            }
+            .onChange(of: dynamicTypeSize) { _, _ in
+                resetScrolling(in: proxy)
+            }
             .onChange(of: highlightedRange) { _, _ in
                 scrollToHighlighted(in: proxy)
             }
         }
         .onAppear {
-            showAll = true
-            showAll = false
+            isVisible = true
+            isVisible = false
         }
     }
 
     @ViewBuilder private func content(at index: Int) -> some View {
         let isHighlighted = highlightedRange.contains(index)
         let isInRange = (highlightedRange.lowerBound - 5...highlightedRange.upperBound + 5).contains(index)
+        let isDot = index == highlightedRange.lowerBound
 
-        if !showAll, isInRange {
+        if isVisible || isInRange {
             content(index, isHighlighted)
                 .background {
                     if index == highlightedRange.lowerBound {
@@ -187,9 +195,9 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
 
     private func resetScrolling(in proxy: ScrollViewProxy) {
         let index = max(0, min(range.upperBound - 1, highlightedRange.lowerBound))
-        showAll = true
+        isVisible = true
         proxy.scrollTo(index, anchor: alignment.unitPoint)
-        showAll = false
+        isVisible = false
     }
 
     private func scrollToHighlighted(in proxy: ScrollViewProxy) {
@@ -320,7 +328,6 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
         .padding()
 
         AppleMusicLyricsView(
-            padding: 0,
             range: 0 ..< count,
             highlightedRange: highlightedRange,
             alignment: alignment
