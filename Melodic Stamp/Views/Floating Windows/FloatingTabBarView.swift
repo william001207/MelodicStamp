@@ -10,11 +10,11 @@ import SwiftUI
 
 struct FloatingTabBarView: View {
     @Environment(FloatingWindowsModel.self) private var floatingWindows
-    @Environment(WindowManagerModel.self) private var windowManager
 
     @Environment(\.luminareAnimation) private var animation
     @Environment(\.luminareAnimationFast) private var animationFast
 
+    @Binding var isInspectorPresented: Bool
     @Binding var selectedContentTab: SidebarContentTab
     @Binding var selectedInspectorTab: SidebarInspectorTab
 
@@ -54,10 +54,10 @@ struct FloatingTabBarView: View {
             }
         }
         .onChange(of: selectedContentTab) { _, newValue in
-            guard windowManager.isInspectorPresented else { return }
+            guard isInspectorPresented else { return }
             if !newValue.inspectors.contains(selectedInspectorTab) {
                 // Tells the inspector to close
-                windowManager.isInspectorPresented = false
+                isInspectorPresented = false
             }
         }
         .background(.clear)
@@ -109,13 +109,13 @@ struct FloatingTabBarView: View {
     }
 
     @ViewBuilder private func inspectorTab(for tab: SidebarInspectorTab) -> some View {
-        let isSelected = windowManager.isInspectorPresented && selectedInspectorTab == tab
+        let isSelected = isInspectorPresented && selectedInspectorTab == tab
 
         Button {
             if isSelected {
-                windowManager.isInspectorPresented.toggle()
+                isInspectorPresented.toggle()
             } else {
-                windowManager.isInspectorPresented = true
+                isInspectorPresented = true
                 selectedInspectorTab = tab
             }
         } label: {

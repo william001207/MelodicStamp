@@ -74,10 +74,6 @@ struct DelegatedPlaylistStorage: View {
 
                         logger.log("Successfully restored playlist")
 
-                        #if DEBUG
-                            await dump(playlist.tracks.map(\.url))
-                        #endif
-
                         Task { @MainActor in
                             // Dependents
                             playbackVolumeState.isReady = true

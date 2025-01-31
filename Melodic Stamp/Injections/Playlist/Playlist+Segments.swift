@@ -60,11 +60,7 @@ extension Playlist {
             let artwork = try JSONDecoder().decode(Artwork.self, from: Self.read(segment: .artwork, fromDirectory: url))
             self.init(info: info, state: state, artwork: artwork)
 
-            logger.info("Successfully read segments for playlist at \(url)")
-
-            #if DEBUG
-                dump(self)
-            #endif
+            logger.info("Successfully read segments for playlist at \(url): \("\(info)"), \("\(state)"), \("\(artwork)")")
         }
 
         convenience init() {

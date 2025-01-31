@@ -75,6 +75,7 @@ struct ContentView: View {
 
     // MARK: Sidebar & Inspector
 
+    @State private var isInspectorPresented: Bool = false
     @State private var selectedContentTab: SidebarContentTab = .playlist
     @State private var selectedInspectorTab: SidebarInspectorTab = .commonMetadata
 
@@ -87,6 +88,7 @@ struct ContentView: View {
     // MARK: - Initializers
 
     init(_ parameters: CreationParameters, library: LibraryModel) {
+        let date = Date()
         let playlist = PlaylistModel(bindingTo: parameters.id, library: library)
         let player = PlayerModel(SFBAudioEnginePlayer(), library: library, playlist: playlist)
 
@@ -103,7 +105,8 @@ struct ContentView: View {
             self.concreteParameters = parameters
         }
 
-        Self.logger.info("Initializing content with \("\(parameters)")")
+        let elapsedTime = Date().timeIntervalSince(date)
+        Self.logger.info("Initializing content with \("\(parameters)"), took \(elapsedTime) seconds")
     }
 
     // MARK: - Body
@@ -259,7 +262,7 @@ struct ContentView: View {
 
         MainView(
             namespace: namespace,
-            isInspectorPresented: $windowManager.isInspectorPresented,
+            isInspectorPresented: $isInspectorPresented,
             selectedContentTab: $selectedContentTab,
             selectedInspectorTab: $selectedInspectorTab
         )
@@ -360,6 +363,7 @@ struct ContentView: View {
             Task.detached {
                 await floatingWindows.addTabBar(to: mainWindow) {
                     FloatingTabBarView(
+                        isInspectorPresented: $isInspectorPresented,
                         selectedContentTab: $selectedContentTab,
                         selectedInspectorTab: $selectedInspectorTab
                     )
@@ -369,7 +373,6 @@ struct ContentView: View {
                         floatingWindows.updateTabBarPosition(size: newValue, in: mainWindow, animate: true)
                     }
                     .environment(floatingWindows)
-                    .environment(windowManager)
                 }
             }
 

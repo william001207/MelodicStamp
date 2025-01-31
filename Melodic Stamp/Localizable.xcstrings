@@ -1507,6 +1507,7 @@
       }
     },
     "Hide Inspector" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -2615,6 +2616,7 @@
       }
     },
     "Show Inspector" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {

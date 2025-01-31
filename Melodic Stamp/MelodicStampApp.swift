@@ -23,7 +23,7 @@ struct MelodicStampApp: App {
     @Environment(\.openWindow) private var openWindow
     @Environment(\.dismissWindow) private var dismissWindow
 
-    @FocusedValue(WindowManagerModel.self) private var windowManager
+//    @FocusedValue(WindowManagerModel.self) private var windowManager
 
     // Globally managed models, uniqueness ensured
     @State private var floatingWindows: FloatingWindowsModel = .init()
@@ -48,26 +48,6 @@ struct MelodicStampApp: App {
         .windowManagerRole(.principal)
         .handlesExternalEvents(matching: []) // Crucial for handling custom external events in `AppDelegate`
         .commands {
-            // `InspectorCommands` isn't localized...
-            CommandGroup(before: .sidebar) {
-                Group {
-                    if let windowManager {
-                        Button {
-                            windowManager.isInspectorPresented.toggle()
-                        } label: {
-                            if windowManager.isInspectorPresented {
-                                Text("Hide Inspector")
-                            } else {
-                                Text("Show Inspector")
-                            }
-                        }
-                    } else {
-                        Button("Show Inspector") {}
-                    }
-                }
-                .keyboardShortcut("i", modifiers: [.command, .option])
-            }
-
             CommandGroup(replacing: .appInfo) {
                 Button("About \(Bundle.main[localized: .displayName])") {
                     if isAboutWindowPresented {
