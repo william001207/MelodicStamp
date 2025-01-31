@@ -5,6 +5,7 @@
 //  Created by KrLite on 2025/1/28.
 //
 
+import QuickLook
 import SwiftUI
 
 struct InspectorLibraryView: View {
@@ -18,11 +19,12 @@ struct InspectorLibraryView: View {
     // MARK: - Fields
 
     @State private var selectedPlaylists: Set<Playlist> = []
+    @State private var quickLookSelection: URL?
 
     // MARK: - Body
 
     var body: some View {
-        if library.isEmpty {
+        if !library.isLoaded {
             ExcerptView(tab: SidebarInspectorTab.library)
         } else {
             List(selection: $selectedPlaylists) {
@@ -39,6 +41,18 @@ struct InspectorLibraryView: View {
             }
             .scrollClipDisabled()
             .scrollContentBackground(.hidden)
+
+            // MARK: Quick Look
+
+            .quickLookPreview($quickLookSelection, in: library.playlists.map(\.possibleURL))
+            .onChange(of: selectedPlaylists) { _, newValue in
+                guard quickLookSelection != nil else { return }
+                guard newValue.count == 1 else {
+                    quickLookSelection = nil
+                    return
+                }
+                quickLookSelection = newValue.first?.possibleURL
+            }
 
             // MARK: Keyboard Handlers
 
@@ -64,8 +78,21 @@ struct InspectorLibraryView: View {
             .onKeyPress(.return) {
                 guard !selectedPlaylists.isEmpty else { return .ignored }
 
-                selectedPlaylists.forEach(open)
+                open(Array(selectedPlaylists))
                 return .handled
+            }
+
+            // Handles [space] -> quick look
+            .onKeyPress(.space) {
+                if quickLookSelection != nil {
+                    quickLookSelection = nil
+                    return .handled
+                } else if selectedPlaylists.count == 1 {
+                    quickLookSelection = selectedPlaylists.first?.possibleURL
+                    return .handled
+                } else {
+                    return .ignored
+                }
             }
         }
     }
@@ -75,7 +102,7 @@ struct InspectorLibraryView: View {
     }
 
     private var canRemove: Bool {
-        !library.isEmpty
+        library.isLoaded
     }
 
     // MARK: - Item View
@@ -104,7 +131,7 @@ struct InspectorLibraryView: View {
             // MARK: Open
 
             Button {
-                open(playlist)
+                open([playlist])
             } label: {
                 Image(systemSymbol: .rectangleStackFill)
             }
@@ -115,6 +142,43 @@ struct InspectorLibraryView: View {
     // MARK: - Context Menu
 
     @ViewBuilder private func contextMenu(for playlist: Playlist) -> some View {
+        // MARK: Open
+
+        Group {
+            if selectedPlaylists.count <= 1 {
+                Button("Open in New Window") {
+                    open([playlist])
+                }
+            } else {
+                Button {
+                    open(Array(selectedPlaylists))
+                } label: {
+                    Text("Open \(selectedPlaylists.count) Playlists")
+                }
+            }
+        }
+        .keyboardShortcut(.return, modifiers: [])
+
+        // MARK: Copy
+
+        Group {
+            if selectedPlaylists.count <= 1 {
+                Button("Copy Playlist") {
+                    Task {
+                        try await copy([playlist])
+                    }
+                }
+            } else {
+                Button {
+                    Task {
+                        try await copy(Array(selectedPlaylists))
+                    }
+                } label: {
+                    Text("Copy \(selectedPlaylists.count) Playlists")
+                }
+            }
+        }
+
         // MARK: Remove from Library
 
         Group {
@@ -132,13 +196,6 @@ struct InspectorLibraryView: View {
         }
         .keyboardShortcut(.deleteForward, modifiers: [])
 
-        // MARK: Open
-
-        Button("Open in New Window") {
-            open(playlist)
-        }
-        .keyboardShortcut(.return, modifiers: [])
-
         Divider()
 
         if let url = playlist.canonicalURL {
@@ -152,11 +209,43 @@ struct InspectorLibraryView: View {
 
     // MARK: - Functions
 
-    private func open(_ playlist: Playlist) {
-        openWindow(
-            id: WindowID.content.rawValue,
-            value: CreationParameters(playlist: .canonical(playlist.id))
-        )
+    private func open(_ playlists: [Playlist]) {
+        for playlist in playlists {
+            openWindow(
+                id: WindowID.content.rawValue,
+                value: CreationParameters(playlist: .canonical(playlist.id))
+            )
+        }
+    }
+
+    private func copy(_ playlists: [Playlist]) async throws {
+        guard
+            !playlists.isEmpty,
+            let firstPlaylist = playlists.first,
+            let index = library.playlists.firstIndex(where: { $0.id == firstPlaylist.id })
+        else { return }
+
+        let stream: AsyncThrowingStream<Playlist, Error> = .init { continuation in
+            Task {
+                for playlist in playlists {
+                    do {
+                        guard let copiedPlaylist = try await Playlist(copyingFrom: playlist) else { continue }
+                        continuation.yield(copiedPlaylist)
+                    } catch {
+                        continuation.finish(throwing: error)
+                    }
+                }
+
+                continuation.finish()
+            }
+        }
+
+        var copiedPlaylists: [Playlist] = []
+        for try await copiedPlaylist in stream {
+            copiedPlaylists.append(copiedPlaylist)
+        }
+
+        library.add(copiedPlaylists, at: index)
     }
 
     @discardableResult private func handleEscape() -> Bool {

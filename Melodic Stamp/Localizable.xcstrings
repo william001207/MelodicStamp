@@ -325,42 +325,6 @@
         }
       }
     },
-    "App: (Subtitle) Tracks" : {
-      "comment" : "The subtitle displayed when there are songs in the playlist and nothing is playing",
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "variations" : {
-            "plural" : {
-              "one" : {
-                "stringUnit" : {
-                  "state" : "needs_review",
-                  "value" : "%lld Tracks"
-                }
-              },
-              "other" : {
-                "stringUnit" : {
-                  "state" : "new",
-                  "value" : "%lld Tracks"
-                }
-              }
-            }
-          }
-        },
-        "zh-Hans" : {
-          "variations" : {
-            "plural" : {
-              "other" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "%lld首音乐"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "Appearance" : {
       "localizations" : {
         "zh-Hans" : {
@@ -959,6 +923,94 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "已复制到剪贴板！"
+          }
+        }
+      }
+    },
+    "Copy %lld Playlists" : {
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Copy %lld Playlist"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "new",
+                  "value" : "Copy %lld Playlists"
+                }
+              }
+            }
+          }
+        },
+        "zh-Hans" : {
+          "variations" : {
+            "plural" : {
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "复制%lld个播放列表"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "Copy %lld Tracks" : {
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Copy %lld Track"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "new",
+                  "value" : "Copy %lld Tracks"
+                }
+              }
+            }
+          }
+        },
+        "zh-Hans" : {
+          "variations" : {
+            "plural" : {
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "复制%lld首音乐"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "Copy Playlist" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "复制播放列表"
+          }
+        }
+      }
+    },
+    "Copy Track" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "复制音乐"
           }
         }
       }
@@ -1810,6 +1862,40 @@
         }
       }
     },
+    "Open %lld Playlists" : {
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Open %lld Playlist"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "new",
+                  "value" : "Open %lld Playlists"
+                }
+              }
+            }
+          }
+        },
+        "zh-Hans" : {
+          "variations" : {
+            "plural" : {
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "打开%lld个播放列表"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "Open File" : {
       "localizations" : {
         "zh-Hans" : {
@@ -2188,7 +2274,7 @@
               "one" : {
                 "stringUnit" : {
                   "state" : "translated",
-                  "value" : "Remove from Library"
+                  "value" : "Remove %lld Playlist from Library"
                 }
               },
               "other" : {
@@ -2222,7 +2308,7 @@
               "one" : {
                 "stringUnit" : {
                   "state" : "translated",
-                  "value" : "Remove from Playlist"
+                  "value" : "Remove %lld Track from Playlist"
                 }
               },
               "other" : {
@@ -2584,6 +2670,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "未知音乐"
+          }
+        }
+      }
+    },
+    "Unknown Playlist" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "未知播放列表"
           }
         }
       }

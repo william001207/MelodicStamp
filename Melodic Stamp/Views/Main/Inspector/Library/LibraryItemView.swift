@@ -28,19 +28,18 @@ struct LibraryItemView: View {
                         .bold()
                         .font(.title3)
                 } else {
-                    HStack {
-                        Text("Playlist")
-                            .fixedSize()
-
-                        Text(playlist.id.uuidString)
-                            .foregroundStyle(.placeholder)
-                    }
-                    .font(.title3)
+                    Text("Unknown Playlist")
+                        .font(.title3)
+                        .foregroundStyle(.placeholder)
                 }
 
-                Text(playlist.id.uuidString)
-                    .font(.caption)
-                    .foregroundStyle(.placeholder)
+                HStack {
+                    Text("\(playlist.count) Tracks")
+
+                    Text(playlist.id.uuidString)
+                        .foregroundStyle(.placeholder)
+                }
+                .font(.caption)
             }
             .lineLimit(1)
             .onDoubleClick(handler: open)
@@ -66,7 +65,7 @@ struct LibraryItemView: View {
             }
         }
         .foregroundStyle(isOpened && !isSelected ? AnyShapeStyle(.tint) : AnyShapeStyle(.primary))
-        .redacted(reason: library.isLoadingPlaylists ? .placeholder : [])
+        .redacted(reason: library.isLoading ? .placeholder : [])
         .frame(height: 50)
         .padding(6)
         .padding(.trailing, -1)

@@ -37,7 +37,7 @@ extension Playlist {
     private(set) var indexer: TrackIndexer
     private(set) var tracks: [Track] = []
 
-    private(set) var isLoadingTracks: Bool = false
+    private(set) var isLoading: Bool = false
 
     // Delegated variables
     // Must not have inlined getters and setters, otherwise causing UI glitches
@@ -84,7 +84,20 @@ extension Playlist {
         guard let segments = try? await Segments(loadingFrom: url) else { return nil }
         self.init(id: id, mode: .canonical, segments: segments)
 
+        Task {
+            loadIndexer()
+        }
+
         logger.info("Loaded canonical playlist from \(url)")
+    }
+
+    convenience init?(copyingFrom playlist: Playlist) async throws {
+        guard playlist.mode.isCanonical else { return nil }
+
+        let playlistID = UUID()
+        try FileManager.default.copyItem(at: playlist.possibleURL, to: Self.url(forID: playlistID))
+
+        await self.init(loadingWith: playlistID)
     }
 
     func makeCanonical() throws {
@@ -146,12 +159,20 @@ extension Playlist: @preconcurrency Sequence {
         tracks.makeIterator()
     }
 
-    var isEmpty: Bool {
-        tracks.isEmpty
+    var count: Int {
+        indexer.value.count
     }
 
-    var count: Int {
+    var loadedCount: Int {
         tracks.count
+    }
+
+    var isEmpty: Bool {
+        count == 0
+    }
+
+    var isLoaded: Bool {
+        loadedCount != 0
     }
 }
 
@@ -186,15 +207,15 @@ extension Playlist {
 
     func loadTracks() async {
         guard mode.isCanonical else { return }
-        guard !isLoadingTracks else { return }
-        isLoadingTracks = true
+        guard !isLoading else { return }
+        isLoading = true
         loadIndexer()
 
         tracks.removeAll()
         for await track in indexer.loadTracks() {
             tracks.append(track)
         }
-        isLoadingTracks = false
+        isLoading = false
     }
 }
 
@@ -291,14 +312,19 @@ extension Playlist {
 }
 
 extension Playlist {
-    static func isCanonical(url: URL) -> Bool {
-        let parent = URL.playlists.standardized
-        return url.standardized.path().hasPrefix(parent.path())
+    func isExistingCanonicalTrack(at url: URL) -> Bool {
+        guard mode.isCanonical else { return false }
+        return tracks.contains { $0.url == url }
     }
 
-    private static func deleteTrack(at url: URL) throws {
-        guard isCanonical(url: url) else { return }
+    private func deleteTrack(at url: URL) throws {
+        guard isExistingCanonicalTrack(at: url) else { return }
+        if currentTrack?.url == url {
+            currentTrack = nil
+        }
+
         Task {
+            tracks.removeAll { $0.url == url }
             try FileManager.default.removeItem(at: url)
 
             logger.info("Deleted canonical track at \(url)")
@@ -310,7 +336,6 @@ extension Playlist {
     }
 
     private func generateCanonicalURL(for url: URL) -> URL {
-        guard !Self.isCanonical(url: url) else { return url }
         let trackID = UUID()
         return possibleURL
             .appending(component: trackID.uuidString, directoryHint: .notDirectory)
@@ -334,26 +359,30 @@ extension Playlist {
         first(where: { $0.url == url })
     }
 
-    func getOrCreateTrack(at url: URL) async -> Track? {
+    func createTrack(from url: URL) async -> Track? {
         await withCheckedContinuation { continuation in
-            if let track = getTrack(at: url) {
-                continuation.resume(returning: track)
-            } else {
-                switch mode {
-                case .referenced:
-                    continuation.resume(returning: Track(loadingFrom: url))
-                case .canonical:
-                    var track: Track?
-                    if let loadedTrack = Track(loadingFrom: url, completion: {
-                        guard let track else { return continuation.resume(returning: nil) }
-                        continuation.resume(returning: try? self.migrateTrack(from: track))
-                    }) {
-                        track = loadedTrack
-                    } else {
-                        continuation.resume(returning: nil)
-                    }
+            switch mode {
+            case .referenced:
+                continuation.resume(returning: Track(loadingFrom: url))
+            case .canonical:
+                var track: Track?
+                if let loadedTrack = Track(loadingFrom: url, completion: {
+                    guard let track else { return continuation.resume(returning: nil) }
+                    continuation.resume(returning: try? self.migrateTrack(from: track))
+                }) {
+                    track = loadedTrack
+                } else {
+                    continuation.resume(returning: nil)
                 }
             }
+        }
+    }
+
+    func getOrCreateTrack(at url: URL) async -> Track? {
+        if let track = getTrack(at: url) {
+            track
+        } else {
+            await createTrack(from: url)
         }
     }
 }
@@ -365,23 +394,23 @@ extension Playlist {
         try? indexTracks(with: captureIndices())
     }
 
-    func add(_ tracks: [Track]) {
-        for track in tracks {
-            guard !contains(track) else { return }
-            self.tracks.append(track)
+    func add(_ tracks: [Track], at destination: Int? = nil) {
+        let filteredTracks = tracks.filter { !self.tracks.contains($0) }
+
+        if let destination, self.tracks.indices.contains(destination) {
+            self.tracks.insert(contentsOf: filteredTracks, at: destination)
+        } else {
+            self.tracks.append(contentsOf: filteredTracks)
         }
 
         try? indexTracks(with: captureIndices())
     }
 
     func remove(_ tracks: [Track]) {
-        if let currentTrack, tracks.contains(currentTrack) {
-            self.currentTrack = nil
-        }
-
         for track in tracks {
-            self.tracks.removeAll { $0 == track }
-            try? Self.deleteTrack(at: track.url)
+            Task {
+                try deleteTrack(at: track.url)
+            }
         }
 
         try? indexTracks(with: captureIndices())

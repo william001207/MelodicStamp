@@ -230,7 +230,7 @@ struct ContentView: View {
 
     private var subtitle: String {
         let fallbackTitle = if !player.isPlaylistEmpty {
-            String(localized: .init("\(player.playlist.count) Tracks"))
+            String(localized: "\(player.playlist.count) Tracks")
         } else {
             ""
         }

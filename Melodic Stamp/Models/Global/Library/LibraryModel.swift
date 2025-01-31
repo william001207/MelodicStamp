@@ -13,7 +13,7 @@ extension LibraryModel: TypeNameReflectable {}
     private(set) var playlists: [Playlist] = []
     private(set) var indexer: PlaylistIndexer = .init()
 
-    private(set) var isLoadingPlaylists: Bool = false
+    private(set) var isLoading: Bool = false
 
     init() {
         Task {
@@ -27,12 +27,20 @@ extension LibraryModel: @preconcurrency Sequence {
         playlists.makeIterator()
     }
 
-    var isEmpty: Bool {
-        playlists.isEmpty
+    var count: Int {
+        indexer.value.count
     }
 
-    var count: Int {
+    var loadedCount: Int {
         playlists.count
+    }
+
+    var isEmpty: Bool {
+        count == 0
+    }
+
+    var isLoaded: Bool {
+        loadedCount != 0
     }
 }
 
@@ -51,8 +59,8 @@ extension LibraryModel {
     }
 
     func loadPlaylists() async {
-        guard !isLoadingPlaylists else { return }
-        isLoadingPlaylists = true
+        guard !isLoading else { return }
+        isLoading = true
         loadIndexer()
 
         var playlists: [Playlist] = []
@@ -60,13 +68,19 @@ extension LibraryModel {
             playlists.append(playlist)
         }
         self.playlists = playlists
-        isLoadingPlaylists = false
+        isLoading = false
     }
 }
 
 extension LibraryModel {
-    private static func deletePlaylist(at url: URL) throws {
+    func isExistingPlaylist(at url: URL) -> Bool {
+        playlists.contains { $0.possibleURL == url }
+    }
+
+    private func deletePlaylist(at url: URL) throws {
+        guard isExistingPlaylist(at: url) else { return }
         Task {
+            self.playlists.removeAll { $0.possibleURL == url }
             try FileManager.default.removeItem(at: url)
 
             logger.info("Deleted playlist at \(url)")
@@ -81,10 +95,13 @@ extension LibraryModel {
         try? indexPlaylists(with: captureIndices())
     }
 
-    func add(_ playlists: [Playlist]) {
-        for playlist in playlists {
-            guard !self.playlists.contains(playlist) else { continue }
-            self.playlists.append(playlist)
+    func add(_ playlists: [Playlist], at destination: Int? = nil) {
+        let filteredPlaylists = playlists.filter { !self.playlists.contains($0) }
+
+        if let destination, self.playlists.indices.contains(destination) {
+            self.playlists.insert(contentsOf: filteredPlaylists, at: destination)
+        } else {
+            self.playlists.append(contentsOf: filteredPlaylists)
         }
 
         try? indexPlaylists(with: captureIndices())
@@ -92,8 +109,9 @@ extension LibraryModel {
 
     func remove(_ playlists: [Playlist]) {
         for playlist in playlists {
-            self.playlists.removeAll { $0 == playlist }
-            try? Self.deletePlaylist(at: playlist.possibleURL)
+            Task {
+                try deletePlaylist(at: playlist.possibleURL)
+            }
         }
 
         try? indexPlaylists(with: captureIndices())

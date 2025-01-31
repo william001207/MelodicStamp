@@ -20,7 +20,7 @@ extension PlaylistIndexer {
 
             Task {
                 for element in value {
-                    guard let playlist = await Playlist(loadingWith: element) else { return }
+                    guard let playlist = await Playlist(loadingWith: element) else { continue }
                     continuation.yield(playlist)
                 }
 

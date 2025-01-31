@@ -7,6 +7,7 @@
 
 import Luminare
 import SwiftUI
+import SwiftUIIntrospect
 
 struct PlaylistMetadataView: View {
     @Environment(\.luminareAnimation) private var animation
@@ -48,6 +49,7 @@ struct PlaylistMetadataView: View {
             }
             .shadow(color: .black.opacity(0.1), radius: 5)
             .animation(nil, value: isTitleHovering)
+            .animation(nil, value: isTitleFocused)
 
             VStack(alignment: .leading) {
                 titleView()
@@ -80,6 +82,7 @@ struct PlaylistMetadataView: View {
         }
         .frame(height: 250)
         .animation(animation, value: isTitleHovering)
+        .animation(animation, value: isTitleFocused)
     }
 
     @ViewBuilder private func artworkView() -> some View {
@@ -121,7 +124,7 @@ struct PlaylistMetadataView: View {
                         }
                         .buttonStyle(.alive)
                     } else {
-                        Text("\(playlist.tracks.count) Tracks")
+                        Text("\(playlist.count) Tracks")
                     }
                 }
                 .font(.body)

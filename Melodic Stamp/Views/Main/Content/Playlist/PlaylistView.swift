@@ -195,7 +195,7 @@ struct PlaylistView: View {
     }
 
     private var canRemove: Bool {
-        !player.playlist.isEmpty
+        player.playlist.isLoaded
     }
 
     private var metadataHeight: CGFloat {
@@ -394,6 +394,28 @@ struct PlaylistView: View {
         .disabled(!isInitialized)
         .keyboardShortcut(.return, modifiers: [])
 
+        if player.playlist.mode.isCanonical {
+            // MARK: Copy
+
+            Group {
+                if player.selectedTracks.count <= 1 {
+                    Button("Copy Track") {
+                        Task {
+                            try await copy([track])
+                        }
+                    }
+                } else {
+                    Button {
+                        Task {
+                            try await copy(Array(player.selectedTracks))
+                        }
+                    } label: {
+                        Text("Copy \(player.selectedTracks.count) Tracks")
+                    }
+                }
+            }
+        }
+
         // MARK: Remove from Playlist
 
         Group {
@@ -454,6 +476,33 @@ struct PlaylistView: View {
         } else {
             bounceAnimationTriggers.insert(track)
         }
+    }
+
+    private func copy(_ tracks: [Track]) async throws {
+        guard
+            player.playlist.mode.isCanonical,
+            !tracks.isEmpty,
+            let firstTrack = tracks.first,
+            let index = player.playlist.tracks.firstIndex(where: { $0.id == firstTrack.id })
+        else { return }
+
+        let stream: AsyncStream<Track> = .init { continuation in
+            Task {
+                for track in tracks {
+                    guard let copiedTrack = await player.playlist.createTrack(from: track.url) else { continue }
+                    continuation.yield(copiedTrack)
+                }
+
+                continuation.finish()
+            }
+        }
+
+        var copiedTracks: [Track] = []
+        for await track in stream {
+            copiedTracks.append(track)
+        }
+
+        player.playlist.add(copiedTracks, at: index)
     }
 
     @discardableResult private func handleEscape() -> Bool {
