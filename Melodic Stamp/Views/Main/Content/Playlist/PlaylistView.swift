@@ -29,11 +29,11 @@ struct PlaylistView: View {
 
     var namespace: Namespace.ID
 
-    @State private var scrollOffset: CGFloat = .zero
     @State private var containerSize: CGSize = .zero
     @State private var contentSize: CGSize = .zero
+    @State private var contentOffset: CGFloat = .zero
 
-    @State private var isRemoveAllAlertPresented: Bool = false
+    @State private var isRemovalAlertPresented: Bool = false
 
     // MARK: - Body
 
@@ -46,10 +46,6 @@ struct PlaylistView: View {
             Group {
                 // MARK: Controls Placeholder
 
-                // This is much more stable than `.contentMargins()`
-                Spacer()
-                    .frame(height: minHeight)
-
                 if playlist.mode.isCanonical {
                     // MARK: Metadata
 
@@ -57,10 +53,17 @@ struct PlaylistView: View {
                         .frame(height: metadataHeight)
                         .padding(.horizontal)
                 }
+
+                // This is much more stable than `.contentMargins()`
+                Spacer()
+                    .frame(height: minHeight)
+                    .contentOffset($contentOffset, in: coordinateSpace)
+                    .onDisappear {
+                        contentOffset = .zero
+                    }
             }
             .listRowSeparator(.hidden)
             .selectionDisabled()
-            .contentOffset($scrollOffset, in: coordinateSpace)
 
             // MARK: Tracks
 
@@ -115,11 +118,7 @@ struct PlaylistView: View {
                 .shadow(color: .black.opacity(0.1), radius: 15)
             }
             .padding(.horizontal)
-            .padding(.top, 8)
-            .opacity(controlsOpacity)
-            .blur(radius: lerp(2.5, 0, factor: controlsOpacity))
-            .animation(animationFast, value: controlsOpacity)
-            .allowsHitTesting(controlsOpacity >= 0.1)
+            .offset(y: max(0, contentOffset - minHeight - 16))
         }
         .animation(animationFast, value: playlist)
         .animation(animationFast, value: player.selectedTracks)
@@ -203,19 +202,6 @@ struct PlaylistView: View {
         }
     }
 
-    private var controlsOpacity: CGFloat {
-        if contentSize.height >= containerSize.height + metadataHeight {
-            switch playlist.mode {
-            case .referenced:
-                1.0
-            case .canonical:
-                max(0, min(1, -scrollOffset / (metadataHeight / 2)))
-            }
-        } else {
-            1.0
-        }
-    }
-
     // MARK: - Leading Actions
 
     @ViewBuilder private func leadingActions() -> some View {
@@ -235,7 +221,7 @@ struct PlaylistView: View {
             Group {
                 if player.selectedTracks.isEmpty {
                     Button(role: .destructive) {
-                        isRemoveAllAlertPresented = true
+                        isRemovalAlertPresented = true
                     } label: {
                         HStack {
                             Image(systemSymbol: .trashFill)
@@ -277,7 +263,7 @@ struct PlaylistView: View {
             .foregroundStyle(.red)
             .fixedSize(horizontal: true, vertical: false)
             .disabled(!canRemove)
-            .alert("Removing All Tracks from Playlist", isPresented: $isRemoveAllAlertPresented) {
+            .alert("Removing All Tracks from Playlist", isPresented: $isRemovalAlertPresented) {
                 Button("Proceed", role: .destructive) {
                     Task {
                         await playlist.clear()

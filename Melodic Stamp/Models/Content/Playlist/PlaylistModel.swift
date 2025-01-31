@@ -12,7 +12,7 @@ import SwiftUI
     #if DEBUG
         var playlist: Playlist
     #else
-        private var playlist: Playlist
+        private(set) var playlist: Playlist
     #endif
     private weak var library: LibraryModel?
 

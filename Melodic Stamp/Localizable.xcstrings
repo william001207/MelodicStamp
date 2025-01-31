@@ -2298,6 +2298,7 @@
       }
     },
     "Remove %lld Playlists from Library" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "variations" : {
@@ -2404,6 +2405,9 @@
           }
         }
       }
+    },
+    "Removing Playlist from Library" : {
+
     },
     "Replacing Current Playlist" : {
       "localizations" : {
@@ -2675,6 +2679,9 @@
           }
         }
       }
+    },
+    "This will permanently delete the corresponding directory." : {
+
     },
     "Title" : {
       "localizations" : {

@@ -67,15 +67,6 @@ struct InspectorLibraryView: View {
                 }
             }
 
-            // Handles [􁂒] -> remove selection
-            .onKeyPress(.deleteForward) {
-                if handleRemove(Array(selectedPlaylists)) {
-                    .handled
-                } else {
-                    .ignored
-                }
-            }
-
             // Handles [⏎] -> open selection
             .onKeyPress(.return) {
                 guard !selectedPlaylists.isEmpty else { return .ignored }
@@ -103,10 +94,6 @@ struct InspectorLibraryView: View {
         !selectedPlaylists.isEmpty
     }
 
-    private var canRemove: Bool {
-        library.isLoaded
-    }
-
     // MARK: - Item View
 
     @ViewBuilder private func itemView(for playlist: Playlist) -> some View {
@@ -118,16 +105,6 @@ struct InspectorLibraryView: View {
         )
         .contextMenu {
             contextMenu(for: playlist)
-        }
-        .swipeActions {
-            // MARK: Remove from Library
-
-            Button(role: .destructive) {
-                handleRemove([playlist])
-            } label: {
-                Image(systemSymbol: .trash)
-            }
-            .tint(.red)
         }
         .swipeActions(edge: .leading) {
             // MARK: Open
@@ -177,23 +154,6 @@ struct InspectorLibraryView: View {
             }
         }
 
-        // MARK: Remove from Library
-
-        Group {
-            if selectedPlaylists.count <= 1 {
-                Button("Remove from Library") {
-                    handleRemove([playlist])
-                }
-            } else {
-                Button {
-                    handleRemove(Array(selectedPlaylists))
-                } label: {
-                    Text("Remove \(selectedPlaylists.count) Playlists from Library")
-                }
-            }
-        }
-        .keyboardShortcut(.deleteForward, modifiers: [])
-
         Divider()
 
         if let url = playlist.unwrappedURL {
@@ -231,12 +191,6 @@ struct InspectorLibraryView: View {
     @discardableResult private func handleEscape() -> Bool {
         guard canEscape else { return false }
         selectedPlaylists.removeAll()
-        return true
-    }
-
-    @discardableResult private func handleRemove(_ playlists: [Playlist]) -> Bool {
-        guard canRemove else { return false }
-        library.remove(playlists)
         return true
     }
 }

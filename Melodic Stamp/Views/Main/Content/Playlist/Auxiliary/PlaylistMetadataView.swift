@@ -75,7 +75,7 @@ struct PlaylistMetadataView: View {
                     }
                     .scrollContentBackground(.hidden)
                     .scrollClipDisabled()
-                    .presentationAttachmentBar(edge: .top, attachment: controls)
+                    .presentationAttachmentBar(edge: .bottom, attachment: controls)
                     .presentationSizing(.fitted)
                     .frame(minWidth: 725, minHeight: 500, maxHeight: 1200)
                 }

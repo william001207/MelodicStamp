@@ -193,7 +193,7 @@ struct LabeledTextEditor<Label, Actions, V>: View where Label: View, Actions: Vi
             }
             .scrollContentBackground(.hidden)
             .scrollClipDisabled()
-            .presentationAttachmentBar(edge: .top, attachment: controls)
+            .presentationAttachmentBar(edge: .bottom, attachment: controls)
             .presentationSizing(.fitted)
             .frame(minWidth: 725, minHeight: 500, maxHeight: 1200)
             .fileImporter(

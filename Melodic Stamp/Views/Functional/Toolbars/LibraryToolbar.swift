@@ -9,12 +9,16 @@ import Defaults
 import SwiftUI
 
 struct LibraryToolbar: View {
+    @Environment(LibraryModel.self) private var library
     @Environment(PlaylistModel.self) private var playlist
+
+    @Environment(\.dismissWindow) private var dismissWindow
 
     @Default(.asksForPlaylistInformation) private var asksForPlaylistInformation
 
     @State private var shouldWaitForPresentation: Bool = false
     @State private var isPlaylistSegmentsSheetPresented: Bool = false
+    @State private var isPlaylistRemovalAlertPresented: Bool = false
 
     var body: some View {
         @Bindable var playlist = playlist
@@ -61,6 +65,28 @@ struct LibraryToolbar: View {
                         .buttonStyle(.alive)
                     }
                     .frame(width: 600)
+            }
+        }
+
+        if playlist.mode.isCanonical || isPlaylistRemovalAlertPresented {
+            Button {
+                isPlaylistRemovalAlertPresented = true
+            } label: {
+                ToolbarLabel {
+                    Image(systemSymbol: .trashFill)
+                        .imageScale(.small)
+
+                    Text("Remove from Library")
+                }
+                .foregroundStyle(.red)
+            }
+            .alert("Removing Playlist from Library", isPresented: $isPlaylistRemovalAlertPresented) {
+                Button("Proceed", role: .destructive) {
+                    library.remove([playlist.playlist])
+                    dismissWindow()
+                }
+            } message: {
+                Text("This will permanently delete the corresponding directory.")
             }
         }
     }
