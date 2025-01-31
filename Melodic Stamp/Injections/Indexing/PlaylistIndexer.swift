@@ -14,18 +14,13 @@ struct PlaylistIndexer: Indexer {
 }
 
 extension PlaylistIndexer {
-    func loadPlaylists() -> AsyncStream<Playlist> {
-        .init { continuation in
-            guard !value.isEmpty else { return continuation.finish() }
+    func loadPlaylists(into playlists: inout [Playlist]) async {
+        playlists.removeAll()
+        guard !value.isEmpty else { return }
 
-            Task {
-                for element in value {
-                    guard let playlist = await Playlist(loadingWith: element) else { continue }
-                    continuation.yield(playlist)
-                }
-
-                continuation.finish()
-            }
+        for element in value {
+            guard let playlist = await Playlist(loadingWith: element) else { continue }
+            playlists.append(playlist)
         }
     }
 }

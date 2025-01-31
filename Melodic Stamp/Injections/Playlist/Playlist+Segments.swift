@@ -54,10 +54,10 @@ extension Playlist {
             self.artwork = artwork
         }
 
-        convenience init(loadingFrom url: URL) async throws {
-            let info = try await JSONDecoder().decode(Info.self, from: Self.read(segment: .info, fromDirectory: url))
-            let state = try await JSONDecoder().decode(State.self, from: Self.read(segment: .state, fromDirectory: url))
-            let artwork = try await JSONDecoder().decode(Artwork.self, from: Self.read(segment: .artwork, fromDirectory: url))
+        convenience init(loadingFrom url: URL) throws {
+            let info = try JSONDecoder().decode(Info.self, from: Self.read(segment: .info, fromDirectory: url))
+            let state = try JSONDecoder().decode(State.self, from: Self.read(segment: .state, fromDirectory: url))
+            let artwork = try JSONDecoder().decode(Artwork.self, from: Self.read(segment: .artwork, fromDirectory: url))
             self.init(info: info, state: state, artwork: artwork)
 
             logger.info("Successfully read segments for playlist at \(url)")
@@ -90,7 +90,7 @@ extension Playlist.Segments: Hashable {
 }
 
 extension Playlist.Segments {
-    static func read(segment: Playlist.Segment, fromDirectory root: URL) async throws -> Data {
+    static func read(segment: Playlist.Segment, fromDirectory root: URL) throws -> Data {
         let url = segment.url(relativeTo: root)
         return try Data(contentsOf: url)
     }

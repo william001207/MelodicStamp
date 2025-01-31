@@ -58,7 +58,7 @@ struct DelegatedPlaylistStorage: View {
             .onChange(of: playlistData) { _, newValue in
                 playlistState.value = newValue
             }
-            .onChange(of: playlist) { _, _ in
+            .onChange(of: playlist.hashValue) { _, _ in
                 playlistState.isReady = false
 
                 Task.detached {
@@ -75,7 +75,7 @@ struct DelegatedPlaylistStorage: View {
                         logger.log("Successfully restored playlist")
 
                         #if DEBUG
-                            await dump(playlist)
+                            await dump(playlist.tracks.map(\.url))
                         #endif
 
                         Task { @MainActor in
@@ -160,8 +160,8 @@ struct DelegatedPlaylistStorage: View {
                 // Already handled by `ContentView`
                 break
             case .referenced:
-                await playlist.bindTo(id, mode: .canonical)
-                await playlist.loadTracks()
+                playlist.bindTo(id, mode: .canonical)
+                playlist.loadTracks()
             }
         }
     }

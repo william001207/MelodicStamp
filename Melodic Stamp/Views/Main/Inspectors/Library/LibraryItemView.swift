@@ -87,7 +87,7 @@ struct LibraryItemView: View {
     }
 
     private var isOpened: Bool {
-        playlist.isUnderlying(playlist: item)
+        playlist.id == item.id
     }
 
     private var hasTitle: Bool {

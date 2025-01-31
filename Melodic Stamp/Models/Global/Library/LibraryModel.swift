@@ -63,11 +63,12 @@ extension LibraryModel {
         isLoading = true
         loadIndexer()
 
+        // Since we don't need real-time feedback, it's better to wait for all playlists to load before eventually updating the UI
+        // While loading, the UI should be redacted instead of removed
         var playlists: [Playlist] = []
-        for await playlist in indexer.loadPlaylists() {
-            playlists.append(playlist)
-        }
+        await indexer.loadPlaylists(into: &playlists)
         self.playlists = playlists
+
         isLoading = false
     }
 }

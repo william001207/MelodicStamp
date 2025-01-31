@@ -166,15 +166,11 @@ struct InspectorLibraryView: View {
         Group {
             if selectedPlaylists.count <= 1 {
                 Button("Copy Playlist") {
-                    Task {
-                        try await copy([playlist])
-                    }
+                    try? copy([playlist])
                 }
             } else {
                 Button {
-                    Task {
-                        try await copy(Array(selectedPlaylists))
-                    }
+                    try? copy(Array(selectedPlaylists))
                 } label: {
                     Text("Copy \(selectedPlaylists.count) Playlists")
                 }
@@ -220,13 +216,13 @@ struct InspectorLibraryView: View {
         }
     }
 
-    private func copy(_ playlists: [Playlist]) async throws {
+    private func copy(_ playlists: [Playlist]) throws {
         guard !playlists.isEmpty else { return }
 
         for playlist in playlists {
             guard
                 let index = library.playlists.firstIndex(where: { $0.id == playlist.id }),
-                let copiedPlaylist = try await Playlist(copyingFrom: playlist)
+                let copiedPlaylist = try Playlist(copyingFrom: playlist)
             else { continue }
             library.add([copiedPlaylist], at: index + 1)
         }

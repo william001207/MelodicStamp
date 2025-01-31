@@ -85,9 +85,9 @@ struct Playlist: Equatable, Hashable, Identifiable {
         loadDelegatedVariables()
     }
 
-    init?(loadingWith id: UUID) async {
+    @MainActor init?(loadingWith id: UUID) {
         let url = Self.url(forID: id)
-        guard let segments = try? await Segments(loadingFrom: url) else { return nil }
+        guard let segments = try? Segments(loadingFrom: url) else { return nil }
         self.init(id: id, mode: .canonical, segments: segments)
 
         loadIndexer()
@@ -95,13 +95,13 @@ struct Playlist: Equatable, Hashable, Identifiable {
         logger.info("Loaded canonical playlist from \(url)")
     }
 
-    init?(copyingFrom playlist: Playlist) async throws {
+    @MainActor init?(copyingFrom playlist: Playlist) throws {
         guard playlist.mode.isCanonical else { return nil }
 
         let playlistID = UUID()
         try FileManager.default.copyItem(at: playlist.url, to: Self.url(forID: playlistID))
 
-        await self.init(loadingWith: playlistID)
+        self.init(loadingWith: playlistID)
     }
 
     @MainActor init?(makingCanonical oldValue: Playlist) throws {
@@ -193,16 +193,13 @@ extension Playlist {
         indexer.value = indexer.read() ?? [:]
     }
 
-    mutating func loadTracks() async {
+    @MainActor mutating func loadTracks() {
         guard mode.isCanonical else { return }
         guard !isLoading else { return }
         isLoading = true
         loadIndexer()
 
-        tracks.removeAll()
-        for await track in indexer.loadTracks() {
-            tracks.append(track)
-        }
+        indexer.loadTracks(into: &tracks)
         isLoading = false
     }
 }
@@ -223,7 +220,7 @@ extension Playlist {
             try Segments.write(segment: segment, ofData: data, toDirectory: url)
         }
 
-        logger.info("Successfully written playlist metadata segments \(segments) for playlist at \(url)")
+        logger.info("Successfully written playlist segments \(segments) for playlist at \(url)")
     }
 }
 

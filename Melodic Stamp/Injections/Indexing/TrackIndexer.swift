@@ -25,18 +25,13 @@ extension TrackIndexer {
             .appendingPathExtension(element.value)
     }
 
-    func loadTracks() -> AsyncStream<Track> {
-        .init { continuation in
-            guard !value.isEmpty else { return continuation.finish() }
+    @MainActor func loadTracks(into tracks: inout [Track]) {
+        tracks.removeAll()
+        guard !value.isEmpty else { return }
 
-            Task {
-                for element in value {
-                    guard let track = await Track(loadingFrom: trackURL(for: element)) else { return }
-                    continuation.yield(track)
-                }
-
-                continuation.finish()
-            }
+        for element in value {
+            guard let track = Track(loadingFrom: trackURL(for: element)) else { continue }
+            tracks.append(track)
         }
     }
 }

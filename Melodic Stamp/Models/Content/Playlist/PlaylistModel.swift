@@ -90,27 +90,23 @@ extension PlaylistModel {
 }
 
 extension PlaylistModel {
-    func isUnderlying(playlist: Playlist) -> Bool {
-        self.playlist == playlist
-    }
-
-    func bindTo(_ id: UUID, mode: Playlist.Mode = .referenced) async {
+    @MainActor func bindTo(_ id: UUID, mode: Playlist.Mode = .referenced) {
         guard !playlist.mode.isCanonical else { return }
-        if mode.isCanonical, let playlist = await Playlist(loadingWith: id) {
+        if mode.isCanonical, let playlist = Playlist(loadingWith: id) {
             self.playlist = playlist
         } else {
             playlist = .referenced(bindingTo: id)
         }
     }
 
-    func loadTracks() async {
-        await playlist.loadTracks()
+    @MainActor func loadTracks() {
+        playlist.loadTracks()
     }
 
-    func makeCanonical() async throws {
-        guard let canonicalPlaylist = try await Playlist(makingCanonical: playlist) else { return }
+    @MainActor func makeCanonical() async throws {
+        guard let canonicalPlaylist = try Playlist(makingCanonical: playlist) else { return }
         playlist = canonicalPlaylist
-        await library?.add([canonicalPlaylist])
+        library?.add([canonicalPlaylist])
     }
 
     func write(segments: [Playlist.Segment] = Playlist.Segment.allCases) throws {
