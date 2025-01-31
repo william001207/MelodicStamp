@@ -31,7 +31,8 @@ struct PlaylistView: View {
     @State private var scrollOffset: CGFloat = .zero
     @State private var containerSize: CGSize = .zero
     @State private var contentSize: CGSize = .zero
-    @State private var bounceAnimationTriggers: Set<Track> = []
+
+    @State private var isRemoveAllAlertPresented: Bool = false
 
     // MARK: - Body
 
@@ -71,7 +72,6 @@ struct PlaylistView: View {
                     .draggable(track) {
                         TrackPreview(track: track)
                     }
-                    .bounceAnimation(bounceAnimationTriggers.contains(track), scale: .init(width: 1.01, height: 1.01))
             }
             .onMove { indices, destination in
                 withAnimation {
@@ -234,33 +234,58 @@ struct PlaylistView: View {
             .disabled(!canEscape)
             .aspectRatio(6 / 5, contentMode: .fit)
 
-            // MARK: Remove Selection from Playlist / Remove All
+            // MARK: Remove from Playlist
 
-            Button(role: .destructive) {
-                if canEscape {
-                    handleRemove(player.selectedTracks.map(\.url))
+            Group {
+                if player.selectedTracks.isEmpty {
+                    Button(role: .destructive) {
+                        isRemoveAllAlertPresented = true
+                    } label: {
+                        HStack {
+                            Image(systemSymbol: .trashFill)
+
+                            Text("Clear Playlist")
+                        }
+                        .padding(.horizontal)
+                        .padding(.vertical, 8)
+                    }
+                } else if player.selectedTracks.count <= 1 {
+                    Button(role: .destructive) {
+                        handleRemove(player.selectedTracks.map(\.url))
+                        resetFocus(in: namespace)
+                    } label: {
+                        HStack {
+                            Image(systemSymbol: .trashFill)
+
+                            Text("Remove from Playlist")
+                        }
+                        .padding(.horizontal)
+                        .padding(.vertical, 8)
+                    }
                 } else {
-                    handleRemove(player.playlist.map(\.url))
-                }
+                    Button(role: .destructive) {
+                        handleRemove(player.selectedTracks.map(\.url))
+                        resetFocus(in: namespace)
+                    } label: {
+                        HStack {
+                            Image(systemSymbol: .trashFill)
 
-                resetFocus(in: namespace) // Must regain focus due to unknown reasons
-            } label: {
-                HStack {
-                    Image(systemSymbol: .trashFill)
-
-                    if !canRemove || !canEscape {
-                        Text("Clear Playlist")
-                    } else {
-                        Text("Remove from Playlist")
+                            Text("Remove \(player.selectedTracks.count) Tracks from Playlist")
+                        }
+                        .padding(.horizontal)
+                        .padding(.vertical, 8)
                     }
                 }
-                .padding(.horizontal)
-                .padding(.vertical, 8)
             }
             .buttonStyle(.luminareProminent)
             .foregroundStyle(.red)
             .fixedSize(horizontal: true, vertical: false)
             .disabled(!canRemove)
+            .alert("Removing All Tracks from Playlist", isPresented: $isRemoveAllAlertPresented) {
+                Button("Proceed", role: .destructive) {
+                    player.clearPlaylist()
+                }
+            }
         }
         .buttonStyle(.luminare)
     }
@@ -386,9 +411,17 @@ struct PlaylistView: View {
         } label: {
             let title = MusicTitle.stringifiedTitle(mode: .title, for: track)
             if !title.isEmpty {
-                Text("Play \(title)")
+                if player.currentTrack == track {
+                    Text("Replay \(title)")
+                } else {
+                    Text("Play \(title)")
+                }
             } else {
-                Text("Play")
+                if player.currentTrack == track {
+                    Text("Replay")
+                } else {
+                    Text("Play")
+                }
             }
         }
         .disabled(!isInitialized)
@@ -401,13 +434,13 @@ struct PlaylistView: View {
                 if player.selectedTracks.count <= 1 {
                     Button("Copy Track") {
                         Task {
-                            try await copy([track])
+                            await copy([track])
                         }
                     }
                 } else {
                     Button {
                         Task {
-                            try await copy(Array(player.selectedTracks))
+                            await copy(Array(player.selectedTracks))
                         }
                     } label: {
                         Text("Copy \(player.selectedTracks.count) Tracks")
@@ -470,39 +503,16 @@ struct PlaylistView: View {
 
     // MARK: - Functions
 
-    private func toggleBounceAnimation(for track: Track) {
-        if bounceAnimationTriggers.contains(track) {
-            bounceAnimationTriggers.remove(track)
-        } else {
-            bounceAnimationTriggers.insert(track)
+    private func copy(_ tracks: [Track]) async {
+        guard !tracks.isEmpty else { return }
+
+        for track in tracks {
+            guard
+                let index = player.playlist.tracks.firstIndex(where: { $0.id == track.id }),
+                let copiedTrack = await player.playlist.createTrack(from: track.url)
+            else { continue }
+            player.playlist.add([copiedTrack], at: index + 1)
         }
-    }
-
-    private func copy(_ tracks: [Track]) async throws {
-        guard
-            player.playlist.mode.isCanonical,
-            !tracks.isEmpty,
-            let firstTrack = tracks.first,
-            let index = player.playlist.tracks.firstIndex(where: { $0.id == firstTrack.id })
-        else { return }
-
-        let stream: AsyncStream<Track> = .init { continuation in
-            Task {
-                for track in tracks {
-                    guard let copiedTrack = await player.playlist.createTrack(from: track.url) else { continue }
-                    continuation.yield(copiedTrack)
-                }
-
-                continuation.finish()
-            }
-        }
-
-        var copiedTracks: [Track] = []
-        for await track in stream {
-            copiedTracks.append(track)
-        }
-
-        player.playlist.add(copiedTracks, at: index)
     }
 
     @discardableResult private func handleEscape() -> Bool {

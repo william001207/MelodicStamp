@@ -11,14 +11,16 @@ struct PlaylistCommands: Commands {
     @FocusedValue(\.player) private var player
     @FocusedValue(\.metadataEditor) private var metadataEditor
 
+    @State private var isRemoveAllAlertPresented = false
+
     var body: some Commands {
         CommandMenu("Playlist") {
             Group {
-                if let metadataEditor {
+                if let player {
                     Button("Clear Selection") {
-                        player?.selectedTracks.removeAll()
+                        handleEscape()
                     }
-                    .disabled(!metadataEditor.hasMetadata)
+                    .disabled(player.selectedTracks.isEmpty)
                 } else {
                     Button("Clear Selection") {}
                         .disabled(true)
@@ -26,23 +28,57 @@ struct PlaylistCommands: Commands {
             }
 
             Group {
-                if let player, let metadataEditor {
-                    if metadataEditor.hasMetadata {
-                        Button("Remove from Playlist") {
-                            player.removeFromPlaylist(player.selectedTracks.map(\.url))
+                if let player {
+                    Group {
+                        if player.selectedTracks.isEmpty {
+                            Button("Copy Selected Track") {}
+                        } else {
+                            Button {
+                                Task {
+                                    await copy(Array(player.selectedTracks))
+                                }
+                            } label: {
+                                if player.selectedTracks.count == 1 {
+                                    Text("Copy Selected Track")
+                                } else {
+                                    Text("Copy \(player.selectedTracks.count) Tracks")
+                                }
+                            }
                         }
-                    } else {
-                        Button("Clear Playlist") {
-                            player.clearPlaylist()
-                        }
-                        .disabled(player.playlist.isEmpty)
                     }
+                    .disabled(player.selectedTracks.isEmpty)
                 } else {
-                    Button("Clear Playlist") {}
+                    Button("Copy Selected Track") {}
+                        .disabled(true)
+                }
+            }
+
+            Group {
+                if let player {
+                    Group {
+                        if player.selectedTracks.isEmpty {
+                            Button("Remove Selected Track from Playlist") {}
+                        } else {
+                            Button {
+                                handleRemove(player.selectedTracks.map(\.url))
+                            } label: {
+                                if player.selectedTracks.count == 1 {
+                                    Text("Remove Selected Track from Playlist")
+                                } else {
+                                    Text("Remove \(player.selectedTracks.count) Tracks from Playlist")
+                                }
+                            }
+                        }
+                    }
+                    .disabled(player.selectedTracks.isEmpty)
+                } else {
+                    Button("Remove Selected Track from Playlist") {}
                         .disabled(true)
                 }
             }
             .keyboardShortcut(.deleteForward, modifiers: [])
+
+            Divider()
 
             Group {
                 if
@@ -54,17 +90,47 @@ struct PlaylistCommands: Commands {
                         player.play(track.url)
                     } label: {
                         if !title.isEmpty {
-                            Text("Play \(title)")
+                            if player.currentTrack == track {
+                                Text("Replay \(title)")
+                            } else {
+                                Text("Play \(title)")
+                            }
                         } else {
-                            Text("Play Selected")
+                            if player.currentTrack == track {
+                                Text("Replay Selected Track")
+                            } else {
+                                Text("Play Selected Track")
+                            }
                         }
                     }
                 } else {
-                    Button("Play Selected") {}
+                    Button("Play Selected Track") {}
                         .disabled(true)
                 }
             }
             .keyboardShortcut(.return, modifiers: [])
         }
+    }
+
+    private func copy(_ tracks: [Track]) async {
+        guard let player, !tracks.isEmpty else { return }
+
+        for track in tracks {
+            guard
+                let index = player.playlist.tracks.firstIndex(where: { $0.id == track.id }),
+                let copiedTrack = await player.playlist.createTrack(from: track.url)
+            else { continue }
+            player.playlist.add([copiedTrack], at: index + 1)
+        }
+    }
+
+    private func handleEscape() {
+        guard let player else { return }
+        player.selectedTracks.removeAll()
+    }
+
+    private func handleRemove(_ urls: [URL]) {
+        guard let player else { return }
+        player.removeFromPlaylist(urls)
     }
 }

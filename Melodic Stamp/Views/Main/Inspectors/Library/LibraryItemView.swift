@@ -20,6 +20,8 @@ struct LibraryItemView: View {
 
     @State private var isHovering: Bool = false
 
+    @State private var bounceAnimationTrigger: Bool = false
+
     var body: some View {
         HStack(alignment: .center) {
             VStack(alignment: .leading, spacing: 2) {
@@ -69,6 +71,7 @@ struct LibraryItemView: View {
         .frame(height: 50)
         .padding(6)
         .padding(.trailing, -1)
+        .bounceAnimation(bounceAnimationTrigger, scale: .init(width: 1.01, height: 1.01))
         .animation(animation, value: isHovering)
         .background {
             Color.clear
@@ -76,6 +79,9 @@ struct LibraryItemView: View {
         }
         .onHover { hover in
             isHovering = hover
+        }
+        .onAppear {
+            bounceAnimationTrigger.toggle()
         }
     }
 

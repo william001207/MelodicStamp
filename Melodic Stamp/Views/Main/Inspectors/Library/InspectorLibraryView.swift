@@ -28,6 +28,8 @@ struct InspectorLibraryView: View {
             ExcerptView(tab: SidebarInspectorTab.library)
         } else {
             List(selection: $selectedPlaylists) {
+                // MARK: Playlists
+
                 ForEach(library.playlists) { playlist in
                     itemView(for: playlist)
                         .id(playlist)
@@ -219,33 +221,15 @@ struct InspectorLibraryView: View {
     }
 
     private func copy(_ playlists: [Playlist]) async throws {
-        guard
-            !playlists.isEmpty,
-            let firstPlaylist = playlists.first,
-            let index = library.playlists.firstIndex(where: { $0.id == firstPlaylist.id })
-        else { return }
+        guard !playlists.isEmpty else { return }
 
-        let stream: AsyncThrowingStream<Playlist, Error> = .init { continuation in
-            Task {
-                for playlist in playlists {
-                    do {
-                        guard let copiedPlaylist = try await Playlist(copyingFrom: playlist) else { continue }
-                        continuation.yield(copiedPlaylist)
-                    } catch {
-                        continuation.finish(throwing: error)
-                    }
-                }
-
-                continuation.finish()
-            }
+        for playlist in playlists {
+            guard
+                let index = library.playlists.firstIndex(where: { $0.id == playlist.id }),
+                let copiedPlaylist = try await Playlist(copyingFrom: playlist)
+            else { continue }
+            library.add([copiedPlaylist], at: index + 1)
         }
-
-        var copiedPlaylists: [Playlist] = []
-        for try await copiedPlaylist in stream {
-            copiedPlaylists.append(copiedPlaylist)
-        }
-
-        library.add(copiedPlaylists, at: index)
     }
 
     @discardableResult private func handleEscape() -> Bool {

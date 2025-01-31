@@ -74,7 +74,6 @@ struct ContentView: View {
 
     // MARK: Sidebar & Inspector
 
-    @State private var isInspectorPresented: Bool = false
     @State private var selectedContentTab: SidebarContentTab = .playlist
     @State private var selectedInspectorTab: SidebarInspectorTab = .commonMetadata
 
@@ -250,9 +249,11 @@ struct ContentView: View {
     // MARK: - Main View
 
     @ViewBuilder private func mainView(_ window: NSWindow? = nil) -> some View {
+        @Bindable var windowManager = windowManager
+
         MainView(
             namespace: namespace,
-            isInspectorPresented: $isInspectorPresented,
+            isInspectorPresented: $windowManager.isInspectorPresented,
             selectedContentTab: $selectedContentTab,
             selectedInspectorTab: $selectedInspectorTab
         )
@@ -353,7 +354,6 @@ struct ContentView: View {
             Task.detached {
                 await floatingWindows.addTabBar(to: mainWindow) {
                     FloatingTabBarView(
-                        isInspectorPresented: $isInspectorPresented,
                         selectedContentTab: $selectedContentTab,
                         selectedInspectorTab: $selectedInspectorTab
                     )
@@ -363,6 +363,7 @@ struct ContentView: View {
                         floatingWindows.updateTabBarPosition(size: newValue, in: mainWindow, animate: true)
                     }
                     .environment(floatingWindows)
+                    .environment(windowManager)
                 }
             }
 

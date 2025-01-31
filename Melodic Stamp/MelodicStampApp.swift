@@ -48,7 +48,25 @@ struct MelodicStampApp: App {
         .windowManagerRole(.principal)
         .handlesExternalEvents(matching: []) // Crucial for handling custom external events in `AppDelegate`
         .commands {
-            InspectorCommands()
+            // `InspectorCommands` isn't localized...
+            CommandGroup(before: .sidebar) {
+                Group {
+                    if let windowManager {
+                        Button {
+                            windowManager.isInspectorPresented.toggle()
+                        } label: {
+                            if windowManager.isInspectorPresented {
+                                Text("Hide Inspector")
+                            } else {
+                                Text("Show Inspector")
+                            }
+                        }
+                    } else {
+                        Button("Show Inspector") {}
+                    }
+                }
+                .keyboardShortcut("i", modifiers: [.command, .option])
+            }
 
             CommandGroup(replacing: .appInfo) {
                 Button("About \(Bundle.main[localized: .displayName])") {

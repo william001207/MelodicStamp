@@ -319,16 +319,14 @@ extension Playlist {
 
     private func deleteTrack(at url: URL) throws {
         guard isExistingCanonicalTrack(at: url) else { return }
+
         if currentTrack?.url == url {
             currentTrack = nil
         }
+        tracks.removeAll { $0.url == url }
+        try FileManager.default.removeItem(at: url)
 
-        Task {
-            tracks.removeAll { $0.url == url }
-            try FileManager.default.removeItem(at: url)
-
-            logger.info("Deleted canonical track at \(url)")
-        }
+        logger.info("Deleted canonical track at \(url)")
     }
 
     private func createFolder() throws {
@@ -397,7 +395,7 @@ extension Playlist {
     func add(_ tracks: [Track], at destination: Int? = nil) {
         let filteredTracks = tracks.filter { !self.tracks.contains($0) }
 
-        if let destination, self.tracks.indices.contains(destination) {
+        if let destination, 0...self.tracks.endIndex ~= destination {
             self.tracks.insert(contentsOf: filteredTracks, at: destination)
         } else {
             self.tracks.append(contentsOf: filteredTracks)
@@ -407,13 +405,13 @@ extension Playlist {
     }
 
     func remove(_ tracks: [Track]) {
-        for track in tracks {
-            Task {
+        Task {
+            for track in tracks {
                 try deleteTrack(at: track.url)
             }
-        }
 
-        try? indexTracks(with: captureIndices())
+            try? indexTracks(with: captureIndices())
+        }
     }
 
     func clearPlaylist() {

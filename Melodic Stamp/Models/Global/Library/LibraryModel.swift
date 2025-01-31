@@ -79,12 +79,11 @@ extension LibraryModel {
 
     private func deletePlaylist(at url: URL) throws {
         guard isExistingPlaylist(at: url) else { return }
-        Task {
-            self.playlists.removeAll { $0.possibleURL == url }
-            try FileManager.default.removeItem(at: url)
 
-            logger.info("Deleted playlist at \(url)")
-        }
+        playlists.removeAll { $0.possibleURL == url }
+        try FileManager.default.removeItem(at: url)
+
+        logger.info("Deleted playlist at \(url)")
     }
 }
 
@@ -98,7 +97,7 @@ extension LibraryModel {
     func add(_ playlists: [Playlist], at destination: Int? = nil) {
         let filteredPlaylists = playlists.filter { !self.playlists.contains($0) }
 
-        if let destination, self.playlists.indices.contains(destination) {
+        if let destination, 0...self.playlists.endIndex ~= destination {
             self.playlists.insert(contentsOf: filteredPlaylists, at: destination)
         } else {
             self.playlists.append(contentsOf: filteredPlaylists)
@@ -108,12 +107,12 @@ extension LibraryModel {
     }
 
     func remove(_ playlists: [Playlist]) {
-        for playlist in playlists {
-            Task {
+        Task {
+            for playlist in playlists {
                 try deletePlaylist(at: playlist.possibleURL)
             }
-        }
 
-        try? indexPlaylists(with: captureIndices())
+            try? indexPlaylists(with: captureIndices())
+        }
     }
 }

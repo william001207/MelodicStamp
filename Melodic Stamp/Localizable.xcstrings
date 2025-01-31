@@ -1005,6 +1005,16 @@
         }
       }
     },
+    "Copy Selected Track" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "复制选择的音乐"
+          }
+        }
+      }
+    },
     "Copy Track" : {
       "localizations" : {
         "zh-Hans" : {
@@ -1492,6 +1502,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "创建一个值"
+          }
+        }
+      }
+    },
+    "Hide Inspector" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "隐藏检查器"
           }
         }
       }
@@ -2076,12 +2096,12 @@
         }
       }
     },
-    "Play Selected" : {
+    "Play Selected Track" : {
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "播放选择的曲目"
+            "value" : "播放选择的音乐"
           }
         }
       }
@@ -2162,6 +2182,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "上一曲"
+          }
+        }
+      }
+    },
+    "Proceed" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "继续"
           }
         }
       }
@@ -2354,12 +2384,62 @@
         }
       }
     },
+    "Remove Selected Track from Playlist" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "从播放列表中移除选择的音乐"
+          }
+        }
+      }
+    },
+    "Removing All Tracks from Playlist" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "正在从播放列表中移除所有音乐"
+          }
+        }
+      }
+    },
     "Replacing Current Playlist" : {
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "替换当前播放列表"
+          }
+        }
+      }
+    },
+    "Replay" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "重新播放"
+          }
+        }
+      }
+    },
+    "Replay %@" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "重新播放《%@》"
+          }
+        }
+      }
+    },
+    "Replay Selected Track" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "重新播放选择的音乐"
           }
         }
       }
@@ -2530,6 +2610,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "在我们的GitHub页面上分享你的反馈！无论你发现了漏洞还是想建议新功能，都请畅所欲言。[加入QQ群聊…](https://qm.qq.com/q/txBDJxnw4i)"
+          }
+        }
+      }
+    },
+    "Show Inspector" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "显示检查器"
           }
         }
       }
