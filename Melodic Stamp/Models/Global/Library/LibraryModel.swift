@@ -77,23 +77,23 @@ extension LibraryModel {
     }
 
     private func deletePlaylist(at url: URL) throws {
-        guard isExistingPlaylist(at: url) else { return }
-
         playlists.removeAll { $0.url == url }
         try FileManager.default.removeItem(at: url)
+
+        guard isExistingPlaylist(at: url) else { return }
 
         logger.info("Deleted playlist at \(url)")
     }
 }
 
 extension LibraryModel {
-    func move(fromOffsets indices: IndexSet, toOffset destination: Int) {
+    @MainActor func move(fromOffsets indices: IndexSet, toOffset destination: Int) {
         playlists.move(fromOffsets: indices, toOffset: destination)
 
         try? indexPlaylists(with: captureIndices())
     }
 
-    func add(_ playlists: [Playlist], at destination: Int? = nil) {
+    @MainActor func add(_ playlists: [Playlist], at destination: Int? = nil) {
         let filteredPlaylists = playlists.filter { !self.playlists.contains($0) }
 
         if let destination, 0...self.playlists.endIndex ~= destination {
@@ -105,7 +105,7 @@ extension LibraryModel {
         try? indexPlaylists(with: captureIndices())
     }
 
-    func remove(_ playlists: [Playlist]) {
+    @MainActor func remove(_ playlists: [Playlist]) {
         Task {
             for playlist in playlists {
                 try deletePlaylist(at: playlist.url)

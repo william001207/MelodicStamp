@@ -155,13 +155,13 @@ extension PlaylistModel {
 }
 
 extension PlaylistModel {
-    func move(fromOffsets indices: IndexSet, toOffset destination: Int) {
+    @MainActor func move(fromOffsets indices: IndexSet, toOffset destination: Int) {
         playlist.move(fromOffsets: indices, toOffset: destination)
 
         try? indexTracks(with: captureIndices())
     }
 
-    func add(_ urls: [URL], at destination: Int? = nil) async {
+    @MainActor func add(_ urls: [URL], at destination: Int? = nil) async {
         var tracks: [Track] = []
         for url in urls {
             guard let track = await getOrCreateTrack(at: url) else { continue }
@@ -172,7 +172,7 @@ extension PlaylistModel {
         try? indexTracks(with: captureIndices())
     }
 
-    func append(_ urls: [URL]) async {
+    @MainActor func append(_ urls: [URL]) async {
         for url in urls {
             guard let track = await getOrCreateTrack(at: url) else { continue }
             playlist.add([track])
@@ -181,7 +181,7 @@ extension PlaylistModel {
         try? indexTracks(with: captureIndices())
     }
 
-    func remove(_ urls: [URL]) async {
+    @MainActor func remove(_ urls: [URL]) async {
         for url in urls {
             guard let track = await getOrCreateTrack(at: url) else { continue }
             playlist.remove([track])
@@ -190,7 +190,7 @@ extension PlaylistModel {
         try? indexTracks(with: captureIndices())
     }
 
-    func clear() async {
+    @MainActor func clear() async {
         await remove(playlist.map(\.url))
     }
 }

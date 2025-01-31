@@ -12,13 +12,15 @@ struct LibraryToolbar: View {
     @Environment(LibraryModel.self) private var library
     @Environment(PlaylistModel.self) private var playlist
 
+    @Environment(\.appearsActive) private var appearsActive
     @Environment(\.dismissWindow) private var dismissWindow
 
     @Default(.asksForPlaylistInformation) private var asksForPlaylistInformation
 
-    @State private var shouldWaitForPresentation: Bool = false
     @State private var isPlaylistSegmentsSheetPresented: Bool = false
     @State private var isPlaylistRemovalAlertPresented: Bool = false
+
+    @State private var shouldWaitForPresentation: Bool = false
 
     var body: some View {
         @Bindable var playlist = playlist
@@ -66,9 +68,7 @@ struct LibraryToolbar: View {
                     }
                     .frame(width: 600)
             }
-        }
-
-        if playlist.mode.isCanonical || isPlaylistRemovalAlertPresented {
+        } else if playlist.mode.isCanonical || isPlaylistRemovalAlertPresented {
             Button {
                 isPlaylistRemovalAlertPresented = true
             } label: {
@@ -83,7 +83,9 @@ struct LibraryToolbar: View {
             .alert("Removing Playlist from Library", isPresented: $isPlaylistRemovalAlertPresented) {
                 Button("Proceed", role: .destructive) {
                     library.remove([playlist.playlist])
-                    dismissWindow()
+                    DispatchQueue.main.async {
+                        dismissWindow()
+                    }
                 }
             } message: {
                 Text("This will permanently delete the corresponding directory.")

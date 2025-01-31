@@ -273,12 +273,12 @@ extension Playlist {
     }
 
     private mutating func deleteTrack(at url: URL) throws {
-        guard isExistingCanonicalTrack(at: url) else { return }
-
         if currentTrack?.url == url {
             currentTrack = nil
         }
         tracks.removeAll { $0.url == url }
+
+        guard isExistingCanonicalTrack(at: url) else { return }
         try FileManager.default.removeItem(at: url)
 
         logger.info("Deleted canonical track at \(url)")

@@ -45,9 +45,10 @@ struct LibraryItemView: View {
                 .font(.caption)
             }
             .lineLimit(1)
-            .onDoubleClick(handler: open)
             .transition(.blurReplace)
+            .opacity(opacity)
             .animation(.default.speed(2), value: hasControl)
+            .onDoubleClick(handler: open)
 
             Spacer()
 
@@ -67,7 +68,6 @@ struct LibraryItemView: View {
                 .animation(nil, value: isHovering)
             }
         }
-        .foregroundStyle(isOpened && !isSelected ? AnyShapeStyle(.tint) : AnyShapeStyle(.primary))
         .redacted(reason: library.isLoading ? .placeholder : [])
         .frame(height: 50)
         .padding(6)
@@ -83,6 +83,18 @@ struct LibraryItemView: View {
         }
         .onAppear {
             bounceAnimationTrigger.toggle()
+        }
+    }
+
+    private var opacity: CGFloat {
+        if playlist.mode.isCanonical {
+            if isOpened {
+                1
+            } else {
+                0.45
+            }
+        } else {
+            1
         }
     }
 
