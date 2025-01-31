@@ -8,6 +8,11 @@
 import Defaults
 import SwiftUI
 
+struct AppleMusicLyricsLineGeometry {
+    var y: CGFloat
+    var height: CGFloat
+}
+
 enum AppleMusicLyricsViewAnimationState {
     case intermediate
     case pushed
@@ -91,232 +96,122 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
     @ViewBuilder var content: (_ index: Int, _ isHighlighted: Bool) -> Content
     var indicator: (_ index: Int, _ isHighlighted: Bool) -> AppleMusicLyricsViewIndicator
 
-    var onScrolling: ((ScrollPosition, CGPoint) -> ())?
-
     @State private var containerSize: CGSize = .zero
     @State private var scrollPosition: ScrollPosition = .init()
     @State private var scrollOffset: CGFloat = .zero
 
     @State private var animationState: AppleMusicLyricsViewAnimationState = .pushed
     @State private var contentOffsets: [Int: CGFloat] = [:]
+
+    @State private var lineOffsets: [Int: AppleMusicLyricsLineGeometry] = [:]
+    @State private var contentOffset: [Int: CGFloat] = [:]
+
     @State private var origin: Origin = .zero
+    @State private var showAll: Bool = false
 
     @State private var animationStateDispatch: DispatchWorkItem?
+
+    @Namespace private var coordinateSpace
 
     // MARK: Body
 
     var body: some View {
         ScrollViewReader { proxy in
             ScrollView {
-                Spacer()
-                    .frame(height: containerSize.height / 2)
-
-                LazyVStack(spacing: 0) {
+                VStack(spacing: 0) {
                     ForEach(range, id: \.self) { index in
                         content(at: index)
+                            .id(index)
                     }
                 }
-
-                Spacer()
-                    .frame(height: containerSize.height / 2)
+                .padding(.vertical, containerSize.height / 2)
             }
-            .contentMargins(.vertical, padding, for: .scrollContent)
-            .contentMargins(.horizontal, 12, for: .scrollContent)
-            .scrollIndicators(interactionState.isDelegated ? .never : .visible)
-            .scrollPosition($scrollPosition)
-            // The code below follows a strict order, do not rearrange arbitrarily
-            .onGeometryChange(for: CGSize.self) { proxy in
+            .scrollIndicators(.visible)
+            .onScrollPhaseChange { _, _, _ in
+            }
+            .onGeometryChange(for: CGSize.self) { proxy in // The code below follows a strict order, do not rearrange arbitrarily
                 proxy.size
             } action: { newValue in
                 containerSize = newValue
                 resetScrolling(in: proxy)
             }
-            .onChange(of: identifier, initial: true) { _, _ in
-                // Force reset on external change
+            .onChange(of: identifier, initial: true) { _, _ in // Force reset on external change
                 resetScrolling(in: proxy)
             }
-            .onChange(of: interactionState) { _, newValue in
-                guard newValue.isDelegated else { return }
-                resetScrolling(in: proxy)
-            }
-            .onChange(of: highlightedRange) { oldValue, newValue in
-                let isLowerBoundJumped = abs(newValue.lowerBound - oldValue.lowerBound) > 1
-                let isUpperBoundJumped = abs(newValue.upperBound - oldValue.upperBound) > 1
-                let isJumped = newValue.lowerBound < oldValue.lowerBound || (isLowerBoundJumped && isUpperBoundJumped)
-
-                if isJumped {
-                    resetScrolling(in: proxy)
-                } else {
-                    withAnimation(.spring(duration: 0.65, bounce: 0.275)) {
-                        scrollToHighlighted()
-                    }
-                }
-            }
-            .onChange(of: highlightedRange, initial: true) { oldValue, newValue in
-                let isLowerBoundChanged = oldValue.lowerBound != newValue.lowerBound
-                let isUpperBoundChanged = oldValue.upperBound != newValue.upperBound
-
-                if isLowerBoundChanged {
-                    updateAnimationState()
-                } else if isUpperBoundChanged {
-                    pushAnimation()
-                }
-            }
-            .onChange(of: contentOffsets) { _, _ in
-                withAnimation(.spring(duration: 0.65, bounce: 0.275)) {
-                    scrollToHighlighted()
-                }
-            }
-            .onScrollGeometryChange(for: CGPoint.self) { proxy in
-                proxy.contentOffset
-            } action: { _, newValue in
-                if !origin.isInitialized {
-                    scrollOffset = newValue.y
-                    origin.offset = newValue.y
-                    origin.isInitialized = true
-                    logger.info("Initialized: \(newValue.y)")
-                } else if scrollPosition.isPositionedByUser {
-                    scrollOffset = newValue.y
-                    onScrolling?(scrollPosition, newValue)
-                }
-            }
-            .observeAnimation(for: scrollOffset) { value in
-                guard interactionState.isDelegated else { return }
-                scrollPosition.scrollTo(y: value)
+            .onChange(of: highlightedRange) { _, _ in
+                scrollToHighlighted(in: proxy)
             }
         }
-    }
-
-    private var isIndicatorVisible: Bool {
-        guard highlightedRange.lowerBound >= 0 else { return false }
-        return indicator(highlightedRange.lowerBound, true).isVisible
-    }
-
-    private var reachedEnd: Bool {
-        highlightedRange.lowerBound >= range.upperBound
-    }
-
-    private var canPauseAnimation: Bool {
-        highlightedRange.isEmpty && isIndicatorVisible
-    }
-
-    private var alignmentCompensation: CGFloat {
-        switch alignment {
-        case .top:
-            (containerSize.height - padding) / 2
-        case .center:
-            if let offset = contentOffsets[highlightedRange.lowerBound] {
-                (offset + padding) / 2
-            } else {
-                padding / 2
-            }
+        .onAppear {
+            showAll = true
+            showAll = false
         }
-    }
-
-    private var animationCompensation: CGFloat {
-        contentOffsets[max(0, highlightedRange.upperBound - 1)] ?? .zero
     }
 
     @ViewBuilder private func content(at index: Int) -> some View {
         let isHighlighted = highlightedRange.contains(index)
-        let delay = delay(at: index)
-        let proportion = proportion(at: index)
+        let isInRange = (highlightedRange.lowerBound - 5...highlightedRange.upperBound + 5).contains(index)
 
-        let compensate: CGFloat = if interactionState.isDelegated || isIndicatorVisible {
-            animationCompensation
-        } else { .zero }
-
-        content(index, isHighlighted)
-            .onGeometryChange(for: CGSize.self) { proxy in
-                proxy.size
-            } action: { newValue in
-                contentOffsets.updateValue(newValue.height, forKey: index)
-            }
-            .id(index)
-            .offset(y: proportion * compensate)
-            .background {
-                if index == highlightedRange.lowerBound {
-                    switch indicator(index, isHighlighted) {
-                    case .invisible:
-                        EmptyView()
-                    case let .visible(content):
-                        content
-                            .opacity(proportion)
-                            .animation(.default, value: proportion)
+        if !showAll, isInRange {
+            content(index, isHighlighted)
+                .background {
+                    if index == highlightedRange.lowerBound {
+                        switch indicator(index, isHighlighted) {
+                        case .invisible:
+                            EmptyView()
+                        case let .visible(content):
+                            content
+                        }
                     }
                 }
-            }
-            .animation(.spring(duration: 0.65, bounce: 0.275).delay(delay), value: animationState)
-            .animation(.spring(duration: 0.55, bounce: 0.15), value: highlightedRange)
-            .animation(.spring(duration: 0.75, bounce: 0.30), value: animationCompensation)
-            .animation(.smooth, value: interactionState.isDelegated)
+                .padding(.vertical, 10)
+                .background {
+                    GeometryReader { reader in
+                        Color.clear.task(id: reader.frame(in: .named(coordinateSpace))) {
+                            lineOffsets[index] = AppleMusicLyricsLineGeometry(
+                                y: reader.frame(in: .named(coordinateSpace)).minY,
+                                height: reader.size.height
+                            )
+                        }
+                    }
+                }
+                .offset(y: contentOffset[index] ?? 0)
+
+        } else {
+            Spacer()
+                .frame(height: lineOffsets[index]?.height ?? 20)
+        }
     }
 
     // MARK: Funcitons
 
     private func resetScrolling(in proxy: ScrollViewProxy) {
-        guard interactionState.isDelegated else { return }
-        origin.isInitialized = false
-
         let index = max(0, min(range.upperBound - 1, highlightedRange.lowerBound))
-        origin.index = index
+        showAll = true
+        proxy.scrollTo(index, anchor: alignment.unitPoint)
+        showAll = false
+    }
 
-        DispatchQueue.main.async {
-            proxy.scrollTo(index, anchor: alignment.unitPoint)
-            logger.info("Reset: \("\(origin)")")
+    private func scrollToHighlighted(in proxy: ScrollViewProxy) {
+        let index = max(0, min(range.upperBound - 1, highlightedRange.lowerBound))
+        let adjustItems = max(0, index - 5) ..< index + 5
+
+        guard let offset = lineOffsets[index] else { return }
+
+        withAnimation(nil) {
+            proxy.scrollTo(index, anchor: .center)
+            for adjustItem in adjustItems {
+                contentOffset[adjustItem] = offset.height
+            }
         }
-    }
 
-    private func scrollToHighlighted() {
-        guard origin.isInitialized else { return }
+        var delay = max(0.0, 0.08 * Double(5 - index))
 
-        let compensation: CGFloat = if let offset = contentOffsets[origin.index] {
-            -offset / 2
-        } else { .zero }
-        let offset = fold(until: highlightedRange.lowerBound)
-        scrollOffset = max(0, origin.offset + offset + compensation + alignmentCompensation)
-        logger.info("Scrolled to highlighted: \(offset)")
-    }
-
-    private func fold(until index: Int) -> CGFloat {
-        contentOffsets
-            .filter { $0.key < index && $0.key >= origin.index }
-            .map(\.value)
-            .reduce(0, +)
-    }
-
-    private func updateAnimationState() {
-        guard !reachedEnd else { return }
-        animationStateDispatch?.cancel()
-        animationState = .intermediate
-
-        let dispatch = DispatchWorkItem {
-            pushAnimation()
-        }
-        animationStateDispatch = dispatch
-        DispatchQueue.main.asyncAfter(deadline: .now() + bounceDelay, execute: dispatch)
-    }
-
-    private func pushAnimation() {
-        guard !canPauseAnimation else { return }
-        animationState = .pushed
-    }
-
-    private func proportion(at index: Int) -> CGFloat {
-        guard index >= highlightedRange.lowerBound else { return .zero }
-        return switch animationState {
-        case .intermediate: 1
-        case .pushed: 0
-        }
-    }
-
-    private func delay(at index: Int) -> CGFloat {
-        switch animationState {
-        case .intermediate:
-            return 0
-        case .pushed:
-            guard index >= highlightedRange.upperBound else { return 0 }
-            return CGFloat(index - (highlightedRange.upperBound - 1)) * delay
+        for idx in adjustItems {
+            delay += 0.08
+            withAnimation(.spring(duration: 0.6, bounce: 0.275).delay(delay)) {
+                contentOffset[idx] = 0
+            }
         }
     }
 }

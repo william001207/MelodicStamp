@@ -57,7 +57,7 @@ struct DisplayLyricLineView: View {
             .opacity(hasFadingEffect ? opacity : 1)
             .hoverableBackground()
             .clipShape(.rect(cornerRadius: 12))
-            .animation(.smooth(duration: 0.25), value: hasFadingEffect)
+            .animation(.smooth(duration: 0.8), value: hasFadingEffect)
             .onHover { hover in
                 isHovering = hover
             }
