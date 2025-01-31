@@ -21,7 +21,7 @@ enum FileAdderPresentationStyle {
     case formingNewPlaylist
 }
 
-@Observable class FileManagerModel {
+@Observable final class FileManagerModel {
     private weak var playlist: PlaylistModel?
     private weak var player: PlayerModel?
 

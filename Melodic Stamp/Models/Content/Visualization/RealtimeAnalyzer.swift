@@ -9,7 +9,7 @@ import Accelerate
 import AVFoundation
 import Foundation
 
-@MainActor class RealtimeAnalyzer {
+class RealtimeAnalyzer {
     private var fftSize: Int
     private lazy var fftSetup = vDSP_create_fftsetup(vDSP_Length(Int(round(log2(Double(fftSize))))), FFTRadix(kFFTRadix2))
 

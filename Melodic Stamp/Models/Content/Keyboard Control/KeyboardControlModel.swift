@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-@MainActor @Observable final class KeyboardControlModel {
+@Observable final class KeyboardControlModel {
     private weak var player: PlayerModel?
 
     var previousSongButtonBounceAnimation: Bool = false
@@ -22,7 +22,7 @@ import SwiftUI
         self.player = player
     }
 
-    @discardableResult func handlePlayPause(
+    @MainActor @discardableResult func handlePlayPause(
         phase: KeyPress.Phases, modifiers: EventModifiers = []
     ) -> KeyPress.Result {
         guard let player else { return .ignored }
@@ -49,7 +49,7 @@ import SwiftUI
         }
     }
 
-    @discardableResult func handleProgressAdjustment(
+    @MainActor @discardableResult func handleProgressAdjustment(
         phase: KeyPress.Phases, modifiers: EventModifiers = [], sign: FloatingPointSign
     ) -> KeyPress.Result {
         guard let player else { return .ignored }
@@ -99,7 +99,7 @@ import SwiftUI
         }
     }
 
-    @discardableResult func handleVolumeAdjustment(
+    @MainActor @discardableResult func handleVolumeAdjustment(
         phase: KeyPress.Phases, modifiers: EventModifiers = [], sign: FloatingPointSign
     ) -> KeyPress.Result {
         guard let player else { return .ignored }

@@ -32,10 +32,12 @@ extension PlayerModel {
     }
 
     func updateNowPlayingMetadataInfo(from track: Track?) {
-        if let track {
-            track.metadata.updateNowPlayingInfo()
-        } else {
-            Metadata.resetNowPlayingInfo()
+        Task { @MainActor in
+            if let track {
+                track.metadata.updateNowPlayingInfo()
+            } else {
+                Metadata.resetNowPlayingInfo()
+            }
         }
     }
 

@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-@MainActor @Observable class MetadataEditorModel: MetadataEditorProtocol {
+@Observable class MetadataEditorModel: MetadataEditorProtocol {
     private weak var player: PlayerModel?
 
     init(player: PlayerModel) {

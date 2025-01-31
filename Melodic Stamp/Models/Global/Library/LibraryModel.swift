@@ -9,7 +9,7 @@ import SwiftUI
 
 extension LibraryModel: TypeNameReflectable {}
 
-@MainActor @Observable final class LibraryModel {
+@Observable final class LibraryModel {
     private(set) var playlists: [Playlist] = []
     private(set) var indexer: PlaylistIndexer = .init()
 
@@ -22,7 +22,7 @@ extension LibraryModel: TypeNameReflectable {}
     }
 }
 
-extension LibraryModel: @preconcurrency Sequence {
+extension LibraryModel: Sequence {
     func makeIterator() -> Array<Playlist>.Iterator {
         playlists.makeIterator()
     }
@@ -58,7 +58,7 @@ extension LibraryModel {
         indexer.value = indexer.read() ?? []
     }
 
-    func loadPlaylists() async {
+    @MainActor func loadPlaylists() async {
         guard !isLoading else { return }
         isLoading = true
         loadIndexer()

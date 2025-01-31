@@ -22,7 +22,7 @@ extension PlayerModel {
     static let bufferSize: AVAudioFrameCount = 2048
 }
 
-@MainActor @Observable final class PlayerModel: NSObject {
+@Observable final class PlayerModel: NSObject {
     // MARK: Player, Library & Analyzer
 
     private var player: any Player

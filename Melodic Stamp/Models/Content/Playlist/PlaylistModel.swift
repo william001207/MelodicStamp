@@ -8,7 +8,7 @@
 import Collections
 import SwiftUI
 
-@MainActor @Observable final class PlaylistModel {
+@Observable final class PlaylistModel {
     #if DEBUG
         var playlist: Playlist
     #else
@@ -52,19 +52,19 @@ extension PlaylistModel {
     var canMakeCanonical: Bool { playlist.canMakeCanonical }
 }
 
-extension PlaylistModel: @preconcurrency Equatable {
+extension PlaylistModel: Equatable {
     static func == (lhs: PlaylistModel, rhs: PlaylistModel) -> Bool {
         lhs.playlist == rhs.playlist
     }
 }
 
-extension PlaylistModel: @preconcurrency Hashable {
+extension PlaylistModel: Hashable {
     func hash(into hasher: inout Hasher) {
         hasher.combine(playlist)
     }
 }
 
-extension PlaylistModel: @preconcurrency Sequence {
+extension PlaylistModel: Sequence {
     func makeIterator() -> Playlist.Iterator {
         playlist.makeIterator()
     }
@@ -105,7 +105,7 @@ extension PlaylistModel {
         try playlist.indexer.write()
     }
 
-    func loadTracks() async {
+    @MainActor func loadTracks() async {
         guard mode.isCanonical, !isLoading else { return }
         isLoading = true
         playlist.loadIndexer()
@@ -119,7 +119,7 @@ extension PlaylistModel {
 }
 
 extension PlaylistModel {
-    func bindTo(_ id: UUID, mode: Playlist.Mode = .referenced) {
+    @MainActor func bindTo(_ id: UUID, mode: Playlist.Mode = .referenced) {
         guard !playlist.mode.isCanonical else { return }
         if mode.isCanonical, let playlist = Playlist(loadingWith: id) {
             self.playlist = playlist
@@ -128,7 +128,7 @@ extension PlaylistModel {
         }
     }
 
-    func makeCanonical() async throws {
+    @MainActor func makeCanonical() async throws {
         guard let canonicalPlaylist = try await Playlist(makingCanonical: playlist) else { return }
         playlist = canonicalPlaylist
         try indexTracks(with: captureIndices())
