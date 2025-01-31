@@ -59,6 +59,6 @@ struct TrackPreview: View {
 
 #if DEBUG
     #Preview {
-        TrackPreview(track: SampleEnvironmentsPreviewModifier.sampleTrack)
+        TrackPreview(track: PreviewEnvironments.sampleTrack)
     }
 #endif

@@ -34,7 +34,7 @@ struct MusicTitle: View {
                         if let title = track.metadata[extracting: \.title]?[keyPath: entry], !title.isEmpty {
                             Text(title)
                         } else {
-                            switch player.playlist.mode {
+                            switch player.playlistStatus.mode {
                             case .referenced:
                                 Text(Self.fallbackTitle(for: track))
                             case .canonical:

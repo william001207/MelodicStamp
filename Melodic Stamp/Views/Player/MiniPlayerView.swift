@@ -562,7 +562,7 @@ struct MiniPlayerView: View {
         }
 
         Menu {
-            ForEach(player.playlist.tracks) { track in
+            ForEach(player.tracks) { track in
                 let binding: Binding<Bool> = Binding {
                     selection.wrappedValue == track
                 } set: { newValue in
@@ -594,7 +594,7 @@ struct MiniPlayerView: View {
 }
 
 #if DEBUG
-    #Preview(traits: .modifier(SampleEnvironmentsPreviewModifier())) {
+    #Preview(traits: .modifier(PreviewEnvironments())) {
         @Previewable @Namespace var namespace
 
         MiniPlayerView(namespace: namespace)

@@ -74,13 +74,13 @@ extension LibraryModel {
 
 extension LibraryModel {
     func isExistingPlaylist(at url: URL) -> Bool {
-        playlists.contains { $0.possibleURL == url }
+        playlists.contains { $0.url == url }
     }
 
     private func deletePlaylist(at url: URL) throws {
         guard isExistingPlaylist(at: url) else { return }
 
-        playlists.removeAll { $0.possibleURL == url }
+        playlists.removeAll { $0.url == url }
         try FileManager.default.removeItem(at: url)
 
         logger.info("Deleted playlist at \(url)")
@@ -109,7 +109,7 @@ extension LibraryModel {
     func remove(_ playlists: [Playlist]) {
         Task {
             for playlist in playlists {
-                try deletePlaylist(at: playlist.possibleURL)
+                try deletePlaylist(at: playlist.url)
             }
 
             try? indexPlaylists(with: captureIndices())

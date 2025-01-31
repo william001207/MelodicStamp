@@ -49,15 +49,12 @@ struct PlaylistView: View {
                 Spacer()
                     .frame(height: minHeight)
 
-                if player.playlist.mode.isCanonical {
+                if player.playlistStatus.mode.isCanonical {
                     // MARK: Metadata
 
-                    PlaylistMetadataView(
-                        playlist: player.playlist,
-                        segments: $player.playlistSegments
-                    )
-                    .frame(height: metadataHeight)
-                    .padding(.horizontal)
+                    PlaylistMetadataView(status: player.playlistStatus)
+                        .frame(height: metadataHeight)
+                        .padding(.horizontal)
                 }
             }
             .listRowSeparator(.hidden)
@@ -66,7 +63,7 @@ struct PlaylistView: View {
 
             // MARK: Tracks
 
-            ForEach(player.playlist.tracks) { track in
+            ForEach(player.tracks) { track in
                 itemView(for: track)
                     .id(track)
                     .draggable(track) {
@@ -123,9 +120,7 @@ struct PlaylistView: View {
             .animation(animationFast, value: controlsOpacity)
             .allowsHitTesting(controlsOpacity >= 0.1)
         }
-        .animation(animationFast, value: player.playlist.mode)
-        .animation(animationFast, value: player.playlist.tracks)
-        .animation(animationFast, value: player.playlist.segments)
+        .animation(animationFast, value: player.playlistStatus)
         .animation(animationFast, value: player.selectedTracks)
 
         // MARK: Keyboard Handlers
@@ -195,11 +190,11 @@ struct PlaylistView: View {
     }
 
     private var canRemove: Bool {
-        player.playlist.isLoaded
+        player.playlistStatus.isLoaded
     }
 
     private var metadataHeight: CGFloat {
-        switch player.playlist.mode {
+        switch player.playlistStatus.mode {
         case .referenced:
             .zero
         case .canonical:
@@ -209,7 +204,7 @@ struct PlaylistView: View {
 
     private var controlsOpacity: CGFloat {
         if contentSize.height >= containerSize.height + metadataHeight {
-            switch player.playlist.mode {
+            switch player.playlistStatus.mode {
             case .referenced:
                 1.0
             case .canonical:
@@ -283,7 +278,9 @@ struct PlaylistView: View {
             .disabled(!canRemove)
             .alert("Removing All Tracks from Playlist", isPresented: $isRemoveAllAlertPresented) {
                 Button("Proceed", role: .destructive) {
-                    player.clearPlaylist()
+                    Task {
+                        await player.clearPlaylist()
+                    }
                 }
             }
         }
@@ -427,7 +424,7 @@ struct PlaylistView: View {
         .disabled(!isInitialized)
         .keyboardShortcut(.return, modifiers: [])
 
-        if player.playlist.mode.isCanonical {
+        if player.playlistStatus.mode.isCanonical {
             // MARK: Copy
 
             Group {
@@ -508,10 +505,10 @@ struct PlaylistView: View {
 
         for track in tracks {
             guard
-                let index = player.playlist.tracks.firstIndex(where: { $0.id == track.id }),
-                let copiedTrack = await player.playlist.createTrack(from: track.url)
+                let index = player.tracks.firstIndex(where: { $0.id == track.id }),
+                let copiedTrack = await player.createTrack(from: track.url)
             else { continue }
-            player.playlist.add([copiedTrack], at: index + 1)
+            await player.addToPlaylist([copiedTrack.url], at: index + 1)
         }
     }
 
@@ -523,7 +520,9 @@ struct PlaylistView: View {
 
     @discardableResult private func handleRemove(_ urls: [URL]) -> Bool {
         guard canRemove else { return false }
-        player.removeFromPlaylist(urls)
+        Task {
+            await player.removeFromPlaylist(urls)
+        }
         return true
     }
 }
@@ -532,7 +531,7 @@ struct PlaylistView: View {
 
     // MARK: - Preview
 
-    #Preview(traits: .modifier(SampleEnvironmentsPreviewModifier())) {
+    #Preview(traits: .modifier(PreviewEnvironments())) {
         @Previewable @Namespace var namespace
 
         PlaylistView(namespace: namespace)

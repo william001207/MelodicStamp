@@ -210,7 +210,7 @@ struct TrackView: View {
 }
 
 #if DEBUG
-    #Preview(traits: .modifier(SampleEnvironmentsPreviewModifier())) {
-        TrackView(track: SampleEnvironmentsPreviewModifier.sampleTrack, isSelected: false)
+    #Preview(traits: .modifier(PreviewEnvironments())) {
+        TrackView(track: PreviewEnvironments.sampleTrack, isSelected: false)
     }
 #endif

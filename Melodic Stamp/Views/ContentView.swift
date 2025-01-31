@@ -120,7 +120,9 @@ struct ContentView: View {
                 processConcreteParameters(newValue)
             }
             .dropDestination(for: Track.self) { tracks, _ in
-                player.addToPlaylist(tracks.map(\.url))
+                Task.detached {
+                    await player.streamAppendToPlaylist(tracks.map(\.url))
+                }
                 return true
             }
             .background {
@@ -182,7 +184,6 @@ struct ContentView: View {
 
         // MARK: Environments
 
-        .environment(floatingWindows)
         .environment(windowManager)
         .environment(fileManager)
         .environment(player)
@@ -228,8 +229,8 @@ struct ContentView: View {
     }
 
     private var subtitle: String {
-        let fallbackTitle = if !player.isPlaylistEmpty {
-            String(localized: "\(player.playlist.count) Tracks")
+        let fallbackTitle = if !player.playlistStatus.isEmpty {
+            String(localized: "\(player.playlistStatus.count) Tracks")
         } else {
             ""
         }
@@ -331,17 +332,17 @@ struct ContentView: View {
                 switch parameters.playlist {
                 case let .referenced(urls):
                     await player.bindTo(parameters.id, mode: .referenced)
-                    await player.addToPlaylist(urls)
+                    await player.streamAppendToPlaylist(urls)
 
                     logger.info("Created window from referenced URLs: \(urls)")
                 case let .canonical(id):
                     await player.bindTo(parameters.id, mode: .canonical)
-                    await player.playlist.loadTracks()
+                    await player.loadTracks()
 
                     logger.info("Created window with canonical ID: \(id)")
                 }
 
-                if parameters.shouldPlay, let firstTrack = await player.playlist.tracks.first {
+                if parameters.shouldPlay, let firstTrack = await player.tracks.first {
                     await player.play(firstTrack.url)
                 }
             }

@@ -40,13 +40,13 @@ struct ModifiedMetadataList: View {
     }
 
     private var tracks: [Track] {
-        player.playlist
+        player.tracks
             .filter(\.metadata.isModified)
     }
 }
 
 #if DEBUG
-    #Preview(traits: .modifier(SampleEnvironmentsPreviewModifier())) {
+    #Preview(traits: .modifier(PreviewEnvironments())) {
         ModifiedMetadataList()
     }
 #endif

@@ -11,10 +11,28 @@ struct PlaylistCommands: Commands {
     @FocusedValue(\.player) private var player
     @FocusedValue(\.metadataEditor) private var metadataEditor
 
+    @Bindable var library: LibraryModel
+
     @State private var isRemoveAllAlertPresented = false
 
     var body: some Commands {
         CommandMenu("Playlist") {
+            Group {
+                if let player {
+                    Button("Add to Library") {
+                        Task.detached {
+                            try await player.makePlaylistCanonical()
+                        }
+                    }
+                    .disabled(!player.playlistStatus.canMakeCanonical)
+                } else {
+                    Button("Add to Library") {}
+                        .disabled(true)
+                }
+            }
+
+            Divider()
+
             Group {
                 if let player {
                     Button("Clear Selection") {
@@ -117,10 +135,10 @@ struct PlaylistCommands: Commands {
 
         for track in tracks {
             guard
-                let index = player.playlist.tracks.firstIndex(where: { $0.id == track.id }),
-                let copiedTrack = await player.playlist.createTrack(from: track.url)
+                let index = player.tracks.firstIndex(where: { $0.id == track.id }),
+                let copiedTrack = await player.createTrack(from: track.url)
             else { continue }
-            player.playlist.add([copiedTrack], at: index + 1)
+            await player.addToPlaylist([copiedTrack.url], at: index + 1)
         }
     }
 
@@ -131,6 +149,8 @@ struct PlaylistCommands: Commands {
 
     private func handleRemove(_ urls: [URL]) {
         guard let player else { return }
-        player.removeFromPlaylist(urls)
+        Task {
+            await player.removeFromPlaylist(urls)
+        }
     }
 }

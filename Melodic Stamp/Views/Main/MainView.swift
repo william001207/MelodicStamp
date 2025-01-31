@@ -110,7 +110,7 @@ struct MainView: View {
 }
 
 #if DEBUG
-    #Preview(traits: .modifier(SampleEnvironmentsPreviewModifier())) {
+    #Preview(traits: .modifier(PreviewEnvironments())) {
         @Previewable @Namespace var namespace
         @Previewable @State var isInspectorPresented = true
         @Previewable @State var selectedContentTab: SidebarContentTab = .playlist

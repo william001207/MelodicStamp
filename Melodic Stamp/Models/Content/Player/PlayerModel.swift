@@ -27,9 +27,9 @@ extension PlayerModel {
 
     private var player: any Player
     private weak var library: LibraryModel?
-    private(set) var playlist: Playlist
+    private var playlist: Playlist
     // The initialization is delayed to `setupEngine`
-    private(set) var analyzer: RealtimeAnalyzer!
+    private var analyzer: RealtimeAnalyzer!
 
     // MARK: Output Devices
 
@@ -141,45 +141,27 @@ extension PlayerModel {
     }
 
     var playbackMode: PlaybackMode {
-        get { playlistSegments.state.playbackMode }
-        set { playlistSegments.state.playbackMode = newValue }
+        get { playlistStatus.segments.state.playbackMode }
+        set { playlistStatus.segments.state.playbackMode = newValue }
     }
 
     var playbackLooping: Bool {
-        get { playlistSegments.state.playbackLooping }
-        set { playlistSegments.state.playbackLooping = newValue }
+        get { playlistStatus.segments.state.playbackLooping }
+        set { playlistStatus.segments.state.playbackLooping = newValue }
     }
 
     // MARK: Playlist
 
-    var playlistSegments: Playlist.Segments {
-        get { playlist.segments }
-        set { playlist.segments = newValue }
-    }
+    var tracks: [Track] { playlist.tracks }
+    var playlistStatus: Playlist.Status { playlist.status }
+    var playlistHashValue: Int { playlist.hashValue }
 
-    var nextTrack: Track? {
-        playlist.nextTrack
-    }
+    var nextTrack: Track? { playlist.nextTrack }
+    var previousTrack: Track? { playlist.previousTrack }
 
-    var previousTrack: Track? {
-        playlist.previousTrack
-    }
-
-    var hasCurrentTrack: Bool {
-        currentTrack != nil
-    }
-
-    var hasNextTrack: Bool {
-        nextTrack != nil
-    }
-
-    var hasPreviousTrack: Bool {
-        previousTrack != nil
-    }
-
-    var isPlaylistEmpty: Bool {
-        playlist.isEmpty
-    }
+    var hasCurrentTrack: Bool { playlist.hasCurrentTrack }
+    var hasNextTrack: Bool { playlist.hasNextTrack }
+    var hasPreviousTrack: Bool { playlist.hasPreviousTrack }
 
     var isPlayable: Bool {
         isRunning && hasCurrentTrack
@@ -220,6 +202,10 @@ extension PlayerModel {
             playlist = .referenced(bindingTo: id)
         }
     }
+
+    func loadTracks() async {
+        await playlist.loadTracks()
+    }
 }
 
 // MARK: - Functions
@@ -249,10 +235,10 @@ extension PlayerModel {
         if let updated = player.playbackTime {
             guard playbackTime != updated else { return }
             playbackTime = updated
-            playlistSegments.state.currentTrackElapsedTime = updated.elapsed
+            playlistStatus.segments.state.currentTrackElapsedTime = updated.elapsed
         } else {
             playbackTime = nil
-            playlistSegments.state.currentTrackElapsedTime = .zero
+            playlistStatus.segments.state.currentTrackElapsedTime = .zero
         }
     }
 
@@ -288,47 +274,56 @@ extension PlayerModel {
 
     // MARK: Playlist
 
-    func addToPlaylist(_ urls: [URL]) {
+    func isCurrentPlaylist(_ playlist: Playlist) -> Bool {
+        self.playlist === playlist
+    }
+
+    func getTrack(at url: URL) -> Track? {
+        playlist.getTrack(at: url)
+    }
+
+    func createTrack(from url: URL) async -> Track? {
+        await playlist.createTrack(from: url)
+    }
+
+    func getOrCreateTrack(at url: URL) async -> Track? {
+        await playlist.getOrCreateTrack(at: url)
+    }
+
+    func addToPlaylist(_ urls: [URL], at destination: Int? = nil) async {
+        var tracks: [Track] = []
         for url in urls {
-            Task {
-                guard let track = await playlist.getOrCreateTrack(at: url) else { return }
-                playlist.add([track])
-            }
+            guard let track = await getOrCreateTrack(at: url) else { continue }
+            tracks.append(track)
+        }
+        playlist.add(tracks, at: destination)
+    }
+
+    func streamAppendToPlaylist(_ urls: [URL]) async {
+        for url in urls {
+            guard let track = await getOrCreateTrack(at: url) else { continue }
+            playlist.add([track])
         }
     }
 
-    func removeFromPlaylist(_ urls: [URL]) {
+    func removeFromPlaylist(_ urls: [URL]) async {
         for url in urls {
-            Task {
-                guard let track = await playlist.getOrCreateTrack(at: url) else { return }
-
-                // Removes from selected
-                selectedTracks.remove(track)
-
-                // Stops if the playing track is removed
-                if currentTrack == track {
-                    player.stop()
-                }
-
-                // Removes from playlist
-                playlist.remove([track])
-            }
+            guard let track = await getOrCreateTrack(at: url) else { continue }
+            playlist.remove([track])
         }
     }
 
-    func clearPlaylist() {
-        removeFromPlaylist(playlist.map(\.url))
+    func clearPlaylist() async {
+        await removeFromPlaylist(playlist.map(\.url))
     }
 
     func moveTrack(fromOffsets indices: IndexSet, toOffset destination: Int) {
         playlist.move(fromOffsets: indices, toOffset: destination)
     }
 
-    func makePlaylistCanonical() {
-        Task {
-            try playlist.makeCanonical()
-            library?.add([playlist])
-        }
+    func makePlaylistCanonical() throws {
+        try playlist.makeCanonical()
+        library?.add([playlist])
     }
 
     // MARK: Convenient Functions
@@ -520,3 +515,11 @@ extension PlayerModel: AudioPlayer.Delegate {
         }
     }
 }
+
+#if DEBUG
+    extension PlayerModel {
+        func debug(withPlaylist playlist: Playlist) {
+            self.playlist = playlist
+        }
+    }
+#endif

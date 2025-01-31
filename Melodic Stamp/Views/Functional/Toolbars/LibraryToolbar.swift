@@ -19,11 +19,11 @@ struct LibraryToolbar: View {
     var body: some View {
         @Bindable var player = player
 
-        if !player.playlist.mode.isCanonical || shouldWaitForPresentation {
+        if !player.playlistStatus.mode.isCanonical || shouldWaitForPresentation {
             Button {
                 shouldWaitForPresentation = asksForPlaylistInformation
                 Task.detached {
-                    await player.makePlaylistCanonical()
+                    try await player.makePlaylistCanonical()
                 }
             } label: {
                 ToolbarLabel {
@@ -33,15 +33,15 @@ struct LibraryToolbar: View {
                     Text("Add to Library")
                 }
             }
-            .disabled(player.playlist.isEmpty || player.playlist.mode.isCanonical)
-            .onChange(of: player.playlist.mode) { _, newValue in
+            .disabled(player.playlistStatus.canMakeCanonical)
+            .onChange(of: player.playlistStatus.mode) { _, newValue in
                 guard newValue.isCanonical, asksForPlaylistInformation else { return }
                 isPlaylistSegmentsSheetPresented = true
             }
             .sheet(isPresented: $isPlaylistSegmentsSheetPresented) {
                 shouldWaitForPresentation = false
             } content: {
-                PlaylistMetadataView(playlist: player.playlist, segments: $player.playlistSegments)
+                PlaylistMetadataView(status: player.playlistStatus)
                     .padding(.horizontal)
                     .padding(.top)
                     .padding(.bottom, -8)

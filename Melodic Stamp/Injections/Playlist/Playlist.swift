@@ -54,17 +54,21 @@ extension Playlist {
         currentTrack = tracks.first { $0.url == segments.state.currentTrackURL }
     }
 
-    var possibleURL: URL {
+    var url: URL {
         Self.url(forID: id)
     }
 
-    var canonicalURL: URL? {
+    var unwrappedURL: URL? {
         switch mode {
         case .referenced:
             nil
         case .canonical:
-            possibleURL
+            url
         }
+    }
+
+    var canMakeCanonical: Bool {
+        !mode.isCanonical && !tracks.isEmpty
     }
 
     private init(
@@ -95,7 +99,7 @@ extension Playlist {
         guard playlist.mode.isCanonical else { return nil }
 
         let playlistID = UUID()
-        try FileManager.default.copyItem(at: playlist.possibleURL, to: Self.url(forID: playlistID))
+        try FileManager.default.copyItem(at: playlist.url, to: Self.url(forID: playlistID))
 
         await self.init(loadingWith: playlistID)
     }
@@ -104,7 +108,7 @@ extension Playlist {
         // Migrates to a new canonical playlist
 
         do {
-            try FileManager.default.createDirectory(at: possibleURL, withIntermediateDirectories: true)
+            try FileManager.default.createDirectory(at: url, withIntermediateDirectories: true)
         } catch {
             return
         }
@@ -128,7 +132,7 @@ extension Playlist {
         try indexTracks(with: captureIndices())
         loadDelegatedVariables()
 
-        logger.info("Successfully made canonical playlist at \(self.possibleURL)")
+        logger.info("Successfully made canonical playlist at \(self.url)")
     }
 
     static func referenced(bindingTo id: UUID = .init()) -> Playlist {
@@ -221,7 +225,7 @@ extension Playlist {
 
 extension Playlist {
     func write(segments: [Playlist.Segment] = Playlist.Segment.allCases) throws {
-        guard !segments.isEmpty, let url = canonicalURL else { return }
+        guard !segments.isEmpty, let url = unwrappedURL else { return }
 
         for segment in segments {
             let data = switch segment {
@@ -330,12 +334,12 @@ extension Playlist {
     }
 
     private func createFolder() throws {
-        try FileManager.default.createDirectory(at: possibleURL, withIntermediateDirectories: true)
+        try FileManager.default.createDirectory(at: url, withIntermediateDirectories: true)
     }
 
     private func generateCanonicalURL(for url: URL) -> URL {
         let trackID = UUID()
-        return possibleURL
+        return url
             .appending(component: trackID.uuidString, directoryHint: .notDirectory)
             .appendingPathExtension(url.pathExtension)
     }
@@ -418,3 +422,17 @@ extension Playlist {
         remove(tracks)
     }
 }
+
+extension Playlist {
+    var status: Status {
+        .init(wrapping: self)
+    }
+}
+
+#if DEBUG
+    extension Playlist {
+        func debug(withTracks tracks: [Track]) {
+            self.tracks = tracks
+        }
+    }
+#endif

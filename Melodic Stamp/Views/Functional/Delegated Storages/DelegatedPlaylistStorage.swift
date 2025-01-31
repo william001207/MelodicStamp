@@ -58,11 +58,11 @@ struct DelegatedPlaylistStorage: View {
                 playlistState.value = newValue
             }
             // `player.playlist` isn't triggering view updates
-            .onChange(of: player.playlist.hashValue) { _, _ in
+            .onChange(of: player.playlistStatus) { _, _ in
                 playlistState.isReady = false
 
                 Task.detached {
-                    try await storePlaylist(from: player.playlist)
+                    try await storePlaylist(from: player.playlistStatus)
                 }
             }
             .onChange(of: playlistState.preparedValue) { _, newValue in
@@ -137,7 +137,7 @@ struct DelegatedPlaylistStorage: View {
         guard let delegatedPlaylist = try? JSONDecoder().decode(DelegatedPlaylist.self, from: data) else { return }
         switch delegatedPlaylist {
         case let .referenced(bookmarks, currentTrackURL, currentTrackElapsedTime, playbackMode, playbackLooping):
-            guard !player.playlist.mode.isCanonical else { break }
+            guard !player.playlistStatus.mode.isCanonical else { break }
 
             var urls: [URL] = []
             try bookmarks.forEach {
@@ -146,44 +146,44 @@ struct DelegatedPlaylistStorage: View {
                 guard !isStale else { return }
                 urls.append(url)
             }
-            player.addToPlaylist(urls)
+            await player.streamAppendToPlaylist(urls)
 
-            player.playlistSegments.state = .init(
+            player.playlistStatus.segments.state = .init(
                 currentTrackURL: currentTrackURL,
                 currentTrackElapsedTime: currentTrackElapsedTime,
                 playbackMode: playbackMode,
                 playbackLooping: playbackLooping
             )
         case let .canonical(id):
-            switch player.playlist.mode {
+            switch player.playlistStatus.mode {
             case .canonical:
                 // Already handled by `ContentView`
                 break
             case .referenced:
                 await player.bindTo(id, mode: .canonical)
-                await player.playlist.loadTracks()
+                await player.loadTracks()
             }
         }
     }
 
-    private func storePlaylist(from playlist: Playlist) async throws {
+    private func storePlaylist(from status: Playlist.Status) async throws {
         let delegatedPlaylist: DelegatedPlaylist
-        switch playlist.mode {
+        switch status.mode {
         case .canonical:
-            delegatedPlaylist = .canonical(playlist.id)
+            delegatedPlaylist = .canonical(status.id)
         case .referenced:
-            let bookmarks: [Data] = try playlist.map(\.url).compactMap { url in
+            let bookmarks: [Data] = try status.map(\.url).compactMap { url in
                 try url.bookmarkData(options: [])
             }
 
             delegatedPlaylist = .referenced(
                 bookmarks: bookmarks,
-                currentTrackURL: playlist.segments.state.currentTrackURL,
-                currentTrackElapsedTime: playlist.segments.state.currentTrackElapsedTime,
-                playbackMode: playlist.segments.state.playbackMode,
-                playbackLooping: playlist.segments.state.playbackLooping
+                currentTrackURL: status.segments.state.currentTrackURL,
+                currentTrackElapsedTime: status.segments.state.currentTrackElapsedTime,
+                playbackMode: status.segments.state.playbackMode,
+                playbackLooping: status.segments.state.playbackLooping
             )
         }
-        self.playlist = try? JSONEncoder().encode(delegatedPlaylist)
+        playlist = try? JSONEncoder().encode(delegatedPlaylist)
     }
 }

@@ -8,8 +8,8 @@
 import Foundation
 
 struct PlaybackTime: Hashable {
-    fileprivate(set) var duration: Duration = .zero
-    fileprivate(set) var elapsed: TimeInterval = .zero
+    private(set) var duration: Duration = .zero
+    private(set) var elapsed: TimeInterval = .zero
 
     var remaining: TimeInterval { TimeInterval(duration) - elapsed }
     var progress: CGFloat { elapsed / TimeInterval(duration) }

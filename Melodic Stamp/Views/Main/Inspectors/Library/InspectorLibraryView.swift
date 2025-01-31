@@ -46,14 +46,14 @@ struct InspectorLibraryView: View {
 
             // MARK: Quick Look
 
-            .quickLookPreview($quickLookSelection, in: library.playlists.map(\.possibleURL))
+            .quickLookPreview($quickLookSelection, in: library.playlists.map(\.url))
             .onChange(of: selectedPlaylists) { _, newValue in
                 guard quickLookSelection != nil else { return }
                 guard newValue.count == 1 else {
                     quickLookSelection = nil
                     return
                 }
-                quickLookSelection = newValue.first?.possibleURL
+                quickLookSelection = newValue.first?.url
             }
 
             // MARK: Keyboard Handlers
@@ -90,7 +90,7 @@ struct InspectorLibraryView: View {
                     quickLookSelection = nil
                     return .handled
                 } else if selectedPlaylists.count == 1 {
-                    quickLookSelection = selectedPlaylists.first?.possibleURL
+                    quickLookSelection = selectedPlaylists.first?.url
                     return .handled
                 } else {
                     return .ignored
@@ -200,7 +200,7 @@ struct InspectorLibraryView: View {
 
         Divider()
 
-        if let url = playlist.canonicalURL {
+        if let url = playlist.unwrappedURL {
             // MARK: Reveal in Finder
 
             Button("Reveal in Finder") {
@@ -249,7 +249,7 @@ struct InspectorLibraryView: View {
 
     // MARK: - Preview
 
-    #Preview(traits: .modifier(SampleEnvironmentsPreviewModifier())) {
+    #Preview(traits: .modifier(PreviewEnvironments())) {
         InspectorLibraryView()
     }
 #endif

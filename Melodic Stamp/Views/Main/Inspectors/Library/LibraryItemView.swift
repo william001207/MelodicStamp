@@ -86,7 +86,7 @@ struct LibraryItemView: View {
     }
 
     private var isOpened: Bool {
-        player.playlist == playlist
+        player.isCurrentPlaylist(playlist)
     }
 
     private var hasTitle: Bool {
@@ -146,7 +146,7 @@ struct LibraryItemView: View {
 }
 
 #if DEBUG
-    #Preview(traits: .modifier(SampleEnvironmentsPreviewModifier())) {
-        LibraryItemView(playlist: SampleEnvironmentsPreviewModifier.samplePlaylist, isSelected: false)
+    #Preview(traits: .modifier(PreviewEnvironments())) {
+        LibraryItemView(playlist: PreviewEnvironments.samplePlaylist, isSelected: false)
     }
 #endif

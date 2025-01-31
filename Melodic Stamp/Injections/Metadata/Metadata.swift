@@ -232,7 +232,7 @@ extension Metadata {
         }
     }
 
-    fileprivate var restorables: [any Restorable] {
+    private var restorables: [any Restorable] {
         guard state.isInitialized else { return [] }
         return [
             attachedPictures,
@@ -249,7 +249,7 @@ extension Metadata {
         ]
     }
 
-    fileprivate func updateState(to state: State) {
+    private func updateState(to state: State) {
         self.state = state
     }
 }

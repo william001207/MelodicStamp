@@ -18,10 +18,10 @@ struct DelegatedPlaylistStateStorage: View {
 
     @ViewBuilder private func stateObservations() -> some View {
         Color.clear
-            .onChange(of: player.playlistSegments.state) { _, _ in
-                guard player.playlist.mode.isCanonical else { return }
+            .onChange(of: player.playlistStatus) { _, _ in
+                guard player.playlistStatus.mode.isCanonical else { return }
                 Task.detached {
-                    try await player.playlist.write(segments: [.state])
+                    try await player.playlistStatus.write(segments: [.state])
                 }
             }
     }

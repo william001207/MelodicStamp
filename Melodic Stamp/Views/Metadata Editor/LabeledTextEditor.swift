@@ -301,7 +301,7 @@ struct LabeledTextEditor<Label, Actions, V>: View where Label: View, Actions: Vi
         }
     }
 
-    #Preview(traits: .modifier(SampleEnvironmentsPreviewModifier())) {
+    #Preview(traits: .modifier(PreviewEnvironments())) {
         LabeledTextEditorPreview()
     }
 #endif

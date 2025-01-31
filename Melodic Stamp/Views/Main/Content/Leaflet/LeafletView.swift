@@ -300,7 +300,7 @@ struct LeafletView: View {
 }
 
 #if DEBUG
-    #Preview(traits: .modifier(SampleEnvironmentsPreviewModifier())) {
+    #Preview(traits: .modifier(PreviewEnvironments())) {
         @Previewable @State var lyrics: LyricsModel = .init()
 
         LeafletView()

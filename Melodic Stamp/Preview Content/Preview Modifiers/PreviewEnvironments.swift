@@ -1,5 +1,5 @@
 //
-//  SampleEnvironmentsPreviewModifier.swift
+//  PreviewEnvironments.swift
 //  MelodicStamp
 //
 //  Created by KrLite on 2024/12/31.
@@ -9,7 +9,7 @@ import CSFBAudioEngine
 import SwiftUI
 
 #if DEBUG
-    struct SampleEnvironmentsPreviewModifier: PreviewModifier {
+    struct PreviewEnvironments: PreviewModifier {
         typealias Context = (
             floatingWindows: FloatingWindowsModel,
             library: LibraryModel,
@@ -34,13 +34,11 @@ import SwiftUI
             let audioVisualizer = AudioVisualizerModel()
             let gradientVisualizer = GradientVisualizerModel()
 
-            let track = sampleTrack
+            player.debug(withPlaylist: samplePlaylist)
+            player.selectedTracks = [sampleTrack]
+            player.play(sampleTrack.url)
 
-            player.playlist.add([track])
-            player.selectedTracks = [track]
-            player.play(track.url)
-
-            player.playlistSegments = samplePlaylistSegments
+            player.playlistStatus.segments = samplePlaylistSegments
 
             let image = NSImage(resource: .templateArtwork)
             await gradientVisualizer.updateDominantColors(from: image)
@@ -72,7 +70,7 @@ import SwiftUI
         }
     }
 
-    extension SampleEnvironmentsPreviewModifier {
+    extension PreviewEnvironments {
         static var sampleArtwork: NSImage {
             .templateArtwork
         }
@@ -122,7 +120,7 @@ import SwiftUI
 
             playlist.segments = samplePlaylistSegments
 
-            playlist.add([sampleTrack])
+            playlist.debug(withTracks: [sampleTrack])
             playlist.currentTrack = sampleTrack
 
             return playlist

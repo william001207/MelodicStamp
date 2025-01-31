@@ -16,7 +16,7 @@ struct ChromaBackgroundView: View {
 }
 
 #if DEBUG
-    #Preview(traits: .modifier(SampleEnvironmentsPreviewModifier())) {
+    #Preview(traits: .modifier(PreviewEnvironments())) {
         ChromaBackgroundView()
     }
 #endif
