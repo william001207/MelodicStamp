@@ -75,7 +75,6 @@ struct ContentView: View {
 
     // MARK: Sidebar & Inspector
 
-    @State private var isInspectorPresented: Bool = false
     @State private var selectedContentTab: SidebarContentTab = .playlist
     @State private var selectedInspectorTab: SidebarInspectorTab = .commonMetadata
 
@@ -214,6 +213,8 @@ struct ContentView: View {
         .focusedValue(player)
         .focusedValue(keyboardControl)
         .focusedValue(metadataEditor)
+        .focusedValue(audioVisualizer)
+        .focusedValue(gradientVisualizer)
 
         // MARK: Navigation
 
@@ -262,7 +263,7 @@ struct ContentView: View {
 
         MainView(
             namespace: namespace,
-            isInspectorPresented: $isInspectorPresented,
+            isInspectorPresented: $windowManager.isInspectorPresented,
             selectedContentTab: $selectedContentTab,
             selectedInspectorTab: $selectedInspectorTab
         )
@@ -333,6 +334,29 @@ struct ContentView: View {
             }
     }
 
+    // MARK: - Floating Windows
+
+    @ViewBuilder private func floatingTabBarView(mainWindow: NSWindow?) -> some View {
+        FloatingTabBarView(
+            selectedContentTab: $selectedContentTab,
+            selectedInspectorTab: $selectedInspectorTab
+        )
+        .onGeometryChange(for: CGSize.self) { proxy in
+            proxy.size
+        } action: { newValue in
+            floatingWindows.updateTabBarPosition(size: newValue, in: mainWindow, animate: true)
+        }
+    }
+
+    @ViewBuilder private func floatingPlayerView(mainWindow: NSWindow?) -> some View {
+        FloatingPlayerView()
+            .onGeometryChange(for: CGSize.self) { proxy in
+                proxy.size
+            } action: { newValue in
+                floatingWindows.updatePlayerPosition(size: newValue, in: mainWindow, animate: true)
+            }
+    }
+
     // MARK: - Functions
 
     private func processConcreteParameters(_ parameters: CreationParameters) {
@@ -365,28 +389,15 @@ struct ContentView: View {
         let dispatch = DispatchWorkItem {
             Task.detached {
                 await floatingWindows.addTabBar(to: mainWindow) {
-                    FloatingTabBarView(
-                        isInspectorPresented: $isInspectorPresented,
-                        selectedContentTab: $selectedContentTab,
-                        selectedInspectorTab: $selectedInspectorTab
-                    )
-                    .onGeometryChange(for: CGSize.self) { proxy in
-                        proxy.size
-                    } action: { newValue in
-                        floatingWindows.updateTabBarPosition(size: newValue, in: mainWindow, animate: true)
-                    }
-                    .environment(floatingWindows)
+                    floatingTabBarView(mainWindow: mainWindow)
+                        .environment(floatingWindows)
+                        .environment(windowManager)
                 }
             }
 
             Task.detached {
                 await floatingWindows.addPlayer(to: mainWindow) {
-                    FloatingPlayerView()
-                        .onGeometryChange(for: CGSize.self) { proxy in
-                            proxy.size
-                        } action: { newValue in
-                            floatingWindows.updatePlayerPosition(size: newValue, in: mainWindow, animate: true)
-                        }
+                    floatingPlayerView(mainWindow: mainWindow)
                         .environment(floatingWindows)
                         .environment(windowManager)
                         .environment(fileManager)
