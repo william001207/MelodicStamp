@@ -19,7 +19,6 @@ struct MainView: View {
 
     var namespace: Namespace.ID
 
-    @Binding var isInspectorPresented: Bool
     @Binding var selectedContentTab: SidebarContentTab
     @Binding var selectedInspectorTab: SidebarInspectorTab
 
@@ -27,9 +26,11 @@ struct MainView: View {
     @State private var displayLyrics: LyricsModel = .init()
 
     var body: some View {
+        @Bindable var windowManager = windowManager
+
         content()
             .frame(minWidth: 600, minHeight: 400)
-            .inspector(isPresented: $isInspectorPresented) {
+            .inspector(isPresented: $windowManager.isInspectorPresented) {
                 inspector()
                     .ignoresSafeArea()
                     .inspectorColumnWidth(min: 300, ideal: 400, max: 700)
@@ -44,9 +45,7 @@ struct MainView: View {
             case .playlist:
                 PlaylistView(namespace: namespace)
                     .toolbar {
-                        ToolbarItemGroup(placement: .navigation) {
-                            FileToolbar()
-                        }
+                        FileToolbar()
                     }
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                     .safeAreaPadding(.bottom, 94)
@@ -69,30 +68,33 @@ struct MainView: View {
             case .commonMetadata:
                 InspectorCommonMetadataView()
                     .toolbar {
-                        if isInspectorPresented {
+                        if windowManager.isInspectorPresented {
                             EditorToolbar()
                         }
                     }
             case .advancedMetadata:
                 InspectorAdvancedMetadataView()
                     .toolbar {
-                        if isInspectorPresented {
+                        if windowManager.isInspectorPresented {
                             EditorToolbar()
                         }
                     }
             case .lyrics:
                 InspectorLyricsView()
                     .toolbar {
-                        if isInspectorPresented {
+                        if windowManager.isInspectorPresented {
                             EditorToolbar()
-
+                        }
+                    }
+                    .toolbar {
+                        if windowManager.isInspectorPresented {
                             LyricsToolbar()
                         }
                     }
             case .library:
                 InspectorLibraryView()
                     .toolbar {
-                        if isInspectorPresented {
+                        if windowManager.isInspectorPresented {
                             LibraryToolbar()
                         }
                     }
@@ -110,13 +112,11 @@ struct MainView: View {
 #if DEBUG
     #Preview(traits: .modifier(PreviewEnvironments())) {
         @Previewable @Namespace var namespace
-        @Previewable @State var isInspectorPresented = true
         @Previewable @State var selectedContentTab: SidebarContentTab = .playlist
         @Previewable @State var selectedInspectorTab: SidebarInspectorTab = .commonMetadata
 
         MainView(
             namespace: namespace,
-            isInspectorPresented: $isInspectorPresented,
             selectedContentTab: $selectedContentTab,
             selectedInspectorTab: $selectedInspectorTab
         )

@@ -170,7 +170,7 @@ struct InspectorLibraryView: View {
     private func open(_ playlists: [Playlist]) {
         for playlist in playlists {
             openWindow(
-                id: WindowID.content.rawValue,
+                id: WindowID.content(),
                 value: CreationParameters(playlist: .canonical(playlist.id))
             )
         }

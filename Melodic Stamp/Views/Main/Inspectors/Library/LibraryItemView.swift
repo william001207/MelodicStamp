@@ -152,7 +152,7 @@ struct LibraryItemView: View {
 
     private func open() {
         openWindow(
-            id: WindowID.content.rawValue,
+            id: WindowID.content(),
             value: CreationParameters(playlist: .canonical(item.id))
         )
     }

@@ -269,11 +269,8 @@ struct ContentView: View {
     // MARK: - Main View
 
     @ViewBuilder private func mainView(_ window: NSWindow? = nil) -> some View {
-        @Bindable var windowManager = windowManager
-
         MainView(
             namespace: namespace,
-            isInspectorPresented: $windowManager.isInspectorPresented,
             selectedContentTab: $selectedContentTab,
             selectedInspectorTab: $selectedInspectorTab
         )
