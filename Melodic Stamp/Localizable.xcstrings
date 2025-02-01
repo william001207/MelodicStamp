@@ -316,15 +316,11 @@
       }
     },
     "Animate gradient with audio" : {
-
-    },
-    "Animates gradient with audio" : {
-      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "随着音频律动改变渐变色"
+            "value" : "随着音频律动渐变"
           }
         }
       }
@@ -797,28 +793,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "清除选择"
-          }
-        }
-      }
-    },
-    "Close" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "关闭"
-          }
-        }
-      }
-    },
-    "Close Anyway" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "强制关闭"
           }
         }
       }
@@ -1473,14 +1447,21 @@
       }
     },
     "Gradient" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "渐变"
+          }
+        }
+      }
     },
     "Gradient dynamics" : {
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "渐变色动态模式"
+            "value" : "渐变动态模式"
           }
         }
       }
@@ -1490,7 +1471,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "渐变色帧率"
+            "value" : "渐变帧率"
           }
         }
       }
@@ -1500,7 +1481,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "渐变色分辨率"
+            "value" : "渐变分辨率"
           }
         }
       }
@@ -2206,7 +2187,14 @@
       }
     },
     "Proceed Anyway" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "无视并继续"
+          }
+        }
+      }
     },
     "Publisher Logo" : {
       "localizations" : {
@@ -2279,7 +2267,14 @@
       }
     },
     "Reduce motion" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "渐弱动态效果"
+          }
+        }
+      }
     },
     "Release Date" : {
       "localizations" : {
@@ -2307,41 +2302,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "重新加载元数据"
-          }
-        }
-      }
-    },
-    "Remove %lld Playlists from Library" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "variations" : {
-            "plural" : {
-              "one" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "Remove %lld Playlist from Library"
-                }
-              },
-              "other" : {
-                "stringUnit" : {
-                  "state" : "new",
-                  "value" : "Remove %lld Playlists from Library"
-                }
-              }
-            }
-          }
-        },
-        "zh-Hans" : {
-          "variations" : {
-            "plural" : {
-              "other" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "从资源库中移除%lld个播放列表"
-                }
-              }
-            }
           }
         }
       }
@@ -2421,7 +2381,14 @@
       }
     },
     "Removing Playlist from Library" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "正在从资源库中移除播放列表"
+          }
+        }
+      }
     },
     "Replacing Current Playlist" : {
       "localizations" : {
@@ -2534,26 +2501,11 @@
       }
     },
     "Save All" : {
-
-    },
-    "Save All and Close" : {
-      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "全部保存并关闭"
-          }
-        }
-      }
-    },
-    "Save and Close" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "保存并关闭"
+            "value" : "保存全部"
           }
         }
       }
@@ -2699,7 +2651,14 @@
       }
     },
     "This will permanently delete the corresponding directory." : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "这将会永久删除对应文件目录。"
+          }
+        }
+      }
     },
     "Title" : {
       "localizations" : {
@@ -2812,7 +2771,14 @@
       }
     },
     "Unsaved Playlist" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "未保存的播放列表"
+          }
+        }
+      }
     },
     "Version" : {
       "localizations" : {
