@@ -1366,6 +1366,16 @@
         }
       }
     },
+    "Fancy" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "精美"
+          }
+        }
+      }
+    },
     "Fast Forward" : {
       "localizations" : {
         "zh-Hans" : {
@@ -1736,12 +1746,32 @@
         }
       }
     },
+    "Minimal" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "最弱"
+          }
+        }
+      }
+    },
     "Miscellaneous" : {
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "杂项"
+          }
+        }
+      }
+    },
+    "Motion level" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "动态效果"
           }
         }
       }
@@ -2266,12 +2296,12 @@
         }
       }
     },
-    "Reduce motion" : {
+    "Reduced" : {
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "渐弱动态效果"
+            "value" : "减弱"
           }
         }
       }
