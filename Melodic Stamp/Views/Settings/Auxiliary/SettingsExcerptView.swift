@@ -31,6 +31,7 @@ struct SettingsExcerptView<Content>: View where Content: View {
     var body: some View {
         VStack {
             SettingsBannerIcon(tab)
+                .motionCard()
 
             Text(tab.name)
                 .font(.title)

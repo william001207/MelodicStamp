@@ -17,6 +17,12 @@ struct SettingsVisualizationPage: View {
         Section {
             SettingsGradientDynamicsControl()
         }
+
+        Section {
+            SettingsGradientFPSControl()
+
+            SettingsGradientResolutionControl()
+        }
     }
 }
 

@@ -15,6 +15,10 @@ struct SettingsPerformancePage: View {
         )
 
         Section {
+            SettingsReduceMotionControl()
+        }
+
+        Section("Gradient") {
             SettingsGradientFPSControl()
 
             SettingsGradientResolutionControl()

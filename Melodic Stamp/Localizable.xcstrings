@@ -315,7 +315,11 @@
         }
       }
     },
+    "Animate gradient with audio" : {
+
+    },
     "Animates gradient with audio" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -1466,6 +1470,9 @@
         }
       }
     },
+    "Gradient" : {
+
+    },
     "Gradient dynamics" : {
       "localizations" : {
         "zh-Hans" : {
@@ -2266,6 +2273,9 @@
           }
         }
       }
+    },
+    "Reduce motion" : {
+
     },
     "Release Date" : {
       "localizations" : {

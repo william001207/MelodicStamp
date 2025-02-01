@@ -5,7 +5,6 @@
 //  Created by KrLite on 2025/1/5.
 //
 
-import Morphed
 import SFSafeSymbols
 import SwiftUI
 
@@ -71,6 +70,7 @@ struct SettingsView: View {
     @ViewBuilder private func entry(_ tab: SettingsTab) -> some View {
         HStack {
             SettingsSidebarIcon(tab)
+
             Text(tab.name)
         }
         .tag(tab)

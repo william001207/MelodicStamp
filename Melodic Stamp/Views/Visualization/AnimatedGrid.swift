@@ -24,7 +24,7 @@ struct AnimatedGrid: View {
     @Environment(GradientVisualizerModel.self) private var gradientVisualizer
 
     @Default(.gradientDynamics) private var dynamics
-    @Default(.isGradientAnimateWithAudioEnabled) private var isAnimateWithAudioEnabled
+    @Default(.gradientAnimateWithAudio) private var animateWithAudio
     @Default(.gradientResolution) private var resolution
     @Default(.gradientFPS) private var fps
 
@@ -80,7 +80,7 @@ struct AnimatedGrid: View {
     }
 
     private var weightFactor: Float {
-        if isAnimateWithAudioEnabled, hasDynamics, minAverage != maxAverage {
+        if animateWithAudio, hasDynamics, minAverage != maxAverage {
             let average = audioVisualizer.average
 
             let range = max(maxAverage - minAverage, 0)

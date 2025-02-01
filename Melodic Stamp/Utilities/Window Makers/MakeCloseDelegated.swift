@@ -51,7 +51,7 @@ class CloseDelegatedWindowHostingController<Content: View>: NSHostingController<
         super.viewWillLayout()
 
         guard let window = view.window else { return }
-        if window.delegate !== delegate {
+        if !(window.delegate is CloseDelegatedWindowDelegate) {
             delegate.originalDelegate = window.delegate
             window.delegate = delegate
         }

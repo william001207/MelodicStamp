@@ -266,19 +266,22 @@ struct ContentView: View {
             selectedContentTab: $selectedContentTab,
             selectedInspectorTab: $selectedInspectorTab
         )
-        .containerBackground(for: .window) {
-            if windowManager.isInFullScreen {
-                OpaqueBackgroundView()
-            } else {
-                switch mainWindowBackgroundStyle {
-                case .opaque:
+        .background {
+            Group {
+                if windowManager.isInFullScreen {
                     OpaqueBackgroundView()
-                case .vibrant:
-                    VibrantBackgroundView()
-                case .ethereal:
-                    EtherealBackgroundView()
+                } else {
+                    switch mainWindowBackgroundStyle {
+                    case .opaque:
+                        OpaqueBackgroundView()
+                    case .vibrant:
+                        VibrantBackgroundView()
+                    case .ethereal:
+                        EtherealBackgroundView()
+                    }
                 }
             }
+            .ignoresSafeArea()
         }
         .onDisappear {
             destroyFloatingWindows(from: window)
@@ -303,28 +306,28 @@ struct ContentView: View {
 
     @ViewBuilder private func miniPlayerView(_ window: NSWindow? = nil) -> some View {
         MiniPlayerView(namespace: namespace)
-            .containerBackground(for: .window) {
-                switch miniPlayerBackgroundStyle {
-                case .opaque:
-                    OpaqueBackgroundView()
-                case .vibrant:
-                    VibrantBackgroundView()
-                case .ethereal:
-                    EtherealBackgroundView()
-                case .chroma:
-                    ChromaBackgroundView()
-                        .overlay(.ultraThinMaterial)
-                        .environment(player)
-                        .environment(audioVisualizer)
-                        .environment(gradientVisualizer)
-                }
-            }
             .padding(12)
             .padding(.top, 4)
             .padding(.bottom, -32)
             .ignoresSafeArea()
             .frame(minWidth: 500, idealWidth: 500)
             .fixedSize(horizontal: false, vertical: true)
+            .background {
+                Group {
+                    switch miniPlayerBackgroundStyle {
+                    case .opaque:
+                        OpaqueBackgroundView()
+                    case .vibrant:
+                        VibrantBackgroundView()
+                    case .ethereal:
+                        EtherealBackgroundView()
+                    case .chroma:
+                        ChromaBackgroundView()
+                            .overlay(.ultraThinMaterial)
+                    }
+                }
+                .ignoresSafeArea()
+            }
             .onAppear {
                 destroyFloatingWindows(from: window)
             }

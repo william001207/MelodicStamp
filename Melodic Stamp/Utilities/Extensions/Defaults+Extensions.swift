@@ -17,6 +17,11 @@ extension Defaults.Keys {
         default: .whilePlaying
     )
 
+    static let reduceMotion: Key<Bool> = .init(
+        "reduceMotion",
+        default: false
+    )
+
     // MARK: Behaviors
 
     static let defaultPlaybackMode: Key<PlaybackMode> = .init(
@@ -48,8 +53,8 @@ extension Defaults.Keys {
         default: .ternary
     )
 
-    static let isGradientAnimateWithAudioEnabled: Key<Bool> = .init(
-        "isGradientAnimateWithAudioEnabled",
+    static let gradientAnimateWithAudio: Key<Bool> = .init(
+        "gradientAnimateWithAudio",
         default: true
     )
 

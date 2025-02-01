@@ -10,7 +10,7 @@ import SwiftUI
 
 struct SettingsGradientDynamicsControl: View {
     @Default(.gradientDynamics) private var dynamics
-    @Default(.isGradientAnimateWithAudioEnabled) private var isAnimateWithAudioEnabled
+    @Default(.gradientAnimateWithAudio) private var animateWithAudio
 
     var body: some View {
         Picker("Gradient dynamics", selection: $dynamics) {
@@ -29,7 +29,7 @@ struct SettingsGradientDynamicsControl: View {
                 .tag(Defaults.GradientDynamics.quaternion)
         }
 
-        Toggle("Animates gradient with audio", isOn: $isAnimateWithAudioEnabled)
+        Toggle("Animate gradient with audio", isOn: $animateWithAudio)
             .disabled(!dynamics.canAnimateWithAudio)
     }
 }
