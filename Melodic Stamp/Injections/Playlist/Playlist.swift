@@ -145,7 +145,12 @@ extension Playlist: Sequence {
     }
 
     var count: Int {
-        indexer.value.count
+        switch mode {
+        case .referenced:
+            loadedCount
+        case .canonical:
+            indexer.value.count
+        }
     }
 
     var loadedCount: Int {
@@ -267,18 +272,7 @@ extension Playlist {
 }
 
 extension Playlist {
-    func isExistingCanonicalTrack(at url: URL) -> Bool {
-        guard mode.isCanonical else { return false }
-        return tracks.contains { $0.url == url }
-    }
-
     private mutating func deleteTrack(at url: URL) throws {
-        if currentTrack?.url == url {
-            currentTrack = nil
-        }
-        tracks.removeAll { $0.url == url }
-
-        guard isExistingCanonicalTrack(at: url) else { return }
         try FileManager.default.removeItem(at: url)
 
         logger.info("Deleted canonical track at \(url)")
@@ -364,9 +358,13 @@ extension Playlist {
     }
 
     mutating func remove(_ tracks: [Track]) {
-        for track in tracks {
-            try? deleteTrack(at: track.url)
+        if let currentTrack, tracks.contains(currentTrack) {
+            self.currentTrack = nil
         }
+        self.tracks.removeAll(where: tracks.contains)
+
+        guard mode.isCanonical else { return }
+        tracks.forEach { try? deleteTrack(at: $0.url) }
     }
 
     mutating func clearPlaylist() {

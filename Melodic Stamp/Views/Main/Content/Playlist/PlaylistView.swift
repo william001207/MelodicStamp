@@ -30,68 +30,82 @@ struct PlaylistView: View {
 
     var namespace: Namespace.ID
 
-    @State private var containerSize: CGSize = .zero
-    @State private var contentSize: CGSize = .zero
     @State private var contentOffset: CGFloat = .zero
+    @State private var contentInsets: EdgeInsets = .zero
 
     // MARK: - Body
 
     var body: some View {
         @Bindable var playlist = playlist
 
-        // MARK: List
+        Group {
+            if playlist.isEmpty {
+                // MARK: Excerpt
 
-        List(selection: $playlist.selectedTracks) {
-            Group {
-                // MARK: Controls Placeholder
+                VStack(spacing: 0) {
+                    if playlist.mode.isCanonical {
+                        // MARK: Metadata
 
-                if playlist.mode.isCanonical {
-                    // MARK: Metadata
+                        PlaylistMetadataView()
+                            .frame(height: metadataHeight)
+                            .padding(.horizontal)
+                    }
 
-                    PlaylistMetadataView()
-                        .frame(height: metadataHeight)
-                        .padding(.horizontal)
+                    ExcerptView(tab: SidebarContentTab.playlist)
                 }
+                .padding(.horizontal)
+                .padding(.vertical, visualInset)
+            } else {
+                // MARK: List
 
-                // This is much more stable than `.contentMargins()`
-                Spacer()
-                    .frame(height: minHeight)
+                List(selection: $playlist.selectedTracks) {
+                    VStack(spacing: 0) {
+                        // MARK: Controls Placeholder
+
+                        if playlist.mode.isCanonical {
+                            // MARK: Metadata
+
+                            PlaylistMetadataView()
+                                .frame(height: metadataHeight)
+                                .padding(.horizontal)
+                        }
+
+                        // This is much more stable than `.contentMargins()`
+                        Spacer()
+                            .frame(height: minHeight)
+                    }
                     .contentOffset($contentOffset, in: coordinateSpace)
+                    .listRowSeparator(.hidden)
+                    .selectionDisabled()
                     .onDisappear {
-                        contentOffset = .zero
+                        contentOffset = -(metadataHeight + controlsInset)
                     }
-            }
-            .listRowSeparator(.hidden)
-            .selectionDisabled()
 
-            // MARK: Tracks
+                    // MARK: Tracks
 
-            ForEach(playlist.tracks) { track in
-                itemView(for: track)
-                    .id(track)
-                    .draggable(track) {
-                        TrackPreview(track: track)
+                    ForEach(playlist.tracks) { track in
+                        itemView(for: track)
+                            .id(track)
+                            .draggable(track) {
+                                TrackPreview(track: track)
+                            }
                     }
-            }
-            .onMove { indices, destination in
-                withAnimation {
-                    playlist.move(fromOffsets: indices, toOffset: destination)
+                    .onMove { indices, destination in
+                        withAnimation {
+                            playlist.move(fromOffsets: indices, toOffset: destination)
+                        }
+                    }
+                    .transition(.slide)
+                }
+                .scrollClipDisabled()
+                .scrollContentBackground(.hidden)
+                .coordinateSpace(name: coordinateSpace)
+                .onScrollGeometryChange(for: EdgeInsets.self) { proxy in
+                    proxy.contentInsets
+                } action: { _, newValue in
+                    contentInsets = newValue
                 }
             }
-            .transition(.slide)
-        }
-        .scrollClipDisabled()
-        .scrollContentBackground(.hidden)
-        .coordinateSpace(name: coordinateSpace)
-        .onScrollGeometryChange(for: CGSize.self) { proxy in
-            proxy.containerSize
-        } action: { _, newValue in
-            containerSize = newValue
-        }
-        .onScrollGeometryChange(for: CGSize.self) { proxy in
-            proxy.contentSize
-        } action: { _, newValue in
-            contentSize = newValue
         }
         .overlay(alignment: .top) {
             // MARK: Controls
@@ -117,7 +131,8 @@ struct PlaylistView: View {
                 .shadow(color: .black.opacity(0.1), radius: 15)
             }
             .padding(.horizontal)
-            .offset(y: max(0, contentOffset - minHeight - 16))
+            .padding(.top, 8)
+            .offset(y: max(0, controlsOffset))
         }
         .animation(animationFast, value: playlist)
         .animation(animationFast, value: playlist.selectedTracks)
@@ -198,6 +213,28 @@ struct PlaylistView: View {
             .zero
         case .canonical:
             300
+        }
+    }
+
+    private var visualInset: CGFloat {
+        14
+        // 14 is the top inset of the list
+    }
+
+    private var controlsInset: CGFloat {
+        -(contentInsets.top + visualInset)
+    }
+
+    private var controlsOffset: CGFloat {
+        switch playlist.mode {
+        case .referenced:
+            0
+        case .canonical:
+            if playlist.isEmpty {
+                metadataHeight
+            } else {
+                contentOffset + controlsInset + metadataHeight
+            }
         }
     }
 
