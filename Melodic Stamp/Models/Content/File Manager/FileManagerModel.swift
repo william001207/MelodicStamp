@@ -57,7 +57,7 @@ enum FileAdderPresentationStyle {
                 await playlist?.clear()
                 await player?.play(url)
             case .formingNewPlaylist:
-                openWindow(id: WindowID.content.rawValue, value: CreationParameters(
+                openWindow(id: WindowID.content(), value: CreationParameters(
                     playlist: .referenced([url]), shouldPlay: true,
                     initialWindowStyle: .miniPlayer
                 ))
@@ -78,7 +78,7 @@ enum FileAdderPresentationStyle {
                 await playlist?.clear()
                 await playlist?.append(urls)
             case .formingNewPlaylist:
-                openWindow(id: WindowID.content.rawValue, value: CreationParameters(
+                openWindow(id: WindowID.content(), value: CreationParameters(
                     playlist: .referenced(urls)
                 ))
             }

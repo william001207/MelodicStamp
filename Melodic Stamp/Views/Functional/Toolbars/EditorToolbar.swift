@@ -8,53 +8,57 @@
 import SFSafeSymbols
 import SwiftUI
 
-struct EditorToolbar: View {
+struct EditorToolbar: CustomizableToolbarContent {
     @Environment(MetadataEditorModel.self) private var metadataEditor
 
-    var body: some View {
-        Button {
-            metadataEditor.writeAll()
-        } label: {
-            ToolbarLabel {
-                switch metadataEditor.state {
-                case .fine, []:
-                    Image(systemSymbol: .trayAndArrowDownFill)
-                        .imageScale(.small)
-                default:
-                    ProgressView()
-                        .progressViewStyle(.circular)
-                        .controlSize(.small)
+    var body: some CustomizableToolbarContent {
+        ToolbarItem(id: ToolbarItemID.editorSaveUpdate()) {
+            ControlGroup {
+                Button {
+                    metadataEditor.writeAll()
+                } label: {
+                    Label {
+                        switch metadataEditor.state {
+                        case .saving:
+                            Text("Saving…")
+                        default:
+                            Text("Save")
+                        }
+                    } icon: {
+                        switch metadataEditor.state {
+                        case .fine, []:
+                            Image(systemSymbol: .trayAndArrowDownFill)
+                        default:
+                            ProgressView()
+                                .progressViewStyle(.circular)
+                        }
+                    }
                 }
+                .disabled(metadataEditor.state.isSaving || !metadataEditor.isModified)
 
+                Button {
+                    metadataEditor.updateAll()
+                } label: {
+                    Label("Update", systemSymbol: .trayAndArrowUpFill)
+                }
+                .disabled(!metadataEditor.hasMetadata)
+            } label: {
                 switch metadataEditor.state {
                 case .saving:
                     Text("Saving…")
                 default:
-                    Text("Save")
+                    Text("Save/Update")
                 }
             }
         }
-        .disabled(metadataEditor.state.isSaving || !metadataEditor.isModified)
 
-        Button {
-            metadataEditor.restoreAll()
-        } label: {
-            ToolbarLabel {
-                Image(systemSymbol: .arrowUturnLeft)
-                    .imageScale(.small)
-
-                Text("Restore")
+        ToolbarItem(id: ToolbarItemID.editorRestore()) {
+            Button {
+                metadataEditor.restoreAll()
+            } label: {
+                Label("Restore", systemSymbol: .arrowUturnLeft)
             }
-            .foregroundStyle(.red)
+            .disabled(!metadataEditor.isModified)
         }
-        .disabled(!metadataEditor.isModified)
-
-        Button {
-            metadataEditor.updateAll()
-        } label: {
-            ToolbarImageLabel(systemSymbol: .trayAndArrowUpFill)
-                .imageScale(.small)
-        }
-        .disabled(!metadataEditor.hasMetadata)
     }
 }

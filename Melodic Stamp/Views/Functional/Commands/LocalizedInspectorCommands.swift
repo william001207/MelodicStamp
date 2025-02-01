@@ -11,7 +11,7 @@ struct LocalizedInspectorCommands: Commands {
     @FocusedValue(WindowManagerModel.self) private var windowManager
 
     var body: some Commands {
-        CommandGroup(before: .sidebar) {
+        CommandGroup(after: .sidebar) {
             Group {
                 if let windowManager {
                     Button {

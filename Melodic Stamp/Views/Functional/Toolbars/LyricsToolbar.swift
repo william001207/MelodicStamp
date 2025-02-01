@@ -8,25 +8,26 @@
 import Luminare
 import SwiftUI
 
-struct LyricsToolbar: View {
+struct LyricsToolbar: CustomizableToolbarContent {
     @Environment(MetadataEditorModel.self) private var metadataEditor
 
-    var body: some View {
-        LabeledTextEditor(
-            entries: metadataEditor[extracting: \.lyrics],
-            layout: .button, style: .code
-        ) {
-            ToolbarImageLabel(systemSymbol: .pencilLine)
-                .imageScale(.small)
-        } actions: {
-            Image(systemSymbol: .info)
-                .luminarePopover {
-                    Text("""
-                    You can use [AMLL TTML Tool](https://steve-xmh.github.io/amll-ttml-tool) to create TTML lyrics through a refined interface.
-                    """)
-                    .padding()
-                }
+    var body: some CustomizableToolbarContent {
+        ToolbarItem(id: ToolbarItemID.lyricsEdit()) {
+            LabeledTextEditor(
+                entries: metadataEditor[extracting: \.lyrics],
+                layout: .button, style: .code
+            ) {
+                Label("Edit Lyrics", systemSymbol: .pencilLine)
+            } actions: {
+                Image(systemSymbol: .info)
+                    .luminarePopover {
+                        Text("""
+                        You can use [AMLL TTML Tool](https://steve-xmh.github.io/amll-ttml-tool) to create TTML lyrics through a refined interface.
+                        """)
+                        .padding()
+                    }
+            }
+            .disabled(!metadataEditor.hasMetadata)
         }
-        .disabled(!metadataEditor.hasMetadata)
     }
 }

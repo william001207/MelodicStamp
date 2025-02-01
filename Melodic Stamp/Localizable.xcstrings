@@ -14,9 +14,6 @@
         }
       }
     },
-    "%@" : {
-      "shouldTranslate" : false
-    },
     "%lld Tracks" : {
       "localizations" : {
         "en" : {
@@ -184,6 +181,9 @@
           }
         }
       }
+    },
+    "Add" : {
+
     },
     "Add Files" : {
       "localizations" : {
@@ -1346,6 +1346,9 @@
         }
       }
     },
+    "Edit Lyrics" : {
+
+    },
     "Ethereal" : {
       "localizations" : {
         "zh-Hans" : {
@@ -1901,6 +1904,9 @@
           }
         }
       }
+    },
+    "Open" : {
+
     },
     "Open %lld Playlists" : {
       "localizations" : {
@@ -2560,6 +2566,9 @@
         }
       }
     },
+    "Save/Update" : {
+
+    },
     "Saving…" : {
       "localizations" : {
         "zh-Hans" : {
@@ -2809,6 +2818,9 @@
           }
         }
       }
+    },
+    "Update" : {
+
     },
     "Version" : {
       "localizations" : {

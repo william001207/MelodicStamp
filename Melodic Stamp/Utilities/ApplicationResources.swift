@@ -5,24 +5,9 @@
 //  Created by KrLite on 2025/1/21.
 //
 
-import OSLog
 import SwiftUI
 
-protocol TypeNameReflectable {}
-
-extension TypeNameReflectable {
-    static var typeName: String {
-        String(describing: Self.self)
-    }
-
-    static var logger: Logger {
-        .init(subsystem: Bundle.main.bundleIdentifier ?? "Application", category: typeName)
-    }
-
-    var logger: Logger {
-        Self.logger
-    }
-}
+// MARK: - URL Resources
 
 extension URL {
     static let github = URL(string: "https://github.com")!
@@ -34,4 +19,57 @@ extension URL {
     static let playlists = musicDirectory
         .appending(component: Bundle.main[.appName], directoryHint: .isDirectory)
         .appending(component: "Playlists", directoryHint: .isDirectory)
+}
+
+// MARK: - Window ID
+
+enum WindowID: String, Equatable, Hashable, CaseIterable, Identifiable, Codable, RawValueCallableAsFunction {
+    case content
+    case about
+
+    var id: Self { self }
+}
+
+// MARK: - Scene Storage ID
+
+enum SceneStorageID: String, Hashable, Equatable, CaseIterable, Identifiable, Codable, RawValueCallableAsFunction {
+    // MARK: Playlist
+
+    case playlistData
+
+    // MARK: Player
+
+    case playbackVolume, playbackMuted
+
+    var id: Self { self }
+}
+
+// MARK: - Toolbar ID
+
+enum ToolbarID: String, Equatable, Hashable, CaseIterable, Identifiable, Codable, RawValueCallableAsFunction {
+    case editor, file, library, lyrics
+
+    var id: Self { self }
+}
+
+// MARK: - Toolbar Item ID
+
+enum ToolbarItemID: String, Equatable, Hashable, CaseIterable, Identifiable, Codable, RawValueCallableAsFunction {
+    // MARK: Editor
+
+    case editorSaveUpdate, editorRestore
+
+    // MARK: File
+
+    case fileOpen, fileAdd
+
+    // MARK: Library
+
+    case libraryAdd, libraryRemove
+
+    // MARK: Lyrics
+
+    case lyricsEdit
+
+    var id: Self { self }
 }

@@ -8,7 +8,7 @@
 import Defaults
 import SwiftUI
 
-struct LibraryToolbar: View {
+struct LibraryToolbar: CustomizableToolbarContent {
     @Environment(LibraryModel.self) private var library
     @Environment(PresentationManagerModel.self) private var presentationManager
     @Environment(PlaylistModel.self) private var playlist
@@ -18,35 +18,29 @@ struct LibraryToolbar: View {
 
     @Default(.asksForPlaylistInformation) private var asksForPlaylistInformation
 
-    var body: some View {
+    var body: some CustomizableToolbarContent {
         @Bindable var playlist = playlist
 
         if !playlist.mode.isCanonical {
-            Button {
-                presentationManager.isPlaylistSegmentsSheetPresented = asksForPlaylistInformation
-                Task.detached {
-                    try await playlist.makeCanonical()
+            ToolbarItem(id: ToolbarItemID.libraryAdd()) {
+                Button {
+                    presentationManager.isPlaylistSegmentsSheetPresented = asksForPlaylistInformation
+                    Task.detached {
+                        try await playlist.makeCanonical()
+                    }
+                } label: {
+                    Label("Add to Library", systemSymbol: .trayFullFill)
                 }
-            } label: {
-                ToolbarLabel {
-                    Image(systemSymbol: .trayFullFill)
-                        .imageScale(.small)
-
-                    Text("Add to Library")
-                }
+                .disabled(!playlist.canMakeCanonical)
             }
-            .disabled(!playlist.canMakeCanonical)
         } else {
-            Button {
-                presentationManager.isPlaylistRemovalAlertPresented = true
-            } label: {
-                ToolbarLabel {
-                    Image(systemSymbol: .trashFill)
-                        .imageScale(.small)
-
-                    Text("Remove from Library")
+            ToolbarItem(id: ToolbarItemID.libraryRemove()) {
+                Button {
+                    presentationManager.isPlaylistRemovalAlertPresented = true
+                } label: {
+                    Label("Remove from Library", systemSymbol: .trashFill)
                 }
-                .foregroundStyle(.red)
+                .tint(.red)
             }
         }
     }

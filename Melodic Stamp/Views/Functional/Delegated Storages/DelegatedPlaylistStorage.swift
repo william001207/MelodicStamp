@@ -29,10 +29,10 @@ struct DelegatedPlaylistStorage: View {
 
     // MARK: Storages
 
-    @SceneStorage(AppSceneStorage.playlistData()) private var playlistData: Data?
+    @SceneStorage(SceneStorageID.playlistData()) private var playlistData: Data?
 
-    @SceneStorage(AppSceneStorage.playbackVolume()) private var playbackVolume: Double?
-    @SceneStorage(AppSceneStorage.playbackMuted()) private var playbackMuted: Bool?
+    @SceneStorage(SceneStorageID.playbackVolume()) private var playbackVolume: Double?
+    @SceneStorage(SceneStorageID.playbackMuted()) private var playbackMuted: Bool?
 
     // MARK: States
 

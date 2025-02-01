@@ -218,7 +218,7 @@ struct PlaylistView: View {
 
     private var visualInset: CGFloat {
         14
-        // 14 is the top inset of the list
+        // 14 is the top inset of the `List`
     }
 
     private var controlsInset: CGFloat {

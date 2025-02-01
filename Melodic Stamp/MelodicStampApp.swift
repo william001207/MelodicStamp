@@ -9,13 +9,6 @@ import CSFBAudioEngine
 import SwiftUI
 import UniformTypeIdentifiers
 
-enum WindowID: String, Equatable, Hashable, CaseIterable, Identifiable, Codable {
-    case content
-    case about
-
-    var id: Self { self }
-}
-
 @main
 struct MelodicStampApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
@@ -30,7 +23,7 @@ struct MelodicStampApp: App {
     @State private var isAboutWindowPresented: Bool = false
 
     var body: some Scene {
-        WindowGroup(id: WindowID.content.rawValue, for: CreationParameters.self) { $parameters in
+        WindowGroup(id: WindowID.content(), for: CreationParameters.self) { $parameters in
             ContentView(parameters, appDelegate: appDelegate, library: library)
                 .environment(\.appDelegate, appDelegate)
                 .environment(floatingWindows)
@@ -51,9 +44,9 @@ struct MelodicStampApp: App {
             CommandGroup(replacing: .appInfo) {
                 Button("About \(Bundle.main[localized: .displayName])") {
                     if isAboutWindowPresented {
-                        dismissWindow(id: WindowID.about.rawValue)
+                        dismissWindow(id: WindowID.about())
                     } else {
-                        openWindow(id: WindowID.about.rawValue)
+                        openWindow(id: WindowID.about())
                     }
                 }
             }
@@ -69,7 +62,7 @@ struct MelodicStampApp: App {
             WindowCommands()
         }
 
-        Window("About \(Bundle.main[localized: .displayName])", id: WindowID.about.rawValue) {
+        Window("About \(Bundle.main[localized: .displayName])", id: WindowID.about()) {
             AboutView()
                 .onAppear {
                     isAboutWindowPresented = true

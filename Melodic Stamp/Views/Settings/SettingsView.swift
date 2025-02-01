@@ -57,7 +57,7 @@ struct SettingsView: View {
         .frame(minHeight: 500, idealHeight: 778)
         .ignoresSafeArea(.all)
         .toolbar {
-            // Preserves the title bar style
+            // Preserves title bar style
             Color.clear
         }
         .background(MakeCustomizable(customization: { window in
