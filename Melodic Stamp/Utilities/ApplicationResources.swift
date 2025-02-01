@@ -44,14 +44,6 @@ enum SceneStorageID: String, Hashable, Equatable, CaseIterable, Identifiable, Co
     var id: Self { self }
 }
 
-// MARK: - Toolbar ID
-
-enum ToolbarID: String, Equatable, Hashable, CaseIterable, Identifiable, Codable, RawValueCallableAsFunction {
-    case editor, file, library, lyrics
-
-    var id: Self { self }
-}
-
 // MARK: - Toolbar Item ID
 
 enum ToolbarItemID: String, Equatable, Hashable, CaseIterable, Identifiable, Codable, RawValueCallableAsFunction {
