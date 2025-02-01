@@ -8,7 +8,7 @@
 import Defaults
 import SwiftUI
 
-struct LibraryToolbar: CustomizableToolbarContent {
+struct LibraryToolbar: ToolbarContent {
     @Environment(LibraryModel.self) private var library
     @Environment(PresentationManagerModel.self) private var presentationManager
     @Environment(PlaylistModel.self) private var playlist
@@ -18,11 +18,11 @@ struct LibraryToolbar: CustomizableToolbarContent {
 
     @Default(.asksForPlaylistInformation) private var asksForPlaylistInformation
 
-    var body: some CustomizableToolbarContent {
+    var body: some ToolbarContent {
         @Bindable var playlist = playlist
 
         if !playlist.mode.isCanonical {
-            ToolbarItem(id: ToolbarItemID.libraryAdd()) {
+            ToolbarItem {
                 Button {
                     presentationManager.isPlaylistSegmentsSheetPresented = asksForPlaylistInformation
                     Task.detached {
@@ -34,13 +34,13 @@ struct LibraryToolbar: CustomizableToolbarContent {
                 .disabled(!playlist.canMakeCanonical)
             }
         } else {
-            ToolbarItem(id: ToolbarItemID.libraryRemove()) {
+            ToolbarItem {
                 Button {
                     presentationManager.isPlaylistRemovalAlertPresented = true
                 } label: {
                     Label("Remove from Library", systemSymbol: .trashFill)
                 }
-                .tint(.red)
+                .foregroundStyle(.red)
             }
         }
     }

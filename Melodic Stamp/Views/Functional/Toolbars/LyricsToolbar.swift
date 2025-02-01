@@ -8,11 +8,11 @@
 import Luminare
 import SwiftUI
 
-struct LyricsToolbar: CustomizableToolbarContent {
+struct LyricsToolbar: ToolbarContent {
     @Environment(MetadataEditorModel.self) private var metadataEditor
 
-    var body: some CustomizableToolbarContent {
-        ToolbarItem(id: ToolbarItemID.lyricsEdit()) {
+    var body: some ToolbarContent {
+        ToolbarItem {
             LabeledTextEditor(
                 entries: metadataEditor[extracting: \.lyrics],
                 layout: .button, style: .code

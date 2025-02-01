@@ -8,78 +8,76 @@
 import SFSafeSymbols
 import SwiftUI
 
-struct FileToolbar: CustomizableToolbarContent {
+struct FileToolbar: ToolbarContent {
     @Environment(FileManagerModel.self) private var fileManager
     @Environment(PlayerModel.self) private var player
 
-    var body: some CustomizableToolbarContent {
+    var body: some ToolbarContent {
         // `Menu`s cannot be put into one `ControlGroup`, otherwise losing the `.navigation` placement
 
-        Group {
-            ToolbarItem(id: ToolbarItemID.fileOpen(), placement: .navigation) {
-                Menu {
-                    Button {
-                        fileManager.emitOpen(style: .inCurrentPlaylist)
-                    } label: {
-                        Image(systemSymbol: .textLineLastAndArrowtriangleForward)
-
-                        Text("In Current Playlist")
-                    }
-                    .keyboardShortcut("o", modifiers: [])
-
-                    Button {
-                        fileManager.emitOpen(style: .replacingCurrentPlaylistOrSelection)
-                    } label: {
-                        Image(systemSymbol: .textInsert)
-
-                        Text("Replacing Current Playlist")
-                    }
-                    .keyboardShortcut("o", modifiers: .shift)
-                    .modifierKeyAlternate(.option) {
-                        Button {
-                            fileManager.emitOpen(style: .formingNewPlaylist)
-                        } label: {
-                            Image(systemSymbol: .textBadgePlus)
-
-                            Text("Forming New Playlist")
-                        }
-                    }
+        ToolbarItem(placement: .navigation) {
+            Menu {
+                Button {
+                    fileManager.emitOpen(style: .inCurrentPlaylist)
                 } label: {
-                    Label("Open", systemSymbol: .playFill)
+                    Image(systemSymbol: .textLineLastAndArrowtriangleForward)
+
+                    Text("In Current Playlist")
                 }
+                .keyboardShortcut("o", modifiers: [])
+
+                Button {
+                    fileManager.emitOpen(style: .replacingCurrentPlaylistOrSelection)
+                } label: {
+                    Image(systemSymbol: .textInsert)
+
+                    Text("Replacing Current Playlist")
+                }
+                .keyboardShortcut("o", modifiers: .shift)
+                .modifierKeyAlternate(.option) {
+                    Button {
+                        fileManager.emitOpen(style: .formingNewPlaylist)
+                    } label: {
+                        Image(systemSymbol: .textBadgePlus)
+
+                        Text("Forming New Playlist")
+                    }
+                }
+            } label: {
+                Label("Open", systemSymbol: .playFill)
             }
+        }
 
-            ToolbarItem(id: ToolbarItemID.fileAdd(), placement: .navigation) {
-                Menu {
-                    Button {
-                        fileManager.emitAdd(style: .toCurrentPlaylist)
-                    } label: {
-                        Image(systemSymbol: .textLineLastAndArrowtriangleForward)
-
-                        Text("To Current Playlist")
-                    }
-                    .keyboardShortcut("p", modifiers: [])
-
-                    Button {
-                        fileManager.emitAdd(style: .replacingCurrentPlaylistOrSelection)
-                    } label: {
-                        Image(systemSymbol: .textInsert)
-
-                        Text("Replacing Current Playlist")
-                    }
-                    .keyboardShortcut("p", modifiers: .shift)
-                    .modifierKeyAlternate(.option) {
-                        Button {
-                            fileManager.emitAdd(style: .formingNewPlaylist)
-                        } label: {
-                            Image(systemSymbol: .textBadgePlus)
-
-                            Text("Forming New Playlist")
-                        }
-                    }
+        ToolbarItem(placement: .navigation) {
+            Menu {
+                Button {
+                    fileManager.emitAdd(style: .toCurrentPlaylist)
                 } label: {
-                    Label("Add", systemSymbol: .plus)
+                    Image(systemSymbol: .textLineLastAndArrowtriangleForward)
+
+                    Text("To Current Playlist")
                 }
+                .keyboardShortcut("p", modifiers: [])
+
+                Button {
+                    fileManager.emitAdd(style: .replacingCurrentPlaylistOrSelection)
+                } label: {
+                    Image(systemSymbol: .textInsert)
+
+                    Text("Replacing Current Playlist")
+                }
+                .keyboardShortcut("p", modifiers: .shift)
+                .modifierKeyAlternate(.option) {
+                    Button {
+                        fileManager.emitAdd(style: .formingNewPlaylist)
+                    } label: {
+                        Image(systemSymbol: .textBadgePlus)
+
+                        Text("Forming New Playlist")
+                    }
+                }
+            } label: {
+                Label("Add", systemSymbol: .plus)
             }
         }
     }

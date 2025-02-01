@@ -8,11 +8,11 @@
 import SFSafeSymbols
 import SwiftUI
 
-struct EditorToolbar: CustomizableToolbarContent {
+struct EditorToolbar: ToolbarContent {
     @Environment(MetadataEditorModel.self) private var metadataEditor
 
-    var body: some CustomizableToolbarContent {
-        ToolbarItem(id: ToolbarItemID.editorSaveUpdate()) {
+    var body: some ToolbarContent {
+        ToolbarItem(placement: .principal) {
             ControlGroup {
                 Button {
                     metadataEditor.writeAll()
@@ -52,11 +52,13 @@ struct EditorToolbar: CustomizableToolbarContent {
             }
         }
 
-        ToolbarItem(id: ToolbarItemID.editorRestore()) {
+        ToolbarItem(placement: .destructiveAction) {
             Button {
                 metadataEditor.restoreAll()
             } label: {
                 Label("Restore", systemSymbol: .arrowUturnLeft)
+                    .foregroundStyle(.red)
+                    .opacity(metadataEditor.isModified ? 1 : 0.5)
             }
             .disabled(!metadataEditor.isModified)
         }
