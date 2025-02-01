@@ -32,7 +32,7 @@ import SwiftUI
 
             playlist.playlist = samplePlaylist
             playlist.selectedTracks = [sampleTrack]
-            player.play(sampleTrack.url)
+            player.play(sampleTrack)
 
             let floatingWindows = FloatingWindowsModel()
             let presentationManager = PresentationManagerModel(windowManager: windowManager)

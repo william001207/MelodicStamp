@@ -21,11 +21,9 @@ struct Track: Identifiable {
         self.metadata = metadata
     }
 
-    @MainActor init?(loadingFrom url: URL, completion: (() -> ())? = nil) {
+    @MainActor init(loadingFrom url: URL, completion: (() -> ())? = nil) {
         self.url = url
-
-        guard let metadata = Metadata(loadingFrom: url, completion: completion) else { return nil }
-        self.metadata = metadata
+        self.metadata = Metadata(loadingFrom: url, completion: completion)
     }
 
     @MainActor init(migratingFrom oldValue: Track, to url: URL?, useFallbackTitleIfNotProvided useFallbackTitle: Bool = false) throws {
@@ -57,7 +55,6 @@ extension Track: Transferable {
         case invalidURL(Data)
         case invalidFormat(URL)
         case notFileURL(URL)
-        case failedToCreateTrack(URL)
 
         var description: String {
             switch self {
@@ -67,8 +64,6 @@ extension Track: Transferable {
                 "(invalidFormat) The file format is not supported: \(url)."
             case let .notFileURL(url):
                 "(notFileURL) The content behind the URL is not a file: \(url)."
-            case let .failedToCreateTrack(url):
-                "(failedToCreateTrack) Failed to create a track from the provided URL: \(url)."
             }
         }
     }
@@ -81,8 +76,7 @@ extension Track: Transferable {
             guard url.isFileURL else { throw TransferableError.notFileURL(url) }
             guard let url = FileHelper.filter(url: url) else { throw TransferableError.invalidFormat(url) }
 
-            guard let track = await Track(loadingFrom: url) else { throw TransferableError.failedToCreateTrack(url) }
-            return track
+            return await Track(loadingFrom: url)
         }
     }
 }

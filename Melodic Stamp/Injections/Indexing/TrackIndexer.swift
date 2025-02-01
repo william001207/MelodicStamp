@@ -30,7 +30,7 @@ extension TrackIndexer {
         guard !value.isEmpty else { return }
 
         for element in value {
-            guard let track = await Track(loadingFrom: trackURL(for: element)) else { continue }
+            let track = await Track(loadingFrom: trackURL(for: element))
             tracks.append(track)
         }
     }

@@ -145,7 +145,7 @@ struct PlaylistView: View {
         // Handles [⏎] -> play
         .onKeyPress(.return) {
             if playlist.selectedTracks.count == 1, let track = playlist.selectedTracks.first {
-                player.play(track.url)
+                player.play(track)
                 return .handled
             } else {
                 return .ignored
@@ -314,7 +314,7 @@ struct PlaylistView: View {
                 // MARK: Play
 
                 Button {
-                    player.play(track.url)
+                    player.play(track)
                 } label: {
                     Image(systemSymbol: .play)
                 }
@@ -382,7 +382,7 @@ struct PlaylistView: View {
         // MARK: Play
 
         Button {
-            player.play(track.url)
+            player.play(track)
         } label: {
             let title = MusicTitle.stringifiedTitle(mode: .title, for: track)
             if !title.isEmpty {

@@ -163,6 +163,15 @@ extension PlaylistModel {
         try? indexTracks(with: captureIndices())
     }
 
+    @MainActor func play(_ url: URL) async -> Track? {
+        guard let track = await getOrCreateTrack(at: url) else { return nil }
+        playlist.add([track])
+        currentTrack = track
+
+        try? indexTracks(with: captureIndices())
+        return track
+    }
+
     @MainActor func add(_ urls: [URL], at destination: Int? = nil) async {
         var tracks: [Track] = []
         for url in urls {

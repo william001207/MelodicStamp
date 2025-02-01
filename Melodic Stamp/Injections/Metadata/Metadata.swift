@@ -147,13 +147,17 @@ extension Metadata {
         }
     }
 
-    init?(loadingFrom url: URL, completion: (() -> ())? = nil) {
+    init(loadingFrom url: URL, completion: (() -> ())? = nil) {
         self.properties = .init()
         self.state = .loading
         self.url = url
 
         Task.detached {
-            try await self.update(completion: completion)
+            do {
+                try await self.update(completion: completion)
+            } catch {
+                completion?()
+            }
         }
     }
 

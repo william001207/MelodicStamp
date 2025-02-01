@@ -106,7 +106,7 @@ struct PlaylistCommands: Commands {
                     let track = playlist.selectedTracks.first {
                     let title = MusicTitle.stringifiedTitle(mode: .title, for: track)
                     Button {
-                        player.play(track.url)
+                        player.play(track)
                     } label: {
                         if !title.isEmpty {
                             if playlist.currentTrack == track {

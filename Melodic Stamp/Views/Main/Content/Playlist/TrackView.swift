@@ -205,7 +205,7 @@ struct TrackView: View {
     }
 
     private func play() {
-        player.play(track.url)
+        player.play(track)
         bounceAnimationTrigger.toggle()
     }
 }

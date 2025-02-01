@@ -113,7 +113,10 @@ extension PlayerModel {
                 player.setPlaying(isPlaying)
             } else {
                 guard isPlaying else { return }
-                play()
+
+                Task { @MainActor in
+                    play()
+                }
             }
         }
     }
@@ -234,14 +237,17 @@ extension PlayerModel {
 extension PlayerModel {
     // MARK: Play
 
-    func play(_ url: URL) {
-        Task {
-            let track = await playlist?.getOrCreateTrack(at: url)
-            currentTrack = track
+    func play(_ url: URL) async {
+        guard let track = await playlist?.play(url) else { return }
+        play(track)
+    }
 
-            if let track {
-                player.play(track)
-            }
+    func play(_ track: Track?) {
+        if let track {
+            currentTrack = track
+            player.play(track)
+        } else {
+            stop()
         }
     }
 
@@ -251,7 +257,7 @@ extension PlayerModel {
         if isRunning {
             player.play()
         } else if let currentTrack {
-            play(currentTrack.url)
+            play(currentTrack)
         }
     }
 
@@ -277,7 +283,7 @@ extension PlayerModel {
             return
         }
 
-        play(nextTrack.url)
+        play(nextTrack)
     }
 
     func playPreviousTrack() {
@@ -286,7 +292,7 @@ extension PlayerModel {
             return
         }
 
-        play(previousTrack.url)
+        play(previousTrack)
     }
 
     // MARK: Engine
@@ -391,7 +397,7 @@ extension PlayerModel: PlayerDelegate {
             if let playlist, playlist.playbackLooping {
                 if let currentTrack = self.currentTrack {
                     // Plays again
-                    self.play(currentTrack.url)
+                    self.play(currentTrack)
                 }
             } else {
                 // Jumps to next track

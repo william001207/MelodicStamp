@@ -409,10 +409,14 @@ struct ContentView: View {
                 await floatingWindows.addPlayer(to: mainWindow) {
                     floatingPlayerView(mainWindow: mainWindow)
                         .environment(windowManager)
+                        .environment(presentationManager)
+                        .environment(fileManager)
                         .environment(playlist)
                         .environment(player)
                         .environment(keyboardControl)
+                        .environment(metadataEditor)
                         .environment(audioVisualizer)
+                        .environment(gradientVisualizer)
                 }
             }
         }

@@ -47,16 +47,15 @@ enum FileAdderPresentationStyle {
     }
 
     func open(url: URL, openWindow: OpenWindowAction) {
-        guard url.startAccessingSecurityScopedResource() else { return }
-        defer { url.stopAccessingSecurityScopedResource() }
+        guard url.canAccessSecurityScopedResourceOrIsReachable() else { return }
 
         Task { @MainActor in
             switch fileOpenerPresentationStyle {
             case .inCurrentPlaylist:
-                player?.play(url)
+                await player?.play(url)
             case .replacingCurrentPlaylistOrSelection:
                 await playlist?.clear()
-                player?.play(url)
+                await player?.play(url)
             case .formingNewPlaylist:
                 openWindow(id: WindowID.content.rawValue, value: CreationParameters(
                     playlist: .referenced([url]), shouldPlay: true,

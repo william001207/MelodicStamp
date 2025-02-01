@@ -319,18 +319,21 @@ extension Playlist {
                 case .referenced:
                     await continuation.resume(returning: Track(loadingFrom: url))
                 case .canonical:
+                    // 1. Wait for the track to load
                     var track: Track?
-                    if let loadedTrack = await Track(loadingFrom: url, completion: {
+
+                    // 2. Set the loaded track
+                    track = await Track(loadingFrom: url, completion: {
+                        // Completed reading metadata
+                        // 3. Check if the track exists
                         guard let track else { return continuation.resume(returning: nil) }
 
                         Task {
-                            await continuation.resume(returning: try? self.migrateTrack(from: track))
+                            // 4. Migrate the track and return
+                            let migratedTrack = try? await self.migrateTrack(from: track)
+                            continuation.resume(returning: migratedTrack)
                         }
-                    }) {
-                        track = loadedTrack
-                    } else {
-                        continuation.resume(returning: nil)
-                    }
+                    })
                 }
             }
         }

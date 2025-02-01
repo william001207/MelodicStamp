@@ -556,7 +556,7 @@ struct MiniPlayerView: View {
             playlist.currentTrack
         } set: { newValue in
             if let newValue {
-                player.play(newValue.url)
+                player.play(newValue)
             } else {
                 player.stop()
             }
