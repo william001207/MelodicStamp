@@ -8,11 +8,6 @@
 import Defaults
 import SwiftUI
 
-struct AppleMusicLyricsLineGeometry {
-    var y: CGFloat
-    var height: CGFloat
-}
-
 enum AppleMusicLyricsViewAnimationState {
     case intermediate
     case pushed
@@ -78,8 +73,6 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
 
     // MARK: Fields
 
-    var interactionState: AppleMusicLyricsViewInteractionState = .following
-
     var padding: CGFloat = 50
     var delay: TimeInterval = 0.1
     var bounceDelay: TimeInterval = 0.175
@@ -91,13 +84,15 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
 
     @ViewBuilder var content: (_ index: Int, _ isHighlighted: Bool) -> Content
     var indicator: (_ index: Int, _ isHighlighted: Bool) -> AppleMusicLyricsViewIndicator
+    
+    @State private var previousHighlightedRange: Range<Int>?
 
+    @State private var scrollPosition = ScrollPosition(idType: Int.self)
     @State private var containerSize: CGSize = .zero
 
     @State private var contentOffset: [Int: CGFloat] = [:]
-    @State private var lineOffsets: [Int: AppleMusicLyricsLineGeometry] = [:]
+    @State private var lineOffsets: [Int: CGFloat] = [:]
 
-    @State private var isVisible: Bool = false
     @State private var isUserScrolling: Bool = false
 
     @State private var animationStateDispatch: DispatchWorkItem?
@@ -107,127 +102,216 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
     // MARK: Body
 
     var body: some View {
-        ScrollViewReader { proxy in
-            ScrollView {
-                VStack(spacing: 0) {
-                    ForEach(range, id: \.self) { index in
-                        content(at: index)
-                            .id(index)
-                    }
+        
+        ScrollView {
+            
+            Spacer()
+                .frame(height: containerSize.height / 2)
+            
+            LazyVStack(spacing: .zero) {
+                ForEach(range, id: \.self) { index in
+                    content(at: index)
+                        .id(index)
                 }
-                .padding(.vertical, containerSize.height / 2)
             }
-            .coordinateSpace(name: coordinateSpace)
-            .scrollIndicators(isUserScrolling ? .visible : .never)
-            .onScrollPhaseChange { phase, _, _ in
-                switch phase {
-                case .idle:
-                    isVisible = false
-                    isUserScrolling = false
+            
+            Spacer()
+                .frame(height: containerSize.height / 2)
+        }
+        .scrollPosition($scrollPosition, anchor: .center)
+        .scrollIndicators(isUserScrolling ? .visible : .hidden)
 
-                case .interacting, .decelerating, .animating, .tracking:
-                    isVisible = true
-                    isUserScrolling = true
+        .onScrollPhaseChange { _, phase, _ in
+            switch phase {
+            case .idle:
+                isUserScrolling = true
+                
+                animationStateDispatch?.cancel()
+                
+                animationStateDispatch = DispatchWorkItem {
+                    isUserScrolling = false
                 }
+                
+                if let dispatchItem = animationStateDispatch {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: dispatchItem)
+                }
+                
+            case .interacting, .decelerating, .animating, .tracking:
+                isUserScrolling = false
+                
+                animationStateDispatch?.cancel()
             }
-            .onGeometryChange(for: CGSize.self) { proxy in // The code below follows a strict order, do not rearrange arbitrarily
-                proxy.size
-            } action: { newValue in
-                containerSize = newValue
-                resetScrolling(in: proxy)
-            }
-            .onChange(of: identifier, initial: true) { _, _ in // Force reset on external change
-                resetScrolling(in: proxy)
-            }
-            .onChange(of: attachments) { _, _ in
-                resetScrolling(in: proxy)
-            }
-            .onChange(of: dynamicTypeSize) { _, _ in
-                resetScrolling(in: proxy)
-            }
-            .onChange(of: highlightedRange) { _, _ in
-                scrollToHighlighted(in: proxy)
+        }
+        .onGeometryChange(for: CGSize.self) { proxy in // The code below follows a strict order, do not rearrange arbitrarily
+            proxy.size
+        } action: { newValue in
+            containerSize = newValue
+            resetScrolling()
+        }
+        .onChange(of: identifier, initial: true) { _, _ in // Force reset on external change
+            apperScolling()
+        }
+        .onChange(of: attachments) { _, _ in
+            resetScrolling()
+        }
+        .onChange(of: dynamicTypeSize) { _, _ in
+            resetScrolling()
+        }
+        .onChange(of: highlightedRange) { oldValue, newValue in
+            let isLowerBoundJumped = abs(newValue.lowerBound - oldValue.lowerBound) > 1
+            let isUpperBoundJumped = abs(newValue.upperBound - oldValue.upperBound) > 1
+            let isJumped = newValue.lowerBound < oldValue.lowerBound || (isLowerBoundJumped && isUpperBoundJumped)
+            
+            if isJumped {
+                resetScrolling()
+            } else {
+                scrollToHighlighted()
             }
         }
         .onAppear {
-            isVisible = true
-            isVisible = false
+            apperScolling()
         }
     }
 
     @ViewBuilder private func content(at index: Int) -> some View {
         let isHighlighted = highlightedRange.contains(index)
-        let isInRange = (highlightedRange.lowerBound - 5...highlightedRange.upperBound + 5).contains(index)
-        let isDot = index == highlightedRange.lowerBound
-
-        if isVisible || isInRange {
-            content(index, isHighlighted)
-                .background {
-                    if index == highlightedRange.lowerBound {
-                        switch indicator(index, isHighlighted) {
-                        case .invisible:
-                            EmptyView()
-                        case let .visible(content):
-                            content
-                        }
+        
+        content(index, isHighlighted)
+            .padding(.vertical, 10)
+            .onGeometryChange(for: CGSize.self) { proxy in
+                proxy.size
+            } action: { newValue in
+                lineOffsets[index] = newValue.height
+            }
+            .offset(y: contentOffset[index] ?? 0)
+            .background {
+                if index == highlightedRange.lowerBound {
+                    switch indicator(index, isHighlighted) {
+                    case .invisible:
+                        EmptyView()
+                    case let .visible(content):
+                        content
+                            .padding(.vertical, 10)
                     }
                 }
-                .padding(.vertical, 10)
-                .background {
-                    GeometryReader { reader in
-                        Color.clear.task(id: reader.frame(in: .named(coordinateSpace))) {
-                            lineOffsets[index] = AppleMusicLyricsLineGeometry(
-                                y: reader.frame(in: .named(coordinateSpace)).minY,
-                                height: reader.size.height
-                            )
-                        }
-                    }
-                }
-                .offset(y: contentOffset[index] ?? 0)
-
-        } else {
-            Spacer()
-                .frame(height: lineOffsets[index]?.height ?? 20)
-        }
+            }
+        
     }
 
     // MARK: Funcitons
-
-    private func resetScrolling(in proxy: ScrollViewProxy) {
+    
+    private func apperScolling() {
         let index = max(0, min(range.upperBound - 1, highlightedRange.lowerBound))
-        isVisible = true
-        proxy.scrollTo(index, anchor: alignment.unitPoint)
-        isVisible = false
+        guard let offset = lineOffsets[index] else { return }
+        
+        withAnimation(nil) {
+            scrollPosition.scrollTo(id: index, anchor: .center)
+            for adjustItem in range {
+                contentOffset[adjustItem] = offset
+            }
+        }
     }
 
-    private func scrollToHighlighted(in proxy: ScrollViewProxy) {
+    private func resetScrolling() {
+        scrollPosition.scrollTo(id: highlightedRange.lowerBound, anchor: .center)
+        
+        for idx in range {
+            contentOffset[idx] = 0
+        }
+    }
+
+    private func scrollToHighlighted() {
+        
         let index = max(0, min(range.upperBound - 1, highlightedRange.lowerBound))
-        let adjustItems = max(0, index - 5) ..< index + 5
-
+        
         guard let offset = lineOffsets[index] else { return }
-
+        
+        let previousOffset = (index > 0) ? (lineOffsets[index - 1] ?? 0) : 0
+        let nextOffset = (index < lineOffsets.count - 1) ? (lineOffsets[index] ?? 0) : 0
+        
+        let diffBefore = abs(CGFloat(offset) - CGFloat(previousOffset))
+        let diffAfter = abs(CGFloat(nextOffset) - CGFloat(offset))
+        
+        let compensate: CGFloat
+        if diffBefore > diffAfter {
+            compensate = (CGFloat(previousOffset) - CGFloat(offset)) / 2
+        } else {
+            compensate = (CGFloat(nextOffset) - CGFloat(offset)) / 2
+        }
+        
         withAnimation(nil) {
-            proxy.scrollTo(index, anchor: .center)
-            for adjustItem in adjustItems {
-                contentOffset[adjustItem] = offset.height
+            if let range = previousHighlightedRange, highlightedRange.lowerBound != range.lowerBound {
+                
+                if highlightedRange.lowerBound != self.range.upperBound {
+                    
+                    scrollPosition.scrollTo(id: index, anchor: .center)
+                    
+                    var testOffset: CGFloat = 0
+                    
+                    var totalOffset: CGFloat = (range.lowerBound..<range.upperBound).reduce(0) { result, idx in
+                        testOffset = result
+                        return result + (lineOffsets[idx] ?? 0)
+                    }
+                    
+                    
+                    
+                    for idx in (highlightedRange.lowerBound..<highlightedRange.upperBound) {
+                        if highlightedRange.lowerBound != highlightedRange.upperBound {
+                            if highlightedRange.upperBound != self.range.upperBound {
+                                totalOffset = (lineOffsets[idx] ?? 0) + compensate + testOffset
+                            } else {
+                                totalOffset = totalOffset
+                            }
+                        } else {
+                            totalOffset = totalOffset
+                        }
+                    }
+                    
+                    for idx in (index - 10)..<index where idx >= 0 {
+                        contentOffset[idx] = totalOffset
+                    }
+                    
+                    for idx in index..<index + 10 {
+                        contentOffset[idx] = totalOffset
+                    }
+                }
             }
         }
-
-        var delay = max(0.0, 0.08 * Double(5 - index))
-
-        for idx in adjustItems {
-            delay += 0.08
-            withAnimation(.spring(duration: 0.6, bounce: 0.275).delay(delay)) {
-                contentOffset[idx] = 0
+        
+        if highlightedRange.lowerBound != self.range.upperBound {
+            var delay = 0.08
+            
+            for idx in (index - 10)..<index where idx >= 0 {
+                withAnimation(.spring(duration: 0.6, bounce: 0.275)) {
+                    contentOffset[idx] = 0
+                }
+            }
+            
+            if highlightedRange.upperBound != highlightedRange.lowerBound {
+                for idx in index..<index + 10 {
+                    delay += 0.08
+                    withAnimation(.spring(duration: 0.6, bounce: 0.275).delay(delay)) {
+                        contentOffset[idx] = 0
+                    }
+                }
+            } else if let range = previousHighlightedRange, highlightedRange.lowerBound != range.lowerBound {
+                for idx in index..<index + 10 {
+                    delay += 0.08
+                    withAnimation(.spring(duration: 0.6, bounce: 0.275).delay(delay)) {
+                        contentOffset[idx] = previousOffset
+                    }
+                }
             }
         }
+        
+        previousHighlightedRange = highlightedRange
     }
 }
 
 // MARK: - Preview
 
 #Preview {
-    @Previewable @State var highlightedRange: Range<Int> = 0 ..< 1
+    @Previewable @State var highlightedRange: Range<Int> = 0 ..< 0
     @Previewable @State var alignment: AppleMusicLyricsViewAlignment = .top
     let count = 20
 
@@ -240,6 +324,18 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
                     .tag(AppleMusicLyricsViewAlignment.center)
             }
             .pickerStyle(SegmentedPickerStyle())
+            
+            Button("Waiting") {
+                highlightedRange = highlightedRange.lowerBound + 1 ..< highlightedRange.upperBound
+            }
+            
+            Button("Next") {
+                highlightedRange = highlightedRange.lowerBound + 1 ..< highlightedRange.upperBound + 1
+            }
+            
+            Button("Cancel waiting") {
+                highlightedRange = highlightedRange.lowerBound ..< highlightedRange.upperBound + 1
+            }
 
             HStack {
                 let upperBound = highlightedRange.upperBound
@@ -335,7 +431,7 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
             Text("\(index)")
                 .font(.title)
                 .shadow(radius: 4)
-                .frame(height: 50)
+                .frame(height: index % 2 == 0 ? 70 : 50)
                 .frame(maxWidth: .infinity)
                 .background(Color(
                     hue: Double(index) / Double(count),
@@ -347,10 +443,13 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
             .visible {
                 HStack {
                     Circle()
+                        .frame(width: 10)
                     Circle()
+                        .frame(width: 10)
                     Circle()
+                        .frame(width: 10)
                 }
-                .frame(height: 10)
+                .frame(maxHeight: .infinity, alignment: .center)
             }
         }
         .border(.foreground)

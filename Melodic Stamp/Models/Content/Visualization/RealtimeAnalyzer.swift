@@ -17,6 +17,7 @@ class RealtimeAnalyzer {
     public var startFrequency: Float = 80 // Initial frequency
     public var endFrequency: Float = 18000 // Cutoff frequency
 
+    @MainActor
     private lazy var bands: [(lowerFrequency: Float, upperFrequency: Float)] = {
         var bands = [(lowerFrequency: Float, upperFrequency: Float)]()
 
@@ -47,6 +48,7 @@ class RealtimeAnalyzer {
         self.fftSize = fftSize
     }
 
+    @MainActor
     func analyze(with buffer: AVAudioPCMBuffer) -> [[Float]] {
         let channelsAmplitudes = fft(buffer)
         let aWeights = createFrequencyWeights()
@@ -70,6 +72,7 @@ class RealtimeAnalyzer {
         return spectrumBuffer
     }
 
+    @MainActor
     private func fft(_ buffer: AVAudioPCMBuffer) -> [[Float]] {
         var amplitudes = [[Float]]()
         guard let floatChannelData = buffer.floatChannelData else { return amplitudes }

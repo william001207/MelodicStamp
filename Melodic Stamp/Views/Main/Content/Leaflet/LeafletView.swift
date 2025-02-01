@@ -47,22 +47,22 @@ struct LeafletView: View {
         if !player.hasCurrentTrack {
             ExcerptView(tab: SidebarContentTab.leaflet)
         } else {
-            ZStack {
+            VStack {
                 if hasCover || hasLyrics {
                     HStack(spacing: 0) {
                         if hasCover {
                             Spacer(minLength: 0)
                         }
-
+                        
                         HStack(spacing: 50) {
                             // MARK: Cover
-
+                            
                             if hasCover, let cover {
                                 coverView(cover)
                             }
-
+                            
                             // MARK: Lyrics
-
+                            
                             if hasLyrics, isShowingLyrics {
                                 lyricsView()
                                     .transition(.blurReplace(.downUp))
@@ -70,7 +70,7 @@ struct LeafletView: View {
                                     .frame(maxWidth: max(Double(maxWidth), innerSize.width / 2))
                             }
                         }
-
+                        
                         if !hasLyrics || !isShowingLyrics {
                             Spacer(minLength: 0)
                         }
@@ -117,8 +117,8 @@ struct LeafletView: View {
             .background {
                 windowBackgroundView()
             }
-//            .animation(.bouncy, value: hasLyrics)
-//            .animation(.bouncy, value: isShowingLyrics)
+            .animation(.bouncy, value: hasLyrics)
+            .animation(.bouncy, value: isShowingLyrics)
             .focusable()
             .focusEffectDisabled()
             .focused($isFocused)
@@ -229,7 +229,7 @@ struct LeafletView: View {
                 .buttonStyle(.alive(isOn: $player.isPlaying))
             }
         }
-//        .matchedGeometryEffect(id: "cover", in: namespace)
+        .matchedGeometryEffect(id: "cover", in: namespace)
         .containerRelativeFrame(.vertical, alignment: .center) { length, axis in
             switch axis {
             case .horizontal:
@@ -245,28 +245,7 @@ struct LeafletView: View {
     // MARK: - Lyrics View
 
     @ViewBuilder private func lyricsView() -> some View {
-        DisplayLyricsView(interactionState: $interaction.state) { position, _ in
-            guard position.isPositionedByUser else { return }
-            interaction.reset()
-        }
-//        .overlay(alignment: .trailing) {
-//            Group {
-//                if !interaction.state.isDelegated {
-//                    AppleMusicLyricsViewInteractionStateButton(
-//                        interactionState: $interaction.state,
-//                        progress: interaction.delegationProgress,
-//                        hasProgressRing: interaction.hasProgressRing && interaction.delegationProgress > 0
-//                    )
-//                    .tint(.white)
-//                    .transition(.blurReplace(.downUp))
-//                }
-//            }
-//            .animation(.bouncy, value: interaction.state.isDelegated)
-//            .padding(12)
-//            .alignmentGuide(.trailing) { d in
-//                d[.leading]
-//            }
-//        }
+        DisplayLyricsView()
     }
 
     // MARK: - Window Background

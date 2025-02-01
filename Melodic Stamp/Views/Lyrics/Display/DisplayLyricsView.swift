@@ -31,8 +31,8 @@ struct DisplayLyricsView: View {
 
     @Default(.lyricsAttachments) private var attachments
 
-    @Binding var interactionState: AppleMusicLyricsViewInteractionState
-    var onScrolling: ((ScrollPosition, CGPoint) -> ())?
+//    @Binding var interactionState: AppleMusicLyricsViewInteractionState
+//    var onScrolling: ((ScrollPosition, CGPoint) -> ())?
 
     @State private var isHovering: Bool = false
     @State private var hoveredIndex: Int? = nil
@@ -45,7 +45,7 @@ struct DisplayLyricsView: View {
         Group {
             if !lines.isEmpty {
                 AppleMusicLyricsView(
-                    interactionState: interactionState,
+//                    interactionState: interactionState,
                     range: 0 ..< lines.count,
                     highlightedRange: highlightedRange,
                     alignment: .center,
@@ -55,8 +55,8 @@ struct DisplayLyricsView: View {
                         line: lines[index], index: index,
                         highlightedRange: highlightedRange,
                         elapsedTime: elapsedTime,
-                        shouldFade: !isHovering,
-                        shouldAnimate: interactionState.isDelegated
+                        shouldFade: !isHovering
+//                        shouldAnimate: interactionState.isDelegated
                     )
                 } indicator: { index, _ in
                     let span = lyrics.storage?.parser.duration(before: index)
@@ -72,7 +72,6 @@ struct DisplayLyricsView: View {
                                 ProgressDotsContainerView(elapsedTime: elapsedTime, beginTime: beginTime, endTime: endTime)
                                     .padding(8.5)
                                     .frame(maxWidth: .infinity, alignment: .leading)
-                                    .padding(.bottom, 21)
                             }
                         } else { .invisible }
                     } else { return .invisible }
