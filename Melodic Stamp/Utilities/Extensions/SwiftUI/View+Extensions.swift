@@ -31,22 +31,6 @@ extension View {
         modifier(HoverableBackgroundModifier(isExplicitlyVisible: isExplicitlyVisible))
     }
 
-    @ViewBuilder func continuousRippleEffect(lerpFactor: CGFloat = 0.2) -> some View {
-        modifier(ContinuousRippleEffectModifier(lerpFactor: lerpFactor))
-    }
-
-    @ViewBuilder func motionCard(
-        scale: CGFloat = 1.02, angle: Angle = .degrees(3.5),
-        shadowColor: Color = .black.opacity(0.1), shadowRadius: CGFloat = 10,
-        glintColor: Color = .white.opacity(0.1), glintRadius: CGFloat = 50
-    ) -> some View {
-        modifier(MotionCardModifier(
-            scale: scale, angle: angle,
-            shadowColor: shadowColor, shadowRadius: shadowRadius,
-            glintColor: glintColor, glintRadius: glintRadius
-        ))
-    }
-
     @ViewBuilder func presentationAttachmentBar(
         edge: VerticalEdge, material: Material = .regular,
         @ViewBuilder attachment: @escaping () -> some View

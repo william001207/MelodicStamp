@@ -15,9 +15,12 @@ struct SettingsDynamicTitleBarControl: View {
         Picker(selection: $dynamicTitleBar) {
             ForEach(Defaults.DynamicTitleBar.allCases) { mode in
                 switch mode {
-                case .never: Text("Never")
-                case .always: Text("Always")
-                case .whilePlaying: Text("While playing")
+                case .never:
+                    Text("Never")
+                case .always:
+                    Text("Always")
+                case .whilePlaying:
+                    Text("While playing")
                 }
             }
         } label: {

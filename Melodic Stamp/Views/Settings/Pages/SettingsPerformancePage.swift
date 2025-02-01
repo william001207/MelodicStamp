@@ -15,7 +15,7 @@ struct SettingsPerformancePage: View {
         )
 
         Section {
-            SettingsReduceMotionControl()
+            SettingsMotionLevelControl()
         }
 
         Section("Gradient") {

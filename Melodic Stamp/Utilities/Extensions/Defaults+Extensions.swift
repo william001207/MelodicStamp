@@ -17,9 +17,9 @@ extension Defaults.Keys {
         default: .whilePlaying
     )
 
-    static let reduceMotion: Key<Bool> = .init(
-        "reduceMotion",
-        default: false
+    static let motionLevel: Key<Defaults.MotionLevel> = .init(
+        "motionLevel",
+        default: .fancy
     )
 
     // MARK: Behaviors

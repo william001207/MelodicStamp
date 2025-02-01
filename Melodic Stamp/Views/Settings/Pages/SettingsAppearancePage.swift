@@ -18,7 +18,7 @@ struct SettingsAppearancePage: View {
         Section {
             SettingsDynamicTitleBarControl()
 
-            SettingsReduceMotionControl()
+            SettingsMotionLevelControl()
         }
 
         Section("Background Styles") {
