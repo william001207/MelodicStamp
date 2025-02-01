@@ -88,11 +88,13 @@ struct ContentView: View {
 
     init(_ parameters: CreationParameters, appDelegate: AppDelegate, library: LibraryModel) {
         let date = Date()
+
+        let windowManager = WindowManagerModel(style: parameters.initialWindowStyle, appDelegate: appDelegate)
         let playlist = PlaylistModel(bindingTo: parameters.id, library: library)
         let player = PlayerModel(SFBAudioEnginePlayer(), library: library, playlist: playlist)
 
-        self.windowManager = WindowManagerModel(style: parameters.initialWindowStyle, appDelegate: appDelegate)
-        self.presentationManager = PresentationManagerModel()
+        self.windowManager = windowManager
+        self.presentationManager = PresentationManagerModel(windowManager: windowManager)
         self.fileManager = FileManagerModel(player: player, playlist: playlist)
         self.playlist = playlist
         self.player = player
@@ -138,6 +140,7 @@ struct ContentView: View {
                 DelegatedPlaylistStateStorage()
 
                 UnsavedChangesPresentation()
+                UnsavedPlaylistPresentation()
                 PlaylistPresentation()
             }
 

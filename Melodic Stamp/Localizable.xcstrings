@@ -802,6 +802,7 @@
       }
     },
     "Close" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -812,6 +813,7 @@
       }
     },
     "Close Anyway" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -2203,6 +2205,9 @@
         }
       }
     },
+    "Proceed Anyway" : {
+
+    },
     "Publisher Logo" : {
       "localizations" : {
         "zh-Hans" : {
@@ -2528,7 +2533,11 @@
         }
       }
     },
+    "Save All" : {
+
+    },
     "Save All and Close" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -2539,6 +2548,7 @@
       }
     },
     "Save and Close" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -2800,6 +2810,9 @@
           }
         }
       }
+    },
+    "Unsaved Playlist" : {
+
     },
     "Version" : {
       "localizations" : {

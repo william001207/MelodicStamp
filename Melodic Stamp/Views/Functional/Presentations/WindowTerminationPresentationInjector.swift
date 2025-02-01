@@ -25,18 +25,10 @@ struct WindowTerminationPresentationInjector<Parent>: View where Parent: View {
                     player.stop()
                     appDelegate?.destroy(window: window)
                 } else {
-                    windowManager.state = .closePending
+                    presentationManager.startStaging()
                     appDelegate?.suspend(window: window)
                 }
             })
-            .onChange(of: windowManager.state) { _, newValue in
-                switch newValue {
-                case .idle, .closeCanceled, .willClose:
-                    presentationManager.reset()
-                case .closePending:
-                    presentationManager.startStaging()
-                }
-            }
     }
 
     private var hasUnsavedChanges: Bool {

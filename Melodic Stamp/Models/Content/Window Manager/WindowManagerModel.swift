@@ -91,6 +91,7 @@ extension WindowManagerModel {
         switch state {
         case .closeCanceled:
             appDelegate?.resumeWindowSuspension()
+            self.state = .idle
         case .willClose:
             DispatchQueue.main.async {
                 self.window?.performClose(nil)

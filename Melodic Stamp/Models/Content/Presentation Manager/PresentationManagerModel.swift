@@ -60,6 +60,12 @@ enum MelodicStampPresentationState: String, Equatable, Hashable, CaseIterable, I
 }
 
 @Observable final class PresentationManagerModel {
+    private weak var windowManager: WindowManagerModel?
+
+    init(windowManager: WindowManagerModel) {
+        self.windowManager = windowManager
+    }
+
     var state: MelodicStampPresentationState = .idle {
         didSet { update(to: state) }
     }
@@ -81,23 +87,41 @@ enum MelodicStampPresentationState: String, Equatable, Hashable, CaseIterable, I
 extension PresentationManagerModel {
     func startStaging() {
         guard state.isIdle else { return }
+        windowManager?.state = .closePending
         state = state.nextStage
+    }
+
+    func cancelStaging() {
+        windowManager?.state = .closeCanceled
+        state = .idle
     }
 
     func nextStep() {
         guard !state.isIdle else {
-            reset()
+            state = .idle
             return
         }
-        state = state.nextStep
+
+        if state.nextStep.isIdle {
+            state = .idle
+            windowManager?.state = .willClose
+        } else {
+            state = state.nextStep
+        }
     }
 
     func nextStage() {
         guard !state.isIdle else {
-            reset()
+            state = .idle
             return
         }
-        state = state.nextStage
+
+        if state.nextStep.isIdle {
+            state = .idle
+            windowManager?.state = .willClose
+        } else {
+            state = state.nextStage
+        }
     }
 
     func reset() {

@@ -8,7 +8,6 @@
 import SwiftUI
 
 struct UnsavedChangesPresentation: View {
-    @Environment(WindowManagerModel.self) private var windowManager
     @Environment(PresentationManagerModel.self) private var presentationManager
     @Environment(PlaylistModel.self) private var playlist
     @Environment(PlayerModel.self) private var player
@@ -53,8 +52,8 @@ struct UnsavedChangesPresentation: View {
 
     @ViewBuilder private func alertContent() -> some View {
         if modifiedFineMetadataSet.isEmpty, !modifiedMetadataSet.isEmpty {
-            Button("Close") {
-                close()
+            Button("Proceed") {
+                presentationManager.nextStage()
             }
         } else {
             if modifiedMetadataSet.count > 1 {
@@ -62,19 +61,23 @@ struct UnsavedChangesPresentation: View {
                     presentationManager.nextStep()
                 }
             } else {
-                Button("Save and Close") {
+                Button("Save") {
                     playlist.writeAll {
                         if modifiedMetadataSet.isEmpty {
-                            close()
+                            presentationManager.nextStage()
                         }
                     }
                 }
             }
 
-            closeAnywayButton()
+            Button("Proceed Anyway", role: .destructive) {
+                presentationManager.nextStage()
+            }
         }
 
-        cancelButton()
+        Button("Cancel", role: .cancel) {
+            presentationManager.cancelStaging()
+        }
     }
 
     @ViewBuilder private func alertMessage() -> some View {
@@ -86,8 +89,10 @@ struct UnsavedChangesPresentation: View {
             .frame(minWidth: 500, minHeight: 280)
             .presentationAttachmentBar(edge: .bottom) {
                 Group {
-                    cancelButton()
-                        .buttonStyle(.alive(enabledStyle: .secondary, hoveringStyle: .tertiary))
+                    Button("Cancel", role: .cancel) {
+                        presentationManager.cancelStaging()
+                    }
+                    .buttonStyle(.alive(enabledStyle: .secondary, hoveringStyle: .tertiary))
 
                     Divider()
 
@@ -97,19 +102,21 @@ struct UnsavedChangesPresentation: View {
                     Spacer()
 
                     if modifiedFineMetadataSet.isEmpty, !modifiedMetadataSet.isEmpty {
-                        Button("Close", role: .destructive) {
-                            close()
+                        Button("Proceed", role: .destructive) {
+                            presentationManager.nextStage()
                         }
                         .buttonStyle(.borderedProminent)
                         .keyboardShortcut(.return, modifiers: [])
                     } else {
-                        closeAnywayButton()
-                            .foregroundStyle(.red)
+                        Button("Proceed Anyway", role: .destructive) {
+                            presentationManager.nextStage()
+                        }
+                        .foregroundStyle(.red)
 
-                        Button("Save All and Close") {
+                        Button("Save All") {
                             playlist.writeAll {
                                 if modifiedMetadataSet.isEmpty {
-                                    close()
+                                    presentationManager.nextStage()
                                 }
                             }
                         }
@@ -120,27 +127,5 @@ struct UnsavedChangesPresentation: View {
                 .buttonStyle(.alive)
             }
             .presentationSizing(.form)
-    }
-
-    @ViewBuilder private func closeAnywayButton() -> some View {
-        Button("Close Anyway", role: .destructive) {
-            close()
-        }
-    }
-
-    @ViewBuilder private func cancelButton() -> some View {
-        Button("Cancel", role: .cancel) {
-            cancel()
-        }
-    }
-
-    private func close() {
-        presentationManager.state = .idle
-        windowManager.state = .willClose
-    }
-
-    private func cancel() {
-        presentationManager.state = .idle
-        windowManager.state = .closeCanceled
     }
 }

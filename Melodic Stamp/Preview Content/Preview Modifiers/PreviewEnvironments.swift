@@ -26,16 +26,16 @@ import SwiftUI
 
         static func makeSharedContext() async throws -> Context {
             let library = LibraryModel()
+            let windowManager = WindowManagerModel(appDelegate: AppDelegate())
             let playlist = PlaylistModel(library: library)
-            playlist.playlist = samplePlaylist
             let player = PlayerModel(BlankPlayer(), library: library, playlist: playlist)
 
+            playlist.playlist = samplePlaylist
             playlist.selectedTracks = [sampleTrack]
             player.play(sampleTrack.url)
 
             let floatingWindows = FloatingWindowsModel()
-            let windowManager = WindowManagerModel(appDelegate: AppDelegate())
-            let presentationManager = PresentationManagerModel()
+            let presentationManager = PresentationManagerModel(windowManager: windowManager)
             let fileManager = FileManagerModel(player: player, playlist: playlist)
             let keyboardControl = KeyboardControlModel(player: player)
             let metadataEditor = MetadataEditorModel(playlist: playlist)
