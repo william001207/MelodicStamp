@@ -14,6 +14,7 @@ import SwiftUI
             floatingWindows: FloatingWindowsModel,
             library: LibraryModel,
             windowManager: WindowManagerModel,
+            presentationManager: PresentationManagerModel,
             fileManager: FileManagerModel,
             playlist: PlaylistModel,
             player: PlayerModel,
@@ -29,16 +30,17 @@ import SwiftUI
             playlist.playlist = samplePlaylist
             let player = PlayerModel(BlankPlayer(), library: library, playlist: playlist)
 
+            playlist.selectedTracks = [sampleTrack]
+            player.play(sampleTrack.url)
+
             let floatingWindows = FloatingWindowsModel()
-            let windowManager = WindowManagerModel()
+            let windowManager = WindowManagerModel(appDelegate: AppDelegate())
+            let presentationManager = PresentationManagerModel()
             let fileManager = FileManagerModel(player: player, playlist: playlist)
             let keyboardControl = KeyboardControlModel(player: player)
-            let metadataEditor = MetadataEditorModel(player: player)
+            let metadataEditor = MetadataEditorModel(playlist: playlist)
             let audioVisualizer = AudioVisualizerModel()
             let gradientVisualizer = GradientVisualizerModel()
-
-            player.selectedTracks = [sampleTrack]
-            player.play(sampleTrack.url)
 
             let image = NSImage(resource: .templateArtwork)
             await gradientVisualizer.updateDominantColors(from: image)
@@ -47,6 +49,7 @@ import SwiftUI
                 floatingWindows,
                 library,
                 windowManager,
+                presentationManager,
                 fileManager,
                 playlist,
                 player,
@@ -62,7 +65,9 @@ import SwiftUI
                 .environment(context.floatingWindows)
                 .environment(context.library)
                 .environment(context.windowManager)
+                .environment(context.presentationManager)
                 .environment(context.fileManager)
+                .environment(context.playlist)
                 .environment(context.player)
                 .environment(context.keyboardControl)
                 .environment(context.metadataEditor)

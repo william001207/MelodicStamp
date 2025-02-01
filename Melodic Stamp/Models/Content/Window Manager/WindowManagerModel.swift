@@ -11,33 +11,51 @@ enum MelodicStampWindowStyle: String, Equatable, Hashable, CaseIterable, Identif
     case main
     case miniPlayer
 
-    var id: Self {
-        self
+    var id: Self { self }
+}
+
+enum MelodicStampWindowState: String, Equatable, Hashable, CaseIterable, Identifiable, Codable {
+    case idle
+    case closePending
+    case closeCanceled
+    case willClose
+
+    var id: Self { self }
+
+    var shouldForceClose: Bool {
+        switch self {
+        case .willClose:
+            true
+        default:
+            false
+        }
     }
 }
 
 @Observable final class WindowManagerModel {
-    var style: MelodicStampWindowStyle {
-        didSet {
-            switch style {
-            case .main:
-                isAlwaysOnTop = false
-            case .miniPlayer:
-                isAlwaysOnTop = true
-            }
-        }
-    }
-
-    var hasConcreteParameters: Bool = false
-    var isInspectorPresented: Bool = false
-    var isAlwaysOnTop: Bool = false
+    private weak var appDelegate: AppDelegate?
+    private weak var window: NSWindow?
     private(set) var isInFullScreen: Bool = false
 
-    init(style: MelodicStampWindowStyle = .main) {
+    var style: MelodicStampWindowStyle {
+        didSet { update(to: style) }
+    }
+
+    var isInspectorPresented: Bool = false
+    var isAlwaysOnTop: Bool = false
+
+    var hasConcreteParameters: Bool = false
+    var state: MelodicStampWindowState = .idle {
+        didSet { update(to: state) }
+    }
+
+    init(style: MelodicStampWindowStyle = .main, appDelegate: AppDelegate) {
         self.style = style
+        self.appDelegate = appDelegate
     }
 
     func observe(_ window: NSWindow? = nil) {
+        self.window = window
         NotificationCenter.default.removeObserver(self)
         guard let window else { return }
 
@@ -56,6 +74,30 @@ enum MelodicStampWindowStyle: String, Equatable, Hashable, CaseIterable, Identif
             name: NSWindow.didExitFullScreenNotification,
             object: window
         )
+    }
+}
+
+extension WindowManagerModel {
+    func update(to style: MelodicStampWindowStyle) {
+        switch style {
+        case .main:
+            isAlwaysOnTop = false
+        case .miniPlayer:
+            isAlwaysOnTop = true
+        }
+    }
+
+    func update(to state: MelodicStampWindowState) {
+        switch state {
+        case .closeCanceled:
+            appDelegate?.resumeWindowSuspension()
+        case .willClose:
+            DispatchQueue.main.async {
+                self.window?.performClose(nil)
+            }
+        default:
+            break
+        }
     }
 }
 

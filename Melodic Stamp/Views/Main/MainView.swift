@@ -12,7 +12,7 @@ import SwiftUI
 struct MainView: View {
     @Environment(WindowManagerModel.self) private var windowManager
     @Environment(FileManagerModel.self) private var fileManager
-    @Environment(PlayerModel.self) private var player
+    @Environment(PlaylistModel.self) private var playlist
     @Environment(MetadataEditorModel.self) private var metadataEditor
 
     @Environment(\.appearsActive) private var appearsActive
@@ -33,7 +33,7 @@ struct MainView: View {
                 inspector()
                     .ignoresSafeArea()
                     .inspectorColumnWidth(min: 300, ideal: 400, max: 700)
-                    .animation(nil, value: player.selectedTracks) // Remove strange transitions when selection changes
+                    .animation(nil, value: playlist.selectedTracks) // Remove strange transitions when selection changes
             }
             .luminareMinHeight(38)
     }
@@ -64,8 +64,6 @@ struct MainView: View {
     }
 
     @ViewBuilder private func inspector() -> some View {
-        @Bindable var player = player
-
         Group {
             switch selectedInspectorTab {
             case .commonMetadata:

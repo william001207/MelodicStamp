@@ -31,7 +31,7 @@ struct MelodicStampApp: App {
 
     var body: some Scene {
         WindowGroup(id: WindowID.content.rawValue, for: CreationParameters.self) { $parameters in
-            ContentView(parameters, library: library)
+            ContentView(parameters, appDelegate: appDelegate, library: library)
                 .environment(\.appDelegate, appDelegate)
                 .environment(floatingWindows)
                 .environment(library)

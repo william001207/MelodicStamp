@@ -9,9 +9,7 @@ import SwiftUI
 
 @Observable final class AppleMusicLyricsViewInteractionModel {
     var state: AppleMusicLyricsViewInteractionState = .following {
-        didSet {
-            update(state)
-        }
+        didSet { update(to: state) }
     }
 
     var countDownDelay: TimeInterval = 1
@@ -27,7 +25,7 @@ import SwiftUI
         state = .intermediate
     }
 
-    func update(_ state: AppleMusicLyricsViewInteractionState) {
+    func update(to state: AppleMusicLyricsViewInteractionState) {
         switch state {
         case .following:
             dispatch?.cancel()

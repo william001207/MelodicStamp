@@ -130,10 +130,6 @@ extension PlayerModel {
         }
     }
 
-    // MARK: Selected Tracks
-
-    var selectedTracks: Set<Track> = []
-
     // MARK: Playlist
 
     private var currentTrack: Track? {

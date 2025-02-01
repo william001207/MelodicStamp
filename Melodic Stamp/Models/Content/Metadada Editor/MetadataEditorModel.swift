@@ -8,17 +8,17 @@
 import SwiftUI
 
 @Observable class MetadataEditorModel: MetadataEditorProtocol {
-    private weak var player: PlayerModel?
+    private weak var playlist: PlaylistModel?
 
-    init(player: PlayerModel) {
-        self.player = player
+    init(playlist: PlaylistModel) {
+        self.playlist = playlist
     }
 
     var metadataSet: Set<Metadata> {
-        guard let player else {
+        guard let playlist else {
             return []
         }
-        return Set(player.selectedTracks.map(\.metadata).filter(\.state.isInitialized))
+        return Set(playlist.selectedTracks.map(\.metadata).filter(\.state.isInitialized))
     }
 
     subscript<V: Equatable & Hashable>(extracting keyPath: WritableKeyPath<Metadata, MetadataEntry<V>>) -> MetadataBatchEditingEntries<V> {

@@ -35,11 +35,11 @@ struct PlaylistCommands: Commands {
             Divider()
 
             Group {
-                if let player {
+                if let playlist {
                     Button("Clear Selection") {
                         handleEscape()
                     }
-                    .disabled(player.selectedTracks.isEmpty)
+                    .disabled(playlist.selectedTracks.isEmpty)
                 } else {
                     Button("Clear Selection") {}
                         .disabled(true)
@@ -47,25 +47,25 @@ struct PlaylistCommands: Commands {
             }
 
             Group {
-                if let player {
+                if let playlist {
                     Group {
-                        if player.selectedTracks.isEmpty {
+                        if playlist.selectedTracks.isEmpty {
                             Button("Copy Selected Track") {}
                         } else {
                             Button {
                                 Task {
-                                    await copy(Array(player.selectedTracks))
+                                    await copy(Array(playlist.selectedTracks))
                                 }
                             } label: {
-                                if player.selectedTracks.count == 1 {
+                                if playlist.selectedTracks.count == 1 {
                                     Text("Copy Selected Track")
                                 } else {
-                                    Text("Copy \(player.selectedTracks.count) Tracks")
+                                    Text("Copy \(playlist.selectedTracks.count) Tracks")
                                 }
                             }
                         }
                     }
-                    .disabled(player.selectedTracks.isEmpty)
+                    .disabled(playlist.selectedTracks.isEmpty)
                 } else {
                     Button("Copy Selected Track") {}
                         .disabled(true)
@@ -73,23 +73,23 @@ struct PlaylistCommands: Commands {
             }
 
             Group {
-                if let player {
+                if let playlist {
                     Group {
-                        if player.selectedTracks.isEmpty {
+                        if playlist.selectedTracks.isEmpty {
                             Button("Remove Selected Track from Playlist") {}
                         } else {
                             Button {
-                                handleRemove(player.selectedTracks.map(\.url))
+                                handleRemove(playlist.selectedTracks.map(\.url))
                             } label: {
-                                if player.selectedTracks.count == 1 {
+                                if playlist.selectedTracks.count == 1 {
                                     Text("Remove Selected Track from Playlist")
                                 } else {
-                                    Text("Remove \(player.selectedTracks.count) Tracks from Playlist")
+                                    Text("Remove \(playlist.selectedTracks.count) Tracks from Playlist")
                                 }
                             }
                         }
                     }
-                    .disabled(player.selectedTracks.isEmpty)
+                    .disabled(playlist.selectedTracks.isEmpty)
                 } else {
                     Button("Remove Selected Track from Playlist") {}
                         .disabled(true)
@@ -102,8 +102,8 @@ struct PlaylistCommands: Commands {
             Group {
                 if
                     let player, let playlist,
-                    player.selectedTracks.count == 1,
-                    let track = player.selectedTracks.first {
+                    playlist.selectedTracks.count == 1,
+                    let track = playlist.selectedTracks.first {
                     let title = MusicTitle.stringifiedTitle(mode: .title, for: track)
                     Button {
                         player.play(track.url)
@@ -144,8 +144,8 @@ struct PlaylistCommands: Commands {
     }
 
     private func handleEscape() {
-        guard let player else { return }
-        player.selectedTracks.removeAll()
+        guard let playlist else { return }
+        playlist.selectedTracks.removeAll()
     }
 
     private func handleRemove(_ urls: [URL]) {

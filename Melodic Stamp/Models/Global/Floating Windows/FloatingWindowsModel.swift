@@ -9,6 +9,7 @@ import AppKit
 import SwiftUI
 
 @Observable final class FloatingWindowsModel {
+    private weak var targetWindow: NSWindow?
     private var isInFullScreen: Bool = false
 
     var isHidden: Bool = false {
@@ -31,7 +32,6 @@ import SwiftUI
     var isTabBarAdded: Bool { tabBarWindow != nil }
     var isPlayerAdded: Bool { playerWindow != nil }
 
-    private var targetWindow: NSWindow?
     private var tabBarAdditionDispatch: DispatchWorkItem?
     private var playerAdditionDispatch: DispatchWorkItem?
 

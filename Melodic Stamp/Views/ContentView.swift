@@ -65,6 +65,7 @@ struct ContentView: View {
     // MARK: Models
 
     @State private var windowManager: WindowManagerModel
+    @State private var presentationManager: PresentationManagerModel
     @State private var fileManager: FileManagerModel
     @State private var playlist: PlaylistModel
     @State private var player: PlayerModel
@@ -81,22 +82,22 @@ struct ContentView: View {
     // MARK: Window
 
     @State private var sizer: Sizer = .init()
-    @State private var isUnsavedChangesPresented: Bool = false
     @State private var floatingWindowsInitializationDispatch: DispatchWorkItem?
 
     // MARK: - Initializers
 
-    init(_ parameters: CreationParameters, library: LibraryModel) {
+    init(_ parameters: CreationParameters, appDelegate: AppDelegate, library: LibraryModel) {
         let date = Date()
         let playlist = PlaylistModel(bindingTo: parameters.id, library: library)
         let player = PlayerModel(SFBAudioEnginePlayer(), library: library, playlist: playlist)
 
-        self.windowManager = WindowManagerModel(style: parameters.initialWindowStyle)
+        self.windowManager = WindowManagerModel(style: parameters.initialWindowStyle, appDelegate: appDelegate)
+        self.presentationManager = PresentationManagerModel()
         self.fileManager = FileManagerModel(player: player, playlist: playlist)
         self.playlist = playlist
         self.player = player
         self.keyboardControl = KeyboardControlModel(player: player)
-        self.metadataEditor = MetadataEditorModel(player: player)
+        self.metadataEditor = MetadataEditorModel(playlist: playlist)
         self.audioVisualizer = AudioVisualizerModel()
         self.gradientVisualizer = GradientVisualizerModel()
 
@@ -132,8 +133,12 @@ struct ContentView: View {
             }
             .background {
                 FileImporters()
+
                 DelegatedPlaylistStorage()
                 DelegatedPlaylistStateStorage()
+
+                UnsavedChangesPresentation()
+                PlaylistPresentation()
             }
 
             // MARK: Window Styling
@@ -183,13 +188,14 @@ struct ContentView: View {
 
             // MARK: Unsaved Changes
 
-            .modifier(UnsavedChangesModifier(isPresented: $isUnsavedChangesPresented, window: window))
+            .modifier(WindowTerminationPresentationInjectorModifier(window: window))
         }
         .frame(minWidth: sizer.minWidth, maxWidth: sizer.maxWidth, minHeight: sizer.minHeight, maxHeight: sizer.maxHeight)
 
         // MARK: Environments
 
         .environment(windowManager)
+        .environment(presentationManager)
         .environment(fileManager)
         .environment(playlist)
         .environment(player)
@@ -208,6 +214,7 @@ struct ContentView: View {
         // MARK: Focused Values
 
         .focusedValue(windowManager)
+        .focusedValue(presentationManager)
         .focusedValue(fileManager)
         .focusedValue(playlist)
         .focusedValue(player)
@@ -398,15 +405,11 @@ struct ContentView: View {
             Task.detached {
                 await floatingWindows.addPlayer(to: mainWindow) {
                     floatingPlayerView(mainWindow: mainWindow)
-                        .environment(floatingWindows)
                         .environment(windowManager)
-                        .environment(fileManager)
                         .environment(playlist)
                         .environment(player)
                         .environment(keyboardControl)
-                        .environment(metadataEditor)
                         .environment(audioVisualizer)
-                        .environment(gradientVisualizer)
                 }
             }
         }

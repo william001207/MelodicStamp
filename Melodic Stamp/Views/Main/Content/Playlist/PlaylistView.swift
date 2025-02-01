@@ -13,6 +13,7 @@ import SwiftUI
 struct PlaylistView: View {
     // MARK: - Environments
 
+    @Environment(PresentationManagerModel.self) private var presentationManager
     @Environment(KeyboardControlModel.self) private var keyboardControl
     @Environment(PlaylistModel.self) private var playlist
     @Environment(PlayerModel.self) private var player
@@ -33,16 +34,14 @@ struct PlaylistView: View {
     @State private var contentSize: CGSize = .zero
     @State private var contentOffset: CGFloat = .zero
 
-    @State private var isRemovalAlertPresented: Bool = false
-
     // MARK: - Body
 
     var body: some View {
-        @Bindable var player = player
+        @Bindable var playlist = playlist
 
         // MARK: List
 
-        List(selection: $player.selectedTracks) {
+        List(selection: $playlist.selectedTracks) {
             Group {
                 // MARK: Controls Placeholder
 
@@ -121,7 +120,7 @@ struct PlaylistView: View {
             .offset(y: max(0, contentOffset - minHeight - 16))
         }
         .animation(animationFast, value: playlist)
-        .animation(animationFast, value: player.selectedTracks)
+        .animation(animationFast, value: playlist.selectedTracks)
 
         // MARK: Keyboard Handlers
 
@@ -136,7 +135,7 @@ struct PlaylistView: View {
 
         // Handles [􁂒] -> remove selection
         .onKeyPress(.deleteForward) {
-            if handleRemove(player.selectedTracks.map(\.url)) {
+            if handleRemove(playlist.selectedTracks.map(\.url)) {
                 .handled
             } else {
                 .ignored
@@ -145,7 +144,7 @@ struct PlaylistView: View {
 
         // Handles [⏎] -> play
         .onKeyPress(.return) {
-            if player.selectedTracks.count == 1, let track = player.selectedTracks.first {
+            if playlist.selectedTracks.count == 1, let track = playlist.selectedTracks.first {
                 player.play(track.url)
                 return .handled
             } else {
@@ -219,9 +218,9 @@ struct PlaylistView: View {
             // MARK: Remove from Playlist
 
             Group {
-                if player.selectedTracks.isEmpty {
+                if playlist.selectedTracks.isEmpty {
                     Button(role: .destructive) {
-                        isRemovalAlertPresented = true
+                        presentationManager.isTrackRemovalAlertPresented = true
                     } label: {
                         HStack {
                             Image(systemSymbol: .trashFill)
@@ -231,9 +230,9 @@ struct PlaylistView: View {
                         .padding(.horizontal)
                         .padding(.vertical, 8)
                     }
-                } else if player.selectedTracks.count <= 1 {
+                } else if playlist.selectedTracks.count <= 1 {
                     Button(role: .destructive) {
-                        handleRemove(player.selectedTracks.map(\.url))
+                        handleRemove(playlist.selectedTracks.map(\.url))
                         resetFocus(in: namespace)
                     } label: {
                         HStack {
@@ -246,13 +245,13 @@ struct PlaylistView: View {
                     }
                 } else {
                     Button(role: .destructive) {
-                        handleRemove(player.selectedTracks.map(\.url))
+                        handleRemove(playlist.selectedTracks.map(\.url))
                         resetFocus(in: namespace)
                     } label: {
                         HStack {
                             Image(systemSymbol: .trashFill)
 
-                            Text("Remove \(player.selectedTracks.count) Tracks from Playlist")
+                            Text("Remove \(playlist.selectedTracks.count) Tracks from Playlist")
                         }
                         .padding(.horizontal)
                         .padding(.vertical, 8)
@@ -263,13 +262,6 @@ struct PlaylistView: View {
             .foregroundStyle(.red)
             .fixedSize(horizontal: true, vertical: false)
             .disabled(!canRemove)
-            .alert("Removing All Tracks from Playlist", isPresented: $isRemovalAlertPresented) {
-                Button("Proceed", role: .destructive) {
-                    Task {
-                        await playlist.clear()
-                    }
-                }
-            }
         }
         .buttonStyle(.luminare)
     }
@@ -311,7 +303,7 @@ struct PlaylistView: View {
 
         TrackView(
             track: track,
-            isSelected: player.selectedTracks.contains(track)
+            isSelected: playlist.selectedTracks.contains(track)
         )
         .redacted(reason: track.metadata.state == .loading ? .placeholder : [])
         .contextMenu {
@@ -414,7 +406,7 @@ struct PlaylistView: View {
             // MARK: Copy
 
             Group {
-                if player.selectedTracks.count <= 1 {
+                if playlist.selectedTracks.count <= 1 {
                     Button("Copy Track") {
                         Task {
                             await copy([track])
@@ -423,10 +415,10 @@ struct PlaylistView: View {
                 } else {
                     Button {
                         Task {
-                            await copy(Array(player.selectedTracks))
+                            await copy(Array(playlist.selectedTracks))
                         }
                     } label: {
-                        Text("Copy \(player.selectedTracks.count) Tracks")
+                        Text("Copy \(playlist.selectedTracks.count) Tracks")
                     }
                 }
             }
@@ -435,15 +427,15 @@ struct PlaylistView: View {
         // MARK: Remove from Playlist
 
         Group {
-            if player.selectedTracks.count <= 1 {
+            if playlist.selectedTracks.count <= 1 {
                 Button("Remove from Playlist") {
                     handleRemove([track.url])
                 }
             } else {
                 Button {
-                    handleRemove(player.selectedTracks.map(\.url))
+                    handleRemove(playlist.selectedTracks.map(\.url))
                 } label: {
-                    Text("Remove \(player.selectedTracks.count) Tracks from Playlist")
+                    Text("Remove \(playlist.selectedTracks.count) Tracks from Playlist")
                 }
             }
         }
@@ -500,7 +492,7 @@ struct PlaylistView: View {
 
     @discardableResult private func handleEscape() -> Bool {
         guard canEscape else { return false }
-        player.selectedTracks.removeAll()
+        playlist.selectedTracks.removeAll()
         return true
     }
 

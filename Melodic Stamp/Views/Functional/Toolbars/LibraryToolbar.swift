@@ -10,6 +10,7 @@ import SwiftUI
 
 struct LibraryToolbar: View {
     @Environment(LibraryModel.self) private var library
+    @Environment(PresentationManagerModel.self) private var presentationManager
     @Environment(PlaylistModel.self) private var playlist
 
     @Environment(\.appearsActive) private var appearsActive
@@ -17,17 +18,12 @@ struct LibraryToolbar: View {
 
     @Default(.asksForPlaylistInformation) private var asksForPlaylistInformation
 
-    @State private var isPlaylistSegmentsSheetPresented: Bool = false
-    @State private var isPlaylistRemovalAlertPresented: Bool = false
-
-    @State private var shouldWaitForPresentation: Bool = false
-
     var body: some View {
         @Bindable var playlist = playlist
 
-        if !playlist.mode.isCanonical || shouldWaitForPresentation {
+        if !playlist.mode.isCanonical {
             Button {
-                shouldWaitForPresentation = asksForPlaylistInformation
+                presentationManager.isPlaylistSegmentsSheetPresented = asksForPlaylistInformation
                 Task.detached {
                     try await playlist.makeCanonical()
                 }
@@ -40,37 +36,9 @@ struct LibraryToolbar: View {
                 }
             }
             .disabled(!playlist.canMakeCanonical)
-            .onChange(of: playlist.mode) { _, newValue in
-                guard newValue.isCanonical, asksForPlaylistInformation else { return }
-                isPlaylistSegmentsSheetPresented = true
-            }
-            .sheet(isPresented: $isPlaylistSegmentsSheetPresented) {
-                shouldWaitForPresentation = false
-            } content: {
-                PlaylistMetadataView()
-                    .padding(.horizontal)
-                    .padding(.top)
-                    .padding(.bottom, -8)
-                    .presentationAttachmentBar(edge: .bottom) {
-                        Group {
-                            Text("Playlist Information")
-
-                            Spacer()
-
-                            Button {
-                                isPlaylistSegmentsSheetPresented = false
-                            } label: {
-                                Text("Done")
-                            }
-                            .foregroundStyle(.tint)
-                        }
-                        .buttonStyle(.alive)
-                    }
-                    .frame(width: 600)
-            }
-        } else if playlist.mode.isCanonical || isPlaylistRemovalAlertPresented {
+        } else {
             Button {
-                isPlaylistRemovalAlertPresented = true
+                presentationManager.isPlaylistRemovalAlertPresented = true
             } label: {
                 ToolbarLabel {
                     Image(systemSymbol: .trashFill)
@@ -79,16 +47,6 @@ struct LibraryToolbar: View {
                     Text("Remove from Library")
                 }
                 .foregroundStyle(.red)
-            }
-            .alert("Removing Playlist from Library", isPresented: $isPlaylistRemovalAlertPresented) {
-                Button("Proceed", role: .destructive) {
-                    library.remove([playlist.playlist])
-                    DispatchQueue.main.async {
-                        dismissWindow()
-                    }
-                }
-            } message: {
-                Text("This will permanently delete the corresponding directory.")
             }
         }
     }

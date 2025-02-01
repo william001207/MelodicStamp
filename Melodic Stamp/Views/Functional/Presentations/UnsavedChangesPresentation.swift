@@ -2,72 +2,70 @@
 //  UnsavedChangesPresentation.swift
 //  Melodic Stamp
 //
-//  Created by KrLite on 2025/1/26.
+//  Created by KrLite on 2025/2/1.
 //
 
 import SwiftUI
 
-struct UnsavedChangesPresentation<Parent>: View where Parent: View {
+struct UnsavedChangesPresentation: View {
+    @Environment(WindowManagerModel.self) private var windowManager
+    @Environment(PresentationManagerModel.self) private var presentationManager
     @Environment(PlaylistModel.self) private var playlist
     @Environment(PlayerModel.self) private var player
 
     @Environment(\.appDelegate) private var appDelegate
 
-    @Binding var isPresented: Bool
     var window: NSWindow?
-    @ViewBuilder var parent: () -> Parent
-
-    @State private var windowShouldForceClose: Bool = false
-    @State private var isSheetPresented: Bool = false
 
     var body: some View {
-        parent()
-            .background(MakeCloseDelegated(shouldClose: windowShouldClose) { window, shouldClose in
-                if shouldClose {
-                    player.stop()
-                    appDelegate?.destroy(window: window)
-                } else {
-                    isPresented = true
-                    appDelegate?.suspend(window: window)
+        @Bindable var presentationManager = presentationManager
+
+        if !modifiedMetadataSet.isEmpty {
+            Color.clear
+                .alert("Unsaved Changes", isPresented: $presentationManager.isUnsavedChangesAlertPresented) {
+                    alertContent()
+                } message: {
+                    alertMessage()
                 }
-            })
-            .alert("Unsaved Changes", isPresented: $isPresented) {
-                alertContent()
-            } message: {
-                alertMessage()
-            }
-            .sheet(isPresented: $isSheetPresented) {
-                sheetContent()
-            }
+                .sheet(isPresented: $presentationManager.isUnsavedChangesSheetPresented) {
+                    sheetContent()
+                }
+        } else {
+            Color.clear
+                .onChange(of: presentationManager.state) { _, newValue in
+                    guard newValue == .unsavedChangesAlert else { return }
+                    presentationManager.nextStage()
+                }
+                .onChange(of: presentationManager.state) { _, newValue in
+                    guard newValue == .unsavedChangesSheet else { return }
+                    presentationManager.nextStage()
+                }
+        }
     }
 
-    private var modifiedMetadatas: [Metadata] {
+    private var modifiedMetadataSet: [Metadata] {
         playlist.metadataSet.filter(\.isModified)
     }
 
-    private var modifiedFineMetadatas: [Metadata] {
-        modifiedMetadatas.filter(\.state.isFine)
-    }
-
-    private var windowShouldClose: Bool {
-        windowShouldForceClose || modifiedMetadatas.isEmpty
+    private var modifiedFineMetadataSet: [Metadata] {
+        modifiedMetadataSet.filter(\.state.isFine)
     }
 
     @ViewBuilder private func alertContent() -> some View {
-        if modifiedFineMetadatas.isEmpty, !modifiedMetadatas.isEmpty {
+        if modifiedFineMetadataSet.isEmpty, !modifiedMetadataSet.isEmpty {
             Button("Close") {
-                forceClose()
+                close()
             }
         } else {
-            if modifiedMetadatas.count > 1 {
+            if modifiedMetadataSet.count > 1 {
                 Button("Save…") {
-                    isSheetPresented = true
+                    presentationManager.nextStep()
                 }
             } else {
                 Button("Save and Close") {
                     playlist.writeAll {
-                        if modifiedMetadatas.isEmpty {
-                            forceClose()
+                        if modifiedMetadataSet.isEmpty {
+                            close()
                         }
                     }
                 }
@@ -98,9 +96,9 @@ struct UnsavedChangesPresentation<Parent>: View where Parent: View {
 
                     Spacer()
 
-                    if modifiedFineMetadatas.isEmpty, !modifiedMetadatas.isEmpty {
+                    if modifiedFineMetadataSet.isEmpty, !modifiedMetadataSet.isEmpty {
                         Button("Close", role: .destructive) {
-                            forceClose()
+                            close()
                         }
                         .buttonStyle(.borderedProminent)
                         .keyboardShortcut(.return, modifiers: [])
@@ -110,8 +108,8 @@ struct UnsavedChangesPresentation<Parent>: View where Parent: View {
 
                         Button("Save All and Close") {
                             playlist.writeAll {
-                                if modifiedMetadatas.isEmpty {
-                                    forceClose()
+                                if modifiedMetadataSet.isEmpty {
+                                    close()
                                 }
                             }
                         }
@@ -126,7 +124,7 @@ struct UnsavedChangesPresentation<Parent>: View where Parent: View {
 
     @ViewBuilder private func closeAnywayButton() -> some View {
         Button("Close Anyway", role: .destructive) {
-            forceClose()
+            close()
         }
     }
 
@@ -136,29 +134,13 @@ struct UnsavedChangesPresentation<Parent>: View where Parent: View {
         }
     }
 
-    private func forceClose() {
-        windowShouldForceClose = true
-        DispatchQueue.main.async {
-            window?.performClose(nil)
-        }
+    private func close() {
+        presentationManager.state = .idle
+        windowManager.state = .willClose
     }
 
     private func cancel() {
-        isPresented = false
-        isSheetPresented = false
-        appDelegate?.resumeWindowSuspension()
-    }
-}
-
-struct UnsavedChangesModifier: ViewModifier {
-    @Binding var isPresented: Bool
-    var window: NSWindow?
-
-    func body(content: Content) -> some View {
-        UnsavedChangesPresentation(
-            isPresented: $isPresented, window: window
-        ) {
-            content
-        }
+        presentationManager.state = .idle
+        windowManager.state = .closeCanceled
     }
 }

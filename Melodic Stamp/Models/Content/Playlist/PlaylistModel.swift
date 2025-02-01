@@ -16,6 +16,8 @@ import SwiftUI
     #endif
     private weak var library: LibraryModel?
 
+    var selectedTracks: Set<Track> = []
+
     private(set) var isLoading: Bool = false
 
     init(bindingTo id: UUID = .init(), library: LibraryModel) {
@@ -185,6 +187,7 @@ extension PlaylistModel {
         for url in urls {
             guard let track = await getOrCreateTrack(at: url) else { continue }
             playlist.remove([track])
+            selectedTracks.remove(track)
         }
 
         try? indexTracks(with: captureIndices())
