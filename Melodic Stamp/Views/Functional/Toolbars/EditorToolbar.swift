@@ -57,8 +57,6 @@ struct EditorToolbar: ToolbarContent {
                 metadataEditor.restoreAll()
             } label: {
                 Label("Restore", systemSymbol: .arrowUturnLeft)
-                    .foregroundStyle(.red)
-                    .opacity(metadataEditor.isModified ? 1 : 0.5)
             }
             .disabled(!metadataEditor.isModified)
         }

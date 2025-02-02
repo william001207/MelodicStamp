@@ -48,7 +48,6 @@ struct LibraryItemView: View {
             .transition(.blurReplace)
             .opacity(opacity)
             .animation(.default.speed(2), value: hasControl)
-            .onDoubleClick(handler: open)
 
             Spacer()
 
@@ -74,10 +73,6 @@ struct LibraryItemView: View {
         .padding(.trailing, -1)
         .bounceAnimation(bounceAnimationTrigger, scale: .init(width: 1.01, height: 1.01))
         .animation(animation, value: isHovering)
-        .background {
-            Color.clear
-                .onDoubleClick(handler: open)
-        }
         .onHover { hover in
             isHovering = hover
         }

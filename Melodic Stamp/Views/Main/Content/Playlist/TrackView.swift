@@ -44,7 +44,6 @@ struct TrackView: View {
                                 .redacted(reason: .placeholder)
                         }
                     }
-                    .onDoubleClick(handler: play)
 
                     switch metadataState {
                     case let .interrupted(error), let .dropped(error):
@@ -85,7 +84,6 @@ struct TrackView: View {
                 }
                 .frame(height: 12)
                 .font(.caption)
-                .onDoubleClick(handler: play)
             }
             .lineLimit(1)
             .transition(.blurReplace)
@@ -116,10 +114,6 @@ struct TrackView: View {
         .wiggleAnimation(wiggleAnimationTrigger)
         .bounceAnimation(bounceAnimationTrigger, scale: .init(width: 1.01, height: 1.01))
         .animation(animation, value: isHovering)
-        .background {
-            Color.clear
-                .onDoubleClick(handler: play)
-        }
         .onHover { hover in
             isHovering = hover
         }

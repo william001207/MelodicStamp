@@ -39,6 +39,11 @@ extension View {
             EmptyView()
         })
     }
+
+    // A hack
+    @ViewBuilder func expandContextMenuActivationArea() -> some View {
+        background(.white.opacity(0.0001))
+    }
 }
 
 extension View {
@@ -62,23 +67,5 @@ extension View {
             )
         )
         .ignoresSafeArea()
-    }
-}
-
-// https://gist.github.com/joelekstrom/91dad79ebdba409556dce663d28e8297
-extension View {
-    /// Adds a double click handler this view.
-    ///
-    /// In order to make listeners like ``onHover`` work, this listener must precede them.
-    ///
-    /// ```
-    /// Text("Hello")
-    ///     .onDoubleClick { print("Double click detected") }
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - handler: Block invoked when a double click is detected
-    func onDoubleClick(handler: @escaping () -> ()) -> some View {
-        modifier(DoubleClickHandler(handler: handler))
     }
 }

@@ -31,7 +31,7 @@ struct InspectorLibraryView: View {
                 // MARK: Playlists
 
                 ForEach(library.playlists) { playlist in
-                    itemView(for: playlist)
+                    playlistView(for: playlist)
                         .id(playlist)
                 }
                 .onMove { indices, destination in
@@ -43,6 +43,11 @@ struct InspectorLibraryView: View {
             }
             .scrollClipDisabled()
             .scrollContentBackground(.hidden)
+            .contextMenu(forSelectionType: Playlist.self) { playlists in
+                PlaylistsContextMenu(playlists: playlists)
+            } primaryAction: { playlists in
+                open(Array(playlists))
+            }
 
             // MARK: Quick Look
 
@@ -96,16 +101,13 @@ struct InspectorLibraryView: View {
 
     // MARK: - Item View
 
-    @ViewBuilder private func itemView(for playlist: Playlist) -> some View {
+    @ViewBuilder private func playlistView(for playlist: Playlist) -> some View {
         let isSelected = selectedPlaylists.contains(playlist)
 
         LibraryItemView(
             item: playlist,
             isSelected: isSelected
         )
-        .contextMenu {
-            contextMenu(for: playlist)
-        }
         .swipeActions(edge: .leading) {
             // MARK: Open
 
@@ -118,53 +120,6 @@ struct InspectorLibraryView: View {
         }
     }
 
-    // MARK: - Context Menu
-
-    @ViewBuilder private func contextMenu(for playlist: Playlist) -> some View {
-        // MARK: Open
-
-        Group {
-            if selectedPlaylists.count <= 1 {
-                Button("Open in New Window") {
-                    open([playlist])
-                }
-            } else {
-                Button {
-                    open(Array(selectedPlaylists))
-                } label: {
-                    Text("Open \(selectedPlaylists.count) Playlists")
-                }
-            }
-        }
-        .keyboardShortcut(.return, modifiers: [])
-
-        // MARK: Copy
-
-        Group {
-            if selectedPlaylists.count <= 1 {
-                Button("Copy Playlist") {
-                    try? copy([playlist])
-                }
-            } else {
-                Button {
-                    try? copy(Array(selectedPlaylists))
-                } label: {
-                    Text("Copy \(selectedPlaylists.count) Playlists")
-                }
-            }
-        }
-
-        Divider()
-
-        if let url = playlist.unwrappedURL {
-            // MARK: Reveal in Finder
-
-            Button("Reveal in Finder") {
-                NSWorkspace.shared.activateFileViewerSelecting([url])
-            }
-        }
-    }
-
     // MARK: - Functions
 
     private func open(_ playlists: [Playlist]) {
@@ -173,18 +128,6 @@ struct InspectorLibraryView: View {
                 id: WindowID.content(),
                 value: CreationParameters(playlist: .canonical(playlist.id))
             )
-        }
-    }
-
-    private func copy(_ playlists: [Playlist]) throws {
-        guard !playlists.isEmpty else { return }
-
-        for playlist in playlists {
-            guard
-                let index = library.playlists.firstIndex(where: { $0.id == playlist.id }),
-                let copiedPlaylist = try Playlist(copyingFrom: playlist)
-            else { continue }
-            library.add([copiedPlaylist], at: index + 1)
         }
     }
 

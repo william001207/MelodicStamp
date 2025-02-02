@@ -31,6 +31,7 @@ struct PlaylistMetadataView: View {
                     .motionCard()
             }
             .buttonStyle(.alive)
+            .shadow(color: .black.opacity(0.1), radius: 5)
             .fileImporter(
                 isPresented: $isImagePickerPresented,
                 allowedContentTypes: AttachedPicturesHandlerModel
@@ -48,7 +49,6 @@ struct PlaylistMetadataView: View {
                     break
                 }
             }
-            .shadow(color: .black.opacity(0.1), radius: 5)
             .animation(nil, value: isTitleHovering)
             .animation(nil, value: isTitleFocused)
 
@@ -75,13 +75,25 @@ struct PlaylistMetadataView: View {
                     }
                     .scrollContentBackground(.hidden)
                     .scrollClipDisabled()
-                    .presentationAttachmentBar(edge: .bottom, attachment: controls)
+                    .presentationAttachmentBar(edge: .bottom, attachment: sheetControls)
                     .presentationSizing(.fitted)
                     .frame(minWidth: 725, minHeight: 500, maxHeight: 1200)
                 }
             }
         }
         .frame(height: 250)
+        // Because this view will be used inside a `List`, so do not apply individual context menus to children views
+        // This comprehensive context menu works best
+        .expandContextMenuActivationArea()
+        .contextMenu {
+            Menu("Artwork") {
+                artworkContextMenu()
+            }
+
+            Menu("Description") {
+                descriptionContextMenu()
+            }
+        }
         .animation(animation, value: isTitleHovering)
         .animation(animation, value: isTitleFocused)
     }
@@ -119,19 +131,24 @@ struct PlaylistMetadataView: View {
                                         time: .standard
                                     )
                                     Text("Created at \(formattedCreationDate)")
+                                        .font(.caption)
                                 }
 
                                 Image(systemSymbol: .folder)
+                                    .font(.body)
                             }
                             .foregroundStyle(.placeholder)
                         }
                         .buttonStyle(.alive)
                     } else {
                         Text("\(playlist.count) Tracks")
+                            .font(.body)
                     }
                 }
-                .font(.body)
+                .lineLimit(1)
+                .minimumScaleFactor(0.5)
                 .foregroundStyle(.placeholder)
+                .frame(minHeight: 20)
                 .transition(.blurReplace)
             }
         }
@@ -156,7 +173,25 @@ struct PlaylistMetadataView: View {
         }
     }
 
-    @ViewBuilder private func controls() -> some View {
+    @ViewBuilder private func artworkContextMenu() -> some View {
+        Button("Remove") {
+            playlist.segments.artwork.tiffRepresentation = nil
+            try? playlist.write(segments: [.artwork])
+        }
+    }
+
+    @ViewBuilder private func descriptionContextMenu() -> some View {
+        Button("Edit") {
+            isDescriptionSheetPresented = true
+        }
+
+        Button("Clear") {
+            playlist.segments.info.description = ""
+            try? playlist.write(segments: [.info])
+        }
+    }
+
+    @ViewBuilder private func sheetControls() -> some View {
         Group {
             Text("Playlist Description")
                 .bold()

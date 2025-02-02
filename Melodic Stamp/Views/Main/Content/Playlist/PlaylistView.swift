@@ -49,6 +49,10 @@ struct PlaylistView: View {
                     }
 
                     ExcerptView(tab: SidebarContentTab.playlist)
+                        .expandContextMenuActivationArea()
+                        .contextMenu {
+                            TracksContextMenu(tracks: [])
+                        }
                 }
                 .padding(.horizontal)
                 .padding(.vertical, 14) // The inset of the `List`
@@ -77,7 +81,7 @@ struct PlaylistView: View {
                     // MARK: Tracks
 
                     ForEach(playlist.tracks) { track in
-                        itemView(for: track)
+                        trackView(for: track)
                             .id(track)
                             .draggable(track) {
                                 TrackPreview(track: track)
@@ -92,6 +96,12 @@ struct PlaylistView: View {
                 }
                 .scrollClipDisabled()
                 .scrollContentBackground(.hidden)
+                .contextMenu(forSelectionType: Track.self) { tracks in
+                    TracksContextMenu(tracks: tracks)
+                } primaryAction: { tracks in
+                    guard let firstTrack = tracks.first else { return }
+                    player.play(firstTrack)
+                }
             }
         }
         .overlay(alignment: .top) {
@@ -298,7 +308,7 @@ struct PlaylistView: View {
 
     // MARK: - Item View
 
-    @ViewBuilder private func itemView(for track: Track) -> some View {
+    @ViewBuilder private func trackView(for track: Track) -> some View {
         let isInitialized = track.metadata.state.isInitialized
         let isModified = track.metadata.isModified
 
@@ -307,9 +317,6 @@ struct PlaylistView: View {
             isSelected: playlist.selectedTracks.contains(track)
         )
         .redacted(reason: track.metadata.state == .loading ? .placeholder : [])
-        .contextMenu {
-            contextMenu(for: track)
-        }
         .swipeActions {
             if isInitialized {
                 // MARK: Play
@@ -374,122 +381,7 @@ struct PlaylistView: View {
         }
     }
 
-    // MARK: - Context Menu
-
-    @ViewBuilder private func contextMenu(for track: Track) -> some View {
-        let isInitialized = track.metadata.state.isInitialized
-        let isModified = track.metadata.isModified
-
-        // MARK: Play
-
-        Button {
-            player.play(track)
-        } label: {
-            let title = MusicTitle.stringifiedTitle(mode: .title, for: track)
-            if !title.isEmpty {
-                if playlist.currentTrack == track {
-                    Text("Replay \(title)")
-                } else {
-                    Text("Play \(title)")
-                }
-            } else {
-                if playlist.currentTrack == track {
-                    Text("Replay")
-                } else {
-                    Text("Play")
-                }
-            }
-        }
-        .disabled(!isInitialized)
-        .keyboardShortcut(.return, modifiers: [])
-
-        if playlist.mode.isCanonical {
-            // MARK: Copy
-
-            Group {
-                if playlist.selectedTracks.count <= 1 {
-                    Button("Copy Track") {
-                        Task {
-                            await copy([track])
-                        }
-                    }
-                } else {
-                    Button {
-                        Task {
-                            await copy(Array(playlist.selectedTracks))
-                        }
-                    } label: {
-                        Text("Copy \(playlist.selectedTracks.count) Tracks")
-                    }
-                }
-            }
-        }
-
-        // MARK: Remove from Playlist
-
-        Group {
-            if playlist.selectedTracks.count <= 1 {
-                Button("Remove from Playlist") {
-                    handleRemove([track.url])
-                }
-            } else {
-                Button {
-                    handleRemove(playlist.selectedTracks.map(\.url))
-                } label: {
-                    Text("Remove \(playlist.selectedTracks.count) Tracks from Playlist")
-                }
-            }
-        }
-        .keyboardShortcut(.deleteForward, modifiers: [])
-
-        Divider()
-
-        // MARK: Save Metadata
-
-        Button("Save Metadata") {
-            Task {
-                try await track.metadata.write()
-            }
-        }
-        .disabled(!isInitialized || !isModified)
-        .keyboardShortcut("s", modifiers: .command)
-
-        // MARK: Restore Metadata
-
-        Button("Restore Metadata") {
-            track.metadata.restore()
-        }
-        .disabled(!isInitialized || !isModified)
-
-        // MARK: Reload Metadata
-
-        Button("Reload Metadata") {
-            Task {
-                try await track.metadata.update()
-            }
-        }
-        .keyboardShortcut("r", modifiers: .command)
-
-        Divider()
-
-        Button("Reveal in Finder") {
-            NSWorkspace.shared.activateFileViewerSelecting([track.url])
-        }
-    }
-
     // MARK: - Functions
-
-    private func copy(_ tracks: [Track]) async {
-        guard !tracks.isEmpty else { return }
-
-        for track in tracks {
-            guard
-                let index = playlist.tracks.firstIndex(where: { $0.id == track.id }),
-                let copiedTrack = await playlist.createTrack(from: track.url)
-            else { continue }
-            await playlist.add([copiedTrack.url], at: index + 1)
-        }
-    }
 
     @discardableResult private func handleEscape() -> Bool {
         guard canEscape else { return false }

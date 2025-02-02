@@ -362,6 +362,9 @@
         }
       }
     },
+    "Artwork" : {
+
+    },
     "Asks for information when creating a new playlist" : {
       "localizations" : {
         "zh-Hans" : {
@@ -1052,6 +1055,9 @@
         }
       }
     },
+    "Description" : {
+
+    },
     "Discs" : {
       "localizations" : {
         "zh-Hans" : {
@@ -1322,6 +1328,9 @@
           }
         }
       }
+    },
+    "Edit" : {
+
     },
     "Edit Lyrics" : {
       "localizations" : {
@@ -2333,6 +2342,9 @@
         }
       }
     },
+    "Remove" : {
+
+    },
     "Remove %lld Tracks from Playlist" : {
       "localizations" : {
         "en" : {
@@ -2428,6 +2440,7 @@
       }
     },
     "Replay" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {

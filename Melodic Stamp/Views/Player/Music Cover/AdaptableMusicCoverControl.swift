@@ -33,6 +33,12 @@ struct AdaptableMusicCoverControl: View {
                 .padding(.horizontal, 16)
         }
         .buttonStyle(.alive)
+        .shadow(color: .black.opacity(0.1), radius: 5)
+        .padding(.top, 8)
+        .overlay(alignment: .top, content: header)
+        .contextMenu {
+            contextMenu()
+        }
         .fileImporter(
             isPresented: $isImagePickerPresented,
             allowedContentTypes: AttachedPicturesHandlerModel
@@ -56,9 +62,6 @@ struct AdaptableMusicCoverControl: View {
                 break
             }
         }
-        .shadow(color: .black.opacity(0.1), radius: 5)
-        .padding(.top, 8)
-        .overlay(alignment: .top, content: header)
     }
 
     private var isModified: Bool {
@@ -151,6 +154,28 @@ struct AdaptableMusicCoverControl: View {
             }
         }
         .clipShape(.rect(cornerRadius: 8))
+    }
+
+    @ViewBuilder private func contextMenu() -> some View {
+        Button("Restore") {
+            attachedPicturesHandler.restore(
+                of: [type], entries: entries,
+                undoManager: undoManager
+            )
+        }
+        .disabled(
+            !attachedPicturesHandler.isModified(
+                of: [type],
+                entries: entries
+            )
+        )
+
+        Button("Remove") {
+            attachedPicturesHandler.remove(
+                of: [type], entries: entries,
+                undoManager: undoManager
+            )
+        }
     }
 
     private func registerUndo(_ oldValue: Set<AttachedPicture>, for entries: Entries) {
