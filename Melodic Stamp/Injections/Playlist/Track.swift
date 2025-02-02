@@ -51,7 +51,7 @@ extension Track: Hashable {
 }
 
 extension Track: Transferable {
-    enum TransferableError: Error, LocalizedError, CustomStringConvertible {
+    enum TransferError: Error, LocalizedError, CustomStringConvertible {
         case invalidURL(Data)
         case invalidFormat(URL)
         case notFileURL(URL)
@@ -72,9 +72,9 @@ extension Track: Transferable {
         DataRepresentation(contentType: .fileURL) { track in
             track.url.dataRepresentation
         } importing: { data in
-            guard let url = URL(dataRepresentation: data, relativeTo: nil) else { throw TransferableError.invalidURL(data) }
-            guard url.isFileURL else { throw TransferableError.notFileURL(url) }
-            guard let url = FileHelper.filter(url: url) else { throw TransferableError.invalidFormat(url) }
+            guard let url = URL(dataRepresentation: data, relativeTo: nil) else { throw TransferError.invalidURL(data) }
+            guard url.isFileURL else { throw TransferError.notFileURL(url) }
+            guard let url = FileHelper.filter(url: url) else { throw TransferError.invalidFormat(url) }
 
             return await Track(loadingFrom: url)
         }

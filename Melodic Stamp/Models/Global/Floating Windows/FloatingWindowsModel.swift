@@ -32,6 +32,7 @@ import SwiftUI
     var isTabBarAdded: Bool { tabBarWindow != nil }
     var isPlayerAdded: Bool { playerWindow != nil }
 
+    private var observationDispatch: DispatchWorkItem?
     private var tabBarAdditionDispatch: DispatchWorkItem?
     private var playerAdditionDispatch: DispatchWorkItem?
 

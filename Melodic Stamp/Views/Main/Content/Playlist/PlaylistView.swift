@@ -25,13 +25,6 @@ struct PlaylistView: View {
     @Environment(\.luminareAnimationFast) private var animationFast
     @Environment(\.namespace) private var namespace
 
-    @Namespace private var coordinateSpace
-
-    // MARK: - Fields
-
-    @State private var contentOffset: CGFloat = .zero
-    @State private var contentInsets: EdgeInsets = .zero
-
     // MARK: - Body
 
     var body: some View {
@@ -42,6 +35,11 @@ struct PlaylistView: View {
                 // MARK: Excerpt
 
                 VStack(spacing: 0) {
+                    // MARK: Controls Placeholder
+
+                    Spacer()
+                        .frame(height: minHeight)
+
                     if playlist.mode.isCanonical {
                         // MARK: Metadata
 
@@ -53,13 +51,17 @@ struct PlaylistView: View {
                     ExcerptView(tab: SidebarContentTab.playlist)
                 }
                 .padding(.horizontal)
-                .padding(.vertical, visualInset)
+                .padding(.vertical, 14) // The inset of the `List`
             } else {
                 // MARK: List
 
                 List(selection: $playlist.selectedTracks) {
                     VStack(spacing: 0) {
                         // MARK: Controls Placeholder
+
+                        // This is much more stable than `.contentMargins()`
+                        Spacer()
+                            .frame(height: minHeight)
 
                         if playlist.mode.isCanonical {
                             // MARK: Metadata
@@ -68,17 +70,9 @@ struct PlaylistView: View {
                                 .frame(height: metadataHeight)
                                 .padding(.horizontal)
                         }
-
-                        // This is much more stable than `.contentMargins()`
-                        Spacer()
-                            .frame(height: minHeight)
                     }
-                    .contentOffset($contentOffset, in: coordinateSpace)
                     .listRowSeparator(.hidden)
                     .selectionDisabled()
-                    .onDisappear {
-                        contentOffset = -(metadataHeight + controlsInset)
-                    }
 
                     // MARK: Tracks
 
@@ -98,12 +92,6 @@ struct PlaylistView: View {
                 }
                 .scrollClipDisabled()
                 .scrollContentBackground(.hidden)
-                .coordinateSpace(name: coordinateSpace)
-                .onScrollGeometryChange(for: EdgeInsets.self) { proxy in
-                    proxy.contentInsets
-                } action: { _, newValue in
-                    contentInsets = newValue
-                }
             }
         }
         .overlay(alignment: .top) {
@@ -131,7 +119,6 @@ struct PlaylistView: View {
             }
             .padding(.horizontal)
             .padding(.top, 8)
-            .offset(y: max(0, controlsOffset))
         }
         .animation(animationFast, value: playlist)
         .animation(animationFast, value: playlist.selectedTracks)
@@ -212,28 +199,6 @@ struct PlaylistView: View {
             .zero
         case .canonical:
             300
-        }
-    }
-
-    private var visualInset: CGFloat {
-        14
-        // 14 is the top inset of the `List`
-    }
-
-    private var controlsInset: CGFloat {
-        -(contentInsets.top + visualInset)
-    }
-
-    private var controlsOffset: CGFloat {
-        switch playlist.mode {
-        case .referenced:
-            0
-        case .canonical:
-            if playlist.isEmpty {
-                metadataHeight
-            } else {
-                contentOffset + controlsInset + metadataHeight
-            }
         }
     }
 

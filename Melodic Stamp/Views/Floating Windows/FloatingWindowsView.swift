@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct FloatingWindowsView<Content>: View where Content: View {
+struct FloatingWindowsView: View {
     @Environment(FloatingWindowsModel.self) private var floatingWindows
     @Environment(WindowManagerModel.self) private var windowManager
     @Environment(PresentationManagerModel.self) private var presentationManager: PresentationManagerModel
@@ -22,12 +22,11 @@ struct FloatingWindowsView<Content>: View where Content: View {
     @Environment(\.namespace) private var namespace
 
     var window: NSWindow?
-    @ViewBuilder var content: () -> Content
 
     @State private var floatingWindowsInitializationDispatch: DispatchWorkItem?
 
     var body: some View {
-        content()
+        Color.clear
             .onChange(of: window) { oldValue, newValue in
                 if let newValue {
                     initializeFloatingWindows(to: newValue)
@@ -76,12 +75,9 @@ struct FloatingWindowsView<Content>: View where Content: View {
                     floatingPlayerView(mainWindow: mainWindow)
                         .environment(\.namespace, namespace)
                         .environment(windowManager)
-                        .environment(presentationManager)
-                        .environment(fileManager)
                         .environment(playlist)
                         .environment(player)
                         .environment(keyboardControl)
-                        .environment(metadataEditor)
                         .environment(audioVisualizer)
                         .environment(gradientVisualizer)
                 }
@@ -95,15 +91,5 @@ struct FloatingWindowsView<Content>: View where Content: View {
         floatingWindowsInitializationDispatch?.cancel()
         floatingWindows.removeTabBar(from: mainWindow)
         floatingWindows.removePlayer(from: mainWindow)
-    }
-}
-
-struct FloatingWindowsModifier: ViewModifier {
-    var window: NSWindow?
-
-    func body(content: Content) -> some View {
-        FloatingWindowsView(window: window) {
-            content
-        }
     }
 }

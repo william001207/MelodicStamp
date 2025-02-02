@@ -114,16 +114,6 @@ struct ContentView: View {
                     }
                     return true
                 }
-                .background {
-                    FileImporters()
-
-                    DelegatedPlaylistStorage()
-                    DelegatedPlaylistStateStorage()
-
-                    UnsavedChangesPresentation()
-                    UnsavedPlaylistPresentation()
-                    PlaylistPresentation()
-                }
 
                 // MARK: Window Styling
 

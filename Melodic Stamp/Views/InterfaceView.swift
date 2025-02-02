@@ -11,6 +11,7 @@ import SwiftUI
 struct InterfaceView: View {
     @Environment(LibraryModel.self) private var library
     @Environment(WindowManagerModel.self) private var windowManager
+    @Environment(PlaylistModel.self) private var playlist
 
     @Environment(\.appearsActive) private var appearsActive
 
@@ -29,9 +30,21 @@ struct InterfaceView: View {
                 miniPlayerView(window)
             }
         }
-        .modifier(WindowTerminationPresentationInjectorModifier(window: window))
-        .modifier(FloatingWindowsModifier(window: floatingWindowsTargetWindow))
-        .modifier(NavigationTitlesModifier())
+        .background {
+            FileImporters()
+
+            DelegatedPlaylistStorage()
+            DelegatedPlaylistStateStorage()
+
+            UnsavedChangesPresentation()
+            UnsavedPlaylistPresentation()
+            PlaylistPresentation()
+
+            WindowTerminationPresentationInjector(window: window)
+            FloatingWindowsView(window: floatingWindowsTargetWindow)
+            NavigationTitlesView()
+            NavigationDocumentView()
+        }
     }
 
     // MARK: - Main View

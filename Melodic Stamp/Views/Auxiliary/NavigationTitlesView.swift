@@ -8,16 +8,14 @@
 import Defaults
 import SwiftUI
 
-struct NavigationTitlesView<Content>: View where Content: View {
+struct NavigationTitlesView: View {
     @Environment(PlaylistModel.self) private var playlist
     @Environment(PlayerModel.self) private var player
 
     @Default(.dynamicTitleBar) private var dynamicTitleBar
 
-    @ViewBuilder var content: () -> Content
-
     var body: some View {
-        content()
+        Color.clear
             .navigationTitle(title)
             .navigationSubtitle(subtitle)
     }
@@ -78,14 +76,6 @@ struct NavigationTitlesView<Content>: View where Content: View {
             String(localized: "\(playlist.count) Tracks")
         } else {
             nil
-        }
-    }
-}
-
-struct NavigationTitlesModifier: ViewModifier {
-    func body(content: Content) -> some View {
-        NavigationTitlesView {
-            content
         }
     }
 }

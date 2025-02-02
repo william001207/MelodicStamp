@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct WindowTerminationPresentationInjector<Parent>: View where Parent: View {
+struct WindowTerminationPresentationInjector: View {
     @Environment(WindowManagerModel.self) private var windowManager
     @Environment(PresentationManagerModel.self) private var presentationManager
     @Environment(PlaylistModel.self) private var playlist
@@ -16,10 +16,9 @@ struct WindowTerminationPresentationInjector<Parent>: View where Parent: View {
     @Environment(\.appDelegate) private var appDelegate
 
     var window: NSWindow?
-    @ViewBuilder var parent: () -> Parent
 
     var body: some View {
-        parent()
+        Color.clear
             .background(MakeCloseDelegated(shouldClose: windowShouldClose) { window, shouldClose in
                 if shouldClose {
                     player.stop()
@@ -41,15 +40,5 @@ struct WindowTerminationPresentationInjector<Parent>: View where Parent: View {
 
     private var windowShouldClose: Bool {
         windowManager.state.shouldForceClose || (!hasUnsavedChanges && playlist.mode.isCanonical)
-    }
-}
-
-struct WindowTerminationPresentationInjectorModifier: ViewModifier {
-    var window: NSWindow?
-
-    func body(content: Content) -> some View {
-        WindowTerminationPresentationInjector(window: window) {
-            content
-        }
     }
 }
