@@ -125,7 +125,7 @@ struct PlaylistMetadataView: View {
                             NSWorkspace.shared.activateFileViewerSelecting([playlist.url])
                         } label: {
                             HStack {
-                                if let creationDate = try? playlist.url.attribute(.creationDate) as? Date {
+                                if let creationDate = playlist.url[attribute: .creationDate] as? Date {
                                     let formattedCreationDate = creationDate.formatted(
                                         date: .complete,
                                         time: .standard

@@ -25,7 +25,14 @@ extension URL {
         return startAccessingSecurityScopedResource() || isReachable
     }
 
-    func attribute(_ key: FileAttributeKey) throws -> Any? {
-        try FileManager.default.attributesOfItem(atPath: standardizedFileURL.path(percentEncoded: false))[key]
+    subscript(attribute key: FileAttributeKey) -> Any? {
+        get {
+            try? FileManager.default.attributesOfItem(atPath: standardizedFileURL.path(percentEncoded: false))[key]
+        }
+
+        set {
+            guard let newValue else { return }
+            try? FileManager.default.setAttributes([key: newValue], ofItemAtPath: standardizedFileURL.path(percentEncoded: false))
+        }
     }
 }
