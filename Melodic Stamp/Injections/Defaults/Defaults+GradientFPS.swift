@@ -37,7 +37,7 @@ extension Defaults.GradientFPS: ExpressibleByIntegerLiteral, Comparable {
 }
 
 extension Defaults.GradientFPS: Clampable {
-    static let range: ClosedRange<Self> = 30...120
+    static let range: ClosedRange<Self> = 30...240
 }
 
 extension Defaults.GradientFPS: Codable, Defaults.Serializable {}
