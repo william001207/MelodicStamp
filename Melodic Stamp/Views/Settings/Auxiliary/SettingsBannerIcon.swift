@@ -27,7 +27,7 @@ struct SettingsBannerIcon: View {
             .font(.system(size: 42))
             .frame(width: 50, height: 50)
             .padding(6)
-            .gradientBackground(color)
+            .simpleGradient(color)
             .clipShape(.rect(cornerRadius: 16))
     }
 }

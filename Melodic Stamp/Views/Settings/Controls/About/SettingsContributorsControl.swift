@@ -14,13 +14,19 @@ struct SettingsContributorsControl: View {
             contributor(
                 avatarSource: .remote(.github.appending(component: "KrLite.png")),
                 "KrLite",
-                "Organization, design, and development."
+                .init(
+                    "Settings Control (Contributors): (Description) KrLite",
+                    defaultValue: "Organization, design, and development."
+                )
             )
 
             contributor(
                 avatarSource: .remote(.github.appending(component: "Xinshao-air.png")),
                 "芯梢",
-                "Design, test, and development support."
+                .init(
+                    "Settings Control (Contributors): (Description) 芯梢",
+                    defaultValue: "Design, test, and development support."
+                )
             )
         }
     }
@@ -28,7 +34,7 @@ struct SettingsContributorsControl: View {
     @ViewBuilder private func contributor(
         avatarSource: ContributorAvatarSource,
         _ name: String,
-        _ descriptionKey: LocalizedStringKey?
+        _ description: LocalizedStringResource?
     ) -> some View {
         HStack {
             ContributorAvatarView(source: avatarSource)
@@ -37,8 +43,8 @@ struct SettingsContributorsControl: View {
                 Text(verbatim: name)
                     .font(.headline)
 
-                if let descriptionKey {
-                    Text(descriptionKey)
+                if let description {
+                    Text(description)
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                 }

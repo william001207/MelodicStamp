@@ -15,7 +15,7 @@ struct AdaptableMusicCoverControl: View {
 
     @Environment(\.undoManager) private var undoManager
 
-    @Namespace private var namespace
+    @Namespace private var localNamespace
 
     var entries: Entries
     var type: AttachedPicture.`Type`
@@ -105,7 +105,7 @@ struct AdaptableMusicCoverControl: View {
                         .fill(.ultraThickMaterial)
                         .clipShape(.capsule)
                         .matchedGeometryEffect(
-                            id: "headerBackground", in: namespace
+                            id: "headerBackground", in: localNamespace
                         )
                 }
             } else {
@@ -120,7 +120,7 @@ struct AdaptableMusicCoverControl: View {
                             .fill(.ultraThinMaterial)
                             .clipShape(.capsule)
                             .matchedGeometryEffect(
-                                id: "headerBackground", in: namespace
+                                id: "headerBackground", in: localNamespace
                             )
                     }
             }
@@ -179,7 +179,7 @@ struct AdaptableMusicCoverControl: View {
         }
     }
 
-    #Preview(traits: .modifier(PreviewEnvironments())) {
+    #Preview(traits: .modifier(PreviewEnvironmentsModifier())) {
         @Previewable @State var attachedPicturesHandler: AttachedPicturesHandlerModel = .init()
 
         AdaptableMusicCoverControlPreview()

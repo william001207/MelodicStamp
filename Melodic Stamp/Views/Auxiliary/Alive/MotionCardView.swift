@@ -1,5 +1,5 @@
 //
-//  MotionCard.swift
+//  MotionCardView.swift
 //  Melodic Stamp
 //
 //  Created by KrLite on 2025/1/23.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct MotionCard<Content>: View where Content: View {
+struct MotionCardView<Content>: View where Content: View {
     var scale: CGFloat = 1.065
     var angle: Angle = .degrees(10)
     var shadowColor: Color = .black.opacity(0.45)
@@ -96,7 +96,7 @@ struct MotionCardModifier: ViewModifier {
     var glintRadius: CGFloat = 50
 
     func body(content: Content) -> some View {
-        MotionCard(
+        MotionCardView(
             scale: scale,
             angle: angle,
             shadowColor: shadowColor,
@@ -111,7 +111,7 @@ struct MotionCardModifier: ViewModifier {
 
 #if DEBUG
     #Preview {
-        MotionCard {
+        MotionCardView {
             Image(.templateArtwork)
                 .resizable()
                 .scaledToFill()

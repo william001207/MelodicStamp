@@ -33,12 +33,7 @@ struct Playlist: Equatable, Hashable, Identifiable {
     let mode: Mode
     var segments: Segments
 
-    #if DEBUG
-        var tracks: [Track] = []
-    #else
-        private(set) var tracks: [Track] = []
-    #endif
-
+    var tracks: [Track] = []
     var indexer: TrackIndexer
 
     // Delegated variables

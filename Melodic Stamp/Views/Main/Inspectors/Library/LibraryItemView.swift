@@ -159,7 +159,7 @@ struct LibraryItemView: View {
 }
 
 #if DEBUG
-    #Preview(traits: .modifier(PreviewEnvironments())) {
-        LibraryItemView(item: PreviewEnvironments.samplePlaylist, isSelected: false)
+    #Preview(traits: .modifier(PreviewEnvironmentsModifier())) {
+        LibraryItemView(item: PreviewEnvironmentsModifier.samplePlaylist, isSelected: false)
     }
 #endif

@@ -1,5 +1,5 @@
 //
-//  NavigationTitles.swift
+//  NavigationTitlesView.swift
 //  Melodic Stamp
 //
 //  Created by KrLite on 2025/2/2.
@@ -8,7 +8,7 @@
 import Defaults
 import SwiftUI
 
-struct NavigationTitles<Content>: View where Content: View {
+struct NavigationTitlesView<Content>: View where Content: View {
     @Environment(PlaylistModel.self) private var playlist
     @Environment(PlayerModel.self) private var player
 
@@ -84,7 +84,7 @@ struct NavigationTitles<Content>: View where Content: View {
 
 struct NavigationTitlesModifier: ViewModifier {
     func body(content: Content) -> some View {
-        NavigationTitles {
+        NavigationTitlesView {
             content
         }
     }

@@ -20,12 +20,17 @@ struct SettingsDynamicTitleBarControl: View {
                 case .always:
                     Text("Always")
                 case .whilePlaying:
-                    Text("While playing")
+                    Text("While Playing")
                 }
             }
         } label: {
             Text("Dynamic title bar")
-            Text("Displays the information of the currently playing track as window title.")
+            Text(String(localized: .init(
+                "Settings Control (Dynamic Title Bar Control): (Subtitle) Dynamic Title Bar",
+                defaultValue: """
+                Displays the information of the currently playing track as window title.
+                """
+            )))
         }
     }
 }

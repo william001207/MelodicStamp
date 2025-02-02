@@ -14,8 +14,6 @@ struct AppleMusicLyricsViewInteractionStateButton: View, Animatable {
         set { progress = newValue }
     }
 
-    @Namespace private var namespace
-
     @Binding var interactionState: AppleMusicLyricsViewInteractionState
     var progress: CGFloat
     var lineWidth: CGFloat = 4

@@ -175,7 +175,7 @@ struct PlaylistMetadataView: View {
 }
 
 #if DEBUG
-    #Preview(traits: .modifier(PreviewEnvironments())) {
+    #Preview(traits: .modifier(PreviewEnvironmentsModifier())) {
         PlaylistMetadataView()
     }
 #endif

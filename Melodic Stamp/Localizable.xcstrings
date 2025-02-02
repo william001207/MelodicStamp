@@ -183,7 +183,14 @@
       }
     },
     "Add" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "添加"
+          }
+        }
+      }
     },
     "Add Files" : {
       "localizations" : {
@@ -331,16 +338,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "外观"
-          }
-        }
-      }
-    },
-    "Applies a fading blur and opacity effect to lyrics that are not currently highlighted." : {
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "向未高亮的歌词应用渐隐的模糊和透明度效果。"
           }
         }
       }
@@ -1055,32 +1052,12 @@
         }
       }
     },
-    "Design, test, and development support." : {
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "设计、测试和开发支持。"
-          }
-        }
-      }
-    },
     "Discs" : {
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "碟片"
-          }
-        }
-      }
-    },
-    "Displays the information of the currently playing track as window title." : {
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "将正在播放的歌曲信息用作窗口标题。"
           }
         }
       }
@@ -1347,7 +1324,14 @@
       }
     },
     "Edit Lyrics" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "编辑歌词"
+          }
+        }
+      }
     },
     "Ethereal" : {
       "localizations" : {
@@ -1619,6 +1603,16 @@
         }
       }
     },
+    "Load" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "加载"
+          }
+        }
+      }
+    },
     "Load from File" : {
       "localizations" : {
         "zh-Hans" : {
@@ -1809,7 +1803,7 @@
         }
       }
     },
-    "MusicTitle : (Separator) Stringified Artists" : {
+    "Music Title : (Separator) Stringified Artists" : {
       "comment" : "The separator between artists in a stringified title",
       "extractionState" : "extracted_with_value",
       "localizations" : {
@@ -1827,7 +1821,7 @@
         }
       }
     },
-    "MusicTitle: (Separator) Artists" : {
+    "Music Title: (Separator) Artists" : {
       "comment" : "The separator between artists in a regular title",
       "extractionState" : "extracted_with_value",
       "localizations" : {
@@ -1906,7 +1900,14 @@
       }
     },
     "Open" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "打开"
+          }
+        }
+      }
     },
     "Open %lld Playlists" : {
       "localizations" : {
@@ -1978,16 +1979,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "开源于GitHub"
-          }
-        }
-      }
-    },
-    "Organization, design, and development." : {
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "策划、设计和开发。"
           }
         }
       }
@@ -2566,8 +2557,15 @@
         }
       }
     },
-    "Save/Update" : {
-
+    "Save/Load" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "保存/加载"
+          }
+        }
+      }
     },
     "Saving…" : {
       "localizations" : {
@@ -2619,12 +2617,121 @@
         }
       }
     },
-    "Share your feedback on our GitHub page! Whether you find a bug or want to suggest a new feature, feel free to speak up. [Join our QQ Group Chat…](https://qm.qq.com/q/txBDJxnw4i)" : {
+    "Settings Control (Contributors): (Description) KrLite" : {
+      "extractionState" : "extracted_with_value",
       "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Organization, design, and development."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "策划、设计和开发。"
+          }
+        }
+      }
+    },
+    "Settings Control (Contributors): (Description) 芯梢" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Design, test, and development support."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "设计、测试和开发支持。"
+          }
+        }
+      }
+    },
+    "Settings Control (Dynamic Title Bar Control): (Subtitle) Dynamic Title Bar" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Displays the information of the currently playing track as window title."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "将正在播放的歌曲信息用作窗口标题。"
+          }
+        }
+      }
+    },
+    "Settings Control (Lyrics Fading Effect): (Subtitle) Fading Effect" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Applies a fading blur and opacity effect to lyrics that are not currently highlighted."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "向未高亮的歌词应用渐隐的模糊和透明度效果。"
+          }
+        }
+      }
+    },
+    "Settings Page (Feedback): (Subtitle) Contributors" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "We developed this app in our spare time. We are looking forward to your participation in bringing %@ to perfection!"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "我们利用空闲时间开发了这款软件。如果你希望和我们一起将%@打磨至完美，随时欢迎！"
+          }
+        }
+      }
+    },
+    "Settings Page (Feedback): Footer" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Share your feedback on our GitHub page! Whether you find a bug or want to suggest a new feature, feel free to speak up. [Join Us in QQ…](https://qm.qq.com/q/txBDJxnw4i)"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "在我们的GitHub页面上分享你的反馈！无论你发现了漏洞还是想建议新功能，都请畅所欲言。[加入QQ群聊…](https://qm.qq.com/q/txBDJxnw4i)"
+          }
+        }
+      }
+    },
+    "Settings Page (Lyrics): (Subtitle) Attachments & Type Size" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "While type size can be adjusted independently in the leaflet page, all changes of the below properties including type size will cause a reset in the lyrics view in order to obtain a correct visual effect."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "尽管文字大小可以在传单页面中单独调整，但对包含文字大小在内的以下属性进行的任何调整都会强制触发歌词视图的重置，以保证视觉效果的准确性。"
           }
         }
       }
@@ -2729,6 +2836,23 @@
         }
       }
     },
+    "Toolbar (Lyrics): (Popover) Information" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "You can use [AMLL TTML Tool](https://steve-xmh.github.io/amll-ttml-tool) to create TTML lyrics through a refined interface."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "你可以使用[AMLL TTML Tool](https://steve-xmh.github.io/amll-ttml-tool)可视化地创建逐字歌词。"
+          }
+        }
+      }
+    },
     "Track & Disc" : {
       "localizations" : {
         "zh-Hans" : {
@@ -2819,9 +2943,6 @@
         }
       }
     },
-    "Update" : {
-
-    },
     "Version" : {
       "localizations" : {
         "zh-Hans" : {
@@ -2852,32 +2973,12 @@
         }
       }
     },
-    "We developed this app in our spare time. We are looking forward to your participation in bringing %@ to perfection!" : {
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "我们利用空闲时间开发了这款软件。如果你希望和我们一起将%@打磨至完美，随时欢迎！"
-          }
-        }
-      }
-    },
-    "While playing" : {
+    "While Playing" : {
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "播放时"
-          }
-        }
-      }
-    },
-    "While type size can be adjusted independently in the leaflet page, all changes of the below properties including type size will cause a reset in the lyrics view in order to obtain a correct visual effect." : {
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "尽管文字大小可以在传单页面中单独调整，但对包含文字大小在内的以下属性进行的任何调整都会强制触发歌词视图的重置，以保证视觉效果的准确性。"
           }
         }
       }
@@ -2888,16 +2989,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "未给予写入权限。"
-          }
-        }
-      }
-    },
-    "You can use [AMLL TTML Tool](https://steve-xmh.github.io/amll-ttml-tool) to create TTML lyrics through a refined interface." : {
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "你可以使用[AMLL TTML Tool](https://steve-xmh.github.io/amll-ttml-tool)可视化地创建逐字歌词。"
           }
         }
       }

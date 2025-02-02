@@ -8,6 +8,7 @@
 import SwiftUI
 
 extension EnvironmentValues {
-    @Entry var appDelegate: AppDelegate?
+    @Entry var namespace: Namespace.ID!
+    @Entry var appDelegate: AppDelegate!
     @Entry var availableTypeSizes: ClosedRange<DynamicTypeSize> = .small...(.xxLarge)
 }

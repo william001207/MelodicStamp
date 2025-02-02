@@ -1,5 +1,12 @@
 //
-//  GradientBackgroundView.swift
+//  SimpleGradientView.swift
+//  Melodic Stamp
+//
+//  Created by KrLite on 2025/2/2.
+//
+
+//
+//  SimpleGradientView.swift
 //  MelodicStamp
 //
 //  Created by KrLite on 2025/1/8.
@@ -7,7 +14,7 @@
 
 import SwiftUI
 
-struct GradientBackgroundView<Content>: View where Content: View {
+struct SimpleGradientView<Content>: View where Content: View {
     var color: Color = .accent
     @ViewBuilder var content: () -> Content
 
@@ -27,18 +34,18 @@ struct GradientBackgroundView<Content>: View where Content: View {
     }
 }
 
-struct GradientBackgroundModifier: ViewModifier {
+struct SimpleGradientModifier: ViewModifier {
     var color: Color = .accent
 
     func body(content: Content) -> some View {
-        GradientBackgroundView(color: color) {
+        SimpleGradientView(color: color) {
             content
         }
     }
 }
 
 #Preview {
-    GradientBackgroundView {
+    SimpleGradientView {
         Image(systemSymbol: .gear)
             .font(.title)
     }

@@ -26,7 +26,7 @@ struct SettingsSidebarIcon: View {
             .foregroundStyle(.white)
             .frame(width: 16, height: 16)
             .padding(2)
-            .gradientBackground(color)
+            .simpleGradient(color)
             .clipShape(.rect(cornerRadius: 5))
     }
 }

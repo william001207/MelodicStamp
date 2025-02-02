@@ -1,0 +1,113 @@
+//
+//  InterfaceView.swift
+//  Melodic Stamp
+//
+//  Created by KrLite on 2025/2/2.
+//
+
+import Defaults
+import SwiftUI
+
+struct InterfaceView: View {
+    @Environment(LibraryModel.self) private var library
+    @Environment(WindowManagerModel.self) private var windowManager
+
+    @Environment(\.appearsActive) private var appearsActive
+
+    @Default(.mainWindowBackgroundStyle) private var mainWindowBackgroundStyle
+    @Default(.miniPlayerBackgroundStyle) private var miniPlayerBackgroundStyle
+
+    var window: NSWindow?
+    @State private var floatingWindowsTargetWindow: NSWindow?
+
+    var body: some View {
+        Group {
+            switch windowManager.style {
+            case .main:
+                mainView(window)
+            case .miniPlayer:
+                miniPlayerView(window)
+            }
+        }
+        .modifier(WindowTerminationPresentationInjectorModifier(window: window))
+        .modifier(FloatingWindowsModifier(window: floatingWindowsTargetWindow))
+        .modifier(NavigationTitlesModifier())
+    }
+
+    // MARK: - Main View
+
+    @ViewBuilder private func mainView(_ window: NSWindow? = nil) -> some View {
+        MainView()
+            .background {
+                Group {
+                    if windowManager.isInFullScreen {
+                        OpaqueBackgroundView()
+                    } else {
+                        switch mainWindowBackgroundStyle {
+                        case .opaque:
+                            OpaqueBackgroundView()
+                        case .vibrant:
+                            VibrantBackgroundView()
+                        case .ethereal:
+                            EtherealBackgroundView()
+                        }
+                    }
+                }
+                .ignoresSafeArea()
+            }
+            .onDisappear {
+                floatingWindowsTargetWindow = nil
+            }
+            .onChange(of: appearsActive, initial: true) { _, newValue in
+                if newValue {
+                    floatingWindowsTargetWindow = window
+                } else {
+                    floatingWindowsTargetWindow = nil
+                }
+            }
+            .onChange(of: appearsActive, initial: true) { _, newValue in
+                guard newValue else { return }
+
+                Task {
+                    await library.loadPlaylists()
+                }
+            }
+    }
+
+    // MARK: - Mini Player View
+
+    @ViewBuilder private func miniPlayerView(_: NSWindow? = nil) -> some View {
+        MiniPlayerView()
+            .padding(12)
+            .padding(.top, 4)
+            .padding(.bottom, -32)
+            .ignoresSafeArea()
+            .frame(minWidth: 500, idealWidth: 500)
+            .fixedSize(horizontal: false, vertical: true)
+            .background {
+                Group {
+                    switch miniPlayerBackgroundStyle {
+                    case .opaque:
+                        OpaqueBackgroundView()
+                    case .vibrant:
+                        VibrantBackgroundView()
+                    case .ethereal:
+                        EtherealBackgroundView()
+                    case .chroma:
+                        ChromaBackgroundView()
+                            .overlay(.ultraThinMaterial)
+                    }
+                }
+                .ignoresSafeArea()
+            }
+            .onAppear {
+                floatingWindowsTargetWindow = nil
+            }
+    }
+}
+
+#if DEBUG
+    #Preview(traits: .modifier(PreviewEnvironmentsModifier())) {
+        InterfaceView()
+    }
+#endif

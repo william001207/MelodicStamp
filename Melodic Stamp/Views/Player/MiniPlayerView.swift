@@ -45,12 +45,9 @@ struct MiniPlayerView: View {
 
     @Environment(\.appearsActive) private var appearsActive
     @Environment(\.luminareAnimation) private var animation
+    @Environment(\.namespace) private var namespace
 
     @FocusState private var isFocused: Bool
-
-    // MARK: - Fields
-
-    var namespace: Namespace.ID
 
     // MARK: Models
 
@@ -229,7 +226,7 @@ struct MiniPlayerView: View {
                     .frame(width: 16, height: 16)
             }
             .matchedGeometryEffect(
-                id: PlayerNamespace.playbackModeButton, in: namespace
+                id: PlayerNamespace.playbackModeButton, in: namespace!
             )
             .contextMenu {
                 PlaybackModePicker(selection: $playlist.playbackMode)
@@ -245,7 +242,7 @@ struct MiniPlayerView: View {
                     .aliveHighlight(playlist.playbackLooping)
             }
             .matchedGeometryEffect(
-                id: PlayerNamespace.playbackLoopingButton, in: namespace
+                id: PlayerNamespace.playbackLoopingButton, in: namespace!
             )
 
             Button {
@@ -266,7 +263,7 @@ struct MiniPlayerView: View {
                     }
                 }
                 .animation(.default, value: playlist.currentTrack)
-                .matchedGeometryEffect(id: PlayerNamespace.title, in: namespace)
+                .matchedGeometryEffect(id: PlayerNamespace.title, in: namespace!)
                 .padding(.bottom, 2)
             }
             .buttonStyle(.alive)
@@ -299,7 +296,7 @@ struct MiniPlayerView: View {
                     Image(systemSymbol: .arrowUpLeftAndArrowDownRight)
                 }
                 .matchedGeometryEffect(
-                    id: PlayerNamespace.expandShrinkButton, in: namespace
+                    id: PlayerNamespace.expandShrinkButton, in: namespace!
                 )
                 .transition(.blurReplace)
             }
@@ -332,7 +329,7 @@ struct MiniPlayerView: View {
                     value: keyboardControl.previousSongButtonBounceAnimation
                 )
                 .matchedGeometryEffect(
-                    id: PlayerNamespace.previousSongButton, in: namespace
+                    id: PlayerNamespace.previousSongButton, in: namespace!
                 )
 
                 // MARK: Play / Pause
@@ -354,7 +351,7 @@ struct MiniPlayerView: View {
                     .bouncy, value: keyboardControl.isPressingSpace
                 )
                 .matchedGeometryEffect(
-                    id: PlayerNamespace.playPauseButton, in: namespace
+                    id: PlayerNamespace.playPauseButton, in: namespace!
                 )
 
                 // MARK: Next Track
@@ -371,7 +368,7 @@ struct MiniPlayerView: View {
                     value: keyboardControl.nextSongButtonBounceAnimation
                 )
                 .matchedGeometryEffect(
-                    id: PlayerNamespace.nextSongButton, in: namespace
+                    id: PlayerNamespace.nextSongButton, in: namespace!
                 )
             }
             .buttonStyle(.alive)
@@ -429,7 +426,7 @@ struct MiniPlayerView: View {
                 value: keyboardControl.speakerButtonBounceAnimation
             )
             .matchedGeometryEffect(
-                id: PlayerNamespace.volumeButton, in: namespace
+                id: PlayerNamespace.volumeButton, in: namespace!
             )
             .contextMenu {
                 if player.isCurrentTrackPlayable {
@@ -482,7 +479,7 @@ struct MiniPlayerView: View {
                 }
             }
             .transition(.blurReplace)
-            .matchedGeometryEffect(id: PlayerNamespace.timeText, in: namespace)
+            .matchedGeometryEffect(id: PlayerNamespace.timeText, in: namespace!)
 
             Group {
                 let value: Binding<CGFloat> =
@@ -526,7 +523,7 @@ struct MiniPlayerView: View {
                 isProgressBarHovering = true
             }
             .animation(.default.speed(2), value: player.isMuted)
-            .matchedGeometryEffect(id: activeControl.id, in: namespace)
+            .matchedGeometryEffect(id: activeControl.id, in: namespace!)
 
             Group {
                 if isProgressControlActive {
@@ -538,7 +535,7 @@ struct MiniPlayerView: View {
             }
             .transition(.blurReplace)
             .matchedGeometryEffect(
-                id: PlayerNamespace.durationText, in: namespace
+                id: PlayerNamespace.durationText, in: namespace!
             )
         }
         .frame(height: 12)
@@ -595,9 +592,7 @@ struct MiniPlayerView: View {
 }
 
 #if DEBUG
-    #Preview(traits: .modifier(PreviewEnvironments())) {
-        @Previewable @Namespace var namespace
-
-        MiniPlayerView(namespace: namespace)
+    #Preview(traits: .modifier(PreviewEnvironmentsModifier())) {
+        MiniPlayerView()
     }
 #endif

@@ -23,12 +23,11 @@ struct PlaylistView: View {
     @Environment(\.luminareMinHeight) private var minHeight
     @Environment(\.luminareAnimation) private var animation
     @Environment(\.luminareAnimationFast) private var animationFast
+    @Environment(\.namespace) private var namespace
 
     @Namespace private var coordinateSpace
 
     // MARK: - Fields
-
-    var namespace: Namespace.ID
 
     @State private var contentOffset: CGFloat = .zero
     @State private var contentInsets: EdgeInsets = .zero
@@ -270,7 +269,7 @@ struct PlaylistView: View {
                 } else if playlist.selectedTracks.count <= 1 {
                     Button(role: .destructive) {
                         handleRemove(playlist.selectedTracks.map(\.url))
-                        resetFocus(in: namespace)
+                        resetFocus(in: namespace!)
                     } label: {
                         HStack {
                             Image(systemSymbol: .trashFill)
@@ -283,7 +282,7 @@ struct PlaylistView: View {
                 } else {
                     Button(role: .destructive) {
                         handleRemove(playlist.selectedTracks.map(\.url))
-                        resetFocus(in: namespace)
+                        resetFocus(in: namespace!)
                     } label: {
                         HStack {
                             Image(systemSymbol: .trashFill)
@@ -546,9 +545,7 @@ struct PlaylistView: View {
 
     // MARK: - Preview
 
-    #Preview(traits: .modifier(PreviewEnvironments())) {
-        @Previewable @Namespace var namespace
-
-        PlaylistView(namespace: namespace)
+    #Preview(traits: .modifier(PreviewEnvironmentsModifier())) {
+        PlaylistView()
     }
 #endif

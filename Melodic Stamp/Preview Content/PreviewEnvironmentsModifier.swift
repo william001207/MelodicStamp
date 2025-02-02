@@ -1,5 +1,5 @@
 //
-//  PreviewEnvironments.swift
+//  PreviewEnvironmentsModifier.swift
 //  MelodicStamp
 //
 //  Created by KrLite on 2024/12/31.
@@ -9,7 +9,7 @@ import CSFBAudioEngine
 import SwiftUI
 
 #if DEBUG
-    struct PreviewEnvironments: PreviewModifier {
+    struct PreviewEnvironmentsModifier: PreviewModifier {
         typealias Context = (
             floatingWindows: FloatingWindowsModel,
             library: LibraryModel,
@@ -76,7 +76,7 @@ import SwiftUI
         }
     }
 
-    extension PreviewEnvironments {
+    extension PreviewEnvironmentsModifier {
         static var sampleArtwork: NSImage {
             .templateArtwork
         }

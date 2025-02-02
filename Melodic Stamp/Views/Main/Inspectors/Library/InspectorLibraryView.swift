@@ -199,7 +199,7 @@ struct InspectorLibraryView: View {
 
     // MARK: - Preview
 
-    #Preview(traits: .modifier(PreviewEnvironments())) {
+    #Preview(traits: .modifier(PreviewEnvironmentsModifier())) {
         InspectorLibraryView()
     }
 #endif

@@ -46,7 +46,7 @@ struct ModifiedMetadataList: View {
 }
 
 #if DEBUG
-    #Preview(traits: .modifier(PreviewEnvironments())) {
+    #Preview(traits: .modifier(PreviewEnvironmentsModifier())) {
         ModifiedMetadataList()
     }
 #endif

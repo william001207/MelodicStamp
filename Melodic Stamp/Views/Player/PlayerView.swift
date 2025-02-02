@@ -19,9 +19,7 @@ struct PlayerView: View {
     @Environment(KeyboardControlModel.self) private var keyboardControl
     @Environment(AudioVisualizerModel.self) private var audioVisualizer
 
-    // MARK: - Fields
-
-    var namespace: Namespace.ID
+    @Environment(\.namespace) private var namespace
 
     // MARK: Appearance
 
@@ -84,7 +82,7 @@ struct PlayerView: View {
                     .frame(width: 20, height: 20)
             }
             .matchedGeometryEffect(
-                id: PlayerNamespace.playbackModeButton, in: namespace
+                id: PlayerNamespace.playbackModeButton, in: namespace!
             )
             .contextMenu {
                 PlaybackModePicker(selection: $playlist.playbackMode)
@@ -101,7 +99,7 @@ struct PlayerView: View {
                     .aliveHighlight(playlist.playbackLooping)
             }
             .matchedGeometryEffect(
-                id: PlayerNamespace.playbackLoopingButton, in: namespace
+                id: PlayerNamespace.playbackLoopingButton, in: namespace!
             )
 
             Spacer()
@@ -111,7 +109,7 @@ struct PlayerView: View {
                     MusicTitle(track: playlist.currentTrack)
                 }
                 .animation(.default, value: playlist.currentTrack)
-                .matchedGeometryEffect(id: PlayerNamespace.title, in: namespace)
+                .matchedGeometryEffect(id: PlayerNamespace.title, in: namespace!)
 
                 if player.hasCurrentTrack {
                     TinyBinaryChannelVisualizerView()
@@ -147,7 +145,7 @@ struct PlayerView: View {
                         .frame(width: 20)
                 }
                 .matchedGeometryEffect(
-                    id: PlayerNamespace.expandShrinkButton, in: namespace
+                    id: PlayerNamespace.expandShrinkButton, in: namespace!
                 )
             }
         }
@@ -174,7 +172,7 @@ struct PlayerView: View {
                 value: keyboardControl.previousSongButtonBounceAnimation
             )
             .matchedGeometryEffect(
-                id: PlayerNamespace.previousSongButton, in: namespace
+                id: PlayerNamespace.previousSongButton, in: namespace!
             )
 
             // MARK: Play / Pause
@@ -194,7 +192,7 @@ struct PlayerView: View {
             )
             .animation(.bouncy, value: keyboardControl.isPressingSpace)
             .matchedGeometryEffect(
-                id: PlayerNamespace.playPauseButton, in: namespace
+                id: PlayerNamespace.playPauseButton, in: namespace!
             )
 
             // MARK: Next Track
@@ -212,7 +210,7 @@ struct PlayerView: View {
                 value: keyboardControl.nextSongButtonBounceAnimation
             )
             .matchedGeometryEffect(
-                id: PlayerNamespace.nextSongButton, in: namespace
+                id: PlayerNamespace.nextSongButton, in: namespace!
             )
         }
         .buttonStyle(.alive)
@@ -242,7 +240,7 @@ struct PlayerView: View {
         .backgroundStyle(.quinary)
         .frame(width: 72, height: 12)
         .animation(.default.speed(2), value: player.isMuted)
-        .matchedGeometryEffect(id: PlayerNamespace.volumeBar, in: namespace)
+        .matchedGeometryEffect(id: PlayerNamespace.volumeBar, in: namespace!)
 
         // MARK: Speaker
 
@@ -259,7 +257,7 @@ struct PlayerView: View {
         .symbolEffect(
             .bounce, value: keyboardControl.speakerButtonBounceAnimation
         )
-        .matchedGeometryEffect(id: PlayerNamespace.volumeButton, in: namespace)
+        .matchedGeometryEffect(id: PlayerNamespace.volumeButton, in: namespace!)
         .contextMenu {
             Toggle("Mute", isOn: $player.isMuted)
         }
@@ -299,7 +297,7 @@ struct PlayerView: View {
         .onTapGesture {
             shouldUseRemainingDuration.toggle()
         }
-        .matchedGeometryEffect(id: PlayerNamespace.timeText, in: namespace)
+        .matchedGeometryEffect(id: PlayerNamespace.timeText, in: namespace!)
 
         ProgressBar(
             value: $player.progress,
@@ -314,7 +312,7 @@ struct PlayerView: View {
         .foregroundStyle(isProgressBarActive ? .primary : .secondary)
         .backgroundStyle(.quinary)
         .frame(height: 12)
-        .matchedGeometryEffect(id: PlayerNamespace.progressBar, in: namespace)
+        .matchedGeometryEffect(id: PlayerNamespace.progressBar, in: namespace!)
         .padding(.horizontal, isProgressBarActive ? 0 : 12)
 
         DurationText(duration: player.playbackTime?.duration)
@@ -322,15 +320,13 @@ struct PlayerView: View {
             .foregroundStyle(.secondary)
             .padding(.bottom, 1)
             .matchedGeometryEffect(
-                id: PlayerNamespace.durationText, in: namespace
+                id: PlayerNamespace.durationText, in: namespace!
             )
     }
 }
 
 #if DEBUG
-    #Preview(traits: .modifier(PreviewEnvironments())) {
-        @Previewable @Namespace var namespace
-
-        PlayerView(namespace: namespace)
+    #Preview(traits: .modifier(PreviewEnvironmentsModifier())) {
+        PlayerView()
     }
 #endif

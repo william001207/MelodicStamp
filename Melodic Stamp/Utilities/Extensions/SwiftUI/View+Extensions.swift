@@ -23,8 +23,8 @@ extension View {
         modifier(AliveHighlightViewModifier(isHighlighted: isHighlighted, cornerRadius: cornerRadius))
     }
 
-    @ViewBuilder func gradientBackground(_ color: Color = .accent) -> some View {
-        modifier(GradientBackgroundModifier(color: color))
+    @ViewBuilder func simpleGradient(_ color: Color = .accent) -> some View {
+        modifier(SimpleGradientModifier(color: color))
     }
 
     @ViewBuilder func hoverableBackground(isExplicitlyVisible: Bool? = nil) -> some View {

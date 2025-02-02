@@ -1,5 +1,5 @@
 //
-//  FloatingWindows.swift
+//  FloatingWindowsView.swift
 //  Melodic Stamp
 //
 //  Created by KrLite on 2025/2/2.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct FloatingWindows<Content>: View where Content: View {
+struct FloatingWindowsView<Content>: View where Content: View {
     @Environment(FloatingWindowsModel.self) private var floatingWindows
     @Environment(WindowManagerModel.self) private var windowManager
     @Environment(PresentationManagerModel.self) private var presentationManager: PresentationManagerModel
@@ -19,14 +19,16 @@ struct FloatingWindows<Content>: View where Content: View {
     @Environment(AudioVisualizerModel.self) private var audioVisualizer: AudioVisualizerModel
     @Environment(GradientVisualizerModel.self) private var gradientVisualizer: GradientVisualizerModel
 
-    var targetWindow: NSWindow?
+    @Environment(\.namespace) private var namespace
+
+    var window: NSWindow?
     @ViewBuilder var content: () -> Content
 
     @State private var floatingWindowsInitializationDispatch: DispatchWorkItem?
 
     var body: some View {
         content()
-            .onChange(of: targetWindow) { oldValue, newValue in
+            .onChange(of: window) { oldValue, newValue in
                 if let newValue {
                     initializeFloatingWindows(to: newValue)
                 } else {
@@ -72,6 +74,7 @@ struct FloatingWindows<Content>: View where Content: View {
             Task.detached {
                 await floatingWindows.addPlayer(to: mainWindow) {
                     floatingPlayerView(mainWindow: mainWindow)
+                        .environment(\.namespace, namespace)
                         .environment(windowManager)
                         .environment(presentationManager)
                         .environment(fileManager)
@@ -96,10 +99,10 @@ struct FloatingWindows<Content>: View where Content: View {
 }
 
 struct FloatingWindowsModifier: ViewModifier {
-    var targetWindow: NSWindow?
+    var window: NSWindow?
 
     func body(content: Content) -> some View {
-        FloatingWindows(targetWindow: targetWindow) {
+        FloatingWindowsView(window: window) {
             content
         }
     }

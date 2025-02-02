@@ -25,7 +25,7 @@ struct LeafletView: View {
 
     @FocusState private var isFocused: Bool
 
-    @Namespace private var namespace
+    @Namespace private var localNamespace
 
     @Default(.lyricsTypeSizes) private var typeSizes
     @Default(.lyricsMaxWidth) private var maxWidth
@@ -117,8 +117,8 @@ struct LeafletView: View {
             .background {
                 windowBackgroundView()
             }
-//            .animation(.bouncy, value: hasLyrics)
-//            .animation(.bouncy, value: isShowingLyrics)
+            .animation(.bouncy, value: hasLyrics)
+            .animation(.bouncy, value: isShowingLyrics)
             .focusable()
             .focusEffectDisabled()
             .focused($isFocused)
@@ -229,7 +229,7 @@ struct LeafletView: View {
                 .buttonStyle(.alive(isOn: $player.isPlaying))
             }
         }
-//        .matchedGeometryEffect(id: "cover", in: namespace)
+        .matchedGeometryEffect(id: "cover", in: localNamespace)
         .containerRelativeFrame(.vertical, alignment: .center) { length, axis in
             switch axis {
             case .horizontal:
@@ -301,7 +301,7 @@ struct LeafletView: View {
 }
 
 #if DEBUG
-    #Preview(traits: .modifier(PreviewEnvironments())) {
+    #Preview(traits: .modifier(PreviewEnvironmentsModifier())) {
         @Previewable @State var lyrics: LyricsModel = .init()
 
         LeafletView()

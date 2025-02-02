@@ -39,7 +39,7 @@ struct EditorToolbar: ToolbarContent {
                 Button {
                     metadataEditor.updateAll()
                 } label: {
-                    Label("Update", systemSymbol: .trayAndArrowUpFill)
+                    Label("Load", systemSymbol: .trayAndArrowUpFill)
                 }
                 .disabled(!metadataEditor.hasMetadata)
             } label: {
@@ -47,7 +47,7 @@ struct EditorToolbar: ToolbarContent {
                 case .saving:
                     Text("Saving…")
                 default:
-                    Text("Save/Update")
+                    Text("Save/Load")
                 }
             }
         }

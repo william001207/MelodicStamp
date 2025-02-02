@@ -54,7 +54,7 @@ struct MusicTitle: View {
                                 offset, composer in
                                 if offset > 0 {
                                     let separator = String(localized: .init(
-                                        "MusicTitle: (Separator) Artists",
+                                        "Music Title: (Separator) Artists",
                                         defaultValue: "·",
                                         comment: "The separator between artists in a regular title"
                                     ))
@@ -95,7 +95,7 @@ struct MusicTitle: View {
         if mode.contains(.artists) {
             if let artists = track.metadata[extracting: \.artist]?.initial?.splittingArtists {
                 let separator = String(localized: .init(
-                    "MusicTitle : (Separator) Stringified Artists",
+                    "Music Title : (Separator) Stringified Artists",
                     defaultValue: ", ",
                     comment: "The separator between artists in a stringified title"
                 ))

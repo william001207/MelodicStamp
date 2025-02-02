@@ -14,7 +14,12 @@ struct SettingsLyricsFadingEffectControl: View {
     var body: some View {
         Toggle(isOn: $isEnabled) {
             Text("Fading effect")
-            Text("Applies a fading blur and opacity effect to lyrics that are not currently highlighted.")
+            Text(String(localized: .init(
+                "Settings Control (Lyrics Fading Effect): (Subtitle) Fading Effect",
+                defaultValue: """
+                Applies a fading blur and opacity effect to lyrics that are not currently highlighted.
+                """
+            )))
         }
     }
 }

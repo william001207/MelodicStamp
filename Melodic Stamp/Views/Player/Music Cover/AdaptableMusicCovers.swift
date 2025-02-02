@@ -102,7 +102,7 @@ struct AdaptableMusicCovers<Content>: View where Content: View {
         }
     }
 
-    #Preview(traits: .modifier(PreviewEnvironments())) {
+    #Preview(traits: .modifier(PreviewEnvironmentsModifier())) {
         @Previewable @State var attachedPicturesHandler: AttachedPicturesHandlerModel = .init()
 
         AdaptableMusicCoversPreview()

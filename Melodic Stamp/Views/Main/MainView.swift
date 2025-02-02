@@ -17,8 +17,6 @@ struct MainView: View {
 
     @Environment(\.appearsActive) private var appearsActive
 
-    var namespace: Namespace.ID
-
     @State private var inspectorLyrics: LyricsModel = .init()
     @State private var displayLyrics: LyricsModel = .init()
 
@@ -40,7 +38,7 @@ struct MainView: View {
         Group {
             switch windowManager.selectedContentTab {
             case .playlist:
-                PlaylistView(namespace: namespace)
+                PlaylistView()
                     .toolbar {
                         FileToolbar()
                     }
@@ -107,9 +105,7 @@ struct MainView: View {
 }
 
 #if DEBUG
-    #Preview(traits: .modifier(PreviewEnvironments())) {
-        @Previewable @Namespace var namespace
-
-        MainView(namespace: namespace)
+    #Preview(traits: .modifier(PreviewEnvironmentsModifier())) {
+        MainView()
     }
 #endif
