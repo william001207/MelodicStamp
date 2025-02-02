@@ -17,7 +17,7 @@ extension PlayerModel {
     }
 
     var playPauseImage: Image {
-        if isPlayable, isPlaying {
+        if isCurrentTrackPlayable, isPlaying {
             Image(systemSymbol: .pauseFill)
         } else {
             Image(systemSymbol: .playFill)

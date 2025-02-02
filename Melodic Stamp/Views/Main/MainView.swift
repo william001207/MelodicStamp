@@ -19,9 +19,6 @@ struct MainView: View {
 
     var namespace: Namespace.ID
 
-    @Binding var selectedContentTab: SidebarContentTab
-    @Binding var selectedInspectorTab: SidebarInspectorTab
-
     @State private var inspectorLyrics: LyricsModel = .init()
     @State private var displayLyrics: LyricsModel = .init()
 
@@ -41,7 +38,7 @@ struct MainView: View {
 
     @ViewBuilder private func content() -> some View {
         Group {
-            switch selectedContentTab {
+            switch windowManager.selectedContentTab {
             case .playlist:
                 PlaylistView(namespace: namespace)
                     .toolbar {
@@ -64,7 +61,7 @@ struct MainView: View {
 
     @ViewBuilder private func inspector() -> some View {
         Group {
-            switch selectedInspectorTab {
+            switch windowManager.selectedInspectorTab {
             case .commonMetadata:
                 InspectorCommonMetadataView()
                     .toolbar {
@@ -112,13 +109,7 @@ struct MainView: View {
 #if DEBUG
     #Preview(traits: .modifier(PreviewEnvironments())) {
         @Previewable @Namespace var namespace
-        @Previewable @State var selectedContentTab: SidebarContentTab = .playlist
-        @Previewable @State var selectedInspectorTab: SidebarInspectorTab = .commonMetadata
 
-        MainView(
-            namespace: namespace,
-            selectedContentTab: $selectedContentTab,
-            selectedInspectorTab: $selectedInspectorTab
-        )
+        MainView(namespace: namespace)
     }
 #endif

@@ -204,7 +204,7 @@ struct PlaylistView: View {
     }
 
     private var canRemove: Bool {
-        playlist.isLoaded
+        !playlist.isLoadedTracksEmpty
     }
 
     private var metadataHeight: CGFloat {

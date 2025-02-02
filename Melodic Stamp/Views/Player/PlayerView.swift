@@ -234,7 +234,7 @@ struct PlayerView: View {
                 }
             }
         )
-        .disabled(!player.isPlayable)
+        .disabled(!player.isCurrentTrackPlayable)
         .foregroundStyle(
             isVolumeBarActive
                 ? .primary : player.isMuted ? .quaternary : .secondary
@@ -255,7 +255,7 @@ struct PlayerView: View {
                 .frame(width: 16)
         }
         .buttonStyle(.alive(enabledStyle: .secondary))
-        .disabled(!player.isPlayable)
+        .disabled(!player.isCurrentTrackPlayable)
         .symbolEffect(
             .bounce, value: keyboardControl.speakerButtonBounceAnimation
         )
@@ -310,7 +310,7 @@ struct PlayerView: View {
                 adjustmentPercentage = newValue
             }
         )
-        .disabled(!player.isPlayable)
+        .disabled(!player.isCurrentTrackPlayable)
         .foregroundStyle(isProgressBarActive ? .primary : .secondary)
         .backgroundStyle(.quinary)
         .frame(height: 12)

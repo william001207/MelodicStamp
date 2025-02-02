@@ -41,8 +41,10 @@ enum MelodicStampWindowState: String, Equatable, Hashable, CaseIterable, Identif
         didSet { update(to: style) }
     }
 
-    var isInspectorPresented: Bool = false
     var isAlwaysOnTop: Bool = false
+    var isInspectorPresented: Bool = false
+    var selectedContentTab: SidebarContentTab = .playlist
+    var selectedInspectorTab: SidebarInspectorTab = .commonMetadata
 
     var hasConcreteParameters: Bool = false
     var state: MelodicStampWindowState = .idle {

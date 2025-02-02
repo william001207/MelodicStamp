@@ -1,0 +1,106 @@
+//
+//  FloatingWindows.swift
+//  Melodic Stamp
+//
+//  Created by KrLite on 2025/2/2.
+//
+
+import SwiftUI
+
+struct FloatingWindows<Content>: View where Content: View {
+    @Environment(FloatingWindowsModel.self) private var floatingWindows
+    @Environment(WindowManagerModel.self) private var windowManager
+    @Environment(PresentationManagerModel.self) private var presentationManager: PresentationManagerModel
+    @Environment(FileManagerModel.self) private var fileManager: FileManagerModel
+    @Environment(PlaylistModel.self) private var playlist: PlaylistModel
+    @Environment(PlayerModel.self) private var player: PlayerModel
+    @Environment(KeyboardControlModel.self) private var keyboardControl: KeyboardControlModel
+    @Environment(MetadataEditorModel.self) private var metadataEditor: MetadataEditorModel
+    @Environment(AudioVisualizerModel.self) private var audioVisualizer: AudioVisualizerModel
+    @Environment(GradientVisualizerModel.self) private var gradientVisualizer: GradientVisualizerModel
+
+    var targetWindow: NSWindow?
+    @ViewBuilder var content: () -> Content
+
+    @State private var floatingWindowsInitializationDispatch: DispatchWorkItem?
+
+    var body: some View {
+        content()
+            .onChange(of: targetWindow) { oldValue, newValue in
+                if let newValue {
+                    initializeFloatingWindows(to: newValue)
+                } else {
+                    destroyFloatingWindows(from: oldValue)
+                }
+            }
+    }
+
+    @ViewBuilder private func floatingTabBarView(mainWindow: NSWindow?) -> some View {
+        @Bindable var windowManager = windowManager
+
+        FloatingTabBarView(
+            selectedContentTab: $windowManager.selectedContentTab,
+            selectedInspectorTab: $windowManager.selectedInspectorTab
+        )
+        .onGeometryChange(for: CGSize.self) { proxy in
+            proxy.size
+        } action: { newValue in
+            floatingWindows.updateTabBarPosition(size: newValue, in: mainWindow, animate: true)
+        }
+    }
+
+    @ViewBuilder private func floatingPlayerView(mainWindow: NSWindow?) -> some View {
+        FloatingPlayerView()
+            .onGeometryChange(for: CGSize.self) { proxy in
+                proxy.size
+            } action: { newValue in
+                floatingWindows.updatePlayerPosition(size: newValue, in: mainWindow, animate: true)
+            }
+    }
+
+    private func initializeFloatingWindows(to mainWindow: NSWindow? = nil) {
+        floatingWindowsInitializationDispatch?.cancel()
+        let dispatch = DispatchWorkItem {
+            Task.detached {
+                await floatingWindows.addTabBar(to: mainWindow) {
+                    floatingTabBarView(mainWindow: mainWindow)
+                        .environment(floatingWindows)
+                        .environment(windowManager)
+                }
+            }
+
+            Task.detached {
+                await floatingWindows.addPlayer(to: mainWindow) {
+                    floatingPlayerView(mainWindow: mainWindow)
+                        .environment(windowManager)
+                        .environment(presentationManager)
+                        .environment(fileManager)
+                        .environment(playlist)
+                        .environment(player)
+                        .environment(keyboardControl)
+                        .environment(metadataEditor)
+                        .environment(audioVisualizer)
+                        .environment(gradientVisualizer)
+                }
+            }
+        }
+        floatingWindowsInitializationDispatch = dispatch
+        DispatchQueue.main.async(execute: dispatch)
+    }
+
+    private func destroyFloatingWindows(from mainWindow: NSWindow? = nil) {
+        floatingWindowsInitializationDispatch?.cancel()
+        floatingWindows.removeTabBar(from: mainWindow)
+        floatingWindows.removePlayer(from: mainWindow)
+    }
+}
+
+struct FloatingWindowsModifier: ViewModifier {
+    var targetWindow: NSWindow?
+
+    func body(content: Content) -> some View {
+        FloatingWindows(targetWindow: targetWindow) {
+            content
+        }
+    }
+}

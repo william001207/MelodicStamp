@@ -47,9 +47,9 @@ extension PlaylistModel {
     var hasPreviousTrack: Bool { playlist.hasPreviousTrack }
 
     var count: Int { playlist.count }
-    var loadedCount: Int { playlist.loadedCount }
+    var loadedTracksCount: Int { playlist.loadedTracksCount }
     var isEmpty: Bool { playlist.isEmpty }
-    var isLoaded: Bool { playlist.isLoaded }
+    var isLoadedTracksEmpty: Bool { playlist.isLoadedTracksEmpty }
 
     var canMakeCanonical: Bool { playlist.canMakeCanonical }
 }

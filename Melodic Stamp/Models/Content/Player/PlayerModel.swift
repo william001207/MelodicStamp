@@ -109,7 +109,7 @@ extension PlayerModel {
 
         set {
             _isPlaying = newValue
-            if isPlayable {
+            if isCurrentTrackPlayable {
                 player.setPlaying(isPlaying)
             } else {
                 guard isPlaying else { return }
@@ -155,7 +155,7 @@ extension PlayerModel {
         return playlist.hasPreviousTrack
     }
 
-    var isPlayable: Bool {
+    var isCurrentTrackPlayable: Bool {
         isRunning && hasCurrentTrack
     }
 

@@ -46,7 +46,7 @@ extension PlayerModel {
 
         // Play
         commandCenter.playCommand.addTarget { [unowned self] _ in
-            guard isPlayable else { return .noActionableNowPlayingItem }
+            guard isCurrentTrackPlayable else { return .noActionableNowPlayingItem }
 
             if isPlaying {
                 return .commandFailed
@@ -58,7 +58,7 @@ extension PlayerModel {
 
         // Pause
         commandCenter.pauseCommand.addTarget { [unowned self] _ in
-            guard isPlayable else { return .noActionableNowPlayingItem }
+            guard isCurrentTrackPlayable else { return .noActionableNowPlayingItem }
 
             if !isPlaying {
                 return .commandFailed
@@ -70,7 +70,7 @@ extension PlayerModel {
 
         // Toggle play pause
         commandCenter.togglePlayPauseCommand.addTarget { [unowned self] _ in
-            guard isPlayable else { return .noActionableNowPlayingItem }
+            guard isCurrentTrackPlayable else { return .noActionableNowPlayingItem }
 
             togglePlayPause()
             return .success
@@ -79,7 +79,7 @@ extension PlayerModel {
         // Skip forward
         commandCenter.skipForwardCommand.preferredIntervals = [1.0, 5.0, 15.0]
         commandCenter.skipForwardCommand.addTarget { [unowned self] event in
-            guard isPlayable else { return .noActionableNowPlayingItem }
+            guard isCurrentTrackPlayable else { return .noActionableNowPlayingItem }
             guard let event = event as? MPSkipIntervalCommandEvent else { return .commandFailed }
 
             adjustTime(delta: event.interval, sign: .plus)
@@ -89,7 +89,7 @@ extension PlayerModel {
         // Skip backward
         commandCenter.skipBackwardCommand.preferredIntervals = [1.0, 5.0, 15.0]
         commandCenter.skipBackwardCommand.addTarget { [unowned self] event in
-            guard isPlayable else { return .noActionableNowPlayingItem }
+            guard isCurrentTrackPlayable else { return .noActionableNowPlayingItem }
             guard let event = event as? MPSkipIntervalCommandEvent else { return .commandFailed }
 
             adjustTime(delta: event.interval, sign: .minus)
@@ -98,7 +98,7 @@ extension PlayerModel {
 
         // Seek
         commandCenter.changePlaybackPositionCommand.addTarget { [unowned self] event in
-            guard isPlayable else { return .noActionableNowPlayingItem }
+            guard isCurrentTrackPlayable else { return .noActionableNowPlayingItem }
             guard let event = event as? MPChangePlaybackPositionCommandEvent else { return .commandFailed }
 
             progress = event.positionTime / TimeInterval(unwrappedPlaybackTime.duration)

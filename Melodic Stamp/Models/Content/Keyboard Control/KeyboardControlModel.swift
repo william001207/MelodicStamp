@@ -61,7 +61,7 @@ import SwiftUI
             }
             return .handled
         case .down, .repeat:
-            guard player.isPlayable else { return .ignored }
+            guard player.isCurrentTrackPlayable else { return .ignored }
 
             if modifiers.contains(.command) {
                 switch sign {
@@ -111,7 +111,7 @@ import SwiftUI
             }
             return .ignored
         case .down, .repeat:
-            guard player.isPlayable else { return .ignored }
+            guard player.isCurrentTrackPlayable else { return .ignored }
 
             let hasShift = modifiers.contains(.shift)
             let hasOption = modifiers.contains(.option)

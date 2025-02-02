@@ -94,7 +94,7 @@ struct TrackView: View {
             .animation(.default.speed(2), value: isMetadataModified)
             .animation(.default.speed(2), value: isCurrentTrack)
             .animation(.default.speed(2), value: hasControl)
-            .animation(.default.speed(2), value: player.isPlayable)
+            .animation(.default.speed(2), value: player.isCurrentTrackPlayable)
             .animation(.default.speed(2), value: player.isPlaying)
 
             Spacer()
@@ -138,7 +138,7 @@ struct TrackView: View {
     private var opacity: CGFloat {
         if isSelected {
             1
-        } else if player.isPlayable {
+        } else if player.isCurrentTrackPlayable {
             if isCurrentTrack {
                 1
             } else {

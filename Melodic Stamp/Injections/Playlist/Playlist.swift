@@ -147,13 +147,13 @@ extension Playlist: Sequence {
     var count: Int {
         switch mode {
         case .referenced:
-            loadedCount
+            loadedTracksCount
         case .canonical:
             indexer.value.count
         }
     }
 
-    var loadedCount: Int {
+    var loadedTracksCount: Int {
         tracks.count
     }
 
@@ -161,8 +161,8 @@ extension Playlist: Sequence {
         count == 0
     }
 
-    var isLoaded: Bool {
-        loadedCount != 0
+    var isLoadedTracksEmpty: Bool {
+        loadedTracksCount == 0
     }
 }
 

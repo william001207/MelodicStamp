@@ -432,7 +432,7 @@ struct MiniPlayerView: View {
                 id: PlayerNamespace.volumeButton, in: namespace
             )
             .contextMenu {
-                if player.isPlayable {
+                if player.isCurrentTrackPlayable {
                     Toggle("Mute", isOn: $player.isMuted)
                 }
             }
@@ -488,7 +488,7 @@ struct MiniPlayerView: View {
                 let value: Binding<CGFloat> =
                     switch activeControl {
                     case .progress:
-                        player.isPlayable ? $player.progress : .constant(0)
+                        player.isCurrentTrackPlayable ? $player.progress : .constant(0)
                     case .volume:
                         $player.volume
                     }
@@ -507,7 +507,7 @@ struct MiniPlayerView: View {
                         keyboardControl.speakerButtonBounceAnimation.toggle()
                     }
                 }
-                .disabled(!player.isPlayable)
+                .disabled(!player.isCurrentTrackPlayable)
                 .foregroundStyle(
                     isProgressBarActive
                         ? .primary
@@ -521,7 +521,7 @@ struct MiniPlayerView: View {
                 !isProgressBarHovering || isProgressBarActive ? 0 : 12
             )
             .onHover { hover in
-                guard player.isPlayable, hover else { return }
+                guard player.isCurrentTrackPlayable, hover else { return }
 
                 isProgressBarHovering = true
             }

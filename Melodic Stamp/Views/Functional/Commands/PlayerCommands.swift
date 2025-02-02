@@ -203,7 +203,7 @@ struct PlayerCommands: Commands {
 
     private var hasPlayerKeyboardControl: Bool { keyboardControl != nil }
 
-    private var isPlayable: Bool { player?.isPlayable ?? false }
+    private var isPlayable: Bool { player?.isCurrentTrackPlayable ?? false }
 
     private var hasCurrentTrack: Bool { playlist?.hasCurrentTrack ?? false }
 

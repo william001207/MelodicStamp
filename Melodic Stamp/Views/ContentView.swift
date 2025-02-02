@@ -56,7 +56,6 @@ struct ContentView: View {
 
     @Default(.mainWindowBackgroundStyle) private var mainWindowBackgroundStyle
     @Default(.miniPlayerBackgroundStyle) private var miniPlayerBackgroundStyle
-    @Default(.dynamicTitleBar) private var dynamicTitleBar
 
     // MARK: - Fields
 
@@ -74,15 +73,10 @@ struct ContentView: View {
     @State private var audioVisualizer: AudioVisualizerModel
     @State private var gradientVisualizer: GradientVisualizerModel
 
-    // MARK: Sidebar & Inspector
-
-    @State private var selectedContentTab: SidebarContentTab = .playlist
-    @State private var selectedInspectorTab: SidebarInspectorTab = .commonMetadata
-
     // MARK: Window
 
     @State private var sizer: Sizer = .init()
-    @State private var floatingWindowsInitializationDispatch: DispatchWorkItem?
+    @State private var floatingWindowsTargetWindow: NSWindow?
 
     // MARK: - Initializers
 
@@ -195,6 +189,14 @@ struct ContentView: View {
         }
         .frame(minWidth: sizer.minWidth, maxWidth: sizer.maxWidth, minHeight: sizer.minHeight, maxHeight: sizer.maxHeight)
 
+        // MARK: Floating Windows
+
+        .modifier(FloatingWindowsModifier(targetWindow: floatingWindowsTargetWindow))
+
+        // MARK: Navigation Titles
+
+        .modifier(NavigationTitlesModifier())
+
         // MARK: Environments
 
         .environment(windowManager)
@@ -225,94 +227,51 @@ struct ContentView: View {
         .focusedValue(metadataEditor)
         .focusedValue(audioVisualizer)
         .focusedValue(gradientVisualizer)
-
-        // MARK: Navigation
-
-        .navigationTitle(title)
-        .navigationSubtitle(subtitle)
-    }
-
-    private var title: String {
-        let fallbackTitle = Bundle.main[localized: .displayName]
-
-        if player.isPlayable, let track = playlist.currentTrack {
-            let musicTitle = MusicTitle.stringifiedTitle(mode: .title, for: track)
-            return switch dynamicTitleBar {
-            case .never: fallbackTitle
-            case .always: musicTitle
-            case .whilePlaying: player.isPlaying ? musicTitle : fallbackTitle
-            }
-        } else {
-            return fallbackTitle
-        }
-    }
-
-    private var subtitle: String {
-        let fallbackTitle = if !playlist.isEmpty {
-            String(localized: "\(playlist.count) Tracks")
-        } else {
-            ""
-        }
-
-        if player.isPlayable, let track = playlist.currentTrack {
-            let musicSubtitle = MusicTitle.stringifiedTitle(mode: .artists, for: track)
-            return switch dynamicTitleBar {
-            case .never: fallbackTitle
-            case .always: musicSubtitle
-            case .whilePlaying: player.isPlaying ? musicSubtitle : fallbackTitle
-            }
-        } else {
-            return fallbackTitle
-        }
     }
 
     // MARK: - Main View
 
     @ViewBuilder private func mainView(_ window: NSWindow? = nil) -> some View {
-        MainView(
-            namespace: namespace,
-            selectedContentTab: $selectedContentTab,
-            selectedInspectorTab: $selectedInspectorTab
-        )
-        .background {
-            Group {
-                if windowManager.isInFullScreen {
-                    OpaqueBackgroundView()
-                } else {
-                    switch mainWindowBackgroundStyle {
-                    case .opaque:
+        MainView(namespace: namespace)
+            .background {
+                Group {
+                    if windowManager.isInFullScreen {
                         OpaqueBackgroundView()
-                    case .vibrant:
-                        VibrantBackgroundView()
-                    case .ethereal:
-                        EtherealBackgroundView()
+                    } else {
+                        switch mainWindowBackgroundStyle {
+                        case .opaque:
+                            OpaqueBackgroundView()
+                        case .vibrant:
+                            VibrantBackgroundView()
+                        case .ethereal:
+                            EtherealBackgroundView()
+                        }
                     }
                 }
+                .ignoresSafeArea()
             }
-            .ignoresSafeArea()
-        }
-        .onDisappear {
-            destroyFloatingWindows(from: window)
-        }
-        .onChange(of: appearsActive, initial: true) { _, newValue in
-            if newValue {
-                initializeFloatingWindows(to: window)
-            } else {
-                destroyFloatingWindows(from: window)
+            .onDisappear {
+                floatingWindowsTargetWindow = nil
             }
-        }
-        .onChange(of: appearsActive, initial: true) { _, newValue in
-            guard newValue else { return }
+            .onChange(of: appearsActive, initial: true) { _, newValue in
+                if newValue {
+                    floatingWindowsTargetWindow = window
+                } else {
+                    floatingWindowsTargetWindow = nil
+                }
+            }
+            .onChange(of: appearsActive, initial: true) { _, newValue in
+                guard newValue else { return }
 
-            Task {
-                await library.loadPlaylists()
+                Task {
+                    await library.loadPlaylists()
+                }
             }
-        }
     }
 
     // MARK: - Mini Player View
 
-    @ViewBuilder private func miniPlayerView(_ window: NSWindow? = nil) -> some View {
+    @ViewBuilder private func miniPlayerView(_: NSWindow? = nil) -> some View {
         MiniPlayerView(namespace: namespace)
             .padding(12)
             .padding(.top, 4)
@@ -337,30 +296,7 @@ struct ContentView: View {
                 .ignoresSafeArea()
             }
             .onAppear {
-                destroyFloatingWindows(from: window)
-            }
-    }
-
-    // MARK: - Floating Windows
-
-    @ViewBuilder private func floatingTabBarView(mainWindow: NSWindow?) -> some View {
-        FloatingTabBarView(
-            selectedContentTab: $selectedContentTab,
-            selectedInspectorTab: $selectedInspectorTab
-        )
-        .onGeometryChange(for: CGSize.self) { proxy in
-            proxy.size
-        } action: { newValue in
-            floatingWindows.updateTabBarPosition(size: newValue, in: mainWindow, animate: true)
-        }
-    }
-
-    @ViewBuilder private func floatingPlayerView(mainWindow: NSWindow?) -> some View {
-        FloatingPlayerView()
-            .onGeometryChange(for: CGSize.self) { proxy in
-                proxy.size
-            } action: { newValue in
-                floatingWindows.updatePlayerPosition(size: newValue, in: mainWindow, animate: true)
+                floatingWindowsTargetWindow = nil
             }
     }
 
@@ -389,41 +325,5 @@ struct ContentView: View {
                 }
             }
         }
-    }
-
-    private func initializeFloatingWindows(to mainWindow: NSWindow? = nil) {
-        floatingWindowsInitializationDispatch?.cancel()
-        let dispatch = DispatchWorkItem {
-            Task.detached {
-                await floatingWindows.addTabBar(to: mainWindow) {
-                    floatingTabBarView(mainWindow: mainWindow)
-                        .environment(floatingWindows)
-                        .environment(windowManager)
-                }
-            }
-
-            Task.detached {
-                await floatingWindows.addPlayer(to: mainWindow) {
-                    floatingPlayerView(mainWindow: mainWindow)
-                        .environment(windowManager)
-                        .environment(presentationManager)
-                        .environment(fileManager)
-                        .environment(playlist)
-                        .environment(player)
-                        .environment(keyboardControl)
-                        .environment(metadataEditor)
-                        .environment(audioVisualizer)
-                        .environment(gradientVisualizer)
-                }
-            }
-        }
-        floatingWindowsInitializationDispatch = dispatch
-        DispatchQueue.main.async(execute: dispatch)
-    }
-
-    private func destroyFloatingWindows(from mainWindow: NSWindow? = nil) {
-        floatingWindowsInitializationDispatch?.cancel()
-        floatingWindows.removeTabBar(from: mainWindow)
-        floatingWindows.removePlayer(from: mainWindow)
     }
 }

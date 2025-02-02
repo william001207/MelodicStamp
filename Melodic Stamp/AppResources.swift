@@ -1,5 +1,5 @@
 //
-//  ApplicationResources.swift
+//  AppResources.swift
 //  Melodic Stamp
 //
 //  Created by KrLite on 2025/1/21.
