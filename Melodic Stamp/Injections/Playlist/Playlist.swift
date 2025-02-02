@@ -201,8 +201,13 @@ extension Playlist {
     }
 
     private func updateFolderIcon() {
-        NSWorkspace.shared.setIcon(segments.artwork.image, forFile: url.standardizedFileURL.path(percentEncoded: false))
-        logger.info("Successfully updated folder icon for playlist at \(url)")
+        Task.detached {
+            NSWorkspace.shared.setIcon(
+                segments.artwork.image?.squared(),
+                forFile: url.standardizedFileURL.path(percentEncoded: false)
+            )
+            logger.info("Successfully updated folder icon for playlist at \(url)")
+        }
     }
 }
 

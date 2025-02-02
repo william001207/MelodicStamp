@@ -29,3 +29,30 @@ extension NSImage {
         }
     }
 }
+
+extension NSImage {
+    func squared() -> NSImage {
+        let originalSize = size
+        let maxLength = max(originalSize.width, originalSize.height)
+        let newSize = NSSize(width: maxLength, height: maxLength)
+
+        let newImage = NSImage(size: newSize)
+        newImage.lockFocus()
+
+        NSGraphicsContext.current?.imageInterpolation = .high
+
+        let origin = NSPoint(
+            x: (maxLength - originalSize.width) / 2,
+            y: (maxLength - originalSize.height) / 2
+        )
+        draw(
+            in: NSRect(origin: origin, size: originalSize),
+            from: .zero,
+            operation: .sourceOver,
+            fraction: 1.0
+        )
+
+        newImage.unlockFocus()
+        return newImage
+    }
+}
