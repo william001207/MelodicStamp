@@ -112,9 +112,10 @@ extension PlaylistModel {
         isLoading = true
         playlist.loadIndexer()
 
-        var tracks: [Track] = []
-        await playlist.indexer.loadTracks(into: &tracks)
-        playlist.tracks = tracks
+        playlist.tracks.removeAll()
+        for await track in playlist.indexer.loadTracks() {
+            playlist.tracks.append(track)
+        }
 
         isLoading = false
     }

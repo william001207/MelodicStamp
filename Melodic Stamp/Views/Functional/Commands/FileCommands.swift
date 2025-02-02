@@ -12,6 +12,8 @@ struct FileCommands: Commands {
 
     var body: some Commands {
         CommandGroup(after: .newItem) {
+            // MARK: Open
+
             Menu("Open File") {
                 Button("In Current Playlist") {
                     fileManager?.emitOpen(style: .inCurrentPlaylist)
@@ -29,6 +31,8 @@ struct FileCommands: Commands {
                 }
             }
             .disabled(fileManager == nil)
+
+            // MARK: Add
 
             Menu("Add Files") {
                 Button("To Current Playlist") {

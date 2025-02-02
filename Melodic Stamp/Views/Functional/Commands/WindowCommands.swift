@@ -12,6 +12,8 @@ struct WindowCommands: Commands {
 
     var body: some Commands {
         CommandGroup(after: .windowSize) {
+            // MARK: Window Style
+
             if let windowManager {
                 @Bindable var windowManager = windowManager
 

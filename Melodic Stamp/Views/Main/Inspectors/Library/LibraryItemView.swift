@@ -67,7 +67,6 @@ struct LibraryItemView: View {
                 .animation(nil, value: isHovering)
             }
         }
-        .redacted(reason: library.isLoading ? .placeholder : [])
         .frame(height: 50)
         .padding(6)
         .padding(.trailing, -1)

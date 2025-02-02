@@ -16,6 +16,8 @@ struct PlayerCommands: Commands {
     var body: some Commands {
         CommandMenu("Player") {
             Group {
+                // MARK: Play / Pause
+
                 Button(player?.isPlaying ?? false ? "Pause" : "Play") {
                     player?.togglePlayPause()
                 }
@@ -23,6 +25,8 @@ struct PlayerCommands: Commands {
                 .disabled(!isPlayable)
 
                 Group {
+                    // MARK: Fast Forward
+
                     Button("Fast Forward") {
                         keyboardControl?.handleProgressAdjustment(
                             phase: .all, sign: .plus
@@ -45,6 +49,8 @@ struct PlayerCommands: Commands {
                         }
                         .badge("×0.1")
                     }
+
+                    // MARK: Rewind
 
                     Button("Rewind") {
                         keyboardControl?.handleProgressAdjustment(
@@ -74,6 +80,8 @@ struct PlayerCommands: Commands {
                 Divider()
 
                 Group {
+                    // MARK: Mute
+
                     Group {
                         if let player {
                             @Bindable var player = player
@@ -86,6 +94,8 @@ struct PlayerCommands: Commands {
                         }
                     }
                     .keyboardShortcut("m", modifiers: [.command, .control])
+
+                    // MARK: Louder
 
                     Button("Louder") {
                         keyboardControl?.handleVolumeAdjustment(
@@ -109,6 +119,8 @@ struct PlayerCommands: Commands {
                         }
                         .badge("×0.1")
                     }
+
+                    // MARK: Quieter
 
                     Button("Quieter") {
                         keyboardControl?.handleVolumeAdjustment(
@@ -138,11 +150,15 @@ struct PlayerCommands: Commands {
                 Divider()
 
                 Group {
+                    // MARK: Next Track
+
                     Button("Next Track") {
                         player?.playNextTrack()
                     }
                     .keyboardShortcut(.rightArrow, modifiers: [.command, .control])
                     .disabled(!hasNextTrack)
+
+                    // MARK: Previous Track
 
                     Button("Previous Track") {
                         player?.playPreviousTrack()
@@ -151,41 +167,43 @@ struct PlayerCommands: Commands {
                     .disabled(!hasPreviousTrack)
                 }
                 .disabled(!hasCurrentTrack)
-
-                if let playlist {
-                    @Bindable var playlist = playlist
-                    let playbackName = PlaybackModeView.name(of: playlist.playbackMode)
-
-                    Menu("Playback") {
-                        ForEach(PlaybackMode.allCases) { mode in
-                            let binding: Binding<Bool> = Binding {
-                                playlist.playbackMode == mode
-                            } set: { newValue in
-                                guard newValue else { return }
-                                playlist.playbackMode = mode
-                            }
-
-                            Toggle(isOn: binding) {
-                                PlaybackModeView(mode: mode)
-                            }
-                        }
-
-                        Divider()
-
-                        Toggle(isOn: $playlist.playbackLooping) {
-                            Image(systemSymbol: .repeat1)
-
-                            Text("Looping")
-                        }
-                    }
-                    .badge(playbackName)
-                } else {
-                    Button("Playback") {
-                        // Do nothing
-                    }
-                }
             }
             .disabled(!hasPlayer || !hasPlayerKeyboardControl)
+
+            // MARK: Playback
+
+            if let playlist {
+                @Bindable var playlist = playlist
+                let playbackName = PlaybackModeView.name(of: playlist.playbackMode)
+
+                Menu("Playback") {
+                    ForEach(PlaybackMode.allCases) { mode in
+                        let binding: Binding<Bool> = Binding {
+                            playlist.playbackMode == mode
+                        } set: { newValue in
+                            guard newValue else { return }
+                            playlist.playbackMode = mode
+                        }
+
+                        Toggle(isOn: binding) {
+                            PlaybackModeView(mode: mode)
+                        }
+                    }
+
+                    Divider()
+
+                    Toggle(isOn: $playlist.playbackLooping) {
+                        Image(systemSymbol: .repeat1)
+
+                        Text("Looping")
+                    }
+                }
+                .badge(playbackName)
+            } else {
+                Button("Playback") {}
+            }
+
+            // MARK: Output Device
 
             if let player {
                 @Bindable var player = player
@@ -195,6 +213,8 @@ struct PlayerCommands: Commands {
                     OutputDeviceList(devices: player.outputDevices, defaultSystemDevice: player.defaultSystemOutputDevice)
                 }
                 .badge(outputDeviceName)
+            } else {
+                Button("Output Device") {}
             }
         }
     }

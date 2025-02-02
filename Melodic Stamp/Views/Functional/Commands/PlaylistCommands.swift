@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct PlaylistCommands: Commands {
+    @FocusedValue(PresentationManagerModel.self) private var presentationManager
     @FocusedValue(PlaylistModel.self) private var playlist
     @FocusedValue(PlayerModel.self) private var player
     @FocusedValue(MetadataEditorModel.self) private var metadataEditor
@@ -18,92 +19,83 @@ struct PlaylistCommands: Commands {
 
     var body: some Commands {
         CommandMenu("Playlist") {
-            Group {
-                if let playlist {
-                    Button("Add to Library") {
-                        Task.detached {
-                            try await playlist.makeCanonical()
-                        }
-                    }
-                    .disabled(!playlist.canMakeCanonical)
-                } else {
-                    Button("Add to Library") {}
-                        .disabled(true)
+            if isCanonical {
+                // MARK: Remove from Library
+
+                Button("Remove from Library") {
+                    presentationManager?.isPlaylistRemovalAlertPresented = true
                 }
+            } else {
+                // MARK: Add to Library
+
+                Button("Add to Library") {
+                    Task.detached {
+                        try await playlist?.makeCanonical()
+                    }
+                }
+                .disabled(!canMakeCanonical)
             }
 
             Divider()
 
-            Group {
-                if let playlist {
-                    Button("Clear Selection") {
-                        handleEscape()
-                    }
-                    .disabled(playlist.selectedTracks.isEmpty)
-                } else {
-                    Button("Clear Selection") {}
-                        .disabled(true)
-                }
+            // MARK: Clear Selection
+
+            Button("Clear Selection") {
+                handleEscape()
             }
+            .disabled(selectedTracks.isEmpty)
+
+            // MARK: Copy Selection
 
             Group {
-                if let playlist {
-                    Group {
-                        if playlist.selectedTracks.isEmpty {
-                            Button("Copy Selected Track") {}
-                        } else {
-                            Button {
-                                Task {
-                                    await copy(Array(playlist.selectedTracks))
-                                }
-                            } label: {
-                                if playlist.selectedTracks.count == 1 {
-                                    Text("Copy Selected Track")
-                                } else {
-                                    Text("Copy \(playlist.selectedTracks.count) Tracks")
-                                }
-                            }
-                        }
-                    }
-                    .disabled(playlist.selectedTracks.isEmpty)
-                } else {
+                if selectedTracks.isEmpty {
                     Button("Copy Selected Track") {}
-                        .disabled(true)
-                }
-            }
-
-            Group {
-                if let playlist {
-                    Group {
-                        if playlist.selectedTracks.isEmpty {
-                            Button("Remove Selected Track from Playlist") {}
+                } else {
+                    Button {
+                        Task {
+                            await copy(Array(selectedTracks))
+                        }
+                    } label: {
+                        if selectedTracks.count == 1 {
+                            Text("Copy Selected Track")
                         } else {
-                            Button {
-                                handleRemove(playlist.selectedTracks.map(\.url))
-                            } label: {
-                                if playlist.selectedTracks.count == 1 {
-                                    Text("Remove Selected Track from Playlist")
-                                } else {
-                                    Text("Remove \(playlist.selectedTracks.count) Tracks from Playlist")
-                                }
-                            }
+                            Text("Copy \(selectedTracks.count) Tracks")
                         }
                     }
-                    .disabled(playlist.selectedTracks.isEmpty)
-                } else {
-                    Button("Remove Selected Track from Playlist") {}
-                        .disabled(true)
                 }
             }
+            .disabled(selectedTracks.isEmpty)
+
+            // MARK: Remove Selection
+
+            Group {
+                if selectedTracks.isEmpty {
+                    Button("Remove Selected Track from Playlist") {}
+                } else {
+                    Button {
+                        handleRemove(selectedTracks.map(\.url))
+                    } label: {
+                        if selectedTracks.count == 1 {
+                            Text("Remove Selected Track from Playlist")
+                        } else {
+                            Text("Remove \(selectedTracks.count) Tracks from Playlist")
+                        }
+                    }
+                }
+            }
+            .disabled(selectedTracks.isEmpty)
             .keyboardShortcut(.deleteForward, modifiers: [])
 
             Divider()
 
+            // MARK: Play Selection
+
             Group {
                 if
-                    let player, let playlist,
+                    let player,
+                    let playlist,
                     playlist.selectedTracks.count == 1,
-                    let track = playlist.selectedTracks.first {
+                    let track = selectedTracks.first {
                     let title = MusicTitle.stringifiedTitle(mode: .title, for: track)
                     Button {
                         player.play(track)
@@ -129,6 +121,18 @@ struct PlaylistCommands: Commands {
             }
             .keyboardShortcut(.return, modifiers: [])
         }
+    }
+
+    private var isCanonical: Bool {
+        playlist?.mode.isCanonical ?? false
+    }
+
+    private var canMakeCanonical: Bool {
+        playlist?.canMakeCanonical ?? false
+    }
+
+    private var selectedTracks: Set<Track> {
+        playlist?.selectedTracks ?? []
     }
 
     private func copy(_ tracks: [Track]) async {

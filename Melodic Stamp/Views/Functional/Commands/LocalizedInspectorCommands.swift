@@ -12,6 +12,8 @@ struct LocalizedInspectorCommands: Commands {
 
     var body: some Commands {
         CommandGroup(after: .sidebar) {
+            // MARK: Show / Hide Inspector
+
             Group {
                 if let windowManager {
                     Button {
