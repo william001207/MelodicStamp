@@ -43,7 +43,7 @@ struct NavigationTitlesView: View {
 
     private var playlistTitle: String? {
         let title = playlist.segments.info.title
-        return if !playlist.isEmpty, !title.isEmpty {
+        return if playlist.mode.isCanonical, !title.isEmpty {
             title
         } else {
             nil

@@ -15,6 +15,9 @@ struct NavigationDocumentView: View {
         if player.isCurrentTrackPlayable, let track = playlist.currentTrack {
             Color.clear
                 .navigationDocument(track.url)
+        } else if playlist.mode.isCanonical {
+            Color.clear
+                .navigationDocument(playlist.url)
         } else {
             Color.clear
         }
