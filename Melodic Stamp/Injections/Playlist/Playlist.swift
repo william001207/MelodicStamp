@@ -5,6 +5,7 @@
 //  Created by KrLite on 2025/1/27.
 //
 
+import AppKit
 import Defaults
 import Foundation
 
@@ -191,6 +192,17 @@ extension Playlist {
         }
 
         logger.info("Successfully written playlist segments \(segments) for playlist at \(url)")
+
+        // Update workspace related things
+
+        if segments.contains(.artwork) {
+            updateFolderIcon()
+        }
+    }
+
+    private func updateFolderIcon() {
+        NSWorkspace.shared.setIcon(segments.artwork.image, forFile: url.standardizedFileURL.path(percentEncoded: false))
+        logger.info("Successfully updated folder icon for playlist at \(url)")
     }
 }
 

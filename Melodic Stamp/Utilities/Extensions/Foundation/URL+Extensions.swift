@@ -26,6 +26,6 @@ extension URL {
     }
 
     func attribute(_ key: FileAttributeKey) throws -> Any? {
-        try FileManager.default.attributesOfItem(atPath: path(percentEncoded: false))[key]
+        try FileManager.default.attributesOfItem(atPath: standardizedFileURL.path(percentEncoded: false))[key]
     }
 }

@@ -44,9 +44,9 @@ extension Playlist {
 extension Playlist {
     // Important! Do not make this a struct, otherwise causing severe UI glitches!!!
     @Observable final class Segments {
-        var info: Info = .init()
-        var state: State = .init()
-        var artwork: Artwork = .init()
+        var info: Info
+        var state: State
+        var artwork: Artwork
 
         private init(info: Info, state: State, artwork: Artwork) {
             self.info = info
