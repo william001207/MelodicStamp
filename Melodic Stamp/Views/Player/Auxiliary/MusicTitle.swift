@@ -56,7 +56,7 @@ struct MusicTitle: View {
                                     let separator = String(localized: .init(
                                         "Music Title: (Separator) Artists",
                                         defaultValue: "·",
-                                        comment: "The separator between artists in a regular title"
+                                        comment: "The separator between artists in a regular title."
                                     ))
                                     Text(separator)
                                         .foregroundStyle(.placeholder)
@@ -97,7 +97,7 @@ struct MusicTitle: View {
                 let separator = String(localized: .init(
                     "Music Title : (Separator) Stringified Artists",
                     defaultValue: ", ",
-                    comment: "The separator between artists in a stringified title"
+                    comment: "The separator between artists in a stringified title."
                 ))
                 components.append(artists.joined(separator: separator))
             }

@@ -1804,7 +1804,7 @@
       }
     },
     "Music Title : (Separator) Stringified Artists" : {
-      "comment" : "The separator between artists in a stringified title",
+      "comment" : "The separator between artists in a stringified title.",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -1822,7 +1822,7 @@
       }
     },
     "Music Title: (Separator) Artists" : {
-      "comment" : "The separator between artists in a regular title",
+      "comment" : "The separator between artists in a regular title.",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {

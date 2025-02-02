@@ -316,9 +316,8 @@ extension PlayerModel {
 
                 buffer.frameLength = AVAudioFrameCount(Self.bufferSize)
 
-                let spectra = strongSelf.analyzer.analyze(with: buffer)
-
                 Task { @MainActor in
+                    let spectra = strongSelf.analyzer.analyze(with: buffer)
                     strongSelf.visualizationDataSubject.send(spectra)
                 }
             }
