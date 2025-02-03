@@ -31,6 +31,7 @@ struct EditorToolbar: ToolbarContent {
                         default:
                             ProgressView()
                                 .progressViewStyle(.circular)
+                                .controlSize(.small)
                         }
                     }
                 }

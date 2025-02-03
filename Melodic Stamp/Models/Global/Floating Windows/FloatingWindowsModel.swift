@@ -115,9 +115,6 @@ import SwiftUI
         floatingWindow.level = .floating
         floatingWindow.collectionBehavior = [.fullScreenNone]
 
-        floatingWindow.alphaValue = 0
-        floatingWindow.animator().alphaValue = 1
-
         tabBarAdditionDispatch?.cancel()
         let dispatch = DispatchWorkItem {
             applicationWindow.addChildWindow(floatingWindow, ordered: .above)
@@ -143,9 +140,6 @@ import SwiftUI
         floatingWindow.backgroundColor = .clear
         floatingWindow.level = .floating
         floatingWindow.collectionBehavior = [.fullScreenNone]
-
-        floatingWindow.alphaValue = 0
-        floatingWindow.animator().alphaValue = 1
 
         playerAdditionDispatch?.cancel()
         let dispatch = DispatchWorkItem {
