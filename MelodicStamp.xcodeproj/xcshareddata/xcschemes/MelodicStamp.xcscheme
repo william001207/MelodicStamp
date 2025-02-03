@@ -17,8 +17,8 @@
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "65F1DA002CECCEE900389E37"
                BuildableName = "Melodic Stamp.app"
-               BlueprintName = "Melodic Stamp"
-               ReferencedContainer = "container:Melodic Stamp.xcodeproj">
+               BlueprintName = "MelodicStamp"
+               ReferencedContainer = "container:MelodicStamp.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -36,9 +36,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "287A233A2D3FE6DD0044029F"
-               BuildableName = "Melodic Stamp Tests.xctest"
-               BlueprintName = "Melodic Stamp Tests"
-               ReferencedContainer = "container:Melodic Stamp.xcodeproj">
+               BuildableName = "MelodicStampTests.xctest"
+               BlueprintName = "MelodicStampTests"
+               ReferencedContainer = "container:MelodicStamp.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
@@ -59,8 +59,8 @@
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "65F1DA002CECCEE900389E37"
             BuildableName = "Melodic Stamp.app"
-            BlueprintName = "Melodic Stamp"
-            ReferencedContainer = "container:Melodic Stamp.xcodeproj">
+            BlueprintName = "MelodicStamp"
+            ReferencedContainer = "container:MelodicStamp.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -76,8 +76,8 @@
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "65F1DA002CECCEE900389E37"
             BuildableName = "Melodic Stamp.app"
-            BlueprintName = "Melodic Stamp"
-            ReferencedContainer = "container:Melodic Stamp.xcodeproj">
+            BlueprintName = "MelodicStamp"
+            ReferencedContainer = "container:MelodicStamp.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

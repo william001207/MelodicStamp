@@ -391,7 +391,7 @@ extension PlayerModel {
 // MARK: - Delegates
 
 extension PlayerModel: PlayerDelegate {
-    nonisolated func playerDidFinishPlaying(_: some Melodic_Stamp.Player) {
+    nonisolated func playerDidFinishPlaying(_: some MelodicStamp.Player) {
         Task { @MainActor in
             if let playlist, playlist.playbackLooping {
                 if let currentTrack = self.currentTrack {

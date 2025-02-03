@@ -343,6 +343,10 @@
 			</array>
 		</dict>
 	</array>
+	<key>CFBundleSignature</key>
+	<string></string>
+	<key>LSHasLocalizedDisplayName</key>
+	<true/>
 	<key>UTImportedTypeDeclarations</key>
 	<array>
 		<dict>

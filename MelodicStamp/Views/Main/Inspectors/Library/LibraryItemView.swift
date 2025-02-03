@@ -84,6 +84,7 @@ struct LibraryItemView: View {
         item.id == playlist.id
     }
 
+    // Using `item` if the playlist is opened will cause segments to stop responding to updates
     private var itemOrPlaylist: Playlist {
         if isOpened {
             playlist.playlist
@@ -93,7 +94,7 @@ struct LibraryItemView: View {
     }
 
     private var opacity: CGFloat {
-        if itemOrPlaylist.mode.isCanonical {
+        if playlist.mode.isCanonical {
             if isOpened {
                 1
             } else {
@@ -155,7 +156,7 @@ struct LibraryItemView: View {
     private func open() {
         openWindow(
             id: WindowID.content(),
-            value: CreationParameters(playlist: .canonical(itemOrPlaylist.id))
+            value: CreationParameters(playlist: .canonical(item.id))
         )
     }
 }

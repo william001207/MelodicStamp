@@ -12,12 +12,12 @@ import SwiftUI
 extension URL {
     static let github = URL(string: "https://github.com")!
     static let organization = github.appending(component: "Cement-Labs")
-    static let repository = organization.appending(component: "Melodic-Stamp")
+    static let repository = organization.appending(component: "MelodicStamp")
 }
 
 extension URL {
     static let playlists = musicDirectory
-        .appending(component: Bundle.main[.appName], directoryHint: .isDirectory)
+        .appending(component: Bundle.main[.displayName], directoryHint: .isDirectory)
         .appending(component: "Playlists", directoryHint: .isDirectory)
 }
 

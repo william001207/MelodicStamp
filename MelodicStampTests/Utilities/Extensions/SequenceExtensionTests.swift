@@ -1,12 +1,12 @@
 //
-//  Sequence+Extensions+Tests.swift
-//  Melodic Stamp Tests
+//  SequenceExtensionTests.swift
+//  MelodicStamp
 //
-//  Created by KrLite on 2025/1/21.
+//  Created by KrLite on 2025/2/3.
 //
 
 import Foundation
-@testable import Melodic_Stamp
+@testable import MelodicStamp
 import Testing
 
 @Suite struct SequenceExtensionTests {

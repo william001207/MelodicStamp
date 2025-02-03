@@ -29,35 +29,35 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		287A233F2D3FE6DD0044029F /* PBXContainerItemProxy */ = {
+		286D1F332D50A75D00DB3C76 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 65F1D9F92CECCEE900389E37 /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = 65F1DA002CECCEE900389E37;
-			remoteInfo = "Melodic Stamp";
+			remoteInfo = MelodicStamp;
 		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		287A233B2D3FE6DD0044029F /* Melodic Stamp Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Melodic Stamp Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		286D1F2F2D50A75D00DB3C76 /* MelodicStampTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MelodicStampTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		65F1DA012CECCEE900389E37 /* Melodic Stamp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Melodic Stamp.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		287A233C2D3FE6DD0044029F /* Melodic Stamp Tests */ = {
+		286D1F302D50A75D00DB3C76 /* MelodicStampTests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			path = "Melodic Stamp Tests";
+			path = MelodicStampTests;
 			sourceTree = "<group>";
 		};
-		28BFA4D12CEE173A00448374 /* Melodic Stamp */ = {
+		28BFA4D12CEE173A00448374 /* MelodicStamp */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			path = "Melodic Stamp";
+			path = MelodicStamp;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		287A23382D3FE6DD0044029F /* Frameworks */ = {
+		286D1F2C2D50A75D00DB3C76 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -96,8 +96,8 @@
 		65F1D9F82CECCEE900389E37 = {
 			isa = PBXGroup;
 			children = (
-				28BFA4D12CEE173A00448374 /* Melodic Stamp */,
-				287A233C2D3FE6DD0044029F /* Melodic Stamp Tests */,
+				28BFA4D12CEE173A00448374 /* MelodicStamp */,
+				286D1F302D50A75D00DB3C76 /* MelodicStampTests */,
 				65F1DA022CECCEE900389E37 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -106,7 +106,7 @@
 			isa = PBXGroup;
 			children = (
 				65F1DA012CECCEE900389E37 /* Melodic Stamp.app */,
-				287A233B2D3FE6DD0044029F /* Melodic Stamp Tests.xctest */,
+				286D1F2F2D50A75D00DB3C76 /* MelodicStampTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -114,32 +114,32 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		287A233A2D3FE6DD0044029F /* Melodic Stamp Tests */ = {
+		286D1F2E2D50A75D00DB3C76 /* MelodicStampTests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 287A23412D3FE6DD0044029F /* Build configuration list for PBXNativeTarget "Melodic Stamp Tests" */;
+			buildConfigurationList = 286D1F352D50A75D00DB3C76 /* Build configuration list for PBXNativeTarget "MelodicStampTests" */;
 			buildPhases = (
-				287A23372D3FE6DD0044029F /* Sources */,
-				287A23382D3FE6DD0044029F /* Frameworks */,
-				287A23392D3FE6DD0044029F /* Resources */,
+				286D1F2B2D50A75D00DB3C76 /* Sources */,
+				286D1F2C2D50A75D00DB3C76 /* Frameworks */,
+				286D1F2D2D50A75D00DB3C76 /* Resources */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-				287A23402D3FE6DD0044029F /* PBXTargetDependency */,
+				286D1F342D50A75D00DB3C76 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
-				287A233C2D3FE6DD0044029F /* Melodic Stamp Tests */,
+				286D1F302D50A75D00DB3C76 /* MelodicStampTests */,
 			);
-			name = "Melodic Stamp Tests";
+			name = MelodicStampTests;
 			packageProductDependencies = (
 			);
-			productName = "Melodic Stamp Tests";
-			productReference = 287A233B2D3FE6DD0044029F /* Melodic Stamp Tests.xctest */;
+			productName = MelodicStampTests;
+			productReference = 286D1F2F2D50A75D00DB3C76 /* MelodicStampTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		65F1DA002CECCEE900389E37 /* Melodic Stamp */ = {
+		65F1DA002CECCEE900389E37 /* MelodicStamp */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 65F1DA102CECCEEB00389E37 /* Build configuration list for PBXNativeTarget "Melodic Stamp" */;
+			buildConfigurationList = 65F1DA102CECCEEB00389E37 /* Build configuration list for PBXNativeTarget "MelodicStamp" */;
 			buildPhases = (
 				65F1D9FD2CECCEE900389E37 /* Sources */,
 				65F1D9FE2CECCEE900389E37 /* Frameworks */,
@@ -150,9 +150,9 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				28BFA4D12CEE173A00448374 /* Melodic Stamp */,
+				28BFA4D12CEE173A00448374 /* MelodicStamp */,
 			);
-			name = "Melodic Stamp";
+			name = MelodicStamp;
 			packageProductDependencies = (
 				65F1DA7C2CED77F100389E37 /* SFBAudioEngine */,
 				65F1DA832CED788D00389E37 /* CAAudioHardware */,
@@ -188,7 +188,7 @@
 				LastSwiftUpdateCheck = 1620;
 				LastUpgradeCheck = 1620;
 				TargetAttributes = {
-					287A233A2D3FE6DD0044029F = {
+					286D1F2E2D50A75D00DB3C76 = {
 						CreatedOnToolsVersion = 16.2;
 						LastSwiftMigration = 1620;
 						TestTargetID = 65F1DA002CECCEE900389E37;
@@ -198,7 +198,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 65F1D9FC2CECCEE900389E37 /* Build configuration list for PBXProject "Melodic Stamp" */;
+			buildConfigurationList = 65F1D9FC2CECCEE900389E37 /* Build configuration list for PBXProject "MelodicStamp" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -229,14 +229,14 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				65F1DA002CECCEE900389E37 /* Melodic Stamp */,
-				287A233A2D3FE6DD0044029F /* Melodic Stamp Tests */,
+				65F1DA002CECCEE900389E37 /* MelodicStamp */,
+				286D1F2E2D50A75D00DB3C76 /* MelodicStampTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		287A23392D3FE6DD0044029F /* Resources */ = {
+		286D1F2D2D50A75D00DB3C76 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -253,7 +253,7 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		287A23372D3FE6DD0044029F /* Sources */ = {
+		286D1F2B2D50A75D00DB3C76 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -270,15 +270,15 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		287A23402D3FE6DD0044029F /* PBXTargetDependency */ = {
+		286D1F342D50A75D00DB3C76 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 65F1DA002CECCEE900389E37 /* Melodic Stamp */;
-			targetProxy = 287A233F2D3FE6DD0044029F /* PBXContainerItemProxy */;
+			target = 65F1DA002CECCEE900389E37 /* MelodicStamp */;
+			targetProxy = 286D1F332D50A75D00DB3C76 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
-		287A23422D3FE6DD0044029F /* Debug */ = {
+		286D1F362D50A75D00DB3C76 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
@@ -289,7 +289,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 15.2;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "labs.cement.Melodic-Stamp-Tests";
+				PRODUCT_BUNDLE_IDENTIFIER = labs.cement.MelodicStampTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -298,7 +298,7 @@
 			};
 			name = Debug;
 		};
-		287A23432D3FE6DD0044029F /* Release */ = {
+		286D1F372D50A75D00DB3C76 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
@@ -309,7 +309,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 15.2;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "labs.cement.Melodic-Stamp-Tests";
+				PRODUCT_BUNDLE_IDENTIFIER = labs.cement.MelodicStampTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
@@ -447,17 +447,17 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
-				CODE_SIGN_ENTITLEMENTS = "Melodic Stamp/Melodic Stamp.entitlements";
+				CODE_SIGN_ENTITLEMENTS = MelodicStamp/MelodicStamp.entitlements;
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 20250123;
 				DEAD_CODE_STRIPPING = YES;
-				DEVELOPMENT_ASSET_PATHS = "\"Melodic Stamp/Preview Content\"";
+				DEVELOPMENT_ASSET_PATHS = "\"MelodicStamp/Preview Content\"";
 				DEVELOPMENT_TEAM = "";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = "Melodic-Stamp-Info.plist";
+				INFOPLIST_FILE = MelodicStampInfo.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Melodic Stamp";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.music";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "© 2024→Future Cement Labs";
@@ -467,7 +467,8 @@
 				);
 				MARKETING_VERSION = 0.0.1;
 				PRODUCT_BUNDLE_IDENTIFIER = labs.cement.MelodicStamp;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_MODULE_NAME = MelodicStamp;
+				PRODUCT_NAME = "Melodic Stamp";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 			};
@@ -479,16 +480,16 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
-				CODE_SIGN_ENTITLEMENTS = "Melodic Stamp/Melodic Stamp.entitlements";
+				CODE_SIGN_ENTITLEMENTS = MelodicStamp/MelodicStamp.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 20250123;
 				DEAD_CODE_STRIPPING = YES;
-				DEVELOPMENT_ASSET_PATHS = "\"Melodic Stamp/Preview Content\"";
+				DEVELOPMENT_ASSET_PATHS = "\"MelodicStamp/Preview Content\"";
 				DEVELOPMENT_TEAM = "";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = "Melodic-Stamp-Info.plist";
+				INFOPLIST_FILE = MelodicStampInfo.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Melodic Stamp";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.music";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "© 2024→Future Cement Labs";
@@ -498,7 +499,8 @@
 				);
 				MARKETING_VERSION = 0.0.1;
 				PRODUCT_BUNDLE_IDENTIFIER = labs.cement.MelodicStamp;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_MODULE_NAME = MelodicStamp;
+				PRODUCT_NAME = "Melodic Stamp";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 			};
@@ -507,16 +509,16 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		287A23412D3FE6DD0044029F /* Build configuration list for PBXNativeTarget "Melodic Stamp Tests" */ = {
+		286D1F352D50A75D00DB3C76 /* Build configuration list for PBXNativeTarget "MelodicStampTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				287A23422D3FE6DD0044029F /* Debug */,
-				287A23432D3FE6DD0044029F /* Release */,
+				286D1F362D50A75D00DB3C76 /* Debug */,
+				286D1F372D50A75D00DB3C76 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		65F1D9FC2CECCEE900389E37 /* Build configuration list for PBXProject "Melodic Stamp" */ = {
+		65F1D9FC2CECCEE900389E37 /* Build configuration list for PBXProject "MelodicStamp" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				65F1DA0E2CECCEEB00389E37 /* Debug */,
@@ -525,7 +527,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		65F1DA102CECCEEB00389E37 /* Build configuration list for PBXNativeTarget "Melodic Stamp" */ = {
+		65F1DA102CECCEEB00389E37 /* Build configuration list for PBXNativeTarget "MelodicStamp" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				65F1DA112CECCEEB00389E37 /* Debug */,

@@ -1,12 +1,12 @@
 //
-//  UUIDShortener+Tests.swift
-//  Melodic Stamp Tests
+//  UUIDShortenerTests.swift
+//  MelodicStamp
 //
-//  Created by KrLite on 2025/1/28.
+//  Created by KrLite on 2025/2/3.
 //
 
 import Foundation
-@testable import Melodic_Stamp
+@testable import MelodicStamp
 import Testing
 
 @Suite struct UUIDShortenerTests {
