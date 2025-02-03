@@ -71,9 +71,16 @@ struct InterfaceView: View {
             .onDisappear {
                 floatingWindowsTargetWindow = nil
             }
+            .onChange(of: playlist.isLoading) { _, newValue in
+                if newValue {
+                    floatingWindowsTargetWindow = nil
+                } else {
+                    floatingWindowsTargetWindow = appearsActive ? window : nil
+                }
+            }
             .onChange(of: appearsActive, initial: true) { _, newValue in
                 if newValue {
-                    floatingWindowsTargetWindow = window
+                    floatingWindowsTargetWindow = playlist.isLoading ? nil : window
                 } else {
                     floatingWindowsTargetWindow = nil
                 }
@@ -81,7 +88,7 @@ struct InterfaceView: View {
             .onChange(of: appearsActive, initial: true) { _, newValue in
                 guard newValue else { return }
 
-                Task {
+                Task.detached {
                     await library.loadPlaylists()
                 }
             }

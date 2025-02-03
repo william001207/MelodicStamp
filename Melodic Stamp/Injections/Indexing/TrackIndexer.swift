@@ -25,15 +25,15 @@ extension TrackIndexer {
             .appendingPathExtension(element.value)
     }
 
-    func loadTracks() -> AsyncStream<Track> {
+    func loadTracks() -> AsyncStream<(Int, Track)> {
         .init {
             continuation in
             guard !value.isEmpty else { return continuation.finish() }
 
             Task.detached {
-                for element in value {
+                for (index, element) in value.enumerated() {
                     let track = await Track(loadingFrom: trackURL(for: element))
-                    continuation.yield(track)
+                    continuation.yield((index, track))
                 }
             }
         }

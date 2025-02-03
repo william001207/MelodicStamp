@@ -99,7 +99,7 @@ import SwiftUI
         playerWindow?.animator().alphaValue = 0
     }
 
-    @MainActor func addTabBar(to mainWindow: NSWindow? = nil, @ViewBuilder content: @MainActor @escaping () -> some View) async {
+    @MainActor func addTabBar(to mainWindow: NSWindow? = nil, @ViewBuilder content: @MainActor @escaping () -> some View) {
         guard !isTabBarAdded else { return }
         guard
             mainWindow == targetWindow,
@@ -125,7 +125,7 @@ import SwiftUI
         DispatchQueue.main.async(execute: dispatch)
     }
 
-    @MainActor func addPlayer(to mainWindow: NSWindow? = nil, @ViewBuilder content: @MainActor @escaping () -> some View) async {
+    @MainActor func addPlayer(to mainWindow: NSWindow? = nil, @ViewBuilder content: @MainActor @escaping () -> some View) {
         guard !isPlayerAdded else { return }
         guard
             mainWindow == targetWindow,

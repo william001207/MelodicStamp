@@ -19,6 +19,7 @@ import SwiftUI
     var selectedTracks: Set<Track> = []
 
     private(set) var isLoading: Bool = false
+    private(set) var loadingProgress: CGFloat?
 
     init(bindingTo id: UUID = .init(), library: LibraryModel) {
         self.playlist = .referenced(bindingTo: id)
@@ -109,15 +110,20 @@ extension PlaylistModel {
 
     @MainActor func loadTracks() async {
         guard mode.isCanonical, !isLoading else { return }
+        loadingProgress = nil
         isLoading = true
+
         playlist.loadIndexer()
-
         playlist.tracks.removeAll()
-        for await track in playlist.indexer.loadTracks() {
+        loadingProgress = .zero
+        for await (index, track) in playlist.indexer.loadTracks() {
             playlist.tracks.append(track)
-        }
+            loadingProgress = CGFloat(index) / CGFloat(count)
 
-        isLoading = false
+            if index == count - 1 {
+                isLoading = false // A must to update views
+            }
+        }
     }
 }
 

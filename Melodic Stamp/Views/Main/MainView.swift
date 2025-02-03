@@ -10,6 +10,7 @@ import Luminare
 import SwiftUI
 
 struct MainView: View {
+    @Environment(LibraryModel.self) private var library
     @Environment(WindowManagerModel.self) private var windowManager
     @Environment(FileManagerModel.self) private var fileManager
     @Environment(PlaylistModel.self) private var playlist

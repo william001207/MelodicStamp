@@ -142,7 +142,7 @@ extension Metadata {
 
         load(from: metadata)
 
-        Task.detached {
+        Task.detached(priority: .background) {
             await self.generateThumbnail()
         }
     }
@@ -152,7 +152,7 @@ extension Metadata {
         self.state = .loading
         self.url = url
 
-        Task.detached {
+        Task.detached(priority: .background) {
             do {
                 try await self.update(completion: completion)
             } catch {
@@ -501,7 +501,7 @@ extension Metadata {
 
         restoreSubject.send()
 
-        Task.detached {
+        Task.detached(priority: .background) {
             await self.generateThumbnail()
         }
     }
@@ -514,12 +514,12 @@ extension Metadata {
 
         applySubject.send()
 
-        Task.detached {
+        Task.detached(priority: .background) {
             await self.generateThumbnail()
         }
     }
 
-    func generateThumbnail() {
+    func generateThumbnail() async {
         guard
             state.isInitialized,
             let attachedPictures = self[extracting: \.attachedPictures]?.current
@@ -529,21 +529,15 @@ extension Metadata {
             return
         }
 
-        Task.detached {
-            if let image = ThumbnailMaker.getCover(from: attachedPictures)?.image {
-                let thumbnail = await ThumbnailMaker.make(image)
-                let menuThumbnail = await ThumbnailMaker.make(image, resolution: 20)
+        if let image = ThumbnailMaker.getCover(from: attachedPictures)?.image {
+            let thumbnail = await ThumbnailMaker.make(image)
+            let menuThumbnail = await ThumbnailMaker.make(image, resolution: 20)
 
-                Task { @MainActor in
-                    self.thumbnail = thumbnail
-                    self.menuThumbnail = menuThumbnail
-                }
-            } else {
-                Task { @MainActor in
-                    self.thumbnail = nil
-                    self.menuThumbnail = nil
-                }
-            }
+            self.thumbnail = thumbnail
+            self.menuThumbnail = menuThumbnail
+        } else {
+            thumbnail = nil
+            menuThumbnail = nil
         }
     }
 
@@ -575,9 +569,7 @@ extension Metadata {
         await apply()
         completion?()
 
-        Task.detached {
-            await self.generateThumbnail()
-        }
+        await generateThumbnail()
     }
 
     nonisolated func write(completion: (() -> ())? = nil) async throws(MetadataError) {

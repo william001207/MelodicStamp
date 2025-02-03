@@ -23,7 +23,7 @@ struct FloatingWindowsView: View {
 
     var window: NSWindow?
 
-    @State private var floatingWindowsInitializationDispatch: DispatchWorkItem?
+    @State private var initializationDispatch: DispatchWorkItem?
 
     var body: some View {
         Color.clear
@@ -60,35 +60,31 @@ struct FloatingWindowsView: View {
     }
 
     private func initializeFloatingWindows(to mainWindow: NSWindow? = nil) {
-        floatingWindowsInitializationDispatch?.cancel()
+        initializationDispatch?.cancel()
         let dispatch = DispatchWorkItem {
-            Task.detached {
-                await floatingWindows.addTabBar(to: mainWindow) {
-                    floatingTabBarView(mainWindow: mainWindow)
-                        .environment(floatingWindows)
-                        .environment(windowManager)
-                }
+            floatingWindows.addTabBar(to: mainWindow) {
+                floatingTabBarView(mainWindow: mainWindow)
+                    .environment(floatingWindows)
+                    .environment(windowManager)
             }
 
-            Task.detached {
-                await floatingWindows.addPlayer(to: mainWindow) {
-                    floatingPlayerView(mainWindow: mainWindow)
-                        .environment(\.namespace, namespace)
-                        .environment(windowManager)
-                        .environment(playlist)
-                        .environment(player)
-                        .environment(keyboardControl)
-                        .environment(audioVisualizer)
-                        .environment(gradientVisualizer)
-                }
+            floatingWindows.addPlayer(to: mainWindow) {
+                floatingPlayerView(mainWindow: mainWindow)
+                    .environment(\.namespace, namespace)
+                    .environment(windowManager)
+                    .environment(playlist)
+                    .environment(player)
+                    .environment(keyboardControl)
+                    .environment(audioVisualizer)
+                    .environment(gradientVisualizer)
             }
         }
-        floatingWindowsInitializationDispatch = dispatch
+        initializationDispatch = dispatch
         DispatchQueue.main.async(execute: dispatch)
     }
 
     private func destroyFloatingWindows(from mainWindow: NSWindow? = nil) {
-        floatingWindowsInitializationDispatch?.cancel()
+        initializationDispatch?.cancel()
         floatingWindows.removeTabBar(from: mainWindow)
         floatingWindows.removePlayer(from: mainWindow)
     }

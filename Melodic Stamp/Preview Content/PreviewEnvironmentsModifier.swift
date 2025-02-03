@@ -112,7 +112,7 @@ import SwiftUI
         }
 
         static var samplePlaylistSegments: Playlist.Segments {
-            let segments = Playlist.Segments()
+            var segments = Playlist.Segments()
 
             segments.info.title = "Sample Playlist"
             segments.info.description = "A sample playlist."

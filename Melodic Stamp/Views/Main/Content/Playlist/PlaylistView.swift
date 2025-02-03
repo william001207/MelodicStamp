@@ -130,8 +130,17 @@ struct PlaylistView: View {
             .padding(.horizontal)
             .padding(.top, 8)
         }
+        .overlay {
+            if playlist.isLoading {
+                loadingView()
+                    .padding()
+                    .ignoresSafeArea()
+                    .background(.regularMaterial)
+            }
+        }
         .animation(animationFast, value: playlist)
         .animation(animationFast, value: playlist.selectedTracks)
+        .animation(.default, value: playlist.isLoading)
 
         // MARK: Keyboard Handlers
 
@@ -306,7 +315,7 @@ struct PlaylistView: View {
         .buttonStyle(.luminare)
     }
 
-    // MARK: - Item View
+    // MARK: - Track View
 
     @ViewBuilder private func trackView(for track: Track) -> some View {
         let isInitialized = track.metadata.state.isInitialized
@@ -377,6 +386,18 @@ struct PlaylistView: View {
                     Text("Reload Metadata")
                 }
                 .tint(.accent)
+            }
+        }
+    }
+
+    // MARK: Loading View
+
+    @ViewBuilder private func loadingView() -> some View {
+        LoadingExcerptView(progress: playlist.loadingProgress) {
+            if playlist.loadingProgress != nil {
+                Text("Loading \(playlist.loadedTracksCount) of \(playlist.count) Tracks…")
+            } else {
+                Text("Loading Tracks…")
             }
         }
     }

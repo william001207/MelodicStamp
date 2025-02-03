@@ -27,7 +27,7 @@ struct LibraryItemView: View {
         HStack(alignment: .center) {
             VStack(alignment: .leading, spacing: 2) {
                 if hasTitle {
-                    Text(item.segments.info.title)
+                    Text(itemOrPlaylist.segments.info.title)
                         .bold()
                         .font(.title3)
                 } else {
@@ -37,9 +37,9 @@ struct LibraryItemView: View {
                 }
 
                 HStack {
-                    Text("\(item.count) Tracks")
+                    Text("\(itemOrPlaylist.count) Tracks")
 
-                    Text(item.id.uuidString)
+                    Text(itemOrPlaylist.id.uuidString)
                         .foregroundStyle(.placeholder)
                 }
                 .font(.caption)
@@ -80,8 +80,20 @@ struct LibraryItemView: View {
         }
     }
 
+    private var isOpened: Bool {
+        item.id == playlist.id
+    }
+
+    private var itemOrPlaylist: Playlist {
+        if isOpened {
+            playlist.playlist
+        } else {
+            item
+        }
+    }
+
     private var opacity: CGFloat {
-        if playlist.mode.isCanonical {
+        if itemOrPlaylist.mode.isCanonical {
             if isOpened {
                 1
             } else {
@@ -92,16 +104,12 @@ struct LibraryItemView: View {
         }
     }
 
-    private var isOpened: Bool {
-        playlist.id == item.id
-    }
-
     private var hasTitle: Bool {
-        !item.segments.info.title.isEmpty
+        !itemOrPlaylist.segments.info.title.isEmpty
     }
 
     private var hasArtwork: Bool {
-        item.segments.artwork.image != nil
+        itemOrPlaylist.segments.artwork.image != nil
     }
 
     private var hasControl: Bool {
@@ -114,7 +122,7 @@ struct LibraryItemView: View {
 
     @ViewBuilder private func coverView() -> some View {
         ZStack {
-            if let artwork = item.segments.artwork.image {
+            if let artwork = itemOrPlaylist.segments.artwork.image {
                 MusicCover(
                     images: [artwork], hasPlaceholder: false, cornerRadius: 4
                 )
@@ -147,7 +155,7 @@ struct LibraryItemView: View {
     private func open() {
         openWindow(
             id: WindowID.content(),
-            value: CreationParameters(playlist: .canonical(item.id))
+            value: CreationParameters(playlist: .canonical(itemOrPlaylist.id))
         )
     }
 }

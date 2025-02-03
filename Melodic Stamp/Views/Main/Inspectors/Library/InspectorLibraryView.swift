@@ -24,7 +24,7 @@ struct InspectorLibraryView: View {
     // MARK: - Body
 
     var body: some View {
-        if !library.isLoaded {
+        if library.isLoadedPlaylistsEmpty {
             ExcerptView(tab: SidebarInspectorTab.library)
         } else {
             List(selection: $selectedPlaylists) {
@@ -99,7 +99,7 @@ struct InspectorLibraryView: View {
         !selectedPlaylists.isEmpty
     }
 
-    // MARK: - Item View
+    // MARK: - Playlist View
 
     @ViewBuilder private func playlistView(for playlist: Playlist) -> some View {
         let isSelected = selectedPlaylists.contains(playlist)

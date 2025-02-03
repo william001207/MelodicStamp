@@ -201,7 +201,7 @@ extension Playlist {
     }
 
     private func updateFolderIcon() {
-        Task.detached {
+        Task.detached(priority: .background) {
             NSWorkspace.shared.setIcon(
                 segments.artwork.image?.squared(),
                 forFile: url.standardizedFileURL.path(percentEncoded: false)

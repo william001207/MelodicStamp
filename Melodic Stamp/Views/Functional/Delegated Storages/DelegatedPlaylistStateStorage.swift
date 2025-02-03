@@ -18,7 +18,7 @@ struct DelegatedPlaylistStateStorage: View {
 
     @ViewBuilder private func stateObservations() -> some View {
         Color.clear
-            .onChange(of: playlist.hashValue) { _, _ in
+            .onChange(of: playlist.segments.state) { _, _ in
                 guard playlist.mode.isCanonical else { return }
                 Task.detached {
                     try await playlist.write(segments: [.state])

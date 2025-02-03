@@ -363,7 +363,14 @@
       }
     },
     "Artwork" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "封面图片"
+          }
+        }
+      }
     },
     "Asks for information when creating a new playlist" : {
       "localizations" : {
@@ -1056,7 +1063,14 @@
       }
     },
     "Description" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "描述"
+          }
+        }
+      }
     },
     "Discs" : {
       "localizations" : {
@@ -1330,7 +1344,14 @@
       }
     },
     "Edit" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "编辑"
+          }
+        }
+      }
     },
     "Edit Lyrics" : {
       "localizations" : {
@@ -1628,6 +1649,70 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "从文件加载"
+          }
+        }
+      }
+    },
+    "Loading %lld of %lld Tracks…" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Loading %1$lld of %#@arg2@…"
+          },
+          "substitutions" : {
+            "arg2" : {
+              "argNum" : 2,
+              "formatSpecifier" : "lld",
+              "variations" : {
+                "plural" : {
+                  "one" : {
+                    "stringUnit" : {
+                      "state" : "translated",
+                      "value" : "%arg Track"
+                    }
+                  },
+                  "other" : {
+                    "stringUnit" : {
+                      "state" : "translated",
+                      "value" : "%arg Tracks"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "正在加载%#@arg2@中的%1$lld首…"
+          },
+          "substitutions" : {
+            "arg2" : {
+              "argNum" : 2,
+              "formatSpecifier" : "lld",
+              "variations" : {
+                "plural" : {
+                  "other" : {
+                    "stringUnit" : {
+                      "state" : "translated",
+                      "value" : "%arg首音乐"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "Loading Tracks…" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "正在加载曲目…"
           }
         }
       }
@@ -2343,7 +2428,14 @@
       }
     },
     "Remove" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "移除"
+          }
+        }
+      }
     },
     "Remove %lld Tracks from Playlist" : {
       "localizations" : {
@@ -2435,17 +2527,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "替换当前播放列表"
-          }
-        }
-      }
-    },
-    "Replay" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "重新播放"
           }
         }
       }

@@ -42,8 +42,7 @@ extension Playlist {
 }
 
 extension Playlist {
-    // Important! Do not make this a struct, otherwise causing severe UI glitches!!!
-    @Observable final class Segments {
+    struct Segments {
         var info: Info
         var state: State
         var artwork: Artwork
@@ -54,7 +53,7 @@ extension Playlist {
             self.artwork = artwork
         }
 
-        convenience init(loadingFrom url: URL) throws {
+        init(loadingFrom url: URL) throws {
             let info = try JSONDecoder().decode(Info.self, from: Self.read(segment: .info, fromDirectory: url))
             let state = try JSONDecoder().decode(State.self, from: Self.read(segment: .state, fromDirectory: url))
             let artwork = try JSONDecoder().decode(Artwork.self, from: Self.read(segment: .artwork, fromDirectory: url))
@@ -63,7 +62,7 @@ extension Playlist {
             logger.info("Successfully read segments for playlist at \(url): \("\(info)"), \("\(state)"), \("\(artwork)")")
         }
 
-        convenience init() {
+        init() {
             self.init(info: .init(), state: .init(), artwork: .init())
         }
     }

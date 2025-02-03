@@ -14,6 +14,7 @@ extension LibraryModel: TypeNameReflectable {}
     private(set) var indexer: PlaylistIndexer = .init()
 
     private(set) var isLoading: Bool = false
+    private(set) var loadingProgress: CGFloat?
 
     init() {
         Task {
@@ -31,7 +32,7 @@ extension LibraryModel: Sequence {
         indexer.value.count
     }
 
-    var loadedCount: Int {
+    var loadedPlaylistsCount: Int {
         playlists.count
     }
 
@@ -39,8 +40,8 @@ extension LibraryModel: Sequence {
         count == 0
     }
 
-    var isLoaded: Bool {
-        loadedCount != 0
+    var isLoadedPlaylistsEmpty: Bool {
+        loadedPlaylistsCount == 0
     }
 }
 
@@ -60,15 +61,20 @@ extension LibraryModel {
 
     @MainActor func loadPlaylists() async {
         guard !isLoading else { return }
+        loadingProgress = nil
         isLoading = true
+
         loadIndexer()
-
         playlists.removeAll()
-        for await playlist in indexer.loadPlaylists() {
+        loadingProgress = .zero
+        for await (index, playlist) in indexer.loadPlaylists() {
             playlists.append(playlist)
-        }
+            loadingProgress = CGFloat(index) / CGFloat(count)
 
-        isLoading = false
+            if index == count - 1 {
+                isLoading = false // A must to update views
+            }
+        }
     }
 }
 
