@@ -9,6 +9,14 @@
 /* Begin PBXBuildFile section */
 		2810E2452CFB169E006FF94A /* Morphed in Frameworks */ = {isa = PBXBuildFile; productRef = 2810E2442CFB169E006FF94A /* Morphed */; };
 		2845A9F72D08745900CD7517 /* SmartCache in Frameworks */ = {isa = PBXBuildFile; productRef = 2845A9F62D08745900CD7517 /* SmartCache */; };
+		286D1F612D50A93100DB3C76 /* Interface.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 286D1F572D50A93100DB3C76 /* Interface.framework */; };
+		286D1F6C2D50A93100DB3C76 /* Interface.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 286D1F572D50A93100DB3C76 /* Interface.framework */; };
+		286D1F6D2D50A93100DB3C76 /* Interface.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 286D1F572D50A93100DB3C76 /* Interface.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		286D1FA92D50AC1B00DB3C76 /* Models.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 286D1F9F2D50AC1B00DB3C76 /* Models.framework */; };
+		286D1FB42D50AC1B00DB3C76 /* Models.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 286D1F9F2D50AC1B00DB3C76 /* Models.framework */; };
+		286D1FB52D50AC1B00DB3C76 /* Models.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 286D1F9F2D50AC1B00DB3C76 /* Models.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		286D1FBF2D50AC4E00DB3C76 /* Models.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 286D1F9F2D50AC1B00DB3C76 /* Models.framework */; };
+		286D1FC02D50AC4E00DB3C76 /* Models.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 286D1F9F2D50AC1B00DB3C76 /* Models.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		287260F52D4B2EDD00D501FB /* SwiftUIScrollOffset in Frameworks */ = {isa = PBXBuildFile; productRef = 287260F42D4B2EDD00D501FB /* SwiftUIScrollOffset */; };
 		287261762D4BBC3000D501FB /* BitCollections in Frameworks */ = {isa = PBXBuildFile; productRef = 287261752D4BBC3000D501FB /* BitCollections */; };
 		287261782D4BBC3000D501FB /* Collections in Frameworks */ = {isa = PBXBuildFile; productRef = 287261772D4BBC3000D501FB /* Collections */; };
@@ -36,17 +44,531 @@
 			remoteGlobalIDString = 65F1DA002CECCEE900389E37;
 			remoteInfo = MelodicStamp;
 		};
+		286D1F622D50A93100DB3C76 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 65F1D9F92CECCEE900389E37 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 286D1F562D50A93100DB3C76;
+			remoteInfo = Interface;
+		};
+		286D1F642D50A93100DB3C76 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 65F1D9F92CECCEE900389E37 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 65F1DA002CECCEE900389E37;
+			remoteInfo = MelodicStamp;
+		};
+		286D1F6A2D50A93100DB3C76 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 65F1D9F92CECCEE900389E37 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 286D1F562D50A93100DB3C76;
+			remoteInfo = Interface;
+		};
+		286D1FAA2D50AC1B00DB3C76 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 65F1D9F92CECCEE900389E37 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 286D1F9E2D50AC1B00DB3C76;
+			remoteInfo = Models;
+		};
+		286D1FAC2D50AC1B00DB3C76 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 65F1D9F92CECCEE900389E37 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 65F1DA002CECCEE900389E37;
+			remoteInfo = MelodicStamp;
+		};
+		286D1FB22D50AC1B00DB3C76 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 65F1D9F92CECCEE900389E37 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 286D1F9E2D50AC1B00DB3C76;
+			remoteInfo = Models;
+		};
+		286D1FC12D50AC4E00DB3C76 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 65F1D9F92CECCEE900389E37 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 286D1F9E2D50AC1B00DB3C76;
+			remoteInfo = Models;
+		};
 /* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		286D1F512D50A8FB00DB3C76 /* Embed ExtensionKit Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "$(EXTENSIONS_FOLDER_PATH)";
+			dstSubfolderSpec = 16;
+			files = (
+			);
+			name = "Embed ExtensionKit Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		286D1F722D50A93100DB3C76 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				286D1FB52D50AC1B00DB3C76 /* Models.framework in Embed Frameworks */,
+				286D1F6D2D50A93100DB3C76 /* Interface.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		286D1FC32D50AC4E00DB3C76 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				286D1FC02D50AC4E00DB3C76 /* Models.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		286D1F2F2D50A75D00DB3C76 /* MelodicStampTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MelodicStampTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		286D1F572D50A93100DB3C76 /* Interface.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Interface.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		286D1F602D50A93100DB3C76 /* InterfaceTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = InterfaceTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		286D1F9F2D50AC1B00DB3C76 /* Models.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Models.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		286D1FA82D50AC1B00DB3C76 /* ModelsTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ModelsTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		65F1DA012CECCEE900389E37 /* Melodic Stamp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Melodic Stamp.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		286D1F6E2D50A93100DB3C76 /* Exceptions for "Interface" folder in "Interface" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				About/AboutView.swift,
+				About/AlternativeAboutView.swift,
+				Auxiliary/Alive/AliveButtonStyle.swift,
+				Auxiliary/Alive/AliveHighlight.swift,
+				Auxiliary/Alive/AliveProgressViewStyle.swift,
+				Auxiliary/Alive/HoverableBackgroundView.swift,
+				Auxiliary/Alive/HoverableLabel.swift,
+				Auxiliary/Alive/MotionCardView.swift,
+				Auxiliary/Backgrounds/ChromaBackgroundView.swift,
+				Auxiliary/Backgrounds/EtherealBackgroundView.swift,
+				Auxiliary/Backgrounds/OpaqueBackgroundView.swift,
+				Auxiliary/Backgrounds/VibrantBackgroundView.swift,
+				Auxiliary/ContributorAvatarView.swift,
+				Auxiliary/Controls/MarqueeScrollView.swift,
+				Auxiliary/Controls/ProgressBar.swift,
+				Auxiliary/Controls/RangeSlider.swift,
+				Auxiliary/DynamicTypeSizeView.swift,
+				Auxiliary/Effects/ContinuousRipple.metal,
+				Auxiliary/Effects/ContinuousRippleEffectView.swift,
+				Auxiliary/EmptyMusicNoteView.swift,
+				Auxiliary/ExcerptView.swift,
+				Auxiliary/Integrations/AppKitNavigationSplitViewController.swift,
+				Auxiliary/Integrations/CatchWindow.swift,
+				Auxiliary/Integrations/VisualEffectView.swift,
+				Auxiliary/LoadingExcerptView.swift,
+				Auxiliary/Modifiers/ContentOffsetModifier.swift,
+				Auxiliary/NavigationDocumentView.swift,
+				Auxiliary/NavigationTitlesView.swift,
+				Auxiliary/PresentationAttachmentBar.swift,
+				Auxiliary/SimpleGradientView.swift,
+				ContentView.swift,
+				"Floating Windows/FloatingPlayerView.swift",
+				"Floating Windows/FloatingTabBarView.swift",
+				"Floating Windows/FloatingWindowsView.swift",
+				Functional/Commands/EditingCommands.swift,
+				Functional/Commands/FileCommands.swift,
+				Functional/Commands/LocalizedInspectorCommands.swift,
+				Functional/Commands/PlayerCommands.swift,
+				Functional/Commands/PlaylistCommands.swift,
+				Functional/Commands/WindowCommands.swift,
+				"Functional/Delegated Storages/DelegatedPlaylistStateStorage.swift",
+				"Functional/Delegated Storages/DelegatedPlaylistStorage.swift",
+				Functional/Errors/MetadataErrorView.swift,
+				"Functional/Output Device/AudioDeviceTransportTypeView.swift",
+				"Functional/Output Device/OutputDeviceList.swift",
+				"Functional/Output Device/OutputDevicePicker.swift",
+				"Functional/Output Device/OutputDeviceView.swift",
+				Functional/Playback/PlaybackModePicker.swift,
+				Functional/Playback/PlaybackModeView.swift,
+				Functional/Presentations/Auxiliary/ModifiedMetadataList.swift,
+				Functional/Presentations/Auxiliary/WindowTerminationPresentationInjector.swift,
+				Functional/Presentations/FileImporters.swift,
+				Functional/Presentations/PlaylistPresentation.swift,
+				Functional/Presentations/UnsavedChangesPresentation.swift,
+				Functional/Presentations/UnsavedPlaylistPresentation.swift,
+				Functional/Toolbars/EditorToolbar.swift,
+				Functional/Toolbars/FileToolbar.swift,
+				Functional/Toolbars/LibraryToolbar.swift,
+				Functional/Toolbars/LyricsToolbar.swift,
+				InterfaceView.swift,
+				Lyrics/AppleMusicLyricsView.swift,
+				Lyrics/Auxiliary/ProgressDotsView.swift,
+				Lyrics/Composed/ComposedLyricLineView.swift,
+				Lyrics/Composed/ComposedLyricsView.swift,
+				Lyrics/Display/DisplayLyricLineView.swift,
+				Lyrics/Display/DisplayLyricsRenderer.swift,
+				Lyrics/Display/DisplayLyricsView.swift,
+				Lyrics/Display/LRC/LRCDisplayLyricLineView.swift,
+				Lyrics/Display/Raw/RawDisplayLyricLineView.swift,
+				Lyrics/Display/TTML/TTMLDisplayLyricLineView.swift,
+				Lyrics/Inspector/TTML/TTMLInspectorInformationView.swift,
+				Lyrics/Inspector/TTML/TTMLInspectorLyricLineView.swift,
+				Lyrics/Inspector/TTML/TTMLInspectorLyricsView.swift,
+				Lyrics/LyricsAnalyzerView.swift,
+				Main/Content/Leaflet/Auxiliary/AppleMusicLyricsViewInteractionStateButton.swift,
+				Main/Content/Leaflet/Auxiliary/LeafletLyricsControlsView.swift,
+				Main/Content/Leaflet/LeafletView.swift,
+				Main/Content/Playlist/Auxiliary/PlaylistMetadataView.swift,
+				Main/Content/Playlist/Auxiliary/TracksContextMenu.swift,
+				Main/Content/Playlist/PlaylistView.swift,
+				Main/Content/Playlist/TrackPreview.swift,
+				Main/Content/Playlist/TrackView.swift,
+				"Main/Inspectors/Advanced Metadata/InspectorAdvancedMetadataView.swift",
+				Main/Inspectors/Analytics/InspectorAnalyticsView.swift,
+				"Main/Inspectors/Common Metadata/InspectorCommonMetadataView.swift",
+				Main/Inspectors/Library/Auxiliary/PlaylistsContextMenu.swift,
+				Main/Inspectors/Library/InspectorLibraryView.swift,
+				Main/Inspectors/Library/LibraryItemView.swift,
+				Main/Inspectors/Lyrics/InspectorLyricsView.swift,
+				Main/MainView.swift,
+				"Metadata Editor/LabeledOptionalControl.swift",
+				"Metadata Editor/LabeledSection.swift",
+				"Metadata Editor/LabeledTextEditor.swift",
+				"Metadata Editor/LabeledTextField.swift",
+				Player/Auxiliary/AttachedPictureCategoryView.swift,
+				Player/Auxiliary/AttachedPictureTypeView.swift,
+				Player/Auxiliary/DurationText.swift,
+				Player/Auxiliary/MusicTitle.swift,
+				Player/MiniPlayerView.swift,
+				"Player/Music Cover/AdaptableMusicCoverControl.swift",
+				"Player/Music Cover/AdaptableMusicCovers.swift",
+				"Player/Music Cover/MusicCover.swift",
+				Player/PlayerView.swift,
+				Settings/Auxiliary/SettingsBannerIcon.swift,
+				Settings/Auxiliary/SettingsExcerptView.swift,
+				Settings/Auxiliary/SettingsSidebarIcon.swift,
+				Settings/Controls/About/SettingsContributorsControl.swift,
+				Settings/Controls/Behaviors/SettingsAsksForPlaylistInformationControl.swift,
+				Settings/Controls/Behaviors/SettingsDefaultPlaybackModeControl.swift,
+				Settings/Controls/Gradient/SettingsGradientDynamicsControl.swift,
+				Settings/Controls/Gradient/SettingsGradientFPSControl.swift,
+				Settings/Controls/Gradient/SettingsGradientResolutionControl.swift,
+				Settings/Controls/Lyrics/SettingsLyricsAttachmentsControl.swift,
+				Settings/Controls/Lyrics/SettingsLyricsFadingEffectControl.swift,
+				Settings/Controls/Lyrics/SettingsLyricsMaxWidthControl.swift,
+				Settings/Controls/Lyrics/SettingsLyricsTypeSizeControl.swift,
+				Settings/Controls/UI/SettingsDynamicTitleBarControl.swift,
+				Settings/Controls/UI/SettingsMotionLevelControl.swift,
+				"Settings/Controls/Window Backgrounds/SettingsBackgroundStylesControl.swift",
+				Settings/Pages/SettingsAppearancePage.swift,
+				Settings/Pages/SettingsBehaviorsPage.swift,
+				Settings/Pages/SettingsFeedbackPage.swift,
+				Settings/Pages/SettingsLyricsPage.swift,
+				Settings/Pages/SettingsPerformancePage.swift,
+				Settings/Pages/SettingsVisualizationPage.swift,
+				Settings/SettingsView.swift,
+				Visualization/AnimatedGrid.swift,
+				Visualization/Spectrum/SpectrumChannel.swift,
+				Visualization/Spectrum/SpectrumView.swift,
+				Visualization/TinyBinaryChannelVisualizerView.swift,
+			);
+			publicHeaders = (
+				Interface.h,
+			);
+			target = 286D1F562D50A93100DB3C76 /* Interface */;
+		};
+		286D1F762D50A95400DB3C76 /* Exceptions for "Interface" folder in "MelodicStamp" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				About/AboutView.swift,
+				About/AlternativeAboutView.swift,
+				Auxiliary/Alive/AliveButtonStyle.swift,
+				Auxiliary/Alive/AliveHighlight.swift,
+				Auxiliary/Alive/AliveProgressViewStyle.swift,
+				Auxiliary/Alive/HoverableBackgroundView.swift,
+				Auxiliary/Alive/HoverableLabel.swift,
+				Auxiliary/Alive/MotionCardView.swift,
+				Auxiliary/Backgrounds/ChromaBackgroundView.swift,
+				Auxiliary/Backgrounds/EtherealBackgroundView.swift,
+				Auxiliary/Backgrounds/OpaqueBackgroundView.swift,
+				Auxiliary/Backgrounds/VibrantBackgroundView.swift,
+				Auxiliary/ContributorAvatarView.swift,
+				Auxiliary/Controls/MarqueeScrollView.swift,
+				Auxiliary/Controls/ProgressBar.swift,
+				Auxiliary/Controls/RangeSlider.swift,
+				Auxiliary/DynamicTypeSizeView.swift,
+				Auxiliary/Effects/ContinuousRipple.metal,
+				Auxiliary/Effects/ContinuousRippleEffectView.swift,
+				Auxiliary/EmptyMusicNoteView.swift,
+				Auxiliary/ExcerptView.swift,
+				Auxiliary/Integrations/AppKitNavigationSplitViewController.swift,
+				Auxiliary/Integrations/CatchWindow.swift,
+				Auxiliary/Integrations/VisualEffectView.swift,
+				Auxiliary/LoadingExcerptView.swift,
+				Auxiliary/Modifiers/ContentOffsetModifier.swift,
+				Auxiliary/NavigationDocumentView.swift,
+				Auxiliary/NavigationTitlesView.swift,
+				Auxiliary/PresentationAttachmentBar.swift,
+				Auxiliary/SimpleGradientView.swift,
+				ContentView.swift,
+				"Floating Windows/FloatingPlayerView.swift",
+				"Floating Windows/FloatingTabBarView.swift",
+				"Floating Windows/FloatingWindowsView.swift",
+				Functional/Commands/EditingCommands.swift,
+				Functional/Commands/FileCommands.swift,
+				Functional/Commands/LocalizedInspectorCommands.swift,
+				Functional/Commands/PlayerCommands.swift,
+				Functional/Commands/PlaylistCommands.swift,
+				Functional/Commands/WindowCommands.swift,
+				"Functional/Delegated Storages/DelegatedPlaylistStateStorage.swift",
+				"Functional/Delegated Storages/DelegatedPlaylistStorage.swift",
+				Functional/Errors/MetadataErrorView.swift,
+				"Functional/Output Device/AudioDeviceTransportTypeView.swift",
+				"Functional/Output Device/OutputDeviceList.swift",
+				"Functional/Output Device/OutputDevicePicker.swift",
+				"Functional/Output Device/OutputDeviceView.swift",
+				Functional/Playback/PlaybackModePicker.swift,
+				Functional/Playback/PlaybackModeView.swift,
+				Functional/Presentations/Auxiliary/ModifiedMetadataList.swift,
+				Functional/Presentations/Auxiliary/WindowTerminationPresentationInjector.swift,
+				Functional/Presentations/FileImporters.swift,
+				Functional/Presentations/PlaylistPresentation.swift,
+				Functional/Presentations/UnsavedChangesPresentation.swift,
+				Functional/Presentations/UnsavedPlaylistPresentation.swift,
+				Functional/Toolbars/EditorToolbar.swift,
+				Functional/Toolbars/FileToolbar.swift,
+				Functional/Toolbars/LibraryToolbar.swift,
+				Functional/Toolbars/LyricsToolbar.swift,
+				InterfaceView.swift,
+				Lyrics/AppleMusicLyricsView.swift,
+				Lyrics/Auxiliary/ProgressDotsView.swift,
+				Lyrics/Composed/ComposedLyricLineView.swift,
+				Lyrics/Composed/ComposedLyricsView.swift,
+				Lyrics/Display/DisplayLyricLineView.swift,
+				Lyrics/Display/DisplayLyricsRenderer.swift,
+				Lyrics/Display/DisplayLyricsView.swift,
+				Lyrics/Display/LRC/LRCDisplayLyricLineView.swift,
+				Lyrics/Display/Raw/RawDisplayLyricLineView.swift,
+				Lyrics/Display/TTML/TTMLDisplayLyricLineView.swift,
+				Lyrics/Inspector/TTML/TTMLInspectorInformationView.swift,
+				Lyrics/Inspector/TTML/TTMLInspectorLyricLineView.swift,
+				Lyrics/Inspector/TTML/TTMLInspectorLyricsView.swift,
+				Lyrics/LyricsAnalyzerView.swift,
+				Main/Content/Leaflet/Auxiliary/AppleMusicLyricsViewInteractionStateButton.swift,
+				Main/Content/Leaflet/Auxiliary/LeafletLyricsControlsView.swift,
+				Main/Content/Leaflet/LeafletView.swift,
+				Main/Content/Playlist/Auxiliary/PlaylistMetadataView.swift,
+				Main/Content/Playlist/Auxiliary/TracksContextMenu.swift,
+				Main/Content/Playlist/PlaylistView.swift,
+				Main/Content/Playlist/TrackPreview.swift,
+				Main/Content/Playlist/TrackView.swift,
+				"Main/Inspectors/Advanced Metadata/InspectorAdvancedMetadataView.swift",
+				Main/Inspectors/Analytics/InspectorAnalyticsView.swift,
+				"Main/Inspectors/Common Metadata/InspectorCommonMetadataView.swift",
+				Main/Inspectors/Library/Auxiliary/PlaylistsContextMenu.swift,
+				Main/Inspectors/Library/InspectorLibraryView.swift,
+				Main/Inspectors/Library/LibraryItemView.swift,
+				Main/Inspectors/Lyrics/InspectorLyricsView.swift,
+				Main/MainView.swift,
+				"Metadata Editor/LabeledOptionalControl.swift",
+				"Metadata Editor/LabeledSection.swift",
+				"Metadata Editor/LabeledTextEditor.swift",
+				"Metadata Editor/LabeledTextField.swift",
+				Player/Auxiliary/AttachedPictureCategoryView.swift,
+				Player/Auxiliary/AttachedPictureTypeView.swift,
+				Player/Auxiliary/DurationText.swift,
+				Player/Auxiliary/MusicTitle.swift,
+				Player/MiniPlayerView.swift,
+				"Player/Music Cover/AdaptableMusicCoverControl.swift",
+				"Player/Music Cover/AdaptableMusicCovers.swift",
+				"Player/Music Cover/MusicCover.swift",
+				Player/PlayerView.swift,
+				Settings/Auxiliary/SettingsBannerIcon.swift,
+				Settings/Auxiliary/SettingsExcerptView.swift,
+				Settings/Auxiliary/SettingsSidebarIcon.swift,
+				Settings/Controls/About/SettingsContributorsControl.swift,
+				Settings/Controls/Behaviors/SettingsAsksForPlaylistInformationControl.swift,
+				Settings/Controls/Behaviors/SettingsDefaultPlaybackModeControl.swift,
+				Settings/Controls/Gradient/SettingsGradientDynamicsControl.swift,
+				Settings/Controls/Gradient/SettingsGradientFPSControl.swift,
+				Settings/Controls/Gradient/SettingsGradientResolutionControl.swift,
+				Settings/Controls/Lyrics/SettingsLyricsAttachmentsControl.swift,
+				Settings/Controls/Lyrics/SettingsLyricsFadingEffectControl.swift,
+				Settings/Controls/Lyrics/SettingsLyricsMaxWidthControl.swift,
+				Settings/Controls/Lyrics/SettingsLyricsTypeSizeControl.swift,
+				Settings/Controls/UI/SettingsDynamicTitleBarControl.swift,
+				Settings/Controls/UI/SettingsMotionLevelControl.swift,
+				"Settings/Controls/Window Backgrounds/SettingsBackgroundStylesControl.swift",
+				Settings/Pages/SettingsAppearancePage.swift,
+				Settings/Pages/SettingsBehaviorsPage.swift,
+				Settings/Pages/SettingsFeedbackPage.swift,
+				Settings/Pages/SettingsLyricsPage.swift,
+				Settings/Pages/SettingsPerformancePage.swift,
+				Settings/Pages/SettingsVisualizationPage.swift,
+				Settings/SettingsView.swift,
+				Visualization/AnimatedGrid.swift,
+				Visualization/Spectrum/SpectrumChannel.swift,
+				Visualization/Spectrum/SpectrumView.swift,
+				Visualization/TinyBinaryChannelVisualizerView.swift,
+			);
+			target = 65F1DA002CECCEE900389E37 /* MelodicStamp */;
+		};
+		286D1FB92D50AC1C00DB3C76 /* Exceptions for "Models" folder in "Models" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				AnimatedString.swift,
+				ClampableExpression.swift,
+				CreationParameters.swift,
+				"Defaults/Defaults+BackgroundStyles.swift",
+				"Defaults/Defaults+DynamicTitleBar.swift",
+				"Defaults/Defaults+GradientDynamics.swift",
+				"Defaults/Defaults+GradientFPS.swift",
+				"Defaults/Defaults+GradientResolution.swift",
+				"Defaults/Defaults+LyricsMaxWidth.swift",
+				"Defaults/Defaults+MotionLevel.swift",
+				"Defaults/Extensions/Defaults+DynamicTypeSize.swift",
+				"Defaults/Extensions/Defaults+LyricsAttachments.swift",
+				"Defaults/Extensions/Defaults+PlaybackMode.swift",
+				Indexing/Indexer.swift,
+				Indexing/PlaylistIndexer.swift,
+				Indexing/TrackIndexer.swift,
+				ISRC.swift,
+				Lyrics/LRC/LRCLyricLine.swift,
+				Lyrics/LRC/LRCParser.swift,
+				Lyrics/LRC/LRCTag.swift,
+				Lyrics/LyricLine.swift,
+				Lyrics/LyricsAttachments.swift,
+				Lyrics/LyricsMetadata.swift,
+				Lyrics/LyricsParser.swift,
+				Lyrics/LyricsStorage.swift,
+				Lyrics/Raw/RawLyricLine.swift,
+				Lyrics/Raw/RawLyricsParser.swift,
+				Lyrics/RawLyrics.swift,
+				Lyrics/TTML/TTMLData.swift,
+				Lyrics/TTML/TTMLLyricLine.swift,
+				Lyrics/TTML/TTMLParser.swift,
+				Metadata/AdditionalMetadata.swift,
+				Metadata/Checkpoint.swift,
+				Metadata/Metadata.swift,
+				Metadata/MetadataEditorProtocol.swift,
+				Metadata/MetadataEntry.swift,
+				Player/PlaybackMode.swift,
+				Player/PlaybackState.swift,
+				Player/PlaybackTime.swift,
+				Player/Player.swift,
+				"Player/SFBAudioEngine/SFBAudioEngine+PlaybackState.swift",
+				"Player/SFBAudioEngine/SFBAudioEngine+Player.swift",
+				Playlist/Playlist.swift,
+				"Playlist/Playlist+Segments.swift",
+				Playlist/Track.swift,
+				RawValueCallableAsFunction.swift,
+				Settings/SettingsTab.swift,
+				Sidebar/SidebarContentTab.swift,
+				Sidebar/SidebarInspectorTab.swift,
+				Sidebar/SidebarTab.swift,
+				StringRepresentable.swift,
+				TypeNameReflectable.swift,
+			);
+			publicHeaders = (
+				Models.h,
+			);
+			target = 286D1F9E2D50AC1B00DB3C76 /* Models */;
+		};
+		286D1FBD2D50AC2D00DB3C76 /* Exceptions for "Models" folder in "MelodicStamp" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				AnimatedString.swift,
+				ClampableExpression.swift,
+				CreationParameters.swift,
+				"Defaults/Defaults+BackgroundStyles.swift",
+				"Defaults/Defaults+DynamicTitleBar.swift",
+				"Defaults/Defaults+GradientDynamics.swift",
+				"Defaults/Defaults+GradientFPS.swift",
+				"Defaults/Defaults+GradientResolution.swift",
+				"Defaults/Defaults+LyricsMaxWidth.swift",
+				"Defaults/Defaults+MotionLevel.swift",
+				"Defaults/Extensions/Defaults+DynamicTypeSize.swift",
+				"Defaults/Extensions/Defaults+LyricsAttachments.swift",
+				"Defaults/Extensions/Defaults+PlaybackMode.swift",
+				Indexing/Indexer.swift,
+				Indexing/PlaylistIndexer.swift,
+				Indexing/TrackIndexer.swift,
+				ISRC.swift,
+				Lyrics/LRC/LRCLyricLine.swift,
+				Lyrics/LRC/LRCParser.swift,
+				Lyrics/LRC/LRCTag.swift,
+				Lyrics/LyricLine.swift,
+				Lyrics/LyricsAttachments.swift,
+				Lyrics/LyricsMetadata.swift,
+				Lyrics/LyricsParser.swift,
+				Lyrics/LyricsStorage.swift,
+				Lyrics/Raw/RawLyricLine.swift,
+				Lyrics/Raw/RawLyricsParser.swift,
+				Lyrics/RawLyrics.swift,
+				Lyrics/TTML/TTMLData.swift,
+				Lyrics/TTML/TTMLLyricLine.swift,
+				Lyrics/TTML/TTMLParser.swift,
+				Metadata/AdditionalMetadata.swift,
+				Metadata/Checkpoint.swift,
+				Metadata/Metadata.swift,
+				Metadata/MetadataEditorProtocol.swift,
+				Metadata/MetadataEntry.swift,
+				Player/PlaybackMode.swift,
+				Player/PlaybackState.swift,
+				Player/PlaybackTime.swift,
+				Player/Player.swift,
+				"Player/SFBAudioEngine/SFBAudioEngine+PlaybackState.swift",
+				"Player/SFBAudioEngine/SFBAudioEngine+Player.swift",
+				Playlist/Playlist.swift,
+				"Playlist/Playlist+Segments.swift",
+				Playlist/Track.swift,
+				RawValueCallableAsFunction.swift,
+				Settings/SettingsTab.swift,
+				Sidebar/SidebarContentTab.swift,
+				Sidebar/SidebarInspectorTab.swift,
+				Sidebar/SidebarTab.swift,
+				StringRepresentable.swift,
+				TypeNameReflectable.swift,
+			);
+			target = 65F1DA002CECCEE900389E37 /* MelodicStamp */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		286D1F302D50A75D00DB3C76 /* MelodicStampTests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = MelodicStampTests;
+			sourceTree = "<group>";
+		};
+		286D1F582D50A93100DB3C76 /* Interface */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				286D1F762D50A95400DB3C76 /* Exceptions for "Interface" folder in "MelodicStamp" target */,
+				286D1F6E2D50A93100DB3C76 /* Exceptions for "Interface" folder in "Interface" target */,
+			);
+			path = Interface;
+			sourceTree = "<group>";
+		};
+		286D1F662D50A93100DB3C76 /* InterfaceTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = InterfaceTests;
+			sourceTree = "<group>";
+		};
+		286D1FA02D50AC1B00DB3C76 /* Models */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				286D1FBD2D50AC2D00DB3C76 /* Exceptions for "Models" folder in "MelodicStamp" target */,
+				286D1FB92D50AC1C00DB3C76 /* Exceptions for "Models" folder in "Models" target */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		286D1FAE2D50AC1B00DB3C76 /* ModelsTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = ModelsTests;
 			sourceTree = "<group>";
 		};
 		28BFA4D12CEE173A00448374 /* MelodicStamp */ = {
@@ -61,6 +583,37 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		286D1F542D50A93100DB3C76 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				286D1FBF2D50AC4E00DB3C76 /* Models.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		286D1F5D2D50A93100DB3C76 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				286D1F612D50A93100DB3C76 /* Interface.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		286D1F9C2D50AC1B00DB3C76 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		286D1FA52D50AC1B00DB3C76 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				286D1FA92D50AC1B00DB3C76 /* Models.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -80,6 +633,7 @@
 				287F978D2CF3160700C60307 /* Luminare in Frameworks */,
 				65F1DA9D2CEDBD8700389E37 /* Defaults in Frameworks */,
 				65F1DA8D2CED83F800389E37 /* FullDiskAccess in Frameworks */,
+				286D1F6C2D50A93100DB3C76 /* Interface.framework in Frameworks */,
 				287261782D4BBC3000D501FB /* Collections in Frameworks */,
 				65DFF89D2CFC2A6F00285040 /* SwiftSoup in Frameworks */,
 				287261762D4BBC3000D501FB /* BitCollections in Frameworks */,
@@ -87,17 +641,30 @@
 				2872617A2D4BBC3000D501FB /* DequeModule in Frameworks */,
 				65F1DA7D2CED77F100389E37 /* SFBAudioEngine in Frameworks */,
 				65F1DA842CED788D00389E37 /* CAAudioHardware in Frameworks */,
+				286D1FB42D50AC1B00DB3C76 /* Models.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		286D1FBE2D50AC4E00DB3C76 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		65F1D9F82CECCEE900389E37 = {
 			isa = PBXGroup;
 			children = (
 				28BFA4D12CEE173A00448374 /* MelodicStamp */,
 				286D1F302D50A75D00DB3C76 /* MelodicStampTests */,
+				286D1F582D50A93100DB3C76 /* Interface */,
+				286D1F662D50A93100DB3C76 /* InterfaceTests */,
+				286D1FA02D50AC1B00DB3C76 /* Models */,
+				286D1FAE2D50AC1B00DB3C76 /* ModelsTests */,
+				286D1FBE2D50AC4E00DB3C76 /* Frameworks */,
 				65F1DA022CECCEE900389E37 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -107,11 +674,32 @@
 			children = (
 				65F1DA012CECCEE900389E37 /* Melodic Stamp.app */,
 				286D1F2F2D50A75D00DB3C76 /* MelodicStampTests.xctest */,
+				286D1F572D50A93100DB3C76 /* Interface.framework */,
+				286D1F602D50A93100DB3C76 /* InterfaceTests.xctest */,
+				286D1F9F2D50AC1B00DB3C76 /* Models.framework */,
+				286D1FA82D50AC1B00DB3C76 /* ModelsTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		286D1F522D50A93100DB3C76 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		286D1F9A2D50AC1B00DB3C76 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
 		286D1F2E2D50A75D00DB3C76 /* MelodicStampTests */ = {
@@ -137,6 +725,102 @@
 			productReference = 286D1F2F2D50A75D00DB3C76 /* MelodicStampTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
+		286D1F562D50A93100DB3C76 /* Interface */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 286D1F6F2D50A93100DB3C76 /* Build configuration list for PBXNativeTarget "Interface" */;
+			buildPhases = (
+				286D1F522D50A93100DB3C76 /* Headers */,
+				286D1F532D50A93100DB3C76 /* Sources */,
+				286D1F542D50A93100DB3C76 /* Frameworks */,
+				286D1F552D50A93100DB3C76 /* Resources */,
+				286D1FC32D50AC4E00DB3C76 /* Embed Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				286D1FC22D50AC4E00DB3C76 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				286D1F582D50A93100DB3C76 /* Interface */,
+			);
+			name = Interface;
+			packageProductDependencies = (
+			);
+			productName = Interface;
+			productReference = 286D1F572D50A93100DB3C76 /* Interface.framework */;
+			productType = "com.apple.product-type.framework";
+		};
+		286D1F5F2D50A93100DB3C76 /* InterfaceTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 286D1F732D50A93100DB3C76 /* Build configuration list for PBXNativeTarget "InterfaceTests" */;
+			buildPhases = (
+				286D1F5C2D50A93100DB3C76 /* Sources */,
+				286D1F5D2D50A93100DB3C76 /* Frameworks */,
+				286D1F5E2D50A93100DB3C76 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				286D1F632D50A93100DB3C76 /* PBXTargetDependency */,
+				286D1F652D50A93100DB3C76 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				286D1F662D50A93100DB3C76 /* InterfaceTests */,
+			);
+			name = InterfaceTests;
+			packageProductDependencies = (
+			);
+			productName = InterfaceTests;
+			productReference = 286D1F602D50A93100DB3C76 /* InterfaceTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		286D1F9E2D50AC1B00DB3C76 /* Models */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 286D1FB62D50AC1C00DB3C76 /* Build configuration list for PBXNativeTarget "Models" */;
+			buildPhases = (
+				286D1F9A2D50AC1B00DB3C76 /* Headers */,
+				286D1F9B2D50AC1B00DB3C76 /* Sources */,
+				286D1F9C2D50AC1B00DB3C76 /* Frameworks */,
+				286D1F9D2D50AC1B00DB3C76 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				286D1FA02D50AC1B00DB3C76 /* Models */,
+			);
+			name = Models;
+			packageProductDependencies = (
+			);
+			productName = Models;
+			productReference = 286D1F9F2D50AC1B00DB3C76 /* Models.framework */;
+			productType = "com.apple.product-type.framework";
+		};
+		286D1FA72D50AC1B00DB3C76 /* ModelsTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 286D1FBA2D50AC1C00DB3C76 /* Build configuration list for PBXNativeTarget "ModelsTests" */;
+			buildPhases = (
+				286D1FA42D50AC1B00DB3C76 /* Sources */,
+				286D1FA52D50AC1B00DB3C76 /* Frameworks */,
+				286D1FA62D50AC1B00DB3C76 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				286D1FAB2D50AC1B00DB3C76 /* PBXTargetDependency */,
+				286D1FAD2D50AC1B00DB3C76 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				286D1FAE2D50AC1B00DB3C76 /* ModelsTests */,
+			);
+			name = ModelsTests;
+			packageProductDependencies = (
+			);
+			productName = ModelsTests;
+			productReference = 286D1FA82D50AC1B00DB3C76 /* ModelsTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 		65F1DA002CECCEE900389E37 /* MelodicStamp */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 65F1DA102CECCEEB00389E37 /* Build configuration list for PBXNativeTarget "MelodicStamp" */;
@@ -144,10 +828,14 @@
 				65F1D9FD2CECCEE900389E37 /* Sources */,
 				65F1D9FE2CECCEE900389E37 /* Frameworks */,
 				65F1D9FF2CECCEE900389E37 /* Resources */,
+				286D1F512D50A8FB00DB3C76 /* Embed ExtensionKit Extensions */,
+				286D1F722D50A93100DB3C76 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				286D1F6B2D50A93100DB3C76 /* PBXTargetDependency */,
+				286D1FB32D50AC1B00DB3C76 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				28BFA4D12CEE173A00448374 /* MelodicStamp */,
@@ -193,6 +881,20 @@
 						LastSwiftMigration = 1620;
 						TestTargetID = 65F1DA002CECCEE900389E37;
 					};
+					286D1F562D50A93100DB3C76 = {
+						CreatedOnToolsVersion = 16.2;
+					};
+					286D1F5F2D50A93100DB3C76 = {
+						CreatedOnToolsVersion = 16.2;
+						TestTargetID = 65F1DA002CECCEE900389E37;
+					};
+					286D1F9E2D50AC1B00DB3C76 = {
+						CreatedOnToolsVersion = 16.2;
+					};
+					286D1FA72D50AC1B00DB3C76 = {
+						CreatedOnToolsVersion = 16.2;
+						TestTargetID = 65F1DA002CECCEE900389E37;
+					};
 					65F1DA002CECCEE900389E37 = {
 						CreatedOnToolsVersion = 16.2;
 					};
@@ -231,12 +933,44 @@
 			targets = (
 				65F1DA002CECCEE900389E37 /* MelodicStamp */,
 				286D1F2E2D50A75D00DB3C76 /* MelodicStampTests */,
+				286D1F562D50A93100DB3C76 /* Interface */,
+				286D1F5F2D50A93100DB3C76 /* InterfaceTests */,
+				286D1F9E2D50AC1B00DB3C76 /* Models */,
+				286D1FA72D50AC1B00DB3C76 /* ModelsTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
 		286D1F2D2D50A75D00DB3C76 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		286D1F552D50A93100DB3C76 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		286D1F5E2D50A93100DB3C76 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		286D1F9D2D50AC1B00DB3C76 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		286D1FA62D50AC1B00DB3C76 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -260,6 +994,34 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		286D1F532D50A93100DB3C76 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		286D1F5C2D50A93100DB3C76 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		286D1F9B2D50AC1B00DB3C76 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		286D1FA42D50AC1B00DB3C76 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		65F1D9FD2CECCEE900389E37 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -274,6 +1036,41 @@
 			isa = PBXTargetDependency;
 			target = 65F1DA002CECCEE900389E37 /* MelodicStamp */;
 			targetProxy = 286D1F332D50A75D00DB3C76 /* PBXContainerItemProxy */;
+		};
+		286D1F632D50A93100DB3C76 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 286D1F562D50A93100DB3C76 /* Interface */;
+			targetProxy = 286D1F622D50A93100DB3C76 /* PBXContainerItemProxy */;
+		};
+		286D1F652D50A93100DB3C76 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 65F1DA002CECCEE900389E37 /* MelodicStamp */;
+			targetProxy = 286D1F642D50A93100DB3C76 /* PBXContainerItemProxy */;
+		};
+		286D1F6B2D50A93100DB3C76 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 286D1F562D50A93100DB3C76 /* Interface */;
+			targetProxy = 286D1F6A2D50A93100DB3C76 /* PBXContainerItemProxy */;
+		};
+		286D1FAB2D50AC1B00DB3C76 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 286D1F9E2D50AC1B00DB3C76 /* Models */;
+			targetProxy = 286D1FAA2D50AC1B00DB3C76 /* PBXContainerItemProxy */;
+		};
+		286D1FAD2D50AC1B00DB3C76 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 65F1DA002CECCEE900389E37 /* MelodicStamp */;
+			targetProxy = 286D1FAC2D50AC1B00DB3C76 /* PBXContainerItemProxy */;
+		};
+		286D1FB32D50AC1B00DB3C76 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 286D1F9E2D50AC1B00DB3C76 /* Models */;
+			targetProxy = 286D1FB22D50AC1B00DB3C76 /* PBXContainerItemProxy */;
+		};
+		286D1FC22D50AC4E00DB3C76 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 286D1F9E2D50AC1B00DB3C76 /* Models */;
+			targetProxy = 286D1FC12D50AC4E00DB3C76 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -310,6 +1107,218 @@
 				MACOSX_DEPLOYMENT_TARGET = 15.2;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = labs.cement.MelodicStampTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Melodic Stamp.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Melodic Stamp";
+			};
+			name = Release;
+		};
+		286D1F702D50A93100DB3C76 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = "";
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_MODULE_VERIFIER = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 15.2;
+				MARKETING_VERSION = 1.0;
+				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
+				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu17 gnu++20";
+				PRODUCT_BUNDLE_IDENTIFIER = labs.cement.MelodicStamp.Interface;
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_INSTALL_OBJC_HEADER = NO;
+				SWIFT_VERSION = 5.0;
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Debug;
+		};
+		286D1F712D50A93100DB3C76 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = "";
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_MODULE_VERIFIER = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 15.2;
+				MARKETING_VERSION = 1.0;
+				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
+				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu17 gnu++20";
+				PRODUCT_BUNDLE_IDENTIFIER = labs.cement.MelodicStamp.Interface;
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_INSTALL_OBJC_HEADER = NO;
+				SWIFT_VERSION = 5.0;
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Release;
+		};
+		286D1F742D50A93100DB3C76 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 7XRF3J9RS4;
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 15.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = labs.cement.MelodicStamp.InterfaceTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Melodic Stamp.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Melodic Stamp";
+			};
+			name = Debug;
+		};
+		286D1F752D50A93100DB3C76 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 7XRF3J9RS4;
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 15.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = labs.cement.MelodicStamp.InterfaceTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Melodic Stamp.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Melodic Stamp";
+			};
+			name = Release;
+		};
+		286D1FB72D50AC1C00DB3C76 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = "";
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_MODULE_VERIFIER = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 15.2;
+				MARKETING_VERSION = 1.0;
+				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
+				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu17 gnu++20";
+				PRODUCT_BUNDLE_IDENTIFIER = labs.cement.MelodicStamp.Models;
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_INSTALL_OBJC_HEADER = NO;
+				SWIFT_VERSION = 5.0;
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Debug;
+		};
+		286D1FB82D50AC1C00DB3C76 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = "";
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_MODULE_VERIFIER = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 15.2;
+				MARKETING_VERSION = 1.0;
+				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
+				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu17 gnu++20";
+				PRODUCT_BUNDLE_IDENTIFIER = labs.cement.MelodicStamp.Models;
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_INSTALL_OBJC_HEADER = NO;
+				SWIFT_VERSION = 5.0;
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Release;
+		};
+		286D1FBB2D50AC1C00DB3C76 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 7XRF3J9RS4;
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 15.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = labs.cement.MelodicStamp.ModelsTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Melodic Stamp.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Melodic Stamp";
+			};
+			name = Debug;
+		};
+		286D1FBC2D50AC1C00DB3C76 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 7XRF3J9RS4;
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 15.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = labs.cement.MelodicStamp.ModelsTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
@@ -514,6 +1523,42 @@
 			buildConfigurations = (
 				286D1F362D50A75D00DB3C76 /* Debug */,
 				286D1F372D50A75D00DB3C76 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		286D1F6F2D50A93100DB3C76 /* Build configuration list for PBXNativeTarget "Interface" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				286D1F702D50A93100DB3C76 /* Debug */,
+				286D1F712D50A93100DB3C76 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		286D1F732D50A93100DB3C76 /* Build configuration list for PBXNativeTarget "InterfaceTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				286D1F742D50A93100DB3C76 /* Debug */,
+				286D1F752D50A93100DB3C76 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		286D1FB62D50AC1C00DB3C76 /* Build configuration list for PBXNativeTarget "Models" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				286D1FB72D50AC1C00DB3C76 /* Debug */,
+				286D1FB82D50AC1C00DB3C76 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		286D1FBA2D50AC1C00DB3C76 /* Build configuration list for PBXNativeTarget "ModelsTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				286D1FBB2D50AC1C00DB3C76 /* Debug */,
+				286D1FBC2D50AC1C00DB3C76 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

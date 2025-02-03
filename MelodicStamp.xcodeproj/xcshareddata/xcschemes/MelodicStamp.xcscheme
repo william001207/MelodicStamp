@@ -35,9 +35,31 @@
             parallelizable = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "287A233A2D3FE6DD0044029F"
+               BlueprintIdentifier = "286D1F2E2D50A75D00DB3C76"
                BuildableName = "MelodicStampTests.xctest"
                BlueprintName = "MelodicStampTests"
+               ReferencedContainer = "container:MelodicStamp.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO"
+            parallelizable = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "286D1F5F2D50A93100DB3C76"
+               BuildableName = "InterfaceTests.xctest"
+               BlueprintName = "InterfaceTests"
+               ReferencedContainer = "container:MelodicStamp.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO"
+            parallelizable = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "286D1F842D50A99100DB3C76"
+               BuildableName = "ModelsTests.xctest"
+               BlueprintName = "ModelsTests"
                ReferencedContainer = "container:MelodicStamp.xcodeproj">
             </BuildableReference>
          </TestableReference>
