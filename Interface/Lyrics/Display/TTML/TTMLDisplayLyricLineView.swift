@@ -38,30 +38,19 @@ struct TTMLDisplayLyricLineView: View {
 
             // Shows background lyrics when necessary
             if !line.backgroundLyrics.isEmpty {
-                VStack {
-                    backgroundContent()
-                        .frame(maxWidth: .infinity, alignment: alignment)
-                        .onGeometryChange(for: CGSize.self) { proxy in
-                            proxy.size
-                        } action: { newValue in
-                            backgroundContentSize = newValue
-                        }
-                        .blur(radius: isHighlighted ? 0 : 2.5)
-                        .opacity(isHighlighted ? 1 : 0)
-                }
-                .frame(height: isHighlighted ? backgroundContentSize.height : 0)
-                .animation(.smooth(duration: 0.6), value: isHighlighted)
+                backgroundContent()
+                    .frame(maxWidth: .infinity, alignment: alignment)
             }
         }
         .multilineTextAlignment(textAlignment)
         .frame(maxWidth: .infinity, alignment: alignment)
         .onChange(of: isHighlighted, initial: true) { _, newValue in
             if !newValue {
-                withAnimation(.linear(duration: 0.45).delay(highlightReleasingDelay)) {
+                withAnimation(.smooth(duration: 0.8).delay(highlightReleasingDelay)) {
                     isActive = false
                 }
             } else {
-                withAnimation(.linear(duration: 0.45)) {
+                withAnimation(.smooth(duration: 0.8)) {
                     isActive = true
                 }
             }

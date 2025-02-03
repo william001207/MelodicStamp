@@ -57,7 +57,7 @@
             parallelizable = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "286D1F842D50A99100DB3C76"
+               BlueprintIdentifier = "286D1FA72D50AC1B00DB3C76"
                BuildableName = "ModelsTests.xctest"
                BlueprintName = "ModelsTests"
                ReferencedContainer = "container:MelodicStamp.xcodeproj">

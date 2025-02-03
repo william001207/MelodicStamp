@@ -143,26 +143,26 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
             proxy.size
         } action: { newValue in
             containerSize = newValue
-            resetScrolling()
+            scrollToHighlighted(true)
         }
         .onChange(of: identifier, initial: true) { _, _ in // Force reset on external change
             apperScolling()
         }
         .onChange(of: attachments) { _, _ in
-            resetScrolling()
+            scrollToHighlighted(true)
         }
         .onChange(of: dynamicTypeSize) { _, _ in
-            resetScrolling()
+            scrollToHighlighted(true)
         }
         .onChange(of: highlightedRange) { oldValue, newValue in
             let isLowerBoundJumped = abs(newValue.lowerBound - oldValue.lowerBound) > 1
             let isUpperBoundJumped = abs(newValue.upperBound - oldValue.upperBound) > 1
-            let isJumped = newValue.lowerBound < oldValue.lowerBound || (isLowerBoundJumped && isUpperBoundJumped)
+            let isJumped = /* newValue.lowerBound < oldValue.lowerBound || */ (isLowerBoundJumped && isUpperBoundJumped)
 
             if isJumped {
-                resetScrolling()
+                scrollToHighlighted(true)
             } else {
-                scrollToHighlighted()
+                scrollToHighlighted(false)
             }
         }
         .onAppear {
@@ -197,27 +197,38 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
     // MARK: Funcitons
 
     private func apperScolling() {
-        let index = max(0, min(range.upperBound - 1, highlightedRange.lowerBound))
-        guard let offset = lineOffsets[index] else { return }
+        let index = highlightedRange.lowerBound
+
+        let offset = lineOffsets[index]
 
         withAnimation(nil) {
             scrollPosition.scrollTo(id: index, anchor: .center)
-            for adjustItem in range {
-                contentOffset[adjustItem] = offset
+            if highlightedRange.lowerBound == highlightedRange.upperBound {
+                for adjustItem in range {
+                    contentOffset[adjustItem] = offset
+                }
             }
         }
     }
 
-    private func resetScrolling() {
-        scrollPosition.scrollTo(id: highlightedRange.lowerBound, anchor: .center)
-
-        for idx in range {
-            contentOffset[idx] = 0
-        }
-    }
-
-    private func scrollToHighlighted() {
+    private func scrollToHighlighted(_ reset: Bool) {
         let index = max(0, min(range.upperBound - 1, highlightedRange.lowerBound))
+
+        if reset {
+            let index = highlightedRange.lowerBound
+
+            let offset = lineOffsets[index]
+
+            scrollPosition.scrollTo(id: index, anchor: .center)
+
+            previousHighlightedRange = highlightedRange
+
+            if highlightedRange.lowerBound == highlightedRange.upperBound {
+                for adjustItem in range {
+                    contentOffset[adjustItem] = offset
+                }
+            }
+        }
 
         guard let offset = lineOffsets[index] else { return }
 
@@ -227,10 +238,14 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
         let diffBefore = abs(CGFloat(offset) - CGFloat(previousOffset))
         let diffAfter = abs(CGFloat(nextOffset) - CGFloat(offset))
 
-        let compensate: CGFloat = if diffBefore > diffAfter {
-            (CGFloat(previousOffset) - CGFloat(offset)) / 2
+        let compensate: CGFloat
+
+        var resultOffset: CGFloat = 0
+
+        if diffBefore > diffAfter {
+            compensate = (CGFloat(previousOffset) - CGFloat(offset)) / 2
         } else {
-            (CGFloat(nextOffset) - CGFloat(offset)) / 2
+            compensate = (CGFloat(nextOffset) - CGFloat(offset)) / 2
         }
 
         withAnimation(nil) {
@@ -238,17 +253,30 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
                 if highlightedRange.lowerBound != self.range.upperBound {
                     scrollPosition.scrollTo(id: index, anchor: .center)
 
-                    var testOffset: CGFloat = 0
+                    var totalOffset: CGFloat = 0
 
-                    var totalOffset: CGFloat = (range.lowerBound ..< range.upperBound).reduce(0) { result, idx in
-                        testOffset = result
-                        return result + (lineOffsets[idx] ?? 0)
+                    if highlightedRange.lowerBound == range.upperBound {
+                        totalOffset = (range.lowerBound ..< range.upperBound).reduce(0) { result, idx in
+                            resultOffset = result
+                            return result + (lineOffsets[idx] ?? 0)
+                        }
+                    } else if range.upperBound == highlightedRange.upperBound {
+                        totalOffset = (range.lowerBound ..< highlightedRange.lowerBound).reduce(0) { result, idx in
+                            resultOffset = result
+                            return result + (lineOffsets[idx] ?? 0)
+                        }
+                    } else if highlightedRange.lowerBound > range.lowerBound,
+                              highlightedRange.lowerBound < range.upperBound {
+                        totalOffset = (range.lowerBound ..< highlightedRange.lowerBound).reduce(0) { result, idx in
+                            resultOffset = result
+                            return result + (lineOffsets[idx] ?? 0)
+                        }
                     }
 
-                    for idx in highlightedRange.lowerBound ..< highlightedRange.upperBound {
+                    for idx in highlightedRange {
                         if highlightedRange.lowerBound != highlightedRange.upperBound {
                             if highlightedRange.upperBound != self.range.upperBound {
-                                totalOffset = (lineOffsets[idx] ?? 0) + compensate + testOffset
+                                totalOffset = (lineOffsets[idx] ?? 0) + compensate + resultOffset
                             } else {
                                 totalOffset = totalOffset
                             }
@@ -288,7 +316,7 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
                 for idx in index ..< index + 10 {
                     delay += 0.08
                     withAnimation(.spring(duration: 0.6, bounce: 0.275).delay(delay)) {
-                        contentOffset[idx] = previousOffset
+                        contentOffset[idx] = offset
                     }
                 }
             }

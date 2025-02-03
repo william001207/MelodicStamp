@@ -10,17 +10,15 @@ import Foundation
 extension String {
     static let vowels: [Regex] = [
         // English
-        /[aeiouAEIOU]+/,
-        /[aeouAEIOU]+[hmHM]+/,
-        /[hH][mM]*/
-        // Japanese
-//        /[あえいおう]+/,
-        // Chinese
-//        /[啊呀哈嗯嘿噢哦嗷呼嘻呃呵]+/
+        /[aeiouAEIOU]{1,7}/,
+
+        /[aeouAEIOU]{1,7}[hmHM]{1,7}/,
+
+        /[hH][mM]{0,6}/
     ]
 
     var splittingArtists: [String] {
-        split(separator: /[\/,]\s*/).map(String.init)
+        split(separator: /[\/,|\-]\s*/).map(String.init) // Added `|\-` for hyphen
     }
 }
 
