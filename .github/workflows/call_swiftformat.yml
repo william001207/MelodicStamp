@@ -1,7 +1,0 @@
-name: SwiftFormat Lint
-
-on: [ pull_request, push, workflow_dispatch ]
-
-jobs:
-  call-workflow:
-    uses: Cement-Labs/.github/.github/workflows/swiftformat.yml@main
