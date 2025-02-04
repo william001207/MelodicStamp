@@ -13,8 +13,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Mint
-        uses: Cement-Labs/.github/.github/actions/mint@main
+      - name: Setup Mint
+        uses: irgaly/setup-mint@v1
 
       - name: SwiftFormat Lint
         run: mint run swiftformat --verbose .
