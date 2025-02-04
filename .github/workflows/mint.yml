@@ -8,7 +8,7 @@ jobs:
 
   swiftformat:
     needs: call-mint
-    uses: ./.github/workflows/mint/swiftformat.yml
+    uses: ./.github/workflows/mint_swiftformat.yml
 
   call-commit:
     needs: [swiftformat]
