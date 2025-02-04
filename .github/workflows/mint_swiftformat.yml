@@ -11,4 +11,4 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: SwiftFormat Lint
-        run: mint run swiftformat --verbose .
+        run: ${{ github.workspace }}/mint run swiftformat --verbose .
