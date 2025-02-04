@@ -1,0 +1,14 @@
+name: "Mint: SwiftFormat Lint"
+
+on:
+  workflow_call:
+
+jobs:
+  swiftformat:
+    runs-on: macos-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: SwiftFormat Lint
+        run: mint run swiftformat --verbose .

@@ -1,7 +1,0 @@
-name: Install Swift Packages with Mint
-
-on: [ pull_request, push, workflow_dispatch ]
-
-jobs:
-  call-workflow:
-    uses: Cement-Labs/.github/.github/workflows/mint.yml@main

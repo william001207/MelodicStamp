@@ -23,7 +23,6 @@ extension LyricsParser {
     var attachments: LyricsAttachments { [] }
     var metadata: [LyricsMetadata] { [] }
 
-    // Do not use sequences, otherwise causing huge performance issues
     func highlight(at time: TimeInterval) -> Range<Int> {
         let endIndex = lines.endIndex
         let suspensionThreshold: TimeInterval = 4.5
