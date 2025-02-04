@@ -63,7 +63,7 @@ struct DisplayLyricsRenderer<Animated>: TextRenderer where Animated: AnimatedStr
     var glowColor: Color = .white.opacity(0.85)
     var glowRadius: Double = 5
 
-    var wave: Double = 1.025
+    var wave: Double = 1.075
     var waveDelay: TimeInterval = 0.102
     var waveActivationDelay: TimeInterval = 0.07
 
@@ -152,32 +152,33 @@ struct DisplayLyricsRenderer<Animated>: TextRenderer where Animated: AnimatedStr
         // let timeToVowels = timeToVowels(at: elapsedTime - waveDelay)
 
         do {
-            // var context = context
+            var context = context
 
+            // Premultiplied wave & glow effect for long vowels
             /*
-             // Premultiplied wave & glow effect for long vowels
-              wave: do {
-                  if let timeToNearestVowel = timeToVowels.sorted(by: { $0.mark < $1.mark }).first {
-                      let isInRange = timeToNearestVowel.time.contains(time: beginTime)
-                      guard isInRange else { break wave }
+             wave: do {
+                 if let timeToNearestVowel = timeToVowels.sorted(by: { $0.mark < $1.mark }).first {
 
-                      let waveProgress = bellCurve(timeToNearestVowel.mark, standardDeviation: 0.65)
-                      guard waveProgress > 1e-6 else { break wave }
+                     let isInRange = timeToNearestVowel.time.contains(time: beginTime)
+                     guard isInRange else { break wave }
 
-                      // Scale
-                      let waveAmount = lerp(1, wave, factor: waveProgress)
-                      context.translateBy(x: bounds.width / 2, y: bounds.height / 2)
-                      context.scaleBy(x: waveAmount, y: waveAmount)
-                      context.translateBy(x: -bounds.width / 2, y: -bounds.height / 2)
+                     let waveProgress = bellCurve(timeToNearestVowel.mark, standardDeviation: 0.325) + 0.08
+                     guard waveProgress > 1e-6 else { break wave }
 
-                      // Glow
-                      context.addFilter(.shadow(
-                          color: glowColor.opacity(waveProgress),
-                          radius: glowRadius * waveProgress
-                      ))
-                  }
-              }
-               */
+                     // Scale
+                     let waveAmount = waveProgress * (wave - 1) + 1
+                     context.translateBy(x: bounds.width / 2, y: bounds.height / 2)
+                     context.scaleBy(x: waveAmount, y: waveAmount)
+                     context.translateBy(x: -bounds.width / 2, y: -bounds.height / 2)
+
+                     // Glow
+                     context.addFilter(.shadow(
+                         color: glowColor.opacity(waveProgress),
+                         radius: glowRadius * waveProgress
+                     ))
+                 }
+             }
+             */
 
             // Unfilled text
             do {
