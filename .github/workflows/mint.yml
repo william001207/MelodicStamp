@@ -3,15 +3,20 @@ name: Install and Run Swift Packages with Mint
 on: [pull_request, push, workflow_dispatch]
 
 jobs:
-  call-mint:
-    uses: Cement-Labs/.github/.github/workflows/mint.yml@main
+  mint:
+    runs-on: macos-latest
 
-  swiftformat:
-    needs: call-mint
-    uses: ./.github/workflows/mint_swiftformat.yml
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
 
-  call-commit:
-    needs: [swiftformat]
-    uses: Cement-Labs/.github/.github/workflows/commit.yml@main
-    with:
-      commit_message: "🎨 Format code"
+      - name: Mint
+        uses: Cement-Labs/.github/.github/actions/mint@main
+
+      - name: SwiftFormat Lint
+        run: mint run swiftformat --verbose .
+
+      - name: Commit changes
+        uses: Cement-Labs/.github/.github/actions/commit@main
+        with:
+          commit-message: "🎨 Format code"
