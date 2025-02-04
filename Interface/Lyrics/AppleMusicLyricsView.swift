@@ -72,6 +72,8 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
     @Default(.lyricsAttachments) private var attachments
 
     // MARK: Fields
+    
+    @Binding var interactionState: AppleMusicLyricsViewInteractionState
 
     var padding: CGFloat = 50
     var delay: TimeInterval = 0.1
@@ -103,40 +105,24 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
 
     var body: some View {
         ScrollView {
-            Spacer()
-                .frame(height: containerSize.height / 2)
-
             LazyVStack(spacing: .zero) {
                 ForEach(range, id: \.self) { index in
                     content(at: index)
                         .id(index)
                 }
             }
-
-            Spacer()
-                .frame(height: containerSize.height / 2)
+            .padding(.vertical, containerSize.height / 2)
         }
         .scrollPosition($scrollPosition, anchor: .center)
-        .scrollIndicators(isUserScrolling ? .visible : .hidden)
+        .scrollIndicators(interactionState.isDelegated ? .hidden : .visible)
         .onScrollPhaseChange { _, phase, _ in
             switch phase {
+            case .interacting, .tracking, .decelerating:
+                interactionState = .intermediate
             case .idle:
-                isUserScrolling = true
-
-                animationStateDispatch?.cancel()
-
-                animationStateDispatch = DispatchWorkItem {
-                    isUserScrolling = false
-                }
-
-                if let dispatchItem = animationStateDispatch {
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: dispatchItem)
-                }
-
-            case .interacting, .decelerating, .animating, .tracking:
-                isUserScrolling = false
-
-                animationStateDispatch?.cancel()
+                break
+            case .animating:
+                break
             }
         }
         .onGeometryChange(for: CGSize.self) { proxy in // The code below follows a strict order, do not rearrange arbitrarily
@@ -148,6 +134,9 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
         .onChange(of: identifier, initial: true) { _, _ in // Force reset on external change
             apperScolling()
         }
+        .onChange(of: interactionState) { _, _ in
+            apperScolling()
+        }
         .onChange(of: attachments) { _, _ in
             scrollToHighlighted(true)
         }
@@ -157,7 +146,9 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
         .onChange(of: highlightedRange) { oldValue, newValue in
             let isLowerBoundJumped = abs(newValue.lowerBound - oldValue.lowerBound) > 1
             let isUpperBoundJumped = abs(newValue.upperBound - oldValue.upperBound) > 1
-            let isJumped = /* newValue.lowerBound < oldValue.lowerBound || */ (isLowerBoundJumped && isUpperBoundJumped)
+            let isJumped = newValue.lowerBound < oldValue.lowerBound || (isLowerBoundJumped && isUpperBoundJumped)
+            
+            guard interactionState.isDelegated else { return }
 
             if isJumped {
                 scrollToHighlighted(true)
@@ -197,6 +188,9 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
     // MARK: Funcitons
 
     private func apperScolling() {
+        
+        guard interactionState.isDelegated else { return }
+        
         let index = highlightedRange.lowerBound
 
         let offset = lineOffsets[index]
@@ -204,14 +198,25 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
         withAnimation(nil) {
             scrollPosition.scrollTo(id: index, anchor: .center)
             if highlightedRange.lowerBound == highlightedRange.upperBound {
-                for adjustItem in range {
-                    contentOffset[adjustItem] = offset
+                if highlightedRange.lowerBound == range.lowerBound {
+                    for adjustItem in range {
+                        contentOffset[adjustItem] = offset
+                    }
+                } else if highlightedRange.lowerBound != self.range.upperBound {
+                    for idx in index ..< index + 10 {
+                        withAnimation(.spring(duration: 0.6, bounce: 0.275).delay(delay)) {
+                            contentOffset[idx] = offset
+                        }
+                    }
                 }
             }
         }
     }
 
     private func scrollToHighlighted(_ reset: Bool) {
+        
+        guard interactionState.isDelegated else { return }
+        
         let index = max(0, min(range.upperBound - 1, highlightedRange.lowerBound))
 
         if reset {
@@ -224,10 +229,19 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
             previousHighlightedRange = highlightedRange
 
             if highlightedRange.lowerBound == highlightedRange.upperBound {
-                for adjustItem in range {
-                    contentOffset[adjustItem] = offset
+                if highlightedRange.lowerBound == range.lowerBound {
+                    for adjustItem in range {
+                        contentOffset[adjustItem] = offset
+                    }
+                } else if highlightedRange.lowerBound != self.range.upperBound {
+                    for idx in index ..< index + 10 {
+                        withAnimation(.spring(duration: 0.6, bounce: 0.275).delay(delay)) {
+                            contentOffset[idx] = offset
+                        }
+                    }
                 }
             }
+            return
         }
 
         guard let offset = lineOffsets[index] else { return }
@@ -321,7 +335,6 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
                 }
             }
         }
-
         previousHighlightedRange = highlightedRange
     }
 }
@@ -331,6 +344,7 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
 #Preview {
     @Previewable @State var highlightedRange: Range<Int> = 0 ..< 0
     @Previewable @State var alignment: AppleMusicLyricsViewAlignment = .top
+    @Previewable @State var interactionState: AppleMusicLyricsViewInteractionState = .following
     let count = 20
 
     VStack {
@@ -442,6 +456,7 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
         .padding()
 
         AppleMusicLyricsView(
+            interactionState: $interactionState,
             range: 0 ..< count,
             highlightedRange: highlightedRange,
             alignment: alignment

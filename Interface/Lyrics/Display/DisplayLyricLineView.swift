@@ -30,39 +30,41 @@ struct DisplayLyricLineView: View {
         let blurRadius = blurRadius(for: index, in: highlightedRange)
         let opacity = opacity(for: index, in: highlightedRange)
 
-        Button {
-            guard let beginTime = line.beginTime else { return }
-            player.time = beginTime + 0.01 // To make sure it's highlighting the current line
-        } label: {
-            Group {
-                switch line {
-                case let line as RawLyricLine:
-                    RawDisplayLyricLineView(line: line)
-                case let line as LRCLyricLine:
-                    LRCDisplayLyricLineView(
-                        line: line, isHighlighted: isHighlighted
-                    )
-                case let line as TTMLLyricLine:
-                    TTMLDisplayLyricLineView(
-                        line: line, elapsedTime: elapsedTime,
-                        isHighlighted: isHighlighted,
-                        shouldAnimate: shouldAnimate
-                    )
-                default:
-                    EmptyView()
+        VStack {
+            Button {
+                guard let beginTime = line.beginTime else { return }
+                player.time = beginTime + 0.01 // To make sure it's highlighting the current line
+            } label: {
+                Group {
+                    switch line {
+                    case let line as RawLyricLine:
+                        RawDisplayLyricLineView(line: line)
+                    case let line as LRCLyricLine:
+                        LRCDisplayLyricLineView(
+                            line: line, isHighlighted: isHighlighted
+                        )
+                    case let line as TTMLLyricLine:
+                        TTMLDisplayLyricLineView(
+                            line: line, elapsedTime: elapsedTime,
+                            isHighlighted: isHighlighted,
+                            shouldAnimate: shouldAnimate
+                        )
+                    default:
+                        EmptyView()
+                    }
+                }
+                .padding(8.5)
+                .blur(radius: hasFadingEffect ? blurRadius : 0)
+                .opacity(hasFadingEffect ? opacity : 1)
+                .hoverableBackground()
+                .clipShape(.rect(cornerRadius: 12))
+                .animation(.smooth(duration: 0.8), value: hasFadingEffect)
+                .onHover { hover in
+                    isHovering = hover
                 }
             }
-            .padding(8.5)
-            .blur(radius: hasFadingEffect ? blurRadius : 0)
-            .opacity(hasFadingEffect ? opacity : 1)
-            .hoverableBackground()
-            .clipShape(.rect(cornerRadius: 12))
-            .animation(.smooth(duration: 0.8), value: hasFadingEffect)
-            .onHover { hover in
-                isHovering = hover
-            }
+            .buttonStyle(.alive(enabledStyle: .white))
         }
-        .buttonStyle(.alive(enabledStyle: .white))
     }
 
     private var isHighlighted: Bool {

@@ -245,7 +245,25 @@ struct LeafletView: View {
     // MARK: - Lyrics View
 
     @ViewBuilder private func lyricsView() -> some View {
-        DisplayLyricsView()
+        DisplayLyricsView(interactionState: $interaction.state)
+            .overlay(alignment: .trailing) {
+                Group {
+                    if !interaction.state.isDelegated {
+                        AppleMusicLyricsViewInteractionStateButton(
+                            interactionState: $interaction.state,
+                            progress: interaction.delegationProgress,
+                            hasProgressRing: interaction.hasProgressRing && interaction.delegationProgress > 0
+                        )
+                        .tint(.white)
+                        .transition(.blurReplace(.downUp))
+                    }
+                }
+                .animation(.bouncy, value: interaction.state.isDelegated)
+                .padding(12)
+                .alignmentGuide(.trailing) { d in
+                    d[.leading]
+                }
+            }
     }
 
     // MARK: - Window Background

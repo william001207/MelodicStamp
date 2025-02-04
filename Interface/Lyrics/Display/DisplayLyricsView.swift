@@ -31,7 +31,7 @@ struct DisplayLyricsView: View {
 
     @Default(.lyricsAttachments) private var attachments
 
-//    @Binding var interactionState: AppleMusicLyricsViewInteractionState
+    @Binding var interactionState: AppleMusicLyricsViewInteractionState
 //    var onScrolling: ((ScrollPosition, CGPoint) -> ())?
 
     @State private var isHovering: Bool = false
@@ -42,10 +42,10 @@ struct DisplayLyricsView: View {
         let lines = lyrics.lines
         let highlightedRange = lyrics.highlight(at: elapsedTime, in: playlist.currentTrack?.url)
 
-        Group {
+        VStack {
             if !lines.isEmpty {
                 AppleMusicLyricsView(
-                    //                    interactionState: interactionState,
+                    interactionState: $interactionState,
                     range: 0 ..< lines.count,
                     highlightedRange: highlightedRange,
                     alignment: .center,
@@ -55,8 +55,8 @@ struct DisplayLyricsView: View {
                         line: lines[index], index: index,
                         highlightedRange: highlightedRange,
                         elapsedTime: elapsedTime,
-                        shouldFade: !isHovering
-//                        shouldAnimate: interactionState.isDelegated
+                        shouldFade: !isHovering,
+                        shouldAnimate: interactionState.isDelegated
                     )
                 } indicator: { index, _ in
                     let span = lyrics.storage?.parser.duration(before: index)

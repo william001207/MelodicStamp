@@ -9,7 +9,14 @@ import AppKit
 import SwiftUI
 
 @Observable final class FloatingWindowsModel {
-    private weak var targetWindow: NSWindow?
+    private weak var targetWindow: NSWindow? {
+        didSet {
+            previousTargetWindow = oldValue
+        }
+    }
+    
+    private(set) var previousTargetWindow: NSWindow?
+    
     private var isInFullScreen: Bool = false
 
     var isHidden: Bool = false {

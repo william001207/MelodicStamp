@@ -152,7 +152,7 @@ struct DisplayLyricsRenderer<Animated>: TextRenderer where Animated: AnimatedStr
         // let timeToVowels = timeToVowels(at: elapsedTime - waveDelay)
 
         do {
-            var context = context
+            // var context = context
 
             // Premultiplied wave & glow effect for long vowels
             /*
