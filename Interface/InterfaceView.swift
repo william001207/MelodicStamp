@@ -20,7 +20,7 @@ struct InterfaceView: View {
 
     var window: NSWindow?
     @State private var floatingWindowsTargetWindow: NSWindow?
-    
+
     @State private var playlistIsLoading: Bool = false
 
     var body: some View {

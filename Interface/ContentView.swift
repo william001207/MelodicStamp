@@ -121,7 +121,7 @@ struct ContentView: View {
                     isFocused = true
                     resetFocus(in: namespace)
                 }
-                .onChange(of: window) { oldValue, newValue in
+                .onChange(of: window) { _, _ in
                     if appearsActive {
                         windowManager.observe(window)
                     }

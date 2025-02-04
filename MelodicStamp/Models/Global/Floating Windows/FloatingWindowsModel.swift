@@ -14,9 +14,9 @@ import SwiftUI
             previousTargetWindow = oldValue
         }
     }
-    
+
     private(set) var previousTargetWindow: NSWindow?
-    
+
     private var isInFullScreen: Bool = false
 
     var isHidden: Bool = false {
