@@ -40,7 +40,7 @@ struct DisplayLyricsView: View {
         // Avoids multiple instantializations
         let lines = lyrics.lines
         let highlightedRange = lyrics.highlight(at: elapsedTime, in: playlist.currentTrack?.url)
-        
+
         // Preserves the view hierarchy
         if !lines.isEmpty {
             AppleMusicLyricsView(
@@ -61,11 +61,11 @@ struct DisplayLyricsView: View {
                 let span = lyrics.storage?.parser.duration(before: index)
                 let beginTime = span?.begin
                 let endTime = span?.end
-                
+
                 if let beginTime, let endTime {
                     let duration = endTime - beginTime
                     let progress = (elapsedTime - beginTime) / duration
-                    
+
                     return if duration >= 4.5, progress <= 1 {
                         .visible {
                             ProgressDotsContainerView(elapsedTime: elapsedTime, beginTime: beginTime, endTime: endTime)

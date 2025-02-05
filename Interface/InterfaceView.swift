@@ -80,9 +80,9 @@ struct InterfaceView: View {
                     floatingWindowsTargetWindow = appearsActive ? window : nil
                 }
             }
-            .onChange(of: window) { oldValue, newValue in
+            .onChange(of: window) { _, newValue in
                 let needAdd = !playlist.isLoading && appearsActive
-                if (newValue != nil) {
+                if newValue != nil {
                     floatingWindowsTargetWindow = needAdd ? window : nil
                 } else {
                     floatingWindowsTargetWindow = nil
