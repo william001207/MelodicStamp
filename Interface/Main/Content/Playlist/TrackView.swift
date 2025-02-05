@@ -88,12 +88,12 @@ struct TrackView: View {
             .lineLimit(1)
             .transition(.blurReplace)
             .opacity(opacity)
-//            .animation(.default.speed(2), value: metadataState)
-//            .animation(.default.speed(2), value: isMetadataModified)
-//            .animation(.default.speed(2), value: isCurrentTrack)
-//            .animation(.default.speed(2), value: hasControl)
-//            .animation(.default.speed(2), value: player.isCurrentTrackPlayable)
-//            .animation(.default.speed(2), value: player.isPlaying)
+            .animation(.default.speed(2), value: metadataState)
+            .animation(.default.speed(2), value: isMetadataModified)
+            .animation(.default.speed(2), value: isCurrentTrack)
+            .animation(.default.speed(2), value: hasControl)
+            .animation(.default.speed(2), value: player.isCurrentTrackPlayable)
+            .animation(.default.speed(2), value: player.isPlaying)
 
             Spacer()
 
@@ -111,8 +111,8 @@ struct TrackView: View {
         .frame(height: 50)
         .padding(6)
         .padding(.trailing, -1)
-//        .wiggleAnimation(wiggleAnimationTrigger)
-//        .bounceAnimation(bounceAnimationTrigger, scale: .init(width: 1.01, height: 1.01))
+        .wiggleAnimation(wiggleAnimationTrigger)
+        .bounceAnimation(bounceAnimationTrigger, scale: .init(width: 1.01, height: 1.01))
         .animation(animation, value: isHovering)
         .onHover { hover in
             isHovering = hover

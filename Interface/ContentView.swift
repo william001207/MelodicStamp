@@ -121,13 +121,10 @@ struct ContentView: View {
                     isFocused = true
                     resetFocus(in: namespace)
                 }
-                .onChange(of: window) { _, _ in
-                    if appearsActive {
-                        windowManager.observe(window)
-                    }
-                }
-                .onChange(of: appearsActive, initial: true) { _, newValue in
-                    guard newValue else { return }
+                .onChange(of: window) { _, newValue in
+                    guard let newValue, appearsActive else { return }
+                    windowManager.observe(newValue)
+                    
                     isFocused = true
                     resetFocus(in: namespace)
                     player.updateOutputDevices()

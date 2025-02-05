@@ -42,6 +42,7 @@ struct DisplayLyricsView: View {
         let lines = lyrics.lines
         let highlightedRange = lyrics.highlight(at: elapsedTime, in: playlist.currentTrack?.url)
 
+        // Preserves the view hierarchy
         VStack {
             if !lines.isEmpty {
                 AppleMusicLyricsView(
