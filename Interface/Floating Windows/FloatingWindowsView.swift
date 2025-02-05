@@ -28,10 +28,12 @@ struct FloatingWindowsView: View {
     var body: some View {
         Color.clear
             .onChange(of: window) { oldValue, newValue in
-                if let newValue {
+                print("XS onChange(of: window): \(newValue)")
+                
+                if let newValue = newValue {
                     floatingWindows.observe(newValue)
                     initializeFloatingWindows(to: newValue)
-                } else {
+                } else if let oldValue = oldValue {
                     destroyFloatingWindows(from: oldValue)
                 }
             }
