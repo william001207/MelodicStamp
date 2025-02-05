@@ -16,13 +16,10 @@ struct CatchWindow<Content>: View where Content: View {
         content(window)
             .background(MakeCustomizable(customization: { window in
                 self.window = window
-                print("XS customization: \(window)")
             }, willAppear: { window in
                 self.window = window
-                print("XS willAppear: \(window)")
             }, didAppear: { window in
                 self.window = window
-                print("XS didAppear: \(window)")
             }))
     }
 }
