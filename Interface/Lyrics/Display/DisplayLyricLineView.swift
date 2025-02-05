@@ -26,10 +26,10 @@ struct DisplayLyricLineView: View {
         // Avoids multiple instantializations
         let isActive = isActive
         let hasFadingEffect = isLyricsFadingEffectEnabled && shouldFade && !isActive
-        
+
         let blurRadius = blurRadius(for: index, in: highlightedRange)
         let opacity = opacity(for: index, in: highlightedRange)
-        
+
         Button {
             guard let beginTime = line.beginTime else { return }
             player.time = beginTime + 0.01 // To make sure it's highlighting the current line
