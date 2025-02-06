@@ -82,7 +82,7 @@ struct TTMLVowelTime: Equatable, Hashable {
 
 extension TTMLVowelTime {
     var duration: TimeInterval { endTime - beginTime }
-    
+
     func contains(time: TimeInterval) -> Bool {
         beginTime...endTime ~= time
     }

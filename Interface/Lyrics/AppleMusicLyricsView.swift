@@ -314,12 +314,12 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
                             return result + (lineOffsets[idx] ?? 0)
                         }
                     } else if highlightedRange.lowerBound > range.lowerBound,
-                               highlightedRange.upperBound == range.upperBound {
-                         totalOffset = (range.lowerBound ..< highlightedRange.lowerBound).reduce(0) { result, idx in
-                             resultOffset = result
-                             return result + (lineOffsets[idx] ?? 0)
-                         }
-                     }
+                              highlightedRange.upperBound == range.upperBound {
+                        totalOffset = (range.lowerBound ..< highlightedRange.lowerBound).reduce(0) { result, idx in
+                            resultOffset = result
+                            return result + (lineOffsets[idx] ?? 0)
+                        }
+                    }
 
                     for idx in highlightedRange {
                         if highlightedRange.lowerBound != highlightedRange.upperBound {

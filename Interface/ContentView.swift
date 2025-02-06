@@ -16,7 +16,7 @@ struct ContentView: View {
         var maxWidth: CGFloat?
         var minHeight: CGFloat?
         var maxHeight: CGFloat?
-        
+
         var windowStyle: MelodicStampWindowStyle? {
             didSet {
                 with(windowStyle: windowStyle ?? .main)
