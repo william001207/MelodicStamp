@@ -67,9 +67,8 @@ class CloseDelegatedWindowDelegate: NSObject, NSWindowDelegate {
     }
 
     func windowShouldClose(_ window: NSWindow) -> Bool {
-        let shouldClose = parent.shouldClose
-        parent.onClose(window, shouldClose)
-        return shouldClose
+        parent.onClose(window, parent.shouldClose)
+        return parent.shouldClose
     }
 
     override func responds(to aSelector: Selector!) -> Bool {
