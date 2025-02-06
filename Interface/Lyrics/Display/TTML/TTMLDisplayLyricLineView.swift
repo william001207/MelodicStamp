@@ -38,8 +38,13 @@ struct TTMLDisplayLyricLineView: View {
 
             // Shows background lyrics when necessary
             if !line.backgroundLyrics.isEmpty {
-                backgroundContent()
-                    .frame(maxWidth: .infinity, alignment: alignment)
+                if isActive {
+                    activebackgroundContent()
+                        .frame(maxWidth: .infinity, alignment: alignment)
+                } else {
+                    inactivebackgroundContent()
+                        .frame(maxWidth: .infinity, alignment: alignment)
+                }
             }
         }
         .multilineTextAlignment(textAlignment)
@@ -109,7 +114,7 @@ struct TTMLDisplayLyricLineView: View {
         }
     }
 
-    @ViewBuilder private func backgroundContent() -> some View {
+    @ViewBuilder private func activebackgroundContent() -> some View {
         VStack(alignment: alignment.horizontal, spacing: 5) {
             Group {
                 if shouldAnimate {
@@ -129,6 +134,20 @@ struct TTMLDisplayLyricLineView: View {
                 .opacity(0.75)
         }
     }
+    
+    @ViewBuilder private func inactivebackgroundContent() -> some View {
+        VStack(alignment: alignment.horizontal, spacing: 5) {
+            Text(line.backgroundContent)
+                .font(.system(size: 18.5 * dynamicTypeSize.scale))
+                .opacity(inactiveOpacity)
+                .bold()
+            
+            additionalContent(for: line.backgroundLyrics)
+                .font(.system(size: 14 * dynamicTypeSize.scale))
+                .opacity(inactiveOpacity)
+        }
+    }
+
 
     @ViewBuilder private func additionalContent(for lyrics: TTMLLyrics) -> some View {
         if attachments.contains(.translation) {

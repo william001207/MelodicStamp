@@ -34,8 +34,7 @@ struct DisplayLyricsView: View {
     @Binding var interactionState: AppleMusicLyricsViewInteractionState
 
     @State private var isHovering: Bool = false
-    @State private var hoveredIndex: Int? = nil
-
+    
     var body: some View {
         // Avoids multiple instantializations
         let lines = lyrics.lines

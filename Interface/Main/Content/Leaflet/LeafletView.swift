@@ -59,6 +59,7 @@ struct LeafletView: View {
 
                             if hasCover, let cover {
                                 coverView(cover)
+                                    .animation(.easeInOut, value: isShowingLyrics)
                             }
 
                             // MARK: Lyrics
@@ -117,8 +118,6 @@ struct LeafletView: View {
             .background {
                 windowBackgroundView()
             }
-            .animation(.bouncy, value: hasLyrics)
-            .animation(.bouncy, value: isShowingLyrics)
             .focusable()
             .focusEffectDisabled()
             .focused($isFocused)
