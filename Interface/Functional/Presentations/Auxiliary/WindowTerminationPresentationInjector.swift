@@ -40,6 +40,6 @@ struct WindowTerminationPresentationInjector: View {
 
     private var windowShouldClose: Bool {
         windowManager.state.shouldForceClose ||
-        (!hasUnsavedChanges && !hasUnsavedPlaylist)
+            (!hasUnsavedChanges && !hasUnsavedPlaylist)
     }
 }

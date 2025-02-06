@@ -32,12 +32,12 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     func destroy(window: NSWindow?) {
         guard let window else { return }
-        
+
         if suspendedWindows.contains(window) {
             suspendedWindows.remove(window)
             window.close()
         }
-        
+
         if suspendedWindows.isEmpty {
             logger.info("Terminated application because no window is suspended anymore")
             NSApp.reply(toApplicationShouldTerminate: true)
