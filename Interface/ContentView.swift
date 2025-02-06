@@ -16,6 +16,12 @@ struct ContentView: View {
         var maxWidth: CGFloat?
         var minHeight: CGFloat?
         var maxHeight: CGFloat?
+        
+        var windowStyle: MelodicStampWindowStyle? {
+            didSet {
+                with(windowStyle: windowStyle ?? .main)
+            }
+        }
 
         mutating func with(windowStyle: MelodicStampWindowStyle) {
             switch windowStyle {
@@ -23,7 +29,7 @@ struct ContentView: View {
                 minWidth = 960
                 maxWidth = nil
                 minHeight = 550
-                maxHeight = 550
+                maxHeight = nil
             case .miniPlayer:
                 minWidth = nil
                 maxWidth = 500
@@ -70,6 +76,7 @@ struct ContentView: View {
 
     // MARK: - Window
 
+    @State private var didLaunch = false
     @State private var sizer: Sizer = .init()
 
     // MARK: - Initializers
@@ -132,11 +139,7 @@ struct ContentView: View {
                 .onChange(of: windowManager.style, initial: true) { _, newValue in
                     isFocused = true
                     resetFocus(in: namespace)
-                    sizer.with(windowStyle: newValue)
-
-                    DispatchQueue.main.async {
-                        sizer.reset()
-                    }
+                    sizer.windowStyle = newValue
                 }
 
                 // MARK: Updates

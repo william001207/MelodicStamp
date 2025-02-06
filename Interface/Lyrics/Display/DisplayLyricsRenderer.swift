@@ -132,7 +132,7 @@ struct DisplayLyricsRenderer<Animated>: TextRenderer where Animated: AnimatedStr
     }
 
     func draw(
-        slice: Text.Layout.RunSlice, index _: Int,
+        slice: Text.Layout.RunSlice, index: Int,
         beginTime: TimeInterval, endTime: TimeInterval,
         in context: inout GraphicsContext
     ) {
@@ -148,21 +148,21 @@ struct DisplayLyricsRenderer<Animated>: TextRenderer where Animated: AnimatedStr
         let filledWidth = bounds.width * progress
         // let liftAmount = lift * bentSigmoid(softenProgress)
 
-        // let waveDelay = waveDelay * Double(index) - waveActivationDelay
-        // let timeToVowels = timeToVowels(at: elapsedTime - waveDelay)
+        let waveDelay = waveDelay * Double(index) - waveActivationDelay
+        let timeToVowels = timeToVowels(at: elapsedTime - waveDelay)
 
         do {
-            // var context = context
+            var context = context
 
             // Premultiplied wave & glow effect for long vowels
-            /*
+            
              wave: do {
                  if let timeToNearestVowel = timeToVowels.sorted(by: { $0.mark < $1.mark }).first {
 
                      let isInRange = timeToNearestVowel.time.contains(time: beginTime)
                      guard isInRange else { break wave }
 
-                     let waveProgress = bellCurve(timeToNearestVowel.mark, standardDeviation: 0.325) + 0.08
+                     let waveProgress = bellCurve(timeToNearestVowel.mark, standardDeviation: 0.325) + 0.10
                      guard waveProgress > 1e-6 else { break wave }
 
                      // Scale
@@ -178,7 +178,7 @@ struct DisplayLyricsRenderer<Animated>: TextRenderer where Animated: AnimatedStr
                      ))
                  }
              }
-             */
+             
 
             // Unfilled text
             do {

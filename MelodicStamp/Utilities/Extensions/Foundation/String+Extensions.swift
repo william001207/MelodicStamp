@@ -9,12 +9,14 @@ import Foundation
 
 extension String {
     static let vowels: [Regex] = [
-        // English
-        /[aeiouAEIOU]{1,7}/,
+        // 1-7 consecutive vowels, but must be an entire word.
+        /\b[aeiouAEIOU]{2,7}\b/,
 
-        /[aeouAEIOU]{1,7}[hmHM]{1,7}/,
+        // 1-7 vowels followed by 1-7 h or m, must be an entire word without spaces.
+        /\b[aeouAEIOU]{2,7}[hmHM]{1,7}\b/,
 
-        /[hH][mM]{0,6}/
+        // At most 6 "m"s can follow "h" and still ensure it is a word without spaces.
+        /\b[hH][mM]{0,6}\b/
     ]
 
     var splittingArtists: [String] {
