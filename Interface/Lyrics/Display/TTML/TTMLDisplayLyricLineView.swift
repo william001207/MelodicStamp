@@ -134,20 +134,19 @@ struct TTMLDisplayLyricLineView: View {
                 .opacity(0.75)
         }
     }
-    
+
     @ViewBuilder private func inactivebackgroundContent() -> some View {
         VStack(alignment: alignment.horizontal, spacing: 5) {
             Text(line.backgroundContent)
                 .font(.system(size: 18.5 * dynamicTypeSize.scale))
                 .opacity(inactiveOpacity)
                 .bold()
-            
+
             additionalContent(for: line.backgroundLyrics)
                 .font(.system(size: 14 * dynamicTypeSize.scale))
                 .opacity(inactiveOpacity)
         }
     }
-
 
     @ViewBuilder private func additionalContent(for lyrics: TTMLLyrics) -> some View {
         if attachments.contains(.translation) {
