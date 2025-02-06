@@ -16,58 +16,53 @@ struct AboutView: View {
     @State private var copyVersionDispatch: DispatchWorkItem?
 
     var body: some View {
-        HStack(spacing: 25) {
-            appIconView()
-                .shadow(radius: 24)
-                .motionCard(scale: 1.02, angle: .degrees(5))
-                .padding(8)
-
-            VStack(alignment: .leading, spacing: 17.5) {
-                titleView()
-
-                VStack(alignment: .leading, spacing: 4) {
-                    Button {
-                        openURL(.organization)
-                    } label: {
-                        HStack(alignment: .firstTextBaseline, spacing: 12) {
-                            Text(copyrightText)
-                                .fontWidth(.expanded)
-                                .bold()
-
-                            Image(.logo)
-                                .resizable()
-                                .scaledToFill()
-                                .padding(.vertical, 0.5)
-                                .padding(.top, 3)
-                                .padding(.bottom, -1)
-                                .frame(height: .preferredPointSize(forTextStyle: .body))
-                        }
-                        .fixedSize()
+        VStack(spacing: 25) {
+            VStack {
+                appIconView()
+                
+                Text(appNameText)
+                    .font(.title3)
+                    .bold()
+                
+                versionView()
+                    .font(.caption)
+            }
+            
+            VStack {
+                Button {
+                    openURL(.organization)
+                } label: {
+                    HStack(alignment: .firstTextBaseline, spacing: 12) {
+                        Text(copyrightText)
+                            .bold()
+                        
+                        Image(.cementLabsBar)
+                            .resizable()
+                            .scaledToFill()
+                            .padding(.vertical, 0.5)
+                            .padding(.top, 1)
+                            .padding(.bottom, -1)
+                            .frame(height: .preferredPointSize(forTextStyle: .caption1))
                     }
-
-                    Button {
-                        openURL(.repository)
-                    } label: {
-                        HStack {
-                            Text("Open sourced on GitHub")
-                        }
-                        .font(.caption)
-                        .foregroundStyle(.tertiary)
+                    .fixedSize()
+                    .foregroundStyle(.tertiary)
+                }
+                
+                Button {
+                    openURL(.repository)
+                } label: {
+                    HStack {
+                        Text("Open sourced on GitHub")
                     }
-
-                    versionView()
+                    .foregroundStyle(.tertiary)
                 }
             }
+            .font(.caption)
         }
         .buttonStyle(.alive)
-        .containerBackground(for: .window) {
-            gradientView()
-                .continuousRippleEffect()
-        }
-        .padding(.horizontal, 25)
-        .padding(100)
+        .padding(50)
+        .padding(.horizontal)
         .ignoresSafeArea()
-        .padding(.bottom, -28)
         .fixedSize()
         .navigationTitle(.init(verbatim: ""))
         .preferredColorScheme(.light)
@@ -77,32 +72,22 @@ struct AboutView: View {
         String(localized: .init("About: Application Name", defaultValue: "Melodic Stamp"))
     }
 
-    private var previewText: String {
-        String(localized: .init("About: Preview", defaultValue: "Preview"))
-    }
-
     private var copyrightText: String {
         String(localized: .init("About: Copyright", defaultValue: "© 2024→Future"))
     }
 
     @ViewBuilder private func appIconView() -> some View {
-        Image("AppIcon")
-            .resizable()
-            .aspectRatio(contentMode: .fit)
-            .frame(width: 72)
-    }
-
-    @ViewBuilder private func titleView() -> some View {
-        HStack {
-            Text(appNameText)
-                .fontWeight(.black)
-
-            Text(previewText)
-                .fontWeight(.thin)
-                .foregroundStyle(.tertiary)
+        ZStack {
+            Image(.appIconBackground)
+                .resizable()
+            
+            Image(.appIconForeground)
+                .resizable()
+                .motionCard(scale: 1.02, angle: .degrees(5))
         }
-        .font(.title)
-        .fontWidth(.expanded)
+        .shadow(color: .black.opacity(0.1), radius: 10)
+        .aspectRatio(contentMode: .fit)
+        .frame(width: 100)
     }
 
     @ViewBuilder private func versionView() -> some View {
@@ -140,36 +125,12 @@ struct AboutView: View {
                 if isVersionCopied {
                     Text("Copied to clipboard!")
                 } else {
-                    HStack(spacing: 12) {
-                        Text("Version")
-
-                        Text(combined)
-                            .monospaced()
-                    }
+                    Text(combined)
+                        .monospaced()
                 }
             }
-            .font(.caption)
-            .foregroundStyle(.tertiary)
+//            .foregroundStyle(.tertiary)
         }
-    }
-
-    @ViewBuilder private func gradientView() -> some View {
-        MeshGradient(
-            width: 4,
-            height: 4,
-            points: [
-                [0.0, 0.0], [0.33, 0.0], [0.86, 0.0], [1.0, 0.0],
-                [0.0, 0.2], [0.33, 0.5], [0.66, 0.25], [1.0, 0.6],
-                [0.0, 0.32], [0.33, 0.55], [0.66, 0.3], [1.0, 0.72],
-                [0.0, 1.0], [0.33, 1.0], [0.66, 1.0], [1.0, 1.0]
-            ],
-            colors: [
-                .init(hex: 0xB5A8FE), .init(hex: 0xD0B4FF), .init(hex: 0xF5CFFD), .init(hex: 0xFDCFCC),
-                .init(hex: 0x9D8DFE), .init(hex: 0xC4BDFF), .init(hex: 0xFDDBFB), .init(hex: 0xFFEDD6),
-                .init(hex: 0xBFBEFF), .init(hex: 0xD0D0FE), .init(hex: 0xCDEBFE), .init(hex: 0xCCFEEE),
-                .init(hex: 0xC0D4FF), .init(hex: 0xD7F5FE), .init(hex: 0xE7FEF1), .init(hex: 0xE0FEE4)
-            ]
-        )
     }
 }
 

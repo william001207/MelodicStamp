@@ -132,9 +132,14 @@
             "state" : "new",
             "value" : "Melodic Stamp"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "音律纹章"
+          }
         }
-      },
-      "shouldTranslate" : false
+      }
     },
     "About: Copyright" : {
       "extractionState" : "extracted_with_value",
@@ -152,18 +157,6 @@
           }
         }
       }
-    },
-    "About: Preview" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Preview"
-          }
-        }
-      },
-      "shouldTranslate" : false
     },
     "About: Version Template" : {
       "extractionState" : "extracted_with_value",
@@ -2977,9 +2970,6 @@
         }
       }
     },
-    "Trigger" : {
-
-    },
     "Tweak %@'s audio visualization experience to the fullest." : {
       "localizations" : {
         "zh-Hans" : {
@@ -3036,16 +3026,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "未保存的播放列表"
-          }
-        }
-      }
-    },
-    "Version" : {
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "版本"
           }
         }
       }

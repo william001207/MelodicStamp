@@ -129,6 +129,16 @@
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		289123322D54581E0092526E /* Embed PlugIns */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+			);
+			name = "Embed PlugIns";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
@@ -830,6 +840,7 @@
 				65F1D9FF2CECCEE900389E37 /* Resources */,
 				286D1F512D50A8FB00DB3C76 /* Embed ExtensionKit Extensions */,
 				286D1F722D50A93100DB3C76 /* Embed Frameworks */,
+				289123322D54581E0092526E /* Embed PlugIns */,
 			);
 			buildRules = (
 			);
