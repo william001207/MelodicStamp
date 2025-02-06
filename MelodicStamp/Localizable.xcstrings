@@ -2977,6 +2977,9 @@
         }
       }
     },
+    "Trigger" : {
+
+    },
     "Tweak %@'s audio visualization experience to the fullest." : {
       "localizations" : {
         "zh-Hans" : {
