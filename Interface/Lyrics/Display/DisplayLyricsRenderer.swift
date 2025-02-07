@@ -156,28 +156,28 @@ struct DisplayLyricsRenderer<Animated>: TextRenderer where Animated: AnimatedStr
 
             // Premultiplied wave & glow effect for long vowels
             /*
-            wave: do {
-                if let timeToNearestVowel = timeToVowels.sorted(by: { $0.mark < $1.mark }).first {
-                    let isInRange = timeToNearestVowel.time.contains(time: beginTime)
-                    guard isInRange else { break wave }
+             wave: do {
+                 if let timeToNearestVowel = timeToVowels.sorted(by: { $0.mark < $1.mark }).first {
+                     let isInRange = timeToNearestVowel.time.contains(time: beginTime)
+                     guard isInRange else { break wave }
 
-                    let waveProgress = bellCurve(timeToNearestVowel.mark, standardDeviation: 0.325) + 0.10
-                    guard waveProgress > 1e-6 else { break wave }
+                     let waveProgress = bellCurve(timeToNearestVowel.mark, standardDeviation: 0.325) + 0.10
+                     guard waveProgress > 1e-6 else { break wave }
 
-                    // Scale
-                    let waveAmount = waveProgress * (wave - 1) + 1
-                    context.translateBy(x: bounds.width / 2, y: bounds.height / 2)
-                    context.scaleBy(x: waveAmount, y: waveAmount)
-                    context.translateBy(x: -bounds.width / 2, y: -bounds.height / 2)
+                     // Scale
+                     let waveAmount = waveProgress * (wave - 1) + 1
+                     context.translateBy(x: bounds.width / 2, y: bounds.height / 2)
+                     context.scaleBy(x: waveAmount, y: waveAmount)
+                     context.translateBy(x: -bounds.width / 2, y: -bounds.height / 2)
 
-                    // Glow
-                    context.addFilter(.shadow(
-                        color: glowColor.opacity(waveProgress),
-                        radius: glowRadius * waveProgress
-                    ))
-                }
-            }
-            */
+                     // Glow
+                     context.addFilter(.shadow(
+                         color: glowColor.opacity(waveProgress),
+                         radius: glowRadius * waveProgress
+                     ))
+                 }
+             }
+             */
 
             // Unfilled text
             do {
