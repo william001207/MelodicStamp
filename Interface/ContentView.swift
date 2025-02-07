@@ -17,12 +17,6 @@ struct ContentView: View {
         var minHeight: CGFloat?
         var maxHeight: CGFloat?
 
-        var windowStyle: MelodicStampWindowStyle? {
-            didSet {
-                with(windowStyle: windowStyle ?? .main)
-            }
-        }
-
         mutating func with(windowStyle: MelodicStampWindowStyle) {
             switch windowStyle {
             case .main:
@@ -139,7 +133,11 @@ struct ContentView: View {
                 .onChange(of: windowManager.style, initial: true) { _, newValue in
                     isFocused = true
                     resetFocus(in: namespace)
-                    sizer.windowStyle = newValue
+                    sizer.with(windowStyle: newValue)
+
+                    DispatchQueue.main.async {
+                        sizer.reset()
+                    }
                 }
 
                 // MARK: Updates
