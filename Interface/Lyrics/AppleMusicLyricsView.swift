@@ -144,8 +144,8 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
             scrollToHighlighted(true)
         }
         .onChange(of: highlightedRange) { oldValue, newValue in
-            let isLowerBoundJumped = abs(newValue.lowerBound - oldValue.lowerBound) > 1
-            let isUpperBoundJumped = abs(newValue.upperBound - oldValue.upperBound) > 1
+            let isLowerBoundJumped = abs(newValue.lowerBound - oldValue.lowerBound) > 5
+            let isUpperBoundJumped = abs(newValue.upperBound - oldValue.upperBound) > 5
             let isJumped = newValue.lowerBound < oldValue.lowerBound || (isLowerBoundJumped && isUpperBoundJumped)
 
             guard interactionState.isDelegated else { return }
