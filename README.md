@@ -73,6 +73,17 @@ What's more, it will always be free and open sourced!
 
 ## Features
 
+- **Audio metadata editing**:
+  Melodic Stamp allows users to edit the metadata of audio files, including song name, artist, album, cover image, release year, etc. Users can easily manage and update the metadata of music files.
+
+- **Lyrics display function**:
+  Melodic Stamp provides a beautiful and highly interactive lyrics display interface, supporting synchronized lyrics display. The lyrics scroll in real time as the music plays. It also provides support for word-by-word lyrics similar to **Apple Music** [^need_use_TTML_lyrics].
+
+[^need_use_TTML_lyrics]: **Melodic Stamp** only accepts word-by-word lyrics driven by [TTML](https://en.wikipedia.org/wiki/Timed_Text_Markup_Language). You can contribute and find lyrics in [AMLL TTML Database](https://github.com/Steve-xmh/amll-ttml-db).
+
+- **Playlist**:
+  Melodic Stamp provides a persistent playlist function. It supports users to edit the cover, name, and description of playlists, making it convenient to manage and organize music content.
+
 ## Screenshots
 
 <div align="center">
@@ -80,6 +91,7 @@ What's more, it will always be free and open sourced!
     <source media="(prefers-color-scheme: dark)" srcset="/Doc/Overview/MSMainViewTabBar_dark.png?raw=true">
     <img src="/Doc/Overview/MSMainViewTabBar_light.png?raw=true" width="750" alt="Playlist Image">
   </picture>
+  <p> Floating tabbar & Floating player <br>
 </div>
 
 <div align="center">
@@ -87,15 +99,15 @@ What's more, it will always be free and open sourced!
     <source media="(prefers-color-scheme: dark)" srcset="/Doc/Overview/MSMainViewLeaflet1_dark.png?raw=true">
     <img src="/Doc/Overview/MSMainViewLeaflet1_light.png?raw=true" width="750" alt="Playlist Image">
   </picture>
-  <p>Show Slay Show<br />ChiliChili</p>
+  <p> LeafletView <br>
 </div>
-
 
 <div align="center">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="/Doc/Overview/MSMainViewInspector1_dark.png?raw=true">
     <img src="/Doc/Overview/MSMainViewInspector1_light.png?raw=true" width="750" alt="Playlist Image">
   </picture>
+  <p> Common Information editor <br>
 </div>
 
 <div align="center">
@@ -103,6 +115,7 @@ What's more, it will always be free and open sourced!
     <source media="(prefers-color-scheme: dark)" srcset="/Doc/Overview/MSMainViewInspector2_dark.png?raw=true">
     <img src="/Doc/Overview/MSMainViewInspector2_light.png?raw=true" width="750" alt="Playlist Image">
   </picture>
+  <p> Advanced Information editor <br>
 </div>
 
 <div align="center">
@@ -110,6 +123,7 @@ What's more, it will always be free and open sourced!
     <source media="(prefers-color-scheme: dark)" srcset="/Doc/Overview/MSMainViewInspector3_dark.png?raw=true">
     <img src="/Doc/Overview/MSMainViewInspector3_light.png?raw=true" width="750" alt="Playlist Image">
   </picture>
+  <p> Lyrics Information editor <br>
 </div>
 
 <div align="center">
@@ -117,6 +131,7 @@ What's more, it will always be free and open sourced!
     <source media="(prefers-color-scheme: dark)" srcset="/Doc/Overview/MSMainViewInspector4_dark.png?raw=true">
     <img src="/Doc/Overview/MSMainViewInspector4_light.png?raw=true" width="750" alt="Playlist Image">
   </picture>
+  <p> Library <br>
 </div>
 
 <div align="center">
@@ -124,6 +139,7 @@ What's more, it will always be free and open sourced!
     <source media="(prefers-color-scheme: dark)" srcset="/Doc/Overview/MSMiniPlayerView1_dark.png?raw=true">
     <img src="/Doc/Overview/MSMiniPlayerView1_light.png?raw=true" width="750" alt="Playlist Image">
   </picture>
+  <p> MiniPlayer <br>
 </div>
 
 ## Install & Run
