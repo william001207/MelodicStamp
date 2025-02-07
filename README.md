@@ -4,13 +4,13 @@
       <code>あ ←→ A</code>
     </summary>
     <!--Head-->
-    &emsp;&ensp;<sub><b>Melodic Stamp</b> supports the following languages. <a href="/Docs/ADD_A_LOCALIZATION.md"><code>↗ Add a localization</code></a></sub>
+    &emsp;&ensp;<sub><b>Melodic Stamp</b> supports the following languages. <a href="/Doc/ADD_A_LOCALIZATION.md"><code>↗ Add a localization</code></a></sub>
     <br />
     <!--Body-->
     <br />
     &emsp;&ensp;English
     <br />
-    &emsp;&ensp;<a href="/Docs/简体中文.md">简体中文</a>
+    &emsp;&ensp;<a href="/Doc/简体中文.md">简体中文</a>
   </details>
 </blockquote>
 
@@ -117,6 +117,15 @@ Resource library. You can view the playlists you have saved.
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="/Doc/Overview/MSMainViewInspector4_dark.png?raw=true">
     <img src="/Doc/Overview/MSMainViewInspector4_light.png?raw=true" width="750" alt="Playlist Image">
+  </picture>
+</div>
+
+### Mini player
+**Melodic Stamp** also provides a mini player mode that can be used in a compact screen space.
+<div align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="/Doc/Overview/MSMiniPlayerView1_dark.png?raw=true">
+    <img src="/Doc/Overview/MSMiniPlayerView1_light.png?raw=true" width="750" alt="Playlist Image">
   </picture>
 </div>
 
