@@ -17,7 +17,7 @@
 <div align="center">
   <img width="225" height="225" src="/MelodicStamp/Assets.xcassets/AppIcon.appiconset/icon_512x512%402x.png" alt="Logo">
   <h1><b>Melodic Stamp</b></h1>
-  <p> A new way to listen and edit music <br>
+  <p> Simple, elegant, and easy-to-use music player <br>
 </div>
 
 > [!IMPORTANT]
@@ -119,3 +119,12 @@ Resource library. You can view the playlists you have saved.
     <img src="/Doc/Overview/MSMainViewInspector4_light.png?raw=true" width="750" alt="Playlist Image">
   </picture>
 </div>
+
+## Install & Run
+
+> [!NOTE]
+> Currently, **Melodic Stamp** is still in the Alpha version. Therefore, you cannot install **Melodic Stamp** directly from the App Store. At the same time, you may also need to allow **Melodic Stamp** to run as an unauthenticated application[^open_as_unidentified].
+>
+> For now, you can only download the compressed application file of **Melodic Stamp** from the [Releases](https://github.com/Cement-Labs/MelodicStamp/releases) page.
+
+[^open_as_unidentified]: [`↗ Open a Mac app from an unidentified developer`](https://support.apple.com/guide/mac-help/mh40616/mac)
