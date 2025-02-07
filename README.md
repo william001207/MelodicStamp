@@ -17,16 +17,18 @@
 <div align="center">
   <img width="225" height="225" src="/MelodicStamp/Assets.xcassets/AppIcon.appiconset/icon_512x512%402x.png" alt="Logo">
   <h1><b>Melodic Stamp</b></h1>
-  <p> Simple, elegant, and easy-to-use music player <br>
+  <p>The very choise to play and edit your local audio files, elegantly.<br>
 </div>
 
 > [!IMPORTANT]
 > **Melodic Stamp** requires **macOS 15.0 Sequoia**[^check_your_macos_version] or above to run.
 
-> [^check_your_macos_version]: [`↗ Find out which macOS your Mac is using`](https://support.apple.com/en-us/HT201260)
+[^check_your_macos_version]: [`↗ Find out which macOS your Mac is using`](https://support.apple.com/en-us/HT201260)
 
-## Learn about Melodic Stamp
-**Melodic Stamp** is a macOS application designed to provide a brand new experience in music appreciation and audio metadata editing. Through an intuitive and elegant interface, users can easily browse and play various audio formats while enjoying high-quality sound effects. The application supports multiple audio formats, including WAV, MP3, AAC, Opus, etc., to meet the needs of different users. Whether it's for fine-grained metadata editing of songs or customizing playlists, Melodic Stamp can provide you with powerful and flexible functions. At the same time, the application also supports batch processing of audio files to help you efficiently manage your music library.
+## Overview
+
+**Melodic Stamp** is a music player designed to provide a brand new experience in local music managing and audio metadata editing.
+Through an intuitive and elegant interface, you can easily browse and play [various audio formats.](#supported-audio-formats)
 
 <div align="center">
   <picture>
@@ -35,37 +37,44 @@
   </picture>
 </div>
 
-## Format Support
-**Melodic Stamp** Driven by [SFBAudioEngine](https://github.com/sbooth/SFBAudioEngine), it supports multiple formats including:
-* WAV
-* AIFF
-* CAF
-* MP3
-* AAC
-* m4a
-* [FLAC](https://xiph.org/flac/)
-* [Ogg Opus](https://opus-codec.org)
-* [Ogg Speex](https://www.speex.org)
-* [Ogg Vorbis](https://xiph.org/vorbis/)
-* [Monkey's Audio](https://www.monkeysaudio.com)
-* [Musepack](https://www.musepack.net)
-* Shorten
-* True Audio
-* [WavPack](http://www.wavpack.com)
-* All formats supported by [libsndfile](http://libsndfile.github.io/libsndfile/)
+**Melodic Stamp** also introduces some finely designed interfaces to entertain your journey of music appreciation, such as the ultra smooth lyrics page that comes along with the support of [multiple lyrics formats.](#supported-lyrics-formats)
+What's more, it will always be free and open sourced!
 
-## User Manual
-The functions of **Melodic Stamp** are expanded based on the tab bar on the side of the window - **Content Panel** and **Inspector Panel**:
-### Content Panel:
-- **Playlist**&emsp;In this area, the currently opened playlists will be displayed.
-- **Leaflet**&emsp;In this area, the real-time lyrics of the currently playing song will be displayed.
-  
-### Inspector Panel:
-- **Common Information**&emsp;In this area, basic metadata editing of songs will be supported.
-- **Advanced Information**&emsp;In this area, advanced metadata for editing songs will be supported.
-- **Lyrics**&emsp;In this area, editing and viewing of song lyrics information will be supported.
-- **Library**&emsp;In this area, your saved playlists will be displayed.
-  
+### Supported Audio Formats
+
+**Melodic Stamp** is driven by [SFBAudioEngine,](https://github.com/sbooth/SFBAudioEngine) which supports the following audio formats:
+
+- WAV
+- AIFF
+- CAF
+- MP3
+- AAC
+- m4a
+- [FLAC](https://xiph.org/flac)
+- [Ogg Opus](https://opus-codec.org)
+- [Ogg Speex](https://www.speex.org)
+- [Ogg Vorbis](https://xiph.org/vorbis)
+- [Monkey's Audio](https://www.monkeysaudio.com)
+- [Musepack](https://www.musepack.net)
+- Shorten
+- True Audio
+- [WavPack](http://www.wavpack.com)
+- All formats supported by [libsndfile](http://libsndfile.github.io/libsndfile)
+
+### Supported Lyrics Formats
+
+**Melodic Stamp** extracts and parses lyrics from audio metadata into multiple formats for you. The following formats are supported:
+
+- [LRC](https://en.wikipedia.org/wiki/LRC_(file_format))[^extended_lrc_features]
+- [TTML](https://en.wikipedia.org/wiki/Timed_Text_Markup_Language)
+- Plain text (also the fallback solution for other unsupported formats)
+
+[^extended_lrc_features]: **Melodic Stamp** only accepts some trivial fellow translation lines beyond the original LRC format specification. Other extensions of the LRC format will be parsed as plain LRC lyric lines.
+
+## Features
+
+## Screenshots
+
 <div align="center">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="/Doc/Overview/MSMainViewTabBar_dark.png?raw=true">
@@ -73,19 +82,15 @@ The functions of **Melodic Stamp** are expanded based on the tab bar on the side
   </picture>
 </div>
 
-## Interface preview
-### Leaflet
-Leaflet page supports displaying **LRC** and **TTML** lyrics.
 <div align="center">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="/Doc/Overview/MSMainViewLeaflet1_dark.png?raw=true">
     <img src="/Doc/Overview/MSMainViewLeaflet1_light.png?raw=true" width="750" alt="Playlist Image">
   </picture>
-  <p> ChiliChill - Show Slay Show <br>
+  <p>Show Slay Show<br />ChiliChili</p>
 </div>
 
-### Common
-Basic Information page can edit information such as cover, title, artist, composer, album, etc.
+
 <div align="center">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="/Doc/Overview/MSMainViewInspector1_dark.png?raw=true">
@@ -93,8 +98,6 @@ Basic Information page can edit information such as cover, title, artist, compos
   </picture>
 </div>
 
-### Advanced
-Additional Information page can edit information such as rating, comment, release date, copyright information, etc.
 <div align="center">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="/Doc/Overview/MSMainViewInspector2_dark.png?raw=true">
@@ -102,8 +105,6 @@ Additional Information page can edit information such as rating, comment, releas
   </picture>
 </div>
 
-### Lyrics
-Lyrics page can view and edit lyrics, and supports parsing and previewing of **LRC** and **TTML** lyrics.
 <div align="center">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="/Doc/Overview/MSMainViewInspector3_dark.png?raw=true">
@@ -111,8 +112,6 @@ Lyrics page can view and edit lyrics, and supports parsing and previewing of **L
   </picture>
 </div>
 
-### Library
-Resource library. You can view the playlists you have saved.
 <div align="center">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="/Doc/Overview/MSMainViewInspector4_dark.png?raw=true">
@@ -120,8 +119,6 @@ Resource library. You can view the playlists you have saved.
   </picture>
 </div>
 
-### Mini player
-**Melodic Stamp** also provides a mini player mode that can be used in a compact screen space.
 <div align="center">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="/Doc/Overview/MSMiniPlayerView1_dark.png?raw=true">
@@ -132,7 +129,7 @@ Resource library. You can view the playlists you have saved.
 ## Install & Run
 
 > [!NOTE]
-> Currently, **Melodic Stamp** is still in the Alpha version. Therefore, you cannot install **Melodic Stamp** directly from the App Store. At the same time, you may also need to allow **Melodic Stamp** to run as an unauthenticated application[^open_as_unidentified].
+> Currently, **Melodic Stamp** is still in active development. Therefore, you cannot install **Melodic Stamp** directly from the App Store. At the same time, you may also need to allow **Melodic Stamp** to run as an unauthenticated application[^open_as_unidentified].
 >
 > For now, you can only download the compressed application file of **Melodic Stamp** from the [Releases](https://github.com/Cement-Labs/MelodicStamp/releases) page.
 
