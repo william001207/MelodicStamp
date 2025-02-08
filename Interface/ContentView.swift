@@ -123,7 +123,7 @@ struct ContentView: View {
                     resetFocus(in: namespace)
                 }
                 .onChange(of: window) { _, newValue in
-                    if let newValue = newValue {
+                    if let newValue {
                         windowManager.observe(newValue)
                     }
 
