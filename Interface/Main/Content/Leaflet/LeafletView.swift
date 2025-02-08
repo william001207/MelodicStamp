@@ -59,7 +59,6 @@ struct LeafletView: View {
 
                             if hasCover, let cover {
                                 coverView(cover)
-                                    .animation(.easeInOut, value: isShowingLyrics)
                             }
 
                             // MARK: Lyrics
@@ -114,6 +113,8 @@ struct LeafletView: View {
                     Color.clear
                 }
             }
+            .animation(.easeInOut, value: hasLyrics)
+            .animation(.easeInOut, value: isShowingLyrics)
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
             .background {
                 windowBackgroundView()
@@ -206,26 +207,29 @@ struct LeafletView: View {
 
         Group {
             if hasLyrics {
-                Button {
-                    isShowingLyrics.toggle()
-                } label: {
+                VStack {
                     MusicCover(
                         images: [cover], hasPlaceholder: true,
                         cornerRadius: 12
                     )
                     .motionCard()
                 }
-                .buttonStyle(.alive)
+                .onTapGesture {
+                    isShowingLyrics.toggle()
+                }
                 .scaleEffect(player.isPlaying ? 1 : 0.85, anchor: .center)
             } else {
-                Button {} label: {
+                VStack {
                     MusicCover(
                         images: [cover], hasPlaceholder: true,
                         cornerRadius: 12
                     )
                     .motionCard()
                 }
-                .buttonStyle(.alive(isOn: $player.isPlaying))
+                .onTapGesture {
+                    isShowingLyrics.toggle()
+                }
+                .scaleEffect(player.isPlaying ? 1 : 0.85, anchor: .center)
             }
         }
         .matchedGeometryEffect(id: "cover", in: localNamespace)
