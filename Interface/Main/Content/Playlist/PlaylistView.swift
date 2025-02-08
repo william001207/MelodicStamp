@@ -412,6 +412,9 @@ struct PlaylistView: View {
 
     @discardableResult private func handleRemove(_ urls: [URL]) -> Bool {
         guard canRemove else { return false }
+        if let currentTrack = playlist.currentTrack, urls.contains(currentTrack.url) {
+            player.stop()
+        }
         Task {
             await playlist.remove(urls)
         }

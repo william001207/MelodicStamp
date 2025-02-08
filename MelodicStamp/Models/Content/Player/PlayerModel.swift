@@ -458,11 +458,6 @@ extension PlayerModel: AudioPlayer.Delegate {
 // MARK: - Audio Visualizer
 
 extension PlayerModel {
-//    func createFFTSetup(fftSize: Int) -> FFTSetup? {
-//        let fftLength = vDSP_Length(Int(round(log2(Double(fftSize)))))
-//        let setup = vDSP_create_fftsetup(fftLength, FFTRadix(kFFTRadix2))
-//        return setup
-//    }
 
     func generateFrequencyBands(startFrequency: Float, endFrequency: Float, frequencyBands: Int) -> [(lowerFrequency: Float, upperFrequency: Float)] {
         var bands = [(lowerFrequency: Float, upperFrequency: Float)]()
