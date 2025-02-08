@@ -90,7 +90,7 @@ What's more, it will always be free and open sourced!
 <div align="center">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="/Docs/Contents/English/Floating%20Windows/Dark/1.png?raw=true">
-    <img src="</Docs/Contents/English/Floating%20Windows/Light/1.png>" width="750" alt="Floating Windows">
+    <img src="/Docs/Contents/English/Floating%20Windows/Light/1.png" width="750" alt="Floating Windows">
   </picture>
   <p>Floating Windows</p>
 </div>
