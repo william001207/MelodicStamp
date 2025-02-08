@@ -222,37 +222,32 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
         guard interactionState.isDelegated else { return }
 
         let index = max(0, min(range.upperBound - 1, highlightedRange.lowerBound))
-
+        
         if reset {
-            let index = highlightedRange.lowerBound
-
-            let offset = lineOffsets[index]
-
-            for adjustItem in range {
-                contentOffset[adjustItem] = 0
+            let selectedIndex = highlightedRange.lowerBound
+            let offset = lineOffsets[selectedIndex]
+        
+            for index in range {
+                contentOffset[index] = 0
             }
-
-            scrollPosition.scrollTo(id: index, anchor: .center)
-
-            if highlightedRange.lowerBound == highlightedRange.upperBound {
-                if highlightedRange.lowerBound == range.lowerBound {
-                    for adjustItem in range {
-                        contentOffset[adjustItem] = offset
-                    }
-                } else if highlightedRange.lowerBound != range.upperBound {
-                    for idx in index ..< index + 10 {
-                        withAnimation(.spring(duration: 0.6, bounce: 0.275).delay(delay)) {
-                            contentOffset[idx] = offset
-                        }
-                    }
-                } else {
-                    for adjustItem in range {
-                        contentOffset[adjustItem] = offset
+            
+            if highlightedRange.isEmpty {
+                for index in range {
+                    contentOffset[index] = offset
+                }
+            } else {
+                let startLine = selectedIndex
+                let endLine = min(selectedIndex + 10, contentOffset.count - 1)
+                
+                for currentLine in startLine..<endLine {
+                    withAnimation(.spring(duration: 0.6, bounce: 0.275).delay(delay)) {
+                        contentOffset[currentLine] = offset
                     }
                 }
             }
+            
+            scrollPosition.scrollTo(id: selectedIndex, anchor: .center)
             previousHighlightedRange = highlightedRange
-            return
         }
 
         guard let offset = lineOffsets[index] else {
@@ -260,19 +255,15 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
             scrollPosition.scrollTo(id: index, anchor: .center)
             return
         }
+        
+        let threshold: Int = 5
+        var compensate: CGFloat = 0
+        var resultOffset: CGFloat = 0
 
         let previousOffset = (index > 0) ? (lineOffsets[index - 1] ?? 0) : 0
         let nextOffset = (lineOffsets[index] ?? 0)
-
         let diffBefore = abs(CGFloat(offset) - CGFloat(previousOffset))
         let diffAfter = abs(CGFloat(nextOffset) - CGFloat(offset))
-
-        let compensate: CGFloat
-
-        var resultOffset: CGFloat = 0
-
-        let threshold = 5.0
-
         let rangeDifference = abs((previousHighlightedRange?.lowerBound ?? 0) - highlightedRange.lowerBound)
 
         if rangeDifference > Int(threshold) {
@@ -288,58 +279,30 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
         withAnimation(nil) {
             if let range = previousHighlightedRange, highlightedRange.lowerBound != range.lowerBound {
                 if highlightedRange.lowerBound != self.range.upperBound {
+                    
                     scrollPosition.scrollTo(id: index, anchor: .center)
 
                     var totalOffset: CGFloat = 0
-
-                    if highlightedRange.lowerBound == range.upperBound {
-                        totalOffset = (range.lowerBound ..< range.upperBound).reduce(0) { result, idx in
-                            resultOffset = result
-                            return result + (lineOffsets[idx] ?? 0)
-                        }
-                    } else if range.upperBound == highlightedRange.upperBound {
-                        totalOffset = (range.lowerBound ..< highlightedRange.lowerBound).reduce(0) { result, idx in
-                            resultOffset = result
-                            return result + (lineOffsets[idx] ?? 0)
-                        }
-                    } else if highlightedRange.lowerBound > range.lowerBound,
-                              highlightedRange.lowerBound < range.upperBound {
-                        totalOffset = (range.lowerBound ..< highlightedRange.lowerBound).reduce(0) { result, idx in
-                            resultOffset = result
-                            return result + (lineOffsets[idx] ?? 0)
-                        }
-                    } else if highlightedRange.lowerBound < range.lowerBound {
-                        totalOffset = (range.lowerBound ..< range.upperBound).reduce(0) { result, idx in
-                            resultOffset = result
-                            return result + (lineOffsets[idx] ?? 0)
-                        }
-                    } else if highlightedRange.lowerBound > range.lowerBound,
-                              highlightedRange.upperBound == range.upperBound {
-                        totalOffset = (range.lowerBound ..< highlightedRange.lowerBound).reduce(0) { result, idx in
-                            resultOffset = result
-                            return result + (lineOffsets[idx] ?? 0)
-                        }
-                    } else if range.upperBound == highlightedRange.lowerBound {
-                        totalOffset = (range.lowerBound ..< highlightedRange.lowerBound).reduce(0) { result, idx in
-                            resultOffset = result
-                            return result + (lineOffsets[idx] ?? 0)
-                        }
+                    
+                    let start = range.lowerBound
+                    let end = if highlightedRange.lowerBound < range.lowerBound {
+                        range.upperBound
                     } else {
-                        totalOffset = (range.lowerBound ..< range.upperBound).reduce(0) { result, idx in
-                            resultOffset = result
-                            return result + (lineOffsets[idx] ?? 0)
-                        }
+                        min(range.upperBound, highlightedRange.lowerBound)
                     }
-
+                    
+                    totalOffset = (start ..< end).reduce(0) { result, idx in
+                        resultOffset = result
+                        return result + (lineOffsets[idx] ?? 0)
+                    }
+                    
                     for idx in highlightedRange {
                         if highlightedRange.lowerBound != highlightedRange.upperBound {
                             if highlightedRange.upperBound != self.range.upperBound {
                                 totalOffset = (lineOffsets[idx] ?? 0) + compensate + resultOffset
                             } else {
-                                totalOffset = totalOffset
+                                totalOffset -= compensate
                             }
-                        } else {
-                            totalOffset = totalOffset
                         }
                     }
 
