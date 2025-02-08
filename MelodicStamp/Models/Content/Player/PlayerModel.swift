@@ -458,7 +458,6 @@ extension PlayerModel: AudioPlayer.Delegate {
 // MARK: - Audio Visualizer
 
 extension PlayerModel {
-
     func generateFrequencyBands(startFrequency: Float, endFrequency: Float, frequencyBands: Int) -> [(lowerFrequency: Float, upperFrequency: Float)] {
         var bands = [(lowerFrequency: Float, upperFrequency: Float)]()
 
