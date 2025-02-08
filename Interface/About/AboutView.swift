@@ -129,7 +129,6 @@ struct AboutView: View {
                         .monospaced()
                 }
             }
-//            .foregroundStyle(.tertiary)
         }
     }
 }

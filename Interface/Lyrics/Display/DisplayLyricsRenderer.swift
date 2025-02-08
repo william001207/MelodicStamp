@@ -149,10 +149,10 @@ struct DisplayLyricsRenderer<Animated>: TextRenderer where Animated: AnimatedStr
         // let liftAmount = lift * bentSigmoid(softenProgress)
 
         let waveDelay = waveDelay * Double(index) - waveActivationDelay
-        let timeToVowels = timeToVowels(at: elapsedTime - waveDelay)
+        // let timeToVowels = timeToVowels(at: elapsedTime - waveDelay)
 
         do {
-            var context = context
+            //var context = context
 
             // Premultiplied wave & glow effect for long vowels
             /*

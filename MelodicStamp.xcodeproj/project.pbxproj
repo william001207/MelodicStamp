@@ -1471,7 +1471,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 20250206;
+				CURRENT_PROJECT_VERSION = 20250208;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"MelodicStamp/Preview Content\"";
 				DEVELOPMENT_TEAM = "";
@@ -1485,7 +1485,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 0.0.1;
+				MARKETING_VERSION = alpha.1;
 				PRODUCT_BUNDLE_IDENTIFIER = labs.cement.MelodicStamp;
 				PRODUCT_MODULE_NAME = MelodicStamp;
 				PRODUCT_NAME = "Melodic Stamp";
@@ -1503,7 +1503,7 @@
 				CODE_SIGN_ENTITLEMENTS = MelodicStamp/MelodicStamp.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 20250206;
+				CURRENT_PROJECT_VERSION = 20250208;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"MelodicStamp/Preview Content\"";
 				DEVELOPMENT_TEAM = "";
@@ -1517,7 +1517,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 0.0.1;
+				MARKETING_VERSION = alpha.1;
 				PRODUCT_BUNDLE_IDENTIFIER = labs.cement.MelodicStamp;
 				PRODUCT_MODULE_NAME = MelodicStamp;
 				PRODUCT_NAME = "Melodic Stamp";

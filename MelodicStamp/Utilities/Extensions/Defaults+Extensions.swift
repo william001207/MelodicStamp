@@ -65,7 +65,7 @@ extension Defaults.Keys {
 
     static let gradientFPS: Key<Defaults.GradientFPS> = .init(
         "gradientFPS",
-        default: .clamp(120)
+        default: .clamp(60)
     )
 
     // MARK: Lyrics

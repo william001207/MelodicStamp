@@ -221,8 +221,6 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
     private func scrollToHighlighted(_ reset: Bool) {
         guard interactionState.isDelegated else { return }
 
-        let index = max(0, min(range.upperBound - 1, highlightedRange.lowerBound))
-
         if reset {
             let selectedIndex = highlightedRange.lowerBound
             let offset = lineOffsets[selectedIndex]
@@ -249,6 +247,8 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
             scrollPosition.scrollTo(id: selectedIndex, anchor: .center)
             previousHighlightedRange = highlightedRange
         }
+        
+        let index = max(0, min(range.upperBound - 1, highlightedRange.lowerBound))
 
         guard let offset = lineOffsets[index] else {
             previousHighlightedRange = highlightedRange
@@ -280,16 +280,16 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
             if let range = previousHighlightedRange, highlightedRange.lowerBound != range.lowerBound {
                 if highlightedRange.lowerBound != self.range.upperBound {
                     scrollPosition.scrollTo(id: index, anchor: .center)
-
+                    
                     var totalOffset: CGFloat = 0
-
+                    
                     let start = range.lowerBound
                     let end = if highlightedRange.lowerBound < range.lowerBound {
                         range.upperBound
                     } else {
                         min(range.upperBound, highlightedRange.lowerBound)
                     }
-
+                    
                     totalOffset = (start ..< end).reduce(0) { result, idx in
                         resultOffset = result
                         return result + (lineOffsets[idx] ?? 0)
@@ -298,13 +298,17 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
                     for idx in highlightedRange {
                         if highlightedRange.lowerBound != highlightedRange.upperBound {
                             if highlightedRange.upperBound != self.range.upperBound {
-                                totalOffset = (lineOffsets[idx] ?? 0) + compensate + resultOffset
+                                totalOffset = (lineOffsets[idx] ?? 0) + resultOffset + compensate
                             } else {
                                 totalOffset -= compensate
                             }
                         }
                     }
-
+                    
+                    if highlightedRange.lowerBound - range.lowerBound >= 2 {
+                        totalOffset = totalOffset + compensate
+                    }
+                    
                     for idx in (index - 10) ..< index where idx >= 0 {
                         if highlightedRange.lowerBound == highlightedRange.upperBound {
                             contentOffset[idx] = totalOffset - compensate
@@ -312,7 +316,7 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
                             contentOffset[idx] = totalOffset
                         }
                     }
-
+                    
                     for idx in index ..< index + 10 {
                         if highlightedRange.lowerBound == highlightedRange.upperBound {
                             contentOffset[idx] = totalOffset - compensate
@@ -415,14 +419,14 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
                             let newBound = min(Int(newValue), upperBound)
                             highlightedRange = max(0, newBound) ..< upperBound
                         },
-                        in: 0...Double(upperBound),
+                        in: 0...Double(upperBound + 1),
                         step: 1
                     ) {
                         EmptyView()
                     } minimumValueLabel: {
                         Text("\(0)")
                     } maximumValueLabel: {
-                        Text("\(upperBound)")
+                        Text("\(upperBound + 1)")
                     }
                     .monospaced()
                 } else {
