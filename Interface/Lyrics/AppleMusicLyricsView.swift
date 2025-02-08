@@ -247,7 +247,7 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
             scrollPosition.scrollTo(id: selectedIndex, anchor: .center)
             previousHighlightedRange = highlightedRange
         }
-        
+
         let index = max(0, min(range.upperBound - 1, highlightedRange.lowerBound))
 
         guard let offset = lineOffsets[index] else {
@@ -280,16 +280,16 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
             if let range = previousHighlightedRange, highlightedRange.lowerBound != range.lowerBound {
                 if highlightedRange.lowerBound != self.range.upperBound {
                     scrollPosition.scrollTo(id: index, anchor: .center)
-                    
+
                     var totalOffset: CGFloat = 0
-                    
+
                     let start = range.lowerBound
                     let end = if highlightedRange.lowerBound < range.lowerBound {
                         range.upperBound
                     } else {
                         min(range.upperBound, highlightedRange.lowerBound)
                     }
-                    
+
                     totalOffset = (start ..< end).reduce(0) { result, idx in
                         resultOffset = result
                         return result + (lineOffsets[idx] ?? 0)
@@ -304,11 +304,11 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
                             }
                         }
                     }
-                    
+
                     if highlightedRange.lowerBound - range.lowerBound >= 2 {
                         totalOffset = totalOffset + compensate
                     }
-                    
+
                     for idx in (index - 10) ..< index where idx >= 0 {
                         if highlightedRange.lowerBound == highlightedRange.upperBound {
                             contentOffset[idx] = totalOffset - compensate
@@ -316,7 +316,7 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
                             contentOffset[idx] = totalOffset
                         }
                     }
-                    
+
                     for idx in index ..< index + 10 {
                         if highlightedRange.lowerBound == highlightedRange.upperBound {
                             contentOffset[idx] = totalOffset - compensate

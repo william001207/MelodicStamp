@@ -30,8 +30,8 @@ struct SettingsFeedbackPage: View {
 
         Section {
             Text("Share your feedback on our GitHub page! Whether you find a bug or want to suggest a new feature, feel free to speak up. [Join Us in QQ…](https://qm.qq.com/q/BfAocvswuI)")
-            .font(.caption)
-            .foregroundStyle(.secondary)
+                .font(.caption)
+                .foregroundStyle(.secondary)
         } header: {
             Text("Feedback")
         } footer: {
