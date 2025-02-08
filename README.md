@@ -21,6 +21,7 @@
 </div>
 
 > [!IMPORTANT]
+>
 > **Melodic Stamp** requires **macOS 15.0 Sequoia**[^check_your_macos_version] or above to run.
 
 [^check_your_macos_version]: [`↗ Find out which macOS your Mac is using`](https://support.apple.com/en-us/HT201260)
@@ -32,8 +33,8 @@ Through an intuitive and elegant interface, you can easily browse and play [vari
 
 <div align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="/Doc/Overview/MSMainViewPlaylist_dark.png?raw=true">
-    <img src="/Doc/Overview/MSMainViewPlaylist_light.png?raw=true" width="750" alt="Playlist Image">
+    <source media="(prefers-color-scheme: dark)" srcset="/Docs/Contents/English/Main/Playlist/Dark/1.png?raw=true">
+    <img src="/Docs/Contents/English/Main/Playlist/Light/1.png?raw=true" width="750" alt="Playlist">
   </picture>
 </div>
 
@@ -65,7 +66,7 @@ What's more, it will always be free and open sourced!
 
 **Melodic Stamp** extracts and parses lyrics from audio metadata into multiple formats for you. The following formats are supported:
 
-- [LRC](https://en.wikipedia.org/wiki/LRC_(file_format))[^extended_lrc_features]
+- [LRC](<https://en.wikipedia.org/wiki/LRC_(file_format)>)[^extended_lrc_features]
 - [TTML](https://en.wikipedia.org/wiki/Timed_Text_Markup_Language)
 - Plain text (also the fallback solution for other unsupported formats)
 
@@ -76,10 +77,10 @@ What's more, it will always be free and open sourced!
 - **Audio metadata editing**:
   Melodic Stamp allows users to edit the metadata of audio files, including song name, artist, album, cover image, release year, etc. Users can easily manage and update the metadata of music files.
 
-- **Lyrics display function**:
-  Melodic Stamp provides a beautiful and highly interactive lyrics display interface, supporting synchronized lyrics display. The lyrics scroll in real time as the music plays. It also provides support for word-by-word lyrics similar to **Apple Music** [^need_use_TTML_lyrics].
+- **Lyrics displaying**:
+  Melodic Stamp provides a fabulous and highly interactive lyrics interface. It supports word-based lyrics just like the one used by **Apple Music**[^word_based_lyrics_formats].
 
-[^need_use_TTML_lyrics]: **Melodic Stamp** only accepts word-by-word lyrics driven by [TTML](https://en.wikipedia.org/wiki/Timed_Text_Markup_Language). You can contribute and find lyrics in [AMLL TTML Database](https://github.com/Steve-xmh/amll-ttml-db).
+[^word_based_lyrics_formats]: In word-based lyrics formats, **Melodic Stamp** only accepts [TTML](https://en.wikipedia.org/wiki/Timed_Text_Markup_Language). To find TTML lyrics, it's recommended to use [AMLL TTML Database](https://github.com/Steve-xmh/amll-ttml-db). You can also create your own lyrics with [AMLL TTML Tool](https://steve-xmh.github.io/amll-ttml-tool/).
 
 - **Playlist**:
   Melodic Stamp provides a persistent playlist function. It supports users to edit the cover, name, and description of playlists, making it convenient to manage and organize music content.
@@ -88,64 +89,65 @@ What's more, it will always be free and open sourced!
 
 <div align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="/Doc/Overview/MSMainViewTabBar_dark.png?raw=true">
-    <img src="/Doc/Overview/MSMainViewTabBar_light.png?raw=true" width="750" alt="Playlist Image">
+    <source media="(prefers-color-scheme: dark)" srcset="/Docs/Contents/English/Floating%20Windows/Dark/1.png?raw=true">
+    <img src="</Docs/Contents/English/Floating%20Windows/Light/1.png>" width="750" alt="Floating Windows">
   </picture>
-  <p> Floating tabbar & Floating player <br>
+  <p>Floating Windows</p>
 </div>
 
 <div align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="/Doc/Overview/MSMainViewLeaflet1_dark.png?raw=true">
-    <img src="/Doc/Overview/MSMainViewLeaflet1_light.png?raw=true" width="750" alt="Playlist Image">
+    <source media="(prefers-color-scheme: dark)" srcset="/Docs/Contents/English/Main/Leaflet/Dark/1.png?raw=true">
+    <img src="/Docs/Contents/English/Main/Leaflet/Light/1.png?raw=true" width="750" alt="Leaflet">
   </picture>
-  <p> LeafletView <br>
+  <p>Leaflet</p>
 </div>
 
 <div align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="/Doc/Overview/MSMainViewInspector1_dark.png?raw=true">
-    <img src="/Doc/Overview/MSMainViewInspector1_light.png?raw=true" width="750" alt="Playlist Image">
+    <source media="(prefers-color-scheme: dark)" srcset="/Docs/Contents/English/Main/Inspector/Dark/1.png?raw=true">
+    <img src="/Docs/Contents/English/Main/Inspector/Light/1.png?raw=true" width="750" alt="Common Metadata Inspector">
   </picture>
-  <p> Common Information editor <br>
+  <p>Metadata Editor (Common)</p>
 </div>
 
 <div align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="/Doc/Overview/MSMainViewInspector2_dark.png?raw=true">
-    <img src="/Doc/Overview/MSMainViewInspector2_light.png?raw=true" width="750" alt="Playlist Image">
+    <source media="(prefers-color-scheme: dark)" srcset="/Docs/Contents/English/Main/Inspector/Dark/2.png?raw=true">
+    <img src="/Docs/Contents/English/Main/Inspector/Light/2.png?raw=true" width="750" alt="Advanced Metadata Inspector">
   </picture>
-  <p> Advanced Information editor <br>
+  <p>Metadata Editor (Advanced)</p>
 </div>
 
 <div align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="/Doc/Overview/MSMainViewInspector3_dark.png?raw=true">
-    <img src="/Doc/Overview/MSMainViewInspector3_light.png?raw=true" width="750" alt="Playlist Image">
+    <source media="(prefers-color-scheme: dark)" srcset="/Docs/Contents/English/Main/Inspector/Dark/3.png?raw=true">
+    <img src="/Docs/Contents/English/Main/Inspector/Light/3.png?raw=true" width="750" alt="Lyrics Inspector">
   </picture>
-  <p> Lyrics Information editor <br>
+  <p>Lyrics Editor</p>
 </div>
 
 <div align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="/Doc/Overview/MSMainViewInspector4_dark.png?raw=true">
-    <img src="/Doc/Overview/MSMainViewInspector4_light.png?raw=true" width="750" alt="Playlist Image">
+    <source media="(prefers-color-scheme: dark)" srcset="/Docs/Contents/English/Main/Inspector/Dark/4.png?raw=true">
+    <img src="/Docs/Contents/English/Main/Inspector/Light/4.png?raw=true" width="750" alt="Library Inspector">
   </picture>
-  <p> Library <br>
+  <p>Library</p>
 </div>
 
 <div align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="/Doc/Overview/MSMiniPlayerView1_dark.png?raw=true">
-    <img src="/Doc/Overview/MSMiniPlayerView1_light.png?raw=true" width="750" alt="Playlist Image">
+    <source media="(prefers-color-scheme: dark)" srcset="/Docs/Contents/English/Mini%20Player/Dark/1.png?raw=true">
+    <img src="/Docs/Contents/English/Mini%20Player/Light/1.png?raw=true" width="750" alt="Mini Player">
   </picture>
-  <p> MiniPlayer <br>
+  <p>Mini Player</p>
 </div>
 
 ## Install & Run
 
 > [!NOTE]
-> Currently, **Melodic Stamp** is still in active development. Therefore, you cannot install **Melodic Stamp** directly from the App Store. At the same time, you may also need to allow **Melodic Stamp** to run as an unauthenticated application[^open_as_unidentified].
+>
+> **Melodic Stamp** is in active development. You cannot install **Melodic Stamp** directly from the App Store until there is a stable release. At the same time, you may also need to allow **Melodic Stamp** to run as an unauthenticated application[^open_as_unidentified].
 >
 > For now, you can only download the compressed application file of **Melodic Stamp** from the [Releases](https://github.com/Cement-Labs/MelodicStamp/releases) page.
 
