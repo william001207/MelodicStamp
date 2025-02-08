@@ -50,8 +50,9 @@ struct ContributorAvatarView: View {
         .padding(.vertical, 6)
     }
 }
+
 #if DEBUG
-#Preview {
-    ContributorAvatarView(source: .local(.templateArtwork))
-}
+    #Preview {
+        ContributorAvatarView(source: .local(.templateArtwork))
+    }
 #endif
