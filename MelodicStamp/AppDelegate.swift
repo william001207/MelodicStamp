@@ -35,6 +35,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
         if suspendedWindows.contains(window) {
             suspendedWindows.remove(window)
+            logger.info("Destroyed \(window)")
             window.close()
         }
 
