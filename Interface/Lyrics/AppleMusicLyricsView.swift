@@ -222,15 +222,15 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
         guard interactionState.isDelegated else { return }
 
         let index = max(0, min(range.upperBound - 1, highlightedRange.lowerBound))
-        
+
         if reset {
             let selectedIndex = highlightedRange.lowerBound
             let offset = lineOffsets[selectedIndex]
-        
+
             for index in range {
                 contentOffset[index] = 0
             }
-            
+
             if highlightedRange.isEmpty {
                 for index in range {
                     contentOffset[index] = offset
@@ -238,14 +238,14 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
             } else {
                 let startLine = selectedIndex
                 let endLine = min(selectedIndex + 10, contentOffset.count - 1)
-                
-                for currentLine in startLine..<endLine {
+
+                for currentLine in startLine ..< endLine {
                     withAnimation(.spring(duration: 0.6, bounce: 0.275).delay(delay)) {
                         contentOffset[currentLine] = offset
                     }
                 }
             }
-            
+
             scrollPosition.scrollTo(id: selectedIndex, anchor: .center)
             previousHighlightedRange = highlightedRange
         }
@@ -255,8 +255,8 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
             scrollPosition.scrollTo(id: index, anchor: .center)
             return
         }
-        
-        let threshold: Int = 5
+
+        let threshold = 5
         var compensate: CGFloat = 0
         var resultOffset: CGFloat = 0
 
@@ -279,23 +279,22 @@ struct AppleMusicLyricsView<Content>: View where Content: View {
         withAnimation(nil) {
             if let range = previousHighlightedRange, highlightedRange.lowerBound != range.lowerBound {
                 if highlightedRange.lowerBound != self.range.upperBound {
-                    
                     scrollPosition.scrollTo(id: index, anchor: .center)
 
                     var totalOffset: CGFloat = 0
-                    
+
                     let start = range.lowerBound
                     let end = if highlightedRange.lowerBound < range.lowerBound {
                         range.upperBound
                     } else {
                         min(range.upperBound, highlightedRange.lowerBound)
                     }
-                    
+
                     totalOffset = (start ..< end).reduce(0) { result, idx in
                         resultOffset = result
                         return result + (lineOffsets[idx] ?? 0)
                     }
-                    
+
                     for idx in highlightedRange {
                         if highlightedRange.lowerBound != highlightedRange.upperBound {
                             if highlightedRange.upperBound != self.range.upperBound {
