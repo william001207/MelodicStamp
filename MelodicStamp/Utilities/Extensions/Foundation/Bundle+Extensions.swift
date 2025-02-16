@@ -24,7 +24,7 @@ extension Bundle {
     }
 
     subscript(_ key: Key) -> String {
-        guard let infoDictionary = self.infoDictionary else {
+        guard let infoDictionary else {
             return "⚠️"
         }
         return infoDictionary[key.rawValue] as? String ?? "⚠️"
