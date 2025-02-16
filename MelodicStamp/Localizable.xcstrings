@@ -757,6 +757,23 @@
         }
       }
     },
+    "CFBundleDisplayName" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Melodic Stamp"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "音律纹章"
+          }
+        }
+      }
+    },
     "Chroma" : {
       "localizations" : {
         "zh-Hans" : {
