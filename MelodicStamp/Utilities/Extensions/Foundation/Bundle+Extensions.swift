@@ -20,7 +20,7 @@ extension Bundle {
 
 extension Bundle {
     subscript(localized key: Key) -> String {
-        localizedInfoDictionary?[key.rawValue] as? String ?? "⚠️"
+        String(localized: String.LocalizationValue(key.rawValue))
     }
 
     subscript(_ key: Key) -> String {
