@@ -72,12 +72,12 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		286D1F2F2D50A75D00DB3C76 /* MelodicStampTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MelodicStampTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		286D1F2F2D50A75D00DB3C76 /* Melodic Stamp Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Melodic Stamp Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		65F1DA012CECCEE900389E37 /* Melodic Stamp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Melodic Stamp.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		286D1F762D50A95400DB3C76 /* Exceptions for "Interface" folder in "MelodicStamp" target */ = {
+		286D1F762D50A95400DB3C76 /* Exceptions for "Interface" folder in "Melodic Stamp" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				About/AboutView.swift,
@@ -211,9 +211,9 @@
 				Visualization/Spectrum/SpectrumView.swift,
 				Visualization/TinyBinaryChannelVisualizerView.swift,
 			);
-			target = 65F1DA002CECCEE900389E37 /* MelodicStamp */;
+			target = 65F1DA002CECCEE900389E37 /* Melodic Stamp */;
 		};
-		286D1FBD2D50AC2D00DB3C76 /* Exceptions for "Models" folder in "MelodicStamp" target */ = {
+		286D1FBD2D50AC2D00DB3C76 /* Exceptions for "Models" folder in "Melodic Stamp" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				AnimatedString.swift,
@@ -269,7 +269,7 @@
 				StringRepresentable.swift,
 				TypeNameReflectable.swift,
 			);
-			target = 65F1DA002CECCEE900389E37 /* MelodicStamp */;
+			target = 65F1DA002CECCEE900389E37 /* Melodic Stamp */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
@@ -282,7 +282,7 @@
 		286D1F582D50A93100DB3C76 /* Interface */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				286D1F762D50A95400DB3C76 /* Exceptions for "Interface" folder in "MelodicStamp" target */,
+				286D1F762D50A95400DB3C76 /* Exceptions for "Interface" folder in "Melodic Stamp" target */,
 			);
 			path = Interface;
 			sourceTree = "<group>";
@@ -295,7 +295,7 @@
 		286D1FA02D50AC1B00DB3C76 /* Models */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				286D1FBD2D50AC2D00DB3C76 /* Exceptions for "Models" folder in "MelodicStamp" target */,
+				286D1FBD2D50AC2D00DB3C76 /* Exceptions for "Models" folder in "Melodic Stamp" target */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -374,7 +374,7 @@
 			isa = PBXGroup;
 			children = (
 				65F1DA012CECCEE900389E37 /* Melodic Stamp.app */,
-				286D1F2F2D50A75D00DB3C76 /* MelodicStampTests.xctest */,
+				286D1F2F2D50A75D00DB3C76 /* Melodic Stamp Tests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -382,9 +382,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		286D1F2E2D50A75D00DB3C76 /* MelodicStampTests */ = {
+		286D1F2E2D50A75D00DB3C76 /* Melodic Stamp Tests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 286D1F352D50A75D00DB3C76 /* Build configuration list for PBXNativeTarget "MelodicStampTests" */;
+			buildConfigurationList = 286D1F352D50A75D00DB3C76 /* Build configuration list for PBXNativeTarget "Melodic Stamp Tests" */;
 			buildPhases = (
 				286D1F2B2D50A75D00DB3C76 /* Sources */,
 				286D1F2C2D50A75D00DB3C76 /* Frameworks */,
@@ -398,16 +398,16 @@
 			fileSystemSynchronizedGroups = (
 				286D1F302D50A75D00DB3C76 /* MelodicStampTests */,
 			);
-			name = MelodicStampTests;
+			name = "Melodic Stamp Tests";
 			packageProductDependencies = (
 			);
 			productName = MelodicStampTests;
-			productReference = 286D1F2F2D50A75D00DB3C76 /* MelodicStampTests.xctest */;
+			productReference = 286D1F2F2D50A75D00DB3C76 /* Melodic Stamp Tests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		65F1DA002CECCEE900389E37 /* MelodicStamp */ = {
+		65F1DA002CECCEE900389E37 /* Melodic Stamp */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 65F1DA102CECCEEB00389E37 /* Build configuration list for PBXNativeTarget "MelodicStamp" */;
+			buildConfigurationList = 65F1DA102CECCEEB00389E37 /* Build configuration list for PBXNativeTarget "Melodic Stamp" */;
 			buildPhases = (
 				65F1D9FD2CECCEE900389E37 /* Sources */,
 				65F1D9FE2CECCEE900389E37 /* Frameworks */,
@@ -423,7 +423,7 @@
 			fileSystemSynchronizedGroups = (
 				28BFA4D12CEE173A00448374 /* MelodicStamp */,
 			);
-			name = MelodicStamp;
+			name = "Melodic Stamp";
 			packageProductDependencies = (
 				65F1DA7C2CED77F100389E37 /* SFBAudioEngine */,
 				65F1DA832CED788D00389E37 /* CAAudioHardware */,
@@ -469,7 +469,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 65F1D9FC2CECCEE900389E37 /* Build configuration list for PBXProject "MelodicStamp" */;
+			buildConfigurationList = 65F1D9FC2CECCEE900389E37 /* Build configuration list for PBXProject "Melodic Stamp" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -500,8 +500,8 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				65F1DA002CECCEE900389E37 /* MelodicStamp */,
-				286D1F2E2D50A75D00DB3C76 /* MelodicStampTests */,
+				65F1DA002CECCEE900389E37 /* Melodic Stamp */,
+				286D1F2E2D50A75D00DB3C76 /* Melodic Stamp Tests */,
 			);
 		};
 /* End PBXProject section */
@@ -543,7 +543,7 @@
 /* Begin PBXTargetDependency section */
 		286D1F342D50A75D00DB3C76 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 65F1DA002CECCEE900389E37 /* MelodicStamp */;
+			target = 65F1DA002CECCEE900389E37 /* Melodic Stamp */;
 			targetProxy = 286D1F332D50A75D00DB3C76 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -728,7 +728,7 @@
 				DEVELOPMENT_TEAM = "";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = MelodicStampInfo.plist;
+				INFOPLIST_FILE = Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Melodic Stamp";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.music";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "© 2024→Future Cement Labs";
@@ -739,7 +739,7 @@
 				MARKETING_VERSION = alpha.1;
 				PRODUCT_BUNDLE_IDENTIFIER = labs.cement.MelodicStamp;
 				PRODUCT_MODULE_NAME = MelodicStamp;
-				PRODUCT_NAME = "Melodic Stamp";
+				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 			};
@@ -760,7 +760,7 @@
 				DEVELOPMENT_TEAM = "";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = MelodicStampInfo.plist;
+				INFOPLIST_FILE = Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Melodic Stamp";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.music";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "© 2024→Future Cement Labs";
@@ -771,7 +771,7 @@
 				MARKETING_VERSION = alpha.1;
 				PRODUCT_BUNDLE_IDENTIFIER = labs.cement.MelodicStamp;
 				PRODUCT_MODULE_NAME = MelodicStamp;
-				PRODUCT_NAME = "Melodic Stamp";
+				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 			};
@@ -780,7 +780,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		286D1F352D50A75D00DB3C76 /* Build configuration list for PBXNativeTarget "MelodicStampTests" */ = {
+		286D1F352D50A75D00DB3C76 /* Build configuration list for PBXNativeTarget "Melodic Stamp Tests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				286D1F362D50A75D00DB3C76 /* Debug */,
@@ -789,7 +789,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		65F1D9FC2CECCEE900389E37 /* Build configuration list for PBXProject "MelodicStamp" */ = {
+		65F1D9FC2CECCEE900389E37 /* Build configuration list for PBXProject "Melodic Stamp" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				65F1DA0E2CECCEEB00389E37 /* Debug */,
@@ -798,7 +798,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		65F1DA102CECCEEB00389E37 /* Build configuration list for PBXNativeTarget "MelodicStamp" */ = {
+		65F1DA102CECCEEB00389E37 /* Build configuration list for PBXNativeTarget "Melodic Stamp" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				65F1DA112CECCEEB00389E37 /* Debug */,

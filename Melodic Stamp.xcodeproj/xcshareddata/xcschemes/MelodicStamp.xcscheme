@@ -17,8 +17,8 @@
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "65F1DA002CECCEE900389E37"
                BuildableName = "Melodic Stamp.app"
-               BlueprintName = "MelodicStamp"
-               ReferencedContainer = "container:MelodicStamp.xcodeproj">
+               BlueprintName = "Melodic Stamp"
+               ReferencedContainer = "container:Melodic Stamp.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -36,9 +36,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "286D1F2E2D50A75D00DB3C76"
-               BuildableName = "MelodicStampTests.xctest"
-               BlueprintName = "MelodicStampTests"
-               ReferencedContainer = "container:MelodicStamp.xcodeproj">
+               BuildableName = "Melodic Stamp Tests.xctest"
+               BlueprintName = "Melodic Stamp Tests"
+               ReferencedContainer = "container:Melodic Stamp.xcodeproj">
             </BuildableReference>
          </TestableReference>
          <TestableReference
@@ -49,7 +49,7 @@
                BlueprintIdentifier = "286D1F5F2D50A93100DB3C76"
                BuildableName = "InterfaceTests.xctest"
                BlueprintName = "InterfaceTests"
-               ReferencedContainer = "container:MelodicStamp.xcodeproj">
+               ReferencedContainer = "container:Melodic Stamp.xcodeproj">
             </BuildableReference>
          </TestableReference>
          <TestableReference
@@ -60,7 +60,7 @@
                BlueprintIdentifier = "286D1FA72D50AC1B00DB3C76"
                BuildableName = "ModelsTests.xctest"
                BlueprintName = "ModelsTests"
-               ReferencedContainer = "container:MelodicStamp.xcodeproj">
+               ReferencedContainer = "container:Melodic Stamp.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
@@ -81,8 +81,8 @@
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "65F1DA002CECCEE900389E37"
             BuildableName = "Melodic Stamp.app"
-            BlueprintName = "MelodicStamp"
-            ReferencedContainer = "container:MelodicStamp.xcodeproj">
+            BlueprintName = "Melodic Stamp"
+            ReferencedContainer = "container:Melodic Stamp.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -98,8 +98,8 @@
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "65F1DA002CECCEE900389E37"
             BuildableName = "Melodic Stamp.app"
-            BlueprintName = "MelodicStamp"
-            ReferencedContainer = "container:MelodicStamp.xcodeproj">
+            BlueprintName = "Melodic Stamp"
+            ReferencedContainer = "container:Melodic Stamp.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>
