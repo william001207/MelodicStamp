@@ -25,12 +25,12 @@ struct SettingsDynamicTitleBarControl: View {
             }
         } label: {
             Text("Dynamic title bar")
-            Text(String(localized: .init(
+            Text(LocalizedStringResource(
                 "Settings Control (Dynamic Title Bar Control): (Subtitle) Dynamic Title Bar",
                 defaultValue: """
                 Displays the information of the currently playing track as window title.
                 """
-            )))
+            ))
         }
     }
 }

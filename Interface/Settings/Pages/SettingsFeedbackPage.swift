@@ -20,18 +20,23 @@ struct SettingsFeedbackPage: View {
             SettingsContributorsControl()
         } header: {
             Text("Contributors")
-            Text(String(localized: .init(
+            Text(LocalizedStringResource(
                 "Settings Page (Feedback): (Subtitle) Contributors",
                 defaultValue: """
                 We developed this app in our spare time. We are looking forward to your participation in bringing \(Bundle.main[localized: .displayName]) to perfection!
                 """
-            )))
+            ))
         }
 
         Section {
-            Text("Share your feedback on our GitHub page! Whether you find a bug or want to suggest a new feature, feel free to speak up. [Join Us in QQ…](https://qm.qq.com/q/BfAocvswuI)")
-                .font(.caption)
-                .foregroundStyle(.secondary)
+            Text(LocalizedStringResource(
+                "Settings Page (Feedback): Footer",
+                defaultValue: """
+                Share your feedback on our GitHub page! Whether you find a bug or want to suggest a new feature, feel free to speak up. [Join Us in QQ…](https://qm.qq.com/q/BfAocvswuI)
+                """
+            ))
+            .font(.caption)
+            .foregroundStyle(.secondary)
         } header: {
             Text("Feedback")
         } footer: {

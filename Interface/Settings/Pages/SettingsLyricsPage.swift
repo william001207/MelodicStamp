@@ -24,12 +24,12 @@ struct SettingsLyricsPage: View {
             SettingsLyricsAttachmentsControl()
         } header: {
             Text("Attachments & Type Size")
-            Text(String(localized: .init(
+            Text(LocalizedStringResource(
                 "Settings Page (Lyrics): (Subtitle) Attachments & Type Size",
                 defaultValue: """
                 While type size can be adjusted independently in the leaflet page, all changes of the below properties including type size will cause a reset in the lyrics view in order to obtain a correct visual effect.
                 """
-            )))
+            ))
         }
 
         Section {

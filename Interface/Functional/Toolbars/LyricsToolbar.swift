@@ -21,12 +21,12 @@ struct LyricsToolbar: ToolbarContent {
             } actions: {
                 Image(systemSymbol: .info)
                     .luminarePopover {
-                        Text(String(localized: .init(
+                        Text(LocalizedStringResource(
                             "Toolbar (Lyrics): (Popover) Information",
                             defaultValue: """
                             You can use [AMLL TTML Tool](https://steve-xmh.github.io/amll-ttml-tool) to create TTML lyrics through a refined interface.
                             """
-                        )))
+                        ))
                         .padding()
                     }
             }

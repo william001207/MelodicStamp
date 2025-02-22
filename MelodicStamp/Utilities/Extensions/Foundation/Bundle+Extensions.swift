@@ -19,14 +19,17 @@ extension Bundle {
 }
 
 extension Bundle {
+    static var invalidInfo: String {
+        "⚠️"
+    }
+
     subscript(localized key: Key) -> String {
-        String(localized: String.LocalizationValue(key.rawValue))
+        guard let localizedInfoDictionary else { return Self.invalidInfo }
+        return localizedInfoDictionary[key.rawValue] as? String ?? Self.invalidInfo
     }
 
     subscript(_ key: Key) -> String {
-        guard let infoDictionary else {
-            return "⚠️"
-        }
-        return infoDictionary[key.rawValue] as? String ?? "⚠️"
+        guard let infoDictionary else { return Self.invalidInfo }
+        return infoDictionary[key.rawValue] as? String ?? Self.invalidInfo
     }
 }

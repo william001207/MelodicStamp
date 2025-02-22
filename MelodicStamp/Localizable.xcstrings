@@ -757,23 +757,6 @@
         }
       }
     },
-    "CFBundleDisplayName" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Melodic Stamp"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "音律纹章"
-          }
-        }
-      }
-    },
     "Chroma" : {
       "localizations" : {
         "zh-Hans" : {
@@ -2807,7 +2790,7 @@
       }
     },
     "Settings Page (Feedback): Footer" : {
-      "extractionState" : "stale",
+      "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -2836,16 +2819,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "尽管文字大小可以在传单页面中单独调整，但对包含文字大小在内的以下属性进行的任何调整都会强制触发歌词视图的重置，以保证视觉效果的准确性。"
-          }
-        }
-      }
-    },
-    "Share your feedback on our GitHub page! Whether you find a bug or want to suggest a new feature, feel free to speak up. [Join Us in QQ…](https://qm.qq.com/q/BfAocvswuI)" : {
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "在我们的GitHub页面上分享你的反馈！无论你发现了漏洞还是想建议新功能，都请畅所欲言。[加入QQ群聊…](https://qm.qq.com/q/BfAocvswuI)"
           }
         }
       }

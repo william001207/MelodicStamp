@@ -132,7 +132,7 @@ struct DisplayLyricsRenderer<Animated>: TextRenderer where Animated: AnimatedStr
     }
 
     func draw(
-        slice: Text.Layout.RunSlice, index: Int,
+        slice: Text.Layout.RunSlice, index _: Int,
         beginTime: TimeInterval, endTime: TimeInterval,
         in context: inout GraphicsContext
     ) {
@@ -148,7 +148,7 @@ struct DisplayLyricsRenderer<Animated>: TextRenderer where Animated: AnimatedStr
         let filledWidth = bounds.width * progress
         // let liftAmount = lift * bentSigmoid(softenProgress)
 
-        let waveDelay = waveDelay * Double(index) - waveActivationDelay
+        // let waveDelay = waveDelay * Double(index) - waveActivationDelay
         // let timeToVowels = timeToVowels(at: elapsedTime - waveDelay)
 
         do {
