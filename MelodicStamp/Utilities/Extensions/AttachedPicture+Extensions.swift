@@ -78,7 +78,7 @@ enum AttachedPictureCategory: String, Hashable, Equatable, CaseIterable, Identif
 }
 
 extension AttachedPictureCategory: Comparable {
-    public static func < (lhs: AttachedPictureCategory, rhs: AttachedPictureCategory) -> Bool {
+    static func < (lhs: AttachedPictureCategory, rhs: AttachedPictureCategory) -> Bool {
         lhs.order < rhs.order
     }
 }

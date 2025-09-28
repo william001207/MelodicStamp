@@ -13,9 +13,9 @@ class RealtimeAnalyzer {
     private var fftSize: Int
     private lazy var fftSetup = vDSP_create_fftsetup(vDSP_Length(Int(round(log2(Double(fftSize))))), FFTRadix(kFFTRadix2))
 
-    public var frequencyBands: Int = 80 // Number of bands
-    public var startFrequency: Float = 80 // Initial frequency
-    public var endFrequency: Float = 18000 // Cutoff frequency
+    var frequencyBands: Int = 80 // Number of bands
+    var startFrequency: Float = 80 // Initial frequency
+    var endFrequency: Float = 18000 // Cutoff frequency
 
     @MainActor
     private lazy var bands: [(lowerFrequency: Float, upperFrequency: Float)] = {
@@ -37,7 +37,7 @@ class RealtimeAnalyzer {
     }()
 
     private var spectrumBuffer = [[Float]]()
-    public var spectrumSmooth: Float = 0.5 {
+    var spectrumSmooth: Float = 0.5 {
         didSet {
             spectrumSmooth = max(0.0, spectrumSmooth)
             spectrumSmooth = min(1.0, spectrumSmooth)
